@@ -1,6 +1,6 @@
-import { multipartFormRequestOptions, createForm } from 'runloop/core';
-import { Blob } from 'runloop/_shims/index';
-import { toFile } from 'runloop';
+import { multipartFormRequestOptions, createForm } from '@runloop/api-client/core';
+import { Blob } from '@runloop/api-client/_shims/index';
+import { toFile } from '@runloop/api-client';
 
 describe('form data validation', () => {
   test('valid values do not error', async () => {

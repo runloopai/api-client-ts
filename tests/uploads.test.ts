@@ -1,6 +1,6 @@
 import fs from 'fs';
-import { toFile, type ResponseLike } from 'runloop/uploads';
-import { File } from 'runloop/_shims/index';
+import { toFile, type ResponseLike } from '@runloop/api-client/uploads';
+import { File } from '@runloop/api-client/_shims/index';
 
 class MyClass {
   name: string = 'foo';

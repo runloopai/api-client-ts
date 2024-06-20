@@ -1,11 +1,11 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-import * as Core from '../../core';
-import { APIResource } from '../../resource';
-import * as FunctionsAPI from './functions';
-import * as Shared from '../shared';
-import * as OpenAPIAPI from './openapi';
-import * as InvocationsAPI from './invocations/invocations';
+import * as Core from '@runloop/api-client/core';
+import { APIResource } from '@runloop/api-client/resource';
+import * as FunctionsAPI from '@runloop/api-client/resources/functions/functions';
+import * as Shared from '@runloop/api-client/resources/shared';
+import * as OpenAPIAPI from '@runloop/api-client/resources/functions/openapi';
+import * as InvocationsAPI from '@runloop/api-client/resources/functions/invocations/invocations';
 
 export class Functions extends APIResource {
   invocations: InvocationsAPI.Invocations = new InvocationsAPI.Invocations(this._client);

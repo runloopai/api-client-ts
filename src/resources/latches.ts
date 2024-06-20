@@ -1,8 +1,8 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-import * as Core from '../core';
-import { APIResource } from '../resource';
-import * as LatchesAPI from './latches';
+import * as Core from '@runloop/api-client/core';
+import { APIResource } from '@runloop/api-client/resource';
+import * as LatchesAPI from '@runloop/api-client/resources/latches';
 
 export class Latches extends APIResource {
   /**
