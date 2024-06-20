@@ -1,5 +1,5 @@
-import { createResponseHeaders } from 'runloop/core';
-import { Headers } from 'runloop/_shims/index';
+import { createResponseHeaders } from '@runloop/api-client/core';
+import { Headers } from '@runloop/api-client/_shims/index';
 
 describe('response parsing', () => {
   // TODO: test unicode characters

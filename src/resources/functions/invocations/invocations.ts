@@ -1,10 +1,10 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-import * as Core from '../../../core';
-import { APIResource } from '../../../resource';
-import * as InvocationsAPI from './invocations';
-import * as Shared from '../../shared';
-import * as SpansAPI from './spans';
+import * as Core from '@runloop/api-client/core';
+import { APIResource } from '@runloop/api-client/resource';
+import * as InvocationsAPI from '@runloop/api-client/resources/functions/invocations/invocations';
+import * as Shared from '@runloop/api-client/resources/shared';
+import * as SpansAPI from '@runloop/api-client/resources/functions/invocations/spans';
 
 export class Invocations extends APIResource {
   spans: SpansAPI.Spans = new SpansAPI.Spans(this._client);

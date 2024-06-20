@@ -1,4 +1,4 @@
-import { APIClient } from 'runloop/core';
+import { APIClient } from '@runloop/api-client/core';
 
 const { stringifyQuery } = APIClient.prototype as any;
 

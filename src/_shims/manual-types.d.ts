@@ -4,8 +4,8 @@
 /**
  * Types will get added to this namespace when you import one of the following:
  *
- *   import 'runloop/shims/node'
- *   import 'runloop/shims/web'
+ *   import '@runloop/api-client/shims/node'
+ *   import '@runloop/api-client/shims/web'
  *
  * Importing more than one will cause type and runtime errors.
  */

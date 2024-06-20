@@ -1,9 +1,9 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-import * as Core from '../../../core';
-import { APIResource } from '../../../resource';
-import * as SessionsAPI from './sessions';
-import * as KvAPI from './kv';
+import * as Core from '@runloop/api-client/core';
+import { APIResource } from '@runloop/api-client/resource';
+import * as SessionsAPI from '@runloop/api-client/resources/sessions/sessions/sessions';
+import * as KvAPI from '@runloop/api-client/resources/sessions/sessions/kv';
 
 export class Sessions extends APIResource {
   kv: KvAPI.Kv = new KvAPI.Kv(this._client);
