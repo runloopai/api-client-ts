@@ -49,5 +49,4 @@ export namespace Sessions {
   export import SessionCreateParams = SessionsAPI.SessionCreateParams;
   export import Kv = KvAPI.Kv;
   export import SessionKv = KvAPI.SessionKv;
-  export import KvListParams = KvAPI.KvListParams;
 }
