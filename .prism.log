@@ -1,0 +1,215 @@
+[10:46:17 AM] › [CLI] …  awaiting  Starting Prism…
+[10:46:17 AM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/v1/code_handles
+[10:46:17 AM] › [CLI] ℹ  info      GET        http://127.0.0.1:4010/v1/code_handles
+[10:46:17 AM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/v1/devboxes
+[10:46:17 AM] › [CLI] ℹ  info      GET        http://127.0.0.1:4010/v1/devboxes
+[10:46:17 AM] › [CLI] ℹ  info      GET        http://127.0.0.1:4010/v1/devboxes/sit
+[10:46:17 AM] › [CLI] ℹ  info      GET        http://127.0.0.1:4010/v1/devboxes/totam/logs
+[10:46:17 AM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/v1/devboxes/aut/shutdown
+[10:46:17 AM] › [CLI] ℹ  info      GET        http://127.0.0.1:4010/v1/functions
+[10:46:17 AM] › [CLI] ℹ  info      GET        http://127.0.0.1:4010/v1/functions/invocations
+[10:46:17 AM] › [CLI] ℹ  info      GET        http://127.0.0.1:4010/v1/functions/invocations/id
+[10:46:17 AM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/v1/functions/invocations/quaerat/kill
+[10:46:17 AM] › [CLI] ℹ  info      GET        http://127.0.0.1:4010/v1/functions/invocations/in/spans
+[10:46:17 AM] › [CLI] ℹ  info      GET        http://127.0.0.1:4010/v1/functions/openapi
+[10:46:17 AM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/v1/functions/error/aperiam/invoke_async
+[10:46:17 AM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/v1/functions/aut/in/invoke_sync
+[10:46:17 AM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/v1/latches/voluptatem
+[10:46:17 AM] › [CLI] ℹ  info      GET        http://127.0.0.1:4010/v1/projects
+[10:46:17 AM] › [CLI] ℹ  info      GET        http://127.0.0.1:4010/v1/projects/numquam/logs
+[10:46:17 AM] › [CLI] ℹ  info      GET        http://127.0.0.1:4010/v1/sessions/sessions
+[10:46:17 AM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/v1/sessions/sessions
+[10:46:17 AM] › [CLI] ℹ  info      GET        http://127.0.0.1:4010/v1/sessions/sessions/voluptatem/kv
+[10:46:17 AM] › [CLI] ▶  start     Prism is listening on http://127.0.0.1:4010
+[10:46:17 AM] › [HTTP SERVER] get / ℹ  info      Request received
+[10:46:17 AM] › [HTTP SERVER] get / ✖  error     Request terminated with error: https://stoplight.io/prism/errors#NO_PATH_MATCHED_ERROR: Route not resolved, no path matched
+[10:46:19 AM] › [HTTP SERVER] get /v1/sessions/sessions/string/kv ℹ  info      Request received
+[10:46:19 AM] ›     [NEGOTIATOR] ℹ  info      Request contains an accept header: application/json
+[10:46:19 AM] ›     [VALIDATOR] ✔  success   The request passed the validation rules. Looking for the best response
+[10:46:19 AM] ›     [NEGOTIATOR] ✔  success   Found a compatible content for application/json
+[10:46:19 AM] ›     [NEGOTIATOR] ✔  success   Responding with the requested status code 200
+[10:46:19 AM] ›     [NEGOTIATOR] ℹ  info      > Responding with "200"
+[10:46:19 AM] › [HTTP SERVER] get /_stainless_unknown_path ℹ  info      Request received
+[10:46:19 AM] › [HTTP SERVER] get /_stainless_unknown_path ✖  error     Request terminated with error: https://stoplight.io/prism/errors#NO_PATH_MATCHED_ERROR: Route not resolved, no path matched
+[10:46:19 AM] › [HTTP SERVER] get /_stainless_unknown_path ℹ  info      Request received
+[10:46:19 AM] › [HTTP SERVER] get /_stainless_unknown_path ✖  error     Request terminated with error: https://stoplight.io/prism/errors#NO_PATH_MATCHED_ERROR: Route not resolved, no path matched
+[10:46:19 AM] › [HTTP SERVER] post /v1/sessions/sessions ℹ  info      Request received
+[10:46:19 AM] ›     [NEGOTIATOR] ℹ  info      Request contains an accept header: application/json
+[10:46:19 AM] ›     [VALIDATOR] ✔  success   The request passed the validation rules. Looking for the best response
+[10:46:19 AM] ›     [NEGOTIATOR] ✔  success   Found a compatible content for application/json
+[10:46:19 AM] ›     [NEGOTIATOR] ✔  success   Responding with the requested status code 200
+[10:46:19 AM] ›     [NEGOTIATOR] ℹ  info      > Responding with "200"
+[10:46:19 AM] › [HTTP SERVER] post /_stainless_unknown_path ℹ  info      Request received
+[10:46:19 AM] › [HTTP SERVER] post /_stainless_unknown_path ✖  error     Request terminated with error: https://stoplight.io/prism/errors#NO_PATH_MATCHED_ERROR: Route not resolved, no path matched
+[10:46:19 AM] › [HTTP SERVER] get /v1/sessions/sessions ℹ  info      Request received
+[10:46:19 AM] ›     [NEGOTIATOR] ℹ  info      Request contains an accept header: application/json
+[10:46:19 AM] ›     [VALIDATOR] ✔  success   The request passed the validation rules. Looking for the best response
+[10:46:19 AM] ›     [NEGOTIATOR] ✔  success   Found a compatible content for application/json
+[10:46:19 AM] ›     [NEGOTIATOR] ✔  success   Responding with the requested status code 200
+[10:46:19 AM] ›     [NEGOTIATOR] ℹ  info      > Responding with "200"
+[10:46:19 AM] › [HTTP SERVER] get /_stainless_unknown_path ℹ  info      Request received
+[10:46:19 AM] › [HTTP SERVER] get /_stainless_unknown_path ✖  error     Request terminated with error: https://stoplight.io/prism/errors#NO_PATH_MATCHED_ERROR: Route not resolved, no path matched
+[10:46:19 AM] › [HTTP SERVER] get /v1/functions/openapi ℹ  info      Request received
+[10:46:19 AM] ›     [NEGOTIATOR] ℹ  info      Request contains an accept header: application/json
+[10:46:19 AM] ›     [VALIDATOR] ✔  success   The request passed the validation rules. Looking for the best response
+[10:46:19 AM] ›     [NEGOTIATOR] ✔  success   Found a compatible content for application/json
+[10:46:19 AM] ›     [NEGOTIATOR] ✔  success   Responding with the requested status code 200
+[10:46:19 AM] ›     [NEGOTIATOR] ℹ  info      > Responding with "200"
+[10:46:19 AM] › [HTTP SERVER] get /_stainless_unknown_path ℹ  info      Request received
+[10:46:19 AM] › [HTTP SERVER] get /_stainless_unknown_path ✖  error     Request terminated with error: https://stoplight.io/prism/errors#NO_PATH_MATCHED_ERROR: Route not resolved, no path matched
+[10:46:19 AM] › [HTTP SERVER] get /v1/functions/invocations/string/spans ℹ  info      Request received
+[10:46:19 AM] ›     [NEGOTIATOR] ℹ  info      Request contains an accept header: application/json
+[10:46:19 AM] ›     [VALIDATOR] ✔  success   The request passed the validation rules. Looking for the best response
+[10:46:19 AM] ›     [NEGOTIATOR] ✔  success   Found a compatible content for application/json
+[10:46:19 AM] ›     [NEGOTIATOR] ✔  success   Responding with the requested status code 200
+[10:46:19 AM] ›     [NEGOTIATOR] ℹ  info      > Responding with "200"
+[10:46:19 AM] › [HTTP SERVER] get /_stainless_unknown_path ℹ  info      Request received
+[10:46:19 AM] › [HTTP SERVER] get /_stainless_unknown_path ✖  error     Request terminated with error: https://stoplight.io/prism/errors#NO_PATH_MATCHED_ERROR: Route not resolved, no path matched
+[10:46:19 AM] › [HTTP SERVER] post /v1/devboxes ℹ  info      Request received
+[10:46:19 AM] ›     [NEGOTIATOR] ℹ  info      Request contains an accept header: application/json
+[10:46:19 AM] ›     [VALIDATOR] ✔  success   The request passed the validation rules. Looking for the best response
+[10:46:19 AM] ›     [NEGOTIATOR] ✔  success   Found a compatible content for application/json
+[10:46:19 AM] ›     [NEGOTIATOR] ✔  success   Responding with the requested status code 200
+[10:46:19 AM] ›     [NEGOTIATOR] ℹ  info      > Responding with "200"
+[10:46:19 AM] › [HTTP SERVER] post /_stainless_unknown_path ℹ  info      Request received
+[10:46:19 AM] › [HTTP SERVER] post /_stainless_unknown_path ✖  error     Request terminated with error: https://stoplight.io/prism/errors#NO_PATH_MATCHED_ERROR: Route not resolved, no path matched
+[10:46:19 AM] › [HTTP SERVER] post /_stainless_unknown_path ℹ  info      Request received
+[10:46:19 AM] › [HTTP SERVER] post /_stainless_unknown_path ✖  error     Request terminated with error: https://stoplight.io/prism/errors#NO_PATH_MATCHED_ERROR: Route not resolved, no path matched
+[10:46:19 AM] › [HTTP SERVER] get /v1/devboxes/string ℹ  info      Request received
+[10:46:19 AM] ›     [NEGOTIATOR] ℹ  info      Request contains an accept header: application/json
+[10:46:19 AM] ›     [VALIDATOR] ✔  success   The request passed the validation rules. Looking for the best response
+[10:46:19 AM] ›     [NEGOTIATOR] ✔  success   Found a compatible content for application/json
+[10:46:19 AM] ›     [NEGOTIATOR] ✔  success   Responding with the requested status code 200
+[10:46:19 AM] ›     [NEGOTIATOR] ℹ  info      > Responding with "200"
+[10:46:19 AM] › [HTTP SERVER] get /_stainless_unknown_path ℹ  info      Request received
+[10:46:19 AM] › [HTTP SERVER] get /_stainless_unknown_path ✖  error     Request terminated with error: https://stoplight.io/prism/errors#NO_PATH_MATCHED_ERROR: Route not resolved, no path matched
+[10:46:19 AM] › [HTTP SERVER] get /v1/devboxes ℹ  info      Request received
+[10:46:19 AM] ›     [NEGOTIATOR] ℹ  info      Request contains an accept header: application/json
+[10:46:19 AM] ›     [VALIDATOR] ✔  success   The request passed the validation rules. Looking for the best response
+[10:46:19 AM] ›     [NEGOTIATOR] ✔  success   Found a compatible content for application/json
+[10:46:19 AM] ›     [NEGOTIATOR] ✔  success   Responding with the requested status code 200
+[10:46:19 AM] ›     [NEGOTIATOR] ℹ  info      > Responding with "200"
+[10:46:19 AM] › [HTTP SERVER] get /_stainless_unknown_path ℹ  info      Request received
+[10:46:19 AM] › [HTTP SERVER] get /_stainless_unknown_path ✖  error     Request terminated with error: https://stoplight.io/prism/errors#NO_PATH_MATCHED_ERROR: Route not resolved, no path matched
+[10:46:19 AM] › [HTTP SERVER] get /_stainless_unknown_path ℹ  info      Request received
+[10:46:19 AM] › [HTTP SERVER] get /_stainless_unknown_path ✖  error     Request terminated with error: https://stoplight.io/prism/errors#NO_PATH_MATCHED_ERROR: Route not resolved, no path matched
+[10:46:19 AM] › [HTTP SERVER] post /v1/devboxes/string/shutdown ℹ  info      Request received
+[10:46:19 AM] ›     [NEGOTIATOR] ℹ  info      Request contains an accept header: application/json
+[10:46:19 AM] ›     [VALIDATOR] ✔  success   The request passed the validation rules. Looking for the best response
+[10:46:19 AM] ›     [NEGOTIATOR] ✔  success   Found a compatible content for application/json
+[10:46:19 AM] ›     [NEGOTIATOR] ✔  success   Responding with the requested status code 200
+[10:46:19 AM] ›     [NEGOTIATOR] ℹ  info      > Responding with "200"
+[10:46:19 AM] › [HTTP SERVER] post /_stainless_unknown_path ℹ  info      Request received
+[10:46:19 AM] › [HTTP SERVER] post /_stainless_unknown_path ✖  error     Request terminated with error: https://stoplight.io/prism/errors#NO_PATH_MATCHED_ERROR: Route not resolved, no path matched
+[10:46:19 AM] › [HTTP SERVER] get /v1/functions/invocations/string ℹ  info      Request received
+[10:46:19 AM] ›     [NEGOTIATOR] ℹ  info      Request contains an accept header: application/json
+[10:46:19 AM] ›     [VALIDATOR] ✔  success   The request passed the validation rules. Looking for the best response
+[10:46:19 AM] ›     [NEGOTIATOR] ✔  success   Found a compatible content for application/json
+[10:46:19 AM] ›     [NEGOTIATOR] ✔  success   Responding with the requested status code 200
+[10:46:19 AM] ›     [NEGOTIATOR] ℹ  info      > Responding with "200"
+[10:46:19 AM] › [HTTP SERVER] get /_stainless_unknown_path ℹ  info      Request received
+[10:46:19 AM] › [HTTP SERVER] get /_stainless_unknown_path ✖  error     Request terminated with error: https://stoplight.io/prism/errors#NO_PATH_MATCHED_ERROR: Route not resolved, no path matched
+[10:46:19 AM] › [HTTP SERVER] get /v1/functions/invocations ℹ  info      Request received
+[10:46:19 AM] ›     [NEGOTIATOR] ℹ  info      Request contains an accept header: application/json
+[10:46:19 AM] ›     [VALIDATOR] ✔  success   The request passed the validation rules. Looking for the best response
+[10:46:19 AM] ›     [NEGOTIATOR] ✔  success   Found a compatible content for application/json
+[10:46:19 AM] ›     [NEGOTIATOR] ✔  success   Responding with the requested status code 200
+[10:46:19 AM] ›     [NEGOTIATOR] ℹ  info      > Responding with "200"
+[10:46:19 AM] › [HTTP SERVER] get /_stainless_unknown_path ℹ  info      Request received
+[10:46:19 AM] › [HTTP SERVER] get /_stainless_unknown_path ✖  error     Request terminated with error: https://stoplight.io/prism/errors#NO_PATH_MATCHED_ERROR: Route not resolved, no path matched
+[10:46:19 AM] › [HTTP SERVER] post /v1/functions/invocations/string/kill ℹ  info      Request received
+[10:46:19 AM] ›     [NEGOTIATOR] ℹ  info      Request contains an accept header: application/json
+[10:46:19 AM] ›     [VALIDATOR] ✔  success   The request passed the validation rules. Looking for the best response
+[10:46:19 AM] ›     [NEGOTIATOR] ✔  success   Found a compatible content for application/json
+[10:46:19 AM] ›     [NEGOTIATOR] ✔  success   Responding with the requested status code 200
+[10:46:19 AM] ›     [NEGOTIATOR] ℹ  info      > Responding with "200"
+[10:46:19 AM] › [HTTP SERVER] post /_stainless_unknown_path ℹ  info      Request received
+[10:46:19 AM] › [HTTP SERVER] post /_stainless_unknown_path ✖  error     Request terminated with error: https://stoplight.io/prism/errors#NO_PATH_MATCHED_ERROR: Route not resolved, no path matched
+[10:46:19 AM] › [HTTP SERVER] get /v1/projects ℹ  info      Request received
+[10:46:19 AM] ›     [NEGOTIATOR] ℹ  info      Request contains an accept header: application/json
+[10:46:19 AM] ›     [VALIDATOR] ✔  success   The request passed the validation rules. Looking for the best response
+[10:46:19 AM] ›     [NEGOTIATOR] ✔  success   Found a compatible content for application/json
+[10:46:19 AM] ›     [NEGOTIATOR] ✔  success   Responding with the requested status code 200
+[10:46:19 AM] ›     [NEGOTIATOR] ℹ  info      > Responding with "200"
+[10:46:19 AM] › [HTTP SERVER] get /_stainless_unknown_path ℹ  info      Request received
+[10:46:19 AM] › [HTTP SERVER] get /_stainless_unknown_path ✖  error     Request terminated with error: https://stoplight.io/prism/errors#NO_PATH_MATCHED_ERROR: Route not resolved, no path matched
+[10:46:19 AM] › [HTTP SERVER] get /v1/projects/string/logs ℹ  info      Request received
+[10:46:19 AM] ›     [NEGOTIATOR] ℹ  info      Request contains an accept header: application/json
+[10:46:19 AM] ›     [VALIDATOR] ✔  success   The request passed the validation rules. Looking for the best response
+[10:46:19 AM] ›     [NEGOTIATOR] ✔  success   Found a compatible content for application/json
+[10:46:19 AM] ›     [NEGOTIATOR] ✔  success   Responding with the requested status code 200
+[10:46:19 AM] ›     [NEGOTIATOR] ℹ  info      > Responding with "200"
+[10:46:19 AM] › [HTTP SERVER] get /_stainless_unknown_path ℹ  info      Request received
+[10:46:19 AM] › [HTTP SERVER] get /_stainless_unknown_path ✖  error     Request terminated with error: https://stoplight.io/prism/errors#NO_PATH_MATCHED_ERROR: Route not resolved, no path matched
+[10:46:19 AM] › [HTTP SERVER] get /v1/functions ℹ  info      Request received
+[10:46:19 AM] ›     [NEGOTIATOR] ℹ  info      Request contains an accept header: application/json
+[10:46:19 AM] ›     [VALIDATOR] ✔  success   The request passed the validation rules. Looking for the best response
+[10:46:19 AM] ›     [NEGOTIATOR] ✔  success   Found a compatible content for application/json
+[10:46:19 AM] ›     [NEGOTIATOR] ✔  success   Responding with the requested status code 200
+[10:46:19 AM] ›     [NEGOTIATOR] ℹ  info      > Responding with "200"
+[10:46:19 AM] › [HTTP SERVER] get /_stainless_unknown_path ℹ  info      Request received
+[10:46:19 AM] › [HTTP SERVER] get /_stainless_unknown_path ✖  error     Request terminated with error: https://stoplight.io/prism/errors#NO_PATH_MATCHED_ERROR: Route not resolved, no path matched
+[10:46:19 AM] › [HTTP SERVER] post /v1/functions/string/string/invoke_async ℹ  info      Request received
+[10:46:19 AM] ›     [NEGOTIATOR] ℹ  info      Request contains an accept header: application/json
+[10:46:19 AM] ›     [VALIDATOR] ✔  success   The request passed the validation rules. Looking for the best response
+[10:46:19 AM] ›     [NEGOTIATOR] ✔  success   Found a compatible content for application/json
+[10:46:19 AM] ›     [NEGOTIATOR] ✔  success   Responding with the requested status code 200
+[10:46:19 AM] ›     [NEGOTIATOR] ℹ  info      > Responding with "200"
+[10:46:19 AM] › [HTTP SERVER] post /v1/functions/string/string/invoke_async ℹ  info      Request received
+[10:46:19 AM] ›     [NEGOTIATOR] ℹ  info      Request contains an accept header: application/json
+[10:46:19 AM] ›     [VALIDATOR] ✔  success   The request passed the validation rules. Looking for the best response
+[10:46:19 AM] ›     [NEGOTIATOR] ✔  success   Found a compatible content for application/json
+[10:46:19 AM] ›     [NEGOTIATOR] ✔  success   Responding with the requested status code 200
+[10:46:19 AM] ›     [NEGOTIATOR] ℹ  info      > Responding with "200"
+[10:46:19 AM] › [HTTP SERVER] post /v1/functions/string/string/invoke_sync ℹ  info      Request received
+[10:46:19 AM] ›     [NEGOTIATOR] ℹ  info      Request contains an accept header: application/json
+[10:46:19 AM] ›     [VALIDATOR] ✔  success   The request passed the validation rules. Looking for the best response
+[10:46:19 AM] ›     [NEGOTIATOR] ✔  success   Found a compatible content for application/json
+[10:46:19 AM] ›     [NEGOTIATOR] ✔  success   Responding with the requested status code 200
+[10:46:19 AM] ›     [NEGOTIATOR] ℹ  info      > Responding with "200"
+[10:46:19 AM] › [HTTP SERVER] post /v1/functions/string/string/invoke_sync ℹ  info      Request received
+[10:46:19 AM] ›     [NEGOTIATOR] ℹ  info      Request contains an accept header: application/json
+[10:46:19 AM] ›     [VALIDATOR] ✔  success   The request passed the validation rules. Looking for the best response
+[10:46:19 AM] ›     [NEGOTIATOR] ✔  success   Found a compatible content for application/json
+[10:46:19 AM] ›     [NEGOTIATOR] ✔  success   Responding with the requested status code 200
+[10:46:19 AM] ›     [NEGOTIATOR] ℹ  info      > Responding with "200"
+[10:46:19 AM] › [HTTP SERVER] get /v1/devboxes/string/logs ℹ  info      Request received
+[10:46:19 AM] ›     [NEGOTIATOR] ℹ  info      Request contains an accept header: application/json
+[10:46:19 AM] ›     [VALIDATOR] ✔  success   The request passed the validation rules. Looking for the best response
+[10:46:19 AM] ›     [NEGOTIATOR] ✔  success   Found a compatible content for application/json
+[10:46:19 AM] ›     [NEGOTIATOR] ✔  success   Responding with the requested status code 200
+[10:46:19 AM] ›     [NEGOTIATOR] ℹ  info      > Responding with "200"
+[10:46:19 AM] › [HTTP SERVER] get /_stainless_unknown_path ℹ  info      Request received
+[10:46:19 AM] › [HTTP SERVER] get /_stainless_unknown_path ✖  error     Request terminated with error: https://stoplight.io/prism/errors#NO_PATH_MATCHED_ERROR: Route not resolved, no path matched
+[10:46:19 AM] › [HTTP SERVER] post /v1/code_handles ℹ  info      Request received
+[10:46:19 AM] ›     [NEGOTIATOR] ℹ  info      Request contains an accept header: application/json
+[10:46:19 AM] ›     [VALIDATOR] ✔  success   The request passed the validation rules. Looking for the best response
+[10:46:19 AM] ›     [NEGOTIATOR] ✔  success   Found a compatible content for application/json
+[10:46:19 AM] ›     [NEGOTIATOR] ✔  success   Responding with the requested status code 200
+[10:46:19 AM] ›     [NEGOTIATOR] ℹ  info      > Responding with "200"
+[10:46:19 AM] › [HTTP SERVER] post /_stainless_unknown_path ℹ  info      Request received
+[10:46:19 AM] › [HTTP SERVER] post /_stainless_unknown_path ✖  error     Request terminated with error: https://stoplight.io/prism/errors#NO_PATH_MATCHED_ERROR: Route not resolved, no path matched
+[10:46:19 AM] › [HTTP SERVER] post /_stainless_unknown_path ℹ  info      Request received
+[10:46:19 AM] › [HTTP SERVER] post /_stainless_unknown_path ✖  error     Request terminated with error: https://stoplight.io/prism/errors#NO_PATH_MATCHED_ERROR: Route not resolved, no path matched
+[10:46:19 AM] › [HTTP SERVER] get /v1/code_handles ℹ  info      Request received
+[10:46:19 AM] ›     [NEGOTIATOR] ℹ  info      Request contains an accept header: application/json
+[10:46:19 AM] ›     [VALIDATOR] ✔  success   The request passed the validation rules. Looking for the best response
+[10:46:19 AM] ›     [NEGOTIATOR] ✔  success   Found a compatible content for application/json
+[10:46:19 AM] ›     [NEGOTIATOR] ✔  success   Responding with the requested status code 200
+[10:46:19 AM] ›     [NEGOTIATOR] ℹ  info      > Responding with "200"
+[10:46:19 AM] › [HTTP SERVER] get /_stainless_unknown_path ℹ  info      Request received
+[10:46:19 AM] › [HTTP SERVER] get /_stainless_unknown_path ✖  error     Request terminated with error: https://stoplight.io/prism/errors#NO_PATH_MATCHED_ERROR: Route not resolved, no path matched
+[10:46:19 AM] › [HTTP SERVER] get /_stainless_unknown_path ℹ  info      Request received
+[10:46:19 AM] › [HTTP SERVER] get /_stainless_unknown_path ✖  error     Request terminated with error: https://stoplight.io/prism/errors#NO_PATH_MATCHED_ERROR: Route not resolved, no path matched
+[10:46:19 AM] › [HTTP SERVER] post /v1/latches/string ℹ  info      Request received
+[10:46:19 AM] ›     [NEGOTIATOR] ℹ  info      Request contains an accept header: application/json
+[10:46:19 AM] ›     [VALIDATOR] ✔  success   The request passed the validation rules. Looking for the best response
+[10:46:19 AM] ›     [NEGOTIATOR] ✔  success   Found a compatible content for application/json
+[10:46:19 AM] ›     [NEGOTIATOR] ✔  success   Responding with the requested status code 200
+[10:46:19 AM] ›     [NEGOTIATOR] ℹ  info      > Responding with "200"
+[10:46:19 AM] › [HTTP SERVER] post /v1/latches/string ℹ  info      Request received
+[10:46:19 AM] ›     [NEGOTIATOR] ℹ  info      Request contains an accept header: application/json
+[10:46:19 AM] ›     [VALIDATOR] ✔  success   The request passed the validation rules. Looking for the best response
+[10:46:19 AM] ›     [NEGOTIATOR] ✔  success   Found a compatible content for application/json
+[10:46:19 AM] ›     [NEGOTIATOR] ✔  success   Responding with the requested status code 200
+[10:46:19 AM] ›     [NEGOTIATOR] ℹ  info      > Responding with "200"
