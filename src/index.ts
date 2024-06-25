@@ -182,12 +182,9 @@ export namespace Runloop {
   export import RequestOptions = Core.RequestOptions;
 
   export import CodeHandles = API.CodeHandles;
-  export import CodeHandleListView = API.CodeHandleListView;
-  export import CodeHandleView = API.CodeHandleView;
-  export import CodeHandleCreateParams = API.CodeHandleCreateParams;
-  export import CodeHandleListParams = API.CodeHandleListParams;
 
   export import Devboxes = API.Devboxes;
+  export import DevboxExecutionDetailView = API.DevboxExecutionDetailView;
   export import DevboxListView = API.DevboxListView;
   export import DevboxView = API.DevboxView;
   export import DevboxCreateParams = API.DevboxCreateParams;
@@ -201,7 +198,6 @@ export namespace Runloop {
   export import Projects = API.Projects;
   export import ProjectListView = API.ProjectListView;
 
-  export import EmptyRecord = API.EmptyRecord;
   export import FunctionInvocationDetailView = API.FunctionInvocationDetailView;
   export import ProjectLogsView = API.ProjectLogsView;
 }

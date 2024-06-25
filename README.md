@@ -30,9 +30,9 @@ const runloop = new Runloop({
 });
 
 async function main() {
-  const codeHandleView = await runloop.codeHandles.create();
+  const devboxView = await runloop.devboxes.create();
 
-  console.log(codeHandleView.id);
+  console.log(devboxView.id);
 }
 
 main();
@@ -51,7 +51,7 @@ const runloop = new Runloop({
 });
 
 async function main() {
-  const codeHandleView: Runloop.CodeHandleView = await runloop.codeHandles.create();
+  const devboxView: Runloop.DevboxView = await runloop.devboxes.create();
 }
 
 main();
@@ -68,7 +68,7 @@ a subclass of `APIError` will be thrown:
 <!-- prettier-ignore -->
 ```ts
 async function main() {
-  const codeHandleView = await runloop.codeHandles.create().catch(async (err) => {
+  const devboxView = await runloop.devboxes.create().catch(async (err) => {
     if (err instanceof Runloop.APIError) {
       console.log(err.status); // 400
       console.log(err.name); // BadRequestError
@@ -111,7 +111,7 @@ const runloop = new Runloop({
 });
 
 // Or, configure per-request:
-await runloop.codeHandles.create({
+await runloop.devboxes.create({
   maxRetries: 5,
 });
 ```
@@ -128,7 +128,7 @@ const runloop = new Runloop({
 });
 
 // Override per-request:
-await runloop.codeHandles.create({
+await runloop.devboxes.create({
   timeout: 5 * 1000,
 });
 ```
@@ -149,13 +149,13 @@ You can also use the `.withResponse()` method to get the raw `Response` along wi
 ```ts
 const runloop = new Runloop();
 
-const response = await runloop.codeHandles.create().asResponse();
+const response = await runloop.devboxes.create().asResponse();
 console.log(response.headers.get('X-My-Header'));
 console.log(response.statusText); // access the underlying Response object
 
-const { data: codeHandleView, response: raw } = await runloop.codeHandles.create().withResponse();
+const { data: devboxView, response: raw } = await runloop.devboxes.create().withResponse();
 console.log(raw.headers.get('X-My-Header'));
-console.log(codeHandleView.id);
+console.log(devboxView.id);
 ```
 
 ### Making custom/undocumented requests
@@ -259,7 +259,7 @@ const runloop = new Runloop({
 });
 
 // Override per-request:
-await runloop.codeHandles.create({
+await runloop.devboxes.create({
   httpAgent: new http.Agent({ keepAlive: false }),
 });
 ```
