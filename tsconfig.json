@@ -9,9 +9,9 @@
     "esModuleInterop": true,
     "baseUrl": "./",
     "paths": {
-      "@runloop/api-client/_shims/auto/*": ["src/_shims/auto/*-node"],
-      "@runloop/api-client/*": ["src/*"],
-      "@runloop/api-client": ["src/index.ts"],
+      "runloop/_shims/auto/*": ["src/_shims/auto/*-node"],
+      "runloop/*": ["src/*"],
+      "runloop": ["src/index.ts"],
     },
     "noEmit": true,
 

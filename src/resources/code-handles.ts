@@ -1,21 +1,21 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-import { APIResource } from '@runloop/api-client/resource';
-import { isRequestOptions } from '@runloop/api-client/core';
-import * as Core from '@runloop/api-client/core';
-import * as CodeHandlesAPI from '@runloop/api-client/resources/code-handles';
+import { APIResource } from '../resource';
+import { isRequestOptions } from '../core';
+import * as Core from '../core';
+import * as CodeHandlesAPI from './code-handles';
 
 export class CodeHandles extends APIResource {
   /**
    * Create a new code handle for a given repository. This can be referenced in other
    * parts of the system to refer to a specific version of a repository.
    */
-  create(body?: CodeHandleCreateParams, options?: Core.RequestOptions): Core.APIPromise<CodeHandle>;
-  create(options?: Core.RequestOptions): Core.APIPromise<CodeHandle>;
+  create(body?: CodeHandleCreateParams, options?: Core.RequestOptions): Core.APIPromise<CodeHandleView>;
+  create(options?: Core.RequestOptions): Core.APIPromise<CodeHandleView>;
   create(
     body: CodeHandleCreateParams | Core.RequestOptions = {},
     options?: Core.RequestOptions,
-  ): Core.APIPromise<CodeHandle> {
+  ): Core.APIPromise<CodeHandleView> {
     if (isRequestOptions(body)) {
       return this.create({}, body);
     }
@@ -25,12 +25,12 @@ export class CodeHandles extends APIResource {
   /**
    * List the code handles that are available for use.
    */
-  list(query?: CodeHandleListParams, options?: Core.RequestOptions): Core.APIPromise<CodeHandleList>;
-  list(options?: Core.RequestOptions): Core.APIPromise<CodeHandleList>;
+  list(query?: CodeHandleListParams, options?: Core.RequestOptions): Core.APIPromise<CodeHandleListView>;
+  list(options?: Core.RequestOptions): Core.APIPromise<CodeHandleListView>;
   list(
     query: CodeHandleListParams | Core.RequestOptions = {},
     options?: Core.RequestOptions,
-  ): Core.APIPromise<CodeHandleList> {
+  ): Core.APIPromise<CodeHandleListView> {
     if (isRequestOptions(query)) {
       return this.list({}, query);
     }
@@ -38,7 +38,14 @@ export class CodeHandles extends APIResource {
   }
 }
 
-export interface CodeHandle {
+export interface CodeHandleListView {
+  /**
+   * List of code handles matching given query.
+   */
+  code_handles?: Array<CodeHandleView>;
+}
+
+export interface CodeHandleView {
   /**
    * The id of the CodeHandle.
    */
@@ -58,13 +65,6 @@ export interface CodeHandle {
    * The name of the source repository.
    */
   repo_name?: string;
-}
-
-export interface CodeHandleList {
-  /**
-   * List of code handles matching given query.
-   */
-  code_handles?: Array<CodeHandle>;
 }
 
 export interface CodeHandleCreateParams {
@@ -102,8 +102,8 @@ export interface CodeHandleListParams {
 }
 
 export namespace CodeHandles {
-  export import CodeHandle = CodeHandlesAPI.CodeHandle;
-  export import CodeHandleList = CodeHandlesAPI.CodeHandleList;
+  export import CodeHandleListView = CodeHandlesAPI.CodeHandleListView;
+  export import CodeHandleView = CodeHandlesAPI.CodeHandleView;
   export import CodeHandleCreateParams = CodeHandlesAPI.CodeHandleCreateParams;
   export import CodeHandleListParams = CodeHandlesAPI.CodeHandleListParams;
 }

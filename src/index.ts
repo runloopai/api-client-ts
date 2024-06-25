@@ -3,8 +3,8 @@
 import * as Errors from './error';
 import * as Uploads from './uploads';
 import { type Agent } from './_shims/index';
-import * as Core from '@runloop/api-client/core';
-import * as API from '@runloop/api-client/resources/index';
+import * as Core from './core';
+import * as API from './resources/index';
 
 export interface ClientOptions {
   /**
@@ -122,9 +122,7 @@ export class Runloop extends Core.APIClient {
   codeHandles: API.CodeHandles = new API.CodeHandles(this);
   devboxes: API.Devboxes = new API.Devboxes(this);
   functions: API.Functions = new API.Functions(this);
-  latches: API.Latches = new API.Latches(this);
   projects: API.Projects = new API.Projects(this);
-  sessions: API.Sessions = new API.Sessions(this);
 
   protected override defaultQuery(): Core.DefaultQuery | undefined {
     return this._options.defaultQuery;
@@ -184,30 +182,29 @@ export namespace Runloop {
   export import RequestOptions = Core.RequestOptions;
 
   export import CodeHandles = API.CodeHandles;
-  export import CodeHandle = API.CodeHandle;
-  export import CodeHandleList = API.CodeHandleList;
+  export import CodeHandleListView = API.CodeHandleListView;
+  export import CodeHandleView = API.CodeHandleView;
   export import CodeHandleCreateParams = API.CodeHandleCreateParams;
   export import CodeHandleListParams = API.CodeHandleListParams;
 
   export import Devboxes = API.Devboxes;
-  export import Devbox = API.Devbox;
-  export import DevboxList = API.DevboxList;
+  export import DevboxExecutionDetailView = API.DevboxExecutionDetailView;
+  export import DevboxListView = API.DevboxListView;
+  export import DevboxView = API.DevboxView;
   export import DevboxCreateParams = API.DevboxCreateParams;
   export import DevboxListParams = API.DevboxListParams;
 
   export import Functions = API.Functions;
-  export import FunctionList = API.FunctionList;
-
-  export import Latches = API.Latches;
-  export import EmptyRecord = API.EmptyRecord;
-  export import LatchFulfillParams = API.LatchFulfillParams;
+  export import FunctionListView = API.FunctionListView;
+  export import FunctionInvokeAsyncParams = API.FunctionInvokeAsyncParams;
+  export import FunctionInvokeSyncParams = API.FunctionInvokeSyncParams;
 
   export import Projects = API.Projects;
-  export import ProjectList = API.ProjectList;
+  export import ProjectListView = API.ProjectListView;
 
-  export import Sessions = API.Sessions;
-
-  export import FunctionInvocationDetail = API.FunctionInvocationDetail;
+  export import EmptyRecord = API.EmptyRecord;
+  export import FunctionInvocationDetailView = API.FunctionInvocationDetailView;
+  export import ProjectLogsView = API.ProjectLogsView;
 }
 
 export default Runloop;

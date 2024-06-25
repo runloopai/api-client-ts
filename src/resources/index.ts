@@ -2,14 +2,24 @@
 
 export * from './shared';
 export {
-  CodeHandle,
-  CodeHandleList,
+  CodeHandleListView,
+  CodeHandleView,
   CodeHandleCreateParams,
   CodeHandleListParams,
   CodeHandles,
 } from './code-handles';
-export { Devbox, DevboxList, DevboxCreateParams, DevboxListParams, Devboxes } from './devboxes/devboxes';
-export { EmptyRecord, LatchFulfillParams, Latches } from './latches';
-export { FunctionList, Functions } from './functions/functions';
-export { ProjectList, Projects } from './projects/projects';
-export { Sessions } from './sessions/sessions';
+export {
+  DevboxExecutionDetailView,
+  DevboxListView,
+  DevboxView,
+  DevboxCreateParams,
+  DevboxListParams,
+  Devboxes,
+} from './devboxes/devboxes';
+export {
+  FunctionListView,
+  FunctionInvokeAsyncParams,
+  FunctionInvokeSyncParams,
+  Functions,
+} from './functions/functions';
+export { ProjectListView, Projects } from './projects/projects';

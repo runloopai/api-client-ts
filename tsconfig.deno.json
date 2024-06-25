@@ -6,9 +6,9 @@
     "rootDir": "./deno",
     "lib": ["es2020", "DOM"],
     "paths": {
-      "@runloop/api-client/_shims/auto/*": ["deno/_shims/auto/*-deno"],
-      "@runloop/api-client/*": ["deno/*"],
-      "@runloop/api-client": ["deno/index.ts"],
+      "runloop/_shims/auto/*": ["deno/_shims/auto/*-deno"],
+      "runloop/*": ["deno/*"],
+      "runloop": ["deno/index.ts"],
     },
     "noEmit": true,
     "declaration": true,

@@ -1,6 +1,6 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-import Runloop from '@runloop/api-client';
+import Runloop from 'runloop';
 import { Response } from 'node-fetch';
 
 const runloop = new Runloop({
@@ -25,5 +25,41 @@ describe('resource functions', () => {
     await expect(runloop.functions.list({ path: '/_stainless_unknown_path' })).rejects.toThrow(
       Runloop.NotFoundError,
     );
+  });
+
+  test('invokeAsync: only required params', async () => {
+    const responsePromise = runloop.functions.invokeAsync('string', 'string', { request: {} });
+    const rawResponse = await responsePromise.asResponse();
+    expect(rawResponse).toBeInstanceOf(Response);
+    const response = await responsePromise;
+    expect(response).not.toBeInstanceOf(Response);
+    const dataAndResponse = await responsePromise.withResponse();
+    expect(dataAndResponse.data).toBe(response);
+    expect(dataAndResponse.response).toBe(rawResponse);
+  });
+
+  test('invokeAsync: required and optional params', async () => {
+    const response = await runloop.functions.invokeAsync('string', 'string', {
+      request: {},
+      runloopMeta: { session_id: 'string' },
+    });
+  });
+
+  test('invokeSync: only required params', async () => {
+    const responsePromise = runloop.functions.invokeSync('string', 'string', { request: {} });
+    const rawResponse = await responsePromise.asResponse();
+    expect(rawResponse).toBeInstanceOf(Response);
+    const response = await responsePromise;
+    expect(response).not.toBeInstanceOf(Response);
+    const dataAndResponse = await responsePromise.withResponse();
+    expect(dataAndResponse.data).toBe(response);
+    expect(dataAndResponse.response).toBe(rawResponse);
+  });
+
+  test('invokeSync: required and optional params', async () => {
+    const response = await runloop.functions.invokeSync('string', 'string', {
+      request: {},
+      runloopMeta: { session_id: 'string' },
+    });
   });
 });
