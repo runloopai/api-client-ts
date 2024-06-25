@@ -1,7 +1,7 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-import * as Core from '@runloop/api-client/core';
 import { APIResource } from '@runloop/api-client/resource';
+import * as Core from '@runloop/api-client/core';
 import * as InvocationsAPI from '@runloop/api-client/resources/functions/invocations/invocations';
 import * as Shared from '@runloop/api-client/resources/shared';
 import * as SpansAPI from '@runloop/api-client/resources/functions/invocations/spans';
