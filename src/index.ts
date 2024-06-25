@@ -119,7 +119,6 @@ export class Runloop extends Core.APIClient {
     this.bearerToken = bearerToken;
   }
 
-  codeHandles: API.CodeHandles = new API.CodeHandles(this);
   devboxes: API.Devboxes = new API.Devboxes(this);
   functions: API.Functions = new API.Functions(this);
   projects: API.Projects = new API.Projects(this);
@@ -180,8 +179,6 @@ export import fileFromPath = Uploads.fileFromPath;
 
 export namespace Runloop {
   export import RequestOptions = Core.RequestOptions;
-
-  export import CodeHandles = API.CodeHandles;
 
   export import Devboxes = API.Devboxes;
   export import DevboxExecutionDetailView = API.DevboxExecutionDetailView;
