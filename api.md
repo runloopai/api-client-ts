@@ -49,8 +49,6 @@ Types:
 Methods:
 
 - <code title="get /v1/functions">client.functions.<a href="./src/resources/functions/functions.ts">list</a>() -> FunctionList</code>
-- <code title="post /v1/functions/{projectName}/{functionName}/invoke_async">client.functions.<a href="./src/resources/functions/functions.ts">invokeAsync</a>(projectName, functionName, { ...params }) -> FunctionInvocationDetail</code>
-- <code title="post /v1/functions/{projectName}/{functionName}/invoke_sync">client.functions.<a href="./src/resources/functions/functions.ts">invokeSync</a>(projectName, functionName, { ...params }) -> FunctionInvocationDetail</code>
 
 ## Invocations
 
@@ -134,7 +132,3 @@ Methods:
 Types:
 
 - <code><a href="./src/resources/sessions/sessions/kv.ts">SessionKv</a></code>
-
-Methods:
-
-- <code title="get /v1/sessions/sessions/{sessionId}/kv">client.sessions.sessions.kv.<a href="./src/resources/sessions/sessions/kv.ts">list</a>(sessionId, { ...params }) -> SessionKv</code>
