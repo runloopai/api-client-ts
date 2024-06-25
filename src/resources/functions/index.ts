@@ -1,10 +1,14 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 export {
-  FunctionInvocationList,
+  FunctionInvocationListView,
   KillOperationResponse,
   InvocationKillParams,
   Invocations,
 } from './invocations/index';
-export { FunctionList, Functions } from './functions';
-export { OpenAPIRetrieveResponse, OpenAPI } from './openapi';
+export {
+  FunctionListView,
+  FunctionInvokeAsyncParams,
+  FunctionInvokeSyncParams,
+  Functions,
+} from './functions';

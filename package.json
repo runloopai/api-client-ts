@@ -1,12 +1,12 @@
 {
-  "name": "@runloop/api-client",
+  "name": "runloop",
   "version": "0.1.0-alpha.1",
   "description": "The official TypeScript library for the Runloop API",
   "author": "Runloop <support@runloop.ai>",
   "types": "dist/index.d.ts",
   "main": "dist/index.js",
   "type": "commonjs",
-  "repository": "github:runloopai/api-client-ts",
+  "repository": "github:stainless-sdks/runloop-node",
   "license": "Apache-2.0",
   "packageManager": "yarn@1.22.22",
   "files": [
@@ -60,8 +60,8 @@
     "./shims/web.mjs"
   ],
   "imports": {
-    "@runloop/api-client": ".",
-    "@runloop/api-client/*": "./src/*"
+    "runloop": ".",
+    "runloop/*": "./src/*"
   },
   "exports": {
     "./_shims/auto/*": {

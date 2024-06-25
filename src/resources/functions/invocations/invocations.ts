@@ -1,10 +1,10 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-import { APIResource } from '@runloop/api-client/resource';
-import * as Core from '@runloop/api-client/core';
-import * as InvocationsAPI from '@runloop/api-client/resources/functions/invocations/invocations';
-import * as Shared from '@runloop/api-client/resources/shared';
-import * as SpansAPI from '@runloop/api-client/resources/functions/invocations/spans';
+import { APIResource } from '../../../resource';
+import * as Core from '../../../core';
+import * as InvocationsAPI from './invocations';
+import * as Shared from '../../shared';
+import * as SpansAPI from './spans';
 
 export class Invocations extends APIResource {
   spans: SpansAPI.Spans = new SpansAPI.Spans(this._client);
@@ -16,14 +16,14 @@ export class Invocations extends APIResource {
   retrieve(
     invocationId: string,
     options?: Core.RequestOptions,
-  ): Core.APIPromise<Shared.FunctionInvocationDetail> {
+  ): Core.APIPromise<Shared.FunctionInvocationDetailView> {
     return this._client.get(`/v1/functions/invocations/${invocationId}`, options);
   }
 
   /**
    * List the functions invocations that are available for invocation.
    */
-  list(options?: Core.RequestOptions): Core.APIPromise<FunctionInvocationList> {
+  list(options?: Core.RequestOptions): Core.APIPromise<FunctionInvocationListView> {
     return this._client.get('/v1/functions/invocations', options);
   }
 
@@ -39,14 +39,14 @@ export class Invocations extends APIResource {
   }
 }
 
-export interface FunctionInvocationList {
+export interface FunctionInvocationListView {
   /**
    * List of functions matching given query.
    */
-  invocations?: Array<FunctionInvocationList.Invocation>;
+  invocations?: Array<FunctionInvocationListView.Invocation>;
 }
 
-export namespace FunctionInvocationList {
+export namespace FunctionInvocationListView {
   export interface Invocation {
     /**
      * Unique ID of the invocations.
@@ -72,9 +72,9 @@ export type KillOperationResponse = unknown;
 export interface InvocationKillParams {}
 
 export namespace Invocations {
-  export import FunctionInvocationList = InvocationsAPI.FunctionInvocationList;
+  export import FunctionInvocationListView = InvocationsAPI.FunctionInvocationListView;
   export import KillOperationResponse = InvocationsAPI.KillOperationResponse;
   export import InvocationKillParams = InvocationsAPI.InvocationKillParams;
   export import Spans = SpansAPI.Spans;
-  export import InvocationSpanList = SpansAPI.InvocationSpanList;
+  export import InvocationSpanListView = SpansAPI.InvocationSpanListView;
 }

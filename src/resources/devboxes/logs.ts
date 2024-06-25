@@ -1,26 +1,26 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-import { APIResource } from '@runloop/api-client/resource';
-import * as Core from '@runloop/api-client/core';
-import * as LogsAPI from '@runloop/api-client/resources/devboxes/logs';
+import { APIResource } from '../../resource';
+import * as Core from '../../core';
+import * as LogsAPI from './logs';
 
 export class Logs extends APIResource {
   /**
    * Get all logs from a Devbox by id.
    */
-  list(id: string, options?: Core.RequestOptions): Core.APIPromise<DevboxLogsList> {
+  list(id: string, options?: Core.RequestOptions): Core.APIPromise<DevboxLogsListView> {
     return this._client.get(`/v1/devboxes/${id}/logs`, options);
   }
 }
 
-export interface DevboxLogsList {
+export interface DevboxLogsListView {
   /**
    * List of logs for the given devbox.
    */
-  logs?: Array<DevboxLogsList.Log>;
+  logs?: Array<DevboxLogsListView.Log>;
 }
 
-export namespace DevboxLogsList {
+export namespace DevboxLogsListView {
   export interface Log {
     /**
      * Log line severity level.
@@ -40,5 +40,5 @@ export namespace DevboxLogsList {
 }
 
 export namespace Logs {
-  export import DevboxLogsList = LogsAPI.DevboxLogsList;
+  export import DevboxLogsListView = LogsAPI.DevboxLogsListView;
 }
