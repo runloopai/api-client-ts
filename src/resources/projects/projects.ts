@@ -68,6 +68,16 @@ export namespace ProjectList {
       id?: string;
 
       /**
+       * Associated Commit Sha
+       */
+      deploy_commit_sha?: string;
+
+      /**
+       * Associated Commit Time
+       */
+      deploy_commit_time_ms?: number;
+
+      /**
        * Time the Deploy completed (Unix timestamp milliseconds).
        */
       deploy_end_time_ms?: number;
@@ -108,6 +118,16 @@ export namespace ProjectList {
       id?: string;
 
       /**
+       * Associated Commit Sha
+       */
+      deploy_commit_sha?: string;
+
+      /**
+       * Associated Commit Time
+       */
+      deploy_commit_time_ms?: number;
+
+      /**
        * Time the Deploy completed (Unix timestamp milliseconds).
        */
       deploy_end_time_ms?: number;
@@ -146,6 +166,16 @@ export namespace ProjectList {
        * ID of the deployment.
        */
       id?: string;
+
+      /**
+       * Associated Commit Sha
+       */
+      deploy_commit_sha?: string;
+
+      /**
+       * Associated Commit Time
+       */
+      deploy_commit_time_ms?: number;
 
       /**
        * Time the Deploy completed (Unix timestamp milliseconds).

@@ -61,7 +61,7 @@ export namespace FunctionInvocationList {
     /**
      * Project name associated with invoked function.
      */
-    projectName?: string;
+    project_name?: string;
 
     status?: 'created' | 'running' | 'success' | 'failure' | 'canceled' | 'suspended';
   }

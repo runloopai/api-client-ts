@@ -11,12 +11,12 @@ export interface FunctionInvocationDetail {
   /**
    * Unique name of the function.
    */
-  functionName?: string;
+  function_name?: string;
 
   /**
    * Unique name of the project associated with function.
    */
-  projectName?: string;
+  project_name?: string;
 
   result?: unknown;
 

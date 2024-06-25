@@ -6,5 +6,5 @@ export {
   InvocationKillParams,
   Invocations,
 } from './invocations/index';
-export { FunctionList, FunctionInvokeAsyncParams, FunctionInvokeSyncParams, Functions } from './functions';
+export { FunctionList, Functions } from './functions';
 export { OpenAPIRetrieveResponse, OpenAPI } from './openapi';

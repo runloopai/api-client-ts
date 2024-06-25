@@ -10,11 +10,6 @@ export {
 } from './code-handles';
 export { Devbox, DevboxList, DevboxCreateParams, DevboxListParams, Devboxes } from './devboxes/devboxes';
 export { EmptyRecord, LatchFulfillParams, Latches } from './latches';
-export {
-  FunctionList,
-  FunctionInvokeAsyncParams,
-  FunctionInvokeSyncParams,
-  Functions,
-} from './functions/functions';
+export { FunctionList, Functions } from './functions/functions';
 export { ProjectList, Projects } from './projects/projects';
 export { Sessions } from './sessions/sessions';

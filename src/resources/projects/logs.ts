@@ -26,6 +26,8 @@ export namespace ProjectLogs {
 
     message?: string;
 
+    source?: string;
+
     timestamp?: string;
   }
 }
