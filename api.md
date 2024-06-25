@@ -2,26 +2,16 @@
 
 Types:
 
-- <code><a href="./src/resources/shared.ts">EmptyRecord</a></code>
 - <code><a href="./src/resources/shared.ts">FunctionInvocationDetailView</a></code>
 - <code><a href="./src/resources/shared.ts">ProjectLogsView</a></code>
 
 # CodeHandles
 
-Types:
-
-- <code><a href="./src/resources/code-handles.ts">CodeHandleListView</a></code>
-- <code><a href="./src/resources/code-handles.ts">CodeHandleView</a></code>
-
-Methods:
-
-- <code title="post /v1/code_handles">client.codeHandles.<a href="./src/resources/code-handles.ts">create</a>({ ...params }) -> CodeHandleView</code>
-- <code title="get /v1/code_handles">client.codeHandles.<a href="./src/resources/code-handles.ts">list</a>({ ...params }) -> CodeHandleListView</code>
-
 # Devboxes
 
 Types:
 
+- <code><a href="./src/resources/devboxes/devboxes.ts">DevboxExecutionDetailView</a></code>
 - <code><a href="./src/resources/devboxes/devboxes.ts">DevboxListView</a></code>
 - <code><a href="./src/resources/devboxes/devboxes.ts">DevboxView</a></code>
 
@@ -30,6 +20,7 @@ Methods:
 - <code title="post /v1/devboxes">client.devboxes.<a href="./src/resources/devboxes/devboxes.ts">create</a>({ ...params }) -> DevboxView</code>
 - <code title="get /v1/devboxes/{id}">client.devboxes.<a href="./src/resources/devboxes/devboxes.ts">retrieve</a>(id) -> DevboxView</code>
 - <code title="get /v1/devboxes">client.devboxes.<a href="./src/resources/devboxes/devboxes.ts">list</a>({ ...params }) -> DevboxListView</code>
+- <code title="post /v1/devboxes/{id}/execute_sync">client.devboxes.<a href="./src/resources/devboxes/devboxes.ts">executeSync</a>(id) -> DevboxExecutionDetailView</code>
 - <code title="post /v1/devboxes/{id}/shutdown">client.devboxes.<a href="./src/resources/devboxes/devboxes.ts">shutdown</a>(id) -> DevboxView</code>
 
 ## Logs

@@ -1,7 +1,5 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-export type EmptyRecord = unknown;
-
 export interface FunctionInvocationDetailView {
   /**
    * Unique ID of the invocation.
