@@ -1,7 +1,7 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-import * as Core from '@runloop/api-client/core';
 import { APIResource } from '@runloop/api-client/resource';
+import * as Core from '@runloop/api-client/core';
 import * as OpenAPIAPI from '@runloop/api-client/resources/functions/openapi';
 
 export class OpenAPI extends APIResource {
