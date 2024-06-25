@@ -197,8 +197,6 @@ export namespace Runloop {
 
   export import Functions = API.Functions;
   export import FunctionList = API.FunctionList;
-  export import FunctionInvokeAsyncParams = API.FunctionInvokeAsyncParams;
-  export import FunctionInvokeSyncParams = API.FunctionInvokeSyncParams;
 
   export import Latches = API.Latches;
   export import EmptyRecord = API.EmptyRecord;

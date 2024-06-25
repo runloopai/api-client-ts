@@ -1,27 +1,9 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 import { APIResource } from '@runloop/api-client/resource';
-import { isRequestOptions } from '@runloop/api-client/core';
-import * as Core from '@runloop/api-client/core';
 import * as KvAPI from '@runloop/api-client/resources/sessions/sessions/kv';
 
-export class Kv extends APIResource {
-  /**
-   * List the sessions associated with your application.
-   */
-  list(sessionId: string, query?: KvListParams, options?: Core.RequestOptions): Core.APIPromise<SessionKv>;
-  list(sessionId: string, options?: Core.RequestOptions): Core.APIPromise<SessionKv>;
-  list(
-    sessionId: string,
-    query: KvListParams | Core.RequestOptions = {},
-    options?: Core.RequestOptions,
-  ): Core.APIPromise<SessionKv> {
-    if (isRequestOptions(query)) {
-      return this.list(sessionId, {}, query);
-    }
-    return this._client.get(`/v1/sessions/sessions/${sessionId}/kv`, { query, ...options });
-  }
-}
+export class Kv extends APIResource {}
 
 export interface SessionKv {
   /**
@@ -83,14 +65,6 @@ export namespace SessionKv {
   }
 }
 
-export interface KvListParams {
-  /**
-   * Filter KV to specific keys.
-   */
-  keys?: string;
-}
-
 export namespace Kv {
   export import SessionKv = KvAPI.SessionKv;
-  export import KvListParams = KvAPI.KvListParams;
 }
