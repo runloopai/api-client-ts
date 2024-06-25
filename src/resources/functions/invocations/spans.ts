@@ -1,8 +1,8 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-import { APIResource } from '../../../resource';
-import * as Core from '../../../core';
-import * as SpansAPI from './spans';
+import { APIResource } from '@runloop/api-client/resource';
+import * as Core from '@runloop/api-client/core';
+import * as SpansAPI from '@runloop/api-client/resources/functions/invocations/spans';
 
 export class Spans extends APIResource {
   /**
