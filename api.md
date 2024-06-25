@@ -5,8 +5,6 @@ Types:
 - <code><a href="./src/resources/shared.ts">FunctionInvocationDetailView</a></code>
 - <code><a href="./src/resources/shared.ts">ProjectLogsView</a></code>
 
-# CodeHandles
-
 # Devboxes
 
 Types:
