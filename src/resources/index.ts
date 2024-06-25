@@ -9,7 +9,6 @@ export {
   CodeHandles,
 } from './code-handles';
 export {
-  DevboxExecutionDetailView,
   DevboxListView,
   DevboxView,
   DevboxCreateParams,
