@@ -1,8 +1,8 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-import { APIResource } from '../../resource';
-import * as Core from '../../core';
-import * as LogsAPI from './logs';
+import { APIResource } from '@runloop/api-client/resource';
+import * as Core from '@runloop/api-client/core';
+import * as LogsAPI from '@runloop/api-client/resources/devboxes/logs';
 
 export class Logs extends APIResource {
   /**

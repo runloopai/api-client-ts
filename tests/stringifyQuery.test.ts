@@ -1,6 +1,6 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-import { Runloop } from 'runloop';
+import { Runloop } from '@runloop/api-client';
 
 const { stringifyQuery } = Runloop.prototype as any;
 

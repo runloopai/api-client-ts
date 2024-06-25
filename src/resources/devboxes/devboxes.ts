@@ -1,10 +1,10 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-import { APIResource } from '../../resource';
-import { isRequestOptions } from '../../core';
-import * as Core from '../../core';
-import * as DevboxesAPI from './devboxes';
-import * as LogsAPI from './logs';
+import { APIResource } from '@runloop/api-client/resource';
+import { isRequestOptions } from '@runloop/api-client/core';
+import * as Core from '@runloop/api-client/core';
+import * as DevboxesAPI from '@runloop/api-client/resources/devboxes/devboxes';
+import * as LogsAPI from '@runloop/api-client/resources/devboxes/logs';
 
 export class Devboxes extends APIResource {
   logs: LogsAPI.Logs = new LogsAPI.Logs(this._client);

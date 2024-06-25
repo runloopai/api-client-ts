@@ -3,8 +3,8 @@
 import * as Errors from './error';
 import * as Uploads from './uploads';
 import { type Agent } from './_shims/index';
-import * as Core from './core';
-import * as API from './resources/index';
+import * as Core from '@runloop/api-client/core';
+import * as API from '@runloop/api-client/resources/index';
 
 export interface ClientOptions {
   /**
