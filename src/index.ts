@@ -188,7 +188,6 @@ export namespace Runloop {
   export import CodeHandleListParams = API.CodeHandleListParams;
 
   export import Devboxes = API.Devboxes;
-  export import DevboxExecutionDetailView = API.DevboxExecutionDetailView;
   export import DevboxListView = API.DevboxListView;
   export import DevboxView = API.DevboxView;
   export import DevboxCreateParams = API.DevboxCreateParams;
