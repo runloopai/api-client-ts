@@ -51,8 +51,21 @@ export class Devboxes extends APIResource {
   /**
    * Synchronously execute a command on a devbox
    */
-  executeSync(id: string, options?: Core.RequestOptions): Core.APIPromise<DevboxExecutionDetailView> {
-    return this._client.post(`/v1/devboxes/${id}/execute_sync`, options);
+  executeSync(
+    id: string,
+    body?: DevboxExecuteSyncParams,
+    options?: Core.RequestOptions,
+  ): Core.APIPromise<DevboxExecutionDetailView>;
+  executeSync(id: string, options?: Core.RequestOptions): Core.APIPromise<DevboxExecutionDetailView>;
+  executeSync(
+    id: string,
+    body: DevboxExecuteSyncParams | Core.RequestOptions = {},
+    options?: Core.RequestOptions,
+  ): Core.APIPromise<DevboxExecutionDetailView> {
+    if (isRequestOptions(body)) {
+      return this.executeSync(id, {}, body);
+    }
+    return this._client.post(`/v1/devboxes/${id}/execute_sync`, { body, ...options });
   }
 
   /**
@@ -143,12 +156,20 @@ export interface DevboxListParams {
   status?: string;
 }
 
+export interface DevboxExecuteSyncParams {
+  /**
+   * The command to execute on the Devbox.
+   */
+  command?: string;
+}
+
 export namespace Devboxes {
   export import DevboxExecutionDetailView = DevboxesAPI.DevboxExecutionDetailView;
   export import DevboxListView = DevboxesAPI.DevboxListView;
   export import DevboxView = DevboxesAPI.DevboxView;
   export import DevboxCreateParams = DevboxesAPI.DevboxCreateParams;
   export import DevboxListParams = DevboxesAPI.DevboxListParams;
+  export import DevboxExecuteSyncParams = DevboxesAPI.DevboxExecuteSyncParams;
   export import Logs = LogsAPI.Logs;
   export import DevboxLogsListView = LogsAPI.DevboxLogsListView;
 }

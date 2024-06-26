@@ -7,6 +7,7 @@ export {
   DevboxView,
   DevboxCreateParams,
   DevboxListParams,
+  DevboxExecuteSyncParams,
   Devboxes,
 } from './devboxes/devboxes';
 export {
