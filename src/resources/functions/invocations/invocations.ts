@@ -76,5 +76,4 @@ export namespace Invocations {
   export import KillOperationResponse = InvocationsAPI.KillOperationResponse;
   export import InvocationKillParams = InvocationsAPI.InvocationKillParams;
   export import Spans = SpansAPI.Spans;
-  export import InvocationSpanListView = SpansAPI.InvocationSpanListView;
 }
