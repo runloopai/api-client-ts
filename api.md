@@ -62,10 +62,6 @@ Types:
 
 - <code><a href="./src/resources/functions/invocations/spans.ts">InvocationSpanListView</a></code>
 
-Methods:
-
-- <code title="get /v1/functions/invocations/{invocationId}/spans">client.functions.invocations.spans.<a href="./src/resources/functions/invocations/spans.ts">list</a>(invocationId) -> InvocationSpanListView</code>
-
 # Projects
 
 Types:
