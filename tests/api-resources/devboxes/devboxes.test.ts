@@ -103,6 +103,13 @@ describe('resource devboxes', () => {
     ).rejects.toThrow(Runloop.NotFoundError);
   });
 
+  test('executeSync: request options and params are passed correctly', async () => {
+    // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
+    await expect(
+      runloop.devboxes.executeSync('string', { command: 'string' }, { path: '/_stainless_unknown_path' }),
+    ).rejects.toThrow(Runloop.NotFoundError);
+  });
+
   test('shutdown', async () => {
     const responsePromise = runloop.devboxes.shutdown('string');
     const rawResponse = await responsePromise.asResponse();
