@@ -117,6 +117,11 @@ export interface DevboxView {
   create_time_ms?: number;
 
   /**
+   * The name of the Devbox.
+   */
+  name?: string;
+
+  /**
    * The current status of the Devbox (provisioning, initializing, running, failure,
    * shutdown).
    */
@@ -140,6 +145,11 @@ export interface DevboxCreateParams {
    * (Optional) Environment variables used to configure your Devbox.
    */
   environment_variables?: Record<string, string>;
+
+  /**
+   * (Optional) A user specified name to give the Devbox.
+   */
+  name?: string;
 
   /**
    * (Optional) List of commands needed to set up your Devbox. Examples might include

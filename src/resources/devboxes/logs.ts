@@ -48,6 +48,11 @@ export namespace DevboxLogsListView {
     message?: string;
 
     /**
+     * The source of the log.
+     */
+    source?: 'setup_commands' | 'entrypoint' | 'exec';
+
+    /**
      * Time of log (Unix timestamp milliseconds).
      */
     timestamp_ms?: number;
