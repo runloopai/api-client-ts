@@ -35,6 +35,7 @@ describe('resource devboxes', () => {
           code_handle: 'string',
           entrypoint: 'string',
           environment_variables: { foo: 'string' },
+          name: 'string',
           setup_commands: ['string', 'string', 'string'],
         },
         { path: '/_stainless_unknown_path' },
