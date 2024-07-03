@@ -157,13 +157,13 @@ describe('instantiate client', () => {
     test('empty env variable', () => {
       process.env['RUNLOOP_BASE_URL'] = ''; // empty
       const client = new Runloop({ bearerToken: 'My Bearer Token' });
-      expect(client.baseURL).toEqual('https://api.runloop.pro');
+      expect(client.baseURL).toEqual('https://api.runloop.ai');
     });
 
     test('blank env variable', () => {
       process.env['RUNLOOP_BASE_URL'] = '  '; // blank
       const client = new Runloop({ bearerToken: 'My Bearer Token' });
-      expect(client.baseURL).toEqual('https://api.runloop.pro');
+      expect(client.baseURL).toEqual('https://api.runloop.ai');
     });
   });
 
