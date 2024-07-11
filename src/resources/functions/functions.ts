@@ -3,7 +3,6 @@
 import { APIResource } from '@runloop/api-client/resource';
 import * as Core from '@runloop/api-client/core';
 import * as FunctionsAPI from '@runloop/api-client/resources/functions/functions';
-import * as Shared from '@runloop/api-client/resources/shared';
 import * as InvocationsAPI from '@runloop/api-client/resources/functions/invocations/invocations';
 
 export class Functions extends APIResource {
@@ -25,7 +24,7 @@ export class Functions extends APIResource {
     functionName: string,
     body: FunctionInvokeAsyncParams,
     options?: Core.RequestOptions,
-  ): Core.APIPromise<Shared.FunctionInvocationDetailView> {
+  ): Core.APIPromise<FunctionInvokeAsyncResponse> {
     return this._client.post(`/v1/functions/${projectName}/${functionName}/invoke_async`, {
       body,
       ...options,
@@ -42,7 +41,7 @@ export class Functions extends APIResource {
     functionName: string,
     body: FunctionInvokeSyncParams,
     options?: Core.RequestOptions,
-  ): Core.APIPromise<Shared.FunctionInvocationDetailView> {
+  ): Core.APIPromise<FunctionInvokeSyncResponse> {
     return this._client.post(`/v1/functions/${projectName}/${functionName}/invoke_sync`, {
       body,
       ...options,
@@ -69,6 +68,52 @@ export namespace FunctionListView {
      */
     project_name?: string;
   }
+}
+
+export interface FunctionInvokeAsyncResponse {
+  /**
+   * Unique ID of the invocation.
+   */
+  id?: string;
+
+  error?: string;
+
+  /**
+   * Unique name of the function.
+   */
+  function_name?: string;
+
+  /**
+   * Unique name of the project associated with function.
+   */
+  project_name?: string;
+
+  result?: unknown;
+
+  status?: 'created' | 'running' | 'success' | 'failure' | 'canceled' | 'suspended';
+}
+
+export interface FunctionInvokeSyncResponse {
+  /**
+   * Unique ID of the invocation.
+   */
+  id?: string;
+
+  error?: string;
+
+  /**
+   * Unique name of the function.
+   */
+  function_name?: string;
+
+  /**
+   * Unique name of the project associated with function.
+   */
+  project_name?: string;
+
+  result?: unknown;
+
+  status?: 'created' | 'running' | 'success' | 'failure' | 'canceled' | 'suspended';
 }
 
 export interface FunctionInvokeAsyncParams {
@@ -109,10 +154,13 @@ export namespace FunctionInvokeSyncParams {
 
 export namespace Functions {
   export import FunctionListView = FunctionsAPI.FunctionListView;
+  export import FunctionInvokeAsyncResponse = FunctionsAPI.FunctionInvokeAsyncResponse;
+  export import FunctionInvokeSyncResponse = FunctionsAPI.FunctionInvokeSyncResponse;
   export import FunctionInvokeAsyncParams = FunctionsAPI.FunctionInvokeAsyncParams;
   export import FunctionInvokeSyncParams = FunctionsAPI.FunctionInvokeSyncParams;
   export import Invocations = InvocationsAPI.Invocations;
   export import FunctionInvocationListView = InvocationsAPI.FunctionInvocationListView;
   export import KillOperationResponse = InvocationsAPI.KillOperationResponse;
+  export import InvocationRetrieveResponse = InvocationsAPI.InvocationRetrieveResponse;
   export import InvocationKillParams = InvocationsAPI.InvocationKillParams;
 }

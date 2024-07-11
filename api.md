@@ -2,7 +2,6 @@
 
 Types:
 
-- <code><a href="./src/resources/shared.ts">FunctionInvocationDetailView</a></code>
 - <code><a href="./src/resources/shared.ts">ProjectLogsView</a></code>
 
 # Devboxes
@@ -36,12 +35,14 @@ Methods:
 Types:
 
 - <code><a href="./src/resources/functions/functions.ts">FunctionListView</a></code>
+- <code><a href="./src/resources/functions/functions.ts">FunctionInvokeAsyncResponse</a></code>
+- <code><a href="./src/resources/functions/functions.ts">FunctionInvokeSyncResponse</a></code>
 
 Methods:
 
 - <code title="get /v1/functions">client.functions.<a href="./src/resources/functions/functions.ts">list</a>() -> FunctionListView</code>
-- <code title="post /v1/functions/{project_name}/{function_name}/invoke_async">client.functions.<a href="./src/resources/functions/functions.ts">invokeAsync</a>(projectName, functionName, { ...params }) -> FunctionInvocationDetailView</code>
-- <code title="post /v1/functions/{project_name}/{function_name}/invoke_sync">client.functions.<a href="./src/resources/functions/functions.ts">invokeSync</a>(projectName, functionName, { ...params }) -> FunctionInvocationDetailView</code>
+- <code title="post /v1/functions/{project_name}/{function_name}/invoke_async">client.functions.<a href="./src/resources/functions/functions.ts">invokeAsync</a>(projectName, functionName, { ...params }) -> FunctionInvokeAsyncResponse</code>
+- <code title="post /v1/functions/{project_name}/{function_name}/invoke_sync">client.functions.<a href="./src/resources/functions/functions.ts">invokeSync</a>(projectName, functionName, { ...params }) -> FunctionInvokeSyncResponse</code>
 
 ## Invocations
 
@@ -49,10 +50,11 @@ Types:
 
 - <code><a href="./src/resources/functions/invocations/invocations.ts">FunctionInvocationListView</a></code>
 - <code><a href="./src/resources/functions/invocations/invocations.ts">KillOperationResponse</a></code>
+- <code><a href="./src/resources/functions/invocations/invocations.ts">InvocationRetrieveResponse</a></code>
 
 Methods:
 
-- <code title="get /v1/functions/invocations/{invocationId}">client.functions.invocations.<a href="./src/resources/functions/invocations/invocations.ts">retrieve</a>(invocationId) -> FunctionInvocationDetailView</code>
+- <code title="get /v1/functions/invocations/{invocationId}">client.functions.invocations.<a href="./src/resources/functions/invocations/invocations.ts">retrieve</a>(invocationId) -> InvocationRetrieveResponse</code>
 - <code title="get /v1/functions/invocations">client.functions.invocations.<a href="./src/resources/functions/invocations/invocations.ts">list</a>() -> FunctionInvocationListView</code>
 - <code title="post /v1/functions/invocations/{invocationId}/kill">client.functions.invocations.<a href="./src/resources/functions/invocations/invocations.ts">kill</a>(invocationId) -> unknown</code>
 

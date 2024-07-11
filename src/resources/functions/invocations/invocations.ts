@@ -3,7 +3,6 @@
 import { APIResource } from '@runloop/api-client/resource';
 import * as Core from '@runloop/api-client/core';
 import * as InvocationsAPI from '@runloop/api-client/resources/functions/invocations/invocations';
-import * as Shared from '@runloop/api-client/resources/shared';
 import * as SpansAPI from '@runloop/api-client/resources/functions/invocations/spans';
 
 export class Invocations extends APIResource {
@@ -13,10 +12,7 @@ export class Invocations extends APIResource {
    * Get the details of a function invocation. This includes the status, response,
    * and error message.
    */
-  retrieve(
-    invocationId: string,
-    options?: Core.RequestOptions,
-  ): Core.APIPromise<Shared.FunctionInvocationDetailView> {
+  retrieve(invocationId: string, options?: Core.RequestOptions): Core.APIPromise<InvocationRetrieveResponse> {
     return this._client.get(`/v1/functions/invocations/${invocationId}`, options);
   }
 
@@ -49,17 +45,29 @@ export interface FunctionInvocationListView {
 export namespace FunctionInvocationListView {
   export interface Invocation {
     /**
-     * Unique ID of the invocations.
+     * End time of the invocation.
+     */
+    end_time_ms: number;
+
+    /**
+     * Start time of the invocation.
+     */
+    start_time_ms: number;
+
+    /**
+     * Unique ID of the invocation.
      */
     id?: string;
 
-    /**
-     * Name of the invoked function.
-     */
-    name?: string;
+    error?: string;
 
     /**
-     * Project name associated with invoked function.
+     * Unique name of the function.
+     */
+    function_name?: string;
+
+    /**
+     * Unique name of the project associated with function.
      */
     project_name?: string;
 
@@ -69,11 +77,35 @@ export namespace FunctionInvocationListView {
 
 export type KillOperationResponse = unknown;
 
+export interface InvocationRetrieveResponse {
+  /**
+   * Unique ID of the invocation.
+   */
+  id?: string;
+
+  error?: string;
+
+  /**
+   * Unique name of the function.
+   */
+  function_name?: string;
+
+  /**
+   * Unique name of the project associated with function.
+   */
+  project_name?: string;
+
+  result?: unknown;
+
+  status?: 'created' | 'running' | 'success' | 'failure' | 'canceled' | 'suspended';
+}
+
 export interface InvocationKillParams {}
 
 export namespace Invocations {
   export import FunctionInvocationListView = InvocationsAPI.FunctionInvocationListView;
   export import KillOperationResponse = InvocationsAPI.KillOperationResponse;
+  export import InvocationRetrieveResponse = InvocationsAPI.InvocationRetrieveResponse;
   export import InvocationKillParams = InvocationsAPI.InvocationKillParams;
   export import Spans = SpansAPI.Spans;
 }
