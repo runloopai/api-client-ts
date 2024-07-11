@@ -10,7 +10,7 @@ const runloop = new Runloop({
 
 describe('resource invocations', () => {
   test('retrieve', async () => {
-    const responsePromise = runloop.functions.invocations.retrieve('string');
+    const responsePromise = runloop.functions.invocations.retrieve('invocationId');
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
     const response = await responsePromise;
@@ -23,7 +23,7 @@ describe('resource invocations', () => {
   test('retrieve: request options instead of params are passed correctly', async () => {
     // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
     await expect(
-      runloop.functions.invocations.retrieve('string', { path: '/_stainless_unknown_path' }),
+      runloop.functions.invocations.retrieve('invocationId', { path: '/_stainless_unknown_path' }),
     ).rejects.toThrow(Runloop.NotFoundError);
   });
 
@@ -46,7 +46,7 @@ describe('resource invocations', () => {
   });
 
   test('kill', async () => {
-    const responsePromise = runloop.functions.invocations.kill('string');
+    const responsePromise = runloop.functions.invocations.kill('invocationId');
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
     const response = await responsePromise;
@@ -59,7 +59,7 @@ describe('resource invocations', () => {
   test('kill: request options and params are passed correctly', async () => {
     // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
     await expect(
-      runloop.functions.invocations.kill('string', {}, { path: '/_stainless_unknown_path' }),
+      runloop.functions.invocations.kill('invocationId', {}, { path: '/_stainless_unknown_path' }),
     ).rejects.toThrow(Runloop.NotFoundError);
   });
 });

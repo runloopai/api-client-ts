@@ -190,13 +190,14 @@ export namespace Runloop {
 
   export import Functions = API.Functions;
   export import FunctionListView = API.FunctionListView;
+  export import FunctionInvokeAsyncResponse = API.FunctionInvokeAsyncResponse;
+  export import FunctionInvokeSyncResponse = API.FunctionInvokeSyncResponse;
   export import FunctionInvokeAsyncParams = API.FunctionInvokeAsyncParams;
   export import FunctionInvokeSyncParams = API.FunctionInvokeSyncParams;
 
   export import Projects = API.Projects;
   export import ProjectListView = API.ProjectListView;
 
-  export import FunctionInvocationDetailView = API.FunctionInvocationDetailView;
   export import ProjectLogsView = API.ProjectLogsView;
 }
 
