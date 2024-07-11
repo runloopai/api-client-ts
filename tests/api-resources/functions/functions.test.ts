@@ -28,7 +28,7 @@ describe('resource functions', () => {
   });
 
   test('invokeAsync: only required params', async () => {
-    const responsePromise = runloop.functions.invokeAsync('string', 'string', { request: {} });
+    const responsePromise = runloop.functions.invokeAsync('project_name', 'function_name', { request: {} });
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
     const response = await responsePromise;
@@ -39,14 +39,14 @@ describe('resource functions', () => {
   });
 
   test('invokeAsync: required and optional params', async () => {
-    const response = await runloop.functions.invokeAsync('string', 'string', {
+    const response = await runloop.functions.invokeAsync('project_name', 'function_name', {
       request: {},
-      runloopMeta: { session_id: 'string' },
+      runloopMeta: { session_id: 'session_id' },
     });
   });
 
   test('invokeSync: only required params', async () => {
-    const responsePromise = runloop.functions.invokeSync('string', 'string', { request: {} });
+    const responsePromise = runloop.functions.invokeSync('project_name', 'function_name', { request: {} });
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
     const response = await responsePromise;
@@ -57,9 +57,9 @@ describe('resource functions', () => {
   });
 
   test('invokeSync: required and optional params', async () => {
-    const response = await runloop.functions.invokeSync('string', 'string', {
+    const response = await runloop.functions.invokeSync('project_name', 'function_name', {
       request: {},
-      runloopMeta: { session_id: 'string' },
+      runloopMeta: { session_id: 'session_id' },
     });
   });
 });
