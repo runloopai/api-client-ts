@@ -3,7 +3,8 @@
 export {
   FunctionInvocationListView,
   KillOperationResponse,
+  InvocationRetrieveResponse,
   InvocationKillParams,
   Invocations,
 } from './invocations';
-export { InvocationSpanListView, Spans } from './spans';
+export { Spans } from './spans';

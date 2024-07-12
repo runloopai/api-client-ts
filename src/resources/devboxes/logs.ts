@@ -23,6 +23,21 @@ export interface DevboxLogsListView {
 export namespace DevboxLogsListView {
   export interface Log {
     /**
+     * The Command Executed
+     */
+    cmd?: string;
+
+    /**
+     * Identifier of the associated command the log is sourced from.
+     */
+    cmd_id?: string;
+
+    /**
+     * The Exit Code of the command
+     */
+    exit_code?: number;
+
+    /**
      * Log line severity level.
      */
     level?: string;
@@ -31,6 +46,11 @@ export namespace DevboxLogsListView {
      * Log line message.
      */
     message?: string;
+
+    /**
+     * The source of the log.
+     */
+    source?: 'setup_commands' | 'entrypoint' | 'exec';
 
     /**
      * Time of log (Unix timestamp milliseconds).

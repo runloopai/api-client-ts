@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.1.0-alpha.5 (2024-07-12)
+
+Full Changelog: [v0.1.0-alpha.4...v0.1.0-alpha.5](https://github.com/runloopai/api-client-ts/compare/v0.1.0-alpha.4...v0.1.0-alpha.5)
+
+### Features
+
+* **api:** OpenAPI spec update via Stainless API ([#18](https://github.com/runloopai/api-client-ts/issues/18)) ([d39c6ed](https://github.com/runloopai/api-client-ts/commit/d39c6ed2988d9483492ff3fb87716689f6249509))
+* **api:** OpenAPI spec update via Stainless API ([#20](https://github.com/runloopai/api-client-ts/issues/20)) ([9447083](https://github.com/runloopai/api-client-ts/commit/9447083356a3e456027e59481ed64e4bc9e4c6e8))
+* **api:** OpenAPI spec update via Stainless API ([#21](https://github.com/runloopai/api-client-ts/issues/21)) ([5bb9bf0](https://github.com/runloopai/api-client-ts/commit/5bb9bf02680b9746242692ffbcf6d4d7d1084959))
+* **api:** OpenAPI spec update via Stainless API ([#22](https://github.com/runloopai/api-client-ts/issues/22)) ([c406449](https://github.com/runloopai/api-client-ts/commit/c40644921678c4a0aef2df58183feea7ed17a677))
+* **api:** OpenAPI spec update via Stainless API ([#23](https://github.com/runloopai/api-client-ts/issues/23)) ([9dc01f8](https://github.com/runloopai/api-client-ts/commit/9dc01f8f0546aa79dc58537d6d1140a114f5038f))
+* **api:** OpenAPI spec update via Stainless API ([#24](https://github.com/runloopai/api-client-ts/issues/24)) ([2f3271c](https://github.com/runloopai/api-client-ts/commit/2f3271cbac1e4a5dbb264f67c67ec2f7b61f3ae8))
+
 ## 0.1.0-alpha.4 (2024-06-25)
 
 Full Changelog: [v0.1.0-alpha.3...v0.1.0-alpha.4](https://github.com/runloopai/api-client-ts/compare/v0.1.0-alpha.3...v0.1.0-alpha.4)

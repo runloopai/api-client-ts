@@ -81,7 +81,7 @@ export class Runloop extends Core.APIClient {
    * API Client for interfacing with the Runloop API.
    *
    * @param {string | undefined} [opts.bearerToken=process.env['RUNLOOP_BEARER_TOKEN'] ?? undefined]
-   * @param {string} [opts.baseURL=process.env['RUNLOOP_BASE_URL'] ?? https://api.runloop.pro] - Override the default base URL for the API.
+   * @param {string} [opts.baseURL=process.env['RUNLOOP_BASE_URL'] ?? https://api.runloop.ai] - Override the default base URL for the API.
    * @param {number} [opts.timeout=1 minute] - The maximum amount of time (in milliseconds) the client will wait for a response before timing out.
    * @param {number} [opts.httpAgent] - An HTTP agent used to manage HTTP(s) connections.
    * @param {Core.Fetch} [opts.fetch] - Specify a custom `fetch` function implementation.
@@ -103,7 +103,7 @@ export class Runloop extends Core.APIClient {
     const options: ClientOptions = {
       bearerToken,
       ...opts,
-      baseURL: baseURL || `https://api.runloop.pro`,
+      baseURL: baseURL || `https://api.runloop.ai`,
     };
 
     super({
@@ -186,16 +186,18 @@ export namespace Runloop {
   export import DevboxView = API.DevboxView;
   export import DevboxCreateParams = API.DevboxCreateParams;
   export import DevboxListParams = API.DevboxListParams;
+  export import DevboxExecuteSyncParams = API.DevboxExecuteSyncParams;
 
   export import Functions = API.Functions;
   export import FunctionListView = API.FunctionListView;
+  export import FunctionInvokeAsyncResponse = API.FunctionInvokeAsyncResponse;
+  export import FunctionInvokeSyncResponse = API.FunctionInvokeSyncResponse;
   export import FunctionInvokeAsyncParams = API.FunctionInvokeAsyncParams;
   export import FunctionInvokeSyncParams = API.FunctionInvokeSyncParams;
 
   export import Projects = API.Projects;
   export import ProjectListView = API.ProjectListView;
 
-  export import FunctionInvocationDetailView = API.FunctionInvocationDetailView;
   export import ProjectLogsView = API.ProjectLogsView;
 }
 

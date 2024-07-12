@@ -100,10 +100,9 @@ export namespace ProjectListView {
       failure_message?: string;
 
       /**
-       * Status of the deploy (deploy_in_progress | deployed | deploy_failed |
-       * not_started).
+       * Status of the deploy.
        */
-      status?: string;
+      status?: 'scheduled' | 'skipped' | 'in_progress' | 'failed' | 'deployed';
     }
 
     export interface InProgressDeploy {
@@ -150,10 +149,9 @@ export namespace ProjectListView {
       failure_message?: string;
 
       /**
-       * Status of the deploy (deploy_in_progress | deployed | deploy_failed |
-       * not_started).
+       * Status of the deploy.
        */
-      status?: string;
+      status?: 'scheduled' | 'skipped' | 'in_progress' | 'failed' | 'deployed';
     }
 
     export interface RecentDeployment {
@@ -200,10 +198,9 @@ export namespace ProjectListView {
       failure_message?: string;
 
       /**
-       * Status of the deploy (deploy_in_progress | deployed | deploy_failed |
-       * not_started).
+       * Status of the deploy.
        */
-      status?: string;
+      status?: 'scheduled' | 'skipped' | 'in_progress' | 'failed' | 'deployed';
     }
   }
 }

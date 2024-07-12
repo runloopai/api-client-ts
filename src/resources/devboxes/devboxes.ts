@@ -51,8 +51,21 @@ export class Devboxes extends APIResource {
   /**
    * Synchronously execute a command on a devbox
    */
-  executeSync(id: string, options?: Core.RequestOptions): Core.APIPromise<DevboxExecutionDetailView> {
-    return this._client.post(`/v1/devboxes/${id}/execute_sync`, options);
+  executeSync(
+    id: string,
+    body?: DevboxExecuteSyncParams,
+    options?: Core.RequestOptions,
+  ): Core.APIPromise<DevboxExecutionDetailView>;
+  executeSync(id: string, options?: Core.RequestOptions): Core.APIPromise<DevboxExecutionDetailView>;
+  executeSync(
+    id: string,
+    body: DevboxExecuteSyncParams | Core.RequestOptions = {},
+    options?: Core.RequestOptions,
+  ): Core.APIPromise<DevboxExecutionDetailView> {
+    if (isRequestOptions(body)) {
+      return this.executeSync(id, {}, body);
+    }
+    return this._client.post(`/v1/devboxes/${id}/execute_sync`, { body, ...options });
   }
 
   /**
@@ -104,6 +117,11 @@ export interface DevboxView {
   create_time_ms?: number;
 
   /**
+   * The name of the Devbox.
+   */
+  name?: string;
+
+  /**
    * The current status of the Devbox (provisioning, initializing, running, failure,
    * shutdown).
    */
@@ -129,6 +147,11 @@ export interface DevboxCreateParams {
   environment_variables?: Record<string, string>;
 
   /**
+   * (Optional) A user specified name to give the Devbox.
+   */
+  name?: string;
+
+  /**
    * (Optional) List of commands needed to set up your Devbox. Examples might include
    * fetching a tool or building your dependencies. Runloop will look optimize these
    * steps for you.
@@ -143,12 +166,20 @@ export interface DevboxListParams {
   status?: string;
 }
 
+export interface DevboxExecuteSyncParams {
+  /**
+   * The command to execute on the Devbox.
+   */
+  command?: string;
+}
+
 export namespace Devboxes {
   export import DevboxExecutionDetailView = DevboxesAPI.DevboxExecutionDetailView;
   export import DevboxListView = DevboxesAPI.DevboxListView;
   export import DevboxView = DevboxesAPI.DevboxView;
   export import DevboxCreateParams = DevboxesAPI.DevboxCreateParams;
   export import DevboxListParams = DevboxesAPI.DevboxListParams;
+  export import DevboxExecuteSyncParams = DevboxesAPI.DevboxExecuteSyncParams;
   export import Logs = LogsAPI.Logs;
   export import DevboxLogsListView = LogsAPI.DevboxLogsListView;
 }
