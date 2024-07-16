@@ -4,7 +4,7 @@
 
 This library provides convenient access to the Runloop REST API from server-side TypeScript or JavaScript.
 
-The REST API documentation can be found [on runloop.ai](https://runloop.ai). The full API of this library can be found in [api.md](api.md).
+The REST API documentation can be found on [runloop.ai](https://runloop.ai). The full API of this library can be found in [api.md](api.md).
 
 It is generated with [Stainless](https://www.stainlessapi.com/).
 
@@ -278,14 +278,6 @@ We are keen for your feedback; please open an [issue](https://www.github.com/run
 TypeScript >= 4.5 is supported.
 
 The following runtimes are supported:
-
-- Node.js 18 LTS or later ([non-EOL](https://endoflife.date/nodejs)) versions.
-- Deno v1.28.0 or higher, using `import Runloop from "npm:@runloop/api-client"`.
-- Bun 1.0 or later.
-- Cloudflare Workers.
-- Vercel Edge Runtime.
-- Jest 28 or greater with the `"node"` environment (`"jsdom"` is not supported at this time).
-- Nitro v2.6 or greater.
 
 Note that React Native is not supported at this time.
 
