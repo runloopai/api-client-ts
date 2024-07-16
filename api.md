@@ -55,7 +55,7 @@ Types:
 Methods:
 
 - <code title="get /v1/functions/invocations/{invocationId}">client.functions.invocations.<a href="./src/resources/functions/invocations/invocations.ts">retrieve</a>(invocationId) -> InvocationRetrieveResponse</code>
-- <code title="get /v1/functions/invocations">client.functions.invocations.<a href="./src/resources/functions/invocations/invocations.ts">list</a>() -> FunctionInvocationListView</code>
+- <code title="get /v1/functions/invocations">client.functions.invocations.<a href="./src/resources/functions/invocations/invocations.ts">list</a>({ ...params }) -> FunctionInvocationListView</code>
 - <code title="post /v1/functions/invocations/{invocationId}/kill">client.functions.invocations.<a href="./src/resources/functions/invocations/invocations.ts">kill</a>(invocationId) -> unknown</code>
 
 ### Spans
