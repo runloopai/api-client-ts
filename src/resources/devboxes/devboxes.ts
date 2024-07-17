@@ -103,6 +103,8 @@ export interface DevboxListView {
    * List of devboxes matching filter.
    */
   devboxes?: Array<DevboxView>;
+
+  has_more?: boolean;
 }
 
 export interface DevboxView {
@@ -115,6 +117,21 @@ export interface DevboxView {
    * Creation time of the Devbox (Unix timestamp milliseconds).
    */
   create_time_ms?: number;
+
+  /**
+   * The time the Devbox finished execution (Unix timestamp milliseconds).
+   */
+  end_time_ms?: number;
+
+  /**
+   * The initiator ID of the devbox.
+   */
+  initiator_id?: string;
+
+  /**
+   * The initiator of the devbox.
+   */
+  initiator_type?: 'unknown' | 'api' | 'invocation';
 
   /**
    * The name of the Devbox.
@@ -160,6 +177,16 @@ export interface DevboxCreateParams {
 }
 
 export interface DevboxListParams {
+  /**
+   * Page Limit
+   */
+  limit?: string;
+
+  /**
+   * Load the next page starting after the given token.
+   */
+  starting_after?: string;
+
   /**
    * Filter by status
    */
