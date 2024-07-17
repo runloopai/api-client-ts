@@ -45,6 +45,16 @@ describe('resource invocations', () => {
     );
   });
 
+  test('list: request options and params are passed correctly', async () => {
+    // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
+    await expect(
+      runloop.functions.invocations.list(
+        { limit: 'limit', starting_after: 'starting_after' },
+        { path: '/_stainless_unknown_path' },
+      ),
+    ).rejects.toThrow(Runloop.NotFoundError);
+  });
+
   test('kill', async () => {
     const responsePromise = runloop.functions.invocations.kill('invocationId');
     const rawResponse = await responsePromise.asResponse();

@@ -4,6 +4,7 @@ export {
   FunctionInvocationListView,
   KillOperationResponse,
   InvocationRetrieveResponse,
+  InvocationListParams,
   InvocationKillParams,
   Invocations,
 } from './invocations';
