@@ -84,9 +84,26 @@ export interface FunctionInvokeAsyncResponse {
   function_name?: string;
 
   /**
+   * The Git sha of the project this invocation used..
+   */
+  gh_commit_sha?: string;
+
+  /**
+   * The Github Owner of the Project.
+   */
+  gh_owner?: string;
+
+  /**
+   * The Devboxes created and used by this invocation.
+   */
+  linked_devboxes?: Array<string>;
+
+  /**
    * Unique name of the project associated with function.
    */
   project_name?: string;
+
+  request?: unknown;
 
   result?: unknown;
 
@@ -107,9 +124,26 @@ export interface FunctionInvokeSyncResponse {
   function_name?: string;
 
   /**
+   * The Git sha of the project this invocation used..
+   */
+  gh_commit_sha?: string;
+
+  /**
+   * The Github Owner of the Project.
+   */
+  gh_owner?: string;
+
+  /**
+   * The Devboxes created and used by this invocation.
+   */
+  linked_devboxes?: Array<string>;
+
+  /**
    * Unique name of the project associated with function.
    */
   project_name?: string;
+
+  request?: unknown;
 
   result?: unknown;
 
@@ -162,5 +196,6 @@ export namespace Functions {
   export import FunctionInvocationListView = InvocationsAPI.FunctionInvocationListView;
   export import KillOperationResponse = InvocationsAPI.KillOperationResponse;
   export import InvocationRetrieveResponse = InvocationsAPI.InvocationRetrieveResponse;
+  export import InvocationListParams = InvocationsAPI.InvocationListParams;
   export import InvocationKillParams = InvocationsAPI.InvocationKillParams;
 }
