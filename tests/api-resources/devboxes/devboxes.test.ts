@@ -35,6 +35,7 @@ describe('resource devboxes', () => {
           code_handle: 'code_handle',
           entrypoint: 'entrypoint',
           environment_variables: { foo: 'string' },
+          image_id: 'image_id',
           name: 'name',
           setup_commands: ['string', 'string', 'string'],
         },
