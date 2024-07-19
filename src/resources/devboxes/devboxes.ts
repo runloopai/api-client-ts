@@ -164,6 +164,12 @@ export interface DevboxCreateParams {
   environment_variables?: Record<string, string>;
 
   /**
+   * (Optional) Image to use as the for the Devbox. If none set, the default Runloop
+   * image will be used.
+   */
+  image_id?: string;
+
+  /**
    * (Optional) A user specified name to give the Devbox.
    */
   name?: string;
