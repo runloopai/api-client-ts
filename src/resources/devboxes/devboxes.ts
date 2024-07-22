@@ -105,6 +105,8 @@ export interface DevboxListView {
   devboxes?: Array<DevboxView>;
 
   has_more?: boolean;
+
+  total_count?: number;
 }
 
 export interface DevboxView {

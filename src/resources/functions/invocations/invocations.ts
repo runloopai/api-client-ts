@@ -54,6 +54,8 @@ export interface FunctionInvocationListView {
    * List of functions matching given query.
    */
   invocations?: Array<FunctionInvocationListView.Invocation>;
+
+  total_count?: number;
 }
 
 export namespace FunctionInvocationListView {
