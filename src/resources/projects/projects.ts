@@ -1,9 +1,9 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-import { APIResource } from '@runloop/api-client/resource';
-import * as Core from '@runloop/api-client/core';
-import * as ProjectsAPI from '@runloop/api-client/resources/projects/projects';
-import * as LogsAPI from '@runloop/api-client/resources/projects/logs';
+import { APIResource } from '../../resource';
+import * as Core from '../../core';
+import * as ProjectsAPI from './projects';
+import * as LogsAPI from './logs';
 
 export class Projects extends APIResource {
   logs: LogsAPI.Logs = new LogsAPI.Logs(this._client);
