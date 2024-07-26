@@ -3,14 +3,14 @@
 import Runloop from '@runloop/api-client';
 import { Response } from 'node-fetch';
 
-const runloop = new Runloop({
+const client = new Runloop({
   bearerToken: 'My Bearer Token',
   baseURL: process.env['TEST_API_BASE_URL'] ?? 'http://127.0.0.1:4010',
 });
 
 describe('resource functions', () => {
   test('list', async () => {
-    const responsePromise = runloop.functions.list();
+    const responsePromise = client.functions.list();
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
     const response = await responsePromise;
@@ -22,13 +22,13 @@ describe('resource functions', () => {
 
   test('list: request options instead of params are passed correctly', async () => {
     // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
-    await expect(runloop.functions.list({ path: '/_stainless_unknown_path' })).rejects.toThrow(
+    await expect(client.functions.list({ path: '/_stainless_unknown_path' })).rejects.toThrow(
       Runloop.NotFoundError,
     );
   });
 
   test('invokeAsync: only required params', async () => {
-    const responsePromise = runloop.functions.invokeAsync('project_name', 'function_name', { request: {} });
+    const responsePromise = client.functions.invokeAsync('project_name', 'function_name', { request: {} });
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
     const response = await responsePromise;
@@ -39,14 +39,14 @@ describe('resource functions', () => {
   });
 
   test('invokeAsync: required and optional params', async () => {
-    const response = await runloop.functions.invokeAsync('project_name', 'function_name', {
+    const response = await client.functions.invokeAsync('project_name', 'function_name', {
       request: {},
       runloopMeta: { session_id: 'session_id' },
     });
   });
 
   test('invokeSync: only required params', async () => {
-    const responsePromise = runloop.functions.invokeSync('project_name', 'function_name', { request: {} });
+    const responsePromise = client.functions.invokeSync('project_name', 'function_name', { request: {} });
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
     const response = await responsePromise;
@@ -57,7 +57,7 @@ describe('resource functions', () => {
   });
 
   test('invokeSync: required and optional params', async () => {
-    const response = await runloop.functions.invokeSync('project_name', 'function_name', {
+    const response = await client.functions.invokeSync('project_name', 'function_name', {
       request: {},
       runloopMeta: { session_id: 'session_id' },
     });

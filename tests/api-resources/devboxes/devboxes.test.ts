@@ -3,14 +3,14 @@
 import Runloop from '@runloop/api-client';
 import { Response } from 'node-fetch';
 
-const runloop = new Runloop({
+const client = new Runloop({
   bearerToken: 'My Bearer Token',
   baseURL: process.env['TEST_API_BASE_URL'] ?? 'http://127.0.0.1:4010',
 });
 
 describe('resource devboxes', () => {
   test('create', async () => {
-    const responsePromise = runloop.devboxes.create();
+    const responsePromise = client.devboxes.create();
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
     const response = await responsePromise;
@@ -22,7 +22,7 @@ describe('resource devboxes', () => {
 
   test('create: request options instead of params are passed correctly', async () => {
     // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
-    await expect(runloop.devboxes.create({ path: '/_stainless_unknown_path' })).rejects.toThrow(
+    await expect(client.devboxes.create({ path: '/_stainless_unknown_path' })).rejects.toThrow(
       Runloop.NotFoundError,
     );
   });
@@ -30,7 +30,7 @@ describe('resource devboxes', () => {
   test('create: request options and params are passed correctly', async () => {
     // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
     await expect(
-      runloop.devboxes.create(
+      client.devboxes.create(
         {
           code_handle: 'code_handle',
           entrypoint: 'entrypoint',
@@ -46,7 +46,7 @@ describe('resource devboxes', () => {
   });
 
   test('retrieve', async () => {
-    const responsePromise = runloop.devboxes.retrieve('id');
+    const responsePromise = client.devboxes.retrieve('id');
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
     const response = await responsePromise;
@@ -58,13 +58,13 @@ describe('resource devboxes', () => {
 
   test('retrieve: request options instead of params are passed correctly', async () => {
     // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
-    await expect(runloop.devboxes.retrieve('id', { path: '/_stainless_unknown_path' })).rejects.toThrow(
+    await expect(client.devboxes.retrieve('id', { path: '/_stainless_unknown_path' })).rejects.toThrow(
       Runloop.NotFoundError,
     );
   });
 
   test('list', async () => {
-    const responsePromise = runloop.devboxes.list();
+    const responsePromise = client.devboxes.list();
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
     const response = await responsePromise;
@@ -76,7 +76,7 @@ describe('resource devboxes', () => {
 
   test('list: request options instead of params are passed correctly', async () => {
     // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
-    await expect(runloop.devboxes.list({ path: '/_stainless_unknown_path' })).rejects.toThrow(
+    await expect(client.devboxes.list({ path: '/_stainless_unknown_path' })).rejects.toThrow(
       Runloop.NotFoundError,
     );
   });
@@ -84,7 +84,7 @@ describe('resource devboxes', () => {
   test('list: request options and params are passed correctly', async () => {
     // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
     await expect(
-      runloop.devboxes.list(
+      client.devboxes.list(
         { limit: 'limit', starting_after: 'starting_after', status: 'status' },
         { path: '/_stainless_unknown_path' },
       ),
@@ -92,7 +92,7 @@ describe('resource devboxes', () => {
   });
 
   test('executeSync', async () => {
-    const responsePromise = runloop.devboxes.executeSync('id');
+    const responsePromise = client.devboxes.executeSync('id');
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
     const response = await responsePromise;
@@ -104,7 +104,7 @@ describe('resource devboxes', () => {
 
   test('executeSync: request options instead of params are passed correctly', async () => {
     // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
-    await expect(runloop.devboxes.executeSync('id', { path: '/_stainless_unknown_path' })).rejects.toThrow(
+    await expect(client.devboxes.executeSync('id', { path: '/_stainless_unknown_path' })).rejects.toThrow(
       Runloop.NotFoundError,
     );
   });
@@ -112,12 +112,12 @@ describe('resource devboxes', () => {
   test('executeSync: request options and params are passed correctly', async () => {
     // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
     await expect(
-      runloop.devboxes.executeSync('id', { command: 'command' }, { path: '/_stainless_unknown_path' }),
+      client.devboxes.executeSync('id', { command: 'command' }, { path: '/_stainless_unknown_path' }),
     ).rejects.toThrow(Runloop.NotFoundError);
   });
 
   test('shutdown', async () => {
-    const responsePromise = runloop.devboxes.shutdown('id');
+    const responsePromise = client.devboxes.shutdown('id');
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
     const response = await responsePromise;
@@ -129,7 +129,7 @@ describe('resource devboxes', () => {
 
   test('shutdown: request options instead of params are passed correctly', async () => {
     // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
-    await expect(runloop.devboxes.shutdown('id', { path: '/_stainless_unknown_path' })).rejects.toThrow(
+    await expect(client.devboxes.shutdown('id', { path: '/_stainless_unknown_path' })).rejects.toThrow(
       Runloop.NotFoundError,
     );
   });
