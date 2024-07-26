@@ -76,6 +76,11 @@ export interface FunctionInvokeAsyncResponse {
    */
   id?: string;
 
+  /**
+   * End time of the invocation.
+   */
+  end_time_ms?: number;
+
   error?: string;
 
   /**
@@ -106,6 +111,11 @@ export interface FunctionInvokeAsyncResponse {
   request?: unknown;
 
   result?: unknown;
+
+  /**
+   * Start time of the invocation.
+   */
+  start_time_ms?: number;
 
   status?: 'created' | 'running' | 'success' | 'failure' | 'canceled' | 'suspended';
 }
@@ -116,6 +126,11 @@ export interface FunctionInvokeSyncResponse {
    */
   id?: string;
 
+  /**
+   * End time of the invocation.
+   */
+  end_time_ms?: number;
+
   error?: string;
 
   /**
@@ -146,6 +161,11 @@ export interface FunctionInvokeSyncResponse {
   request?: unknown;
 
   result?: unknown;
+
+  /**
+   * Start time of the invocation.
+   */
+  start_time_ms?: number;
 
   status?: 'created' | 'running' | 'success' | 'failure' | 'canceled' | 'suspended';
 }
