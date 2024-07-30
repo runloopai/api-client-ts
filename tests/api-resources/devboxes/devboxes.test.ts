@@ -32,11 +32,11 @@ describe('resource devboxes', () => {
     await expect(
       client.devboxes.create(
         {
+          blueprint_id: 'blueprint_id',
+          blueprint_name: 'blueprint_name',
           code_handle: 'code_handle',
           entrypoint: 'entrypoint',
           environment_variables: { foo: 'string' },
-          image_id: 'image_id',
-          image_name: 'image_name',
           name: 'name',
           setup_commands: ['string', 'string', 'string'],
         },
