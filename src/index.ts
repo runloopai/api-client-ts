@@ -119,6 +119,9 @@ export class Runloop extends Core.APIClient {
     this.bearerToken = bearerToken;
   }
 
+  account: API.Account = new API.Account(this);
+  blueprints: API.Blueprints = new API.Blueprints(this);
+  code: API.Code = new API.Code(this);
   devboxes: API.Devboxes = new API.Devboxes(this);
   functions: API.Functions = new API.Functions(this);
   projects: API.Projects = new API.Projects(this);
@@ -180,6 +183,21 @@ export import fileFromPath = Uploads.fileFromPath;
 
 export namespace Runloop {
   export import RequestOptions = Core.RequestOptions;
+
+  export import Account = API.Account;
+  export import ResourceSize = API.ResourceSize;
+
+  export import Blueprints = API.Blueprints;
+  export import BlueprintBuildLog = API.BlueprintBuildLog;
+  export import BlueprintBuildLogsListView = API.BlueprintBuildLogsListView;
+  export import BlueprintBuildParameters = API.BlueprintBuildParameters;
+  export import BlueprintListView = API.BlueprintListView;
+  export import BlueprintPreviewView = API.BlueprintPreviewView;
+  export import BlueprintView = API.BlueprintView;
+  export import BlueprintCreateParams = API.BlueprintCreateParams;
+
+  export import Code = API.Code;
+  export import CodeMountParameters = API.CodeMountParameters;
 
   export import Devboxes = API.Devboxes;
   export import DevboxExecutionDetailView = API.DevboxExecutionDetailView;

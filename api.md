@@ -4,6 +4,35 @@ Types:
 
 - <code><a href="./src/resources/shared.ts">ProjectLogsView</a></code>
 
+# Account
+
+Types:
+
+- <code><a href="./src/resources/account.ts">ResourceSize</a></code>
+
+# Blueprints
+
+Types:
+
+- <code><a href="./src/resources/blueprints.ts">BlueprintBuildLog</a></code>
+- <code><a href="./src/resources/blueprints.ts">BlueprintBuildLogsListView</a></code>
+- <code><a href="./src/resources/blueprints.ts">BlueprintBuildParameters</a></code>
+- <code><a href="./src/resources/blueprints.ts">BlueprintListView</a></code>
+- <code><a href="./src/resources/blueprints.ts">BlueprintPreviewView</a></code>
+- <code><a href="./src/resources/blueprints.ts">BlueprintView</a></code>
+
+Methods:
+
+- <code title="post /v1/blueprints">client.blueprints.<a href="./src/resources/blueprints.ts">create</a>({ ...params }) -> BlueprintPreviewView</code>
+- <code title="get /v1/blueprints/{id}">client.blueprints.<a href="./src/resources/blueprints.ts">retrieve</a>(id) -> BlueprintView</code>
+- <code title="get /v1/blueprints">client.blueprints.<a href="./src/resources/blueprints.ts">list</a>() -> BlueprintBuildLogsListView</code>
+
+# Code
+
+Types:
+
+- <code><a href="./src/resources/code.ts">CodeMountParameters</a></code>
+
 # Devboxes
 
 Types:
