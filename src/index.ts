@@ -139,6 +139,7 @@ export class Runloop extends Core.APIClient {
   }
 
   static Runloop = this;
+  static DEFAULT_TIMEOUT = 60000; // 1 minute
 
   static RunloopError = Errors.RunloopError;
   static APIError = Errors.APIError;
