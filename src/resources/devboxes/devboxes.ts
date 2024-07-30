@@ -149,6 +149,18 @@ export interface DevboxView {
 
 export interface DevboxCreateParams {
   /**
+   * (Optional) Blueprint to use for the Devbox. If none set, the Devbox will be
+   * created with the default Runloop Devbox image.
+   */
+  blueprint_id?: string;
+
+  /**
+   * (Optional) Name of Blueprint to use for the Devbox. When set, this will load the
+   * latest successfully built Blueprint with the given name.
+   */
+  blueprint_name?: string;
+
+  /**
    * (Optional) Id of a code handle to mount to devbox.
    */
   code_handle?: string;
@@ -164,18 +176,6 @@ export interface DevboxCreateParams {
    * (Optional) Environment variables used to configure your Devbox.
    */
   environment_variables?: Record<string, string>;
-
-  /**
-   * (Optional) Image to use for the Devbox. If none set, the default Runloop image
-   * will be used.
-   */
-  image_id?: string;
-
-  /**
-   * (Optional) Name of image to use for the Devbox. When set, this will load the
-   * latest successfully built image with the given name.
-   */
-  image_name?: string;
 
   /**
    * (Optional) A user specified name to give the Devbox.
