@@ -9,8 +9,6 @@ export {
   BlueprintPreviewView,
   BlueprintView,
   BlueprintCreateParams,
-  BlueprintListParams,
-  BlueprintPreviewParams,
   Blueprints,
 } from './blueprints';
 export { CodeMountParameters, Code } from './code';
