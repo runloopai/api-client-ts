@@ -195,6 +195,8 @@ export namespace Runloop {
   export import BlueprintPreviewView = API.BlueprintPreviewView;
   export import BlueprintView = API.BlueprintView;
   export import BlueprintCreateParams = API.BlueprintCreateParams;
+  export import BlueprintListParams = API.BlueprintListParams;
+  export import BlueprintPreviewParams = API.BlueprintPreviewParams;
 
   export import Code = API.Code;
   export import CodeMountParameters = API.CodeMountParameters;

@@ -27,9 +27,9 @@ const client = new Runloop({
 });
 
 async function main() {
-  const blueprintPreviewView = await client.blueprints.create();
+  const blueprintView = await client.blueprints.create();
 
-  console.log(blueprintPreviewView.dockerfile);
+  console.log(blueprintView.id);
 }
 
 main();
@@ -48,7 +48,7 @@ const client = new Runloop({
 });
 
 async function main() {
-  const blueprintPreviewView: Runloop.BlueprintPreviewView = await client.blueprints.create();
+  const blueprintView: Runloop.BlueprintView = await client.blueprints.create();
 }
 
 main();
@@ -65,7 +65,7 @@ a subclass of `APIError` will be thrown:
 <!-- prettier-ignore -->
 ```ts
 async function main() {
-  const blueprintPreviewView = await client.blueprints.create().catch(async (err) => {
+  const blueprintView = await client.blueprints.create().catch(async (err) => {
     if (err instanceof Runloop.APIError) {
       console.log(err.status); // 400
       console.log(err.name); // BadRequestError
@@ -150,9 +150,9 @@ const response = await client.blueprints.create().asResponse();
 console.log(response.headers.get('X-My-Header'));
 console.log(response.statusText); // access the underlying Response object
 
-const { data: blueprintPreviewView, response: raw } = await client.blueprints.create().withResponse();
+const { data: blueprintView, response: raw } = await client.blueprints.create().withResponse();
 console.log(raw.headers.get('X-My-Header'));
-console.log(blueprintPreviewView.dockerfile);
+console.log(blueprintView.id);
 ```
 
 ### Making custom/undocumented requests
