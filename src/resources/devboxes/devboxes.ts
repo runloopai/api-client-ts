@@ -116,11 +116,6 @@ export interface DevboxView {
   id?: string;
 
   /**
-   * The Blueprint ID used in creation of the Devbox, if any.
-   */
-  blueprint_id?: string;
-
-  /**
    * Creation time of the Devbox (Unix timestamp milliseconds).
    */
   create_time_ms?: number;
