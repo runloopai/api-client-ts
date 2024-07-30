@@ -27,9 +27,9 @@ const client = new Runloop({
 });
 
 async function main() {
-  const devboxView = await client.devboxes.create();
+  const blueprintPreviewView = await client.blueprints.create();
 
-  console.log(devboxView.id);
+  console.log(blueprintPreviewView.dockerfile);
 }
 
 main();
@@ -48,7 +48,7 @@ const client = new Runloop({
 });
 
 async function main() {
-  const devboxView: Runloop.DevboxView = await client.devboxes.create();
+  const blueprintPreviewView: Runloop.BlueprintPreviewView = await client.blueprints.create();
 }
 
 main();
@@ -65,7 +65,7 @@ a subclass of `APIError` will be thrown:
 <!-- prettier-ignore -->
 ```ts
 async function main() {
-  const devboxView = await client.devboxes.create().catch(async (err) => {
+  const blueprintPreviewView = await client.blueprints.create().catch(async (err) => {
     if (err instanceof Runloop.APIError) {
       console.log(err.status); // 400
       console.log(err.name); // BadRequestError
@@ -108,7 +108,7 @@ const client = new Runloop({
 });
 
 // Or, configure per-request:
-await client.devboxes.create({
+await client.blueprints.create({
   maxRetries: 5,
 });
 ```
@@ -125,7 +125,7 @@ const client = new Runloop({
 });
 
 // Override per-request:
-await client.devboxes.create({
+await client.blueprints.create({
   timeout: 5 * 1000,
 });
 ```
@@ -146,13 +146,13 @@ You can also use the `.withResponse()` method to get the raw `Response` along wi
 ```ts
 const client = new Runloop();
 
-const response = await client.devboxes.create().asResponse();
+const response = await client.blueprints.create().asResponse();
 console.log(response.headers.get('X-My-Header'));
 console.log(response.statusText); // access the underlying Response object
 
-const { data: devboxView, response: raw } = await client.devboxes.create().withResponse();
+const { data: blueprintPreviewView, response: raw } = await client.blueprints.create().withResponse();
 console.log(raw.headers.get('X-My-Header'));
-console.log(devboxView.id);
+console.log(blueprintPreviewView.dockerfile);
 ```
 
 ### Making custom/undocumented requests
@@ -256,7 +256,7 @@ const client = new Runloop({
 });
 
 // Override per-request:
-await client.devboxes.create({
+await client.blueprints.create({
   httpAgent: new http.Agent({ keepAlive: false }),
 });
 ```
