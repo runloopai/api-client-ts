@@ -3,15 +3,12 @@
 export {
   FunctionInvocationListView,
   KillOperationResponse,
-  InvocationRetrieveResponse,
   InvocationListParams,
   InvocationKillParams,
   Invocations,
-} from './invocations/index';
+} from './invocations';
 export {
   FunctionListView,
-  FunctionInvokeAsyncResponse,
-  FunctionInvokeSyncResponse,
   FunctionInvokeAsyncParams,
   FunctionInvokeSyncParams,
   Functions,

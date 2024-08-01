@@ -3,7 +3,8 @@
 import { APIResource } from '../../resource';
 import * as Core from '../../core';
 import * as FunctionsAPI from './functions';
-import * as InvocationsAPI from './invocations/invocations';
+import * as Shared from '../shared';
+import * as InvocationsAPI from './invocations';
 
 export class Functions extends APIResource {
   invocations: InvocationsAPI.Invocations = new InvocationsAPI.Invocations(this._client);
@@ -24,7 +25,7 @@ export class Functions extends APIResource {
     functionName: string,
     body: FunctionInvokeAsyncParams,
     options?: Core.RequestOptions,
-  ): Core.APIPromise<FunctionInvokeAsyncResponse> {
+  ): Core.APIPromise<Shared.FunctionInvocationExecutionDetailView> {
     return this._client.post(`/v1/functions/${projectName}/${functionName}/invoke_async`, {
       body,
       ...options,
@@ -41,7 +42,7 @@ export class Functions extends APIResource {
     functionName: string,
     body: FunctionInvokeSyncParams,
     options?: Core.RequestOptions,
-  ): Core.APIPromise<FunctionInvokeSyncResponse> {
+  ): Core.APIPromise<Shared.FunctionInvocationExecutionDetailView> {
     return this._client.post(`/v1/functions/${projectName}/${functionName}/invoke_sync`, {
       body,
       ...options,
@@ -68,106 +69,6 @@ export namespace FunctionListView {
      */
     project_name?: string;
   }
-}
-
-export interface FunctionInvokeAsyncResponse {
-  /**
-   * Unique ID of the invocation.
-   */
-  id?: string;
-
-  /**
-   * End time of the invocation.
-   */
-  end_time_ms?: number;
-
-  error?: string;
-
-  /**
-   * Unique name of the function.
-   */
-  function_name?: string;
-
-  /**
-   * The Git sha of the project this invocation used..
-   */
-  gh_commit_sha?: string;
-
-  /**
-   * The Github Owner of the Project.
-   */
-  gh_owner?: string;
-
-  /**
-   * The Devboxes created and used by this invocation.
-   */
-  linked_devboxes?: Array<string>;
-
-  /**
-   * Unique name of the project associated with function.
-   */
-  project_name?: string;
-
-  request?: unknown;
-
-  result?: unknown;
-
-  /**
-   * Start time of the invocation.
-   */
-  start_time_ms?: number;
-
-  status?: 'created' | 'running' | 'success' | 'failure' | 'canceled' | 'suspended';
-}
-
-export interface FunctionInvokeSyncResponse {
-  /**
-   * Unique ID of the invocation.
-   */
-  id?: string;
-
-  /**
-   * End time of the invocation.
-   */
-  end_time_ms?: number;
-
-  error?: string;
-
-  /**
-   * Unique name of the function.
-   */
-  function_name?: string;
-
-  /**
-   * The Git sha of the project this invocation used..
-   */
-  gh_commit_sha?: string;
-
-  /**
-   * The Github Owner of the Project.
-   */
-  gh_owner?: string;
-
-  /**
-   * The Devboxes created and used by this invocation.
-   */
-  linked_devboxes?: Array<string>;
-
-  /**
-   * Unique name of the project associated with function.
-   */
-  project_name?: string;
-
-  request?: unknown;
-
-  result?: unknown;
-
-  /**
-   * Start time of the invocation.
-   */
-  start_time_ms?: number;
-
-  status?: 'created' | 'running' | 'success' | 'failure' | 'canceled' | 'suspended';
 }
 
 export interface FunctionInvokeAsyncParams {
@@ -208,14 +109,11 @@ export namespace FunctionInvokeSyncParams {
 
 export namespace Functions {
   export import FunctionListView = FunctionsAPI.FunctionListView;
-  export import FunctionInvokeAsyncResponse = FunctionsAPI.FunctionInvokeAsyncResponse;
-  export import FunctionInvokeSyncResponse = FunctionsAPI.FunctionInvokeSyncResponse;
   export import FunctionInvokeAsyncParams = FunctionsAPI.FunctionInvokeAsyncParams;
   export import FunctionInvokeSyncParams = FunctionsAPI.FunctionInvokeSyncParams;
   export import Invocations = InvocationsAPI.Invocations;
   export import FunctionInvocationListView = InvocationsAPI.FunctionInvocationListView;
   export import KillOperationResponse = InvocationsAPI.KillOperationResponse;
-  export import InvocationRetrieveResponse = InvocationsAPI.InvocationRetrieveResponse;
   export import InvocationListParams = InvocationsAPI.InvocationListParams;
   export import InvocationKillParams = InvocationsAPI.InvocationKillParams;
 }
