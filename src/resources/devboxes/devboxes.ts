@@ -183,6 +183,11 @@ export interface DevboxCreateParams {
   environment_variables?: Record<string, string>;
 
   /**
+   * (Optional) Map of paths and file contents to write before setup..
+   */
+  file_mounts?: Record<string, string>;
+
+  /**
    * (Optional) A user specified name to give the Devbox.
    */
   name?: string;
