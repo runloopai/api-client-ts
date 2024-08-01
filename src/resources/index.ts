@@ -25,8 +25,6 @@ export {
 } from './devboxes/devboxes';
 export {
   FunctionListView,
-  FunctionInvokeAsyncResponse,
-  FunctionInvokeSyncResponse,
   FunctionInvokeAsyncParams,
   FunctionInvokeSyncParams,
   Functions,

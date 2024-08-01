@@ -69,10 +69,24 @@ export class Devboxes extends APIResource {
   }
 
   /**
+   * Read file contents from a file on given Devbox.
+   */
+  readFile(id: string, options?: Core.RequestOptions): Core.APIPromise<DevboxExecutionDetailView> {
+    return this._client.post(`/v1/devboxes/${id}/read_file`, options);
+  }
+
+  /**
    * Shutdown a running devbox by id. This will take the devbox out of service.
    */
   shutdown(id: string, options?: Core.RequestOptions): Core.APIPromise<DevboxView> {
     return this._client.post(`/v1/devboxes/${id}/shutdown`, options);
+  }
+
+  /**
+   * Write contents to a file at path on the Devbox.
+   */
+  writeFile(id: string, options?: Core.RequestOptions): Core.APIPromise<DevboxExecutionDetailView> {
+    return this._client.post(`/v1/devboxes/${id}/write_file`, options);
   }
 }
 

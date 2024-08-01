@@ -1,19 +1,20 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-import { APIResource } from '../../../resource';
-import { isRequestOptions } from '../../../core';
-import * as Core from '../../../core';
+import { APIResource } from '../../resource';
+import { isRequestOptions } from '../../core';
+import * as Core from '../../core';
 import * as InvocationsAPI from './invocations';
-import * as SpansAPI from './spans';
+import * as Shared from '../shared';
 
 export class Invocations extends APIResource {
-  spans: SpansAPI.Spans = new SpansAPI.Spans(this._client);
-
   /**
    * Get the details of a function invocation. This includes the status, response,
    * and error message.
    */
-  retrieve(invocationId: string, options?: Core.RequestOptions): Core.APIPromise<InvocationRetrieveResponse> {
+  retrieve(
+    invocationId: string,
+    options?: Core.RequestOptions,
+  ): Core.APIPromise<Shared.FunctionInvocationExecutionDetailView> {
     return this._client.get(`/v1/functions/invocations/${invocationId}`, options);
   }
 
@@ -108,56 +109,6 @@ export namespace FunctionInvocationListView {
 
 export type KillOperationResponse = unknown;
 
-export interface InvocationRetrieveResponse {
-  /**
-   * Unique ID of the invocation.
-   */
-  id?: string;
-
-  /**
-   * End time of the invocation.
-   */
-  end_time_ms?: number;
-
-  error?: string;
-
-  /**
-   * Unique name of the function.
-   */
-  function_name?: string;
-
-  /**
-   * The Git sha of the project this invocation used..
-   */
-  gh_commit_sha?: string;
-
-  /**
-   * The Github Owner of the Project.
-   */
-  gh_owner?: string;
-
-  /**
-   * The Devboxes created and used by this invocation.
-   */
-  linked_devboxes?: Array<string>;
-
-  /**
-   * Unique name of the project associated with function.
-   */
-  project_name?: string;
-
-  request?: unknown;
-
-  result?: unknown;
-
-  /**
-   * Start time of the invocation.
-   */
-  start_time_ms?: number;
-
-  status?: 'created' | 'running' | 'success' | 'failure' | 'canceled' | 'suspended';
-}
-
 export interface InvocationListParams {
   /**
    * Page Limit
@@ -175,8 +126,6 @@ export interface InvocationKillParams {}
 export namespace Invocations {
   export import FunctionInvocationListView = InvocationsAPI.FunctionInvocationListView;
   export import KillOperationResponse = InvocationsAPI.KillOperationResponse;
-  export import InvocationRetrieveResponse = InvocationsAPI.InvocationRetrieveResponse;
   export import InvocationListParams = InvocationsAPI.InvocationListParams;
   export import InvocationKillParams = InvocationsAPI.InvocationKillParams;
-  export import Spans = SpansAPI.Spans;
 }
