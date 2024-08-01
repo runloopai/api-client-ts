@@ -116,6 +116,11 @@ export interface BlueprintBuildParameters {
   dockerfile?: string;
 
   /**
+   * (Optional) Map of paths and file contents to write before setup..
+   */
+  file_mounts?: Record<string, string>;
+
+  /**
    * Parameters to configure your Devbox at launch time.
    */
   launch_parameters?: BlueprintBuildParameters.LaunchParameters;
@@ -205,6 +210,11 @@ export interface BlueprintCreateParams {
   dockerfile?: string;
 
   /**
+   * (Optional) Map of paths and file contents to write before setup..
+   */
+  file_mounts?: Record<string, string>;
+
+  /**
    * Parameters to configure your Devbox at launch time.
    */
   launch_parameters?: BlueprintCreateParams.LaunchParameters;
@@ -264,6 +274,11 @@ export interface BlueprintPreviewParams {
    * Dockerfile contents to be used to build the Blueprint.
    */
   dockerfile?: string;
+
+  /**
+   * (Optional) Map of paths and file contents to write before setup..
+   */
+  file_mounts?: Record<string, string>;
 
   /**
    * Parameters to configure your Devbox at launch time.
