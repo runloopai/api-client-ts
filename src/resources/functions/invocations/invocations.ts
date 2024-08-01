@@ -1,9 +1,10 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-import { APIResource } from '@runloop/api-client/resource';
-import * as Core from '@runloop/api-client/core';
-import * as InvocationsAPI from '@runloop/api-client/resources/functions/invocations/invocations';
-import * as SpansAPI from '@runloop/api-client/resources/functions/invocations/spans';
+import { APIResource } from '../../../resource';
+import { isRequestOptions } from '../../../core';
+import * as Core from '../../../core';
+import * as InvocationsAPI from './invocations';
+import * as SpansAPI from './spans';
 
 export class Invocations extends APIResource {
   spans: SpansAPI.Spans = new SpansAPI.Spans(this._client);
@@ -19,8 +20,19 @@ export class Invocations extends APIResource {
   /**
    * List the functions invocations that are available for invocation.
    */
-  list(options?: Core.RequestOptions): Core.APIPromise<FunctionInvocationListView> {
-    return this._client.get('/v1/functions/invocations', options);
+  list(
+    query?: InvocationListParams,
+    options?: Core.RequestOptions,
+  ): Core.APIPromise<FunctionInvocationListView>;
+  list(options?: Core.RequestOptions): Core.APIPromise<FunctionInvocationListView>;
+  list(
+    query: InvocationListParams | Core.RequestOptions = {},
+    options?: Core.RequestOptions,
+  ): Core.APIPromise<FunctionInvocationListView> {
+    if (isRequestOptions(query)) {
+      return this.list({}, query);
+    }
+    return this._client.get('/v1/functions/invocations', { query, ...options });
   }
 
   /**
@@ -36,28 +48,27 @@ export class Invocations extends APIResource {
 }
 
 export interface FunctionInvocationListView {
+  has_more?: boolean;
+
   /**
    * List of functions matching given query.
    */
   invocations?: Array<FunctionInvocationListView.Invocation>;
+
+  total_count?: number;
 }
 
 export namespace FunctionInvocationListView {
   export interface Invocation {
     /**
-     * End time of the invocation.
-     */
-    end_time_ms: number;
-
-    /**
-     * Start time of the invocation.
-     */
-    start_time_ms: number;
-
-    /**
      * Unique ID of the invocation.
      */
     id?: string;
+
+    /**
+     * End time of the invocation.
+     */
+    end_time_ms?: number;
 
     error?: string;
 
@@ -67,9 +78,29 @@ export namespace FunctionInvocationListView {
     function_name?: string;
 
     /**
+     * The Git sha of the project this invocation used.
+     */
+    gh_commit_sha?: string;
+
+    /**
+     * The Github Owner of the Project.
+     */
+    gh_owner?: string;
+
+    /**
+     * The Devboxes created and used by this invocation.
+     */
+    linked_devboxes?: Array<string>;
+
+    /**
      * Unique name of the project associated with function.
      */
     project_name?: string;
+
+    /**
+     * Start time of the invocation.
+     */
+    start_time_ms?: number;
 
     status?: 'created' | 'running' | 'success' | 'failure' | 'canceled' | 'suspended';
   }
@@ -83,6 +114,11 @@ export interface InvocationRetrieveResponse {
    */
   id?: string;
 
+  /**
+   * End time of the invocation.
+   */
+  end_time_ms?: number;
+
   error?: string;
 
   /**
@@ -91,13 +127,47 @@ export interface InvocationRetrieveResponse {
   function_name?: string;
 
   /**
+   * The Git sha of the project this invocation used..
+   */
+  gh_commit_sha?: string;
+
+  /**
+   * The Github Owner of the Project.
+   */
+  gh_owner?: string;
+
+  /**
+   * The Devboxes created and used by this invocation.
+   */
+  linked_devboxes?: Array<string>;
+
+  /**
    * Unique name of the project associated with function.
    */
   project_name?: string;
 
+  request?: unknown;
+
   result?: unknown;
 
+  /**
+   * Start time of the invocation.
+   */
+  start_time_ms?: number;
+
   status?: 'created' | 'running' | 'success' | 'failure' | 'canceled' | 'suspended';
+}
+
+export interface InvocationListParams {
+  /**
+   * Page Limit
+   */
+  limit?: string;
+
+  /**
+   * Load the next page starting after the given token.
+   */
+  starting_after?: string;
 }
 
 export interface InvocationKillParams {}
@@ -106,6 +176,7 @@ export namespace Invocations {
   export import FunctionInvocationListView = InvocationsAPI.FunctionInvocationListView;
   export import KillOperationResponse = InvocationsAPI.KillOperationResponse;
   export import InvocationRetrieveResponse = InvocationsAPI.InvocationRetrieveResponse;
+  export import InvocationListParams = InvocationsAPI.InvocationListParams;
   export import InvocationKillParams = InvocationsAPI.InvocationKillParams;
   export import Spans = SpansAPI.Spans;
 }

@@ -1,10 +1,10 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-import { APIResource } from '@runloop/api-client/resource';
-import { isRequestOptions } from '@runloop/api-client/core';
-import * as Core from '@runloop/api-client/core';
-import * as DevboxesAPI from '@runloop/api-client/resources/devboxes/devboxes';
-import * as LogsAPI from '@runloop/api-client/resources/devboxes/logs';
+import { APIResource } from '../../resource';
+import { isRequestOptions } from '../../core';
+import * as Core from '../../core';
+import * as DevboxesAPI from './devboxes';
+import * as LogsAPI from './logs';
 
 export class Devboxes extends APIResource {
   logs: LogsAPI.Logs = new LogsAPI.Logs(this._client);
@@ -103,6 +103,10 @@ export interface DevboxListView {
    * List of devboxes matching filter.
    */
   devboxes?: Array<DevboxView>;
+
+  has_more?: boolean;
+
+  total_count?: number;
 }
 
 export interface DevboxView {
@@ -112,9 +116,29 @@ export interface DevboxView {
   id?: string;
 
   /**
+   * The Blueprint ID used in creation of the Devbox, if any.
+   */
+  blueprint_id?: string;
+
+  /**
    * Creation time of the Devbox (Unix timestamp milliseconds).
    */
   create_time_ms?: number;
+
+  /**
+   * The time the Devbox finished execution (Unix timestamp milliseconds).
+   */
+  end_time_ms?: number;
+
+  /**
+   * The initiator ID of the devbox.
+   */
+  initiator_id?: string;
+
+  /**
+   * The initiator of the devbox.
+   */
+  initiator_type?: 'unknown' | 'api' | 'invocation';
 
   /**
    * The name of the Devbox.
@@ -129,6 +153,18 @@ export interface DevboxView {
 }
 
 export interface DevboxCreateParams {
+  /**
+   * (Optional) Blueprint to use for the Devbox. If none set, the Devbox will be
+   * created with the default Runloop Devbox image.
+   */
+  blueprint_id?: string;
+
+  /**
+   * (Optional) Name of Blueprint to use for the Devbox. When set, this will load the
+   * latest successfully built Blueprint with the given name.
+   */
+  blueprint_name?: string;
+
   /**
    * (Optional) Id of a code handle to mount to devbox.
    */
@@ -147,6 +183,11 @@ export interface DevboxCreateParams {
   environment_variables?: Record<string, string>;
 
   /**
+   * (Optional) Map of paths and file contents to write before setup..
+   */
+  file_mounts?: Record<string, string>;
+
+  /**
    * (Optional) A user specified name to give the Devbox.
    */
   name?: string;
@@ -160,6 +201,16 @@ export interface DevboxCreateParams {
 }
 
 export interface DevboxListParams {
+  /**
+   * Page Limit
+   */
+  limit?: string;
+
+  /**
+   * Load the next page starting after the given token.
+   */
+  starting_after?: string;
+
   /**
    * Filter by status
    */

@@ -8,9 +8,9 @@ const client = new Runloop({
   baseURL: process.env['TEST_API_BASE_URL'] ?? 'http://127.0.0.1:4010',
 });
 
-describe('resource devboxes', () => {
+describe('resource blueprints', () => {
   test('create', async () => {
-    const responsePromise = client.devboxes.create();
+    const responsePromise = client.blueprints.create();
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
     const response = await responsePromise;
@@ -22,7 +22,7 @@ describe('resource devboxes', () => {
 
   test('create: request options instead of params are passed correctly', async () => {
     // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
-    await expect(client.devboxes.create({ path: '/_stainless_unknown_path' })).rejects.toThrow(
+    await expect(client.blueprints.create({ path: '/_stainless_unknown_path' })).rejects.toThrow(
       Runloop.NotFoundError,
     );
   });
@@ -30,16 +30,36 @@ describe('resource devboxes', () => {
   test('create: request options and params are passed correctly', async () => {
     // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
     await expect(
-      client.devboxes.create(
+      client.blueprints.create(
         {
-          blueprint_id: 'blueprint_id',
-          blueprint_name: 'blueprint_name',
-          code_handle: 'code_handle',
-          entrypoint: 'entrypoint',
-          environment_variables: { foo: 'string' },
+          code_mounts: [
+            {
+              repo_name: 'repo_name',
+              repo_owner: 'repo_owner',
+              install_command: 'install_command',
+              token: 'token',
+            },
+            {
+              repo_name: 'repo_name',
+              repo_owner: 'repo_owner',
+              install_command: 'install_command',
+              token: 'token',
+            },
+            {
+              repo_name: 'repo_name',
+              repo_owner: 'repo_owner',
+              install_command: 'install_command',
+              token: 'token',
+            },
+          ],
+          dockerfile: 'dockerfile',
           file_mounts: { foo: 'string' },
+          launch_parameters: {
+            launch_commands: ['string', 'string', 'string'],
+            resource_size_request: 'MINI',
+          },
           name: 'name',
-          setup_commands: ['string', 'string', 'string'],
+          system_setup_commands: ['string', 'string', 'string'],
         },
         { path: '/_stainless_unknown_path' },
       ),
@@ -47,7 +67,7 @@ describe('resource devboxes', () => {
   });
 
   test('retrieve', async () => {
-    const responsePromise = client.devboxes.retrieve('id');
+    const responsePromise = client.blueprints.retrieve('id');
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
     const response = await responsePromise;
@@ -59,13 +79,13 @@ describe('resource devboxes', () => {
 
   test('retrieve: request options instead of params are passed correctly', async () => {
     // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
-    await expect(client.devboxes.retrieve('id', { path: '/_stainless_unknown_path' })).rejects.toThrow(
+    await expect(client.blueprints.retrieve('id', { path: '/_stainless_unknown_path' })).rejects.toThrow(
       Runloop.NotFoundError,
     );
   });
 
   test('list', async () => {
-    const responsePromise = client.devboxes.list();
+    const responsePromise = client.blueprints.list();
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
     const response = await responsePromise;
@@ -77,7 +97,7 @@ describe('resource devboxes', () => {
 
   test('list: request options instead of params are passed correctly', async () => {
     // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
-    await expect(client.devboxes.list({ path: '/_stainless_unknown_path' })).rejects.toThrow(
+    await expect(client.blueprints.list({ path: '/_stainless_unknown_path' })).rejects.toThrow(
       Runloop.NotFoundError,
     );
   });
@@ -85,15 +105,15 @@ describe('resource devboxes', () => {
   test('list: request options and params are passed correctly', async () => {
     // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
     await expect(
-      client.devboxes.list(
-        { limit: 'limit', starting_after: 'starting_after', status: 'status' },
+      client.blueprints.list(
+        { limit: 'limit', name: 'name', starting_after: 'starting_after' },
         { path: '/_stainless_unknown_path' },
       ),
     ).rejects.toThrow(Runloop.NotFoundError);
   });
 
-  test('executeSync', async () => {
-    const responsePromise = client.devboxes.executeSync('id');
+  test('logs', async () => {
+    const responsePromise = client.blueprints.logs('id');
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
     const response = await responsePromise;
@@ -103,35 +123,67 @@ describe('resource devboxes', () => {
     expect(dataAndResponse.response).toBe(rawResponse);
   });
 
-  test('executeSync: request options instead of params are passed correctly', async () => {
+  test('logs: request options instead of params are passed correctly', async () => {
     // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
-    await expect(client.devboxes.executeSync('id', { path: '/_stainless_unknown_path' })).rejects.toThrow(
+    await expect(client.blueprints.logs('id', { path: '/_stainless_unknown_path' })).rejects.toThrow(
       Runloop.NotFoundError,
     );
   });
 
-  test('executeSync: request options and params are passed correctly', async () => {
+  test('preview', async () => {
+    const responsePromise = client.blueprints.preview();
+    const rawResponse = await responsePromise.asResponse();
+    expect(rawResponse).toBeInstanceOf(Response);
+    const response = await responsePromise;
+    expect(response).not.toBeInstanceOf(Response);
+    const dataAndResponse = await responsePromise.withResponse();
+    expect(dataAndResponse.data).toBe(response);
+    expect(dataAndResponse.response).toBe(rawResponse);
+  });
+
+  test('preview: request options instead of params are passed correctly', async () => {
+    // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
+    await expect(client.blueprints.preview({ path: '/_stainless_unknown_path' })).rejects.toThrow(
+      Runloop.NotFoundError,
+    );
+  });
+
+  test('preview: request options and params are passed correctly', async () => {
     // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
     await expect(
-      client.devboxes.executeSync('id', { command: 'command' }, { path: '/_stainless_unknown_path' }),
+      client.blueprints.preview(
+        {
+          code_mounts: [
+            {
+              repo_name: 'repo_name',
+              repo_owner: 'repo_owner',
+              install_command: 'install_command',
+              token: 'token',
+            },
+            {
+              repo_name: 'repo_name',
+              repo_owner: 'repo_owner',
+              install_command: 'install_command',
+              token: 'token',
+            },
+            {
+              repo_name: 'repo_name',
+              repo_owner: 'repo_owner',
+              install_command: 'install_command',
+              token: 'token',
+            },
+          ],
+          dockerfile: 'dockerfile',
+          file_mounts: { foo: 'string' },
+          launch_parameters: {
+            launch_commands: ['string', 'string', 'string'],
+            resource_size_request: 'MINI',
+          },
+          name: 'name',
+          system_setup_commands: ['string', 'string', 'string'],
+        },
+        { path: '/_stainless_unknown_path' },
+      ),
     ).rejects.toThrow(Runloop.NotFoundError);
-  });
-
-  test('shutdown', async () => {
-    const responsePromise = client.devboxes.shutdown('id');
-    const rawResponse = await responsePromise.asResponse();
-    expect(rawResponse).toBeInstanceOf(Response);
-    const response = await responsePromise;
-    expect(response).not.toBeInstanceOf(Response);
-    const dataAndResponse = await responsePromise.withResponse();
-    expect(dataAndResponse.data).toBe(response);
-    expect(dataAndResponse.response).toBe(rawResponse);
-  });
-
-  test('shutdown: request options instead of params are passed correctly', async () => {
-    // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
-    await expect(client.devboxes.shutdown('id', { path: '/_stainless_unknown_path' })).rejects.toThrow(
-      Runloop.NotFoundError,
-    );
   });
 });

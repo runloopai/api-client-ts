@@ -3,12 +3,12 @@
 import * as Errors from './error';
 import * as Uploads from './uploads';
 import { type Agent } from './_shims/index';
-import * as Core from '@runloop/api-client/core';
-import * as API from '@runloop/api-client/resources/index';
+import * as Core from './core';
+import * as API from './resources/index';
 
 export interface ClientOptions {
   /**
-   * Defaults to process.env['RUNLOOP_BEARER_TOKEN'].
+   * Defaults to process.env['RUNLOOP_API_KEY'].
    */
   bearerToken?: string | undefined;
 
@@ -80,7 +80,7 @@ export class Runloop extends Core.APIClient {
   /**
    * API Client for interfacing with the Runloop API.
    *
-   * @param {string | undefined} [opts.bearerToken=process.env['RUNLOOP_BEARER_TOKEN'] ?? undefined]
+   * @param {string | undefined} [opts.bearerToken=process.env['RUNLOOP_API_KEY'] ?? undefined]
    * @param {string} [opts.baseURL=process.env['RUNLOOP_BASE_URL'] ?? https://api.runloop.ai] - Override the default base URL for the API.
    * @param {number} [opts.timeout=1 minute] - The maximum amount of time (in milliseconds) the client will wait for a response before timing out.
    * @param {number} [opts.httpAgent] - An HTTP agent used to manage HTTP(s) connections.
@@ -91,12 +91,12 @@ export class Runloop extends Core.APIClient {
    */
   constructor({
     baseURL = Core.readEnv('RUNLOOP_BASE_URL'),
-    bearerToken = Core.readEnv('RUNLOOP_BEARER_TOKEN'),
+    bearerToken = Core.readEnv('RUNLOOP_API_KEY'),
     ...opts
   }: ClientOptions = {}) {
     if (bearerToken === undefined) {
       throw new Errors.RunloopError(
-        "The RUNLOOP_BEARER_TOKEN environment variable is missing or empty; either provide it, or instantiate the Runloop client with an bearerToken option, like new Runloop({ bearerToken: 'My Bearer Token' }).",
+        "The RUNLOOP_API_KEY environment variable is missing or empty; either provide it, or instantiate the Runloop client with an bearerToken option, like new Runloop({ bearerToken: 'My Bearer Token' }).",
       );
     }
 
@@ -119,6 +119,9 @@ export class Runloop extends Core.APIClient {
     this.bearerToken = bearerToken;
   }
 
+  account: API.Account = new API.Account(this);
+  blueprints: API.Blueprints = new API.Blueprints(this);
+  code: API.Code = new API.Code(this);
   devboxes: API.Devboxes = new API.Devboxes(this);
   functions: API.Functions = new API.Functions(this);
   projects: API.Projects = new API.Projects(this);
@@ -139,6 +142,7 @@ export class Runloop extends Core.APIClient {
   }
 
   static Runloop = this;
+  static DEFAULT_TIMEOUT = 60000; // 1 minute
 
   static RunloopError = Errors.RunloopError;
   static APIError = Errors.APIError;
@@ -179,6 +183,23 @@ export import fileFromPath = Uploads.fileFromPath;
 
 export namespace Runloop {
   export import RequestOptions = Core.RequestOptions;
+
+  export import Account = API.Account;
+  export import ResourceSize = API.ResourceSize;
+
+  export import Blueprints = API.Blueprints;
+  export import BlueprintBuildLog = API.BlueprintBuildLog;
+  export import BlueprintBuildLogsListView = API.BlueprintBuildLogsListView;
+  export import BlueprintBuildParameters = API.BlueprintBuildParameters;
+  export import BlueprintListView = API.BlueprintListView;
+  export import BlueprintPreviewView = API.BlueprintPreviewView;
+  export import BlueprintView = API.BlueprintView;
+  export import BlueprintCreateParams = API.BlueprintCreateParams;
+  export import BlueprintListParams = API.BlueprintListParams;
+  export import BlueprintPreviewParams = API.BlueprintPreviewParams;
+
+  export import Code = API.Code;
+  export import CodeMountParameters = API.CodeMountParameters;
 
   export import Devboxes = API.Devboxes;
   export import DevboxExecutionDetailView = API.DevboxExecutionDetailView;

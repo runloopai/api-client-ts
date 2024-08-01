@@ -4,7 +4,7 @@
 
 This library provides convenient access to the Runloop REST API from server-side TypeScript or JavaScript.
 
-The REST API documentation can be found [on runloop.ai](https://runloop.ai). The full API of this library can be found in [api.md](api.md).
+The REST API documentation can be found on [runloop.ai](https://runloop.ai). The full API of this library can be found in [api.md](api.md).
 
 It is generated with [Stainless](https://www.stainlessapi.com/).
 
@@ -22,14 +22,14 @@ The full API of this library can be found in [api.md](api.md).
 ```js
 import Runloop from '@runloop/api-client';
 
-const runloop = new Runloop({
-  bearerToken: process.env['RUNLOOP_BEARER_TOKEN'], // This is the default and can be omitted
+const client = new Runloop({
+  bearerToken: process.env['RUNLOOP_API_KEY'], // This is the default and can be omitted
 });
 
 async function main() {
-  const devboxView = await runloop.devboxes.create();
+  const blueprintView = await client.blueprints.create();
 
-  console.log(devboxView.id);
+  console.log(blueprintView.id);
 }
 
 main();
@@ -43,12 +43,12 @@ This library includes TypeScript definitions for all request params and response
 ```ts
 import Runloop from '@runloop/api-client';
 
-const runloop = new Runloop({
-  bearerToken: process.env['RUNLOOP_BEARER_TOKEN'], // This is the default and can be omitted
+const client = new Runloop({
+  bearerToken: process.env['RUNLOOP_API_KEY'], // This is the default and can be omitted
 });
 
 async function main() {
-  const devboxView: Runloop.DevboxView = await runloop.devboxes.create();
+  const blueprintView: Runloop.BlueprintView = await client.blueprints.create();
 }
 
 main();
@@ -65,7 +65,7 @@ a subclass of `APIError` will be thrown:
 <!-- prettier-ignore -->
 ```ts
 async function main() {
-  const devboxView = await runloop.devboxes.create().catch(async (err) => {
+  const blueprintView = await client.blueprints.create().catch(async (err) => {
     if (err instanceof Runloop.APIError) {
       console.log(err.status); // 400
       console.log(err.name); // BadRequestError
@@ -103,12 +103,12 @@ You can use the `maxRetries` option to configure or disable this:
 <!-- prettier-ignore -->
 ```js
 // Configure the default for all requests:
-const runloop = new Runloop({
+const client = new Runloop({
   maxRetries: 0, // default is 2
 });
 
 // Or, configure per-request:
-await runloop.devboxes.create({
+await client.blueprints.create({
   maxRetries: 5,
 });
 ```
@@ -120,12 +120,12 @@ Requests time out after 1 minute by default. You can configure this with a `time
 <!-- prettier-ignore -->
 ```ts
 // Configure the default for all requests:
-const runloop = new Runloop({
+const client = new Runloop({
   timeout: 20 * 1000, // 20 seconds (default is 1 minute)
 });
 
 // Override per-request:
-await runloop.devboxes.create({
+await client.blueprints.create({
   timeout: 5 * 1000,
 });
 ```
@@ -144,15 +144,15 @@ You can also use the `.withResponse()` method to get the raw `Response` along wi
 
 <!-- prettier-ignore -->
 ```ts
-const runloop = new Runloop();
+const client = new Runloop();
 
-const response = await runloop.devboxes.create().asResponse();
+const response = await client.blueprints.create().asResponse();
 console.log(response.headers.get('X-My-Header'));
 console.log(response.statusText); // access the underlying Response object
 
-const { data: devboxView, response: raw } = await runloop.devboxes.create().withResponse();
+const { data: blueprintView, response: raw } = await client.blueprints.create().withResponse();
 console.log(raw.headers.get('X-My-Header'));
-console.log(devboxView.id);
+console.log(blueprintView.id);
 ```
 
 ### Making custom/undocumented requests
@@ -251,12 +251,12 @@ import http from 'http';
 import { HttpsProxyAgent } from 'https-proxy-agent';
 
 // Configure the default for all requests:
-const runloop = new Runloop({
+const client = new Runloop({
   httpAgent: new HttpsProxyAgent(process.env.PROXY_URL),
 });
 
 // Override per-request:
-await runloop.devboxes.create({
+await client.blueprints.create({
   httpAgent: new http.Agent({ keepAlive: false }),
 });
 ```
@@ -278,14 +278,6 @@ We are keen for your feedback; please open an [issue](https://www.github.com/run
 TypeScript >= 4.5 is supported.
 
 The following runtimes are supported:
-
-- Node.js 18 LTS or later ([non-EOL](https://endoflife.date/nodejs)) versions.
-- Deno v1.28.0 or higher, using `import Runloop from "npm:@runloop/api-client"`.
-- Bun 1.0 or later.
-- Cloudflare Workers.
-- Vercel Edge Runtime.
-- Jest 28 or greater with the `"node"` environment (`"jsdom"` is not supported at this time).
-- Nitro v2.6 or greater.
 
 Note that React Native is not supported at this time.
 

@@ -3,14 +3,14 @@
 import Runloop from '@runloop/api-client';
 import { Response } from 'node-fetch';
 
-const runloop = new Runloop({
+const client = new Runloop({
   bearerToken: 'My Bearer Token',
   baseURL: process.env['TEST_API_BASE_URL'] ?? 'http://127.0.0.1:4010',
 });
 
 describe('resource logs', () => {
   test('list', async () => {
-    const responsePromise = runloop.projects.logs.list('id');
+    const responsePromise = client.projects.logs.list('id');
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
     const response = await responsePromise;
@@ -22,7 +22,7 @@ describe('resource logs', () => {
 
   test('list: request options instead of params are passed correctly', async () => {
     // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
-    await expect(runloop.projects.logs.list('id', { path: '/_stainless_unknown_path' })).rejects.toThrow(
+    await expect(client.projects.logs.list('id', { path: '/_stainless_unknown_path' })).rejects.toThrow(
       Runloop.NotFoundError,
     );
   });
