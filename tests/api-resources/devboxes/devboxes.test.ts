@@ -135,6 +135,13 @@ describe('resource devboxes', () => {
     );
   });
 
+  test('readFile: request options and params are passed correctly', async () => {
+    // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
+    await expect(
+      client.devboxes.readFile('id', { file_path: 'file_path' }, { path: '/_stainless_unknown_path' }),
+    ).rejects.toThrow(Runloop.NotFoundError);
+  });
+
   test('shutdown', async () => {
     const responsePromise = client.devboxes.shutdown('id');
     const rawResponse = await responsePromise.asResponse();
@@ -169,5 +176,16 @@ describe('resource devboxes', () => {
     await expect(client.devboxes.writeFile('id', { path: '/_stainless_unknown_path' })).rejects.toThrow(
       Runloop.NotFoundError,
     );
+  });
+
+  test('writeFile: request options and params are passed correctly', async () => {
+    // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
+    await expect(
+      client.devboxes.writeFile(
+        'id',
+        { contents: 'contents', file_path: 'file_path' },
+        { path: '/_stainless_unknown_path' },
+      ),
+    ).rejects.toThrow(Runloop.NotFoundError);
   });
 });
