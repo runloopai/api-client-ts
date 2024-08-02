@@ -71,21 +71,8 @@ export class Devboxes extends APIResource {
   /**
    * Read file contents from a file on given Devbox.
    */
-  readFile(
-    id: string,
-    body?: DevboxReadFileParams,
-    options?: Core.RequestOptions,
-  ): Core.APIPromise<DevboxExecutionDetailView>;
-  readFile(id: string, options?: Core.RequestOptions): Core.APIPromise<DevboxExecutionDetailView>;
-  readFile(
-    id: string,
-    body: DevboxReadFileParams | Core.RequestOptions = {},
-    options?: Core.RequestOptions,
-  ): Core.APIPromise<DevboxExecutionDetailView> {
-    if (isRequestOptions(body)) {
-      return this.readFile(id, {}, body);
-    }
-    return this._client.post(`/v1/devboxes/${id}/read_file`, { body, ...options });
+  readFile(id: string, options?: Core.RequestOptions): Core.APIPromise<DevboxExecutionDetailView> {
+    return this._client.post(`/v1/devboxes/${id}/read_file`, options);
   }
 
   /**
@@ -98,21 +85,8 @@ export class Devboxes extends APIResource {
   /**
    * Write contents to a file at path on the Devbox.
    */
-  writeFile(
-    id: string,
-    body?: DevboxWriteFileParams,
-    options?: Core.RequestOptions,
-  ): Core.APIPromise<DevboxExecutionDetailView>;
-  writeFile(id: string, options?: Core.RequestOptions): Core.APIPromise<DevboxExecutionDetailView>;
-  writeFile(
-    id: string,
-    body: DevboxWriteFileParams | Core.RequestOptions = {},
-    options?: Core.RequestOptions,
-  ): Core.APIPromise<DevboxExecutionDetailView> {
-    if (isRequestOptions(body)) {
-      return this.writeFile(id, {}, body);
-    }
-    return this._client.post(`/v1/devboxes/${id}/write_file`, { body, ...options });
+  writeFile(id: string, options?: Core.RequestOptions): Core.APIPromise<DevboxExecutionDetailView> {
+    return this._client.post(`/v1/devboxes/${id}/write_file`, options);
   }
 }
 
@@ -264,25 +238,6 @@ export interface DevboxExecuteSyncParams {
   command?: string;
 }
 
-export interface DevboxReadFileParams {
-  /**
-   * The path of the file to read.
-   */
-  file_path?: string;
-}
-
-export interface DevboxWriteFileParams {
-  /**
-   * The contents to write to file.
-   */
-  contents?: string;
-
-  /**
-   * The path of the file to read.
-   */
-  file_path?: string;
-}
-
 export namespace Devboxes {
   export import DevboxExecutionDetailView = DevboxesAPI.DevboxExecutionDetailView;
   export import DevboxListView = DevboxesAPI.DevboxListView;
@@ -290,8 +245,6 @@ export namespace Devboxes {
   export import DevboxCreateParams = DevboxesAPI.DevboxCreateParams;
   export import DevboxListParams = DevboxesAPI.DevboxListParams;
   export import DevboxExecuteSyncParams = DevboxesAPI.DevboxExecuteSyncParams;
-  export import DevboxReadFileParams = DevboxesAPI.DevboxReadFileParams;
-  export import DevboxWriteFileParams = DevboxesAPI.DevboxWriteFileParams;
   export import Logs = LogsAPI.Logs;
   export import DevboxLogsListView = LogsAPI.DevboxLogsListView;
 }

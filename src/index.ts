@@ -208,8 +208,6 @@ export namespace Runloop {
   export import DevboxCreateParams = API.DevboxCreateParams;
   export import DevboxListParams = API.DevboxListParams;
   export import DevboxExecuteSyncParams = API.DevboxExecuteSyncParams;
-  export import DevboxReadFileParams = API.DevboxReadFileParams;
-  export import DevboxWriteFileParams = API.DevboxWriteFileParams;
 
   export import Functions = API.Functions;
   export import FunctionListView = API.FunctionListView;
