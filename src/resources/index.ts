@@ -21,6 +21,8 @@ export {
   DevboxCreateParams,
   DevboxListParams,
   DevboxExecuteSyncParams,
+  DevboxReadFileParams,
+  DevboxWriteFileParams,
   Devboxes,
 } from './devboxes/devboxes';
 export {
