@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.0-alpha.8 (2024-08-02)
+
+Full Changelog: [v0.1.0-alpha.7...v0.1.0-alpha.8](https://github.com/runloopai/api-client-ts/compare/v0.1.0-alpha.7...v0.1.0-alpha.8)
+
+### Features
+
+* **api:** update via SDK Studio ([#62](https://github.com/runloopai/api-client-ts/issues/62)) ([333ab42](https://github.com/runloopai/api-client-ts/commit/333ab429868d2098baa1040b096709082d1d269c))
+
 ## 0.1.0-alpha.7 (2024-08-01)
 
 Full Changelog: [v0.1.0-alpha.6...v0.1.0-alpha.7](https://github.com/runloopai/api-client-ts/compare/v0.1.0-alpha.6...v0.1.0-alpha.7)

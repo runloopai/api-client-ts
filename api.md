@@ -50,9 +50,9 @@ Methods:
 - <code title="get /v1/devboxes/{id}">client.devboxes.<a href="./src/resources/devboxes/devboxes.ts">retrieve</a>(id) -> DevboxView</code>
 - <code title="get /v1/devboxes">client.devboxes.<a href="./src/resources/devboxes/devboxes.ts">list</a>({ ...params }) -> DevboxListView</code>
 - <code title="post /v1/devboxes/{id}/execute_sync">client.devboxes.<a href="./src/resources/devboxes/devboxes.ts">executeSync</a>(id, { ...params }) -> DevboxExecutionDetailView</code>
-- <code title="post /v1/devboxes/{id}/read_file">client.devboxes.<a href="./src/resources/devboxes/devboxes.ts">readFile</a>(id) -> DevboxExecutionDetailView</code>
+- <code title="post /v1/devboxes/{id}/read_file">client.devboxes.<a href="./src/resources/devboxes/devboxes.ts">readFile</a>(id, { ...params }) -> DevboxExecutionDetailView</code>
 - <code title="post /v1/devboxes/{id}/shutdown">client.devboxes.<a href="./src/resources/devboxes/devboxes.ts">shutdown</a>(id) -> DevboxView</code>
-- <code title="post /v1/devboxes/{id}/write_file">client.devboxes.<a href="./src/resources/devboxes/devboxes.ts">writeFile</a>(id) -> DevboxExecutionDetailView</code>
+- <code title="post /v1/devboxes/{id}/write_file">client.devboxes.<a href="./src/resources/devboxes/devboxes.ts">writeFile</a>(id, { ...params }) -> DevboxExecutionDetailView</code>
 
 ## Logs
 
