@@ -89,6 +89,30 @@ export class Devboxes extends APIResource {
   }
 
   /**
+   * Read file contents from a file on given Devbox.
+   */
+  readFileContents(
+    id: string,
+    body?: DevboxReadFileContentsParams,
+    options?: Core.RequestOptions,
+  ): Core.APIPromise<string>;
+  readFileContents(id: string, options?: Core.RequestOptions): Core.APIPromise<string>;
+  readFileContents(
+    id: string,
+    body: DevboxReadFileContentsParams | Core.RequestOptions = {},
+    options?: Core.RequestOptions,
+  ): Core.APIPromise<string> {
+    if (isRequestOptions(body)) {
+      return this.readFileContents(id, {}, body);
+    }
+    return this._client.post(`/v1/devboxes/${id}/read_file_contents`, {
+      body,
+      ...options,
+      headers: { Accept: 'text/plain', ...options?.headers },
+    });
+  }
+
+  /**
    * Shutdown a running devbox by id. This will take the devbox out of service.
    */
   shutdown(id: string, options?: Core.RequestOptions): Core.APIPromise<DevboxView> {
@@ -191,6 +215,8 @@ export interface DevboxView {
   status?: 'provisioning' | 'initializing' | 'running' | 'failure' | 'shutdown';
 }
 
+export type DevboxReadFileContentsResponse = string;
+
 export interface DevboxCreateParams {
   /**
    * (Optional) Blueprint to use for the Devbox. If none set, the Devbox will be
@@ -270,6 +296,13 @@ export interface DevboxReadFileParams {
   file_path?: string;
 }
 
+export interface DevboxReadFileContentsParams {
+  /**
+   * The path of the file to read.
+   */
+  file_path?: string;
+}
+
 export interface DevboxWriteFileParams {
   /**
    * The contents to write to file.
@@ -286,10 +319,12 @@ export namespace Devboxes {
   export import DevboxExecutionDetailView = DevboxesAPI.DevboxExecutionDetailView;
   export import DevboxListView = DevboxesAPI.DevboxListView;
   export import DevboxView = DevboxesAPI.DevboxView;
+  export import DevboxReadFileContentsResponse = DevboxesAPI.DevboxReadFileContentsResponse;
   export import DevboxCreateParams = DevboxesAPI.DevboxCreateParams;
   export import DevboxListParams = DevboxesAPI.DevboxListParams;
   export import DevboxExecuteSyncParams = DevboxesAPI.DevboxExecuteSyncParams;
   export import DevboxReadFileParams = DevboxesAPI.DevboxReadFileParams;
+  export import DevboxReadFileContentsParams = DevboxesAPI.DevboxReadFileContentsParams;
   export import DevboxWriteFileParams = DevboxesAPI.DevboxWriteFileParams;
   export import Logs = LogsAPI.Logs;
   export import DevboxLogsListView = LogsAPI.DevboxLogsListView;

@@ -18,10 +18,12 @@ export {
   DevboxExecutionDetailView,
   DevboxListView,
   DevboxView,
+  DevboxReadFileContentsResponse,
   DevboxCreateParams,
   DevboxListParams,
   DevboxExecuteSyncParams,
   DevboxReadFileParams,
+  DevboxReadFileContentsParams,
   DevboxWriteFileParams,
   Devboxes,
 } from './devboxes/devboxes';
