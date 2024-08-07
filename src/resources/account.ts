@@ -5,7 +5,7 @@ import * as AccountAPI from './account';
 
 export class Account extends APIResource {}
 
-export type ResourceSize = 'MINI' | 'SMALL' | 'MEDIUM' | 'LARGE';
+export type ResourceSize = 'MINI' | 'SMALL' | 'MEDIUM' | 'LARGE' | 'X_LARGE';
 
 export namespace Account {
   export import ResourceSize = AccountAPI.ResourceSize;
