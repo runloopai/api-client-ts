@@ -4,6 +4,7 @@ import { APIResource } from '../../resource';
 import { isRequestOptions } from '../../core';
 import * as Core from '../../core';
 import * as DevboxesAPI from './devboxes';
+import * as AccountAPI from '../account';
 import * as LogsAPI from './logs';
 
 export class Devboxes extends APIResource {
@@ -231,11 +232,6 @@ export interface DevboxCreateParams {
   blueprint_name?: string;
 
   /**
-   * (Optional) Id of a code handle to mount to devbox.
-   */
-  code_handle?: string;
-
-  /**
    * (Optional) When specified, the Devbox will run this script as its main
    * executable. The devbox lifecycle will be bound to entrypoint, shutting down when
    * the process is complete.
@@ -253,6 +249,11 @@ export interface DevboxCreateParams {
   file_mounts?: Record<string, string>;
 
   /**
+   * Parameters to configure the resources and launch time behavior of the Devbox.
+   */
+  launch_parameters?: DevboxCreateParams.LaunchParameters;
+
+  /**
    * (Optional) A user specified name to give the Devbox.
    */
   name?: string;
@@ -263,6 +264,29 @@ export interface DevboxCreateParams {
    * steps for you.
    */
   setup_commands?: Array<string>;
+}
+
+export namespace DevboxCreateParams {
+  /**
+   * Parameters to configure the resources and launch time behavior of the Devbox.
+   */
+  export interface LaunchParameters {
+    /**
+     * Time in seconds after which Devbox will automatically shutdown. Default is 1
+     * hour.
+     */
+    keep_alive_time_seconds?: number;
+
+    /**
+     * Set of commands to be run at launch time, before the entrypoint process is run.
+     */
+    launch_commands?: Array<string>;
+
+    /**
+     * Manual resource configuration for Devbox. If not set, defaults will be used.
+     */
+    resource_size_request?: AccountAPI.ResourceSize;
+  }
 }
 
 export interface DevboxListParams {
