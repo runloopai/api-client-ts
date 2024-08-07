@@ -142,6 +142,12 @@ export namespace BlueprintBuildParameters {
    */
   export interface LaunchParameters {
     /**
+     * Time in seconds after which Devbox will automatically shutdown. Default is 1
+     * hour.
+     */
+    keep_alive_time_seconds?: number;
+
+    /**
      * Set of commands to be run at launch time, before the entrypoint process is run.
      */
     launch_commands?: Array<string>;
@@ -236,6 +242,12 @@ export namespace BlueprintCreateParams {
    */
   export interface LaunchParameters {
     /**
+     * Time in seconds after which Devbox will automatically shutdown. Default is 1
+     * hour.
+     */
+    keep_alive_time_seconds?: number;
+
+    /**
      * Set of commands to be run at launch time, before the entrypoint process is run.
      */
     launch_commands?: Array<string>;
@@ -301,6 +313,12 @@ export namespace BlueprintPreviewParams {
    * Parameters to configure your Devbox at launch time.
    */
   export interface LaunchParameters {
+    /**
+     * Time in seconds after which Devbox will automatically shutdown. Default is 1
+     * hour.
+     */
+    keep_alive_time_seconds?: number;
+
     /**
      * Set of commands to be run at launch time, before the entrypoint process is run.
      */
