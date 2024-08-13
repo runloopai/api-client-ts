@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.0-alpha.15 (2024-08-13)
+
+Full Changelog: [v0.1.0-alpha.14...v0.1.0-alpha.15](https://github.com/runloopai/api-client-ts/compare/v0.1.0-alpha.14...v0.1.0-alpha.15)
+
+### Features
+
+* **api:** OpenAPI spec update via Stainless API ([#90](https://github.com/runloopai/api-client-ts/issues/90)) ([a054341](https://github.com/runloopai/api-client-ts/commit/a0543417aadbff5a4acb2af8d34f716127b5969c))
+
 ## 0.1.0-alpha.14 (2024-08-13)
 
 Full Changelog: [v0.1.0-alpha.13...v0.1.0-alpha.14](https://github.com/runloopai/api-client-ts/compare/v0.1.0-alpha.13...v0.1.0-alpha.14)
