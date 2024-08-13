@@ -1,5 +1,22 @@
 # Changelog
 
+## 0.1.0-alpha.14 (2024-08-13)
+
+Full Changelog: [v0.1.0-alpha.13...v0.1.0-alpha.14](https://github.com/runloopai/api-client-ts/compare/v0.1.0-alpha.13...v0.1.0-alpha.14)
+
+### Features
+
+* **api:** OpenAPI spec update via Stainless API ([#82](https://github.com/runloopai/api-client-ts/issues/82)) ([7199e56](https://github.com/runloopai/api-client-ts/commit/7199e56c9259e1496edd0ece3e3180b6e197bba2))
+
+
+### Chores
+
+* **ci:** bump prism mock server version ([#87](https://github.com/runloopai/api-client-ts/issues/87)) ([e91edcf](https://github.com/runloopai/api-client-ts/commit/e91edcf91aa1daff14625e2d2f22f87e8a80f7ce))
+* **ci:** minor changes ([#86](https://github.com/runloopai/api-client-ts/issues/86)) ([b6dcabd](https://github.com/runloopai/api-client-ts/commit/b6dcabd273a138b3dda2e5c07d3e5c0fa9566011))
+* **examples:** minor formatting changes ([#88](https://github.com/runloopai/api-client-ts/issues/88)) ([a21efc2](https://github.com/runloopai/api-client-ts/commit/a21efc215d09d1775214223d6e96adae87a73845))
+* **internal:** codegen related update ([#84](https://github.com/runloopai/api-client-ts/issues/84)) ([f99fc85](https://github.com/runloopai/api-client-ts/commit/f99fc8525f5599d149dfcf94965a7b3ff1816b26))
+* **internal:** codegen related update ([#85](https://github.com/runloopai/api-client-ts/issues/85)) ([bec4bfe](https://github.com/runloopai/api-client-ts/commit/bec4bfe48efada132cebe485610f396d5c454f60))
+
 ## 0.1.0-alpha.13 (2024-08-07)
 
 Full Changelog: [v0.1.0-alpha.12...v0.1.0-alpha.13](https://github.com/runloopai/api-client-ts/compare/v0.1.0-alpha.12...v0.1.0-alpha.13)
