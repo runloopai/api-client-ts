@@ -113,7 +113,7 @@ export interface InvocationListParams {
   /**
    * Page Limit
    */
-  limit?: number;
+  limit?: string;
 
   /**
    * Load the next page starting after the given token.
