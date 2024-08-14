@@ -580,8 +580,8 @@ export abstract class APIClient {
   }
 
   private calculateDefaultRetryTimeoutMillis(retriesRemaining: number, maxRetries: number): number {
-    const initialRetryDelay = 0.5;
-    const maxRetryDelay = 8.0;
+    const initialRetryDelay = 1.0;
+    const maxRetryDelay = 5.0;
 
     const numRetries = maxRetries - retriesRemaining;
 
