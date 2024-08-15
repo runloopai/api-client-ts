@@ -350,7 +350,7 @@ export interface DevboxReadFileContentsParams {
 }
 
 export interface DevboxUploadFileParams {
-  file?: Core.Uploadable;
+  fileInputStream?: Core.Uploadable;
 
   path?: string;
 }
