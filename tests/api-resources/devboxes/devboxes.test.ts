@@ -216,7 +216,7 @@ describe('resource devboxes', () => {
     await expect(
       client.devboxes.uploadFile(
         'id',
-        { file: await toFile(Buffer.from('# my file contents'), 'README.md'), path: 'path' },
+        { fileInputStream: await toFile(Buffer.from('# my file contents'), 'README.md'), path: 'path' },
         { path: '/_stainless_unknown_path' },
       ),
     ).rejects.toThrow(Runloop.NotFoundError);
