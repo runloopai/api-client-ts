@@ -137,7 +137,10 @@ export class Devboxes extends APIResource {
     if (isRequestOptions(body)) {
       return this.uploadFile(id, {}, body);
     }
-    return this._client.post(`/v1/devboxes/${id}/upload_file`, { body, ...options });
+    return this._client.post(
+      `/v1/devboxes/${id}/upload_file`,
+      Core.multipartFormRequestOptions({ body, ...options }),
+    );
   }
 
   /**
