@@ -218,6 +218,8 @@ export interface DevboxView {
    */
   end_time_ms?: number;
 
+  initializing_time_ms?: number;
+
   /**
    * The initiator ID of the devbox.
    */
@@ -232,6 +234,8 @@ export interface DevboxView {
    * The name of the Devbox.
    */
   name?: string;
+
+  running_time_ms?: number;
 
   /**
    * The current status of the Devbox.
