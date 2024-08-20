@@ -72,26 +72,6 @@ export class Devboxes extends APIResource {
   /**
    * Read file contents from a file on given Devbox.
    */
-  readFile(
-    id: string,
-    body?: DevboxReadFileParams,
-    options?: Core.RequestOptions,
-  ): Core.APIPromise<DevboxExecutionDetailView>;
-  readFile(id: string, options?: Core.RequestOptions): Core.APIPromise<DevboxExecutionDetailView>;
-  readFile(
-    id: string,
-    body: DevboxReadFileParams | Core.RequestOptions = {},
-    options?: Core.RequestOptions,
-  ): Core.APIPromise<DevboxExecutionDetailView> {
-    if (isRequestOptions(body)) {
-      return this.readFile(id, {}, body);
-    }
-    return this._client.post(`/v1/devboxes/${id}/read_file`, { body, ...options });
-  }
-
-  /**
-   * Read file contents from a file on given Devbox.
-   */
   readFileContents(
     id: string,
     body?: DevboxReadFileContentsParams,
@@ -342,13 +322,6 @@ export interface DevboxExecuteSyncParams {
   command?: string;
 }
 
-export interface DevboxReadFileParams {
-  /**
-   * The path of the file to read.
-   */
-  file_path?: string;
-}
-
 export interface DevboxReadFileContentsParams {
   /**
    * The path of the file to read.
@@ -383,7 +356,6 @@ export namespace Devboxes {
   export import DevboxCreateParams = DevboxesAPI.DevboxCreateParams;
   export import DevboxListParams = DevboxesAPI.DevboxListParams;
   export import DevboxExecuteSyncParams = DevboxesAPI.DevboxExecuteSyncParams;
-  export import DevboxReadFileParams = DevboxesAPI.DevboxReadFileParams;
   export import DevboxReadFileContentsParams = DevboxesAPI.DevboxReadFileContentsParams;
   export import DevboxUploadFileParams = DevboxesAPI.DevboxUploadFileParams;
   export import DevboxWriteFileParams = DevboxesAPI.DevboxWriteFileParams;
