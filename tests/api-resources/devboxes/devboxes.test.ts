@@ -42,6 +42,7 @@ describe('resource devboxes', () => {
             launch_commands: ['string', 'string', 'string'],
             resource_size_request: 'MINI',
           },
+          metadata: { foo: 'string' },
           name: 'name',
           setup_commands: ['string', 'string', 'string'],
         },
