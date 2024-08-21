@@ -209,11 +209,6 @@ export interface DevboxView {
   initiator_type?: 'unknown' | 'api' | 'invocation';
 
   /**
-   * The user defined Devbox metadata.
-   */
-  metadata?: Record<string, string>;
-
-  /**
    * The name of the Devbox.
    */
   name?: string;
@@ -262,11 +257,6 @@ export interface DevboxCreateParams {
    * Parameters to configure the resources and launch time behavior of the Devbox.
    */
   launch_parameters?: DevboxCreateParams.LaunchParameters;
-
-  /**
-   * User defined metadata to attach to the devbox for organization.
-   */
-  metadata?: Record<string, string>;
 
   /**
    * (Optional) A user specified name to give the Devbox.
