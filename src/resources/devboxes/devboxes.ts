@@ -121,6 +121,29 @@ export class Devboxes extends APIResource {
   }
 
   /**
+   * Upload file contents to a file at path on the Devbox.
+   */
+  uploadFile(
+    id: string,
+    body?: DevboxUploadFileParams,
+    options?: Core.RequestOptions,
+  ): Core.APIPromise<unknown>;
+  uploadFile(id: string, options?: Core.RequestOptions): Core.APIPromise<unknown>;
+  uploadFile(
+    id: string,
+    body: DevboxUploadFileParams | Core.RequestOptions = {},
+    options?: Core.RequestOptions,
+  ): Core.APIPromise<unknown> {
+    if (isRequestOptions(body)) {
+      return this.uploadFile(id, {}, body);
+    }
+    return this._client.post(
+      `/v1/devboxes/${id}/upload_file`,
+      Core.multipartFormRequestOptions({ body, ...options }),
+    );
+  }
+
+  /**
    * Write contents to a file at path on the Devbox.
    */
   writeFile(
@@ -217,6 +240,8 @@ export interface DevboxView {
 }
 
 export type DevboxReadFileContentsResponse = string;
+
+export type DevboxUploadFileResponse = unknown;
 
 export interface DevboxCreateParams {
   /**
@@ -327,6 +352,12 @@ export interface DevboxReadFileContentsParams {
   file_path?: string;
 }
 
+export interface DevboxUploadFileParams {
+  file?: Core.Uploadable;
+
+  path?: string;
+}
+
 export interface DevboxWriteFileParams {
   /**
    * The contents to write to file.
@@ -344,11 +375,13 @@ export namespace Devboxes {
   export import DevboxListView = DevboxesAPI.DevboxListView;
   export import DevboxView = DevboxesAPI.DevboxView;
   export import DevboxReadFileContentsResponse = DevboxesAPI.DevboxReadFileContentsResponse;
+  export import DevboxUploadFileResponse = DevboxesAPI.DevboxUploadFileResponse;
   export import DevboxCreateParams = DevboxesAPI.DevboxCreateParams;
   export import DevboxListParams = DevboxesAPI.DevboxListParams;
   export import DevboxExecuteSyncParams = DevboxesAPI.DevboxExecuteSyncParams;
   export import DevboxReadFileParams = DevboxesAPI.DevboxReadFileParams;
   export import DevboxReadFileContentsParams = DevboxesAPI.DevboxReadFileContentsParams;
+  export import DevboxUploadFileParams = DevboxesAPI.DevboxUploadFileParams;
   export import DevboxWriteFileParams = DevboxesAPI.DevboxWriteFileParams;
   export import Logs = LogsAPI.Logs;
   export import DevboxLogsListView = LogsAPI.DevboxLogsListView;
