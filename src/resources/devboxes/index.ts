@@ -5,11 +5,12 @@ export {
   DevboxListView,
   DevboxView,
   DevboxReadFileContentsResponse,
+  DevboxUploadFileResponse,
   DevboxCreateParams,
   DevboxListParams,
   DevboxExecuteSyncParams,
-  DevboxReadFileParams,
   DevboxReadFileContentsParams,
+  DevboxUploadFileParams,
   DevboxWriteFileParams,
   Devboxes,
 } from './devboxes';

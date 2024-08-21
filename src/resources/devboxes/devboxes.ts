@@ -72,26 +72,6 @@ export class Devboxes extends APIResource {
   /**
    * Read file contents from a file on given Devbox.
    */
-  readFile(
-    id: string,
-    body?: DevboxReadFileParams,
-    options?: Core.RequestOptions,
-  ): Core.APIPromise<DevboxExecutionDetailView>;
-  readFile(id: string, options?: Core.RequestOptions): Core.APIPromise<DevboxExecutionDetailView>;
-  readFile(
-    id: string,
-    body: DevboxReadFileParams | Core.RequestOptions = {},
-    options?: Core.RequestOptions,
-  ): Core.APIPromise<DevboxExecutionDetailView> {
-    if (isRequestOptions(body)) {
-      return this.readFile(id, {}, body);
-    }
-    return this._client.post(`/v1/devboxes/${id}/read_file`, { body, ...options });
-  }
-
-  /**
-   * Read file contents from a file on given Devbox.
-   */
   readFileContents(
     id: string,
     body?: DevboxReadFileContentsParams,
@@ -118,6 +98,29 @@ export class Devboxes extends APIResource {
    */
   shutdown(id: string, options?: Core.RequestOptions): Core.APIPromise<DevboxView> {
     return this._client.post(`/v1/devboxes/${id}/shutdown`, options);
+  }
+
+  /**
+   * Upload file contents to a file at path on the Devbox.
+   */
+  uploadFile(
+    id: string,
+    body?: DevboxUploadFileParams,
+    options?: Core.RequestOptions,
+  ): Core.APIPromise<unknown>;
+  uploadFile(id: string, options?: Core.RequestOptions): Core.APIPromise<unknown>;
+  uploadFile(
+    id: string,
+    body: DevboxUploadFileParams | Core.RequestOptions = {},
+    options?: Core.RequestOptions,
+  ): Core.APIPromise<unknown> {
+    if (isRequestOptions(body)) {
+      return this.uploadFile(id, {}, body);
+    }
+    return this._client.post(
+      `/v1/devboxes/${id}/upload_file`,
+      Core.multipartFormRequestOptions({ body, ...options }),
+    );
   }
 
   /**
@@ -206,6 +209,11 @@ export interface DevboxView {
   initiator_type?: 'unknown' | 'api' | 'invocation';
 
   /**
+   * The user defined Devbox metadata.
+   */
+  metadata?: Record<string, string>;
+
+  /**
    * The name of the Devbox.
    */
   name?: string;
@@ -217,6 +225,8 @@ export interface DevboxView {
 }
 
 export type DevboxReadFileContentsResponse = string;
+
+export type DevboxUploadFileResponse = unknown;
 
 export interface DevboxCreateParams {
   /**
@@ -252,6 +262,11 @@ export interface DevboxCreateParams {
    * Parameters to configure the resources and launch time behavior of the Devbox.
    */
   launch_parameters?: DevboxCreateParams.LaunchParameters;
+
+  /**
+   * User defined metadata to attach to the devbox for organization.
+   */
+  metadata?: Record<string, string>;
 
   /**
    * (Optional) A user specified name to give the Devbox.
@@ -313,18 +328,17 @@ export interface DevboxExecuteSyncParams {
   command?: string;
 }
 
-export interface DevboxReadFileParams {
+export interface DevboxReadFileContentsParams {
   /**
    * The path of the file to read.
    */
   file_path?: string;
 }
 
-export interface DevboxReadFileContentsParams {
-  /**
-   * The path of the file to read.
-   */
-  file_path?: string;
+export interface DevboxUploadFileParams {
+  file?: Core.Uploadable;
+
+  path?: string;
 }
 
 export interface DevboxWriteFileParams {
@@ -344,11 +358,12 @@ export namespace Devboxes {
   export import DevboxListView = DevboxesAPI.DevboxListView;
   export import DevboxView = DevboxesAPI.DevboxView;
   export import DevboxReadFileContentsResponse = DevboxesAPI.DevboxReadFileContentsResponse;
+  export import DevboxUploadFileResponse = DevboxesAPI.DevboxUploadFileResponse;
   export import DevboxCreateParams = DevboxesAPI.DevboxCreateParams;
   export import DevboxListParams = DevboxesAPI.DevboxListParams;
   export import DevboxExecuteSyncParams = DevboxesAPI.DevboxExecuteSyncParams;
-  export import DevboxReadFileParams = DevboxesAPI.DevboxReadFileParams;
   export import DevboxReadFileContentsParams = DevboxesAPI.DevboxReadFileContentsParams;
+  export import DevboxUploadFileParams = DevboxesAPI.DevboxUploadFileParams;
   export import DevboxWriteFileParams = DevboxesAPI.DevboxWriteFileParams;
   export import Logs = LogsAPI.Logs;
   export import DevboxLogsListView = LogsAPI.DevboxLogsListView;

@@ -44,6 +44,7 @@ Types:
 - <code><a href="./src/resources/devboxes/devboxes.ts">DevboxListView</a></code>
 - <code><a href="./src/resources/devboxes/devboxes.ts">DevboxView</a></code>
 - <code><a href="./src/resources/devboxes/devboxes.ts">DevboxReadFileContentsResponse</a></code>
+- <code><a href="./src/resources/devboxes/devboxes.ts">DevboxUploadFileResponse</a></code>
 
 Methods:
 
@@ -51,9 +52,9 @@ Methods:
 - <code title="get /v1/devboxes/{id}">client.devboxes.<a href="./src/resources/devboxes/devboxes.ts">retrieve</a>(id) -> DevboxView</code>
 - <code title="get /v1/devboxes">client.devboxes.<a href="./src/resources/devboxes/devboxes.ts">list</a>({ ...params }) -> DevboxListView</code>
 - <code title="post /v1/devboxes/{id}/execute_sync">client.devboxes.<a href="./src/resources/devboxes/devboxes.ts">executeSync</a>(id, { ...params }) -> DevboxExecutionDetailView</code>
-- <code title="post /v1/devboxes/{id}/read_file">client.devboxes.<a href="./src/resources/devboxes/devboxes.ts">readFile</a>(id, { ...params }) -> DevboxExecutionDetailView</code>
 - <code title="post /v1/devboxes/{id}/read_file_contents">client.devboxes.<a href="./src/resources/devboxes/devboxes.ts">readFileContents</a>(id, { ...params }) -> string</code>
 - <code title="post /v1/devboxes/{id}/shutdown">client.devboxes.<a href="./src/resources/devboxes/devboxes.ts">shutdown</a>(id) -> DevboxView</code>
+- <code title="post /v1/devboxes/{id}/upload_file">client.devboxes.<a href="./src/resources/devboxes/devboxes.ts">uploadFile</a>(id, { ...params }) -> unknown</code>
 - <code title="post /v1/devboxes/{id}/write_file">client.devboxes.<a href="./src/resources/devboxes/devboxes.ts">writeFile</a>(id, { ...params }) -> DevboxExecutionDetailView</code>
 
 ## Logs
