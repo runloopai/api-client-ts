@@ -42,6 +42,7 @@ describe('resource devboxes', () => {
             launch_commands: ['string', 'string', 'string'],
             resource_size_request: 'MINI',
           },
+          metadata: { foo: 'string' },
           name: 'name',
           setup_commands: ['string', 'string', 'string'],
         },
@@ -96,6 +97,49 @@ describe('resource devboxes', () => {
     ).rejects.toThrow(Runloop.NotFoundError);
   });
 
+  test('createSSHKey', async () => {
+    const responsePromise = client.devboxes.createSSHKey('id');
+    const rawResponse = await responsePromise.asResponse();
+    expect(rawResponse).toBeInstanceOf(Response);
+    const response = await responsePromise;
+    expect(response).not.toBeInstanceOf(Response);
+    const dataAndResponse = await responsePromise.withResponse();
+    expect(dataAndResponse.data).toBe(response);
+    expect(dataAndResponse.response).toBe(rawResponse);
+  });
+
+  test('createSSHKey: request options instead of params are passed correctly', async () => {
+    // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
+    await expect(client.devboxes.createSSHKey('id', { path: '/_stainless_unknown_path' })).rejects.toThrow(
+      Runloop.NotFoundError,
+    );
+  });
+
+  test('executeAsync', async () => {
+    const responsePromise = client.devboxes.executeAsync('id');
+    const rawResponse = await responsePromise.asResponse();
+    expect(rawResponse).toBeInstanceOf(Response);
+    const response = await responsePromise;
+    expect(response).not.toBeInstanceOf(Response);
+    const dataAndResponse = await responsePromise.withResponse();
+    expect(dataAndResponse.data).toBe(response);
+    expect(dataAndResponse.response).toBe(rawResponse);
+  });
+
+  test('executeAsync: request options instead of params are passed correctly', async () => {
+    // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
+    await expect(client.devboxes.executeAsync('id', { path: '/_stainless_unknown_path' })).rejects.toThrow(
+      Runloop.NotFoundError,
+    );
+  });
+
+  test('executeAsync: request options and params are passed correctly', async () => {
+    // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
+    await expect(
+      client.devboxes.executeAsync('id', { command: 'command' }, { path: '/_stainless_unknown_path' }),
+    ).rejects.toThrow(Runloop.NotFoundError);
+  });
+
   test('executeSync', async () => {
     const responsePromise = client.devboxes.executeSync('id');
     const rawResponse = await responsePromise.asResponse();
@@ -118,31 +162,6 @@ describe('resource devboxes', () => {
     // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
     await expect(
       client.devboxes.executeSync('id', { command: 'command' }, { path: '/_stainless_unknown_path' }),
-    ).rejects.toThrow(Runloop.NotFoundError);
-  });
-
-  test('readFile', async () => {
-    const responsePromise = client.devboxes.readFile('id');
-    const rawResponse = await responsePromise.asResponse();
-    expect(rawResponse).toBeInstanceOf(Response);
-    const response = await responsePromise;
-    expect(response).not.toBeInstanceOf(Response);
-    const dataAndResponse = await responsePromise.withResponse();
-    expect(dataAndResponse.data).toBe(response);
-    expect(dataAndResponse.response).toBe(rawResponse);
-  });
-
-  test('readFile: request options instead of params are passed correctly', async () => {
-    // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
-    await expect(client.devboxes.readFile('id', { path: '/_stainless_unknown_path' })).rejects.toThrow(
-      Runloop.NotFoundError,
-    );
-  });
-
-  test('readFile: request options and params are passed correctly', async () => {
-    // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
-    await expect(
-      client.devboxes.readFile('id', { file_path: 'file_path' }, { path: '/_stainless_unknown_path' }),
     ).rejects.toThrow(Runloop.NotFoundError);
   });
 

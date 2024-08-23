@@ -5,10 +5,12 @@ import { isRequestOptions } from '../../core';
 import * as Core from '../../core';
 import * as DevboxesAPI from './devboxes';
 import * as AccountAPI from '../account';
+import * as ExecutionsAPI from './executions';
 import * as LogsAPI from './logs';
 
 export class Devboxes extends APIResource {
   logs: LogsAPI.Logs = new LogsAPI.Logs(this._client);
+  executions: ExecutionsAPI.Executions = new ExecutionsAPI.Executions(this._client);
 
   /**
    * Create a Devbox with the specified configuration. The Devbox will be created in
@@ -37,16 +39,46 @@ export class Devboxes extends APIResource {
    * List all devboxes or filter by status. If no status is provided, all devboxes
    * are returned.
    */
-  list(query?: DevboxListParams, options?: Core.RequestOptions): Core.APIPromise<DevboxListView>;
-  list(options?: Core.RequestOptions): Core.APIPromise<DevboxListView>;
+  list(query?: DevboxListParams, options?: Core.RequestOptions): Core.APIPromise<DevboxListResponse>;
+  list(options?: Core.RequestOptions): Core.APIPromise<DevboxListResponse>;
   list(
     query: DevboxListParams | Core.RequestOptions = {},
     options?: Core.RequestOptions,
-  ): Core.APIPromise<DevboxListView> {
+  ): Core.APIPromise<DevboxListResponse> {
     if (isRequestOptions(query)) {
       return this.list({}, query);
     }
     return this._client.get('/v1/devboxes', { query, ...options });
+  }
+
+  /**
+   * Create an SSH key for a devbox by id.
+   */
+  createSSHKey(id: string, options?: Core.RequestOptions): Core.APIPromise<DevboxCreateSSHKeyResponse> {
+    return this._client.post(`/v1/devboxes/${id}/create_ssh_key`, options);
+  }
+
+  /**
+   * Asynchronously execute a command on a devbox
+   */
+  executeAsync(
+    id: string,
+    body?: DevboxExecuteAsyncParams,
+    options?: Core.RequestOptions,
+  ): Core.APIPromise<ExecutionsAPI.DevboxAsyncExecutionDetailView>;
+  executeAsync(
+    id: string,
+    options?: Core.RequestOptions,
+  ): Core.APIPromise<ExecutionsAPI.DevboxAsyncExecutionDetailView>;
+  executeAsync(
+    id: string,
+    body: DevboxExecuteAsyncParams | Core.RequestOptions = {},
+    options?: Core.RequestOptions,
+  ): Core.APIPromise<ExecutionsAPI.DevboxAsyncExecutionDetailView> {
+    if (isRequestOptions(body)) {
+      return this.executeAsync(id, {}, body);
+    }
+    return this._client.post(`/v1/devboxes/${id}/executions/execute_async`, { body, ...options });
   }
 
   /**
@@ -56,37 +88,20 @@ export class Devboxes extends APIResource {
     id: string,
     body?: DevboxExecuteSyncParams,
     options?: Core.RequestOptions,
-  ): Core.APIPromise<DevboxExecutionDetailView>;
-  executeSync(id: string, options?: Core.RequestOptions): Core.APIPromise<DevboxExecutionDetailView>;
+  ): Core.APIPromise<ExecutionsAPI.DevboxExecutionDetailView>;
+  executeSync(
+    id: string,
+    options?: Core.RequestOptions,
+  ): Core.APIPromise<ExecutionsAPI.DevboxExecutionDetailView>;
   executeSync(
     id: string,
     body: DevboxExecuteSyncParams | Core.RequestOptions = {},
     options?: Core.RequestOptions,
-  ): Core.APIPromise<DevboxExecutionDetailView> {
+  ): Core.APIPromise<ExecutionsAPI.DevboxExecutionDetailView> {
     if (isRequestOptions(body)) {
       return this.executeSync(id, {}, body);
     }
     return this._client.post(`/v1/devboxes/${id}/execute_sync`, { body, ...options });
-  }
-
-  /**
-   * Read file contents from a file on given Devbox.
-   */
-  readFile(
-    id: string,
-    body?: DevboxReadFileParams,
-    options?: Core.RequestOptions,
-  ): Core.APIPromise<DevboxExecutionDetailView>;
-  readFile(id: string, options?: Core.RequestOptions): Core.APIPromise<DevboxExecutionDetailView>;
-  readFile(
-    id: string,
-    body: DevboxReadFileParams | Core.RequestOptions = {},
-    options?: Core.RequestOptions,
-  ): Core.APIPromise<DevboxExecutionDetailView> {
-    if (isRequestOptions(body)) {
-      return this.readFile(id, {}, body);
-    }
-    return this._client.post(`/v1/devboxes/${id}/read_file`, { body, ...options });
   }
 
   /**
@@ -150,51 +165,21 @@ export class Devboxes extends APIResource {
     id: string,
     body?: DevboxWriteFileParams,
     options?: Core.RequestOptions,
-  ): Core.APIPromise<DevboxExecutionDetailView>;
-  writeFile(id: string, options?: Core.RequestOptions): Core.APIPromise<DevboxExecutionDetailView>;
+  ): Core.APIPromise<ExecutionsAPI.DevboxExecutionDetailView>;
+  writeFile(
+    id: string,
+    options?: Core.RequestOptions,
+  ): Core.APIPromise<ExecutionsAPI.DevboxExecutionDetailView>;
   writeFile(
     id: string,
     body: DevboxWriteFileParams | Core.RequestOptions = {},
     options?: Core.RequestOptions,
-  ): Core.APIPromise<DevboxExecutionDetailView> {
+  ): Core.APIPromise<ExecutionsAPI.DevboxExecutionDetailView> {
     if (isRequestOptions(body)) {
       return this.writeFile(id, {}, body);
     }
     return this._client.post(`/v1/devboxes/${id}/write_file`, { body, ...options });
   }
-}
-
-export interface DevboxExecutionDetailView {
-  /**
-   * Devbox id where command was executed.
-   */
-  devbox_id?: string;
-
-  /**
-   * Exit status of command execution.
-   */
-  exit_status?: number;
-
-  /**
-   * Standard error generated by command.
-   */
-  stderr?: string;
-
-  /**
-   * Standard out generated by command.
-   */
-  stdout?: string;
-}
-
-export interface DevboxListView {
-  /**
-   * List of devboxes matching filter.
-   */
-  devboxes?: Array<DevboxView>;
-
-  has_more?: boolean;
-
-  total_count?: number;
 }
 
 export interface DevboxView {
@@ -219,6 +204,11 @@ export interface DevboxView {
   end_time_ms?: number;
 
   /**
+   * The failure reason if the Devbox failed, if any.
+   */
+  failure_reason?: 'out_of_memory' | 'out_of_disk' | 'execution_failed';
+
+  /**
    * The initiator ID of the devbox.
    */
   initiator_id?: string;
@@ -229,6 +219,11 @@ export interface DevboxView {
   initiator_type?: 'unknown' | 'api' | 'invocation';
 
   /**
+   * The user defined Devbox metadata.
+   */
+  metadata?: Record<string, string>;
+
+  /**
    * The name of the Devbox.
    */
   name?: string;
@@ -237,6 +232,34 @@ export interface DevboxView {
    * The current status of the Devbox.
    */
   status?: 'provisioning' | 'initializing' | 'running' | 'failure' | 'shutdown';
+}
+
+export interface DevboxListResponse {
+  /**
+   * List of devboxes matching filter.
+   */
+  devboxes?: Array<DevboxView>;
+
+  has_more?: boolean;
+
+  total_count?: number;
+}
+
+export interface DevboxCreateSSHKeyResponse {
+  /**
+   * The id of the Devbox.
+   */
+  id?: string;
+
+  /**
+   * The ssh private key, in PEM format.
+   */
+  ssh_private_key?: string;
+
+  /**
+   * The url of the Devbox.
+   */
+  url?: string;
 }
 
 export type DevboxReadFileContentsResponse = string;
@@ -277,6 +300,11 @@ export interface DevboxCreateParams {
    * Parameters to configure the resources and launch time behavior of the Devbox.
    */
   launch_parameters?: DevboxCreateParams.LaunchParameters;
+
+  /**
+   * User defined metadata to attach to the devbox for organization.
+   */
+  metadata?: Record<string, string>;
 
   /**
    * (Optional) A user specified name to give the Devbox.
@@ -331,6 +359,13 @@ export interface DevboxListParams {
   status?: string;
 }
 
+export interface DevboxExecuteAsyncParams {
+  /**
+   * The command to execute on the Devbox.
+   */
+  command?: string;
+}
+
 export interface DevboxExecuteSyncParams {
   /**
    * The command to execute on the Devbox.
@@ -338,18 +373,17 @@ export interface DevboxExecuteSyncParams {
   command?: string;
 }
 
-export interface DevboxReadFileParams {
+export interface DevboxReadFileContentsParams {
   /**
    * The path of the file to read.
    */
   file_path?: string;
 }
 
-export interface DevboxReadFileContentsParams {
-  /**
-   * The path of the file to read.
-   */
-  file_path?: string;
+export interface DevboxUploadFileParams {
+  file?: Core.Uploadable;
+
+  path?: string;
 }
 
 export interface DevboxUploadFileParams {
@@ -371,18 +405,24 @@ export interface DevboxWriteFileParams {
 }
 
 export namespace Devboxes {
-  export import DevboxExecutionDetailView = DevboxesAPI.DevboxExecutionDetailView;
-  export import DevboxListView = DevboxesAPI.DevboxListView;
   export import DevboxView = DevboxesAPI.DevboxView;
+  export import DevboxListResponse = DevboxesAPI.DevboxListResponse;
+  export import DevboxCreateSSHKeyResponse = DevboxesAPI.DevboxCreateSSHKeyResponse;
   export import DevboxReadFileContentsResponse = DevboxesAPI.DevboxReadFileContentsResponse;
   export import DevboxUploadFileResponse = DevboxesAPI.DevboxUploadFileResponse;
   export import DevboxCreateParams = DevboxesAPI.DevboxCreateParams;
   export import DevboxListParams = DevboxesAPI.DevboxListParams;
+  export import DevboxExecuteAsyncParams = DevboxesAPI.DevboxExecuteAsyncParams;
   export import DevboxExecuteSyncParams = DevboxesAPI.DevboxExecuteSyncParams;
-  export import DevboxReadFileParams = DevboxesAPI.DevboxReadFileParams;
   export import DevboxReadFileContentsParams = DevboxesAPI.DevboxReadFileContentsParams;
   export import DevboxUploadFileParams = DevboxesAPI.DevboxUploadFileParams;
   export import DevboxWriteFileParams = DevboxesAPI.DevboxWriteFileParams;
   export import Logs = LogsAPI.Logs;
-  export import DevboxLogsListView = LogsAPI.DevboxLogsListView;
+  export import Executions = ExecutionsAPI.Executions;
+  export import DevboxAsyncExecutionDetailView = ExecutionsAPI.DevboxAsyncExecutionDetailView;
+  export import DevboxExecutionDetailView = ExecutionsAPI.DevboxExecutionDetailView;
+  export import DevboxLogsListView = ExecutionsAPI.DevboxLogsListView;
+  export import ExecutionRetrieveParams = ExecutionsAPI.ExecutionRetrieveParams;
+  export import ExecutionExecuteAsyncParams = ExecutionsAPI.ExecutionExecuteAsyncParams;
+  export import ExecutionExecuteSyncParams = ExecutionsAPI.ExecutionExecuteSyncParams;
 }
