@@ -122,7 +122,6 @@ export class Runloop extends Core.APIClient {
   account: API.Account = new API.Account(this);
   blueprints: API.Blueprints = new API.Blueprints(this);
   code: API.Code = new API.Code(this);
-  deployments: API.Deployments = new API.Deployments(this);
   devboxes: API.Devboxes = new API.Devboxes(this);
   functions: API.Functions = new API.Functions(this);
   projects: API.Projects = new API.Projects(this);
@@ -202,17 +201,11 @@ export namespace Runloop {
   export import Code = API.Code;
   export import CodeMountParameters = API.CodeMountParameters;
 
-  export import Deployments = API.Deployments;
-  export import DeploymentRetrieveResponse = API.DeploymentRetrieveResponse;
-  export import DeploymentGetResponse = API.DeploymentGetResponse;
-  export import DeploymentLogsResponse = API.DeploymentLogsResponse;
-  export import DeploymentRedeployResponse = API.DeploymentRedeployResponse;
-  export import DeploymentTailResponse = API.DeploymentTailResponse;
-  export import DeploymentGetParams = API.DeploymentGetParams;
-
   export import Devboxes = API.Devboxes;
+  export import DevboxAsyncExecutionDetailView = API.DevboxAsyncExecutionDetailView;
+  export import DevboxExecutionDetailView = API.DevboxExecutionDetailView;
+  export import DevboxListView = API.DevboxListView;
   export import DevboxView = API.DevboxView;
-  export import DevboxListResponse = API.DevboxListResponse;
   export import DevboxCreateSSHKeyResponse = API.DevboxCreateSSHKeyResponse;
   export import DevboxReadFileContentsResponse = API.DevboxReadFileContentsResponse;
   export import DevboxUploadFileResponse = API.DevboxUploadFileResponse;
@@ -226,7 +219,6 @@ export namespace Runloop {
 
   export import Functions = API.Functions;
   export import FunctionListView = API.FunctionListView;
-  export import FunctionListOpenAPIResponse = API.FunctionListOpenAPIResponse;
   export import FunctionInvokeAsyncParams = API.FunctionInvokeAsyncParams;
   export import FunctionInvokeSyncParams = API.FunctionInvokeSyncParams;
 
