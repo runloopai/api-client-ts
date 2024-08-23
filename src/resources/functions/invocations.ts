@@ -46,6 +46,13 @@ export class Invocations extends APIResource {
   ): Core.APIPromise<unknown> {
     return this._client.post(`/v1/functions/invocations/${invocationId}/kill`, { body, ...options });
   }
+
+  /**
+   * Get the logs for the given invocation.
+   */
+  logs(invocationId: string, options?: Core.RequestOptions): Core.APIPromise<InvocationLogsResponse> {
+    return this._client.get(`/v1/functions/invocations/${invocationId}/logs`, options);
+  }
 }
 
 export interface FunctionInvocationListView {
@@ -109,6 +116,37 @@ export namespace FunctionInvocationListView {
 
 export type KillOperationResponse = unknown;
 
+export interface InvocationLogsResponse {
+  /**
+   * ID of the invocation.
+   */
+  invocation_id?: string;
+
+  /**
+   * List of logs for the given invocation.
+   */
+  logs?: Array<InvocationLogsResponse.Log>;
+}
+
+export namespace InvocationLogsResponse {
+  export interface Log {
+    /**
+     * Log line severity level.
+     */
+    level?: string;
+
+    /**
+     * Log line message.
+     */
+    message?: string;
+
+    /**
+     * Time of log (Unix timestamp milliseconds).
+     */
+    timestamp_ms?: number;
+  }
+}
+
 export interface InvocationListParams {
   /**
    * Page Limit
@@ -126,6 +164,7 @@ export interface InvocationKillParams {}
 export namespace Invocations {
   export import FunctionInvocationListView = InvocationsAPI.FunctionInvocationListView;
   export import KillOperationResponse = InvocationsAPI.KillOperationResponse;
+  export import InvocationLogsResponse = InvocationsAPI.InvocationLogsResponse;
   export import InvocationListParams = InvocationsAPI.InvocationListParams;
   export import InvocationKillParams = InvocationsAPI.InvocationKillParams;
 }

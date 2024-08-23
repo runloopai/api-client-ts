@@ -8,9 +8,9 @@ const client = new Runloop({
   baseURL: process.env['TEST_API_BASE_URL'] ?? 'http://127.0.0.1:4010',
 });
 
-describe('resource invocations', () => {
+describe('resource deployments', () => {
   test('retrieve', async () => {
-    const responsePromise = client.functions.invocations.retrieve('invocationId');
+    const responsePromise = client.deployments.retrieve('deployment_id');
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
     const response = await responsePromise;
@@ -23,12 +23,12 @@ describe('resource invocations', () => {
   test('retrieve: request options instead of params are passed correctly', async () => {
     // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
     await expect(
-      client.functions.invocations.retrieve('invocationId', { path: '/_stainless_unknown_path' }),
+      client.deployments.retrieve('deployment_id', { path: '/_stainless_unknown_path' }),
     ).rejects.toThrow(Runloop.NotFoundError);
   });
 
-  test('list', async () => {
-    const responsePromise = client.functions.invocations.list();
+  test('get', async () => {
+    const responsePromise = client.deployments.get();
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
     const response = await responsePromise;
@@ -38,43 +38,25 @@ describe('resource invocations', () => {
     expect(dataAndResponse.response).toBe(rawResponse);
   });
 
-  test('list: request options instead of params are passed correctly', async () => {
+  test('get: request options instead of params are passed correctly', async () => {
     // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
-    await expect(client.functions.invocations.list({ path: '/_stainless_unknown_path' })).rejects.toThrow(
+    await expect(client.deployments.get({ path: '/_stainless_unknown_path' })).rejects.toThrow(
       Runloop.NotFoundError,
     );
   });
 
-  test('list: request options and params are passed correctly', async () => {
+  test('get: request options and params are passed correctly', async () => {
     // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
     await expect(
-      client.functions.invocations.list(
-        { limit: 0, starting_after: 'starting_after' },
+      client.deployments.get(
+        { limit: 'limit', starting_after: 'starting_after' },
         { path: '/_stainless_unknown_path' },
       ),
     ).rejects.toThrow(Runloop.NotFoundError);
   });
 
-  test('kill', async () => {
-    const responsePromise = client.functions.invocations.kill('invocationId');
-    const rawResponse = await responsePromise.asResponse();
-    expect(rawResponse).toBeInstanceOf(Response);
-    const response = await responsePromise;
-    expect(response).not.toBeInstanceOf(Response);
-    const dataAndResponse = await responsePromise.withResponse();
-    expect(dataAndResponse.data).toBe(response);
-    expect(dataAndResponse.response).toBe(rawResponse);
-  });
-
-  test('kill: request options and params are passed correctly', async () => {
-    // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
-    await expect(
-      client.functions.invocations.kill('invocationId', {}, { path: '/_stainless_unknown_path' }),
-    ).rejects.toThrow(Runloop.NotFoundError);
-  });
-
   test('logs', async () => {
-    const responsePromise = client.functions.invocations.logs('invocation_id');
+    const responsePromise = client.deployments.logs('deployment_id');
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
     const response = await responsePromise;
@@ -87,7 +69,43 @@ describe('resource invocations', () => {
   test('logs: request options instead of params are passed correctly', async () => {
     // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
     await expect(
-      client.functions.invocations.logs('invocation_id', { path: '/_stainless_unknown_path' }),
+      client.deployments.logs('deployment_id', { path: '/_stainless_unknown_path' }),
+    ).rejects.toThrow(Runloop.NotFoundError);
+  });
+
+  test('redeploy', async () => {
+    const responsePromise = client.deployments.redeploy('deployment_id');
+    const rawResponse = await responsePromise.asResponse();
+    expect(rawResponse).toBeInstanceOf(Response);
+    const response = await responsePromise;
+    expect(response).not.toBeInstanceOf(Response);
+    const dataAndResponse = await responsePromise.withResponse();
+    expect(dataAndResponse.data).toBe(response);
+    expect(dataAndResponse.response).toBe(rawResponse);
+  });
+
+  test('redeploy: request options instead of params are passed correctly', async () => {
+    // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
+    await expect(
+      client.deployments.redeploy('deployment_id', { path: '/_stainless_unknown_path' }),
+    ).rejects.toThrow(Runloop.NotFoundError);
+  });
+
+  test('tail', async () => {
+    const responsePromise = client.deployments.tail('deployment_id');
+    const rawResponse = await responsePromise.asResponse();
+    expect(rawResponse).toBeInstanceOf(Response);
+    const response = await responsePromise;
+    expect(response).not.toBeInstanceOf(Response);
+    const dataAndResponse = await responsePromise.withResponse();
+    expect(dataAndResponse.data).toBe(response);
+    expect(dataAndResponse.response).toBe(rawResponse);
+  });
+
+  test('tail: request options instead of params are passed correctly', async () => {
+    // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
+    await expect(
+      client.deployments.tail('deployment_id', { path: '/_stainless_unknown_path' }),
     ).rejects.toThrow(Runloop.NotFoundError);
   });
 });
