@@ -158,7 +158,7 @@ export abstract class APIClient {
 
   constructor({
     baseURL,
-    maxRetries = 0,
+    maxRetries = 2,
     timeout = 60000, // 1 minute
     httpAgent,
     fetch: overridenFetch,
@@ -580,8 +580,8 @@ export abstract class APIClient {
   }
 
   private calculateDefaultRetryTimeoutMillis(retriesRemaining: number, maxRetries: number): number {
-    const initialRetryDelay = 1.0;
-    const maxRetryDelay = 5.0;
+    const initialRetryDelay = 0.5;
+    const maxRetryDelay = 8.0;
 
     const numRetries = maxRetries - retriesRemaining;
 
