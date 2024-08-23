@@ -27,7 +27,8 @@ describe('resource logs', () => {
     );
   });
 
-  test('tail', async () => {
+  // cannot test text/event-stream
+  test.skip('tail', async () => {
     const responsePromise = client.devboxes.logs.tail('id');
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
@@ -38,7 +39,8 @@ describe('resource logs', () => {
     expect(dataAndResponse.response).toBe(rawResponse);
   });
 
-  test('tail: request options instead of params are passed correctly', async () => {
+  // cannot test text/event-stream
+  test.skip('tail: request options instead of params are passed correctly', async () => {
     // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
     await expect(client.devboxes.logs.tail('id', { path: '/_stainless_unknown_path' })).rejects.toThrow(
       Runloop.NotFoundError,
