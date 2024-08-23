@@ -9,36 +9,6 @@ const client = new Runloop({
 });
 
 describe('resource executions', () => {
-  test('retrieve', async () => {
-    const responsePromise = client.devboxes.executions.retrieve('id', 'exeId');
-    const rawResponse = await responsePromise.asResponse();
-    expect(rawResponse).toBeInstanceOf(Response);
-    const response = await responsePromise;
-    expect(response).not.toBeInstanceOf(Response);
-    const dataAndResponse = await responsePromise.withResponse();
-    expect(dataAndResponse.data).toBe(response);
-    expect(dataAndResponse.response).toBe(rawResponse);
-  });
-
-  test('retrieve: request options instead of params are passed correctly', async () => {
-    // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
-    await expect(
-      client.devboxes.executions.retrieve('id', 'exeId', { path: '/_stainless_unknown_path' }),
-    ).rejects.toThrow(Runloop.NotFoundError);
-  });
-
-  test('retrieve: request options and params are passed correctly', async () => {
-    // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
-    await expect(
-      client.devboxes.executions.retrieve(
-        'id',
-        'exeId',
-        { command: 'command' },
-        { path: '/_stainless_unknown_path' },
-      ),
-    ).rejects.toThrow(Runloop.NotFoundError);
-  });
-
   test('executeAsync', async () => {
     const responsePromise = client.devboxes.executions.executeAsync('id');
     const rawResponse = await responsePromise.asResponse();
@@ -94,62 +64,6 @@ describe('resource executions', () => {
         { command: 'command' },
         { path: '/_stainless_unknown_path' },
       ),
-    ).rejects.toThrow(Runloop.NotFoundError);
-  });
-
-  test('kill', async () => {
-    const responsePromise = client.devboxes.executions.kill('id', 'exeId');
-    const rawResponse = await responsePromise.asResponse();
-    expect(rawResponse).toBeInstanceOf(Response);
-    const response = await responsePromise;
-    expect(response).not.toBeInstanceOf(Response);
-    const dataAndResponse = await responsePromise.withResponse();
-    expect(dataAndResponse.data).toBe(response);
-    expect(dataAndResponse.response).toBe(rawResponse);
-  });
-
-  test('kill: request options instead of params are passed correctly', async () => {
-    // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
-    await expect(
-      client.devboxes.executions.kill('id', 'exeId', { path: '/_stainless_unknown_path' }),
-    ).rejects.toThrow(Runloop.NotFoundError);
-  });
-
-  test('logs', async () => {
-    const responsePromise = client.devboxes.executions.logs('id', 'execution_id');
-    const rawResponse = await responsePromise.asResponse();
-    expect(rawResponse).toBeInstanceOf(Response);
-    const response = await responsePromise;
-    expect(response).not.toBeInstanceOf(Response);
-    const dataAndResponse = await responsePromise.withResponse();
-    expect(dataAndResponse.data).toBe(response);
-    expect(dataAndResponse.response).toBe(rawResponse);
-  });
-
-  test('logs: request options instead of params are passed correctly', async () => {
-    // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
-    await expect(
-      client.devboxes.executions.logs('id', 'execution_id', { path: '/_stainless_unknown_path' }),
-    ).rejects.toThrow(Runloop.NotFoundError);
-  });
-
-  // cannot test text/event-stream
-  test.skip('tail', async () => {
-    const responsePromise = client.devboxes.executions.tail('id', 'execution_id');
-    const rawResponse = await responsePromise.asResponse();
-    expect(rawResponse).toBeInstanceOf(Response);
-    const response = await responsePromise;
-    expect(response).not.toBeInstanceOf(Response);
-    const dataAndResponse = await responsePromise.withResponse();
-    expect(dataAndResponse.data).toBe(response);
-    expect(dataAndResponse.response).toBe(rawResponse);
-  });
-
-  // cannot test text/event-stream
-  test.skip('tail: request options instead of params are passed correctly', async () => {
-    // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
-    await expect(
-      client.devboxes.executions.tail('id', 'execution_id', { path: '/_stainless_unknown_path' }),
     ).rejects.toThrow(Runloop.NotFoundError);
   });
 });
