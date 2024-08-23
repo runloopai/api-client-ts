@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.0-alpha.19 (2024-08-23)
+
+Full Changelog: [v0.1.0-alpha.18...v0.1.0-alpha.19](https://github.com/runloopai/api-client-ts/compare/v0.1.0-alpha.18...v0.1.0-alpha.19)
+
+### Features
+
+* various codegen changes ([c4805f7](https://github.com/runloopai/api-client-ts/commit/c4805f7b7351c8009c65be52c85673596f9f296f))
+
 ## 0.1.0-alpha.18 (2024-08-15)
 
 Full Changelog: [v0.1.0-alpha.17...v0.1.0-alpha.18](https://github.com/runloopai/api-client-ts/compare/v0.1.0-alpha.17...v0.1.0-alpha.18)
