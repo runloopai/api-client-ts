@@ -15,17 +15,10 @@ export {
 } from './blueprints';
 export { CodeMountParameters, Code } from './code';
 export {
-  DeploymentRetrieveResponse,
-  DeploymentGetResponse,
-  DeploymentLogsResponse,
-  DeploymentRedeployResponse,
-  DeploymentTailResponse,
-  DeploymentGetParams,
-  Deployments,
-} from './deployments';
-export {
+  DevboxAsyncExecutionDetailView,
+  DevboxExecutionDetailView,
+  DevboxListView,
   DevboxView,
-  DevboxListResponse,
   DevboxCreateSSHKeyResponse,
   DevboxReadFileContentsResponse,
   DevboxUploadFileResponse,
@@ -40,7 +33,6 @@ export {
 } from './devboxes/devboxes';
 export {
   FunctionListView,
-  FunctionListOpenAPIResponse,
   FunctionInvokeAsyncParams,
   FunctionInvokeSyncParams,
   Functions,
