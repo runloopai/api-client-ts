@@ -48,13 +48,6 @@ export class Functions extends APIResource {
       ...options,
     });
   }
-
-  /**
-   * Get the OpenAPI Spec for this project.
-   */
-  listOpenAPI(options?: Core.RequestOptions): Core.APIPromise<unknown> {
-    return this._client.get('/v1/functions/openapi', options);
-  }
 }
 
 export interface FunctionListView {
@@ -77,8 +70,6 @@ export namespace FunctionListView {
     project_name?: string;
   }
 }
-
-export type FunctionListOpenAPIResponse = unknown;
 
 export interface FunctionInvokeAsyncParams {
   /**
@@ -118,13 +109,11 @@ export namespace FunctionInvokeSyncParams {
 
 export namespace Functions {
   export import FunctionListView = FunctionsAPI.FunctionListView;
-  export import FunctionListOpenAPIResponse = FunctionsAPI.FunctionListOpenAPIResponse;
   export import FunctionInvokeAsyncParams = FunctionsAPI.FunctionInvokeAsyncParams;
   export import FunctionInvokeSyncParams = FunctionsAPI.FunctionInvokeSyncParams;
   export import Invocations = InvocationsAPI.Invocations;
   export import FunctionInvocationListView = InvocationsAPI.FunctionInvocationListView;
   export import KillOperationResponse = InvocationsAPI.KillOperationResponse;
-  export import InvocationLogsResponse = InvocationsAPI.InvocationLogsResponse;
   export import InvocationListParams = InvocationsAPI.InvocationListParams;
   export import InvocationKillParams = InvocationsAPI.InvocationKillParams;
 }

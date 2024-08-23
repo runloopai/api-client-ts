@@ -7,32 +7,6 @@ import * as ExecutionsAPI from './executions';
 
 export class Executions extends APIResource {
   /**
-   * Get status of an execution on a devbox.
-   */
-  retrieve(
-    id: string,
-    exeId: string,
-    body?: ExecutionRetrieveParams,
-    options?: Core.RequestOptions,
-  ): Core.APIPromise<DevboxAsyncExecutionDetailView>;
-  retrieve(
-    id: string,
-    exeId: string,
-    options?: Core.RequestOptions,
-  ): Core.APIPromise<DevboxAsyncExecutionDetailView>;
-  retrieve(
-    id: string,
-    exeId: string,
-    body: ExecutionRetrieveParams | Core.RequestOptions = {},
-    options?: Core.RequestOptions,
-  ): Core.APIPromise<DevboxAsyncExecutionDetailView> {
-    if (isRequestOptions(body)) {
-      return this.retrieve(id, exeId, {}, body);
-    }
-    return this._client.post(`/v1/devboxes/${id}/executions/${exeId}`, { body, ...options });
-  }
-
-  /**
    * Asynchronously execute a command on a devbox
    */
   executeAsync(
@@ -70,36 +44,6 @@ export class Executions extends APIResource {
       return this.executeSync(id, {}, body);
     }
     return this._client.post(`/v1/devboxes/${id}/execute_sync`, { body, ...options });
-  }
-
-  /**
-   * Kill an asynchronous execution currently running on a devbox
-   */
-  kill(
-    id: string,
-    exeId: string,
-    options?: Core.RequestOptions,
-  ): Core.APIPromise<DevboxAsyncExecutionDetailView> {
-    return this._client.post(`/v1/devboxes/${id}/executions/${exeId}/kill`, options);
-  }
-
-  /**
-   * Get all logs from a Devbox execution by id.
-   */
-  logs(id: string, executionId: string, options?: Core.RequestOptions): Core.APIPromise<DevboxLogsListView> {
-    return this._client.get(`/v1/devboxes/${id}/executions/${executionId}/logs`, options);
-  }
-
-  /**
-   * Tail the logs for the given devbox async execution. This will return past log
-   * entries and continue from there. This is a streaming api and will continue to
-   * stream logs until the connection is closed.
-   */
-  tail(id: string, executionId: string, options?: Core.RequestOptions): Core.APIPromise<void> {
-    return this._client.get(`/v1/devboxes/${id}/executions/${executionId}/logs/tail`, {
-      ...options,
-      headers: { Accept: '*/*', ...options?.headers },
-    });
   }
 }
 
@@ -206,13 +150,6 @@ export namespace DevboxLogsListView {
   }
 }
 
-export interface ExecutionRetrieveParams {
-  /**
-   * The command to execute on the Devbox.
-   */
-  command?: string;
-}
-
 export interface ExecutionExecuteAsyncParams {
   /**
    * The command to execute on the Devbox.
@@ -231,7 +168,6 @@ export namespace Executions {
   export import DevboxAsyncExecutionDetailView = ExecutionsAPI.DevboxAsyncExecutionDetailView;
   export import DevboxExecutionDetailView = ExecutionsAPI.DevboxExecutionDetailView;
   export import DevboxLogsListView = ExecutionsAPI.DevboxLogsListView;
-  export import ExecutionRetrieveParams = ExecutionsAPI.ExecutionRetrieveParams;
   export import ExecutionExecuteAsyncParams = ExecutionsAPI.ExecutionExecuteAsyncParams;
   export import ExecutionExecuteSyncParams = ExecutionsAPI.ExecutionExecuteSyncParams;
 }
