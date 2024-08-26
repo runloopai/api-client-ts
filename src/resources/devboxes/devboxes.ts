@@ -470,6 +470,7 @@ export namespace Devboxes {
   export import Logs = LogsAPI.Logs;
   export import DevboxLogsListView = LogsAPI.DevboxLogsListView;
   export import Executions = ExecutionsAPI.Executions;
+  export import ExecutionRetrieveParams = ExecutionsAPI.ExecutionRetrieveParams;
   export import ExecutionExecuteAsyncParams = ExecutionsAPI.ExecutionExecuteAsyncParams;
   export import ExecutionExecuteSyncParams = ExecutionsAPI.ExecutionExecuteSyncParams;
 }
