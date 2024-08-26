@@ -18,9 +18,4 @@ export {
   Devboxes,
 } from './devboxes';
 export { DevboxLogsListView, Logs } from './logs';
-export {
-  ExecutionRetrieveParams,
-  ExecutionExecuteAsyncParams,
-  ExecutionExecuteSyncParams,
-  Executions,
-} from './executions';
+export { ExecutionExecuteAsyncParams, ExecutionExecuteSyncParams, Executions } from './executions';
