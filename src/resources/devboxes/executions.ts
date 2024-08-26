@@ -45,6 +45,13 @@ export class Executions extends APIResource {
     }
     return this._client.post(`/v1/devboxes/${id}/execute_sync`, { body, ...options });
   }
+
+  /**
+   * Get all logs from a Devbox execution by id.
+   */
+  logs(id: string, executionId: string, options?: Core.RequestOptions): Core.APIPromise<DevboxLogsListView> {
+    return this._client.get(`/v1/devboxes/${id}/executions/${executionId}/logs`, options);
+  }
 }
 
 export interface DevboxAsyncExecutionDetailView {
