@@ -17,12 +17,10 @@ export {
   DevboxWriteFileParams,
   Devboxes,
 } from './devboxes';
+export { DevboxLogsListView, Logs } from './logs';
 export {
-  DevboxAsyncExecutionDetailView,
-  DevboxExecutionDetailView,
-  DevboxLogsListView,
+  ExecutionRetrieveParams,
   ExecutionExecuteAsyncParams,
   ExecutionExecuteSyncParams,
   Executions,
 } from './executions';
-export { DevboxLogsListView, Logs } from './logs';
