@@ -73,16 +73,12 @@ Methods:
 
 ## Executions
 
-Types:
-
-- <code><a href="./src/resources/devboxes/executions.ts">DevboxAsyncExecutionDetailView</a></code>
-- <code><a href="./src/resources/devboxes/executions.ts">DevboxExecutionDetailView</a></code>
-- <code><a href="./src/resources/devboxes/executions.ts">DevboxLogsListView</a></code>
-
 Methods:
 
+- <code title="get /v1/devboxes/{id}/executions/{execution_id}">client.devboxes.executions.<a href="./src/resources/devboxes/executions.ts">retrieve</a>(id, executionId, { ...params }) -> DevboxAsyncExecutionDetailView</code>
 - <code title="post /v1/devboxes/{id}/executions/execute_async">client.devboxes.executions.<a href="./src/resources/devboxes/executions.ts">executeAsync</a>(id, { ...params }) -> DevboxAsyncExecutionDetailView</code>
 - <code title="post /v1/devboxes/{id}/execute_sync">client.devboxes.executions.<a href="./src/resources/devboxes/executions.ts">executeSync</a>(id, { ...params }) -> DevboxExecutionDetailView</code>
+- <code title="post /v1/devboxes/{id}/executions/{execution_id}/kill">client.devboxes.executions.<a href="./src/resources/devboxes/executions.ts">kill</a>(id, executionId) -> DevboxAsyncExecutionDetailView</code>
 - <code title="get /v1/devboxes/{id}/executions/{execution_id}/logs">client.devboxes.executions.<a href="./src/resources/devboxes/executions.ts">logs</a>(id, executionId) -> DevboxLogsListView</code>
 
 # Functions

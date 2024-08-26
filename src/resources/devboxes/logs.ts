@@ -3,13 +3,12 @@
 import { APIResource } from '../../resource';
 import * as Core from '../../core';
 import * as LogsAPI from './logs';
-import * as ExecutionsAPI from './executions';
 
 export class Logs extends APIResource {
   /**
    * Get all logs from a Devbox by id.
    */
-  list(id: string, options?: Core.RequestOptions): Core.APIPromise<ExecutionsAPI.DevboxLogsListView> {
+  list(id: string, options?: Core.RequestOptions): Core.APIPromise<DevboxLogsListView> {
     return this._client.get(`/v1/devboxes/${id}/logs`, options);
   }
 }

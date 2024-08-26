@@ -65,16 +65,13 @@ export class Devboxes extends APIResource {
     id: string,
     body?: DevboxExecuteAsyncParams,
     options?: Core.RequestOptions,
-  ): Core.APIPromise<ExecutionsAPI.DevboxAsyncExecutionDetailView>;
-  executeAsync(
-    id: string,
-    options?: Core.RequestOptions,
-  ): Core.APIPromise<ExecutionsAPI.DevboxAsyncExecutionDetailView>;
+  ): Core.APIPromise<DevboxAsyncExecutionDetailView>;
+  executeAsync(id: string, options?: Core.RequestOptions): Core.APIPromise<DevboxAsyncExecutionDetailView>;
   executeAsync(
     id: string,
     body: DevboxExecuteAsyncParams | Core.RequestOptions = {},
     options?: Core.RequestOptions,
-  ): Core.APIPromise<ExecutionsAPI.DevboxAsyncExecutionDetailView> {
+  ): Core.APIPromise<DevboxAsyncExecutionDetailView> {
     if (isRequestOptions(body)) {
       return this.executeAsync(id, {}, body);
     }
@@ -88,16 +85,13 @@ export class Devboxes extends APIResource {
     id: string,
     body?: DevboxExecuteSyncParams,
     options?: Core.RequestOptions,
-  ): Core.APIPromise<ExecutionsAPI.DevboxExecutionDetailView>;
-  executeSync(
-    id: string,
-    options?: Core.RequestOptions,
-  ): Core.APIPromise<ExecutionsAPI.DevboxExecutionDetailView>;
+  ): Core.APIPromise<DevboxExecutionDetailView>;
+  executeSync(id: string, options?: Core.RequestOptions): Core.APIPromise<DevboxExecutionDetailView>;
   executeSync(
     id: string,
     body: DevboxExecuteSyncParams | Core.RequestOptions = {},
     options?: Core.RequestOptions,
-  ): Core.APIPromise<ExecutionsAPI.DevboxExecutionDetailView> {
+  ): Core.APIPromise<DevboxExecutionDetailView> {
     if (isRequestOptions(body)) {
       return this.executeSync(id, {}, body);
     }
@@ -165,16 +159,13 @@ export class Devboxes extends APIResource {
     id: string,
     body?: DevboxWriteFileParams,
     options?: Core.RequestOptions,
-  ): Core.APIPromise<ExecutionsAPI.DevboxExecutionDetailView>;
-  writeFile(
-    id: string,
-    options?: Core.RequestOptions,
-  ): Core.APIPromise<ExecutionsAPI.DevboxExecutionDetailView>;
+  ): Core.APIPromise<DevboxExecutionDetailView>;
+  writeFile(id: string, options?: Core.RequestOptions): Core.APIPromise<DevboxExecutionDetailView>;
   writeFile(
     id: string,
     body: DevboxWriteFileParams | Core.RequestOptions = {},
     options?: Core.RequestOptions,
-  ): Core.APIPromise<ExecutionsAPI.DevboxExecutionDetailView> {
+  ): Core.APIPromise<DevboxExecutionDetailView> {
     if (isRequestOptions(body)) {
       return this.writeFile(id, {}, body);
     }
@@ -479,6 +470,7 @@ export namespace Devboxes {
   export import Logs = LogsAPI.Logs;
   export import DevboxLogsListView = LogsAPI.DevboxLogsListView;
   export import Executions = ExecutionsAPI.Executions;
+  export import ExecutionRetrieveParams = ExecutionsAPI.ExecutionRetrieveParams;
   export import ExecutionExecuteAsyncParams = ExecutionsAPI.ExecutionExecuteAsyncParams;
   export import ExecutionExecuteSyncParams = ExecutionsAPI.ExecutionExecuteSyncParams;
 }
