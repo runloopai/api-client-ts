@@ -5,7 +5,6 @@ import { isRequestOptions } from '../../core';
 import * as Core from '../../core';
 import * as ExecutionsAPI from './executions';
 import * as DevboxesAPI from './devboxes';
-import * as LogsAPI from './logs';
 
 export class Executions extends APIResource {
   /**
@@ -54,7 +53,7 @@ export class Executions extends APIResource {
     if (isRequestOptions(body)) {
       return this.executeAsync(id, {}, body);
     }
-    return this._client.post(`/v1/devboxes/${id}/executions/execute_async`, { body, ...options });
+    return this._client.post(`/v1/devboxes/${id}/execute_async`, { body, ...options });
   }
 
   /**
@@ -89,17 +88,6 @@ export class Executions extends APIResource {
     options?: Core.RequestOptions,
   ): Core.APIPromise<DevboxesAPI.DevboxAsyncExecutionDetailView> {
     return this._client.post(`/v1/devboxes/${id}/executions/${executionId}/kill`, options);
-  }
-
-  /**
-   * Get all logs from a Devbox execution by id.
-   */
-  logs(
-    id: string,
-    executionId: string,
-    options?: Core.RequestOptions,
-  ): Core.APIPromise<LogsAPI.DevboxLogsListView> {
-    return this._client.get(`/v1/devboxes/${id}/executions/${executionId}/logs`, options);
   }
 }
 
