@@ -10,14 +10,13 @@ export {
   DevboxUploadFileResponse,
   DevboxCreateParams,
   DevboxListParams,
-  DevboxExecuteAsyncParams,
   DevboxExecuteSyncParams,
   DevboxReadFileContentsParams,
   DevboxUploadFileParams,
   DevboxWriteFileParams,
   Devboxes,
 } from './devboxes';
-export { DevboxLogsListView, Logs } from './logs';
+export { DevboxLogsListView, LogListParams, Logs } from './logs';
 export {
   ExecutionRetrieveParams,
   ExecutionExecuteAsyncParams,

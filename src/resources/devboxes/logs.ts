@@ -1,6 +1,7 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 import { APIResource } from '../../resource';
+import { isRequestOptions } from '../../core';
 import * as Core from '../../core';
 import * as LogsAPI from './logs';
 
@@ -8,8 +9,17 @@ export class Logs extends APIResource {
   /**
    * Get all logs from a Devbox by id.
    */
-  list(id: string, options?: Core.RequestOptions): Core.APIPromise<DevboxLogsListView> {
-    return this._client.get(`/v1/devboxes/${id}/logs`, options);
+  list(id: string, query?: LogListParams, options?: Core.RequestOptions): Core.APIPromise<DevboxLogsListView>;
+  list(id: string, options?: Core.RequestOptions): Core.APIPromise<DevboxLogsListView>;
+  list(
+    id: string,
+    query: LogListParams | Core.RequestOptions = {},
+    options?: Core.RequestOptions,
+  ): Core.APIPromise<DevboxLogsListView> {
+    if (isRequestOptions(query)) {
+      return this.list(id, {}, query);
+    }
+    return this._client.get(`/v1/devboxes/${id}/logs`, { query, ...options });
   }
 }
 
@@ -59,6 +69,14 @@ export namespace DevboxLogsListView {
   }
 }
 
+export interface LogListParams {
+  /**
+   * Id of execution to filter logs by.
+   */
+  execution_id?: string;
+}
+
 export namespace Logs {
   export import DevboxLogsListView = LogsAPI.DevboxLogsListView;
+  export import LogListParams = LogsAPI.LogListParams;
 }
