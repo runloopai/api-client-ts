@@ -24,7 +24,6 @@ export {
   DevboxUploadFileResponse,
   DevboxCreateParams,
   DevboxListParams,
-  DevboxExecuteAsyncParams,
   DevboxExecuteSyncParams,
   DevboxReadFileContentsParams,
   DevboxUploadFileParams,
