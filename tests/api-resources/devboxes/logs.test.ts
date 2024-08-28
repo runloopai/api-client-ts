@@ -26,11 +26,4 @@ describe('resource logs', () => {
       Runloop.NotFoundError,
     );
   });
-
-  test('list: request options and params are passed correctly', async () => {
-    // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
-    await expect(
-      client.devboxes.logs.list('id', { execution_id: 'execution_id' }, { path: '/_stainless_unknown_path' }),
-    ).rejects.toThrow(Runloop.NotFoundError);
-  });
 });
