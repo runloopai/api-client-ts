@@ -59,6 +59,26 @@ export class Devboxes extends APIResource {
   }
 
   /**
+   * Asynchronously execute a command on a devbox
+   */
+  executeAsync(
+    id: string,
+    body?: DevboxExecuteAsyncParams,
+    options?: Core.RequestOptions,
+  ): Core.APIPromise<DevboxAsyncExecutionDetailView>;
+  executeAsync(id: string, options?: Core.RequestOptions): Core.APIPromise<DevboxAsyncExecutionDetailView>;
+  executeAsync(
+    id: string,
+    body: DevboxExecuteAsyncParams | Core.RequestOptions = {},
+    options?: Core.RequestOptions,
+  ): Core.APIPromise<DevboxAsyncExecutionDetailView> {
+    if (isRequestOptions(body)) {
+      return this.executeAsync(id, {}, body);
+    }
+    return this._client.post(`/v1/devboxes/${id}/execute_async`, { body, ...options });
+  }
+
+  /**
    * Synchronously execute a command on a devbox
    */
   executeSync(
@@ -387,6 +407,13 @@ export interface DevboxListParams {
   status?: string;
 }
 
+export interface DevboxExecuteAsyncParams {
+  /**
+   * The command to execute on the Devbox.
+   */
+  command?: string;
+}
+
 export interface DevboxExecuteSyncParams {
   /**
    * The command to execute on the Devbox.
@@ -429,6 +456,7 @@ export namespace Devboxes {
   export import DevboxUploadFileResponse = DevboxesAPI.DevboxUploadFileResponse;
   export import DevboxCreateParams = DevboxesAPI.DevboxCreateParams;
   export import DevboxListParams = DevboxesAPI.DevboxListParams;
+  export import DevboxExecuteAsyncParams = DevboxesAPI.DevboxExecuteAsyncParams;
   export import DevboxExecuteSyncParams = DevboxesAPI.DevboxExecuteSyncParams;
   export import DevboxReadFileContentsParams = DevboxesAPI.DevboxReadFileContentsParams;
   export import DevboxUploadFileParams = DevboxesAPI.DevboxUploadFileParams;
