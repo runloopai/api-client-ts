@@ -34,29 +34,6 @@ export class Executions extends APIResource {
   }
 
   /**
-   * Asynchronously execute a command on a devbox
-   */
-  executeAsync(
-    id: string,
-    body?: ExecutionExecuteAsyncParams,
-    options?: Core.RequestOptions,
-  ): Core.APIPromise<DevboxesAPI.DevboxAsyncExecutionDetailView>;
-  executeAsync(
-    id: string,
-    options?: Core.RequestOptions,
-  ): Core.APIPromise<DevboxesAPI.DevboxAsyncExecutionDetailView>;
-  executeAsync(
-    id: string,
-    body: ExecutionExecuteAsyncParams | Core.RequestOptions = {},
-    options?: Core.RequestOptions,
-  ): Core.APIPromise<DevboxesAPI.DevboxAsyncExecutionDetailView> {
-    if (isRequestOptions(body)) {
-      return this.executeAsync(id, {}, body);
-    }
-    return this._client.post(`/v1/devboxes/${id}/execute_async`, { body, ...options });
-  }
-
-  /**
    * Synchronously execute a command on a devbox
    */
   executeSync(
@@ -98,13 +75,6 @@ export interface ExecutionRetrieveParams {
   last_n?: string;
 }
 
-export interface ExecutionExecuteAsyncParams {
-  /**
-   * The command to execute on the Devbox.
-   */
-  command?: string;
-}
-
 export interface ExecutionExecuteSyncParams {
   /**
    * The command to execute on the Devbox.
@@ -114,6 +84,5 @@ export interface ExecutionExecuteSyncParams {
 
 export namespace Executions {
   export import ExecutionRetrieveParams = ExecutionsAPI.ExecutionRetrieveParams;
-  export import ExecutionExecuteAsyncParams = ExecutionsAPI.ExecutionExecuteAsyncParams;
   export import ExecutionExecuteSyncParams = ExecutionsAPI.ExecutionExecuteSyncParams;
 }
