@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.1.0-alpha.23 (2024-08-29)
+
+Full Changelog: [v0.1.0-alpha.22...v0.1.0-alpha.23](https://github.com/runloopai/api-client-ts/compare/v0.1.0-alpha.22...v0.1.0-alpha.23)
+
+### Chores
+
+* **ci:** install deps via ./script/bootstrap ([#153](https://github.com/runloopai/api-client-ts/issues/153)) ([7678750](https://github.com/runloopai/api-client-ts/commit/7678750817796ff42e01946497795ec1548b114f))
+* run tsc as part of lint script ([#151](https://github.com/runloopai/api-client-ts/issues/151)) ([de179a3](https://github.com/runloopai/api-client-ts/commit/de179a3471c0d1062f3230abb12e8264a4025221))
+
 ## 0.1.0-alpha.22 (2024-08-28)
 
 Full Changelog: [v0.1.0-alpha.21...v0.1.0-alpha.22](https://github.com/runloopai/api-client-ts/compare/v0.1.0-alpha.21...v0.1.0-alpha.22)
