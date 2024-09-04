@@ -91,7 +91,7 @@ describe('resource devboxes', () => {
     // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
     await expect(
       client.devboxes.list(
-        { limit: 'limit', starting_after: 'starting_after', status: 'status' },
+        { limit: 0, starting_after: 'starting_after', status: 'status' },
         { path: '/_stainless_unknown_path' },
       ),
     ).rejects.toThrow(Runloop.NotFoundError);
