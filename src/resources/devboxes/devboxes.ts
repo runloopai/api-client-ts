@@ -288,6 +288,11 @@ export interface DevboxView {
   name?: string;
 
   /**
+   * The shutdown reason if the Devbox shutdown, if any.
+   */
+  shutdown_reason?: 'api_shutdown' | 'keep_alive_timeout' | 'entrypoint_exit';
+
+  /**
    * The current status of the Devbox.
    */
   status?: 'provisioning' | 'initializing' | 'running' | 'failure' | 'shutdown';
