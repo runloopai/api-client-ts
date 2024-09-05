@@ -62,7 +62,7 @@ describe('resource executions', () => {
     await expect(
       client.devboxes.executions.executeAsync(
         'id',
-        { command: 'command' },
+        { command: 'command', shell_name: 'shell_name' },
         { path: '/_stainless_unknown_path' },
       ),
     ).rejects.toThrow(Runloop.NotFoundError);
@@ -91,7 +91,7 @@ describe('resource executions', () => {
     await expect(
       client.devboxes.executions.executeSync(
         'id',
-        { command: 'command' },
+        { command: 'command', shell_name: 'shell_name' },
         { path: '/_stainless_unknown_path' },
       ),
     ).rejects.toThrow(Runloop.NotFoundError);

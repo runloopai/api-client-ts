@@ -103,6 +103,11 @@ export interface ExecutionExecuteAsyncParams {
    * The command to execute on the Devbox.
    */
   command?: string;
+
+  /**
+   * Which named shell to run the command in.
+   */
+  shell_name?: string;
 }
 
 export interface ExecutionExecuteSyncParams {
@@ -110,6 +115,11 @@ export interface ExecutionExecuteSyncParams {
    * The command to execute on the Devbox.
    */
   command?: string;
+
+  /**
+   * Which named shell to run the command in.
+   */
+  shell_name?: string;
 }
 
 export namespace Executions {
