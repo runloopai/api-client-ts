@@ -58,6 +58,11 @@ export namespace DevboxLogsListView {
     message?: string;
 
     /**
+     * The Shell name the cmd executed in.
+     */
+    shell_name?: string;
+
+    /**
      * The source of the log.
      */
     source?: 'setup_commands' | 'entrypoint' | 'exec';
@@ -74,6 +79,11 @@ export interface LogListParams {
    * Id of execution to filter logs by.
    */
   execution_id?: string;
+
+  /**
+   * Shell Name to filter logs by.
+   */
+  shell_name?: string;
 }
 
 export namespace Logs {
