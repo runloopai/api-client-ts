@@ -5,6 +5,7 @@ import { isRequestOptions } from '../../core';
 import * as Core from '../../core';
 import * as DevboxesAPI from './devboxes';
 import * as AccountAPI from '../account';
+import * as CodeAPI from '../code';
 import * as ExecutionsAPI from './executions';
 import * as LogsAPI from './logs';
 
@@ -341,6 +342,11 @@ export interface DevboxCreateParams {
    * latest successfully built Blueprint with the given name.
    */
   blueprint_name?: string;
+
+  /**
+   * A list of code mounts to be included in the Devbox.
+   */
+  code_mounts?: Array<CodeAPI.CodeMountParameters>;
 
   /**
    * (Optional) When specified, the Devbox will run this script as its main
