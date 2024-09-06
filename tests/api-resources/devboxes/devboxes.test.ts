@@ -34,6 +34,26 @@ describe('resource devboxes', () => {
         {
           blueprint_id: 'blueprint_id',
           blueprint_name: 'blueprint_name',
+          code_mounts: [
+            {
+              token: 'token',
+              install_command: 'install_command',
+              repo_name: 'repo_name',
+              repo_owner: 'repo_owner',
+            },
+            {
+              token: 'token',
+              install_command: 'install_command',
+              repo_name: 'repo_name',
+              repo_owner: 'repo_owner',
+            },
+            {
+              token: 'token',
+              install_command: 'install_command',
+              repo_name: 'repo_name',
+              repo_owner: 'repo_owner',
+            },
+          ],
           entrypoint: 'entrypoint',
           environment_variables: { foo: 'string' },
           file_mounts: { foo: 'string' },
