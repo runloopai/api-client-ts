@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.1.0-alpha.25 (2024-09-06)
+
+Full Changelog: [v0.1.0-alpha.24...v0.1.0-alpha.25](https://github.com/runloopai/api-client-ts/compare/v0.1.0-alpha.24...v0.1.0-alpha.25)
+
+### Features
+
+* **api:** OpenAPI spec update via Stainless API ([#165](https://github.com/runloopai/api-client-ts/issues/165)) ([13d4e9e](https://github.com/runloopai/api-client-ts/commit/13d4e9e42a518b52bd8ff1afdfb347715f84fa6a))
+
+
+### Bug Fixes
+
+* **uploads:** avoid making redundant memory copies ([#163](https://github.com/runloopai/api-client-ts/issues/163)) ([8e7d746](https://github.com/runloopai/api-client-ts/commit/8e7d7461b23ab5f132dcdbddff7c4eefb92e1ee5))
+
 ## 0.1.0-alpha.24 (2024-09-05)
 
 Full Changelog: [v0.1.0-alpha.23...v0.1.0-alpha.24](https://github.com/runloopai/api-client-ts/compare/v0.1.0-alpha.23...v0.1.0-alpha.24)
