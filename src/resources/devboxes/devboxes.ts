@@ -289,6 +289,11 @@ export interface DevboxView {
   initiator_type?: 'unknown' | 'api' | 'invocation';
 
   /**
+   * The launch parameters used to create the Devbox.
+   */
+  launch_parameters?: DevboxView.LaunchParameters;
+
+  /**
    * The user defined Devbox metadata.
    */
   metadata?: Record<string, string>;
@@ -307,6 +312,29 @@ export interface DevboxView {
    * The current status of the Devbox.
    */
   status?: 'provisioning' | 'initializing' | 'running' | 'failure' | 'shutdown';
+}
+
+export namespace DevboxView {
+  /**
+   * The launch parameters used to create the Devbox.
+   */
+  export interface LaunchParameters {
+    /**
+     * Time in seconds after which Devbox will automatically shutdown. Default is 1
+     * hour.
+     */
+    keep_alive_time_seconds?: number;
+
+    /**
+     * Set of commands to be run at launch time, before the entrypoint process is run.
+     */
+    launch_commands?: Array<string>;
+
+    /**
+     * Manual resource configuration for Devbox. If not set, defaults will be used.
+     */
+    resource_size_request?: AccountAPI.ResourceSize;
+  }
 }
 
 export interface DevboxCreateSSHKeyResponse {
