@@ -60,7 +60,7 @@ describe('resource devboxes', () => {
           launch_parameters: {
             keep_alive_time_seconds: 0,
             launch_commands: ['string', 'string', 'string'],
-            resource_size_request: 'SMALL',
+            resource_size_request: 'MINI',
           },
           metadata: { foo: 'string' },
           name: 'name',
