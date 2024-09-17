@@ -64,6 +64,7 @@ describe('resource devboxes', () => {
           },
           metadata: { foo: 'string' },
           name: 'name',
+          prebuilt_handle: 'prebuilt_handle',
           setup_commands: ['string', 'string', 'string'],
         },
         { path: '/_stainless_unknown_path' },
