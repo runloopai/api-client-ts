@@ -409,11 +409,6 @@ export interface DevboxCreateParams {
   name?: string;
 
   /**
-   * Handle to prebuilt.
-   */
-  prebuilt_handle?: string;
-
-  /**
    * (Optional) List of commands needed to set up your Devbox. Examples might include
    * fetching a tool or building your dependencies. Runloop will look optimize these
    * steps for you.
