@@ -409,7 +409,7 @@ export interface DevboxCreateParams {
   name?: string;
 
   /**
-   * Handle to prebuilt.
+   * Reference to prebuilt Blueprint.
    */
   prebuilt?: string;
 
