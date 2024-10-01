@@ -13,7 +13,15 @@ export class Blueprints extends APIResource {
    * building upon create, ' and will transition to 'building_complete' once it is
    * ready.
    */
-  create(body: BlueprintCreateParams, options?: Core.RequestOptions): Core.APIPromise<BlueprintView> {
+  create(body?: BlueprintCreateParams, options?: Core.RequestOptions): Core.APIPromise<BlueprintView>;
+  create(options?: Core.RequestOptions): Core.APIPromise<BlueprintView>;
+  create(
+    body: BlueprintCreateParams | Core.RequestOptions = {},
+    options?: Core.RequestOptions,
+  ): Core.APIPromise<BlueprintView> {
+    if (isRequestOptions(body)) {
+      return this.create({}, body);
+    }
     return this._client.post('/v1/blueprints', { body, ...options });
   }
 
@@ -52,9 +60,17 @@ export class Blueprints extends APIResource {
    * resulting Dockerfile and test out your build.
    */
   preview(
-    body: BlueprintPreviewParams,
+    body?: BlueprintPreviewParams,
+    options?: Core.RequestOptions,
+  ): Core.APIPromise<BlueprintPreviewView>;
+  preview(options?: Core.RequestOptions): Core.APIPromise<BlueprintPreviewView>;
+  preview(
+    body: BlueprintPreviewParams | Core.RequestOptions = {},
     options?: Core.RequestOptions,
   ): Core.APIPromise<BlueprintPreviewView> {
+    if (isRequestOptions(body)) {
+      return this.preview({}, body);
+    }
     return this._client.post('/v1/blueprints/preview', { body, ...options });
   }
 }
@@ -63,37 +79,32 @@ export interface BlueprintBuildLog {
   /**
    * Log line severity level.
    */
-  level: string;
+  level?: string;
 
   /**
    * Log line message.
    */
-  message: string;
+  message?: string;
 
   /**
    * Time of log (Unix timestamp milliseconds).
    */
-  timestamp_ms: number;
+  timestamp_ms?: number;
 }
 
 export interface BlueprintBuildLogsListView {
   /**
    * ID of the Blueprint.
    */
-  blueprint_id: string;
+  blueprint_id?: string;
 
   /**
    * List of logs generated during Blueprint build.
    */
-  logs: Array<BlueprintBuildLog>;
+  logs?: Array<BlueprintBuildLog>;
 }
 
 export interface BlueprintBuildParameters {
-  /**
-   * Name of the Blueprint.
-   */
-  name: string;
-
   /**
    * A list of code mounts to be included in the Blueprint.
    */
@@ -113,6 +124,11 @@ export interface BlueprintBuildParameters {
    * Parameters to configure your Devbox at launch time.
    */
   launch_parameters?: BlueprintBuildParameters.LaunchParameters;
+
+  /**
+   * Name of the Blueprint.
+   */
+  name?: string;
 
   /**
    * A list of commands to run to set up your system.
@@ -147,58 +163,53 @@ export interface BlueprintListView {
   /**
    * List of blueprints matching filter.
    */
-  blueprints: Array<BlueprintView>;
+  blueprints?: Array<BlueprintView>;
 
-  has_more: boolean;
+  has_more?: boolean;
 
-  total_count: number;
+  total_count?: number;
 }
 
 export interface BlueprintPreviewView {
   /**
    * The Dockerfile contents that will built.
    */
-  dockerfile: string;
+  dockerfile?: string;
 }
 
 export interface BlueprintView {
   /**
    * The id of the Blueprint.
    */
-  id: string;
+  id?: string;
 
   /**
    * Creation time of the Blueprint (Unix timestamp milliseconds).
    */
-  create_time_ms: number;
-
-  /**
-   * The name of the Blueprint.
-   */
-  name: string;
-
-  /**
-   * The parameters used to create Blueprint.
-   */
-  parameters: BlueprintBuildParameters;
-
-  /**
-   * The status of the Blueprint build.
-   */
-  status: 'provisioning' | 'building' | 'failed' | 'build_complete';
+  create_time_ms?: number;
 
   /**
    * The failure reason if the Blueprint build failed, if any.
    */
   failure_reason?: 'out_of_memory' | 'out_of_disk' | 'build_failed';
+
+  /**
+   * The name of the Blueprint.
+   */
+  name?: string;
+
+  /**
+   * The parameters used to create Blueprint.
+   */
+  parameters?: BlueprintBuildParameters;
+
+  /**
+   * The status of the Blueprint build.
+   */
+  status?: 'provisioning' | 'building' | 'failed' | 'build_complete';
 }
 
 export interface BlueprintCreateParams {
-  /**
-   * Name of the Blueprint.
-   */
-  name: string;
-
   /**
    * A list of code mounts to be included in the Blueprint.
    */
@@ -218,6 +229,11 @@ export interface BlueprintCreateParams {
    * Parameters to configure your Devbox at launch time.
    */
   launch_parameters?: BlueprintCreateParams.LaunchParameters;
+
+  /**
+   * Name of the Blueprint.
+   */
+  name?: string;
 
   /**
    * A list of commands to run to set up your system.
@@ -267,11 +283,6 @@ export interface BlueprintListParams {
 
 export interface BlueprintPreviewParams {
   /**
-   * Name of the Blueprint.
-   */
-  name: string;
-
-  /**
    * A list of code mounts to be included in the Blueprint.
    */
   code_mounts?: Array<CodeAPI.CodeMountParameters>;
@@ -290,6 +301,11 @@ export interface BlueprintPreviewParams {
    * Parameters to configure your Devbox at launch time.
    */
   launch_parameters?: BlueprintPreviewParams.LaunchParameters;
+
+  /**
+   * Name of the Blueprint.
+   */
+  name?: string;
 
   /**
    * A list of commands to run to set up your system.
