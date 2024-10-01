@@ -38,9 +38,21 @@ export class Executions extends APIResource {
    */
   executeAsync(
     id: string,
-    body: ExecutionExecuteAsyncParams,
+    body?: ExecutionExecuteAsyncParams,
+    options?: Core.RequestOptions,
+  ): Core.APIPromise<DevboxesAPI.DevboxAsyncExecutionDetailView>;
+  executeAsync(
+    id: string,
+    options?: Core.RequestOptions,
+  ): Core.APIPromise<DevboxesAPI.DevboxAsyncExecutionDetailView>;
+  executeAsync(
+    id: string,
+    body: ExecutionExecuteAsyncParams | Core.RequestOptions = {},
     options?: Core.RequestOptions,
   ): Core.APIPromise<DevboxesAPI.DevboxAsyncExecutionDetailView> {
+    if (isRequestOptions(body)) {
+      return this.executeAsync(id, {}, body);
+    }
     return this._client.post(`/v1/devboxes/${id}/execute_async`, { body, ...options });
   }
 
@@ -49,9 +61,21 @@ export class Executions extends APIResource {
    */
   executeSync(
     id: string,
-    body: ExecutionExecuteSyncParams,
+    body?: ExecutionExecuteSyncParams,
+    options?: Core.RequestOptions,
+  ): Core.APIPromise<DevboxesAPI.DevboxExecutionDetailView>;
+  executeSync(
+    id: string,
+    options?: Core.RequestOptions,
+  ): Core.APIPromise<DevboxesAPI.DevboxExecutionDetailView>;
+  executeSync(
+    id: string,
+    body: ExecutionExecuteSyncParams | Core.RequestOptions = {},
     options?: Core.RequestOptions,
   ): Core.APIPromise<DevboxesAPI.DevboxExecutionDetailView> {
+    if (isRequestOptions(body)) {
+      return this.executeSync(id, {}, body);
+    }
     return this._client.post(`/v1/devboxes/${id}/execute_sync`, { body, ...options });
   }
 
@@ -78,7 +102,7 @@ export interface ExecutionExecuteAsyncParams {
   /**
    * The command to execute on the Devbox.
    */
-  command: string;
+  command?: string;
 
   /**
    * Which named shell to run the command in.
@@ -90,7 +114,7 @@ export interface ExecutionExecuteSyncParams {
   /**
    * The command to execute on the Devbox.
    */
-  command: string;
+  command?: string;
 
   /**
    * Which named shell to run the command in.

@@ -54,17 +54,17 @@ export interface ProjectLogsView {
   /**
    * List of logs for the given project.
    */
-  logs: Array<ProjectLogsView.Log>;
+  logs?: Array<ProjectLogsView.Log>;
 }
 
 export namespace ProjectLogsView {
   export interface Log {
-    level: string;
+    level?: string;
 
-    message: string;
+    message?: string;
 
-    source: string;
+    source?: string;
 
-    timestamp: string;
+    timestamp?: string;
   }
 }
