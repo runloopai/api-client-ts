@@ -9,8 +9,8 @@ const client = new Runloop({
 });
 
 describe('resource blueprints', () => {
-  test('create', async () => {
-    const responsePromise = client.blueprints.create();
+  test('create: only required params', async () => {
+    const responsePromise = client.blueprints.create({ name: 'name' });
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
     const response = await responsePromise;
@@ -20,51 +20,38 @@ describe('resource blueprints', () => {
     expect(dataAndResponse.response).toBe(rawResponse);
   });
 
-  test('create: request options instead of params are passed correctly', async () => {
-    // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
-    await expect(client.blueprints.create({ path: '/_stainless_unknown_path' })).rejects.toThrow(
-      Runloop.NotFoundError,
-    );
-  });
-
-  test('create: request options and params are passed correctly', async () => {
-    // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
-    await expect(
-      client.blueprints.create(
+  test('create: required and optional params', async () => {
+    const response = await client.blueprints.create({
+      name: 'name',
+      code_mounts: [
         {
-          code_mounts: [
-            {
-              token: 'token',
-              install_command: 'install_command',
-              repo_name: 'repo_name',
-              repo_owner: 'repo_owner',
-            },
-            {
-              token: 'token',
-              install_command: 'install_command',
-              repo_name: 'repo_name',
-              repo_owner: 'repo_owner',
-            },
-            {
-              token: 'token',
-              install_command: 'install_command',
-              repo_name: 'repo_name',
-              repo_owner: 'repo_owner',
-            },
-          ],
-          dockerfile: 'dockerfile',
-          file_mounts: { foo: 'string' },
-          launch_parameters: {
-            keep_alive_time_seconds: 0,
-            launch_commands: ['string', 'string', 'string'],
-            resource_size_request: 'SMALL',
-          },
-          name: 'name',
-          system_setup_commands: ['string', 'string', 'string'],
+          repo_name: 'repo_name',
+          repo_owner: 'repo_owner',
+          token: 'token',
+          install_command: 'install_command',
         },
-        { path: '/_stainless_unknown_path' },
-      ),
-    ).rejects.toThrow(Runloop.NotFoundError);
+        {
+          repo_name: 'repo_name',
+          repo_owner: 'repo_owner',
+          token: 'token',
+          install_command: 'install_command',
+        },
+        {
+          repo_name: 'repo_name',
+          repo_owner: 'repo_owner',
+          token: 'token',
+          install_command: 'install_command',
+        },
+      ],
+      dockerfile: 'dockerfile',
+      file_mounts: { foo: 'string' },
+      launch_parameters: {
+        keep_alive_time_seconds: 0,
+        launch_commands: ['string', 'string', 'string'],
+        resource_size_request: 'SMALL',
+      },
+      system_setup_commands: ['string', 'string', 'string'],
+    });
   });
 
   test('retrieve', async () => {
@@ -131,8 +118,8 @@ describe('resource blueprints', () => {
     );
   });
 
-  test('preview', async () => {
-    const responsePromise = client.blueprints.preview();
+  test('preview: only required params', async () => {
+    const responsePromise = client.blueprints.preview({ name: 'name' });
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
     const response = await responsePromise;
@@ -142,50 +129,37 @@ describe('resource blueprints', () => {
     expect(dataAndResponse.response).toBe(rawResponse);
   });
 
-  test('preview: request options instead of params are passed correctly', async () => {
-    // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
-    await expect(client.blueprints.preview({ path: '/_stainless_unknown_path' })).rejects.toThrow(
-      Runloop.NotFoundError,
-    );
-  });
-
-  test('preview: request options and params are passed correctly', async () => {
-    // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
-    await expect(
-      client.blueprints.preview(
+  test('preview: required and optional params', async () => {
+    const response = await client.blueprints.preview({
+      name: 'name',
+      code_mounts: [
         {
-          code_mounts: [
-            {
-              token: 'token',
-              install_command: 'install_command',
-              repo_name: 'repo_name',
-              repo_owner: 'repo_owner',
-            },
-            {
-              token: 'token',
-              install_command: 'install_command',
-              repo_name: 'repo_name',
-              repo_owner: 'repo_owner',
-            },
-            {
-              token: 'token',
-              install_command: 'install_command',
-              repo_name: 'repo_name',
-              repo_owner: 'repo_owner',
-            },
-          ],
-          dockerfile: 'dockerfile',
-          file_mounts: { foo: 'string' },
-          launch_parameters: {
-            keep_alive_time_seconds: 0,
-            launch_commands: ['string', 'string', 'string'],
-            resource_size_request: 'SMALL',
-          },
-          name: 'name',
-          system_setup_commands: ['string', 'string', 'string'],
+          repo_name: 'repo_name',
+          repo_owner: 'repo_owner',
+          token: 'token',
+          install_command: 'install_command',
         },
-        { path: '/_stainless_unknown_path' },
-      ),
-    ).rejects.toThrow(Runloop.NotFoundError);
+        {
+          repo_name: 'repo_name',
+          repo_owner: 'repo_owner',
+          token: 'token',
+          install_command: 'install_command',
+        },
+        {
+          repo_name: 'repo_name',
+          repo_owner: 'repo_owner',
+          token: 'token',
+          install_command: 'install_command',
+        },
+      ],
+      dockerfile: 'dockerfile',
+      file_mounts: { foo: 'string' },
+      launch_parameters: {
+        keep_alive_time_seconds: 0,
+        launch_commands: ['string', 'string', 'string'],
+        resource_size_request: 'SMALL',
+      },
+      system_setup_commands: ['string', 'string', 'string'],
+    });
   });
 });
