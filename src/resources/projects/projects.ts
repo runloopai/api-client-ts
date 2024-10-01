@@ -18,12 +18,12 @@ export class Projects extends APIResource {
 }
 
 export interface ProjectListView {
-  installation: ProjectListView.Installation;
+  installation?: ProjectListView.Installation;
 
   /**
    * List of projects matching given query.
    */
-  projects: Array<ProjectListView.Project>;
+  projects?: Array<ProjectListView.Project>;
 }
 
 export namespace ProjectListView {
@@ -31,24 +31,24 @@ export namespace ProjectListView {
     /**
      * Status of the installation (installed | uninstalled | never_installed).
      */
-    status: string;
+    status?: string;
   }
 
   export interface Project {
     /**
      * Unique id of Project.
      */
-    id: string;
+    id?: string;
 
     /**
      * Owner of the project in Github
      */
-    gh_owner: string;
+    gh_owner?: string;
 
     /**
      * Project display name.
      */
-    name: string;
+    name?: string;
   }
 }
 
