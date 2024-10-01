@@ -27,11 +27,26 @@ export interface DevboxLogsListView {
   /**
    * List of logs for the given devbox.
    */
-  logs?: Array<DevboxLogsListView.Log>;
+  logs: Array<DevboxLogsListView.Log>;
 }
 
 export namespace DevboxLogsListView {
   export interface Log {
+    /**
+     * Log line severity level.
+     */
+    level: string;
+
+    /**
+     * The source of the log.
+     */
+    source: 'setup_commands' | 'entrypoint' | 'exec';
+
+    /**
+     * Time of log (Unix timestamp milliseconds).
+     */
+    timestamp_ms: number;
+
     /**
      * The Command Executed
      */
@@ -48,11 +63,6 @@ export namespace DevboxLogsListView {
     exit_code?: number;
 
     /**
-     * Log line severity level.
-     */
-    level?: string;
-
-    /**
      * Log line message.
      */
     message?: string;
@@ -61,16 +71,6 @@ export namespace DevboxLogsListView {
      * The Shell name the cmd executed in.
      */
     shell_name?: string;
-
-    /**
-     * The source of the log.
-     */
-    source?: 'setup_commands' | 'entrypoint' | 'exec';
-
-    /**
-     * Time of log (Unix timestamp milliseconds).
-     */
-    timestamp_ms?: number;
   }
 }
 
