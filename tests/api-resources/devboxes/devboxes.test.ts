@@ -34,16 +34,37 @@ describe('resource devboxes', () => {
         {
           blueprint_id: 'blueprint_id',
           blueprint_name: 'blueprint_name',
+          code_mounts: [
+            {
+              repo_name: 'repo_name',
+              repo_owner: 'repo_owner',
+              token: 'token',
+              install_command: 'install_command',
+            },
+            {
+              repo_name: 'repo_name',
+              repo_owner: 'repo_owner',
+              token: 'token',
+              install_command: 'install_command',
+            },
+            {
+              repo_name: 'repo_name',
+              repo_owner: 'repo_owner',
+              token: 'token',
+              install_command: 'install_command',
+            },
+          ],
           entrypoint: 'entrypoint',
           environment_variables: { foo: 'string' },
           file_mounts: { foo: 'string' },
           launch_parameters: {
             keep_alive_time_seconds: 0,
             launch_commands: ['string', 'string', 'string'],
-            resource_size_request: 'MINI',
+            resource_size_request: 'SMALL',
           },
           metadata: { foo: 'string' },
           name: 'name',
+          prebuilt: 'prebuilt',
           setup_commands: ['string', 'string', 'string'],
         },
         { path: '/_stainless_unknown_path' },
@@ -115,8 +136,8 @@ describe('resource devboxes', () => {
     );
   });
 
-  test('executeAsync', async () => {
-    const responsePromise = client.devboxes.executeAsync('id');
+  test('executeAsync: only required params', async () => {
+    const responsePromise = client.devboxes.executeAsync('id', { command: 'command' });
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
     const response = await responsePromise;
@@ -126,26 +147,15 @@ describe('resource devboxes', () => {
     expect(dataAndResponse.response).toBe(rawResponse);
   });
 
-  test('executeAsync: request options instead of params are passed correctly', async () => {
-    // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
-    await expect(client.devboxes.executeAsync('id', { path: '/_stainless_unknown_path' })).rejects.toThrow(
-      Runloop.NotFoundError,
-    );
+  test('executeAsync: required and optional params', async () => {
+    const response = await client.devboxes.executeAsync('id', {
+      command: 'command',
+      shell_name: 'shell_name',
+    });
   });
 
-  test('executeAsync: request options and params are passed correctly', async () => {
-    // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
-    await expect(
-      client.devboxes.executeAsync(
-        'id',
-        { command: 'command', shell_name: 'shell_name' },
-        { path: '/_stainless_unknown_path' },
-      ),
-    ).rejects.toThrow(Runloop.NotFoundError);
-  });
-
-  test('executeSync', async () => {
-    const responsePromise = client.devboxes.executeSync('id');
+  test('executeSync: only required params', async () => {
+    const responsePromise = client.devboxes.executeSync('id', { command: 'command' });
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
     const response = await responsePromise;
@@ -155,26 +165,15 @@ describe('resource devboxes', () => {
     expect(dataAndResponse.response).toBe(rawResponse);
   });
 
-  test('executeSync: request options instead of params are passed correctly', async () => {
-    // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
-    await expect(client.devboxes.executeSync('id', { path: '/_stainless_unknown_path' })).rejects.toThrow(
-      Runloop.NotFoundError,
-    );
+  test('executeSync: required and optional params', async () => {
+    const response = await client.devboxes.executeSync('id', {
+      command: 'command',
+      shell_name: 'shell_name',
+    });
   });
 
-  test('executeSync: request options and params are passed correctly', async () => {
-    // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
-    await expect(
-      client.devboxes.executeSync(
-        'id',
-        { command: 'command', shell_name: 'shell_name' },
-        { path: '/_stainless_unknown_path' },
-      ),
-    ).rejects.toThrow(Runloop.NotFoundError);
-  });
-
-  test('readFileContents', async () => {
-    const responsePromise = client.devboxes.readFileContents('id');
+  test('readFileContents: only required params', async () => {
+    const responsePromise = client.devboxes.readFileContents('id', { file_path: 'file_path' });
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
     const response = await responsePromise;
@@ -184,22 +183,8 @@ describe('resource devboxes', () => {
     expect(dataAndResponse.response).toBe(rawResponse);
   });
 
-  test('readFileContents: request options instead of params are passed correctly', async () => {
-    // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
-    await expect(
-      client.devboxes.readFileContents('id', { path: '/_stainless_unknown_path' }),
-    ).rejects.toThrow(Runloop.NotFoundError);
-  });
-
-  test('readFileContents: request options and params are passed correctly', async () => {
-    // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
-    await expect(
-      client.devboxes.readFileContents(
-        'id',
-        { file_path: 'file_path' },
-        { path: '/_stainless_unknown_path' },
-      ),
-    ).rejects.toThrow(Runloop.NotFoundError);
+  test('readFileContents: required and optional params', async () => {
+    const response = await client.devboxes.readFileContents('id', { file_path: 'file_path' });
   });
 
   test('shutdown', async () => {
@@ -249,8 +234,8 @@ describe('resource devboxes', () => {
     ).rejects.toThrow(Runloop.NotFoundError);
   });
 
-  test('writeFile', async () => {
-    const responsePromise = client.devboxes.writeFile('id');
+  test('writeFile: only required params', async () => {
+    const responsePromise = client.devboxes.writeFile('id', { contents: 'contents', file_path: 'file_path' });
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
     const response = await responsePromise;
@@ -260,21 +245,7 @@ describe('resource devboxes', () => {
     expect(dataAndResponse.response).toBe(rawResponse);
   });
 
-  test('writeFile: request options instead of params are passed correctly', async () => {
-    // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
-    await expect(client.devboxes.writeFile('id', { path: '/_stainless_unknown_path' })).rejects.toThrow(
-      Runloop.NotFoundError,
-    );
-  });
-
-  test('writeFile: request options and params are passed correctly', async () => {
-    // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
-    await expect(
-      client.devboxes.writeFile(
-        'id',
-        { contents: 'contents', file_path: 'file_path' },
-        { path: '/_stainless_unknown_path' },
-      ),
-    ).rejects.toThrow(Runloop.NotFoundError);
+  test('writeFile: required and optional params', async () => {
+    const response = await client.devboxes.writeFile('id', { contents: 'contents', file_path: 'file_path' });
   });
 });
