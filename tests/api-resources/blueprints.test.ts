@@ -94,7 +94,7 @@ describe('resource blueprints', () => {
     // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
     await expect(
       client.blueprints.list(
-        { limit: 'limit', name: 'name', starting_after: 'starting_after' },
+        { limit: 0, name: 'name', starting_after: 'starting_after' },
         { path: '/_stainless_unknown_path' },
       ),
     ).rejects.toThrow(Runloop.NotFoundError);
