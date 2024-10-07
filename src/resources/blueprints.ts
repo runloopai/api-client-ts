@@ -252,7 +252,7 @@ export interface BlueprintListParams {
   /**
    * Page Limit
    */
-  limit?: string;
+  limit?: number;
 
   /**
    * Filter by name

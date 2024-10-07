@@ -10,6 +10,7 @@ export {
   DevboxUploadFileResponse,
   DevboxCreateParams,
   DevboxListParams,
+  DevboxDownloadFileParams,
   DevboxExecuteAsyncParams,
   DevboxExecuteSyncParams,
   DevboxReadFileContentsParams,
