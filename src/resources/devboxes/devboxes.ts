@@ -8,6 +8,7 @@ import * as AccountAPI from '../account';
 import * as CodeAPI from '../code';
 import * as ExecutionsAPI from './executions';
 import * as LogsAPI from './logs';
+import { type Response } from '../../_shims/index';
 
 export class Devboxes extends APIResource {
   logs: LogsAPI.Logs = new LogsAPI.Logs(this._client);
@@ -57,6 +58,21 @@ export class Devboxes extends APIResource {
    */
   createSSHKey(id: string, options?: Core.RequestOptions): Core.APIPromise<DevboxCreateSSHKeyResponse> {
     return this._client.post(`/v1/devboxes/${id}/create_ssh_key`, options);
+  }
+
+  /**
+   * Download file contents to a file at path on the Devbox.
+   */
+  downloadFile(
+    id: string,
+    body: DevboxDownloadFileParams,
+    options?: Core.RequestOptions,
+  ): Core.APIPromise<Response> {
+    return this._client.post(`/v1/devboxes/${id}/download_file`, {
+      body,
+      ...options,
+      __binaryResponse: true,
+    });
   }
 
   /**
@@ -425,6 +441,13 @@ export interface DevboxListParams {
   status?: string;
 }
 
+export interface DevboxDownloadFileParams {
+  /**
+   * The path on the devbox to read the file
+   */
+  path: string;
+}
+
 export interface DevboxExecuteAsyncParams {
   /**
    * The command to execute on the Devbox.
@@ -484,6 +507,7 @@ export namespace Devboxes {
   export import DevboxUploadFileResponse = DevboxesAPI.DevboxUploadFileResponse;
   export import DevboxCreateParams = DevboxesAPI.DevboxCreateParams;
   export import DevboxListParams = DevboxesAPI.DevboxListParams;
+  export import DevboxDownloadFileParams = DevboxesAPI.DevboxDownloadFileParams;
   export import DevboxExecuteAsyncParams = DevboxesAPI.DevboxExecuteAsyncParams;
   export import DevboxExecuteSyncParams = DevboxesAPI.DevboxExecuteSyncParams;
   export import DevboxReadFileContentsParams = DevboxesAPI.DevboxReadFileContentsParams;
