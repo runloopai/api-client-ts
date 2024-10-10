@@ -229,6 +229,7 @@ export namespace Runloop {
   export import ProjectListView = API.ProjectListView;
 
   export import FunctionInvocationExecutionDetailView = API.FunctionInvocationExecutionDetailView;
+  export import LauchParameters = API.LauchParameters;
   export import ProjectLogsView = API.ProjectLogsView;
 }
 
