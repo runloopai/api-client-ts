@@ -66,12 +66,12 @@ export class Devboxes extends APIResource {
   diskSnapshots(
     query?: DevboxDiskSnapshotsParams,
     options?: Core.RequestOptions,
-  ): Core.APIPromise<DevboxDiskSnapshotsResponse>;
-  diskSnapshots(options?: Core.RequestOptions): Core.APIPromise<DevboxDiskSnapshotsResponse>;
+  ): Core.APIPromise<DevboxSnapshotListView>;
+  diskSnapshots(options?: Core.RequestOptions): Core.APIPromise<DevboxSnapshotListView>;
   diskSnapshots(
     query: DevboxDiskSnapshotsParams | Core.RequestOptions = {},
     options?: Core.RequestOptions,
-  ): Core.APIPromise<DevboxDiskSnapshotsResponse> {
+  ): Core.APIPromise<DevboxSnapshotListView> {
     if (isRequestOptions(query)) {
       return this.diskSnapshots({}, query);
     }
@@ -250,6 +250,39 @@ export interface DevboxListView {
   total_count: number;
 }
 
+export interface DevboxSnapshotListView {
+  has_more: boolean;
+
+  /**
+   * List of snapshots matching filter.
+   */
+  snapshots: Array<DevboxSnapshotView>;
+
+  total_count: number;
+}
+
+export interface DevboxSnapshotView {
+  /**
+   * The unique identifier of the snapshot.
+   */
+  id: string;
+
+  /**
+   * metadata associated with the snapshot.
+   */
+  metadata: Record<string, string>;
+
+  /**
+   * The source devbox identifier.
+   */
+  sourceDevboxId: string;
+
+  /**
+   * (Optional) The custom name of the snapshot.
+   */
+  name?: string;
+}
+
 export interface DevboxView {
   /**
    * The id of the Devbox.
@@ -327,41 +360,6 @@ export interface DevboxCreateSSHKeyResponse {
    * The url of the Devbox.
    */
   url: string;
-}
-
-export interface DevboxDiskSnapshotsResponse {
-  has_more: boolean;
-
-  /**
-   * List of snapshots matching filter.
-   */
-  snapshots: Array<DevboxDiskSnapshotsResponse.Snapshot>;
-
-  total_count: number;
-}
-
-export namespace DevboxDiskSnapshotsResponse {
-  export interface Snapshot {
-    /**
-     * The unique identifier of the snapshot.
-     */
-    id: string;
-
-    /**
-     * metadata associated with the snapshot.
-     */
-    metadata: Record<string, string>;
-
-    /**
-     * The source devbox identifier.
-     */
-    sourceDevboxId: string;
-
-    /**
-     * (Optional) The custom name of the snapshot.
-     */
-    name?: string;
-  }
 }
 
 export type DevboxReadFileContentsResponse = string;
@@ -531,9 +529,10 @@ export namespace Devboxes {
   export import DevboxAsyncExecutionDetailView = DevboxesAPI.DevboxAsyncExecutionDetailView;
   export import DevboxExecutionDetailView = DevboxesAPI.DevboxExecutionDetailView;
   export import DevboxListView = DevboxesAPI.DevboxListView;
+  export import DevboxSnapshotListView = DevboxesAPI.DevboxSnapshotListView;
+  export import DevboxSnapshotView = DevboxesAPI.DevboxSnapshotView;
   export import DevboxView = DevboxesAPI.DevboxView;
   export import DevboxCreateSSHKeyResponse = DevboxesAPI.DevboxCreateSSHKeyResponse;
-  export import DevboxDiskSnapshotsResponse = DevboxesAPI.DevboxDiskSnapshotsResponse;
   export import DevboxReadFileContentsResponse = DevboxesAPI.DevboxReadFileContentsResponse;
   export import DevboxUploadFileResponse = DevboxesAPI.DevboxUploadFileResponse;
   export import DevboxCreateParams = DevboxesAPI.DevboxCreateParams;
