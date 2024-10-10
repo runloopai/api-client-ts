@@ -61,6 +61,24 @@ export class Devboxes extends APIResource {
   }
 
   /**
+   * List all snapshots of a devbox by id.
+   */
+  diskSnapshots(
+    query?: DevboxDiskSnapshotsParams,
+    options?: Core.RequestOptions,
+  ): Core.APIPromise<DevboxDiskSnapshotsResponse>;
+  diskSnapshots(options?: Core.RequestOptions): Core.APIPromise<DevboxDiskSnapshotsResponse>;
+  diskSnapshots(
+    query: DevboxDiskSnapshotsParams | Core.RequestOptions = {},
+    options?: Core.RequestOptions,
+  ): Core.APIPromise<DevboxDiskSnapshotsResponse> {
+    if (isRequestOptions(query)) {
+      return this.diskSnapshots({}, query);
+    }
+    return this._client.get('/v1/devboxes/disk_snapshots', { query, ...options });
+  }
+
+  /**
    * Download file contents to a file at path on the Devbox.
    */
   downloadFile(
@@ -334,6 +352,41 @@ export interface DevboxCreateSSHKeyResponse {
   url: string;
 }
 
+export interface DevboxDiskSnapshotsResponse {
+  has_more: boolean;
+
+  /**
+   * List of snapshots matching filter.
+   */
+  snapshots: Array<DevboxDiskSnapshotsResponse.Snapshot>;
+
+  total_count: number;
+}
+
+export namespace DevboxDiskSnapshotsResponse {
+  export interface Snapshot {
+    /**
+     * The unique identifier of the snapshot.
+     */
+    id: string;
+
+    /**
+     * metadata associated with the snapshot.
+     */
+    metadata: Record<string, string>;
+
+    /**
+     * The source devbox identifier.
+     */
+    sourceDevboxId: string;
+
+    /**
+     * (Optional) The custom name of the snapshot.
+     */
+    name?: string;
+  }
+}
+
 export type DevboxReadFileContentsResponse = string;
 
 export type DevboxUploadFileResponse = unknown;
@@ -446,6 +499,18 @@ export interface DevboxListParams {
   status?: string;
 }
 
+export interface DevboxDiskSnapshotsParams {
+  /**
+   * Page Limit
+   */
+  limit?: number;
+
+  /**
+   * Load the next page starting after the given token.
+   */
+  starting_after?: string;
+}
+
 export interface DevboxDownloadFileParams {
   /**
    * The path on the devbox to read the file
@@ -514,10 +579,12 @@ export namespace Devboxes {
   export import DevboxListView = DevboxesAPI.DevboxListView;
   export import DevboxView = DevboxesAPI.DevboxView;
   export import DevboxCreateSSHKeyResponse = DevboxesAPI.DevboxCreateSSHKeyResponse;
+  export import DevboxDiskSnapshotsResponse = DevboxesAPI.DevboxDiskSnapshotsResponse;
   export import DevboxReadFileContentsResponse = DevboxesAPI.DevboxReadFileContentsResponse;
   export import DevboxUploadFileResponse = DevboxesAPI.DevboxUploadFileResponse;
   export import DevboxCreateParams = DevboxesAPI.DevboxCreateParams;
   export import DevboxListParams = DevboxesAPI.DevboxListParams;
+  export import DevboxDiskSnapshotsParams = DevboxesAPI.DevboxDiskSnapshotsParams;
   export import DevboxDownloadFileParams = DevboxesAPI.DevboxDownloadFileParams;
   export import DevboxExecuteAsyncParams = DevboxesAPI.DevboxExecuteAsyncParams;
   export import DevboxExecuteSyncParams = DevboxesAPI.DevboxExecuteSyncParams;
