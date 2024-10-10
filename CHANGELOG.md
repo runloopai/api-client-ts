@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.2.0 (2024-10-10)
+
+Full Changelog: [v0.1.23-alpha...v0.2.0](https://github.com/runloopai/api-client-ts/compare/v0.1.23-alpha...v0.2.0)
+
+### Features
+
+* **api:** api update ([#197](https://github.com/runloopai/api-client-ts/issues/197)) ([8ac30d8](https://github.com/runloopai/api-client-ts/commit/8ac30d8f7cad43f73932c2a57b6ba710544a9c79))
+* **api:** api update ([#198](https://github.com/runloopai/api-client-ts/issues/198)) ([17d6c59](https://github.com/runloopai/api-client-ts/commit/17d6c59444cc1b66ba912b1b31638e5bd699daa8))
+* **api:** api update ([#199](https://github.com/runloopai/api-client-ts/issues/199)) ([676f74b](https://github.com/runloopai/api-client-ts/commit/676f74b185242b2ada3713acc0caaca2b4ca7ccd))
+
+
+### Chores
+
+* **internal:** pass props through internal parser ([#195](https://github.com/runloopai/api-client-ts/issues/195)) ([ecd1193](https://github.com/runloopai/api-client-ts/commit/ecd1193ee3d4556baf79f696b65efaa24d996b0b))
+
 ## 0.1.23-alpha (2024-10-07)
 
 Full Changelog: [v0.1.26...v0.1.23-alpha](https://github.com/runloopai/api-client-ts/compare/v0.1.26...v0.1.23-alpha)

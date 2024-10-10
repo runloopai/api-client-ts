@@ -207,10 +207,12 @@ export namespace Runloop {
   export import DevboxListView = API.DevboxListView;
   export import DevboxView = API.DevboxView;
   export import DevboxCreateSSHKeyResponse = API.DevboxCreateSSHKeyResponse;
+  export import DevboxDiskSnapshotsResponse = API.DevboxDiskSnapshotsResponse;
   export import DevboxReadFileContentsResponse = API.DevboxReadFileContentsResponse;
   export import DevboxUploadFileResponse = API.DevboxUploadFileResponse;
   export import DevboxCreateParams = API.DevboxCreateParams;
   export import DevboxListParams = API.DevboxListParams;
+  export import DevboxDiskSnapshotsParams = API.DevboxDiskSnapshotsParams;
   export import DevboxDownloadFileParams = API.DevboxDownloadFileParams;
   export import DevboxExecuteAsyncParams = API.DevboxExecuteAsyncParams;
   export import DevboxExecuteSyncParams = API.DevboxExecuteSyncParams;
