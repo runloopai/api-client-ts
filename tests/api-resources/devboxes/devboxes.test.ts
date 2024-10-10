@@ -66,6 +66,7 @@ describe('resource devboxes', () => {
           name: 'name',
           prebuilt: 'prebuilt',
           setup_commands: ['string', 'string', 'string'],
+          snapshot_id: 'snapshot_id',
         },
         { path: '/_stainless_unknown_path' },
       ),
