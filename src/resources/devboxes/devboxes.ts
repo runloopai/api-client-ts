@@ -399,6 +399,11 @@ export interface DevboxCreateParams {
    * steps for you.
    */
   setup_commands?: Array<string>;
+
+  /**
+   * Snapshot ID to use for the Devbox.
+   */
+  snapshot_id?: string;
 }
 
 export namespace DevboxCreateParams {
