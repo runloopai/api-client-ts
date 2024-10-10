@@ -165,7 +165,8 @@ describe('resource devboxes', () => {
     ).rejects.toThrow(Runloop.NotFoundError);
   });
 
-  test('downloadFile: required and optional params', async () => {
+  // prism can't support octet
+  test.skip('downloadFile: required and optional params', async () => {
     const response = await client.devboxes.downloadFile('id', { path: 'path' });
   });
 
