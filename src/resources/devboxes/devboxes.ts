@@ -4,8 +4,8 @@ import { APIResource } from '../../resource';
 import { isRequestOptions } from '../../core';
 import * as Core from '../../core';
 import * as DevboxesAPI from './devboxes';
-import * as AccountAPI from '../account';
 import * as CodeAPI from '../code';
+import * as Shared from '../shared';
 import * as ExecutionsAPI from './executions';
 import * as LogsAPI from './logs';
 import { type Response } from '../../_shims/index';
@@ -274,7 +274,7 @@ export interface DevboxView {
   /**
    * The launch parameters used to create the Devbox.
    */
-  launch_parameters: DevboxView.LaunchParameters;
+  launch_parameters: Shared.LauchParameters;
 
   /**
    * The user defined Devbox metadata.
@@ -310,29 +310,6 @@ export interface DevboxView {
    * The shutdown reason if the Devbox shutdown, if any.
    */
   shutdown_reason?: 'api_shutdown' | 'keep_alive_timeout' | 'entrypoint_exit';
-}
-
-export namespace DevboxView {
-  /**
-   * The launch parameters used to create the Devbox.
-   */
-  export interface LaunchParameters {
-    /**
-     * Time in seconds after which Devbox will automatically shutdown. Default is 1
-     * hour.
-     */
-    keep_alive_time_seconds?: number;
-
-    /**
-     * Set of commands to be run at launch time, before the entrypoint process is run.
-     */
-    launch_commands?: Array<string>;
-
-    /**
-     * Manual resource configuration for Devbox. If not set, defaults will be used.
-     */
-    resource_size_request?: AccountAPI.ResourceSize;
-  }
 }
 
 export interface DevboxCreateSSHKeyResponse {
@@ -429,7 +406,7 @@ export interface DevboxCreateParams {
   /**
    * Parameters to configure the resources and launch time behavior of the Devbox.
    */
-  launch_parameters?: DevboxCreateParams.LaunchParameters;
+  launch_parameters?: Shared.LauchParameters;
 
   /**
    * User defined metadata to attach to the devbox for organization.
@@ -457,29 +434,6 @@ export interface DevboxCreateParams {
    * Snapshot ID to use for the Devbox.
    */
   snapshot_id?: string;
-}
-
-export namespace DevboxCreateParams {
-  /**
-   * Parameters to configure the resources and launch time behavior of the Devbox.
-   */
-  export interface LaunchParameters {
-    /**
-     * Time in seconds after which Devbox will automatically shutdown. Default is 1
-     * hour.
-     */
-    keep_alive_time_seconds?: number;
-
-    /**
-     * Set of commands to be run at launch time, before the entrypoint process is run.
-     */
-    launch_commands?: Array<string>;
-
-    /**
-     * Manual resource configuration for Devbox. If not set, defaults will be used.
-     */
-    resource_size_request?: AccountAPI.ResourceSize;
-  }
 }
 
 export interface DevboxListParams {

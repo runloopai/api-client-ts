@@ -3,6 +3,7 @@
 Types:
 
 - <code><a href="./src/resources/shared.ts">FunctionInvocationExecutionDetailView</a></code>
+- <code><a href="./src/resources/shared.ts">LauchParameters</a></code>
 - <code><a href="./src/resources/shared.ts">ProjectLogsView</a></code>
 
 # Account
