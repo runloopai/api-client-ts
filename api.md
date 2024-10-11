@@ -3,14 +3,8 @@
 Types:
 
 - <code><a href="./src/resources/shared.ts">FunctionInvocationExecutionDetailView</a></code>
-- <code><a href="./src/resources/shared.ts">LauchParameters</a></code>
+- <code><a href="./src/resources/shared.ts">LaunchParameters</a></code>
 - <code><a href="./src/resources/shared.ts">ProjectLogsView</a></code>
-
-# Account
-
-Types:
-
-- <code><a href="./src/resources/account.ts">ResourceSize</a></code>
 
 # Blueprints
 
@@ -91,6 +85,7 @@ Methods:
 Types:
 
 - <code><a href="./src/resources/functions/functions.ts">FunctionListView</a></code>
+- <code><a href="./src/resources/functions/functions.ts">ResourceSize</a></code>
 
 Methods:
 

@@ -112,7 +112,7 @@ export interface BlueprintBuildParameters {
   /**
    * Parameters to configure your Devbox at launch time.
    */
-  launch_parameters?: Shared.LauchParameters;
+  launch_parameters?: Shared.LaunchParameters;
 
   /**
    * A list of commands to run to set up your system.
@@ -194,7 +194,7 @@ export interface BlueprintCreateParams {
   /**
    * Parameters to configure your Devbox at launch time.
    */
-  launch_parameters?: Shared.LauchParameters;
+  launch_parameters?: Shared.LaunchParameters;
 
   /**
    * A list of commands to run to set up your system.
@@ -243,7 +243,7 @@ export interface BlueprintPreviewParams {
   /**
    * Parameters to configure your Devbox at launch time.
    */
-  launch_parameters?: Shared.LauchParameters;
+  launch_parameters?: Shared.LaunchParameters;
 
   /**
    * A list of commands to run to set up your system.
