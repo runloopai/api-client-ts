@@ -4,8 +4,8 @@ import { APIResource } from '../resource';
 import { isRequestOptions } from '../core';
 import * as Core from '../core';
 import * as BlueprintsAPI from './blueprints';
-import * as AccountAPI from './account';
 import * as CodeAPI from './code';
+import * as Shared from './shared';
 
 export class Blueprints extends APIResource {
   /**
@@ -112,35 +112,12 @@ export interface BlueprintBuildParameters {
   /**
    * Parameters to configure your Devbox at launch time.
    */
-  launch_parameters?: BlueprintBuildParameters.LaunchParameters;
+  launch_parameters?: Shared.LauchParameters;
 
   /**
    * A list of commands to run to set up your system.
    */
   system_setup_commands?: Array<string>;
-}
-
-export namespace BlueprintBuildParameters {
-  /**
-   * Parameters to configure your Devbox at launch time.
-   */
-  export interface LaunchParameters {
-    /**
-     * Time in seconds after which Devbox will automatically shutdown. Default is 1
-     * hour.
-     */
-    keep_alive_time_seconds?: number;
-
-    /**
-     * Set of commands to be run at launch time, before the entrypoint process is run.
-     */
-    launch_commands?: Array<string>;
-
-    /**
-     * Manual resource configuration for Devbox. If not set, defaults will be used.
-     */
-    resource_size_request?: AccountAPI.ResourceSize;
-  }
 }
 
 export interface BlueprintListView {
@@ -217,35 +194,12 @@ export interface BlueprintCreateParams {
   /**
    * Parameters to configure your Devbox at launch time.
    */
-  launch_parameters?: BlueprintCreateParams.LaunchParameters;
+  launch_parameters?: Shared.LauchParameters;
 
   /**
    * A list of commands to run to set up your system.
    */
   system_setup_commands?: Array<string>;
-}
-
-export namespace BlueprintCreateParams {
-  /**
-   * Parameters to configure your Devbox at launch time.
-   */
-  export interface LaunchParameters {
-    /**
-     * Time in seconds after which Devbox will automatically shutdown. Default is 1
-     * hour.
-     */
-    keep_alive_time_seconds?: number;
-
-    /**
-     * Set of commands to be run at launch time, before the entrypoint process is run.
-     */
-    launch_commands?: Array<string>;
-
-    /**
-     * Manual resource configuration for Devbox. If not set, defaults will be used.
-     */
-    resource_size_request?: AccountAPI.ResourceSize;
-  }
 }
 
 export interface BlueprintListParams {
@@ -289,35 +243,12 @@ export interface BlueprintPreviewParams {
   /**
    * Parameters to configure your Devbox at launch time.
    */
-  launch_parameters?: BlueprintPreviewParams.LaunchParameters;
+  launch_parameters?: Shared.LauchParameters;
 
   /**
    * A list of commands to run to set up your system.
    */
   system_setup_commands?: Array<string>;
-}
-
-export namespace BlueprintPreviewParams {
-  /**
-   * Parameters to configure your Devbox at launch time.
-   */
-  export interface LaunchParameters {
-    /**
-     * Time in seconds after which Devbox will automatically shutdown. Default is 1
-     * hour.
-     */
-    keep_alive_time_seconds?: number;
-
-    /**
-     * Set of commands to be run at launch time, before the entrypoint process is run.
-     */
-    launch_commands?: Array<string>;
-
-    /**
-     * Manual resource configuration for Devbox. If not set, defaults will be used.
-     */
-    resource_size_request?: AccountAPI.ResourceSize;
-  }
 }
 
 export namespace Blueprints {

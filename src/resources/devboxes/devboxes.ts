@@ -4,8 +4,8 @@ import { APIResource } from '../../resource';
 import { isRequestOptions } from '../../core';
 import * as Core from '../../core';
 import * as DevboxesAPI from './devboxes';
-import * as AccountAPI from '../account';
 import * as CodeAPI from '../code';
+import * as Shared from '../shared';
 import * as ExecutionsAPI from './executions';
 import * as LogsAPI from './logs';
 import { type Response } from '../../_shims/index';
@@ -66,12 +66,12 @@ export class Devboxes extends APIResource {
   diskSnapshots(
     query?: DevboxDiskSnapshotsParams,
     options?: Core.RequestOptions,
-  ): Core.APIPromise<DevboxDiskSnapshotsResponse>;
-  diskSnapshots(options?: Core.RequestOptions): Core.APIPromise<DevboxDiskSnapshotsResponse>;
+  ): Core.APIPromise<DevboxSnapshotListView>;
+  diskSnapshots(options?: Core.RequestOptions): Core.APIPromise<DevboxSnapshotListView>;
   diskSnapshots(
     query: DevboxDiskSnapshotsParams | Core.RequestOptions = {},
     options?: Core.RequestOptions,
-  ): Core.APIPromise<DevboxDiskSnapshotsResponse> {
+  ): Core.APIPromise<DevboxSnapshotListView> {
     if (isRequestOptions(query)) {
       return this.diskSnapshots({}, query);
     }
@@ -250,6 +250,39 @@ export interface DevboxListView {
   total_count: number;
 }
 
+export interface DevboxSnapshotListView {
+  has_more: boolean;
+
+  /**
+   * List of snapshots matching filter.
+   */
+  snapshots: Array<DevboxSnapshotView>;
+
+  total_count: number;
+}
+
+export interface DevboxSnapshotView {
+  /**
+   * The unique identifier of the snapshot.
+   */
+  id: string;
+
+  /**
+   * metadata associated with the snapshot.
+   */
+  metadata: Record<string, string>;
+
+  /**
+   * The source devbox identifier.
+   */
+  sourceDevboxId: string;
+
+  /**
+   * (Optional) The custom name of the snapshot.
+   */
+  name?: string;
+}
+
 export interface DevboxView {
   /**
    * The id of the Devbox.
@@ -274,7 +307,7 @@ export interface DevboxView {
   /**
    * The launch parameters used to create the Devbox.
    */
-  launch_parameters: DevboxView.LaunchParameters;
+  launch_parameters: Shared.LauchParameters;
 
   /**
    * The user defined Devbox metadata.
@@ -312,29 +345,6 @@ export interface DevboxView {
   shutdown_reason?: 'api_shutdown' | 'keep_alive_timeout' | 'entrypoint_exit';
 }
 
-export namespace DevboxView {
-  /**
-   * The launch parameters used to create the Devbox.
-   */
-  export interface LaunchParameters {
-    /**
-     * Time in seconds after which Devbox will automatically shutdown. Default is 1
-     * hour.
-     */
-    keep_alive_time_seconds?: number;
-
-    /**
-     * Set of commands to be run at launch time, before the entrypoint process is run.
-     */
-    launch_commands?: Array<string>;
-
-    /**
-     * Manual resource configuration for Devbox. If not set, defaults will be used.
-     */
-    resource_size_request?: AccountAPI.ResourceSize;
-  }
-}
-
 export interface DevboxCreateSSHKeyResponse {
   /**
    * The id of the Devbox.
@@ -350,41 +360,6 @@ export interface DevboxCreateSSHKeyResponse {
    * The url of the Devbox.
    */
   url: string;
-}
-
-export interface DevboxDiskSnapshotsResponse {
-  has_more: boolean;
-
-  /**
-   * List of snapshots matching filter.
-   */
-  snapshots: Array<DevboxDiskSnapshotsResponse.Snapshot>;
-
-  total_count: number;
-}
-
-export namespace DevboxDiskSnapshotsResponse {
-  export interface Snapshot {
-    /**
-     * The unique identifier of the snapshot.
-     */
-    id: string;
-
-    /**
-     * metadata associated with the snapshot.
-     */
-    metadata: Record<string, string>;
-
-    /**
-     * The source devbox identifier.
-     */
-    sourceDevboxId: string;
-
-    /**
-     * (Optional) The custom name of the snapshot.
-     */
-    name?: string;
-  }
 }
 
 export type DevboxReadFileContentsResponse = string;
@@ -429,7 +404,7 @@ export interface DevboxCreateParams {
   /**
    * Parameters to configure the resources and launch time behavior of the Devbox.
    */
-  launch_parameters?: DevboxCreateParams.LaunchParameters;
+  launch_parameters?: Shared.LauchParameters;
 
   /**
    * User defined metadata to attach to the devbox for organization.
@@ -457,29 +432,6 @@ export interface DevboxCreateParams {
    * Snapshot ID to use for the Devbox.
    */
   snapshot_id?: string;
-}
-
-export namespace DevboxCreateParams {
-  /**
-   * Parameters to configure the resources and launch time behavior of the Devbox.
-   */
-  export interface LaunchParameters {
-    /**
-     * Time in seconds after which Devbox will automatically shutdown. Default is 1
-     * hour.
-     */
-    keep_alive_time_seconds?: number;
-
-    /**
-     * Set of commands to be run at launch time, before the entrypoint process is run.
-     */
-    launch_commands?: Array<string>;
-
-    /**
-     * Manual resource configuration for Devbox. If not set, defaults will be used.
-     */
-    resource_size_request?: AccountAPI.ResourceSize;
-  }
 }
 
 export interface DevboxListParams {
@@ -577,9 +529,10 @@ export namespace Devboxes {
   export import DevboxAsyncExecutionDetailView = DevboxesAPI.DevboxAsyncExecutionDetailView;
   export import DevboxExecutionDetailView = DevboxesAPI.DevboxExecutionDetailView;
   export import DevboxListView = DevboxesAPI.DevboxListView;
+  export import DevboxSnapshotListView = DevboxesAPI.DevboxSnapshotListView;
+  export import DevboxSnapshotView = DevboxesAPI.DevboxSnapshotView;
   export import DevboxView = DevboxesAPI.DevboxView;
   export import DevboxCreateSSHKeyResponse = DevboxesAPI.DevboxCreateSSHKeyResponse;
-  export import DevboxDiskSnapshotsResponse = DevboxesAPI.DevboxDiskSnapshotsResponse;
   export import DevboxReadFileContentsResponse = DevboxesAPI.DevboxReadFileContentsResponse;
   export import DevboxUploadFileResponse = DevboxesAPI.DevboxUploadFileResponse;
   export import DevboxCreateParams = DevboxesAPI.DevboxCreateParams;

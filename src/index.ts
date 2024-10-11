@@ -205,9 +205,10 @@ export namespace Runloop {
   export import DevboxAsyncExecutionDetailView = API.DevboxAsyncExecutionDetailView;
   export import DevboxExecutionDetailView = API.DevboxExecutionDetailView;
   export import DevboxListView = API.DevboxListView;
+  export import DevboxSnapshotListView = API.DevboxSnapshotListView;
+  export import DevboxSnapshotView = API.DevboxSnapshotView;
   export import DevboxView = API.DevboxView;
   export import DevboxCreateSSHKeyResponse = API.DevboxCreateSSHKeyResponse;
-  export import DevboxDiskSnapshotsResponse = API.DevboxDiskSnapshotsResponse;
   export import DevboxReadFileContentsResponse = API.DevboxReadFileContentsResponse;
   export import DevboxUploadFileResponse = API.DevboxUploadFileResponse;
   export import DevboxCreateParams = API.DevboxCreateParams;
@@ -229,6 +230,7 @@ export namespace Runloop {
   export import ProjectListView = API.ProjectListView;
 
   export import FunctionInvocationExecutionDetailView = API.FunctionInvocationExecutionDetailView;
+  export import LauchParameters = API.LauchParameters;
   export import ProjectLogsView = API.ProjectLogsView;
 }
 
