@@ -38,7 +38,6 @@ export {
 } from './devboxes/devboxes';
 export {
   FunctionListView,
-  ResourceSize,
   FunctionInvokeAsyncParams,
   FunctionInvokeSyncParams,
   Functions,

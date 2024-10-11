@@ -71,8 +71,6 @@ export namespace FunctionListView {
   }
 }
 
-export type ResourceSize = 'SMALL' | 'MEDIUM' | 'LARGE' | 'X_LARGE' | 'CUSTOM_SIZE';
-
 export interface FunctionInvokeAsyncParams {
   /**
    * Json of the request
@@ -111,7 +109,6 @@ export namespace FunctionInvokeSyncParams {
 
 export namespace Functions {
   export import FunctionListView = FunctionsAPI.FunctionListView;
-  export import ResourceSize = FunctionsAPI.ResourceSize;
   export import FunctionInvokeAsyncParams = FunctionsAPI.FunctionInvokeAsyncParams;
   export import FunctionInvokeSyncParams = FunctionsAPI.FunctionInvokeSyncParams;
   export import Invocations = InvocationsAPI.Invocations;

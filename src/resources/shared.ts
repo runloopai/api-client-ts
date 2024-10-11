@@ -1,7 +1,5 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-import * as FunctionsAPI from './functions/functions';
-
 export interface FunctionInvocationExecutionDetailView {
   /**
    * Unique ID of the invocation.
@@ -67,7 +65,7 @@ export interface LaunchParameters {
   /**
    * Manual resource configuration for Devbox. If not set, defaults will be used.
    */
-  resource_size_request?: FunctionsAPI.ResourceSize;
+  resource_size_request?: 'SMALL' | 'MEDIUM' | 'LARGE' | 'X_LARGE' | 'CUSTOM_SIZE';
 }
 
 export interface ProjectLogsView {
@@ -88,5 +86,3 @@ export namespace ProjectLogsView {
     timestamp: string;
   }
 }
-
-export type ResourceSize = 'SMALL' | 'MEDIUM' | 'LARGE' | 'X_LARGE' | 'CUSTOM_SIZE';
