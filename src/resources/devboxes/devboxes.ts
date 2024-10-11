@@ -331,7 +331,7 @@ export interface DevboxView {
   /**
    * The launch parameters used to create the Devbox.
    */
-  launch_parameters: Shared.LauchParameters;
+  launch_parameters: Shared.LaunchParameters;
 
   /**
    * The user defined Devbox metadata.
@@ -428,7 +428,7 @@ export interface DevboxCreateParams {
   /**
    * Parameters to configure the resources and launch time behavior of the Devbox.
    */
-  launch_parameters?: Shared.LauchParameters;
+  launch_parameters?: Shared.LaunchParameters;
 
   /**
    * User defined metadata to attach to the devbox for organization.
