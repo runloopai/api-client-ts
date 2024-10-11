@@ -17,6 +17,7 @@ export {
   DevboxExecuteAsyncParams,
   DevboxExecuteSyncParams,
   DevboxReadFileContentsParams,
+  DevboxSnapshotDiskParams,
   DevboxUploadFileParams,
   DevboxWriteFileParams,
   Devboxes,

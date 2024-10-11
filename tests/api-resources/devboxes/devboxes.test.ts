@@ -239,6 +239,35 @@ describe('resource devboxes', () => {
     );
   });
 
+  test('snapshotDisk', async () => {
+    const responsePromise = client.devboxes.snapshotDisk('id');
+    const rawResponse = await responsePromise.asResponse();
+    expect(rawResponse).toBeInstanceOf(Response);
+    const response = await responsePromise;
+    expect(response).not.toBeInstanceOf(Response);
+    const dataAndResponse = await responsePromise.withResponse();
+    expect(dataAndResponse.data).toBe(response);
+    expect(dataAndResponse.response).toBe(rawResponse);
+  });
+
+  test('snapshotDisk: request options instead of params are passed correctly', async () => {
+    // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
+    await expect(client.devboxes.snapshotDisk('id', { path: '/_stainless_unknown_path' })).rejects.toThrow(
+      Runloop.NotFoundError,
+    );
+  });
+
+  test('snapshotDisk: request options and params are passed correctly', async () => {
+    // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
+    await expect(
+      client.devboxes.snapshotDisk(
+        'id',
+        { metadata: { foo: 'string' }, name: 'name' },
+        { path: '/_stainless_unknown_path' },
+      ),
+    ).rejects.toThrow(Runloop.NotFoundError);
+  });
+
   test('uploadFile', async () => {
     const responsePromise = client.devboxes.uploadFile('id');
     const rawResponse = await responsePromise.asResponse();
