@@ -38,9 +38,9 @@ export {
 } from './devboxes/devboxes';
 export {
   FunctionListView,
+  ResourceSize,
   FunctionInvokeAsyncParams,
   FunctionInvokeSyncParams,
   Functions,
 } from './functions/functions';
 export { ProjectListView, Projects } from './projects/projects';
-export { ResourceSize, Account } from './account';

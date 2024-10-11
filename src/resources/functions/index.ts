@@ -9,6 +9,7 @@ export {
 } from './invocations';
 export {
   FunctionListView,
+  ResourceSize,
   FunctionInvokeAsyncParams,
   FunctionInvokeSyncParams,
   Functions,
