@@ -218,6 +218,7 @@ export namespace Runloop {
   export import DevboxExecuteAsyncParams = API.DevboxExecuteAsyncParams;
   export import DevboxExecuteSyncParams = API.DevboxExecuteSyncParams;
   export import DevboxReadFileContentsParams = API.DevboxReadFileContentsParams;
+  export import DevboxSnapshotDiskParams = API.DevboxSnapshotDiskParams;
   export import DevboxUploadFileParams = API.DevboxUploadFileParams;
   export import DevboxWriteFileParams = API.DevboxWriteFileParams;
 
