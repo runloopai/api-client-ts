@@ -88,5 +88,3 @@ export namespace ProjectLogsView {
     timestamp: string;
   }
 }
-
-export type ResourceSize = 'SMALL' | 'MEDIUM' | 'LARGE' | 'X_LARGE' | 'CUSTOM_SIZE';
