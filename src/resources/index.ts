@@ -31,6 +31,7 @@ export {
   DevboxExecuteAsyncParams,
   DevboxExecuteSyncParams,
   DevboxReadFileContentsParams,
+  DevboxSnapshotDiskParams,
   DevboxUploadFileParams,
   DevboxWriteFileParams,
   Devboxes,
@@ -42,4 +43,3 @@ export {
   Functions,
 } from './functions/functions';
 export { ProjectListView, Projects } from './projects/projects';
-export { ResourceSize, Account } from './account';

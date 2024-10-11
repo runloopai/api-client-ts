@@ -1,7 +1,5 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-import * as AccountAPI from './account';
-
 export interface FunctionInvocationExecutionDetailView {
   /**
    * Unique ID of the invocation.
@@ -52,7 +50,7 @@ export interface FunctionInvocationExecutionDetailView {
   status?: 'created' | 'running' | 'success' | 'failure' | 'canceled' | 'suspended';
 }
 
-export interface LauchParameters {
+export interface LaunchParameters {
   /**
    * Time in seconds after which Devbox will automatically shutdown. Default is 1
    * hour.
@@ -67,7 +65,7 @@ export interface LauchParameters {
   /**
    * Manual resource configuration for Devbox. If not set, defaults will be used.
    */
-  resource_size_request?: AccountAPI.ResourceSize;
+  resource_size_request?: 'SMALL' | 'MEDIUM' | 'LARGE' | 'X_LARGE' | 'CUSTOM_SIZE';
 }
 
 export interface ProjectLogsView {
