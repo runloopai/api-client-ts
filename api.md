@@ -5,6 +5,7 @@ Types:
 - <code><a href="./src/resources/shared.ts">FunctionInvocationExecutionDetailView</a></code>
 - <code><a href="./src/resources/shared.ts">LaunchParameters</a></code>
 - <code><a href="./src/resources/shared.ts">ProjectLogsView</a></code>
+- <code><a href="./src/resources/shared.ts">ResourceSize</a></code>
 
 # Blueprints
 
