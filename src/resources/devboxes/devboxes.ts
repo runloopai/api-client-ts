@@ -138,6 +138,30 @@ export class Devboxes extends APIResource {
   }
 
   /**
+   * Create a filesystem snapshot of a devbox with the specified name and metadata.
+   */
+  snapshotDisk(
+    id: string,
+    body?: DevboxSnapshotDiskParams,
+    options?: Core.RequestOptions,
+  ): Core.APIPromise<void>;
+  snapshotDisk(id: string, options?: Core.RequestOptions): Core.APIPromise<void>;
+  snapshotDisk(
+    id: string,
+    body: DevboxSnapshotDiskParams | Core.RequestOptions = {},
+    options?: Core.RequestOptions,
+  ): Core.APIPromise<void> {
+    if (isRequestOptions(body)) {
+      return this.snapshotDisk(id, {}, body);
+    }
+    return this._client.post(`/v1/devboxes/${id}/snapshot_disk`, {
+      body,
+      ...options,
+      headers: { Accept: '*/*', ...options?.headers },
+    });
+  }
+
+  /**
    * Upload file contents to a file at path on the Devbox.
    */
   uploadFile(
@@ -501,6 +525,18 @@ export interface DevboxReadFileContentsParams {
   file_path: string;
 }
 
+export interface DevboxSnapshotDiskParams {
+  /**
+   * (Optional) Metadata used to describe the snapshot
+   */
+  metadata?: Record<string, string>;
+
+  /**
+   * (Optional) A user specified name to give the snapshot
+   */
+  name?: string;
+}
+
 export interface DevboxUploadFileParams {
   file?: Core.Uploadable;
 
@@ -542,6 +578,7 @@ export namespace Devboxes {
   export import DevboxExecuteAsyncParams = DevboxesAPI.DevboxExecuteAsyncParams;
   export import DevboxExecuteSyncParams = DevboxesAPI.DevboxExecuteSyncParams;
   export import DevboxReadFileContentsParams = DevboxesAPI.DevboxReadFileContentsParams;
+  export import DevboxSnapshotDiskParams = DevboxesAPI.DevboxSnapshotDiskParams;
   export import DevboxUploadFileParams = DevboxesAPI.DevboxUploadFileParams;
   export import DevboxWriteFileParams = DevboxesAPI.DevboxWriteFileParams;
   export import Logs = LogsAPI.Logs;
