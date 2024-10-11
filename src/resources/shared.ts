@@ -52,7 +52,7 @@ export interface FunctionInvocationExecutionDetailView {
   status?: 'created' | 'running' | 'success' | 'failure' | 'canceled' | 'suspended';
 }
 
-export interface LauchParameters {
+export interface LaunchParameters {
   /**
    * Time in seconds after which Devbox will automatically shutdown. Default is 1
    * hour.
