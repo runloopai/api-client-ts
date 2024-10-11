@@ -220,7 +220,6 @@ export namespace Runloop {
 
   export import Functions = API.Functions;
   export import FunctionListView = API.FunctionListView;
-  export import ResourceSize = API.ResourceSize;
   export import FunctionInvokeAsyncParams = API.FunctionInvokeAsyncParams;
   export import FunctionInvokeSyncParams = API.FunctionInvokeSyncParams;
 
@@ -230,7 +229,6 @@ export namespace Runloop {
   export import FunctionInvocationExecutionDetailView = API.FunctionInvocationExecutionDetailView;
   export import LaunchParameters = API.LaunchParameters;
   export import ProjectLogsView = API.ProjectLogsView;
-  export import ResourceSize = API.ResourceSize;
 }
 
 export default Runloop;
