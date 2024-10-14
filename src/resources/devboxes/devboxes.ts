@@ -144,21 +144,17 @@ export class Devboxes extends APIResource {
     id: string,
     body?: DevboxSnapshotDiskParams,
     options?: Core.RequestOptions,
-  ): Core.APIPromise<void>;
-  snapshotDisk(id: string, options?: Core.RequestOptions): Core.APIPromise<void>;
+  ): Core.APIPromise<DevboxSnapshotView>;
+  snapshotDisk(id: string, options?: Core.RequestOptions): Core.APIPromise<DevboxSnapshotView>;
   snapshotDisk(
     id: string,
     body: DevboxSnapshotDiskParams | Core.RequestOptions = {},
     options?: Core.RequestOptions,
-  ): Core.APIPromise<void> {
+  ): Core.APIPromise<DevboxSnapshotView> {
     if (isRequestOptions(body)) {
       return this.snapshotDisk(id, {}, body);
     }
-    return this._client.post(`/v1/devboxes/${id}/snapshot_disk`, {
-      body,
-      ...options,
-      headers: { Accept: '*/*', ...options?.headers },
-    });
+    return this._client.post(`/v1/devboxes/${id}/snapshot_disk`, { body, ...options });
   }
 
   /**
