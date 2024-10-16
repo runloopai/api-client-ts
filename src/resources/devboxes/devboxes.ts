@@ -288,6 +288,11 @@ export interface DevboxSnapshotView {
   id: string;
 
   /**
+   * Creation time of the Snapshot (Unix timestamp milliseconds).
+   */
+  create_time_ms: number;
+
+  /**
    * metadata associated with the snapshot.
    */
   metadata: Record<string, string>;
