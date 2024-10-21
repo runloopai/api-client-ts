@@ -32,6 +32,7 @@ describe('resource devboxes', () => {
     await expect(
       client.devboxes.create(
         {
+          available_ports: [0, 0, 0],
           blueprint_id: 'blueprint_id',
           blueprint_name: 'blueprint_name',
           code_mounts: [
