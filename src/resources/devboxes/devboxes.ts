@@ -288,6 +288,11 @@ export interface DevboxSnapshotView {
   id: string;
 
   /**
+   * Creation time of the Snapshot (Unix timestamp milliseconds).
+   */
+  create_time_ms: number;
+
+  /**
    * metadata associated with the snapshot.
    */
   metadata: Record<string, string>;
@@ -337,7 +342,7 @@ export interface DevboxView {
   /**
    * The current status of the Devbox.
    */
-  status: 'provisioning' | 'initializing' | 'running' | 'failure' | 'shutdown';
+  status: 'provisioning' | 'initializing' | 'running' | 'suspending' | 'suspended' | 'failure' | 'shutdown';
 
   /**
    * The Blueprint ID used in creation of the Devbox, if any.
