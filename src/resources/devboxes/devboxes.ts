@@ -393,12 +393,6 @@ export type DevboxUploadFileResponse = unknown;
 
 export interface DevboxCreateParams {
   /**
-   * A list of ports to make available on the Devbox. Call createTunnel to open a
-   * tunnel to the port.
-   */
-  available_ports?: Array<number>;
-
-  /**
    * (Optional) Blueprint to use for the Devbox. If none set, the Devbox will be
    * created with the default Runloop Devbox image.
    */
