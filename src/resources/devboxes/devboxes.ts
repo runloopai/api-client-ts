@@ -342,15 +342,7 @@ export interface DevboxView {
   /**
    * The current status of the Devbox.
    */
-  status:
-    | 'provisioning'
-    | 'initializing'
-    | 'running'
-    | 'suspending'
-    | 'suspended'
-    | 'resuming'
-    | 'failure'
-    | 'shutdown';
+  status: 'provisioning' | 'initializing' | 'running' | 'failure' | 'shutdown';
 
   /**
    * The Blueprint ID used in creation of the Devbox, if any.
@@ -400,6 +392,12 @@ export type DevboxReadFileContentsResponse = string;
 export type DevboxUploadFileResponse = unknown;
 
 export interface DevboxCreateParams {
+  /**
+   * A list of ports to make available on the Devbox. Call createTunnel to open a
+   * tunnel to the port.
+   */
+  available_ports?: Array<number>;
+
   /**
    * (Optional) Blueprint to use for the Devbox. If none set, the Devbox will be
    * created with the default Runloop Devbox image.
