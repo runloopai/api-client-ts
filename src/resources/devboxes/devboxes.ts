@@ -342,15 +342,7 @@ export interface DevboxView {
   /**
    * The current status of the Devbox.
    */
-  status:
-    | 'provisioning'
-    | 'initializing'
-    | 'running'
-    | 'suspending'
-    | 'suspended'
-    | 'resuming'
-    | 'failure'
-    | 'shutdown';
+  status: 'provisioning' | 'initializing' | 'running' | 'failure' | 'shutdown';
 
   /**
    * The Blueprint ID used in creation of the Devbox, if any.
