@@ -61,6 +61,13 @@ export class Devboxes extends APIResource {
   }
 
   /**
+   * Create a tunnel to an available port on the Devbox.
+   */
+  createTunnel(id: string, options?: Core.RequestOptions): Core.APIPromise<DevboxTunnelView> {
+    return this._client.post(`/v1/devboxes/${id}/create_tunnel`, options);
+  }
+
+  /**
    * List all snapshots of a devbox by id.
    */
   diskSnapshots(
@@ -131,6 +138,13 @@ export class Devboxes extends APIResource {
   }
 
   /**
+   * Resume a suspended devbox by id.
+   */
+  resume(id: string, options?: Core.RequestOptions): Core.APIPromise<DevboxView> {
+    return this._client.post(`/v1/devboxes/${id}/resume`, options);
+  }
+
+  /**
    * Shutdown a running devbox by id. This will take the devbox out of service.
    */
   shutdown(id: string, options?: Core.RequestOptions): Core.APIPromise<DevboxView> {
@@ -155,6 +169,13 @@ export class Devboxes extends APIResource {
       return this.snapshotDisk(id, {}, body);
     }
     return this._client.post(`/v1/devboxes/${id}/snapshot_disk`, { body, ...options });
+  }
+
+  /**
+   * Suspend a devbox by id. This will take the devbox out of service.
+   */
+  suspend(id: string, options?: Core.RequestOptions): Core.APIPromise<DevboxView> {
+    return this._client.post(`/v1/devboxes/${id}/suspend`, options);
   }
 
   /**
@@ -306,6 +327,23 @@ export interface DevboxSnapshotView {
    * (Optional) The custom name of the snapshot.
    */
   name?: string;
+}
+
+export interface DevboxTunnelView {
+  /**
+   * ID of the Devbox the tunnel routes to.
+   */
+  devbox_id: string;
+
+  /**
+   * Port of the Devbox the tunnel routes to.
+   */
+  port: number;
+
+  /**
+   * Public url used to access Devbox.
+   */
+  url: string;
 }
 
 export interface DevboxView {
@@ -582,6 +620,7 @@ export namespace Devboxes {
   export import DevboxListView = DevboxesAPI.DevboxListView;
   export import DevboxSnapshotListView = DevboxesAPI.DevboxSnapshotListView;
   export import DevboxSnapshotView = DevboxesAPI.DevboxSnapshotView;
+  export import DevboxTunnelView = DevboxesAPI.DevboxTunnelView;
   export import DevboxView = DevboxesAPI.DevboxView;
   export import DevboxCreateSSHKeyResponse = DevboxesAPI.DevboxCreateSSHKeyResponse;
   export import DevboxReadFileContentsResponse = DevboxesAPI.DevboxReadFileContentsResponse;

@@ -203,6 +203,7 @@ export namespace Runloop {
   export import DevboxListView = API.DevboxListView;
   export import DevboxSnapshotListView = API.DevboxSnapshotListView;
   export import DevboxSnapshotView = API.DevboxSnapshotView;
+  export import DevboxTunnelView = API.DevboxTunnelView;
   export import DevboxView = API.DevboxView;
   export import DevboxCreateSSHKeyResponse = API.DevboxCreateSSHKeyResponse;
   export import DevboxReadFileContentsResponse = API.DevboxReadFileContentsResponse;
