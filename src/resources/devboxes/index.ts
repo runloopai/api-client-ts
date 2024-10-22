@@ -6,6 +6,7 @@ export {
   DevboxListView,
   DevboxSnapshotListView,
   DevboxSnapshotView,
+  DevboxTunnelView,
   DevboxView,
   DevboxCreateSSHKeyResponse,
   DevboxReadFileContentsResponse,
