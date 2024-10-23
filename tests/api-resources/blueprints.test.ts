@@ -46,6 +46,7 @@ describe('resource blueprints', () => {
       dockerfile: 'dockerfile',
       file_mounts: { foo: 'string' },
       launch_parameters: {
+        available_ports: [0, 0, 0],
         keep_alive_time_seconds: 0,
         launch_commands: ['string', 'string', 'string'],
         resource_size_request: 'SMALL',
@@ -155,6 +156,7 @@ describe('resource blueprints', () => {
       dockerfile: 'dockerfile',
       file_mounts: { foo: 'string' },
       launch_parameters: {
+        available_ports: [0, 0, 0],
         keep_alive_time_seconds: 0,
         launch_commands: ['string', 'string', 'string'],
         resource_size_request: 'SMALL',
