@@ -52,12 +52,6 @@ export interface FunctionInvocationExecutionDetailView {
 
 export interface LaunchParameters {
   /**
-   * A list of ports to make available on the Devbox. Call createTunnel to open a
-   * tunnel to the port.
-   */
-  available_ports?: Array<number>;
-
-  /**
    * Time in seconds after which Devbox will automatically shutdown. Default is 1
    * hour.
    */
