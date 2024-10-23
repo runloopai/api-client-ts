@@ -32,7 +32,6 @@ describe('resource devboxes', () => {
     await expect(
       client.devboxes.create(
         {
-          available_ports: [0, 0, 0],
           blueprint_id: 'blueprint_id',
           blueprint_name: 'blueprint_name',
           code_mounts: [
@@ -59,6 +58,7 @@ describe('resource devboxes', () => {
           environment_variables: { foo: 'string' },
           file_mounts: { foo: 'string' },
           launch_parameters: {
+            available_ports: [0, 0, 0],
             keep_alive_time_seconds: 0,
             launch_commands: ['string', 'string', 'string'],
             resource_size_request: 'SMALL',
