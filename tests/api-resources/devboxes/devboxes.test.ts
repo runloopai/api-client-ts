@@ -32,7 +32,6 @@ describe('resource devboxes', () => {
     await expect(
       client.devboxes.create(
         {
-          available_ports: [0, 0, 0],
           blueprint_id: 'blueprint_id',
           blueprint_name: 'blueprint_name',
           code_mounts: [
@@ -59,6 +58,7 @@ describe('resource devboxes', () => {
           environment_variables: { foo: 'string' },
           file_mounts: { foo: 'string' },
           launch_parameters: {
+            available_ports: [0, 0, 0],
             keep_alive_time_seconds: 0,
             launch_commands: ['string', 'string', 'string'],
             resource_size_request: 'SMALL',
@@ -138,8 +138,8 @@ describe('resource devboxes', () => {
     );
   });
 
-  test('createTunnel', async () => {
-    const responsePromise = client.devboxes.createTunnel('id');
+  test('createTunnel: only required params', async () => {
+    const responsePromise = client.devboxes.createTunnel('id', { port: 0 });
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
     const response = await responsePromise;
@@ -149,11 +149,8 @@ describe('resource devboxes', () => {
     expect(dataAndResponse.response).toBe(rawResponse);
   });
 
-  test('createTunnel: request options instead of params are passed correctly', async () => {
-    // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
-    await expect(client.devboxes.createTunnel('id', { path: '/_stainless_unknown_path' })).rejects.toThrow(
-      Runloop.NotFoundError,
-    );
+  test('createTunnel: required and optional params', async () => {
+    const response = await client.devboxes.createTunnel('id', { port: 0 });
   });
 
   test('diskSnapshots', async () => {
