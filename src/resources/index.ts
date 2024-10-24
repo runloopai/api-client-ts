@@ -27,6 +27,7 @@ export {
   DevboxUploadFileResponse,
   DevboxCreateParams,
   DevboxListParams,
+  DevboxCreateTunnelParams,
   DevboxDiskSnapshotsParams,
   DevboxDownloadFileParams,
   DevboxExecuteAsyncParams,
