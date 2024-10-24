@@ -63,8 +63,12 @@ export class Devboxes extends APIResource {
   /**
    * Create a tunnel to an available port on the Devbox.
    */
-  createTunnel(id: string, options?: Core.RequestOptions): Core.APIPromise<DevboxTunnelView> {
-    return this._client.post(`/v1/devboxes/${id}/create_tunnel`, options);
+  createTunnel(
+    id: string,
+    body: DevboxCreateTunnelParams,
+    options?: Core.RequestOptions,
+  ): Core.APIPromise<DevboxTunnelView> {
+    return this._client.post(`/v1/devboxes/${id}/create_tunnel`, { body, ...options });
   }
 
   /**
@@ -522,6 +526,13 @@ export interface DevboxListParams {
   status?: string;
 }
 
+export interface DevboxCreateTunnelParams {
+  /**
+   * Devbox port that tunnel will expose.
+   */
+  port: number;
+}
+
 export interface DevboxDiskSnapshotsParams {
   /**
    * Page Limit
@@ -615,6 +626,7 @@ export namespace Devboxes {
   export import DevboxUploadFileResponse = DevboxesAPI.DevboxUploadFileResponse;
   export import DevboxCreateParams = DevboxesAPI.DevboxCreateParams;
   export import DevboxListParams = DevboxesAPI.DevboxListParams;
+  export import DevboxCreateTunnelParams = DevboxesAPI.DevboxCreateTunnelParams;
   export import DevboxDiskSnapshotsParams = DevboxesAPI.DevboxDiskSnapshotsParams;
   export import DevboxDownloadFileParams = DevboxesAPI.DevboxDownloadFileParams;
   export import DevboxExecuteAsyncParams = DevboxesAPI.DevboxExecuteAsyncParams;
