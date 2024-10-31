@@ -3,7 +3,6 @@
 import { APIResource } from '../../resource';
 import { isRequestOptions } from '../../core';
 import * as Core from '../../core';
-import * as ExecutionsAPI from './executions';
 import * as DevboxesAPI from './devboxes';
 
 export class Executions extends APIResource {
@@ -98,8 +97,10 @@ export interface ExecutionExecuteSyncParams {
   shell_name?: string;
 }
 
-export namespace Executions {
-  export import ExecutionRetrieveParams = ExecutionsAPI.ExecutionRetrieveParams;
-  export import ExecutionExecuteAsyncParams = ExecutionsAPI.ExecutionExecuteAsyncParams;
-  export import ExecutionExecuteSyncParams = ExecutionsAPI.ExecutionExecuteSyncParams;
+export declare namespace Executions {
+  export {
+    type ExecutionRetrieveParams as ExecutionRetrieveParams,
+    type ExecutionExecuteAsyncParams as ExecutionExecuteAsyncParams,
+    type ExecutionExecuteSyncParams as ExecutionExecuteSyncParams,
+  };
 }

@@ -1,10 +1,54 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-import * as Errors from './error';
-import * as Uploads from './uploads';
 import { type Agent } from './_shims/index';
 import * as Core from './core';
+import * as Errors from './error';
+import * as Uploads from './uploads';
 import * as API from './resources/index';
+import {
+  BlueprintBuildLog,
+  BlueprintBuildLogsListView,
+  BlueprintBuildParameters,
+  BlueprintCreateParams,
+  BlueprintListParams,
+  BlueprintListView,
+  BlueprintPreviewParams,
+  BlueprintPreviewView,
+  BlueprintView,
+  Blueprints,
+} from './resources/blueprints';
+import { Code, CodeMountParameters } from './resources/code';
+import {
+  DevboxAsyncExecutionDetailView,
+  DevboxCreateParams,
+  DevboxCreateSSHKeyResponse,
+  DevboxCreateTunnelParams,
+  DevboxDiskSnapshotsParams,
+  DevboxDownloadFileParams,
+  DevboxExecuteAsyncParams,
+  DevboxExecuteSyncParams,
+  DevboxExecutionDetailView,
+  DevboxListParams,
+  DevboxListView,
+  DevboxReadFileContentsParams,
+  DevboxReadFileContentsResponse,
+  DevboxSnapshotDiskParams,
+  DevboxSnapshotListView,
+  DevboxSnapshotView,
+  DevboxTunnelView,
+  DevboxUploadFileParams,
+  DevboxUploadFileResponse,
+  DevboxView,
+  DevboxWriteFileParams,
+  Devboxes,
+} from './resources/devboxes/devboxes';
+import {
+  FunctionInvokeAsyncParams,
+  FunctionInvokeSyncParams,
+  FunctionListView,
+  Functions,
+} from './resources/functions/functions';
+import { ProjectListView, Projects } from './resources/projects/projects';
 
 export interface ClientOptions {
   /**
@@ -161,76 +205,84 @@ export class Runloop extends Core.APIClient {
   static fileFromPath = Uploads.fileFromPath;
 }
 
-export const {
-  RunloopError,
-  APIError,
-  APIConnectionError,
-  APIConnectionTimeoutError,
-  APIUserAbortError,
-  NotFoundError,
-  ConflictError,
-  RateLimitError,
-  BadRequestError,
-  AuthenticationError,
-  InternalServerError,
-  PermissionDeniedError,
-  UnprocessableEntityError,
-} = Errors;
+export const RunloopError = Errors.RunloopError;
+export const APIError = Errors.APIError;
+export const APIConnectionError = Errors.APIConnectionError;
+export const APIConnectionTimeoutError = Errors.APIConnectionTimeoutError;
+export const APIUserAbortError = Errors.APIUserAbortError;
+export const NotFoundError = Errors.NotFoundError;
+export const ConflictError = Errors.ConflictError;
+export const RateLimitError = Errors.RateLimitError;
+export const BadRequestError = Errors.BadRequestError;
+export const AuthenticationError = Errors.AuthenticationError;
+export const InternalServerError = Errors.InternalServerError;
+export const PermissionDeniedError = Errors.PermissionDeniedError;
+export const UnprocessableEntityError = Errors.UnprocessableEntityError;
 
 export import toFile = Uploads.toFile;
 export import fileFromPath = Uploads.fileFromPath;
 
-export namespace Runloop {
-  export import RequestOptions = Core.RequestOptions;
+Runloop.Blueprints = Blueprints;
+Runloop.Code = Code;
+Runloop.Devboxes = Devboxes;
+Runloop.Functions = Functions;
+Runloop.Projects = Projects;
 
-  export import Blueprints = API.Blueprints;
-  export import BlueprintBuildLog = API.BlueprintBuildLog;
-  export import BlueprintBuildLogsListView = API.BlueprintBuildLogsListView;
-  export import BlueprintBuildParameters = API.BlueprintBuildParameters;
-  export import BlueprintListView = API.BlueprintListView;
-  export import BlueprintPreviewView = API.BlueprintPreviewView;
-  export import BlueprintView = API.BlueprintView;
-  export import BlueprintCreateParams = API.BlueprintCreateParams;
-  export import BlueprintListParams = API.BlueprintListParams;
-  export import BlueprintPreviewParams = API.BlueprintPreviewParams;
+export declare namespace Runloop {
+  export type RequestOptions = Core.RequestOptions;
 
-  export import Code = API.Code;
-  export import CodeMountParameters = API.CodeMountParameters;
+  export {
+    Blueprints as Blueprints,
+    type BlueprintBuildLog as BlueprintBuildLog,
+    type BlueprintBuildLogsListView as BlueprintBuildLogsListView,
+    type BlueprintBuildParameters as BlueprintBuildParameters,
+    type BlueprintListView as BlueprintListView,
+    type BlueprintPreviewView as BlueprintPreviewView,
+    type BlueprintView as BlueprintView,
+    type BlueprintCreateParams as BlueprintCreateParams,
+    type BlueprintListParams as BlueprintListParams,
+    type BlueprintPreviewParams as BlueprintPreviewParams,
+  };
 
-  export import Devboxes = API.Devboxes;
-  export import DevboxAsyncExecutionDetailView = API.DevboxAsyncExecutionDetailView;
-  export import DevboxExecutionDetailView = API.DevboxExecutionDetailView;
-  export import DevboxListView = API.DevboxListView;
-  export import DevboxSnapshotListView = API.DevboxSnapshotListView;
-  export import DevboxSnapshotView = API.DevboxSnapshotView;
-  export import DevboxTunnelView = API.DevboxTunnelView;
-  export import DevboxView = API.DevboxView;
-  export import DevboxCreateSSHKeyResponse = API.DevboxCreateSSHKeyResponse;
-  export import DevboxReadFileContentsResponse = API.DevboxReadFileContentsResponse;
-  export import DevboxUploadFileResponse = API.DevboxUploadFileResponse;
-  export import DevboxCreateParams = API.DevboxCreateParams;
-  export import DevboxListParams = API.DevboxListParams;
-  export import DevboxCreateTunnelParams = API.DevboxCreateTunnelParams;
-  export import DevboxDiskSnapshotsParams = API.DevboxDiskSnapshotsParams;
-  export import DevboxDownloadFileParams = API.DevboxDownloadFileParams;
-  export import DevboxExecuteAsyncParams = API.DevboxExecuteAsyncParams;
-  export import DevboxExecuteSyncParams = API.DevboxExecuteSyncParams;
-  export import DevboxReadFileContentsParams = API.DevboxReadFileContentsParams;
-  export import DevboxSnapshotDiskParams = API.DevboxSnapshotDiskParams;
-  export import DevboxUploadFileParams = API.DevboxUploadFileParams;
-  export import DevboxWriteFileParams = API.DevboxWriteFileParams;
+  export { Code as Code, type CodeMountParameters as CodeMountParameters };
 
-  export import Functions = API.Functions;
-  export import FunctionListView = API.FunctionListView;
-  export import FunctionInvokeAsyncParams = API.FunctionInvokeAsyncParams;
-  export import FunctionInvokeSyncParams = API.FunctionInvokeSyncParams;
+  export {
+    Devboxes as Devboxes,
+    type DevboxAsyncExecutionDetailView as DevboxAsyncExecutionDetailView,
+    type DevboxExecutionDetailView as DevboxExecutionDetailView,
+    type DevboxListView as DevboxListView,
+    type DevboxSnapshotListView as DevboxSnapshotListView,
+    type DevboxSnapshotView as DevboxSnapshotView,
+    type DevboxTunnelView as DevboxTunnelView,
+    type DevboxView as DevboxView,
+    type DevboxCreateSSHKeyResponse as DevboxCreateSSHKeyResponse,
+    type DevboxReadFileContentsResponse as DevboxReadFileContentsResponse,
+    type DevboxUploadFileResponse as DevboxUploadFileResponse,
+    type DevboxCreateParams as DevboxCreateParams,
+    type DevboxListParams as DevboxListParams,
+    type DevboxCreateTunnelParams as DevboxCreateTunnelParams,
+    type DevboxDiskSnapshotsParams as DevboxDiskSnapshotsParams,
+    type DevboxDownloadFileParams as DevboxDownloadFileParams,
+    type DevboxExecuteAsyncParams as DevboxExecuteAsyncParams,
+    type DevboxExecuteSyncParams as DevboxExecuteSyncParams,
+    type DevboxReadFileContentsParams as DevboxReadFileContentsParams,
+    type DevboxSnapshotDiskParams as DevboxSnapshotDiskParams,
+    type DevboxUploadFileParams as DevboxUploadFileParams,
+    type DevboxWriteFileParams as DevboxWriteFileParams,
+  };
 
-  export import Projects = API.Projects;
-  export import ProjectListView = API.ProjectListView;
+  export {
+    Functions as Functions,
+    type FunctionListView as FunctionListView,
+    type FunctionInvokeAsyncParams as FunctionInvokeAsyncParams,
+    type FunctionInvokeSyncParams as FunctionInvokeSyncParams,
+  };
 
-  export import FunctionInvocationExecutionDetailView = API.FunctionInvocationExecutionDetailView;
-  export import LaunchParameters = API.LaunchParameters;
-  export import ProjectLogsView = API.ProjectLogsView;
+  export { Projects as Projects, type ProjectListView as ProjectListView };
+
+  export type FunctionInvocationExecutionDetailView = API.FunctionInvocationExecutionDetailView;
+  export type LaunchParameters = API.LaunchParameters;
+  export type ProjectLogsView = API.ProjectLogsView;
 }
 
 export default Runloop;

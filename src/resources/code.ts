@@ -1,7 +1,6 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 import { APIResource } from '../resource';
-import * as CodeAPI from './code';
 
 export class Code extends APIResource {}
 
@@ -28,6 +27,6 @@ export interface CodeMountParameters {
   install_command?: string;
 }
 
-export namespace Code {
-  export import CodeMountParameters = CodeAPI.CodeMountParameters;
+export declare namespace Code {
+  export { type CodeMountParameters as CodeMountParameters };
 }

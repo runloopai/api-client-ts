@@ -3,7 +3,6 @@
 import { APIResource } from '../../resource';
 import { isRequestOptions } from '../../core';
 import * as Core from '../../core';
-import * as InvocationsAPI from './invocations';
 import * as Shared from '../shared';
 
 export class Invocations extends APIResource {
@@ -123,9 +122,11 @@ export interface InvocationListParams {
 
 export interface InvocationKillParams {}
 
-export namespace Invocations {
-  export import FunctionInvocationListView = InvocationsAPI.FunctionInvocationListView;
-  export import KillOperationResponse = InvocationsAPI.KillOperationResponse;
-  export import InvocationListParams = InvocationsAPI.InvocationListParams;
-  export import InvocationKillParams = InvocationsAPI.InvocationKillParams;
+export declare namespace Invocations {
+  export {
+    type FunctionInvocationListView as FunctionInvocationListView,
+    type KillOperationResponse as KillOperationResponse,
+    type InvocationListParams as InvocationListParams,
+    type InvocationKillParams as InvocationKillParams,
+  };
 }

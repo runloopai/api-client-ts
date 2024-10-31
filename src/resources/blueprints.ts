@@ -3,7 +3,6 @@
 import { APIResource } from '../resource';
 import { isRequestOptions } from '../core';
 import * as Core from '../core';
-import * as BlueprintsAPI from './blueprints';
 import * as CodeAPI from './code';
 import * as Shared from './shared';
 
@@ -251,14 +250,16 @@ export interface BlueprintPreviewParams {
   system_setup_commands?: Array<string>;
 }
 
-export namespace Blueprints {
-  export import BlueprintBuildLog = BlueprintsAPI.BlueprintBuildLog;
-  export import BlueprintBuildLogsListView = BlueprintsAPI.BlueprintBuildLogsListView;
-  export import BlueprintBuildParameters = BlueprintsAPI.BlueprintBuildParameters;
-  export import BlueprintListView = BlueprintsAPI.BlueprintListView;
-  export import BlueprintPreviewView = BlueprintsAPI.BlueprintPreviewView;
-  export import BlueprintView = BlueprintsAPI.BlueprintView;
-  export import BlueprintCreateParams = BlueprintsAPI.BlueprintCreateParams;
-  export import BlueprintListParams = BlueprintsAPI.BlueprintListParams;
-  export import BlueprintPreviewParams = BlueprintsAPI.BlueprintPreviewParams;
+export declare namespace Blueprints {
+  export {
+    type BlueprintBuildLog as BlueprintBuildLog,
+    type BlueprintBuildLogsListView as BlueprintBuildLogsListView,
+    type BlueprintBuildParameters as BlueprintBuildParameters,
+    type BlueprintListView as BlueprintListView,
+    type BlueprintPreviewView as BlueprintPreviewView,
+    type BlueprintView as BlueprintView,
+    type BlueprintCreateParams as BlueprintCreateParams,
+    type BlueprintListParams as BlueprintListParams,
+    type BlueprintPreviewParams as BlueprintPreviewParams,
+  };
 }
