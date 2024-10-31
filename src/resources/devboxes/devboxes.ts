@@ -3,11 +3,17 @@
 import { APIResource } from '../../resource';
 import { isRequestOptions } from '../../core';
 import * as Core from '../../core';
-import * as DevboxesAPI from './devboxes';
 import * as CodeAPI from '../code';
 import * as Shared from '../shared';
 import * as ExecutionsAPI from './executions';
+import {
+  ExecutionExecuteAsyncParams,
+  ExecutionExecuteSyncParams,
+  ExecutionRetrieveParams,
+  Executions,
+} from './executions';
 import * as LogsAPI from './logs';
+import { DevboxLogsListView, LogListParams, Logs } from './logs';
 import { type Response } from '../../_shims/index';
 
 export class Devboxes extends APIResource {
@@ -619,33 +625,40 @@ export interface DevboxWriteFileParams {
   file_path: string;
 }
 
-export namespace Devboxes {
-  export import DevboxAsyncExecutionDetailView = DevboxesAPI.DevboxAsyncExecutionDetailView;
-  export import DevboxExecutionDetailView = DevboxesAPI.DevboxExecutionDetailView;
-  export import DevboxListView = DevboxesAPI.DevboxListView;
-  export import DevboxSnapshotListView = DevboxesAPI.DevboxSnapshotListView;
-  export import DevboxSnapshotView = DevboxesAPI.DevboxSnapshotView;
-  export import DevboxTunnelView = DevboxesAPI.DevboxTunnelView;
-  export import DevboxView = DevboxesAPI.DevboxView;
-  export import DevboxCreateSSHKeyResponse = DevboxesAPI.DevboxCreateSSHKeyResponse;
-  export import DevboxReadFileContentsResponse = DevboxesAPI.DevboxReadFileContentsResponse;
-  export import DevboxUploadFileResponse = DevboxesAPI.DevboxUploadFileResponse;
-  export import DevboxCreateParams = DevboxesAPI.DevboxCreateParams;
-  export import DevboxListParams = DevboxesAPI.DevboxListParams;
-  export import DevboxCreateTunnelParams = DevboxesAPI.DevboxCreateTunnelParams;
-  export import DevboxDiskSnapshotsParams = DevboxesAPI.DevboxDiskSnapshotsParams;
-  export import DevboxDownloadFileParams = DevboxesAPI.DevboxDownloadFileParams;
-  export import DevboxExecuteAsyncParams = DevboxesAPI.DevboxExecuteAsyncParams;
-  export import DevboxExecuteSyncParams = DevboxesAPI.DevboxExecuteSyncParams;
-  export import DevboxReadFileContentsParams = DevboxesAPI.DevboxReadFileContentsParams;
-  export import DevboxSnapshotDiskParams = DevboxesAPI.DevboxSnapshotDiskParams;
-  export import DevboxUploadFileParams = DevboxesAPI.DevboxUploadFileParams;
-  export import DevboxWriteFileParams = DevboxesAPI.DevboxWriteFileParams;
-  export import Logs = LogsAPI.Logs;
-  export import DevboxLogsListView = LogsAPI.DevboxLogsListView;
-  export import LogListParams = LogsAPI.LogListParams;
-  export import Executions = ExecutionsAPI.Executions;
-  export import ExecutionRetrieveParams = ExecutionsAPI.ExecutionRetrieveParams;
-  export import ExecutionExecuteAsyncParams = ExecutionsAPI.ExecutionExecuteAsyncParams;
-  export import ExecutionExecuteSyncParams = ExecutionsAPI.ExecutionExecuteSyncParams;
+Devboxes.Logs = Logs;
+Devboxes.Executions = Executions;
+
+export declare namespace Devboxes {
+  export {
+    type DevboxAsyncExecutionDetailView as DevboxAsyncExecutionDetailView,
+    type DevboxExecutionDetailView as DevboxExecutionDetailView,
+    type DevboxListView as DevboxListView,
+    type DevboxSnapshotListView as DevboxSnapshotListView,
+    type DevboxSnapshotView as DevboxSnapshotView,
+    type DevboxTunnelView as DevboxTunnelView,
+    type DevboxView as DevboxView,
+    type DevboxCreateSSHKeyResponse as DevboxCreateSSHKeyResponse,
+    type DevboxReadFileContentsResponse as DevboxReadFileContentsResponse,
+    type DevboxUploadFileResponse as DevboxUploadFileResponse,
+    type DevboxCreateParams as DevboxCreateParams,
+    type DevboxListParams as DevboxListParams,
+    type DevboxCreateTunnelParams as DevboxCreateTunnelParams,
+    type DevboxDiskSnapshotsParams as DevboxDiskSnapshotsParams,
+    type DevboxDownloadFileParams as DevboxDownloadFileParams,
+    type DevboxExecuteAsyncParams as DevboxExecuteAsyncParams,
+    type DevboxExecuteSyncParams as DevboxExecuteSyncParams,
+    type DevboxReadFileContentsParams as DevboxReadFileContentsParams,
+    type DevboxSnapshotDiskParams as DevboxSnapshotDiskParams,
+    type DevboxUploadFileParams as DevboxUploadFileParams,
+    type DevboxWriteFileParams as DevboxWriteFileParams,
+  };
+
+  export { Logs as Logs, type DevboxLogsListView as DevboxLogsListView, type LogListParams as LogListParams };
+
+  export {
+    Executions as Executions,
+    type ExecutionRetrieveParams as ExecutionRetrieveParams,
+    type ExecutionExecuteAsyncParams as ExecutionExecuteAsyncParams,
+    type ExecutionExecuteSyncParams as ExecutionExecuteSyncParams,
+  };
 }

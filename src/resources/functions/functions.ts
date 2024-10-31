@@ -2,9 +2,15 @@
 
 import { APIResource } from '../../resource';
 import * as Core from '../../core';
-import * as FunctionsAPI from './functions';
 import * as Shared from '../shared';
 import * as InvocationsAPI from './invocations';
+import {
+  FunctionInvocationListView,
+  InvocationKillParams,
+  InvocationListParams,
+  Invocations,
+  KillOperationResponse,
+} from './invocations';
 
 export class Functions extends APIResource {
   invocations: InvocationsAPI.Invocations = new InvocationsAPI.Invocations(this._client);
@@ -107,13 +113,20 @@ export namespace FunctionInvokeSyncParams {
   }
 }
 
-export namespace Functions {
-  export import FunctionListView = FunctionsAPI.FunctionListView;
-  export import FunctionInvokeAsyncParams = FunctionsAPI.FunctionInvokeAsyncParams;
-  export import FunctionInvokeSyncParams = FunctionsAPI.FunctionInvokeSyncParams;
-  export import Invocations = InvocationsAPI.Invocations;
-  export import FunctionInvocationListView = InvocationsAPI.FunctionInvocationListView;
-  export import KillOperationResponse = InvocationsAPI.KillOperationResponse;
-  export import InvocationListParams = InvocationsAPI.InvocationListParams;
-  export import InvocationKillParams = InvocationsAPI.InvocationKillParams;
+Functions.Invocations = Invocations;
+
+export declare namespace Functions {
+  export {
+    type FunctionListView as FunctionListView,
+    type FunctionInvokeAsyncParams as FunctionInvokeAsyncParams,
+    type FunctionInvokeSyncParams as FunctionInvokeSyncParams,
+  };
+
+  export {
+    Invocations as Invocations,
+    type FunctionInvocationListView as FunctionInvocationListView,
+    type KillOperationResponse as KillOperationResponse,
+    type InvocationListParams as InvocationListParams,
+    type InvocationKillParams as InvocationKillParams,
+  };
 }
