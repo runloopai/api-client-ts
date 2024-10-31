@@ -11,7 +11,7 @@
     "paths": {
       "@runloop/api-client/_shims/auto/*": ["src/_shims/auto/*-node"],
       "@runloop/api-client/*": ["src/*"],
-      "@runloop/api-client": ["src/index.ts"],
+      "@runloop/api-client": ["src/index.ts"]
     },
     "noEmit": true,
 

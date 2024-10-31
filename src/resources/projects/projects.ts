@@ -2,8 +2,8 @@
 
 import { APIResource } from '../../resource';
 import * as Core from '../../core';
-import * as ProjectsAPI from './projects';
 import * as LogsAPI from './logs';
+import { Logs } from './logs';
 
 export class Projects extends APIResource {
   logs: LogsAPI.Logs = new LogsAPI.Logs(this._client);
@@ -52,7 +52,10 @@ export namespace ProjectListView {
   }
 }
 
-export namespace Projects {
-  export import ProjectListView = ProjectsAPI.ProjectListView;
-  export import Logs = LogsAPI.Logs;
+Projects.Logs = Logs;
+
+export declare namespace Projects {
+  export { type ProjectListView as ProjectListView };
+
+  export { Logs as Logs };
 }

@@ -3,7 +3,6 @@
 import { APIResource } from '../../resource';
 import { isRequestOptions } from '../../core';
 import * as Core from '../../core';
-import * as LogsAPI from './logs';
 
 export class Logs extends APIResource {
   /**
@@ -86,7 +85,6 @@ export interface LogListParams {
   shell_name?: string;
 }
 
-export namespace Logs {
-  export import DevboxLogsListView = LogsAPI.DevboxLogsListView;
-  export import LogListParams = LogsAPI.LogListParams;
+export declare namespace Logs {
+  export { type DevboxLogsListView as DevboxLogsListView, type LogListParams as LogListParams };
 }
