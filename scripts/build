@@ -50,7 +50,7 @@ node scripts/utils/postprocess-files.cjs
 (cd dist && node -e 'require("@runloop/api-client")')
 (cd dist && node -e 'import("@runloop/api-client")' --input-type=module)
 
-if command -v deno &> /dev/null && [ -e ./scripts/build-deno ]
+if [ -e ./scripts/build-deno ]
 then
   ./scripts/build-deno
 fi
