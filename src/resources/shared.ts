@@ -52,12 +52,6 @@ export interface FunctionInvocationExecutionDetailView {
 
 export interface LaunchParameters {
   /**
-   * Configure Devbox lifecycle based on idle activity. If after_idle is set, Devbox
-   * will ignore keep_alive_time_seconds.
-   */
-  after_idle?: LaunchParameters.AfterIdle;
-
-  /**
    * A list of ports to make available on the Devbox. Call createTunnel to open a
    * tunnel to the port.
    */
@@ -78,24 +72,6 @@ export interface LaunchParameters {
    * Manual resource configuration for Devbox. If not set, defaults will be used.
    */
   resource_size_request?: 'SMALL' | 'MEDIUM' | 'LARGE' | 'X_LARGE' | 'CUSTOM_SIZE';
-}
-
-export namespace LaunchParameters {
-  /**
-   * Configure Devbox lifecycle based on idle activity. If after_idle is set, Devbox
-   * will ignore keep_alive_time_seconds.
-   */
-  export interface AfterIdle {
-    /**
-     * After idle_time_seconds, on_idle action will be taken.
-     */
-    idle_time_seconds: number;
-
-    /**
-     * Action to take after Devbox becomes idle.
-     */
-    on_idle: 'unknown' | 'shutdown' | 'suspend';
-  }
 }
 
 export interface ProjectLogsView {
