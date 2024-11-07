@@ -282,6 +282,7 @@ export declare namespace Runloop {
 
   export { Projects as Projects, type ProjectListView as ProjectListView };
 
+  export type AfterIdle = API.AfterIdle;
   export type FunctionInvocationExecutionDetailView = API.FunctionInvocationExecutionDetailView;
   export type LaunchParameters = API.LaunchParameters;
   export type ProjectLogsView = API.ProjectLogsView;
