@@ -58,7 +58,7 @@ describe('resource devboxes', () => {
           environment_variables: { foo: 'string' },
           file_mounts: { foo: 'string' },
           launch_parameters: {
-            after_idle: { idle_time_seconds: 0, on_idle: 'unknown' },
+            after_idle: { idle_time_seconds: 0, on_idle: 'shutdown' },
             available_ports: [0, 0, 0],
             keep_alive_time_seconds: 0,
             launch_commands: ['string', 'string', 'string'],
