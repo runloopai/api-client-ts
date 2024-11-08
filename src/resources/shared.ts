@@ -9,7 +9,7 @@ export interface AfterIdle {
   /**
    * Action to take after Devbox becomes idle.
    */
-  on_idle: 'shutdown' | 'suspend';
+  on_idle: 'unknown' | 'shutdown' | 'suspend';
 }
 
 export interface FunctionInvocationExecutionDetailView {
