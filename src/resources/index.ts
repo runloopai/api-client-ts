@@ -24,6 +24,7 @@ export {
   type DevboxTunnelView,
   type DevboxView,
   type DevboxCreateSSHKeyResponse,
+  type DevboxKeepAliveResponse,
   type DevboxReadFileContentsResponse,
   type DevboxUploadFileResponse,
   type DevboxCreateParams,
