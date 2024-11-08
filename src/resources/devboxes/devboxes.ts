@@ -133,13 +133,6 @@ export class Devboxes extends APIResource {
   }
 
   /**
-   * Keep alive a running devbox that is configured to shutdown on idle.
-   */
-  keepAlive(id: string, options?: Core.RequestOptions): Core.APIPromise<unknown> {
-    return this._client.post(`/v1/devboxes/${id}/keep_alive`, options);
-  }
-
-  /**
    * Read file contents from a file on given Devbox.
    */
   readFileContents(
@@ -450,8 +443,6 @@ export interface DevboxCreateSSHKeyResponse {
   url: string;
 }
 
-export type DevboxKeepAliveResponse = unknown;
-
 export type DevboxReadFileContentsResponse = string;
 
 export type DevboxUploadFileResponse = unknown;
@@ -641,7 +632,6 @@ export declare namespace Devboxes {
     type DevboxTunnelView as DevboxTunnelView,
     type DevboxView as DevboxView,
     type DevboxCreateSSHKeyResponse as DevboxCreateSSHKeyResponse,
-    type DevboxKeepAliveResponse as DevboxKeepAliveResponse,
     type DevboxReadFileContentsResponse as DevboxReadFileContentsResponse,
     type DevboxUploadFileResponse as DevboxUploadFileResponse,
     type DevboxCreateParams as DevboxCreateParams,
