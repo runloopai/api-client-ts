@@ -430,7 +430,7 @@ export interface DevboxView {
   /**
    * The shutdown reason if the Devbox shutdown, if any.
    */
-  shutdown_reason?: 'api_shutdown' | 'keep_alive_timeout' | 'entrypoint_exit' | 'idle' | 'lambda_lifecycle';
+  shutdown_reason?: 'api_shutdown' | 'keep_alive_timeout' | 'entrypoint_exit';
 }
 
 export interface DevboxCreateSSHKeyResponse {
