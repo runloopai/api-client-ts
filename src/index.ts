@@ -206,31 +206,11 @@ export class Runloop extends Core.APIClient {
   static fileFromPath = Uploads.fileFromPath;
 }
 
-export {
-  RunloopError,
-  APIError,
-  APIConnectionError,
-  APIConnectionTimeoutError,
-  APIUserAbortError,
-  NotFoundError,
-  ConflictError,
-  RateLimitError,
-  BadRequestError,
-  AuthenticationError,
-  InternalServerError,
-  PermissionDeniedError,
-  UnprocessableEntityError,
-} from './error';
-
-export import toFile = Uploads.toFile;
-export import fileFromPath = Uploads.fileFromPath;
-
 Runloop.Blueprints = Blueprints;
 Runloop.Code = Code;
 Runloop.Devboxes = Devboxes;
 Runloop.Functions = Functions;
 Runloop.Projects = Projects;
-
 export declare namespace Runloop {
   export type RequestOptions = Core.RequestOptions;
 
@@ -289,5 +269,22 @@ export declare namespace Runloop {
   export type LaunchParameters = API.LaunchParameters;
   export type ProjectLogsView = API.ProjectLogsView;
 }
+
+export { toFile, fileFromPath } from '@runloop/api-client/uploads';
+export {
+  RunloopError,
+  APIError,
+  APIConnectionError,
+  APIConnectionTimeoutError,
+  APIUserAbortError,
+  NotFoundError,
+  ConflictError,
+  RateLimitError,
+  BadRequestError,
+  AuthenticationError,
+  InternalServerError,
+  PermissionDeniedError,
+  UnprocessableEntityError,
+} from '@runloop/api-client/error';
 
 export default Runloop;
