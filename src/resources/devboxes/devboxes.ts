@@ -629,7 +629,7 @@ export interface DevboxWriteFileParams {
   contents: string;
 
   /**
-   * The path of the file to read.
+   * The path of the file to write.
    */
   file_path: string;
 }
