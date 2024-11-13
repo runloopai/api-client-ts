@@ -1,5 +1,27 @@
 # Changelog
 
+## 0.7.0 (2024-11-13)
+
+Full Changelog: [v0.6.0...v0.7.0](https://github.com/runloopai/api-client-ts/compare/v0.6.0...v0.7.0)
+
+### Features
+
+* **api:** api update ([#260](https://github.com/runloopai/api-client-ts/issues/260)) ([89e4bc6](https://github.com/runloopai/api-client-ts/commit/89e4bc6dca1395c303f0318ee46f6d382895b362))
+* **api:** api update ([#262](https://github.com/runloopai/api-client-ts/issues/262)) ([3157aa3](https://github.com/runloopai/api-client-ts/commit/3157aa3af6f4412dcec07019ee916872a1367ba3))
+* **api:** api update ([#263](https://github.com/runloopai/api-client-ts/issues/263)) ([000cfa9](https://github.com/runloopai/api-client-ts/commit/000cfa98f1c927c76acf3eb38c8ac1d3c932604a))
+* **api:** api update ([#264](https://github.com/runloopai/api-client-ts/issues/264)) ([eb33f26](https://github.com/runloopai/api-client-ts/commit/eb33f26b9461f3c858a6043b80041c387a118058))
+* **api:** api update ([#265](https://github.com/runloopai/api-client-ts/issues/265)) ([8dfb10c](https://github.com/runloopai/api-client-ts/commit/8dfb10c1bb3ab8908abc6a84803e8537d1b929a8))
+* **api:** api update ([#266](https://github.com/runloopai/api-client-ts/issues/266)) ([4cfd0f1](https://github.com/runloopai/api-client-ts/commit/4cfd0f101e60ccfa76e47cb5ff8f46c27ce515e7))
+* **api:** api update ([#267](https://github.com/runloopai/api-client-ts/issues/267)) ([29f4d20](https://github.com/runloopai/api-client-ts/commit/29f4d207e2abbd0ee0acda55b3625d4af4842b52))
+* **api:** api update ([#268](https://github.com/runloopai/api-client-ts/issues/268)) ([80ef815](https://github.com/runloopai/api-client-ts/commit/80ef815b2255b6b240fcf52cf86164e80f084892))
+* **api:** api update ([#269](https://github.com/runloopai/api-client-ts/issues/269)) ([9b585d9](https://github.com/runloopai/api-client-ts/commit/9b585d9024c4625e065263d9b4ae5fb7735e08f7))
+* **api:** api update ([#270](https://github.com/runloopai/api-client-ts/issues/270)) ([1bd3c3b](https://github.com/runloopai/api-client-ts/commit/1bd3c3be23b5bc00dcaf855d486bc79d5e6b16d6))
+* **api:** api update ([#271](https://github.com/runloopai/api-client-ts/issues/271)) ([d1bb853](https://github.com/runloopai/api-client-ts/commit/d1bb85356f6de38f3f9119e3ce9cd02fba8b0959))
+* **api:** api update ([#272](https://github.com/runloopai/api-client-ts/issues/272)) ([46069cf](https://github.com/runloopai/api-client-ts/commit/46069cfb4dbd6d7e22bc471b8044dabae611bb92))
+* **api:** api update ([#273](https://github.com/runloopai/api-client-ts/issues/273)) ([0ddb4bd](https://github.com/runloopai/api-client-ts/commit/0ddb4bd7e264e1a99a108a1e098150d2228e5d9e))
+* **api:** api update ([#274](https://github.com/runloopai/api-client-ts/issues/274)) ([e0ba26d](https://github.com/runloopai/api-client-ts/commit/e0ba26da4fd20cc840399f920b4065f760c8dcb3))
+* **api:** api update ([#275](https://github.com/runloopai/api-client-ts/issues/275)) ([260031f](https://github.com/runloopai/api-client-ts/commit/260031fd9d59f1383dc6586468e6544bf76d305a))
+
 ## 0.6.0 (2024-11-07)
 
 Full Changelog: [v0.5.0...v0.6.0](https://github.com/runloopai/api-client-ts/compare/v0.5.0...v0.6.0)
