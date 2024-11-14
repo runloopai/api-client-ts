@@ -270,7 +270,7 @@ export declare namespace Runloop {
   export type ProjectLogsView = API.ProjectLogsView;
 }
 
-export { toFile, fileFromPath } from '@runloop/api-client/uploads';
+export { toFile, fileFromPath } from './uploads';
 export {
   RunloopError,
   APIError,
@@ -285,6 +285,6 @@ export {
   InternalServerError,
   PermissionDeniedError,
   UnprocessableEntityError,
-} from '@runloop/api-client/error';
+} from './error';
 
 export default Runloop;
