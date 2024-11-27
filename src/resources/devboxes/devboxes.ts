@@ -585,13 +585,6 @@ export interface DevboxCreateParams {
   prebuilt?: string;
 
   /**
-   * (Optional) List of commands needed to set up your Devbox. Examples might include
-   * fetching a tool or building your dependencies. Runloop will look optimize these
-   * steps for you.
-   */
-  setup_commands?: Array<string>;
-
-  /**
    * Snapshot ID to use for the Devbox.
    */
   snapshot_id?: string;
