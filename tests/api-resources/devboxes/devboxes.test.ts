@@ -55,7 +55,6 @@ describe('resource devboxes', () => {
           metadata: { foo: 'string' },
           name: 'name',
           prebuilt: 'prebuilt',
-          setup_commands: ['string'],
           snapshot_id: 'snapshot_id',
         },
         { path: '/_stainless_unknown_path' },
