@@ -18,17 +18,7 @@ import {
   Blueprints,
 } from './resources/blueprints';
 import { Code, CodeMountParameters } from './resources/code';
-import {
-  Repositories,
-  RepositoryConnectionListView,
-  RepositoryConnectionView,
-  RepositoryCreateParams,
-  RepositoryDeleteParams,
-  RepositoryDeleteResponse,
-  RepositoryListParams,
-  RepositoryVersionDetails,
-  RepositoryVersionListView,
-} from './resources/repositories';
+import { Repositories } from './resources/repositories';
 import {
   DevboxAsyncExecutionDetailView,
   DevboxCreateParams,
@@ -268,17 +258,7 @@ export declare namespace Runloop {
     type DevboxWriteFileParams as DevboxWriteFileParams,
   };
 
-  export {
-    Repositories as Repositories,
-    type RepositoryConnectionListView as RepositoryConnectionListView,
-    type RepositoryConnectionView as RepositoryConnectionView,
-    type RepositoryVersionDetails as RepositoryVersionDetails,
-    type RepositoryVersionListView as RepositoryVersionListView,
-    type RepositoryDeleteResponse as RepositoryDeleteResponse,
-    type RepositoryCreateParams as RepositoryCreateParams,
-    type RepositoryListParams as RepositoryListParams,
-    type RepositoryDeleteParams as RepositoryDeleteParams,
-  };
+  export { Repositories as Repositories };
 
   export {
     Functions as Functions,

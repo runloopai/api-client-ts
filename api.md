@@ -70,82 +70,6 @@ Methods:
 
 ## Lsp
 
-Types:
-
-- <code><a href="./src/resources/devboxes/lsp.ts">BaseCodeAction</a></code>
-- <code><a href="./src/resources/devboxes/lsp.ts">BaseCommand</a></code>
-- <code><a href="./src/resources/devboxes/lsp.ts">BaseDiagnostic</a></code>
-- <code><a href="./src/resources/devboxes/lsp.ts">BaseLocation</a></code>
-- <code><a href="./src/resources/devboxes/lsp.ts">BaseMarkupContent</a></code>
-- <code><a href="./src/resources/devboxes/lsp.ts">BaseParameterInformation</a></code>
-- <code><a href="./src/resources/devboxes/lsp.ts">BaseRange</a></code>
-- <code><a href="./src/resources/devboxes/lsp.ts">BaseSignature</a></code>
-- <code><a href="./src/resources/devboxes/lsp.ts">BaseWorkspaceEdit</a></code>
-- <code><a href="./src/resources/devboxes/lsp.ts">CodeActionApplicationResult</a></code>
-- <code><a href="./src/resources/devboxes/lsp.ts">CodeActionContext</a></code>
-- <code><a href="./src/resources/devboxes/lsp.ts">CodeActionKind</a></code>
-- <code><a href="./src/resources/devboxes/lsp.ts">CodeActionsForDiagnosticRequestBody</a></code>
-- <code><a href="./src/resources/devboxes/lsp.ts">CodeActionsRequestBody</a></code>
-- <code><a href="./src/resources/devboxes/lsp.ts">CodeActionsResponse</a></code>
-- <code><a href="./src/resources/devboxes/lsp.ts">CodeActionTriggerKind</a></code>
-- <code><a href="./src/resources/devboxes/lsp.ts">CodeDescription</a></code>
-- <code><a href="./src/resources/devboxes/lsp.ts">CodeSegmentInfoRequestBody</a></code>
-- <code><a href="./src/resources/devboxes/lsp.ts">CodeSegmentInfoResponse</a></code>
-- <code><a href="./src/resources/devboxes/lsp.ts">Diagnostic</a></code>
-- <code><a href="./src/resources/devboxes/lsp.ts">DiagnosticRelatedInformation</a></code>
-- <code><a href="./src/resources/devboxes/lsp.ts">DiagnosticSeverity</a></code>
-- <code><a href="./src/resources/devboxes/lsp.ts">DiagnosticsResponse</a></code>
-- <code><a href="./src/resources/devboxes/lsp.ts">DiagnosticTag</a></code>
-- <code><a href="./src/resources/devboxes/lsp.ts">DocumentSymbol</a></code>
-- <code><a href="./src/resources/devboxes/lsp.ts">DocumentSymbolResponse</a></code>
-- <code><a href="./src/resources/devboxes/lsp.ts">DocumentUri</a></code>
-- <code><a href="./src/resources/devboxes/lsp.ts">FileContentsResponse</a></code>
-- <code><a href="./src/resources/devboxes/lsp.ts">FileDefinitionRequestBody</a></code>
-- <code><a href="./src/resources/devboxes/lsp.ts">FileDefinitionResponse</a></code>
-- <code><a href="./src/resources/devboxes/lsp.ts">FilePath</a></code>
-- <code><a href="./src/resources/devboxes/lsp.ts">FileRequestBody</a></code>
-- <code><a href="./src/resources/devboxes/lsp.ts">FileUri</a></code>
-- <code><a href="./src/resources/devboxes/lsp.ts">FormattingResponse</a></code>
-- <code><a href="./src/resources/devboxes/lsp.ts">HealthStatusResponse</a></code>
-- <code><a href="./src/resources/devboxes/lsp.ts">Integer</a></code>
-- <code><a href="./src/resources/devboxes/lsp.ts">Location</a></code>
-- <code><a href="./src/resources/devboxes/lsp.ts">LSpAny</a></code>
-- <code><a href="./src/resources/devboxes/lsp.ts">Position</a></code>
-- <code><a href="./src/resources/devboxes/lsp.ts">Range</a></code>
-- <code><a href="./src/resources/devboxes/lsp.ts">RecordStringTextEditArray</a></code>
-- <code><a href="./src/resources/devboxes/lsp.ts">ReferencesRequestBody</a></code>
-- <code><a href="./src/resources/devboxes/lsp.ts">ReferencesResponse</a></code>
-- <code><a href="./src/resources/devboxes/lsp.ts">SetWatchDirectoryRequestBody</a></code>
-- <code><a href="./src/resources/devboxes/lsp.ts">SignatureHelpRequestBody</a></code>
-- <code><a href="./src/resources/devboxes/lsp.ts">SignatureHelpResponse</a></code>
-- <code><a href="./src/resources/devboxes/lsp.ts">SymbolKind</a></code>
-- <code><a href="./src/resources/devboxes/lsp.ts">SymbolTag</a></code>
-- <code><a href="./src/resources/devboxes/lsp.ts">SymbolType</a></code>
-- <code><a href="./src/resources/devboxes/lsp.ts">TextEdit</a></code>
-- <code><a href="./src/resources/devboxes/lsp.ts">Uinteger</a></code>
-- <code><a href="./src/resources/devboxes/lsp.ts">URi</a></code>
-- <code><a href="./src/resources/devboxes/lsp.ts">WatchedFileResponse</a></code>
-- <code><a href="./src/resources/devboxes/lsp.ts">LspFilesResponse</a></code>
-- <code><a href="./src/resources/devboxes/lsp.ts">LspGetCodeActionsForDiagnosticResponse</a></code>
-- <code><a href="./src/resources/devboxes/lsp.ts">LspSetWatchDirectoryResponse</a></code>
-
-Methods:
-
-- <code title="post /v1/devboxes/{id}/lsp/apply-code-action">client.devboxes.lsp.<a href="./src/resources/devboxes/lsp.ts">applyCodeAction</a>(id, { ...params }) -> CodeActionApplicationResult</code>
-- <code title="post /v1/devboxes/{id}/lsp/code-actions">client.devboxes.lsp.<a href="./src/resources/devboxes/lsp.ts">codeActions</a>(id, { ...params }) -> unknown</code>
-- <code title="post /v1/devboxes/{id}/lsp/diagnostics">client.devboxes.lsp.<a href="./src/resources/devboxes/lsp.ts">diagnostics</a>(id, { ...params }) -> DiagnosticsResponse</code>
-- <code title="post /v1/devboxes/{id}/lsp/document-symbols">client.devboxes.lsp.<a href="./src/resources/devboxes/lsp.ts">documentSymbols</a>(id, { ...params }) -> unknown</code>
-- <code title="post /v1/devboxes/{id}/lsp/file">client.devboxes.lsp.<a href="./src/resources/devboxes/lsp.ts">file</a>(id, { ...params }) -> FileContentsResponse</code>
-- <code title="post /v1/devboxes/{id}/lsp/file-definition">client.devboxes.lsp.<a href="./src/resources/devboxes/lsp.ts">fileDefinition</a>(id, { ...params }) -> unknown</code>
-- <code title="get /v1/devboxes/{id}/lsp/files">client.devboxes.lsp.<a href="./src/resources/devboxes/lsp.ts">files</a>(id) -> LspFilesResponse</code>
-- <code title="post /v1/devboxes/{id}/lsp/formatting">client.devboxes.lsp.<a href="./src/resources/devboxes/lsp.ts">formatting</a>(id, { ...params }) -> unknown</code>
-- <code title="post /v1/devboxes/{id}/lsp/get-code-actions-for-diagnostic">client.devboxes.lsp.<a href="./src/resources/devboxes/lsp.ts">getCodeActionsForDiagnostic</a>(id, { ...params }) -> LspGetCodeActionsForDiagnosticResponse</code>
-- <code title="post /v1/devboxes/{id}/lsp/get-code-segment-info">client.devboxes.lsp.<a href="./src/resources/devboxes/lsp.ts">getCodeSegmentInfo</a>(id, { ...params }) -> CodeSegmentInfoResponse</code>
-- <code title="post /v1/devboxes/{id}/lsp/get-signature-help">client.devboxes.lsp.<a href="./src/resources/devboxes/lsp.ts">getSignatureHelp</a>(id, { ...params }) -> SignatureHelpResponse</code>
-- <code title="get /v1/devboxes/{id}/lsp/health">client.devboxes.lsp.<a href="./src/resources/devboxes/lsp.ts">health</a>(id) -> HealthStatusResponse</code>
-- <code title="post /v1/devboxes/{id}/lsp/references">client.devboxes.lsp.<a href="./src/resources/devboxes/lsp.ts">references</a>(id, { ...params }) -> unknown</code>
-- <code title="post /v1/devboxes/{id}/lsp/set-watch-directory">client.devboxes.lsp.<a href="./src/resources/devboxes/lsp.ts">setWatchDirectory</a>(id, { ...params }) -> string</code>
-
 ## Logs
 
 Types:
@@ -166,22 +90,6 @@ Methods:
 - <code title="post /v1/devboxes/{id}/executions/{execution_id}/kill">client.devboxes.executions.<a href="./src/resources/devboxes/executions.ts">kill</a>(id, executionId) -> DevboxAsyncExecutionDetailView</code>
 
 # Repositories
-
-Types:
-
-- <code><a href="./src/resources/repositories.ts">RepositoryConnectionListView</a></code>
-- <code><a href="./src/resources/repositories.ts">RepositoryConnectionView</a></code>
-- <code><a href="./src/resources/repositories.ts">RepositoryVersionDetails</a></code>
-- <code><a href="./src/resources/repositories.ts">RepositoryVersionListView</a></code>
-- <code><a href="./src/resources/repositories.ts">RepositoryDeleteResponse</a></code>
-
-Methods:
-
-- <code title="post /v1/repositories">client.repositories.<a href="./src/resources/repositories.ts">create</a>({ ...params }) -> RepositoryConnectionView</code>
-- <code title="get /v1/repositories/{id}">client.repositories.<a href="./src/resources/repositories.ts">retrieve</a>(id) -> RepositoryConnectionView</code>
-- <code title="get /v1/repositories">client.repositories.<a href="./src/resources/repositories.ts">list</a>({ ...params }) -> RepositoryConnectionListView</code>
-- <code title="post /v1/repositories/{id}/delete">client.repositories.<a href="./src/resources/repositories.ts">delete</a>(id) -> unknown</code>
-- <code title="get /v1/repositories/{id}/versions">client.repositories.<a href="./src/resources/repositories.ts">versions</a>(id) -> RepositoryVersionListView</code>
 
 # Functions
 
