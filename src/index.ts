@@ -18,6 +18,7 @@ import {
   Blueprints,
 } from './resources/blueprints';
 import { Code, CodeMountParameters } from './resources/code';
+import { Repositories } from './resources/repositories';
 import {
   DevboxAsyncExecutionDetailView,
   DevboxCreateParams,
@@ -167,6 +168,7 @@ export class Runloop extends Core.APIClient {
   blueprints: API.Blueprints = new API.Blueprints(this);
   code: API.Code = new API.Code(this);
   devboxes: API.Devboxes = new API.Devboxes(this);
+  repositories: API.Repositories = new API.Repositories(this);
   functions: API.Functions = new API.Functions(this);
   projects: API.Projects = new API.Projects(this);
 
@@ -209,6 +211,7 @@ export class Runloop extends Core.APIClient {
 Runloop.Blueprints = Blueprints;
 Runloop.Code = Code;
 Runloop.Devboxes = Devboxes;
+Runloop.Repositories = Repositories;
 Runloop.Functions = Functions;
 Runloop.Projects = Projects;
 export declare namespace Runloop {
@@ -254,6 +257,8 @@ export declare namespace Runloop {
     type DevboxUploadFileParams as DevboxUploadFileParams,
     type DevboxWriteFileParams as DevboxWriteFileParams,
   };
+
+  export { Repositories as Repositories };
 
   export {
     Functions as Functions,
