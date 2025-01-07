@@ -89,6 +89,8 @@ Methods:
 - <code title="post /v1/devboxes/{id}/execute_sync">client.devboxes.executions.<a href="./src/resources/devboxes/executions.ts">executeSync</a>(id, { ...params }) -> DevboxExecutionDetailView</code>
 - <code title="post /v1/devboxes/{id}/executions/{execution_id}/kill">client.devboxes.executions.<a href="./src/resources/devboxes/executions.ts">kill</a>(id, executionId) -> DevboxAsyncExecutionDetailView</code>
 
+# Repositories
+
 # Functions
 
 Types:
