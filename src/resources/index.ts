@@ -46,4 +46,14 @@ export {
   type FunctionInvokeSyncParams,
 } from './functions/functions';
 export { Projects, type ProjectListView } from './projects/projects';
-export { Repositories } from './repositories';
+export {
+  Repositories,
+  type RepositoryConnectionListView,
+  type RepositoryConnectionView,
+  type RepositoryVersionDetails,
+  type RepositoryVersionListView,
+  type RepositoryDeleteResponse,
+  type RepositoryCreateParams,
+  type RepositoryListParams,
+  type RepositoryDeleteParams,
+} from './repositories';
