@@ -46,3 +46,4 @@ export {
   type FunctionInvokeSyncParams,
 } from './functions/functions';
 export { Projects, type ProjectListView } from './projects/projects';
+export { Repositories } from './repositories';
