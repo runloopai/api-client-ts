@@ -4,6 +4,7 @@ import { APIResource } from '../../resource';
 import { isRequestOptions } from '../../core';
 import * as Core from '../../core';
 import * as DevboxesAPI from './devboxes';
+import { PollingOptions, poll } from '@runloop/api-client/lib/polling';
 
 export class Executions extends APIResource {
   /**
@@ -41,6 +42,31 @@ export class Executions extends APIResource {
     options?: Core.RequestOptions,
   ): Core.APIPromise<DevboxesAPI.DevboxAsyncExecutionDetailView> {
     return this._client.post(`/v1/devboxes/${id}/execute_async`, { body, ...options });
+  }
+
+  /**
+   * Wait for an async execution to complete.
+   * Polls the execution status until it reaches completed state.
+   */
+  async awaitAsyncExectionFinish(
+    id: string,
+    executionId: string,
+    options?: Core.RequestOptions & {
+      polling?: Partial<PollingOptions<DevboxesAPI.DevboxAsyncExecutionDetailView>>;
+    },
+  ): Promise<DevboxesAPI.DevboxAsyncExecutionDetailView> {
+    const finalResult = await poll(
+      () => this.retrieve(id, executionId, options),
+      () => this.retrieve(id, executionId, options),
+      {
+        ...options?.polling,
+        shouldStop: (result: DevboxesAPI.DevboxAsyncExecutionDetailView) => {
+          return result.status === 'completed';
+        },
+      },
+    );
+
+    return finalResult;
   }
 
   /**
