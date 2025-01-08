@@ -12,7 +12,7 @@ export class DevboxTools {
   /**
    * Get all file-related tools
    */
-  file_tools(devboxId: string, options?: Core.RequestOptions) {
+  fileTools(devboxId: string, options?: Core.RequestOptions) {
     const tools = [
       createTool({
         name: 'read_file',
@@ -61,7 +61,7 @@ export class DevboxTools {
   /**
    * Get all shell-related tools
    */
-  shell_tools(devboxId: string, options?: Core.RequestOptions) {
+  shellTools(devboxId: string, options?: Core.RequestOptions) {
     const tools = [
       createTool({
         name: 'execute_command',
@@ -128,7 +128,7 @@ export class DevboxTools {
   /**
    * Get tools for managing tunnels on the devbox
    */
-  getTunnelTools(devboxId: string, options?: Core.RequestOptions) {
+  tunnelTools(devboxId: string, options?: Core.RequestOptions) {
     const tools = [
       createTool({
         name: 'create_tunnel',
