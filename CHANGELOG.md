@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.10.0 (2025-01-08)
+
+Full Changelog: [v0.9.0...v0.10.0](https://github.com/runloopai/api-client-ts/compare/v0.9.0...v0.10.0)
+
+### Features
+
+* Add a bunch of helpers for making agent integration easy ([113bd2f](https://github.com/runloopai/api-client-ts/commit/113bd2ffe081175a97fb8c07f59ba293b82d77ae))
+* **api:** api update ([#481](https://github.com/runloopai/api-client-ts/issues/481)) ([cccd04b](https://github.com/runloopai/api-client-ts/commit/cccd04b8706c7ead889d4d9805133e46d39631b5))
+* Fix casing ([fef4ca0](https://github.com/runloopai/api-client-ts/commit/fef4ca07bce3e2c80233b56dcfce85c4c0c4e240))
+
 ## 0.9.0 (2025-01-07)
 
 Full Changelog: [v0.8.0...v0.9.0](https://github.com/runloopai/api-client-ts/compare/v0.8.0...v0.9.0)
