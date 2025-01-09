@@ -126,7 +126,7 @@ export class Devboxes extends APIResource {
    * Wait for a devbox to reach the running state.
    * Polls the devbox status until it reaches running state or fails with an error.
    */
-  async awaitDevboxRunning(
+  async awaitRunning(
     id: string,
     options?: Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxView>> },
   ): Promise<DevboxView> {
@@ -158,7 +158,7 @@ export class Devboxes extends APIResource {
     options?: Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxView>> },
   ): Promise<DevboxView> {
     const devbox = await this.create(body, options);
-    return this.awaitDevboxRunning(devbox.id, options);
+    return this.awaitRunning(devbox.id, options);
   }
 
   /**

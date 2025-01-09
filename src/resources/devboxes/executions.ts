@@ -48,7 +48,7 @@ export class Executions extends APIResource {
    * Wait for an async execution to complete.
    * Polls the execution status until it reaches completed state.
    */
-  async awaitAsyncExectionFinish(
+  async awaitCompleted(
     id: string,
     executionId: string,
     options?: Core.RequestOptions & {
