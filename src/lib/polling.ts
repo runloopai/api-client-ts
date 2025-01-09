@@ -18,9 +18,8 @@ export interface PollingOptions<T> {
 
 const DEFAULT_OPTIONS: Partial<PollingOptions<any>> = {
   initialDelayMs: 1000,
-  pollingIntervalMs: 2000,
-  maxAttempts: 30,
-  timeoutMs: 300000, // 5 minutes
+  pollingIntervalMs: 1000,
+  maxAttempts: 120,
 };
 
 export class PollingTimeoutError extends Error {
