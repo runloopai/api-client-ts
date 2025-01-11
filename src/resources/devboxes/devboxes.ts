@@ -109,6 +109,7 @@ export class Devboxes extends APIResource {
     return this._client.post(`/v1/devboxes/${id}/download_file`, {
       body,
       ...options,
+      headers: { Accept: 'application/octet-stream', ...options?.headers },
       __binaryResponse: true,
     });
   }
