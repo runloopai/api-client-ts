@@ -102,7 +102,7 @@ describe('resource devboxes', () => {
     // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
     await expect(
       client.devboxes.list(
-        { limit: 0, starting_after: 'starting_after', status: 'status' },
+        { limit: 0, starting_after: 'starting_after', status: 'provisioning' },
         { path: '/_stainless_unknown_path' },
       ),
     ).rejects.toThrow(Runloop.NotFoundError);
@@ -141,8 +141,8 @@ describe('resource devboxes', () => {
     const response = await client.devboxes.createTunnel('id', { port: 0 });
   });
 
-  test('diskSnapshots', async () => {
-    const responsePromise = client.devboxes.diskSnapshots();
+  test('deleteDiskSnapshot', async () => {
+    const responsePromise = client.devboxes.deleteDiskSnapshot('id');
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
     const response = await responsePromise;
@@ -152,20 +152,10 @@ describe('resource devboxes', () => {
     expect(dataAndResponse.response).toBe(rawResponse);
   });
 
-  test('diskSnapshots: request options instead of params are passed correctly', async () => {
-    // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
-    await expect(client.devboxes.diskSnapshots({ path: '/_stainless_unknown_path' })).rejects.toThrow(
-      Runloop.NotFoundError,
-    );
-  });
-
-  test('diskSnapshots: request options and params are passed correctly', async () => {
+  test('deleteDiskSnapshot: request options instead of params are passed correctly', async () => {
     // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
     await expect(
-      client.devboxes.diskSnapshots(
-        { limit: 0, starting_after: 'starting_after' },
-        { path: '/_stainless_unknown_path' },
-      ),
+      client.devboxes.deleteDiskSnapshot('id', { path: '/_stainless_unknown_path' }),
     ).rejects.toThrow(Runloop.NotFoundError);
   });
 
@@ -228,6 +218,34 @@ describe('resource devboxes', () => {
     );
   });
 
+  test('listDiskSnapshots', async () => {
+    const responsePromise = client.devboxes.listDiskSnapshots();
+    const rawResponse = await responsePromise.asResponse();
+    expect(rawResponse).toBeInstanceOf(Response);
+    const response = await responsePromise;
+    expect(response).not.toBeInstanceOf(Response);
+    const dataAndResponse = await responsePromise.withResponse();
+    expect(dataAndResponse.data).toBe(response);
+    expect(dataAndResponse.response).toBe(rawResponse);
+  });
+
+  test('listDiskSnapshots: request options instead of params are passed correctly', async () => {
+    // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
+    await expect(client.devboxes.listDiskSnapshots({ path: '/_stainless_unknown_path' })).rejects.toThrow(
+      Runloop.NotFoundError,
+    );
+  });
+
+  test('listDiskSnapshots: request options and params are passed correctly', async () => {
+    // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
+    await expect(
+      client.devboxes.listDiskSnapshots(
+        { devbox_id: 'devbox_id', limit: 0, starting_after: 'starting_after' },
+        { path: '/_stainless_unknown_path' },
+      ),
+    ).rejects.toThrow(Runloop.NotFoundError);
+  });
+
   test('readFileContents: only required params', async () => {
     const responsePromise = client.devboxes.readFileContents('id', { file_path: 'file_path' });
     const rawResponse = await responsePromise.asResponse();
@@ -241,6 +259,21 @@ describe('resource devboxes', () => {
 
   test('readFileContents: required and optional params', async () => {
     const response = await client.devboxes.readFileContents('id', { file_path: 'file_path' });
+  });
+
+  test('removeTunnel: only required params', async () => {
+    const responsePromise = client.devboxes.removeTunnel('id', { port: 0 });
+    const rawResponse = await responsePromise.asResponse();
+    expect(rawResponse).toBeInstanceOf(Response);
+    const response = await responsePromise;
+    expect(response).not.toBeInstanceOf(Response);
+    const dataAndResponse = await responsePromise.withResponse();
+    expect(dataAndResponse.data).toBe(response);
+    expect(dataAndResponse.response).toBe(rawResponse);
+  });
+
+  test('removeTunnel: required and optional params', async () => {
+    const response = await client.devboxes.removeTunnel('id', { port: 0 });
   });
 
   test('resume', async () => {
@@ -326,8 +359,8 @@ describe('resource devboxes', () => {
     );
   });
 
-  test('uploadFile', async () => {
-    const responsePromise = client.devboxes.uploadFile('id');
+  test('uploadFile: only required params', async () => {
+    const responsePromise = client.devboxes.uploadFile('id', { path: 'path' });
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
     const response = await responsePromise;
@@ -337,26 +370,18 @@ describe('resource devboxes', () => {
     expect(dataAndResponse.response).toBe(rawResponse);
   });
 
-  test('uploadFile: request options instead of params are passed correctly', async () => {
-    // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
-    await expect(client.devboxes.uploadFile('id', { path: '/_stainless_unknown_path' })).rejects.toThrow(
-      Runloop.NotFoundError,
-    );
+  test('uploadFile: required and optional params', async () => {
+    const response = await client.devboxes.uploadFile('id', {
+      path: 'path',
+      file: await toFile(Buffer.from('# my file contents'), 'README.md'),
+    });
   });
 
-  test('uploadFile: request options and params are passed correctly', async () => {
-    // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
-    await expect(
-      client.devboxes.uploadFile(
-        'id',
-        { file: await toFile(Buffer.from('# my file contents'), 'README.md'), path: 'path' },
-        { path: '/_stainless_unknown_path' },
-      ),
-    ).rejects.toThrow(Runloop.NotFoundError);
-  });
-
-  test('writeFile: only required params', async () => {
-    const responsePromise = client.devboxes.writeFile('id', { contents: 'contents', file_path: 'file_path' });
+  test('writeFileContents: only required params', async () => {
+    const responsePromise = client.devboxes.writeFileContents('id', {
+      contents: 'contents',
+      file_path: 'file_path',
+    });
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
     const response = await responsePromise;
@@ -366,7 +391,10 @@ describe('resource devboxes', () => {
     expect(dataAndResponse.response).toBe(rawResponse);
   });
 
-  test('writeFile: required and optional params', async () => {
-    const response = await client.devboxes.writeFile('id', { contents: 'contents', file_path: 'file_path' });
+  test('writeFileContents: required and optional params', async () => {
+    const response = await client.devboxes.writeFileContents('id', {
+      contents: 'contents',
+      file_path: 'file_path',
+    });
   });
 });
