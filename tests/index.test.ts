@@ -208,6 +208,16 @@ describe('instantiate client', () => {
   });
 });
 
+describe('idempotency', () => {
+  test('key can be set per-request', async () => {
+    const client = new Runloop({
+      baseURL: process.env['TEST_API_BASE_URL'] ?? 'http://127.0.0.1:4010',
+      bearerToken: 'My Bearer Token',
+    });
+    await client.blueprints.create({ name: 'name' }, { idempotencyKey: 'my-idempotency-key' });
+  });
+});
+
 describe('request building', () => {
   const client = new Runloop({ bearerToken: 'My Bearer Token' });
 

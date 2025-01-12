@@ -3,19 +3,89 @@
 import { APIResource } from '../../resource';
 import { isRequestOptions } from '../../core';
 import * as Core from '../../core';
-import * as CodeAPI from '../code';
 import * as Shared from '../shared';
 import * as ExecutionsAPI from './executions';
-import {
-  ExecutionExecuteAsyncParams,
-  ExecutionExecuteSyncParams,
-  ExecutionRetrieveParams,
-  Executions,
-} from './executions';
+import { ExecutionExecuteAsyncParams, ExecutionExecuteSyncParams, Executions } from './executions';
 import * as LogsAPI from './logs';
 import { DevboxLogsListView, LogListParams, Logs } from './logs';
 import * as LspAPI from './lsp';
-import { Lsp } from './lsp';
+import {
+  BaseCodeAction,
+  BaseCommand,
+  BaseDiagnostic,
+  BaseLocation,
+  BaseMarkupContent,
+  BaseParameterInformation,
+  BaseRange,
+  BaseSignature,
+  BaseWorkspaceEdit,
+  CodeActionApplicationResult,
+  CodeActionContext,
+  CodeActionKind,
+  CodeActionTriggerKind,
+  CodeActionsForDiagnosticRequestBody,
+  CodeActionsRequestBody,
+  CodeActionsResponse,
+  CodeDescription,
+  CodeSegmentInfoRequestBody,
+  CodeSegmentInfoResponse,
+  Diagnostic,
+  DiagnosticRelatedInformation,
+  DiagnosticSeverity,
+  DiagnosticTag,
+  DiagnosticsResponse,
+  DocumentSymbol,
+  DocumentSymbolResponse,
+  DocumentUri,
+  FileContentsResponse,
+  FileDefinitionRequestBody,
+  FileDefinitionResponse,
+  FilePath,
+  FileRequestBody,
+  FileUri,
+  FormattingResponse,
+  HealthStatusResponse,
+  Integer,
+  LSpAny,
+  Location,
+  Lsp,
+  LspApplyCodeActionParams,
+  LspCodeActionsParams,
+  LspDiagnosticsParams,
+  LspDocumentSymbolsParams,
+  LspFileDefinitionParams,
+  LspFileParams,
+  LspFilesResponse,
+  LspFormattingParams,
+  LspGetCodeActionsForDiagnosticParams,
+  LspGetCodeActionsForDiagnosticResponse,
+  LspGetCodeSegmentInfoParams,
+  LspGetSignatureHelpParams,
+  LspReferencesParams,
+  LspSetWatchDirectoryParams,
+  LspSetWatchDirectoryResponse,
+  Position,
+  Range,
+  RecordStringTextEditArray,
+  ReferencesRequestBody,
+  ReferencesResponse,
+  SetWatchDirectoryRequestBody,
+  SignatureHelpRequestBody,
+  SignatureHelpResponse,
+  SymbolKind,
+  SymbolTag,
+  SymbolType,
+  TextEdit,
+  URi,
+  Uinteger,
+  WatchedFileResponse,
+} from './lsp';
+import {
+  DevboxesCursorIDPage,
+  type DevboxesCursorIDPageParams,
+  DiskSnapshotsCursorIDPage,
+  type DiskSnapshotsCursorIDPageParams,
+} from '../../pagination';
 import { type Response } from '../../_shims/index';
 import { PollingOptions, poll } from '@runloop/api-client/lib/polling';
 import { RunloopError } from '../..';
@@ -30,8 +100,11 @@ export class Devboxes extends APIResource {
   executions: ExecutionsAPI.Executions = new ExecutionsAPI.Executions(this._client);
 
   /**
-   * Create a Devbox with the specified configuration. The Devbox will be created in
-   * the 'pending' state and will transition to 'running' once it is ready.
+   * Create a Devbox and begin the boot process. The Devbox will initially launch in
+   * the 'provisioning' state while Runloop allocates the necessary infrastructure.
+   * It will transition to the 'initializing' state while the booted Devbox runs any
+   * Runloop or user defined set up scripts. Finally, the Devbox will transition to
+   * the 'running' state when it is ready for use.
    */
   create(body?: DevboxCreateParams, options?: Core.RequestOptions): Core.APIPromise<DevboxView>;
   create(options?: Core.RequestOptions): Core.APIPromise<DevboxView>;
@@ -46,7 +119,7 @@ export class Devboxes extends APIResource {
   }
 
   /**
-   * Get a devbox by id. If the devbox does not exist, a 404 is returned.
+   * Get the latest details and status of a Devbox.
    */
   retrieve(id: string, options?: Core.RequestOptions): Core.APIPromise<DevboxView> {
     return this._client.get(`/v1/devboxes/${id}`, options);
@@ -92,30 +165,34 @@ export class Devboxes extends APIResource {
   }
 
   /**
-   * List all devboxes or filter by status. If no status is provided, all devboxes
-   * are returned.
+   * List all Devboxes while optionally filtering by status.
    */
-  list(query?: DevboxListParams, options?: Core.RequestOptions): Core.APIPromise<DevboxListView>;
-  list(options?: Core.RequestOptions): Core.APIPromise<DevboxListView>;
+  list(
+    query?: DevboxListParams,
+    options?: Core.RequestOptions,
+  ): Core.PagePromise<DevboxViewsDevboxesCursorIDPage, DevboxView>;
+  list(options?: Core.RequestOptions): Core.PagePromise<DevboxViewsDevboxesCursorIDPage, DevboxView>;
   list(
     query: DevboxListParams | Core.RequestOptions = {},
     options?: Core.RequestOptions,
-  ): Core.APIPromise<DevboxListView> {
+  ): Core.PagePromise<DevboxViewsDevboxesCursorIDPage, DevboxView> {
     if (isRequestOptions(query)) {
       return this.list({}, query);
     }
-    return this._client.get('/v1/devboxes', { query, ...options });
+    return this._client.getAPIList('/v1/devboxes', DevboxViewsDevboxesCursorIDPage, { query, ...options });
   }
 
   /**
-   * Create an SSH key for a devbox by id.
+   * Create an SSH key for a Devbox to enable remote access.
    */
   createSSHKey(id: string, options?: Core.RequestOptions): Core.APIPromise<DevboxCreateSSHKeyResponse> {
     return this._client.post(`/v1/devboxes/${id}/create_ssh_key`, options);
   }
 
   /**
-   * Create a tunnel to an available port on the Devbox.
+   * Create a live tunnel to an available port on the Devbox. Note the port must be
+   * made available using Devbox.create.availablePorts. Otherwise, the tunnel will
+   * not connect to any running processes on the Devbox.
    */
   createTunnel(
     id: string,
@@ -126,25 +203,15 @@ export class Devboxes extends APIResource {
   }
 
   /**
-   * List all snapshots of a devbox by id.
+   * Delete a previously taken disk snapshot of a Devbox.
    */
-  diskSnapshots(
-    query?: DevboxDiskSnapshotsParams,
-    options?: Core.RequestOptions,
-  ): Core.APIPromise<DevboxSnapshotListView>;
-  diskSnapshots(options?: Core.RequestOptions): Core.APIPromise<DevboxSnapshotListView>;
-  diskSnapshots(
-    query: DevboxDiskSnapshotsParams | Core.RequestOptions = {},
-    options?: Core.RequestOptions,
-  ): Core.APIPromise<DevboxSnapshotListView> {
-    if (isRequestOptions(query)) {
-      return this.diskSnapshots({}, query);
-    }
-    return this._client.get('/v1/devboxes/disk_snapshots', { query, ...options });
+  deleteDiskSnapshot(id: string, options?: Core.RequestOptions): Core.APIPromise<unknown> {
+    return this._client.post(`/v1/devboxes/disk_snapshots/${id}/delete`, options);
   }
 
   /**
-   * Download file contents to a file at path on the Devbox.
+   * Download file contents of any type (binary, text, etc) from a specified path on
+   * the Devbox.
    */
   downloadFile(
     id: string,
@@ -160,7 +227,8 @@ export class Devboxes extends APIResource {
   }
 
   /**
-   * Asynchronously execute a command on a devbox
+   * Execute the given command in the Devbox shell asynchronously and returns the
+   * execution that can be used to track the command's progress.
    */
   executeAsync(
     id: string,
@@ -171,7 +239,8 @@ export class Devboxes extends APIResource {
   }
 
   /**
-   * Synchronously execute a command on a devbox
+   * Execute a bash command in the Devbox shell, await the command completion and
+   * return the output.
    */
   executeSync(
     id: string,
@@ -182,14 +251,41 @@ export class Devboxes extends APIResource {
   }
 
   /**
-   * Keep alive a running devbox that is configured to shutdown on idle.
+   * Send a 'Keep Alive' signal to a running Devbox that is configured to shutdown on
+   * idle so the idle time resets.
    */
   keepAlive(id: string, options?: Core.RequestOptions): Core.APIPromise<unknown> {
     return this._client.post(`/v1/devboxes/${id}/keep_alive`, options);
   }
 
   /**
-   * Read file contents from a file on given Devbox.
+   * List all snapshots of a Devbox while optionally filtering by Devbox ID.
+   */
+  listDiskSnapshots(
+    query?: DevboxListDiskSnapshotsParams,
+    options?: Core.RequestOptions,
+  ): Core.PagePromise<DevboxSnapshotViewsDiskSnapshotsCursorIDPage, DevboxSnapshotView>;
+  listDiskSnapshots(
+    options?: Core.RequestOptions,
+  ): Core.PagePromise<DevboxSnapshotViewsDiskSnapshotsCursorIDPage, DevboxSnapshotView>;
+  listDiskSnapshots(
+    query: DevboxListDiskSnapshotsParams | Core.RequestOptions = {},
+    options?: Core.RequestOptions,
+  ): Core.PagePromise<DevboxSnapshotViewsDiskSnapshotsCursorIDPage, DevboxSnapshotView> {
+    if (isRequestOptions(query)) {
+      return this.listDiskSnapshots({}, query);
+    }
+    return this._client.getAPIList(
+      '/v1/devboxes/disk_snapshots',
+      DevboxSnapshotViewsDiskSnapshotsCursorIDPage,
+      { query, ...options },
+    );
+  }
+
+  /**
+   * Read file contents from a file on a Devbox as a UTF-8. Note 'downloadFile'
+   * should be used for large files (greater than 100MB). Returns the file contents
+   * as a UTF-8 string.
    */
   readFileContents(
     id: string,
@@ -204,21 +300,37 @@ export class Devboxes extends APIResource {
   }
 
   /**
-   * Resume a suspended devbox by id.
+   * Remove a previously opened tunnel on the Devbox.
+   */
+  removeTunnel(
+    id: string,
+    body: DevboxRemoveTunnelParams,
+    options?: Core.RequestOptions,
+  ): Core.APIPromise<DevboxTunnelView> {
+    return this._client.post(`/v1/devboxes/${id}/remove_tunnel`, { body, ...options });
+  }
+
+  /**
+   * Resume a suspended Devbox with the disk state captured as suspend time. Note
+   * that any previously running processes or daemons will need to be restarted using
+   * the Devbox shell tools.
    */
   resume(id: string, options?: Core.RequestOptions): Core.APIPromise<DevboxView> {
     return this._client.post(`/v1/devboxes/${id}/resume`, options);
   }
 
   /**
-   * Shutdown a running devbox by id. This will take the devbox out of service.
+   * Shutdown a running Devbox. This will permanently stop the Devbox. If you want to
+   * save the state of the Devbox, you should take a snapshot before shutting down or
+   * should suspend the Devbox instead of shutting down.
    */
   shutdown(id: string, options?: Core.RequestOptions): Core.APIPromise<DevboxView> {
     return this._client.post(`/v1/devboxes/${id}/shutdown`, options);
   }
 
   /**
-   * Create a filesystem snapshot of a devbox with the specified name and metadata.
+   * Create a disk snapshot of a devbox with the specified name and metadata to
+   * enable launching future Devboxes with the same disk state.
    */
   snapshotDisk(
     id: string,
@@ -238,29 +350,24 @@ export class Devboxes extends APIResource {
   }
 
   /**
-   * Suspend a devbox by id. This will take the devbox out of service.
+   * Suspend a running Devbox and create a disk snapshot to enable resuming the
+   * Devbox later with the same disk. Note this will not snapshot memory state such
+   * as running processes.
    */
   suspend(id: string, options?: Core.RequestOptions): Core.APIPromise<DevboxView> {
     return this._client.post(`/v1/devboxes/${id}/suspend`, options);
   }
 
   /**
-   * Upload file contents to a file at path on the Devbox.
+   * Upload file contents of any type (binary, text, etc) to a Devbox. Note this API
+   * is suitable for large files (larger than 100MB) and efficiently uploads files
+   * via multipart form data.
    */
   uploadFile(
     id: string,
-    body?: DevboxUploadFileParams,
-    options?: Core.RequestOptions,
-  ): Core.APIPromise<unknown>;
-  uploadFile(id: string, options?: Core.RequestOptions): Core.APIPromise<unknown>;
-  uploadFile(
-    id: string,
-    body: DevboxUploadFileParams | Core.RequestOptions = {},
+    body: DevboxUploadFileParams,
     options?: Core.RequestOptions,
   ): Core.APIPromise<unknown> {
-    if (isRequestOptions(body)) {
-      return this.uploadFile(id, {}, body);
-    }
     return this._client.post(
       `/v1/devboxes/${id}/upload_file`,
       Core.multipartFormRequestOptions({ body, ...options }),
@@ -268,14 +375,15 @@ export class Devboxes extends APIResource {
   }
 
   /**
-   * Write contents to a file at path on the Devbox.
+   * Write UTF-8 string contents to a file at path on the Devbox. Note for large
+   * files (larger than 100MB), the upload_file endpoint must be used.
    */
-  writeFile(
+  writeFileContents(
     id: string,
-    body: DevboxWriteFileParams,
+    body: DevboxWriteFileContentsParams,
     options?: Core.RequestOptions,
   ): Core.APIPromise<DevboxExecutionDetailView> {
-    return this._client.post(`/v1/devboxes/${id}/write_file`, { body, ...options });
+    return this._client.post(`/v1/devboxes/${id}/write_file_contents`, { body, ...options });
   }
 
   // Make an accessor for tools
@@ -283,6 +391,10 @@ export class Devboxes extends APIResource {
     return new DevboxTools(this);
   }
 }
+
+export class DevboxViewsDevboxesCursorIDPage extends DevboxesCursorIDPage<DevboxView> {}
+
+export class DevboxSnapshotViewsDiskSnapshotsCursorIDPage extends DiskSnapshotsCursorIDPage<DevboxSnapshotView> {}
 
 export interface DevboxAsyncExecutionDetailView {
   /**
@@ -304,24 +416,24 @@ export interface DevboxAsyncExecutionDetailView {
    * Exit code of command execution. This field will remain unset until the execution
    * has completed.
    */
-  exit_status?: number;
+  exit_status?: number | null;
 
   /**
    * Shell name.
    */
-  shell_name?: string;
+  shell_name?: string | null;
 
   /**
    * Standard error generated by command. This field will remain unset until the
    * execution has completed.
    */
-  stderr?: string;
+  stderr?: string | null;
 
   /**
    * Standard out generated by command. This field will remain unset until the
    * execution has completed.
    */
-  stdout?: string;
+  stdout?: string | null;
 }
 
 export interface DevboxExecutionDetailView {
@@ -348,7 +460,7 @@ export interface DevboxExecutionDetailView {
   /**
    * Shell name.
    */
-  shell_name?: string;
+  shell_name?: string | null;
 }
 
 export interface DevboxListView {
@@ -385,19 +497,19 @@ export interface DevboxSnapshotView {
   create_time_ms: number;
 
   /**
-   * metadata associated with the snapshot.
+   * User defined metadata associated with the snapshot.
    */
   metadata: Record<string, string>;
 
   /**
-   * The source devbox identifier.
+   * The source Devbox ID this snapshot was created from.
    */
-  sourceDevboxId: string;
+  source_devbox_id: string;
 
   /**
    * (Optional) The custom name of the snapshot.
    */
-  name?: string;
+  name?: string | null;
 }
 
 export interface DevboxTunnelView {
@@ -417,9 +529,14 @@ export interface DevboxTunnelView {
   url: string;
 }
 
+/**
+ * A Devbox represents a virtual development environment. It is an isolated sandbox
+ * that can be given to agents and used to run arbitrary code such as AI generated
+ * code.
+ */
 export interface DevboxView {
   /**
-   * The id of the Devbox.
+   * The ID of the Devbox.
    */
   id: string;
 
@@ -427,16 +544,6 @@ export interface DevboxView {
    * Creation time of the Devbox (Unix timestamp milliseconds).
    */
   create_time_ms: number;
-
-  /**
-   * The initiator ID of the devbox.
-   */
-  initiator_id: string;
-
-  /**
-   * The initiator of the devbox.
-   */
-  initiator_type: 'unknown' | 'api' | 'invocation';
 
   /**
    * The launch parameters used to create the Devbox.
@@ -462,34 +569,49 @@ export interface DevboxView {
     | 'shutdown';
 
   /**
-   * The Blueprint ID used in creation of the Devbox, if any.
+   * The Blueprint ID used in creation of the Devbox, if the devbox was created from
+   * a Blueprint.
    */
-  blueprint_id?: string;
+  blueprint_id?: string | null;
 
   /**
-   * The time the Devbox finished execution (Unix timestamp milliseconds).
+   * The time the Devbox finished execution (Unix timestamp milliseconds). Present if
+   * the Devbox is in a terminal state.
    */
-  end_time_ms?: number;
+  end_time_ms?: number | null;
 
   /**
-   * The failure reason if the Devbox failed, if any.
+   * The failure reason if the Devbox failed, if the Devbox has a 'failure' status.
    */
-  failure_reason?: 'out_of_memory' | 'out_of_disk' | 'execution_failed';
+  failure_reason?: 'out_of_memory' | 'out_of_disk' | 'execution_failed' | null;
 
   /**
    * The name of the Devbox.
    */
-  name?: string;
+  name?: string | null;
 
   /**
-   * The shutdown reason if the Devbox shutdown, if any.
+   * The shutdown reason if the Devbox shutdown, if the Devbox has a 'shutdown'
+   * status.
    */
-  shutdown_reason?: 'api_shutdown' | 'keep_alive_timeout' | 'entrypoint_exit' | 'idle' | 'lambda_lifecycle';
+  shutdown_reason?:
+    | 'api_shutdown'
+    | 'keep_alive_timeout'
+    | 'entrypoint_exit'
+    | 'idle'
+    | 'lambda_lifecycle'
+    | null;
+
+  /**
+   * The Snapshot ID used in creation of the Devbox, if the devbox was created from a
+   * Snapshot.
+   */
+  snapshot_id?: string | null;
 }
 
 export interface DevboxCreateSSHKeyResponse {
   /**
-   * The id of the Devbox.
+   * The ID of the Devbox.
    */
   id: string;
 
@@ -499,10 +621,12 @@ export interface DevboxCreateSSHKeyResponse {
   ssh_private_key: string;
 
   /**
-   * The url of the Devbox.
+   * The host url of the Devbox that can be used for SSH.
    */
   url: string;
 }
+
+export type DevboxDeleteDiskSnapshotResponse = unknown;
 
 export type DevboxKeepAliveResponse = unknown;
 
@@ -512,80 +636,82 @@ export type DevboxUploadFileResponse = unknown;
 
 export interface DevboxCreateParams {
   /**
-   * (Optional) Blueprint to use for the Devbox. If none set, the Devbox will be
-   * created with the default Runloop Devbox image.
+   * Blueprint ID to use for the Devbox. If none set, the Devbox will be created with
+   * the default Runloop Devbox image. Only one of (Snapshot ID, Blueprint ID,
+   * Blueprint name) should be specified.
    */
-  blueprint_id?: string;
+  blueprint_id?: string | null;
 
   /**
-   * (Optional) Name of Blueprint to use for the Devbox. When set, this will load the
-   * latest successfully built Blueprint with the given name.
+   * Name of Blueprint to use for the Devbox. When set, this will load the latest
+   * successfully built Blueprint with the given name. Only one of (Snapshot ID,
+   * Blueprint ID, Blueprint name) should be specified.
    */
-  blueprint_name?: string;
+  blueprint_name?: string | null;
 
   /**
    * A list of code mounts to be included in the Devbox.
    */
-  code_mounts?: Array<CodeAPI.CodeMountParameters>;
+  code_mounts?: Array<Shared.CodeMountParameters> | null;
 
   /**
    * (Optional) When specified, the Devbox will run this script as its main
    * executable. The devbox lifecycle will be bound to entrypoint, shutting down when
    * the process is complete.
    */
-  entrypoint?: string;
+  entrypoint?: string | null;
 
   /**
    * (Optional) Environment variables used to configure your Devbox.
    */
-  environment_variables?: Record<string, string>;
+  environment_variables?: Record<string, string> | null;
 
   /**
    * (Optional) Map of paths and file contents to write before setup..
    */
-  file_mounts?: Record<string, string>;
+  file_mounts?: Record<string, string> | null;
 
   /**
    * Parameters to configure the resources and launch time behavior of the Devbox.
    */
-  launch_parameters?: Shared.LaunchParameters;
+  launch_parameters?: Shared.LaunchParameters | null;
 
   /**
    * User defined metadata to attach to the devbox for organization.
    */
-  metadata?: Record<string, string>;
+  metadata?: Record<string, string> | null;
 
   /**
    * (Optional) A user specified name to give the Devbox.
    */
-  name?: string;
+  name?: string | null;
 
   /**
-   * Reference to prebuilt Blueprint.
+   * Reference to prebuilt Blueprint to create the Devbox from. Should not be used
+   * together with (Snapshot ID, Blueprint ID, or Blueprint name).
    */
-  prebuilt?: string;
+  prebuilt?: string | null;
 
   /**
-   * Snapshot ID to use for the Devbox.
+   * Snapshot ID to use for the Devbox. Only one of (Snapshot ID, Blueprint ID,
+   * Blueprint name) should be specified.
    */
-  snapshot_id?: string;
+  snapshot_id?: string | null;
 }
 
-export interface DevboxListParams {
-  /**
-   * Page Limit
-   */
-  limit?: number;
-
-  /**
-   * Load the next page starting after the given token.
-   */
-  starting_after?: string;
-
+export interface DevboxListParams extends DevboxesCursorIDPageParams {
   /**
    * Filter by status
    */
-  status?: string;
+  status?:
+    | 'provisioning'
+    | 'initializing'
+    | 'running'
+    | 'suspending'
+    | 'suspended'
+    | 'resuming'
+    | 'failure'
+    | 'shutdown';
 }
 
 export interface DevboxCreateTunnelParams {
@@ -595,92 +721,113 @@ export interface DevboxCreateTunnelParams {
   port: number;
 }
 
-export interface DevboxDiskSnapshotsParams {
-  /**
-   * Page Limit
-   */
-  limit?: number;
-
-  /**
-   * Load the next page starting after the given token.
-   */
-  starting_after?: string;
-}
-
 export interface DevboxDownloadFileParams {
   /**
-   * The path on the devbox to read the file
+   * The path on the Devbox filesystem to read the file from. Path is relative to
+   * user home directory.
    */
   path: string;
 }
 
 export interface DevboxExecuteAsyncParams {
   /**
-   * The command to execute on the Devbox.
+   * The command to execute via the Devbox shell. By default, commands are run from
+   * the user home directory unless shell_name is specified. If shell_name is
+   * specified the command is run from the directory based on the recent state of the
+   * persistent shell.
    */
   command: string;
 
   /**
-   * Which named shell to run the command in.
+   * The name of the persistent shell to create or use if already created. When using
+   * a persistent shell, the command will run from the directory at the end of the
+   * previous command and environment variables will be preserved.
    */
-  shell_name?: string;
+  shell_name?: string | null;
 }
 
 export interface DevboxExecuteSyncParams {
   /**
-   * The command to execute on the Devbox.
+   * The command to execute via the Devbox shell. By default, commands are run from
+   * the user home directory unless shell_name is specified. If shell_name is
+   * specified the command is run from the directory based on the recent state of the
+   * persistent shell.
    */
   command: string;
 
   /**
-   * Which named shell to run the command in.
+   * The name of the persistent shell to create or use if already created. When using
+   * a persistent shell, the command will run from the directory at the end of the
+   * previous command and environment variables will be preserved.
    */
-  shell_name?: string;
+  shell_name?: string | null;
+}
+
+export interface DevboxListDiskSnapshotsParams extends DiskSnapshotsCursorIDPageParams {
+  /**
+   * Devbox ID to filter by.
+   */
+  devbox_id?: string;
 }
 
 export interface DevboxReadFileContentsParams {
   /**
-   * The path of the file to read.
+   * The path on the Devbox filesystem to read the file from. Path is relative to
+   * user home directory.
    */
   file_path: string;
+}
+
+export interface DevboxRemoveTunnelParams {
+  /**
+   * Devbox port that tunnel will expose.
+   */
+  port: number;
 }
 
 export interface DevboxSnapshotDiskParams {
   /**
    * (Optional) Metadata used to describe the snapshot
    */
-  metadata?: Record<string, string>;
+  metadata?: Record<string, string> | null;
 
   /**
    * (Optional) A user specified name to give the snapshot
    */
-  name?: string;
+  name?: string | null;
 }
 
 export interface DevboxUploadFileParams {
-  file?: Core.Uploadable;
-
-  path?: string;
-}
-
-export interface DevboxUploadFileParams {
-  file?: Core.Uploadable;
-
-  path?: string;
-}
-
-export interface DevboxWriteFileParams {
   /**
-   * The contents to write to file.
+   * The path to write the file to on the Devbox. Path is relative to user home
+   * directory.
+   */
+  path: string;
+
+  file?: Core.Uploadable;
+}
+
+export interface DevboxUploadFileParams {
+  file?: Core.Uploadable;
+
+  path?: string;
+}
+
+export interface DevboxWriteFileContentsParams {
+  /**
+   * The UTF-8 string contents to write to the file.
    */
   contents: string;
 
   /**
-   * The path of the file to write.
+   * The path to write the file to on the Devbox. Path is relative to user home
+   * directory.
    */
   file_path: string;
 }
 
+Devboxes.DevboxViewsDevboxesCursorIDPage = DevboxViewsDevboxesCursorIDPage;
+Devboxes.DevboxSnapshotViewsDiskSnapshotsCursorIDPage = DevboxSnapshotViewsDiskSnapshotsCursorIDPage;
 Devboxes.Lsp = Lsp;
 Devboxes.Logs = Logs;
 Devboxes.Executions = Executions;
@@ -695,29 +842,102 @@ export declare namespace Devboxes {
     type DevboxTunnelView as DevboxTunnelView,
     type DevboxView as DevboxView,
     type DevboxCreateSSHKeyResponse as DevboxCreateSSHKeyResponse,
+    type DevboxDeleteDiskSnapshotResponse as DevboxDeleteDiskSnapshotResponse,
     type DevboxKeepAliveResponse as DevboxKeepAliveResponse,
     type DevboxReadFileContentsResponse as DevboxReadFileContentsResponse,
     type DevboxUploadFileResponse as DevboxUploadFileResponse,
+    DevboxViewsDevboxesCursorIDPage as DevboxViewsDevboxesCursorIDPage,
+    DevboxSnapshotViewsDiskSnapshotsCursorIDPage as DevboxSnapshotViewsDiskSnapshotsCursorIDPage,
     type DevboxCreateParams as DevboxCreateParams,
     type DevboxListParams as DevboxListParams,
     type DevboxCreateTunnelParams as DevboxCreateTunnelParams,
-    type DevboxDiskSnapshotsParams as DevboxDiskSnapshotsParams,
     type DevboxDownloadFileParams as DevboxDownloadFileParams,
     type DevboxExecuteAsyncParams as DevboxExecuteAsyncParams,
     type DevboxExecuteSyncParams as DevboxExecuteSyncParams,
+    type DevboxListDiskSnapshotsParams as DevboxListDiskSnapshotsParams,
     type DevboxReadFileContentsParams as DevboxReadFileContentsParams,
+    type DevboxRemoveTunnelParams as DevboxRemoveTunnelParams,
     type DevboxSnapshotDiskParams as DevboxSnapshotDiskParams,
     type DevboxUploadFileParams as DevboxUploadFileParams,
-    type DevboxWriteFileParams as DevboxWriteFileParams,
+    type DevboxWriteFileContentsParams as DevboxWriteFileContentsParams,
   };
 
-  export { Lsp as Lsp };
+  export {
+    Lsp as Lsp,
+    type BaseCodeAction as BaseCodeAction,
+    type BaseCommand as BaseCommand,
+    type BaseDiagnostic as BaseDiagnostic,
+    type BaseLocation as BaseLocation,
+    type BaseMarkupContent as BaseMarkupContent,
+    type BaseParameterInformation as BaseParameterInformation,
+    type BaseRange as BaseRange,
+    type BaseSignature as BaseSignature,
+    type BaseWorkspaceEdit as BaseWorkspaceEdit,
+    type CodeActionApplicationResult as CodeActionApplicationResult,
+    type CodeActionContext as CodeActionContext,
+    type CodeActionKind as CodeActionKind,
+    type CodeActionsForDiagnosticRequestBody as CodeActionsForDiagnosticRequestBody,
+    type CodeActionsRequestBody as CodeActionsRequestBody,
+    type CodeActionsResponse as CodeActionsResponse,
+    type CodeActionTriggerKind as CodeActionTriggerKind,
+    type CodeDescription as CodeDescription,
+    type CodeSegmentInfoRequestBody as CodeSegmentInfoRequestBody,
+    type CodeSegmentInfoResponse as CodeSegmentInfoResponse,
+    type Diagnostic as Diagnostic,
+    type DiagnosticRelatedInformation as DiagnosticRelatedInformation,
+    type DiagnosticSeverity as DiagnosticSeverity,
+    type DiagnosticsResponse as DiagnosticsResponse,
+    type DiagnosticTag as DiagnosticTag,
+    type DocumentSymbol as DocumentSymbol,
+    type DocumentSymbolResponse as DocumentSymbolResponse,
+    type DocumentUri as DocumentUri,
+    type FileContentsResponse as FileContentsResponse,
+    type FileDefinitionRequestBody as FileDefinitionRequestBody,
+    type FileDefinitionResponse as FileDefinitionResponse,
+    type FilePath as FilePath,
+    type FileRequestBody as FileRequestBody,
+    type FileUri as FileUri,
+    type FormattingResponse as FormattingResponse,
+    type HealthStatusResponse as HealthStatusResponse,
+    type Integer as Integer,
+    type Location as Location,
+    type LSpAny as LSpAny,
+    type Position as Position,
+    type Range as Range,
+    type RecordStringTextEditArray as RecordStringTextEditArray,
+    type ReferencesRequestBody as ReferencesRequestBody,
+    type ReferencesResponse as ReferencesResponse,
+    type SetWatchDirectoryRequestBody as SetWatchDirectoryRequestBody,
+    type SignatureHelpRequestBody as SignatureHelpRequestBody,
+    type SignatureHelpResponse as SignatureHelpResponse,
+    type SymbolKind as SymbolKind,
+    type SymbolTag as SymbolTag,
+    type SymbolType as SymbolType,
+    type TextEdit as TextEdit,
+    type Uinteger as Uinteger,
+    type URi as URi,
+    type WatchedFileResponse as WatchedFileResponse,
+    type LspFilesResponse as LspFilesResponse,
+    type LspGetCodeActionsForDiagnosticResponse as LspGetCodeActionsForDiagnosticResponse,
+    type LspSetWatchDirectoryResponse as LspSetWatchDirectoryResponse,
+    type LspApplyCodeActionParams as LspApplyCodeActionParams,
+    type LspCodeActionsParams as LspCodeActionsParams,
+    type LspDiagnosticsParams as LspDiagnosticsParams,
+    type LspDocumentSymbolsParams as LspDocumentSymbolsParams,
+    type LspFileParams as LspFileParams,
+    type LspFileDefinitionParams as LspFileDefinitionParams,
+    type LspFormattingParams as LspFormattingParams,
+    type LspGetCodeActionsForDiagnosticParams as LspGetCodeActionsForDiagnosticParams,
+    type LspGetCodeSegmentInfoParams as LspGetCodeSegmentInfoParams,
+    type LspGetSignatureHelpParams as LspGetSignatureHelpParams,
+    type LspReferencesParams as LspReferencesParams,
+    type LspSetWatchDirectoryParams as LspSetWatchDirectoryParams,
+  };
 
   export { Logs as Logs, type DevboxLogsListView as DevboxLogsListView, type LogListParams as LogListParams };
 
   export {
     Executions as Executions,
-    type ExecutionRetrieveParams as ExecutionRetrieveParams,
     type ExecutionExecuteAsyncParams as ExecutionExecuteAsyncParams,
     type ExecutionExecuteSyncParams as ExecutionExecuteSyncParams,
   };

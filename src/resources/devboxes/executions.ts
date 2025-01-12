@@ -34,7 +34,8 @@ export class Executions extends APIResource {
   }
 
   /**
-   * Asynchronously execute a command on a devbox
+   * Execute the given command in the Devbox shell asynchronously and returns the
+   * execution that can be used to track the command's progress.
    */
   executeAsync(
     id: string,
@@ -70,7 +71,8 @@ export class Executions extends APIResource {
   }
 
   /**
-   * Synchronously execute a command on a devbox
+   * Execute a bash command in the Devbox shell, await the command completion and
+   * return the output.
    */
   executeSync(
     id: string,
@@ -101,31 +103,40 @@ export interface ExecutionRetrieveParams {
 
 export interface ExecutionExecuteAsyncParams {
   /**
-   * The command to execute on the Devbox.
+   * The command to execute via the Devbox shell. By default, commands are run from
+   * the user home directory unless shell_name is specified. If shell_name is
+   * specified the command is run from the directory based on the recent state of the
+   * persistent shell.
    */
   command: string;
 
   /**
-   * Which named shell to run the command in.
+   * The name of the persistent shell to create or use if already created. When using
+   * a persistent shell, the command will run from the directory at the end of the
+   * previous command and environment variables will be preserved.
    */
-  shell_name?: string;
+  shell_name?: string | null;
 }
 
 export interface ExecutionExecuteSyncParams {
   /**
-   * The command to execute on the Devbox.
+   * The command to execute via the Devbox shell. By default, commands are run from
+   * the user home directory unless shell_name is specified. If shell_name is
+   * specified the command is run from the directory based on the recent state of the
+   * persistent shell.
    */
   command: string;
 
   /**
-   * Which named shell to run the command in.
+   * The name of the persistent shell to create or use if already created. When using
+   * a persistent shell, the command will run from the directory at the end of the
+   * previous command and environment variables will be preserved.
    */
-  shell_name?: string;
+  shell_name?: string | null;
 }
 
 export declare namespace Executions {
   export {
-    type ExecutionRetrieveParams as ExecutionRetrieveParams,
     type ExecutionExecuteAsyncParams as ExecutionExecuteAsyncParams,
     type ExecutionExecuteSyncParams as ExecutionExecuteSyncParams,
   };

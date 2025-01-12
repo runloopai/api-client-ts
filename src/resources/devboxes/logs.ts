@@ -6,7 +6,7 @@ import * as Core from '../../core';
 
 export class Logs extends APIResource {
   /**
-   * Get all logs from a Devbox by id.
+   * Get all logs from a running or completed Devbox.
    */
   list(id: string, query?: LogListParams, options?: Core.RequestOptions): Core.APIPromise<DevboxLogsListView>;
   list(id: string, options?: Core.RequestOptions): Core.APIPromise<DevboxLogsListView>;
@@ -49,33 +49,33 @@ export namespace DevboxLogsListView {
     /**
      * The Command Executed
      */
-    cmd?: string;
+    cmd?: string | null;
 
     /**
      * Identifier of the associated command the log is sourced from.
      */
-    cmd_id?: string;
+    cmd_id?: string | null;
 
     /**
      * The Exit Code of the command
      */
-    exit_code?: number;
+    exit_code?: number | null;
 
     /**
      * Log line message.
      */
-    message?: string;
+    message?: string | null;
 
     /**
      * The Shell name the cmd executed in.
      */
-    shell_name?: string;
+    shell_name?: string | null;
   }
 }
 
 export interface LogListParams {
   /**
-   * Id of execution to filter logs by.
+   * ID of execution to filter logs by.
    */
   execution_id?: string;
 
