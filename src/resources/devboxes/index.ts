@@ -29,7 +29,12 @@ export {
   type DevboxUploadFileParams,
   type DevboxWriteFileContentsParams,
 } from './devboxes';
-export { Executions, type ExecutionExecuteAsyncParams, type ExecutionExecuteSyncParams } from './executions';
+export {
+  Executions,
+  type ExecutionRetrieveParams,
+  type ExecutionExecuteAsyncParams,
+  type ExecutionExecuteSyncParams,
+} from './executions';
 export { Logs, type DevboxLogsListView, type LogListParams } from './logs';
 export {
   Lsp,

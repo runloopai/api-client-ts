@@ -8,29 +8,30 @@ import { PollingOptions, poll } from '@runloop/api-client/lib/polling';
 
 export class Executions extends APIResource {
   /**
-   * Get status of an execution on a devbox.
+   * Get the latest status of a previously launched asynchronous execuction including
+   * stdout/error and the exit code if complete.
    */
   retrieve(
-    id: string,
+    devboxId: string,
     executionId: string,
     query?: ExecutionRetrieveParams,
     options?: Core.RequestOptions,
   ): Core.APIPromise<DevboxesAPI.DevboxAsyncExecutionDetailView>;
   retrieve(
-    id: string,
+    devboxId: string,
     executionId: string,
     options?: Core.RequestOptions,
   ): Core.APIPromise<DevboxesAPI.DevboxAsyncExecutionDetailView>;
   retrieve(
-    id: string,
+    devboxId: string,
     executionId: string,
     query: ExecutionRetrieveParams | Core.RequestOptions = {},
     options?: Core.RequestOptions,
   ): Core.APIPromise<DevboxesAPI.DevboxAsyncExecutionDetailView> {
     if (isRequestOptions(query)) {
-      return this.retrieve(id, executionId, {}, query);
+      return this.retrieve(devboxId, executionId, {}, query);
     }
-    return this._client.get(`/v1/devboxes/${id}/executions/${executionId}`, { query, ...options });
+    return this._client.get(`/v1/devboxes/${devboxId}/executions/${executionId}`, { query, ...options });
   }
 
   /**
@@ -83,14 +84,15 @@ export class Executions extends APIResource {
   }
 
   /**
-   * Kill an asynchronous execution currently running on a devbox
+   * Kill a previously launched asynchronous execution if it is still running by
+   * killing the launched process.
    */
   kill(
-    id: string,
+    devboxId: string,
     executionId: string,
     options?: Core.RequestOptions,
   ): Core.APIPromise<DevboxesAPI.DevboxAsyncExecutionDetailView> {
-    return this._client.post(`/v1/devboxes/${id}/executions/${executionId}/kill`, options);
+    return this._client.post(`/v1/devboxes/${devboxId}/executions/${executionId}/kill`, options);
   }
 }
 
@@ -137,6 +139,7 @@ export interface ExecutionExecuteSyncParams {
 
 export declare namespace Executions {
   export {
+    type ExecutionRetrieveParams as ExecutionRetrieveParams,
     type ExecutionExecuteAsyncParams as ExecutionExecuteAsyncParams,
     type ExecutionExecuteSyncParams as ExecutionExecuteSyncParams,
   };

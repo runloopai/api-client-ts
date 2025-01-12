@@ -5,7 +5,12 @@ import { isRequestOptions } from '../../core';
 import * as Core from '../../core';
 import * as Shared from '../shared';
 import * as ExecutionsAPI from './executions';
-import { ExecutionExecuteAsyncParams, ExecutionExecuteSyncParams, Executions } from './executions';
+import {
+  ExecutionExecuteAsyncParams,
+  ExecutionExecuteSyncParams,
+  ExecutionRetrieveParams,
+  Executions,
+} from './executions';
 import * as LogsAPI from './logs';
 import { DevboxLogsListView, LogListParams, Logs } from './logs';
 import * as LspAPI from './lsp';
@@ -938,6 +943,7 @@ export declare namespace Devboxes {
 
   export {
     Executions as Executions,
+    type ExecutionRetrieveParams as ExecutionRetrieveParams,
     type ExecutionExecuteAsyncParams as ExecutionExecuteAsyncParams,
     type ExecutionExecuteSyncParams as ExecutionExecuteSyncParams,
   };
