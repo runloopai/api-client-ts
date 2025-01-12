@@ -3,44 +3,50 @@
 import { APIResource } from '../resource';
 import { isRequestOptions } from '../core';
 import * as Core from '../core';
-import * as CodeAPI from './code';
 import * as Shared from './shared';
+import { BlueprintsCursorIDPage, type BlueprintsCursorIDPageParams } from '../pagination';
 
 export class Blueprints extends APIResource {
   /**
-   * Build a Blueprint with the specified configuration. The Blueprint will begin
-   * building upon create, ' and will transition to 'building_complete' once it is
-   * ready.
+   * Starts build of custom defined container Blueprint. The Blueprint will begin in
+   * the 'provisioning' step and transition to the 'building' step once it is
+   * selected off the build queue., Upon build complete it will transition to
+   * 'building_complete' if the build is successful.
    */
   create(body: BlueprintCreateParams, options?: Core.RequestOptions): Core.APIPromise<BlueprintView> {
     return this._client.post('/v1/blueprints', { body, ...options });
   }
 
   /**
-   * Get a previously built Blueprint.
+   * Get the details of a previously created Blueprint including the build status.
    */
   retrieve(id: string, options?: Core.RequestOptions): Core.APIPromise<BlueprintView> {
     return this._client.get(`/v1/blueprints/${id}`, options);
   }
 
   /**
-   * List all blueprints or filter by name. If no status is provided, all blueprints
-   * are returned.
+   * List all Blueprints or filter by name.
    */
-  list(query?: BlueprintListParams, options?: Core.RequestOptions): Core.APIPromise<BlueprintListView>;
-  list(options?: Core.RequestOptions): Core.APIPromise<BlueprintListView>;
+  list(
+    query?: BlueprintListParams,
+    options?: Core.RequestOptions,
+  ): Core.PagePromise<BlueprintViewsBlueprintsCursorIDPage, BlueprintView>;
+  list(options?: Core.RequestOptions): Core.PagePromise<BlueprintViewsBlueprintsCursorIDPage, BlueprintView>;
   list(
     query: BlueprintListParams | Core.RequestOptions = {},
     options?: Core.RequestOptions,
-  ): Core.APIPromise<BlueprintListView> {
+  ): Core.PagePromise<BlueprintViewsBlueprintsCursorIDPage, BlueprintView> {
     if (isRequestOptions(query)) {
       return this.list({}, query);
     }
-    return this._client.get('/v1/blueprints', { query, ...options });
+    return this._client.getAPIList('/v1/blueprints', BlueprintViewsBlueprintsCursorIDPage, {
+      query,
+      ...options,
+    });
   }
 
   /**
-   * Get Blueprint build logs.
+   * Get all logs from the building of a Blueprint.
    */
   logs(id: string, options?: Core.RequestOptions): Core.APIPromise<BlueprintBuildLogsListView> {
     return this._client.get(`/v1/blueprints/${id}/logs`, options);
@@ -48,7 +54,7 @@ export class Blueprints extends APIResource {
 
   /**
    * Preview building a Blueprint with the specified configuration. You can take the
-   * resulting Dockerfile and test out your build.
+   * resulting Dockerfile and test out your build using any local docker tooling.
    */
   preview(
     body: BlueprintPreviewParams,
@@ -57,6 +63,8 @@ export class Blueprints extends APIResource {
     return this._client.post('/v1/blueprints/preview', { body, ...options });
   }
 }
+
+export class BlueprintViewsBlueprintsCursorIDPage extends BlueprintsCursorIDPage<BlueprintView> {}
 
 export interface BlueprintBuildLog {
   /**
@@ -96,27 +104,27 @@ export interface BlueprintBuildParameters {
   /**
    * A list of code mounts to be included in the Blueprint.
    */
-  code_mounts?: Array<CodeAPI.CodeMountParameters>;
+  code_mounts?: Array<Shared.CodeMountParameters> | null;
 
   /**
    * Dockerfile contents to be used to build the Blueprint.
    */
-  dockerfile?: string;
+  dockerfile?: string | null;
 
   /**
    * (Optional) Map of paths and file contents to write before setup..
    */
-  file_mounts?: Record<string, string>;
+  file_mounts?: Record<string, string> | null;
 
   /**
    * Parameters to configure your Devbox at launch time.
    */
-  launch_parameters?: Shared.LaunchParameters;
+  launch_parameters?: Shared.LaunchParameters | null;
 
   /**
    * A list of commands to run to set up your system.
    */
-  system_setup_commands?: Array<string>;
+  system_setup_commands?: Array<string> | null;
 }
 
 export interface BlueprintListView {
@@ -137,6 +145,11 @@ export interface BlueprintPreviewView {
   dockerfile: string;
 }
 
+/**
+ * Blueprints are ways to create customized starting points for Devboxes. They
+ * allow you to define custom starting points for Devboxes such that environment
+ * set up can be cached to improve Devbox boot times.
+ */
 export interface BlueprintView {
   /**
    * The id of the Blueprint.
@@ -166,7 +179,7 @@ export interface BlueprintView {
   /**
    * The failure reason if the Blueprint build failed, if any.
    */
-  failure_reason?: 'out_of_memory' | 'out_of_disk' | 'build_failed';
+  failure_reason?: 'out_of_memory' | 'out_of_disk' | 'build_failed' | null;
 }
 
 export interface BlueprintCreateParams {
@@ -178,44 +191,34 @@ export interface BlueprintCreateParams {
   /**
    * A list of code mounts to be included in the Blueprint.
    */
-  code_mounts?: Array<CodeAPI.CodeMountParameters>;
+  code_mounts?: Array<Shared.CodeMountParameters> | null;
 
   /**
    * Dockerfile contents to be used to build the Blueprint.
    */
-  dockerfile?: string;
+  dockerfile?: string | null;
 
   /**
    * (Optional) Map of paths and file contents to write before setup..
    */
-  file_mounts?: Record<string, string>;
+  file_mounts?: Record<string, string> | null;
 
   /**
    * Parameters to configure your Devbox at launch time.
    */
-  launch_parameters?: Shared.LaunchParameters;
+  launch_parameters?: Shared.LaunchParameters | null;
 
   /**
    * A list of commands to run to set up your system.
    */
-  system_setup_commands?: Array<string>;
+  system_setup_commands?: Array<string> | null;
 }
 
-export interface BlueprintListParams {
-  /**
-   * Page Limit
-   */
-  limit?: number;
-
+export interface BlueprintListParams extends BlueprintsCursorIDPageParams {
   /**
    * Filter by name
    */
   name?: string;
-
-  /**
-   * Load the next page starting after the given token.
-   */
-  starting_after?: string;
 }
 
 export interface BlueprintPreviewParams {
@@ -227,28 +230,30 @@ export interface BlueprintPreviewParams {
   /**
    * A list of code mounts to be included in the Blueprint.
    */
-  code_mounts?: Array<CodeAPI.CodeMountParameters>;
+  code_mounts?: Array<Shared.CodeMountParameters> | null;
 
   /**
    * Dockerfile contents to be used to build the Blueprint.
    */
-  dockerfile?: string;
+  dockerfile?: string | null;
 
   /**
    * (Optional) Map of paths and file contents to write before setup..
    */
-  file_mounts?: Record<string, string>;
+  file_mounts?: Record<string, string> | null;
 
   /**
    * Parameters to configure your Devbox at launch time.
    */
-  launch_parameters?: Shared.LaunchParameters;
+  launch_parameters?: Shared.LaunchParameters | null;
 
   /**
    * A list of commands to run to set up your system.
    */
-  system_setup_commands?: Array<string>;
+  system_setup_commands?: Array<string> | null;
 }
+
+Blueprints.BlueprintViewsBlueprintsCursorIDPage = BlueprintViewsBlueprintsCursorIDPage;
 
 export declare namespace Blueprints {
   export {
@@ -258,6 +263,7 @@ export declare namespace Blueprints {
     type BlueprintListView as BlueprintListView,
     type BlueprintPreviewView as BlueprintPreviewView,
     type BlueprintView as BlueprintView,
+    BlueprintViewsBlueprintsCursorIDPage as BlueprintViewsBlueprintsCursorIDPage,
     type BlueprintCreateParams as BlueprintCreateParams,
     type BlueprintListParams as BlueprintListParams,
     type BlueprintPreviewParams as BlueprintPreviewParams,

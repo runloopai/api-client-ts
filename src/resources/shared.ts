@@ -12,101 +12,60 @@ export interface AfterIdle {
   on_idle: 'shutdown' | 'suspend';
 }
 
-export interface FunctionInvocationExecutionDetailView {
+export interface CodeMountParameters {
   /**
-   * Unique ID of the invocation.
+   * The name of the repo to mount. By default, code will be mounted at
+   * /home/user/{repo_name}s.
    */
-  id?: string;
-
-  /**
-   * End time of the invocation.
-   */
-  end_time_ms?: number;
-
-  error?: string;
+  repo_name: string;
 
   /**
-   * Unique name of the function.
+   * The owner of the repo.
    */
-  function_name?: string;
+  repo_owner: string;
 
   /**
-   * The Git sha of the project this invocation used..
+   * The authentication token necessary to pull repo.
    */
-  gh_commit_sha?: string;
+  token?: string | null;
 
   /**
-   * The Github Owner of the Project.
+   * Installation command to install and setup repository.
    */
-  gh_owner?: string;
-
-  /**
-   * The Devboxes created and used by this invocation.
-   */
-  linked_devboxes?: Array<string>;
-
-  /**
-   * Unique name of the project associated with function.
-   */
-  project_name?: string;
-
-  request?: unknown;
-
-  result?: unknown;
-
-  /**
-   * Start time of the invocation.
-   */
-  start_time_ms?: number;
-
-  status?: 'created' | 'running' | 'success' | 'failure' | 'canceled' | 'suspended';
+  install_command?: string | null;
 }
 
+/**
+ * LaunchParameters enable you to customize the resources available to your Devbox
+ * as well as the environment set up that should be completed before the Devbox is
+ * marked as 'running'.
+ */
 export interface LaunchParameters {
   /**
    * Configure Devbox lifecycle based on idle activity. If after_idle is set, Devbox
    * will ignore keep_alive_time_seconds.
    */
-  after_idle?: AfterIdle;
+  after_idle?: AfterIdle | null;
 
   /**
-   * A list of ports to make available on the Devbox. Call createTunnel to open a
-   * tunnel to the port.
+   * A list of ports to make available on the Devbox. Only ports made available will
+   * be surfaced to create tunnels via the 'createTunnel' API.
    */
-  available_ports?: Array<number>;
+  available_ports?: Array<number> | null;
 
   /**
    * Time in seconds after which Devbox will automatically shutdown. Default is 1
    * hour.
    */
-  keep_alive_time_seconds?: number;
+  keep_alive_time_seconds?: number | null;
 
   /**
    * Set of commands to be run at launch time, before the entrypoint process is run.
    */
-  launch_commands?: Array<string>;
+  launch_commands?: Array<string> | null;
 
   /**
    * Manual resource configuration for Devbox. If not set, defaults will be used.
    */
-  resource_size_request?: 'SMALL' | 'MEDIUM' | 'LARGE' | 'X_LARGE' | 'XX_LARGE' | 'CUSTOM_SIZE';
-}
-
-export interface ProjectLogsView {
-  /**
-   * List of logs for the given project.
-   */
-  logs: Array<ProjectLogsView.Log>;
-}
-
-export namespace ProjectLogsView {
-  export interface Log {
-    level: string;
-
-    message: string;
-
-    source: string;
-
-    timestamp: string;
-  }
+  resource_size_request?: 'SMALL' | 'MEDIUM' | 'LARGE' | 'X_LARGE' | 'XX_LARGE' | 'CUSTOM_SIZE' | null;
 }
