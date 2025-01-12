@@ -1,10 +1,38 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 import { APIResource } from '../../resource';
+import { isRequestOptions } from '../../core';
 import * as Core from '../../core';
 import * as DevboxesAPI from './devboxes';
+import { PollingOptions, poll } from '@runloop/api-client/lib/polling';
 
 export class Executions extends APIResource {
+  /**
+   * Get status of an execution on a devbox.
+   */
+  retrieve(
+    id: string,
+    executionId: string,
+    query?: ExecutionRetrieveParams,
+    options?: Core.RequestOptions,
+  ): Core.APIPromise<DevboxesAPI.DevboxAsyncExecutionDetailView>;
+  retrieve(
+    id: string,
+    executionId: string,
+    options?: Core.RequestOptions,
+  ): Core.APIPromise<DevboxesAPI.DevboxAsyncExecutionDetailView>;
+  retrieve(
+    id: string,
+    executionId: string,
+    query: ExecutionRetrieveParams | Core.RequestOptions = {},
+    options?: Core.RequestOptions,
+  ): Core.APIPromise<DevboxesAPI.DevboxAsyncExecutionDetailView> {
+    if (isRequestOptions(query)) {
+      return this.retrieve(id, executionId, {}, query);
+    }
+    return this._client.get(`/v1/devboxes/${id}/executions/${executionId}`, { query, ...options });
+  }
+
   /**
    * Execute the given command in the Devbox shell asynchronously and returns the
    * execution that can be used to track the command's progress.
@@ -18,6 +46,31 @@ export class Executions extends APIResource {
   }
 
   /**
+   * Wait for an async execution to complete.
+   * Polls the execution status until it reaches completed state.
+   */
+  async awaitCompleted(
+    id: string,
+    executionId: string,
+    options?: Core.RequestOptions & {
+      polling?: Partial<PollingOptions<DevboxesAPI.DevboxAsyncExecutionDetailView>>;
+    },
+  ): Promise<DevboxesAPI.DevboxAsyncExecutionDetailView> {
+    const finalResult = await poll(
+      () => this.retrieve(id, executionId, options),
+      () => this.retrieve(id, executionId, options),
+      {
+        ...options?.polling,
+        shouldStop: (result: DevboxesAPI.DevboxAsyncExecutionDetailView) => {
+          return result.status === 'completed';
+        },
+      },
+    );
+
+    return finalResult;
+  }
+
+  /**
    * Execute a bash command in the Devbox shell, await the command completion and
    * return the output.
    */
@@ -28,6 +81,24 @@ export class Executions extends APIResource {
   ): Core.APIPromise<DevboxesAPI.DevboxExecutionDetailView> {
     return this._client.post(`/v1/devboxes/${id}/execute_sync`, { body, ...options });
   }
+
+  /**
+   * Kill an asynchronous execution currently running on a devbox
+   */
+  kill(
+    id: string,
+    executionId: string,
+    options?: Core.RequestOptions,
+  ): Core.APIPromise<DevboxesAPI.DevboxAsyncExecutionDetailView> {
+    return this._client.post(`/v1/devboxes/${id}/executions/${executionId}/kill`, options);
+  }
+}
+
+export interface ExecutionRetrieveParams {
+  /**
+   * Last n lines of standard error / standard out to return
+   */
+  last_n?: string;
 }
 
 export interface ExecutionExecuteAsyncParams {
