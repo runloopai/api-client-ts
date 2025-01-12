@@ -1,6 +1,8 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 export {
+  DevboxViewsDevboxesCursorIDPage,
+  DevboxSnapshotViewsDiskSnapshotsCursorIDPage,
   Devboxes,
   type DevboxAsyncExecutionDetailView,
   type DevboxExecutionDetailView,
@@ -10,20 +12,22 @@ export {
   type DevboxTunnelView,
   type DevboxView,
   type DevboxCreateSSHKeyResponse,
+  type DevboxDeleteDiskSnapshotResponse,
   type DevboxKeepAliveResponse,
   type DevboxReadFileContentsResponse,
   type DevboxUploadFileResponse,
   type DevboxCreateParams,
   type DevboxListParams,
   type DevboxCreateTunnelParams,
-  type DevboxDiskSnapshotsParams,
   type DevboxDownloadFileParams,
   type DevboxExecuteAsyncParams,
   type DevboxExecuteSyncParams,
+  type DevboxListDiskSnapshotsParams,
   type DevboxReadFileContentsParams,
+  type DevboxRemoveTunnelParams,
   type DevboxSnapshotDiskParams,
   type DevboxUploadFileParams,
-  type DevboxWriteFileParams,
+  type DevboxWriteFileContentsParams,
 } from './devboxes';
 export {
   Executions,

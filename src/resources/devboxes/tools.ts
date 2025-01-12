@@ -31,7 +31,7 @@ export class DevboxTools {
         },
       }),
       createTool({
-        name: 'write_file',
+        name: 'write_file_contents',
         description: 'Write contents to a file on the devbox',
         parameters: z.object({
           file_path: z.string().describe('The path of the file to write relative to the user home directory'),
@@ -39,7 +39,7 @@ export class DevboxTools {
         }),
         execute: async (params) => {
           try {
-            await this.devboxes.writeFile(
+            await this.devboxes.writeFileContents(
               devboxId,
               {
                 file_path: params.file_path,

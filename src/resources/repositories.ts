@@ -3,10 +3,12 @@
 import { APIResource } from '../resource';
 import { isRequestOptions } from '../core';
 import * as Core from '../core';
+import { RepositoriesCursorIDPage, type RepositoriesCursorIDPageParams } from '../pagination';
 
 export class Repositories extends APIResource {
   /**
-   * Create a connection a Repository with the specified configuration.
+   * Create a connection to a Github Repository and trigger an initial inspection of
+   * the repo's technical stack and developer environment requirements.
    */
   create(
     body: RepositoryCreateParams,
@@ -16,7 +18,8 @@ export class Repositories extends APIResource {
   }
 
   /**
-   * Get repository connection details.
+   * Get Repository Connection details including latest inspection status and
+   * generated respository insights.
    */
   retrieve(id: string, options?: Core.RequestOptions): Core.APIPromise<RepositoryConnectionView> {
     return this._client.get(`/v1/repositories/${id}`, options);
@@ -28,20 +31,26 @@ export class Repositories extends APIResource {
   list(
     query?: RepositoryListParams,
     options?: Core.RequestOptions,
-  ): Core.APIPromise<RepositoryConnectionListView>;
-  list(options?: Core.RequestOptions): Core.APIPromise<RepositoryConnectionListView>;
+  ): Core.PagePromise<RepositoryConnectionViewsRepositoriesCursorIDPage, RepositoryConnectionView>;
+  list(
+    options?: Core.RequestOptions,
+  ): Core.PagePromise<RepositoryConnectionViewsRepositoriesCursorIDPage, RepositoryConnectionView>;
   list(
     query: RepositoryListParams | Core.RequestOptions = {},
     options?: Core.RequestOptions,
-  ): Core.APIPromise<RepositoryConnectionListView> {
+  ): Core.PagePromise<RepositoryConnectionViewsRepositoriesCursorIDPage, RepositoryConnectionView> {
     if (isRequestOptions(query)) {
       return this.list({}, query);
     }
-    return this._client.get('/v1/repositories', { query, ...options });
+    return this._client.getAPIList('/v1/repositories', RepositoryConnectionViewsRepositoriesCursorIDPage, {
+      query,
+      ...options,
+    });
   }
 
   /**
-   * Delete a repository connection.
+   * Permanently Delete a Repository Connection including any automatically generated
+   * inspection insights.
    */
   delete(
     id: string,
@@ -52,12 +61,15 @@ export class Repositories extends APIResource {
   }
 
   /**
-   * List all analyzed versions of a repository connection.
+   * List all analyzed versions of a repository connection including automatically
+   * generated insights for each version.
    */
   versions(id: string, options?: Core.RequestOptions): Core.APIPromise<RepositoryVersionListView> {
     return this._client.get(`/v1/repositories/${id}/versions`, options);
   }
 }
+
+export class RepositoryConnectionViewsRepositoriesCursorIDPage extends RepositoriesCursorIDPage<RepositoryConnectionView> {}
 
 export interface RepositoryConnectionListView {
   has_more: boolean;
@@ -70,9 +82,12 @@ export interface RepositoryConnectionListView {
   total_count: number;
 }
 
+/**
+ * The ID of the Repository.
+ */
 export interface RepositoryConnectionView {
   /**
-   * The id of the Repository.
+   * The ID of the Repository.
    */
   id: string;
 
@@ -92,9 +107,9 @@ export interface RepositoryConnectionView {
   status: 'pending' | 'failure' | 'active';
 
   /**
-   * Reason for failure, if any.
+   * Reason for failure, if the status is 'failure'.
    */
-  failure_reason?: string;
+  failure_reason?: string | null;
 }
 
 export interface RepositoryVersionDetails {
@@ -182,19 +197,12 @@ export interface RepositoryCreateParams {
   owner: string;
 }
 
-export interface RepositoryListParams {
-  /**
-   * Page Limit
-   */
-  limit?: number;
-
-  /**
-   * Load the next page starting after the given token.
-   */
-  starting_after?: string;
-}
+export interface RepositoryListParams extends RepositoriesCursorIDPageParams {}
 
 export interface RepositoryDeleteParams {}
+
+Repositories.RepositoryConnectionViewsRepositoriesCursorIDPage =
+  RepositoryConnectionViewsRepositoriesCursorIDPage;
 
 export declare namespace Repositories {
   export {
@@ -203,6 +211,7 @@ export declare namespace Repositories {
     type RepositoryVersionDetails as RepositoryVersionDetails,
     type RepositoryVersionListView as RepositoryVersionListView,
     type RepositoryDeleteResponse as RepositoryDeleteResponse,
+    RepositoryConnectionViewsRepositoriesCursorIDPage as RepositoryConnectionViewsRepositoriesCursorIDPage,
     type RepositoryCreateParams as RepositoryCreateParams,
     type RepositoryListParams as RepositoryListParams,
     type RepositoryDeleteParams as RepositoryDeleteParams,

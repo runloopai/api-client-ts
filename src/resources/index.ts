@@ -2,6 +2,7 @@
 
 export * from './shared';
 export {
+  BlueprintViewsBlueprintsCursorIDPage,
   Blueprints,
   type BlueprintBuildLog,
   type BlueprintBuildLogsListView,
@@ -13,8 +14,9 @@ export {
   type BlueprintListParams,
   type BlueprintPreviewParams,
 } from './blueprints';
-export { Code, type CodeMountParameters } from './code';
 export {
+  DevboxViewsDevboxesCursorIDPage,
+  DevboxSnapshotViewsDiskSnapshotsCursorIDPage,
   Devboxes,
   type DevboxAsyncExecutionDetailView,
   type DevboxExecutionDetailView,
@@ -24,29 +26,25 @@ export {
   type DevboxTunnelView,
   type DevboxView,
   type DevboxCreateSSHKeyResponse,
+  type DevboxDeleteDiskSnapshotResponse,
   type DevboxKeepAliveResponse,
   type DevboxReadFileContentsResponse,
   type DevboxUploadFileResponse,
   type DevboxCreateParams,
   type DevboxListParams,
   type DevboxCreateTunnelParams,
-  type DevboxDiskSnapshotsParams,
   type DevboxDownloadFileParams,
   type DevboxExecuteAsyncParams,
   type DevboxExecuteSyncParams,
+  type DevboxListDiskSnapshotsParams,
   type DevboxReadFileContentsParams,
+  type DevboxRemoveTunnelParams,
   type DevboxSnapshotDiskParams,
   type DevboxUploadFileParams,
-  type DevboxWriteFileParams,
+  type DevboxWriteFileContentsParams,
 } from './devboxes/devboxes';
 export {
-  Functions,
-  type FunctionListView,
-  type FunctionInvokeAsyncParams,
-  type FunctionInvokeSyncParams,
-} from './functions/functions';
-export { Projects, type ProjectListView } from './projects/projects';
-export {
+  RepositoryConnectionViewsRepositoriesCursorIDPage,
   Repositories,
   type RepositoryConnectionListView,
   type RepositoryConnectionView,

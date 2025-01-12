@@ -1,5 +1,29 @@
 # Changelog
 
+## 0.10.0 (2025-01-12)
+
+Full Changelog: [v0.9.0...v0.10.0](https://github.com/runloopai/api-client-ts/compare/v0.9.0...v0.10.0)
+
+### Features
+
+* Add a bunch of helpers for making agent integration easy ([113bd2f](https://github.com/runloopai/api-client-ts/commit/113bd2ffe081175a97fb8c07f59ba293b82d77ae))
+* **api:** api update ([#481](https://github.com/runloopai/api-client-ts/issues/481)) ([cccd04b](https://github.com/runloopai/api-client-ts/commit/cccd04b8706c7ead889d4d9805133e46d39631b5))
+* **api:** manual updates ([#488](https://github.com/runloopai/api-client-ts/issues/488)) ([aebf84d](https://github.com/runloopai/api-client-ts/commit/aebf84daf752c43ec9edaf3e8cc29a437390cb23))
+* **api:** manual updates ([#491](https://github.com/runloopai/api-client-ts/issues/491)) ([ada2bba](https://github.com/runloopai/api-client-ts/commit/ada2bbaa8c543ea913060efccf39adf8365d4302))
+* feat: Fix naming of the polling helpers to be more concise ([977b1bb](https://github.com/runloopai/api-client-ts/commit/977b1bbf48f02a356482fd9e6895f32a88fc7319))
+* Fix casing ([fef4ca0](https://github.com/runloopai/api-client-ts/commit/fef4ca07bce3e2c80233b56dcfce85c4c0c4e240))
+* make better defaults for polling ([434fad9](https://github.com/runloopai/api-client-ts/commit/434fad958026092e32d38cd7b18cde623019400f))
+
+
+### Bug Fixes
+
+* send correct Accept header for certain endpoints ([#487](https://github.com/runloopai/api-client-ts/issues/487)) ([97da120](https://github.com/runloopai/api-client-ts/commit/97da1208445229c850e869ef0391941cda470e38))
+
+
+### Chores
+
+* **internal:** codegen related update ([#486](https://github.com/runloopai/api-client-ts/issues/486)) ([9b70ea0](https://github.com/runloopai/api-client-ts/commit/9b70ea0437e00fd2fc95bdfc2aead3c290f8237c))
+
 ## 0.9.0 (2025-01-07)
 
 Full Changelog: [v0.8.0...v0.9.0](https://github.com/runloopai/api-client-ts/compare/v0.8.0...v0.9.0)

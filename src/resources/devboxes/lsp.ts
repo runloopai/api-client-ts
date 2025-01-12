@@ -154,11 +154,7 @@ export class Lsp extends APIResource {
     body: LspSetWatchDirectoryParams,
     options?: Core.RequestOptions,
   ): Core.APIPromise<string> {
-    return this._client.post(`/v1/devboxes/${id}/lsp/set-watch-directory`, {
-      body,
-      ...options,
-      headers: { Accept: 'application/json', ...options?.headers },
-    });
+    return this._client.post(`/v1/devboxes/${id}/lsp/set-watch-directory`, { body, ...options });
   }
 }
 

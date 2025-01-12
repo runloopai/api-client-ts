@@ -3,6 +3,17 @@
 import { type Agent } from './_shims/index';
 import * as Core from './core';
 import * as Errors from './error';
+import * as Pagination from './pagination';
+import {
+  type BlueprintsCursorIDPageParams,
+  BlueprintsCursorIDPageResponse,
+  type DevboxesCursorIDPageParams,
+  DevboxesCursorIDPageResponse,
+  type DiskSnapshotsCursorIDPageParams,
+  DiskSnapshotsCursorIDPageResponse,
+  type RepositoriesCursorIDPageParams,
+  RepositoriesCursorIDPageResponse,
+} from './pagination';
 import * as Uploads from './uploads';
 import * as API from './resources/index';
 import {
@@ -15,13 +26,14 @@ import {
   BlueprintPreviewParams,
   BlueprintPreviewView,
   BlueprintView,
+  BlueprintViewsBlueprintsCursorIDPage,
   Blueprints,
 } from './resources/blueprints';
-import { Code, CodeMountParameters } from './resources/code';
 import {
   Repositories,
   RepositoryConnectionListView,
   RepositoryConnectionView,
+  RepositoryConnectionViewsRepositoriesCursorIDPage,
   RepositoryCreateParams,
   RepositoryDeleteParams,
   RepositoryDeleteResponse,
@@ -34,33 +46,30 @@ import {
   DevboxCreateParams,
   DevboxCreateSSHKeyResponse,
   DevboxCreateTunnelParams,
-  DevboxDiskSnapshotsParams,
+  DevboxDeleteDiskSnapshotResponse,
   DevboxDownloadFileParams,
   DevboxExecuteAsyncParams,
   DevboxExecuteSyncParams,
   DevboxExecutionDetailView,
   DevboxKeepAliveResponse,
+  DevboxListDiskSnapshotsParams,
   DevboxListParams,
   DevboxListView,
   DevboxReadFileContentsParams,
   DevboxReadFileContentsResponse,
+  DevboxRemoveTunnelParams,
   DevboxSnapshotDiskParams,
   DevboxSnapshotListView,
   DevboxSnapshotView,
+  DevboxSnapshotViewsDiskSnapshotsCursorIDPage,
   DevboxTunnelView,
   DevboxUploadFileParams,
   DevboxUploadFileResponse,
   DevboxView,
-  DevboxWriteFileParams,
+  DevboxViewsDevboxesCursorIDPage,
+  DevboxWriteFileContentsParams,
   Devboxes,
 } from './resources/devboxes/devboxes';
-import {
-  FunctionInvokeAsyncParams,
-  FunctionInvokeSyncParams,
-  FunctionListView,
-  Functions,
-} from './resources/functions/functions';
-import { ProjectListView, Projects } from './resources/projects/projects';
 
 export interface ClientOptions {
   /**
@@ -171,16 +180,14 @@ export class Runloop extends Core.APIClient {
     });
 
     this._options = options;
+    this.idempotencyHeader = 'x-request-id';
 
     this.bearerToken = bearerToken;
   }
 
   blueprints: API.Blueprints = new API.Blueprints(this);
-  code: API.Code = new API.Code(this);
   devboxes: API.Devboxes = new API.Devboxes(this);
   repositories: API.Repositories = new API.Repositories(this);
-  functions: API.Functions = new API.Functions(this);
-  projects: API.Projects = new API.Projects(this);
 
   protected override defaultQuery(): Core.DefaultQuery | undefined {
     return this._options.defaultQuery;
@@ -219,13 +226,38 @@ export class Runloop extends Core.APIClient {
 }
 
 Runloop.Blueprints = Blueprints;
-Runloop.Code = Code;
+Runloop.BlueprintViewsBlueprintsCursorIDPage = BlueprintViewsBlueprintsCursorIDPage;
 Runloop.Devboxes = Devboxes;
+Runloop.DevboxViewsDevboxesCursorIDPage = DevboxViewsDevboxesCursorIDPage;
+Runloop.DevboxSnapshotViewsDiskSnapshotsCursorIDPage = DevboxSnapshotViewsDiskSnapshotsCursorIDPage;
 Runloop.Repositories = Repositories;
-Runloop.Functions = Functions;
-Runloop.Projects = Projects;
+Runloop.RepositoryConnectionViewsRepositoriesCursorIDPage = RepositoryConnectionViewsRepositoriesCursorIDPage;
 export declare namespace Runloop {
   export type RequestOptions = Core.RequestOptions;
+
+  export import BlueprintsCursorIDPage = Pagination.BlueprintsCursorIDPage;
+  export {
+    type BlueprintsCursorIDPageParams as BlueprintsCursorIDPageParams,
+    type BlueprintsCursorIDPageResponse as BlueprintsCursorIDPageResponse,
+  };
+
+  export import DevboxesCursorIDPage = Pagination.DevboxesCursorIDPage;
+  export {
+    type DevboxesCursorIDPageParams as DevboxesCursorIDPageParams,
+    type DevboxesCursorIDPageResponse as DevboxesCursorIDPageResponse,
+  };
+
+  export import RepositoriesCursorIDPage = Pagination.RepositoriesCursorIDPage;
+  export {
+    type RepositoriesCursorIDPageParams as RepositoriesCursorIDPageParams,
+    type RepositoriesCursorIDPageResponse as RepositoriesCursorIDPageResponse,
+  };
+
+  export import DiskSnapshotsCursorIDPage = Pagination.DiskSnapshotsCursorIDPage;
+  export {
+    type DiskSnapshotsCursorIDPageParams as DiskSnapshotsCursorIDPageParams,
+    type DiskSnapshotsCursorIDPageResponse as DiskSnapshotsCursorIDPageResponse,
+  };
 
   export {
     Blueprints as Blueprints,
@@ -235,12 +267,11 @@ export declare namespace Runloop {
     type BlueprintListView as BlueprintListView,
     type BlueprintPreviewView as BlueprintPreviewView,
     type BlueprintView as BlueprintView,
+    BlueprintViewsBlueprintsCursorIDPage as BlueprintViewsBlueprintsCursorIDPage,
     type BlueprintCreateParams as BlueprintCreateParams,
     type BlueprintListParams as BlueprintListParams,
     type BlueprintPreviewParams as BlueprintPreviewParams,
   };
-
-  export { Code as Code, type CodeMountParameters as CodeMountParameters };
 
   export {
     Devboxes as Devboxes,
@@ -252,20 +283,24 @@ export declare namespace Runloop {
     type DevboxTunnelView as DevboxTunnelView,
     type DevboxView as DevboxView,
     type DevboxCreateSSHKeyResponse as DevboxCreateSSHKeyResponse,
+    type DevboxDeleteDiskSnapshotResponse as DevboxDeleteDiskSnapshotResponse,
     type DevboxKeepAliveResponse as DevboxKeepAliveResponse,
     type DevboxReadFileContentsResponse as DevboxReadFileContentsResponse,
     type DevboxUploadFileResponse as DevboxUploadFileResponse,
+    DevboxViewsDevboxesCursorIDPage as DevboxViewsDevboxesCursorIDPage,
+    DevboxSnapshotViewsDiskSnapshotsCursorIDPage as DevboxSnapshotViewsDiskSnapshotsCursorIDPage,
     type DevboxCreateParams as DevboxCreateParams,
     type DevboxListParams as DevboxListParams,
     type DevboxCreateTunnelParams as DevboxCreateTunnelParams,
-    type DevboxDiskSnapshotsParams as DevboxDiskSnapshotsParams,
     type DevboxDownloadFileParams as DevboxDownloadFileParams,
     type DevboxExecuteAsyncParams as DevboxExecuteAsyncParams,
     type DevboxExecuteSyncParams as DevboxExecuteSyncParams,
+    type DevboxListDiskSnapshotsParams as DevboxListDiskSnapshotsParams,
     type DevboxReadFileContentsParams as DevboxReadFileContentsParams,
+    type DevboxRemoveTunnelParams as DevboxRemoveTunnelParams,
     type DevboxSnapshotDiskParams as DevboxSnapshotDiskParams,
     type DevboxUploadFileParams as DevboxUploadFileParams,
-    type DevboxWriteFileParams as DevboxWriteFileParams,
+    type DevboxWriteFileContentsParams as DevboxWriteFileContentsParams,
   };
 
   export {
@@ -275,24 +310,15 @@ export declare namespace Runloop {
     type RepositoryVersionDetails as RepositoryVersionDetails,
     type RepositoryVersionListView as RepositoryVersionListView,
     type RepositoryDeleteResponse as RepositoryDeleteResponse,
+    RepositoryConnectionViewsRepositoriesCursorIDPage as RepositoryConnectionViewsRepositoriesCursorIDPage,
     type RepositoryCreateParams as RepositoryCreateParams,
     type RepositoryListParams as RepositoryListParams,
     type RepositoryDeleteParams as RepositoryDeleteParams,
   };
 
-  export {
-    Functions as Functions,
-    type FunctionListView as FunctionListView,
-    type FunctionInvokeAsyncParams as FunctionInvokeAsyncParams,
-    type FunctionInvokeSyncParams as FunctionInvokeSyncParams,
-  };
-
-  export { Projects as Projects, type ProjectListView as ProjectListView };
-
   export type AfterIdle = API.AfterIdle;
-  export type FunctionInvocationExecutionDetailView = API.FunctionInvocationExecutionDetailView;
+  export type CodeMountParameters = API.CodeMountParameters;
   export type LaunchParameters = API.LaunchParameters;
-  export type ProjectLogsView = API.ProjectLogsView;
 }
 
 export { toFile, fileFromPath } from './uploads';
