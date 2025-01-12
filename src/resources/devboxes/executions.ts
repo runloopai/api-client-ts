@@ -1,10 +1,38 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 import { APIResource } from '../../resource';
+import { isRequestOptions } from '../../core';
 import * as Core from '../../core';
 import * as DevboxesAPI from './devboxes';
 
 export class Executions extends APIResource {
+  /**
+   * Get the latest status of a previously launched asynchronous execuction including
+   * stdout/error and the exit code if complete.
+   */
+  retrieve(
+    devboxId: string,
+    executionId: string,
+    query?: ExecutionRetrieveParams,
+    options?: Core.RequestOptions,
+  ): Core.APIPromise<DevboxesAPI.DevboxAsyncExecutionDetailView>;
+  retrieve(
+    devboxId: string,
+    executionId: string,
+    options?: Core.RequestOptions,
+  ): Core.APIPromise<DevboxesAPI.DevboxAsyncExecutionDetailView>;
+  retrieve(
+    devboxId: string,
+    executionId: string,
+    query: ExecutionRetrieveParams | Core.RequestOptions = {},
+    options?: Core.RequestOptions,
+  ): Core.APIPromise<DevboxesAPI.DevboxAsyncExecutionDetailView> {
+    if (isRequestOptions(query)) {
+      return this.retrieve(devboxId, executionId, {}, query);
+    }
+    return this._client.get(`/v1/devboxes/${devboxId}/executions/${executionId}`, { query, ...options });
+  }
+
   /**
    * Execute the given command in the Devbox shell asynchronously and returns the
    * execution that can be used to track the command's progress.
@@ -28,6 +56,25 @@ export class Executions extends APIResource {
   ): Core.APIPromise<DevboxesAPI.DevboxExecutionDetailView> {
     return this._client.post(`/v1/devboxes/${id}/execute_sync`, { body, ...options });
   }
+
+  /**
+   * Kill a previously launched asynchronous execution if it is still running by
+   * killing the launched process.
+   */
+  kill(
+    devboxId: string,
+    executionId: string,
+    options?: Core.RequestOptions,
+  ): Core.APIPromise<DevboxesAPI.DevboxAsyncExecutionDetailView> {
+    return this._client.post(`/v1/devboxes/${devboxId}/executions/${executionId}/kill`, options);
+  }
+}
+
+export interface ExecutionRetrieveParams {
+  /**
+   * Last n lines of standard error / standard out to return
+   */
+  last_n?: string;
 }
 
 export interface ExecutionExecuteAsyncParams {
@@ -66,6 +113,7 @@ export interface ExecutionExecuteSyncParams {
 
 export declare namespace Executions {
   export {
+    type ExecutionRetrieveParams as ExecutionRetrieveParams,
     type ExecutionExecuteAsyncParams as ExecutionExecuteAsyncParams,
     type ExecutionExecuteSyncParams as ExecutionExecuteSyncParams,
   };
