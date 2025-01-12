@@ -395,6 +395,11 @@ export class Devboxes extends APIResource {
   get tools(): DevboxTools {
     return new DevboxTools(this);
   }
+
+  // Make an accessor for tools
+  get tools(): DevboxTools {
+    return new DevboxTools(this);
+  }
 }
 
 export class DevboxViewsDevboxesCursorIDPage extends DevboxesCursorIDPage<DevboxView> {}
