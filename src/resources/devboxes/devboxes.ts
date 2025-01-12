@@ -395,11 +395,6 @@ export class Devboxes extends APIResource {
   get tools(): DevboxTools {
     return new DevboxTools(this);
   }
-
-  // Make an accessor for tools
-  get tools(): DevboxTools {
-    return new DevboxTools(this);
-  }
 }
 
 export class DevboxViewsDevboxesCursorIDPage extends DevboxesCursorIDPage<DevboxView> {}
@@ -815,12 +810,6 @@ export interface DevboxUploadFileParams {
   path: string;
 
   file?: Core.Uploadable;
-}
-
-export interface DevboxUploadFileParams {
-  file?: Core.Uploadable;
-
-  path?: string;
 }
 
 export interface DevboxWriteFileContentsParams {
