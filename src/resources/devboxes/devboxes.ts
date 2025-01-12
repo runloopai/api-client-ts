@@ -17,6 +17,12 @@ import { DevboxLogsListView, LogListParams, Logs } from './logs';
 import * as LspAPI from './lsp';
 import { Lsp } from './lsp';
 import { type Response } from '../../_shims/index';
+import { PollingOptions, poll } from '@runloop/api-client/lib/polling';
+import { RunloopError } from '../..';
+import { DevboxTools } from './tools';
+
+type DevboxStatus = DevboxView['status'];
+const DEVBOX_BOOTING_STATES: DevboxStatus[] = ['provisioning', 'initializing'];
 
 export class Devboxes extends APIResource {
   lsp: LspAPI.Lsp = new LspAPI.Lsp(this._client);
@@ -44,6 +50,45 @@ export class Devboxes extends APIResource {
    */
   retrieve(id: string, options?: Core.RequestOptions): Core.APIPromise<DevboxView> {
     return this._client.get(`/v1/devboxes/${id}`, options);
+  }
+
+  /**
+   * Wait for a devbox to reach the running state.
+   * Polls the devbox status until it reaches running state or fails with an error.
+   */
+  async awaitRunning(
+    id: string,
+    options?: Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxView>> },
+  ): Promise<DevboxView> {
+    const finalResult = await poll(
+      () => this.retrieve(id, options),
+      () => this.retrieve(id, options),
+      {
+        ...options?.polling,
+        shouldStop: (result) => {
+          return !DEVBOX_BOOTING_STATES.includes(result.status);
+        },
+      },
+    );
+
+    // Now we check if the devbox is 'running' otherwise we throw an error
+    if (finalResult.status !== 'running') {
+      throw new RunloopError(`Devbox ${id} is in non-running state ${finalResult.status}`);
+    }
+
+    return finalResult;
+  }
+
+  /**
+   * Create a devbox and wait for it to reach the running state.
+   * This is a convenience method that combines create() and awaitDevboxRunning().
+   */
+  async createAndAwaitRunning(
+    body?: DevboxCreateParams,
+    options?: Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxView>> },
+  ): Promise<DevboxView> {
+    const devbox = await this.create(body, options);
+    return this.awaitRunning(devbox.id, options);
   }
 
   /**
@@ -231,6 +276,11 @@ export class Devboxes extends APIResource {
     options?: Core.RequestOptions,
   ): Core.APIPromise<DevboxExecutionDetailView> {
     return this._client.post(`/v1/devboxes/${id}/write_file`, { body, ...options });
+  }
+
+  // Make an accessor for tools
+  get tools(): DevboxTools {
+    return new DevboxTools(this);
   }
 }
 
@@ -605,6 +655,12 @@ export interface DevboxSnapshotDiskParams {
    * (Optional) A user specified name to give the snapshot
    */
   name?: string;
+}
+
+export interface DevboxUploadFileParams {
+  file?: Core.Uploadable;
+
+  path?: string;
 }
 
 export interface DevboxUploadFileParams {
