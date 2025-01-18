@@ -13,9 +13,9 @@ export class DevboxTools {
    * Get all file-related tools
    */
   fileTools(devboxId: string, options?: Core.RequestOptions) {
-    const tools = [
-      createTool({
-        name: 'read_file',
+    const tools = {
+      read_file_contents: createTool({
+        name: 'read_file_contents',
         description: 'Read contents of a file on the devbox',
         parameters: z.object({
           file_path: z.string().describe('The path of the file to read relative to the user home directory'),
@@ -30,7 +30,7 @@ export class DevboxTools {
           );
         },
       }),
-      createTool({
+      write_file_contents: createTool({
         name: 'write_file_contents',
         description: 'Write contents to a file on the devbox',
         parameters: z.object({
@@ -53,7 +53,7 @@ export class DevboxTools {
           }
         },
       }),
-    ];
+    };
 
     return tools;
   }
@@ -62,8 +62,8 @@ export class DevboxTools {
    * Get all shell-related tools
    */
   shellTools(devboxId: string, options?: Core.RequestOptions) {
-    const tools = [
-      createTool({
+    const tools = {
+      execute_command: createTool({
         name: 'execute_command',
         description: 'Execute a shell command on the devbox',
         parameters: z.object({
@@ -84,7 +84,7 @@ export class DevboxTools {
           }
         },
       }),
-      createTool({
+      execute_command_async: createTool({
         name: 'execute_command_async',
         description: 'Execute a shell command asynchronously on the devbox',
         parameters: z.object({
@@ -105,7 +105,7 @@ export class DevboxTools {
           }
         },
       }),
-      createTool({
+      retrieve_async_command_status: createTool({
         name: 'retrieve_async_command_status',
         description: 'Retrieve the status and output of an asynchronous command execution',
         parameters: z.object({
@@ -120,7 +120,22 @@ export class DevboxTools {
           }
         },
       }),
-    ];
+      kill_async_command: createTool({
+        name: 'kill_async_command',
+        description: 'Kill an asynchronous command execution',
+        parameters: z.object({
+          execution_id: z.string().describe('The ID of the async execution to kill'),
+        }),
+        execute: async (params) => {
+          try {
+            await this.devboxes.executions.kill(devboxId, params.execution_id, options);
+            return 'Async command execution killed successfully';
+          } catch (error) {
+            return `Failed to kill async command execution: ${error}`;
+          }
+        },
+      }),
+    };
 
     return tools;
   }
@@ -129,8 +144,8 @@ export class DevboxTools {
    * Get tools for managing tunnels on the devbox
    */
   tunnelTools(devboxId: string, options?: Core.RequestOptions) {
-    const tools = [
-      createTool({
+    const tools = {
+      create_tunnel: createTool({
         name: 'create_tunnel',
         description: 'Create a new tunnel to expose a port on the devbox',
         parameters: z.object({
@@ -152,7 +167,22 @@ export class DevboxTools {
           }
         },
       }),
-    ];
+      remove_tunnel: createTool({
+        name: 'remove_tunnel',
+        description: 'Delete a tunnel',
+        parameters: z.object({
+          port: z.number().describe('The port of the tunnel to delete'),
+        }),
+        execute: async (params) => {
+          try {
+            await this.devboxes.removeTunnel(devboxId, { port: params.port }, options);
+            return 'Tunnel deleted successfully';
+          } catch (error) {
+            return `Failed to delete tunnel: ${error}`;
+          }
+        },
+      }),
+    };
 
     return tools;
   }
