@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - 'next'
+  workflow_dispatch:
 
 jobs:
   generate-schema:
