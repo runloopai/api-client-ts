@@ -58,13 +58,13 @@ describe('resource lsp', () => {
             message: 'message',
             range: { end: { character: 0, line: 0 }, start: { character: 0, line: 0 } },
             code: 0,
-            codeDescription: { href: 'href' },
+            codeDescription: { href: 'string' },
             data: {},
             relatedInformation: [
               {
                 location: {
                   range: { end: { character: 0, line: 0 }, start: { character: 0, line: 0 } },
-                  uri: 'uri',
+                  uri: 'string',
                 },
                 message: 'message',
               },
@@ -82,7 +82,7 @@ describe('resource lsp', () => {
   });
 
   test('diagnostics: only required params', async () => {
-    const responsePromise = client.devboxes.lsp.diagnostics('id', { uri: 'uri' });
+    const responsePromise = client.devboxes.lsp.diagnostics('id', { uri: 'string' });
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
     const response = await responsePromise;
@@ -93,11 +93,11 @@ describe('resource lsp', () => {
   });
 
   test('diagnostics: required and optional params', async () => {
-    const response = await client.devboxes.lsp.diagnostics('id', { uri: 'uri' });
+    const response = await client.devboxes.lsp.diagnostics('id', { uri: 'string' });
   });
 
   test('documentSymbols: only required params', async () => {
-    const responsePromise = client.devboxes.lsp.documentSymbols('id', { uri: 'uri' });
+    const responsePromise = client.devboxes.lsp.documentSymbols('id', { uri: 'string' });
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
     const response = await responsePromise;
@@ -108,11 +108,11 @@ describe('resource lsp', () => {
   });
 
   test('documentSymbols: required and optional params', async () => {
-    const response = await client.devboxes.lsp.documentSymbols('id', { uri: 'uri' });
+    const response = await client.devboxes.lsp.documentSymbols('id', { uri: 'string' });
   });
 
   test('file: only required params', async () => {
-    const responsePromise = client.devboxes.lsp.file('id', { path: 'path' });
+    const responsePromise = client.devboxes.lsp.file('id', { path: 'string' });
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
     const response = await responsePromise;
@@ -123,7 +123,7 @@ describe('resource lsp', () => {
   });
 
   test('file: required and optional params', async () => {
-    const response = await client.devboxes.lsp.file('id', { path: 'path' });
+    const response = await client.devboxes.lsp.file('id', { path: 'string' });
   });
 
   test('fileDefinition: only required params', async () => {
@@ -160,7 +160,7 @@ describe('resource lsp', () => {
   });
 
   test('formatting: only required params', async () => {
-    const responsePromise = client.devboxes.lsp.formatting('id', { uri: 'uri' });
+    const responsePromise = client.devboxes.lsp.formatting('id', { uri: 'string' });
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
     const response = await responsePromise;
@@ -171,7 +171,7 @@ describe('resource lsp', () => {
   });
 
   test('formatting: required and optional params', async () => {
-    const response = await client.devboxes.lsp.formatting('id', { uri: 'uri' });
+    const response = await client.devboxes.lsp.formatting('id', { uri: 'string' });
   });
 
   test('getCodeActionsForDiagnostic: only required params', async () => {
@@ -207,7 +207,7 @@ describe('resource lsp', () => {
   test('getCodeSegmentInfo: only required params', async () => {
     const responsePromise = client.devboxes.lsp.getCodeSegmentInfo('id', {
       symbolName: 'symbolName',
-      uri: 'uri',
+      uri: 'string',
     });
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
@@ -221,7 +221,7 @@ describe('resource lsp', () => {
   test('getCodeSegmentInfo: required and optional params', async () => {
     const response = await client.devboxes.lsp.getCodeSegmentInfo('id', {
       symbolName: 'symbolName',
-      uri: 'uri',
+      uri: 'string',
       symbolType: 'function',
     });
   });
@@ -275,7 +275,7 @@ describe('resource lsp', () => {
   });
 
   test('setWatchDirectory: only required params', async () => {
-    const responsePromise = client.devboxes.lsp.setWatchDirectory('id', { path: 'path' });
+    const responsePromise = client.devboxes.lsp.setWatchDirectory('id', { path: 'string' });
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
     const response = await responsePromise;
@@ -286,6 +286,6 @@ describe('resource lsp', () => {
   });
 
   test('setWatchDirectory: required and optional params', async () => {
-    const response = await client.devboxes.lsp.setWatchDirectory('id', { path: 'path' });
+    const response = await client.devboxes.lsp.setWatchDirectory('id', { path: 'string' });
   });
 });
