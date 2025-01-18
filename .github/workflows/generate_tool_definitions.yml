@@ -49,5 +49,5 @@ jobs:
           git config --global user.name 'GitHub Action'
           git config --global user.email 'action@github.com'
           git add src/
-          git commit -m "chore: <your commit message>"
+          git commit -m "chore: add autogen zod types"
           git push
