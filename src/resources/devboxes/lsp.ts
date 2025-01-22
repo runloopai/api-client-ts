@@ -520,7 +520,7 @@ export interface DocumentSymbol {
   children?: Array<DocumentSymbol>;
 
   /**
-   * @deprecated: Indicates if this symbol is deprecated.
+   * @deprecated Indicates if this symbol is deprecated.
    */
   deprecated?: boolean;
 
