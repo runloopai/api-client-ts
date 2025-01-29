@@ -42,6 +42,17 @@ import {
   RepositoryVersionListView,
 } from './resources/repositories';
 import {
+  BenchmarkCreateParameters,
+  BenchmarkCreateParams,
+  BenchmarkListParams,
+  BenchmarkListView,
+  BenchmarkRunView,
+  BenchmarkStartRunParams,
+  BenchmarkView,
+  Benchmarks,
+  StartBenchmarkRunParameters,
+} from './resources/benchmarks/benchmarks';
+import {
   DevboxAsyncExecutionDetailView,
   DevboxCreateParams,
   DevboxCreateSSHKeyResponse,
@@ -70,6 +81,25 @@ import {
   DevboxWriteFileContentsParams,
   Devboxes,
 } from './resources/devboxes/devboxes';
+import {
+  InputContextParameters,
+  RepositoryConnectionListView as ScenariosAPIRepositoryConnectionListView,
+  ScenarioCreateParameters,
+  ScenarioCreateParams,
+  ScenarioEnvironmentParameters,
+  ScenarioListParams,
+  ScenarioListView,
+  ScenarioRunListView,
+  ScenarioRunView,
+  ScenarioStartRunParams,
+  ScenarioView,
+  Scenarios,
+  ScoringContractParameters,
+  ScoringContractResultView,
+  ScoringFunctionParameters,
+  ScoringFunctionResultView,
+  StartScenarioRunParameters,
+} from './resources/scenarios/scenarios';
 
 export interface ClientOptions {
   /**
@@ -185,8 +215,10 @@ export class Runloop extends Core.APIClient {
     this.bearerToken = bearerToken;
   }
 
+  benchmarks: API.Benchmarks = new API.Benchmarks(this);
   blueprints: API.Blueprints = new API.Blueprints(this);
   devboxes: API.Devboxes = new API.Devboxes(this);
+  scenarios: API.Scenarios = new API.Scenarios(this);
   repositories: API.Repositories = new API.Repositories(this);
 
   protected override defaultQuery(): Core.DefaultQuery | undefined {
@@ -225,11 +257,13 @@ export class Runloop extends Core.APIClient {
   static fileFromPath = Uploads.fileFromPath;
 }
 
+Runloop.Benchmarks = Benchmarks;
 Runloop.Blueprints = Blueprints;
 Runloop.BlueprintViewsBlueprintsCursorIDPage = BlueprintViewsBlueprintsCursorIDPage;
 Runloop.Devboxes = Devboxes;
 Runloop.DevboxViewsDevboxesCursorIDPage = DevboxViewsDevboxesCursorIDPage;
 Runloop.DevboxSnapshotViewsDiskSnapshotsCursorIDPage = DevboxSnapshotViewsDiskSnapshotsCursorIDPage;
+Runloop.Scenarios = Scenarios;
 Runloop.Repositories = Repositories;
 Runloop.RepositoryConnectionViewsRepositoriesCursorIDPage = RepositoryConnectionViewsRepositoriesCursorIDPage;
 export declare namespace Runloop {
@@ -257,6 +291,18 @@ export declare namespace Runloop {
   export {
     type DiskSnapshotsCursorIDPageParams as DiskSnapshotsCursorIDPageParams,
     type DiskSnapshotsCursorIDPageResponse as DiskSnapshotsCursorIDPageResponse,
+  };
+
+  export {
+    Benchmarks as Benchmarks,
+    type BenchmarkCreateParameters as BenchmarkCreateParameters,
+    type BenchmarkListView as BenchmarkListView,
+    type BenchmarkRunView as BenchmarkRunView,
+    type BenchmarkView as BenchmarkView,
+    type StartBenchmarkRunParameters as StartBenchmarkRunParameters,
+    type BenchmarkCreateParams as BenchmarkCreateParams,
+    type BenchmarkListParams as BenchmarkListParams,
+    type BenchmarkStartRunParams as BenchmarkStartRunParams,
   };
 
   export {
@@ -301,6 +347,26 @@ export declare namespace Runloop {
     type DevboxSnapshotDiskParams as DevboxSnapshotDiskParams,
     type DevboxUploadFileParams as DevboxUploadFileParams,
     type DevboxWriteFileContentsParams as DevboxWriteFileContentsParams,
+  };
+
+  export {
+    Scenarios as Scenarios,
+    type InputContextParameters as InputContextParameters,
+    type ScenariosAPIRepositoryConnectionListView as RepositoryConnectionListView,
+    type ScenarioCreateParameters as ScenarioCreateParameters,
+    type ScenarioEnvironmentParameters as ScenarioEnvironmentParameters,
+    type ScenarioListView as ScenarioListView,
+    type ScenarioRunListView as ScenarioRunListView,
+    type ScenarioRunView as ScenarioRunView,
+    type ScenarioView as ScenarioView,
+    type ScoringContractParameters as ScoringContractParameters,
+    type ScoringContractResultView as ScoringContractResultView,
+    type ScoringFunctionParameters as ScoringFunctionParameters,
+    type ScoringFunctionResultView as ScoringFunctionResultView,
+    type StartScenarioRunParameters as StartScenarioRunParameters,
+    type ScenarioCreateParams as ScenarioCreateParams,
+    type ScenarioListParams as ScenarioListParams,
+    type ScenarioStartRunParams as ScenarioStartRunParams,
   };
 
   export {
