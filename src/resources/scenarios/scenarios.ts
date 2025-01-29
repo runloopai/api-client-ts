@@ -3,7 +3,6 @@
 import { APIResource } from '../../resource';
 import { isRequestOptions } from '../../core';
 import * as Core from '../../core';
-import * as RepositoriesAPI from '../repositories';
 import * as RunsAPI from './runs';
 import { RunListParams, Runs } from './runs';
 
@@ -57,17 +56,6 @@ export interface InputContextParameters {
    * The problem statement for the Scenario.
    */
   problem_statement: string;
-}
-
-export interface RepositoryConnectionListView {
-  has_more: boolean;
-
-  /**
-   * List of repositories matching filter.
-   */
-  repositories: Array<RepositoriesAPI.RepositoryConnectionView>;
-
-  total_count: number;
 }
 
 export interface ScenarioCreateParameters {
@@ -351,7 +339,6 @@ Scenarios.Runs = Runs;
 export declare namespace Scenarios {
   export {
     type InputContextParameters as InputContextParameters,
-    type RepositoryConnectionListView as RepositoryConnectionListView,
     type ScenarioCreateParameters as ScenarioCreateParameters,
     type ScenarioEnvironmentParameters as ScenarioEnvironmentParameters,
     type ScenarioListView as ScenarioListView,

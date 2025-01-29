@@ -16,12 +16,15 @@ export class Runs extends APIResource {
   /**
    * List all BenchmarkRuns matching filter.
    */
-  list(query?: RunListParams, options?: Core.RequestOptions): Core.APIPromise<RunListResponse>;
-  list(options?: Core.RequestOptions): Core.APIPromise<RunListResponse>;
+  list(
+    query?: RunListParams,
+    options?: Core.RequestOptions,
+  ): Core.APIPromise<BenchmarksAPI.BenchmarkRunListView>;
+  list(options?: Core.RequestOptions): Core.APIPromise<BenchmarksAPI.BenchmarkRunListView>;
   list(
     query: RunListParams | Core.RequestOptions = {},
     options?: Core.RequestOptions,
-  ): Core.APIPromise<RunListResponse> {
+  ): Core.APIPromise<BenchmarksAPI.BenchmarkRunListView> {
     if (isRequestOptions(query)) {
       return this.list({}, query);
     }
@@ -34,17 +37,6 @@ export class Runs extends APIResource {
   complete(id: string, options?: Core.RequestOptions): Core.APIPromise<BenchmarksAPI.BenchmarkRunView> {
     return this._client.post(`/v1/benchmarks/runs/${id}/complete`, options);
   }
-}
-
-export interface RunListResponse {
-  has_more: boolean;
-
-  /**
-   * List of BenchmarkRuns matching filter.
-   */
-  runs: Array<BenchmarksAPI.BenchmarkRunView>;
-
-  total_count: number;
 }
 
 export interface RunListParams {
@@ -60,5 +52,5 @@ export interface RunListParams {
 }
 
 export declare namespace Runs {
-  export { type RunListResponse as RunListResponse, type RunListParams as RunListParams };
+  export { type RunListParams as RunListParams };
 }

@@ -4,7 +4,7 @@ import { APIResource } from '../../resource';
 import { isRequestOptions } from '../../core';
 import * as Core from '../../core';
 import * as RunsAPI from './runs';
-import { RunListParams, RunListResponse, Runs } from './runs';
+import { RunListParams, Runs } from './runs';
 
 export class Benchmarks extends APIResource {
   runs: RunsAPI.Runs = new RunsAPI.Runs(this._client);
@@ -68,6 +68,17 @@ export interface BenchmarkListView {
   benchmarks: Array<BenchmarkView>;
 
   has_more: boolean;
+
+  total_count: number;
+}
+
+export interface BenchmarkRunListView {
+  has_more: boolean;
+
+  /**
+   * List of BenchmarkRuns matching filter.
+   */
+  runs: Array<BenchmarkRunView>;
 
   total_count: number;
 }
@@ -173,6 +184,7 @@ export declare namespace Benchmarks {
   export {
     type BenchmarkCreateParameters as BenchmarkCreateParameters,
     type BenchmarkListView as BenchmarkListView,
+    type BenchmarkRunListView as BenchmarkRunListView,
     type BenchmarkRunView as BenchmarkRunView,
     type BenchmarkView as BenchmarkView,
     type StartBenchmarkRunParameters as StartBenchmarkRunParameters,
@@ -181,5 +193,5 @@ export declare namespace Benchmarks {
     type BenchmarkStartRunParams as BenchmarkStartRunParams,
   };
 
-  export { Runs as Runs, type RunListResponse as RunListResponse, type RunListParams as RunListParams };
+  export { Runs as Runs, type RunListParams as RunListParams };
 }
