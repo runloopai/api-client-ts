@@ -5,6 +5,7 @@ export {
   Benchmarks,
   type BenchmarkCreateParameters,
   type BenchmarkListView,
+  type BenchmarkRunListView,
   type BenchmarkRunView,
   type BenchmarkView,
   type StartBenchmarkRunParameters,
@@ -69,7 +70,6 @@ export {
 export {
   Scenarios,
   type InputContextParameters,
-  type RepositoryConnectionListView,
   type ScenarioCreateParameters,
   type ScenarioEnvironmentParameters,
   type ScenarioListView,

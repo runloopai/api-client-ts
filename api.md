@@ -12,6 +12,7 @@ Types:
 
 - <code><a href="./src/resources/benchmarks/benchmarks.ts">BenchmarkCreateParameters</a></code>
 - <code><a href="./src/resources/benchmarks/benchmarks.ts">BenchmarkListView</a></code>
+- <code><a href="./src/resources/benchmarks/benchmarks.ts">BenchmarkRunListView</a></code>
 - <code><a href="./src/resources/benchmarks/benchmarks.ts">BenchmarkRunView</a></code>
 - <code><a href="./src/resources/benchmarks/benchmarks.ts">BenchmarkView</a></code>
 - <code><a href="./src/resources/benchmarks/benchmarks.ts">StartBenchmarkRunParameters</a></code>
@@ -25,14 +26,10 @@ Methods:
 
 ## Runs
 
-Types:
-
-- <code><a href="./src/resources/benchmarks/runs.ts">RunListResponse</a></code>
-
 Methods:
 
 - <code title="get /v1/benchmarks/runs/{id}">client.benchmarks.runs.<a href="./src/resources/benchmarks/runs.ts">retrieve</a>(id) -> BenchmarkRunView</code>
-- <code title="get /v1/benchmarks/runs">client.benchmarks.runs.<a href="./src/resources/benchmarks/runs.ts">list</a>({ ...params }) -> RunListResponse</code>
+- <code title="get /v1/benchmarks/runs">client.benchmarks.runs.<a href="./src/resources/benchmarks/runs.ts">list</a>({ ...params }) -> BenchmarkRunListView</code>
 - <code title="post /v1/benchmarks/runs/{id}/complete">client.benchmarks.runs.<a href="./src/resources/benchmarks/runs.ts">complete</a>(id) -> BenchmarkRunView</code>
 
 # Blueprints
@@ -195,7 +192,6 @@ Methods:
 Types:
 
 - <code><a href="./src/resources/scenarios/scenarios.ts">InputContextParameters</a></code>
-- <code><a href="./src/resources/scenarios/scenarios.ts">RepositoryConnectionListView</a></code>
 - <code><a href="./src/resources/scenarios/scenarios.ts">ScenarioCreateParameters</a></code>
 - <code><a href="./src/resources/scenarios/scenarios.ts">ScenarioEnvironmentParameters</a></code>
 - <code><a href="./src/resources/scenarios/scenarios.ts">ScenarioListView</a></code>

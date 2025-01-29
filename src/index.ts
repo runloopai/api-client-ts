@@ -46,6 +46,7 @@ import {
   BenchmarkCreateParams,
   BenchmarkListParams,
   BenchmarkListView,
+  BenchmarkRunListView,
   BenchmarkRunView,
   BenchmarkStartRunParams,
   BenchmarkView,
@@ -83,7 +84,6 @@ import {
 } from './resources/devboxes/devboxes';
 import {
   InputContextParameters,
-  RepositoryConnectionListView as ScenariosAPIRepositoryConnectionListView,
   ScenarioCreateParameters,
   ScenarioCreateParams,
   ScenarioEnvironmentParameters,
@@ -297,6 +297,7 @@ export declare namespace Runloop {
     Benchmarks as Benchmarks,
     type BenchmarkCreateParameters as BenchmarkCreateParameters,
     type BenchmarkListView as BenchmarkListView,
+    type BenchmarkRunListView as BenchmarkRunListView,
     type BenchmarkRunView as BenchmarkRunView,
     type BenchmarkView as BenchmarkView,
     type StartBenchmarkRunParameters as StartBenchmarkRunParameters,
@@ -352,7 +353,6 @@ export declare namespace Runloop {
   export {
     Scenarios as Scenarios,
     type InputContextParameters as InputContextParameters,
-    type ScenariosAPIRepositoryConnectionListView as RepositoryConnectionListView,
     type ScenarioCreateParameters as ScenarioCreateParameters,
     type ScenarioEnvironmentParameters as ScenarioEnvironmentParameters,
     type ScenarioListView as ScenarioListView,
