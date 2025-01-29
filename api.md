@@ -193,14 +193,11 @@ Types:
 
 - <code><a href="./src/resources/scenarios/scenarios.ts">InputContextParameters</a></code>
 - <code><a href="./src/resources/scenarios/scenarios.ts">ScenarioCreateParameters</a></code>
-- <code><a href="./src/resources/scenarios/scenarios.ts">ScenarioEnvironmentParameters</a></code>
 - <code><a href="./src/resources/scenarios/scenarios.ts">ScenarioListView</a></code>
 - <code><a href="./src/resources/scenarios/scenarios.ts">ScenarioRunListView</a></code>
 - <code><a href="./src/resources/scenarios/scenarios.ts">ScenarioRunView</a></code>
 - <code><a href="./src/resources/scenarios/scenarios.ts">ScenarioView</a></code>
-- <code><a href="./src/resources/scenarios/scenarios.ts">ScoringContractParameters</a></code>
 - <code><a href="./src/resources/scenarios/scenarios.ts">ScoringContractResultView</a></code>
-- <code><a href="./src/resources/scenarios/scenarios.ts">ScoringFunctionParameters</a></code>
 - <code><a href="./src/resources/scenarios/scenarios.ts">ScoringFunctionResultView</a></code>
 - <code><a href="./src/resources/scenarios/scenarios.ts">StartScenarioRunParameters</a></code>
 
