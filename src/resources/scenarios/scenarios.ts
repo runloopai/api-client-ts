@@ -51,7 +51,7 @@ export class Scenarios extends APIResource {
  * InputContextView specifies the problem statement along with all additional
  * context for a Scenario.
  */
-export interface InputContextParameters {
+export interface InputContext {
   /**
    * The problem statement for the Scenario.
    */
@@ -62,7 +62,7 @@ export interface ScenarioCreateParameters {
   /**
    * The input context for the Scenario.
    */
-  input_context: InputContextParameters;
+  input_context: InputContext;
 
   /**
    * Name of the scenario.
@@ -72,69 +72,33 @@ export interface ScenarioCreateParameters {
   /**
    * The scoring contract for the Scenario.
    */
-  scoring_contract: ScenarioCreateParameters.ScoringContract;
+  scoring_contract: ScoringContract;
 
   /**
    * The Environment in which the Scenario will run.
    */
-  environment_parameters?: ScenarioCreateParameters.EnvironmentParameters | null;
+  environment_parameters?: ScenarioEnvironment | null;
 }
 
-export namespace ScenarioCreateParameters {
+/**
+ * ScenarioEnvironmentParameters specify the environment in which a Scenario will
+ * be run.
+ */
+export interface ScenarioEnvironment {
   /**
-   * The scoring contract for the Scenario.
+   * Use the blueprint with matching ID.
    */
-  export interface ScoringContract {
-    /**
-     * A list of scoring functions used to evaluate the Scenario.
-     */
-    scoring_function_parameters: Array<ScoringContract.ScoringFunctionParameter>;
-  }
-
-  export namespace ScoringContract {
-    /**
-     * ScoringFunctionParameters specifies a method of scoring a Scenario.
-     */
-    export interface ScoringFunctionParameter {
-      /**
-       * Name of scoring function.
-       */
-      name: string;
-
-      /**
-       * Wight to apply to scoring function score. Weights of all scoring functions
-       * should sum to 1.0.
-       */
-      weight: number;
-
-      /**
-       * A single bash script that sets up the environment, scores, and prints the final
-       * score to standard out. Score should be an integer between 0 and 100, and look
-       * like "score=[0..100].
-       */
-      bash_script?: string | null;
-    }
-  }
+  blueprint_id?: string | null;
 
   /**
-   * The Environment in which the Scenario will run.
+   * Use the prebuilt with matching ID.
    */
-  export interface EnvironmentParameters {
-    /**
-     * Use the blueprint with matching ID.
-     */
-    blueprint_id?: string | null;
+  prebuilt_id?: string | null;
 
-    /**
-     * Use the prebuilt with matching ID.
-     */
-    prebuilt_id?: string | null;
-
-    /**
-     * Use the snapshot with matching ID.
-     */
-    snapshot_id?: string | null;
-  }
+  /**
+   * Use the snapshot with matching ID.
+   */
+  snapshot_id?: string | null;
 }
 
 export interface ScenarioListView {
@@ -213,7 +177,7 @@ export interface ScenarioView {
   /**
    * The input context for the Scenario.
    */
-  input_context: InputContextParameters;
+  input_context: InputContext;
 
   /**
    * The name of the Scenario.
@@ -223,69 +187,23 @@ export interface ScenarioView {
   /**
    * The scoring contract for the Scenario.
    */
-  scoring_contract: ScenarioView.ScoringContract;
+  scoring_contract: ScoringContract;
 
   /**
    * The Environment in which the Scenario is run.
    */
-  environment?: ScenarioView.Environment | null;
+  environment?: ScenarioEnvironment | null;
 }
 
-export namespace ScenarioView {
+/**
+ * InputContextView specifies the problem statement along with all additional
+ * context for a Scenario.
+ */
+export interface ScoringContract {
   /**
-   * The scoring contract for the Scenario.
+   * A list of scoring functions used to evaluate the Scenario.
    */
-  export interface ScoringContract {
-    /**
-     * A list of scoring functions used to evaluate the Scenario.
-     */
-    scoring_function_parameters: Array<ScoringContract.ScoringFunctionParameter>;
-  }
-
-  export namespace ScoringContract {
-    /**
-     * ScoringFunctionParameters specifies a method of scoring a Scenario.
-     */
-    export interface ScoringFunctionParameter {
-      /**
-       * Name of scoring function.
-       */
-      name: string;
-
-      /**
-       * Wight to apply to scoring function score. Weights of all scoring functions
-       * should sum to 1.0.
-       */
-      weight: number;
-
-      /**
-       * A single bash script that sets up the environment, scores, and prints the final
-       * score to standard out. Score should be an integer between 0 and 100, and look
-       * like "score=[0..100].
-       */
-      bash_script?: string | null;
-    }
-  }
-
-  /**
-   * The Environment in which the Scenario is run.
-   */
-  export interface Environment {
-    /**
-     * Use the blueprint with matching ID.
-     */
-    blueprint_id?: string | null;
-
-    /**
-     * Use the prebuilt with matching ID.
-     */
-    prebuilt_id?: string | null;
-
-    /**
-     * Use the snapshot with matching ID.
-     */
-    snapshot_id?: string | null;
-  }
+  scoring_function_parameters: Array<ScoringFunction>;
 }
 
 /**
@@ -302,6 +220,29 @@ export interface ScoringContractResultView {
    * List of all individual scoring function results.
    */
   scoring_function_results: Array<ScoringFunctionResultView>;
+}
+
+/**
+ * ScoringFunctionParameters specifies a method of scoring a Scenario.
+ */
+export interface ScoringFunction {
+  /**
+   * Name of scoring function.
+   */
+  name: string;
+
+  /**
+   * Wight to apply to scoring function score. Weights of all scoring functions
+   * should sum to 1.0.
+   */
+  weight: number;
+
+  /**
+   * A single bash script that sets up the environment, scores, and prints the final
+   * score to standard out. Score should be an integer between 0 and 100, and look
+   * like "score=[0..100].
+   */
+  bash_script?: string | null;
 }
 
 /**
@@ -346,7 +287,7 @@ export interface ScenarioCreateParams {
   /**
    * The input context for the Scenario.
    */
-  input_context: InputContextParameters;
+  input_context: InputContext;
 
   /**
    * Name of the scenario.
@@ -356,69 +297,12 @@ export interface ScenarioCreateParams {
   /**
    * The scoring contract for the Scenario.
    */
-  scoring_contract: ScenarioCreateParams.ScoringContract;
+  scoring_contract: ScoringContract;
 
   /**
    * The Environment in which the Scenario will run.
    */
-  environment_parameters?: ScenarioCreateParams.EnvironmentParameters | null;
-}
-
-export namespace ScenarioCreateParams {
-  /**
-   * The scoring contract for the Scenario.
-   */
-  export interface ScoringContract {
-    /**
-     * A list of scoring functions used to evaluate the Scenario.
-     */
-    scoring_function_parameters: Array<ScoringContract.ScoringFunctionParameter>;
-  }
-
-  export namespace ScoringContract {
-    /**
-     * ScoringFunctionParameters specifies a method of scoring a Scenario.
-     */
-    export interface ScoringFunctionParameter {
-      /**
-       * Name of scoring function.
-       */
-      name: string;
-
-      /**
-       * Wight to apply to scoring function score. Weights of all scoring functions
-       * should sum to 1.0.
-       */
-      weight: number;
-
-      /**
-       * A single bash script that sets up the environment, scores, and prints the final
-       * score to standard out. Score should be an integer between 0 and 100, and look
-       * like "score=[0..100].
-       */
-      bash_script?: string | null;
-    }
-  }
-
-  /**
-   * The Environment in which the Scenario will run.
-   */
-  export interface EnvironmentParameters {
-    /**
-     * Use the blueprint with matching ID.
-     */
-    blueprint_id?: string | null;
-
-    /**
-     * Use the prebuilt with matching ID.
-     */
-    prebuilt_id?: string | null;
-
-    /**
-     * Use the snapshot with matching ID.
-     */
-    snapshot_id?: string | null;
-  }
+  environment_parameters?: ScenarioEnvironment | null;
 }
 
 export interface ScenarioListParams {
@@ -454,13 +338,16 @@ Scenarios.Runs = Runs;
 
 export declare namespace Scenarios {
   export {
-    type InputContextParameters as InputContextParameters,
+    type InputContext as InputContext,
     type ScenarioCreateParameters as ScenarioCreateParameters,
+    type ScenarioEnvironment as ScenarioEnvironment,
     type ScenarioListView as ScenarioListView,
     type ScenarioRunListView as ScenarioRunListView,
     type ScenarioRunView as ScenarioRunView,
     type ScenarioView as ScenarioView,
+    type ScoringContract as ScoringContract,
     type ScoringContractResultView as ScoringContractResultView,
+    type ScoringFunction as ScoringFunction,
     type ScoringFunctionResultView as ScoringFunctionResultView,
     type StartScenarioRunParameters as StartScenarioRunParameters,
     type ScenarioCreateParams as ScenarioCreateParams,
