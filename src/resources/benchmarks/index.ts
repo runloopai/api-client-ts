@@ -4,6 +4,7 @@ export {
   Benchmarks,
   type BenchmarkCreateParameters,
   type BenchmarkListView,
+  type BenchmarkRunListView,
   type BenchmarkRunView,
   type BenchmarkView,
   type StartBenchmarkRunParameters,
@@ -11,4 +12,4 @@ export {
   type BenchmarkListParams,
   type BenchmarkStartRunParams,
 } from './benchmarks';
-export { Runs, type RunListResponse, type RunListParams } from './runs';
+export { Runs, type RunListParams } from './runs';

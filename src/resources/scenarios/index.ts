@@ -4,7 +4,6 @@ export { Runs, type RunListParams } from './runs';
 export {
   Scenarios,
   type InputContextParameters,
-  type RepositoryConnectionListView,
   type ScenarioCreateParameters,
   type ScenarioEnvironmentParameters,
   type ScenarioListView,
