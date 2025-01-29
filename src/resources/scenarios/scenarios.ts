@@ -72,33 +72,69 @@ export interface ScenarioCreateParameters {
   /**
    * The scoring contract for the Scenario.
    */
-  scoring_contract: ScoringContractParameters;
+  scoring_contract: ScenarioCreateParameters.ScoringContract;
 
   /**
    * The Environment in which the Scenario will run.
    */
-  environment_parameters?: ScenarioEnvironmentParameters | null;
+  environment_parameters?: ScenarioCreateParameters.EnvironmentParameters | null;
 }
 
-/**
- * ScenarioEnvironmentParameters specify the environment in which a Scenario will
- * be run.
- */
-export interface ScenarioEnvironmentParameters {
+export namespace ScenarioCreateParameters {
   /**
-   * Use the blueprint with matching ID.
+   * The scoring contract for the Scenario.
    */
-  blueprint_id?: string | null;
+  export interface ScoringContract {
+    /**
+     * A list of scoring functions used to evaluate the Scenario.
+     */
+    scoring_function_parameters: Array<ScoringContract.ScoringFunctionParameter>;
+  }
+
+  export namespace ScoringContract {
+    /**
+     * ScoringFunctionParameters specifies a method of scoring a Scenario.
+     */
+    export interface ScoringFunctionParameter {
+      /**
+       * Name of scoring function.
+       */
+      name: string;
+
+      /**
+       * Wight to apply to scoring function score. Weights of all scoring functions
+       * should sum to 1.0.
+       */
+      weight: number;
+
+      /**
+       * A single bash script that sets up the environment, scores, and prints the final
+       * score to standard out. Score should be an integer between 0 and 100, and look
+       * like "score=[0..100].
+       */
+      bash_script?: string | null;
+    }
+  }
 
   /**
-   * Use the prebuilt with matching ID.
+   * The Environment in which the Scenario will run.
    */
-  prebuilt_id?: string | null;
+  export interface EnvironmentParameters {
+    /**
+     * Use the blueprint with matching ID.
+     */
+    blueprint_id?: string | null;
 
-  /**
-   * Use the snapshot with matching ID.
-   */
-  snapshot_id?: string | null;
+    /**
+     * Use the prebuilt with matching ID.
+     */
+    prebuilt_id?: string | null;
+
+    /**
+     * Use the snapshot with matching ID.
+     */
+    snapshot_id?: string | null;
+  }
 }
 
 export interface ScenarioListView {
@@ -187,23 +223,69 @@ export interface ScenarioView {
   /**
    * The scoring contract for the Scenario.
    */
-  scoring_contract: ScoringContractParameters;
+  scoring_contract: ScenarioView.ScoringContract;
 
   /**
    * The Environment in which the Scenario is run.
    */
-  environment?: ScenarioEnvironmentParameters | null;
+  environment?: ScenarioView.Environment | null;
 }
 
-/**
- * InputContextView specifies the problem statement along with all additional
- * context for a Scenario.
- */
-export interface ScoringContractParameters {
+export namespace ScenarioView {
   /**
-   * A list of scoring functions used to evaluate the Scenario.
+   * The scoring contract for the Scenario.
    */
-  scoring_function_parameters: Array<ScoringFunctionParameters>;
+  export interface ScoringContract {
+    /**
+     * A list of scoring functions used to evaluate the Scenario.
+     */
+    scoring_function_parameters: Array<ScoringContract.ScoringFunctionParameter>;
+  }
+
+  export namespace ScoringContract {
+    /**
+     * ScoringFunctionParameters specifies a method of scoring a Scenario.
+     */
+    export interface ScoringFunctionParameter {
+      /**
+       * Name of scoring function.
+       */
+      name: string;
+
+      /**
+       * Wight to apply to scoring function score. Weights of all scoring functions
+       * should sum to 1.0.
+       */
+      weight: number;
+
+      /**
+       * A single bash script that sets up the environment, scores, and prints the final
+       * score to standard out. Score should be an integer between 0 and 100, and look
+       * like "score=[0..100].
+       */
+      bash_script?: string | null;
+    }
+  }
+
+  /**
+   * The Environment in which the Scenario is run.
+   */
+  export interface Environment {
+    /**
+     * Use the blueprint with matching ID.
+     */
+    blueprint_id?: string | null;
+
+    /**
+     * Use the prebuilt with matching ID.
+     */
+    prebuilt_id?: string | null;
+
+    /**
+     * Use the snapshot with matching ID.
+     */
+    snapshot_id?: string | null;
+  }
 }
 
 /**
@@ -220,29 +302,6 @@ export interface ScoringContractResultView {
    * List of all individual scoring function results.
    */
   scoring_function_results: Array<ScoringFunctionResultView>;
-}
-
-/**
- * ScoringFunctionParameters specifies a method of scoring a Scenario.
- */
-export interface ScoringFunctionParameters {
-  /**
-   * Name of scoring function.
-   */
-  name: string;
-
-  /**
-   * Wight to apply to scoring function score. Weights of all scoring functions
-   * should sum to 1.0.
-   */
-  weight: number;
-
-  /**
-   * A single bash script that sets up the environment, scores, and prints the final
-   * score to standard out. Score should be an integer between 0 and 100, and look
-   * like "score=[0..100].
-   */
-  bash_script?: string | null;
 }
 
 /**
@@ -297,12 +356,69 @@ export interface ScenarioCreateParams {
   /**
    * The scoring contract for the Scenario.
    */
-  scoring_contract: ScoringContractParameters;
+  scoring_contract: ScenarioCreateParams.ScoringContract;
 
   /**
    * The Environment in which the Scenario will run.
    */
-  environment_parameters?: ScenarioEnvironmentParameters | null;
+  environment_parameters?: ScenarioCreateParams.EnvironmentParameters | null;
+}
+
+export namespace ScenarioCreateParams {
+  /**
+   * The scoring contract for the Scenario.
+   */
+  export interface ScoringContract {
+    /**
+     * A list of scoring functions used to evaluate the Scenario.
+     */
+    scoring_function_parameters: Array<ScoringContract.ScoringFunctionParameter>;
+  }
+
+  export namespace ScoringContract {
+    /**
+     * ScoringFunctionParameters specifies a method of scoring a Scenario.
+     */
+    export interface ScoringFunctionParameter {
+      /**
+       * Name of scoring function.
+       */
+      name: string;
+
+      /**
+       * Wight to apply to scoring function score. Weights of all scoring functions
+       * should sum to 1.0.
+       */
+      weight: number;
+
+      /**
+       * A single bash script that sets up the environment, scores, and prints the final
+       * score to standard out. Score should be an integer between 0 and 100, and look
+       * like "score=[0..100].
+       */
+      bash_script?: string | null;
+    }
+  }
+
+  /**
+   * The Environment in which the Scenario will run.
+   */
+  export interface EnvironmentParameters {
+    /**
+     * Use the blueprint with matching ID.
+     */
+    blueprint_id?: string | null;
+
+    /**
+     * Use the prebuilt with matching ID.
+     */
+    prebuilt_id?: string | null;
+
+    /**
+     * Use the snapshot with matching ID.
+     */
+    snapshot_id?: string | null;
+  }
 }
 
 export interface ScenarioListParams {
@@ -340,14 +456,11 @@ export declare namespace Scenarios {
   export {
     type InputContextParameters as InputContextParameters,
     type ScenarioCreateParameters as ScenarioCreateParameters,
-    type ScenarioEnvironmentParameters as ScenarioEnvironmentParameters,
     type ScenarioListView as ScenarioListView,
     type ScenarioRunListView as ScenarioRunListView,
     type ScenarioRunView as ScenarioRunView,
     type ScenarioView as ScenarioView,
-    type ScoringContractParameters as ScoringContractParameters,
     type ScoringContractResultView as ScoringContractResultView,
-    type ScoringFunctionParameters as ScoringFunctionParameters,
     type ScoringFunctionResultView as ScoringFunctionResultView,
     type StartScenarioRunParameters as StartScenarioRunParameters,
     type ScenarioCreateParams as ScenarioCreateParams,
