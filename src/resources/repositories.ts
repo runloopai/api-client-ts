@@ -19,7 +19,7 @@ export class Repositories extends APIResource {
 
   /**
    * Get Repository Connection details including latest inspection status and
-   * generated respository insights.
+   * generated repository insights.
    */
   retrieve(id: string, options?: Core.RequestOptions): Core.APIPromise<RepositoryConnectionView> {
     return this._client.get(`/v1/repositories/${id}`, options);
@@ -195,9 +195,24 @@ export interface RepositoryCreateParams {
    * Account owner of the repository.
    */
   owner: string;
+
+  /**
+   * ID of blueprint to use as base for resulting RepositoryVersion blueprint.
+   */
+  blueprint_id?: string | null;
 }
 
-export interface RepositoryListParams extends RepositoriesCursorIDPageParams {}
+export interface RepositoryListParams extends RepositoriesCursorIDPageParams {
+  /**
+   * Filter by repository name
+   */
+  name?: string;
+
+  /**
+   * Filter by repository owner
+   */
+  owner?: string;
+}
 
 export interface RepositoryDeleteParams {}
 

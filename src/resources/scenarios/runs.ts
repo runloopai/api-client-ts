@@ -55,7 +55,7 @@ export interface RunListParams {
   /**
    * Filter runs associated to Scenario given ID
    */
-  scenario_id?: boolean;
+  scenario_id?: string;
 
   /**
    * Load the next page of data starting after the item with the given ID.
