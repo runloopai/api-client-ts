@@ -21,7 +21,11 @@ describe('resource repositories', () => {
   });
 
   test('create: required and optional params', async () => {
-    const response = await client.repositories.create({ name: 'name', owner: 'owner' });
+    const response = await client.repositories.create({
+      name: 'name',
+      owner: 'owner',
+      blueprint_id: 'blueprint_id',
+    });
   });
 
   test('retrieve', async () => {
@@ -64,7 +68,7 @@ describe('resource repositories', () => {
     // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
     await expect(
       client.repositories.list(
-        { limit: 0, starting_after: 'starting_after' },
+        { limit: 0, name: 'name', owner: 'owner', starting_after: 'starting_after' },
         { path: '/_stainless_unknown_path' },
       ),
     ).rejects.toThrow(Runloop.NotFoundError);
