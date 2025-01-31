@@ -99,9 +99,19 @@ export interface BenchmarkRunView {
   benchmark_id: string;
 
   /**
+   * The time the benchmark run execution started (Unix timestamp milliseconds).
+   */
+  start_time_ms: number;
+
+  /**
    * The state of the BenchmarkRun.
    */
   state: 'running' | 'completed';
+
+  /**
+   * The duration for the BenchmarkRun to complete.
+   */
+  duration_ms?: number | null;
 
   /**
    * The name of the BenchmarkRun.

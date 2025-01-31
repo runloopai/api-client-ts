@@ -167,6 +167,11 @@ export interface ScenarioRunView {
    * The input context for the Scenario.
    */
   scoring_contract_result?: ScoringContractResultView | null;
+
+  /**
+   * The time that the scenario started
+   */
+  start_time_ms?: number | null;
 }
 
 /**
