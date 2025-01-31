@@ -90,6 +90,32 @@ Methods:
 - <code title="post /v1/devboxes/{id}/upload_file">client.devboxes.<a href="./src/resources/devboxes/devboxes.ts">uploadFile</a>(id, { ...params }) -> unknown</code>
 - <code title="post /v1/devboxes/{id}/write_file_contents">client.devboxes.<a href="./src/resources/devboxes/devboxes.ts">writeFileContents</a>(id, { ...params }) -> DevboxExecutionDetailView</code>
 
+## Browsers
+
+Types:
+
+- <code><a href="./src/resources/devboxes/browsers.ts">BrowserView</a></code>
+
+Methods:
+
+- <code title="post /v1/devboxes/browsers">client.devboxes.browsers.<a href="./src/resources/devboxes/browsers.ts">create</a>() -> BrowserView</code>
+
+## Computers
+
+Types:
+
+- <code><a href="./src/resources/devboxes/computers.ts">ComputerView</a></code>
+- <code><a href="./src/resources/devboxes/computers.ts">ComputerKeyboardInteractionResponse</a></code>
+- <code><a href="./src/resources/devboxes/computers.ts">ComputerMouseInteractionResponse</a></code>
+- <code><a href="./src/resources/devboxes/computers.ts">ComputerScreenInteractionResponse</a></code>
+
+Methods:
+
+- <code title="post /v1/devboxes/computers">client.devboxes.computers.<a href="./src/resources/devboxes/computers.ts">create</a>({ ...params }) -> ComputerView</code>
+- <code title="post /v1/devboxes/computers/{id}/keyboard_interaction">client.devboxes.computers.<a href="./src/resources/devboxes/computers.ts">keyboardInteraction</a>(id, { ...params }) -> ComputerKeyboardInteractionResponse</code>
+- <code title="post /v1/devboxes/computers/{id}/mouse_interaction">client.devboxes.computers.<a href="./src/resources/devboxes/computers.ts">mouseInteraction</a>(id, { ...params }) -> ComputerMouseInteractionResponse</code>
+- <code title="post /v1/devboxes/computers/{id}/screen_interaction">client.devboxes.computers.<a href="./src/resources/devboxes/computers.ts">screenInteraction</a>(id, { ...params }) -> ComputerScreenInteractionResponse</code>
+
 ## Lsp
 
 Types:

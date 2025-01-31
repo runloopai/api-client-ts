@@ -146,7 +146,7 @@ export interface ScenarioRunView {
   /**
    * The state of the ScenarioRun.
    */
-  state: 'running' | 'scoring' | 'completed' | 'canceled' | 'timeout' | 'failed';
+  state: 'running' | 'scoring' | 'scored' | 'completed' | 'canceled' | 'timeout' | 'failed';
 
   /**
    * ID of the BenchmarkRun that this Scenario is associated with, if any.
@@ -157,6 +157,11 @@ export interface ScenarioRunView {
    * Duration scenario took to run.
    */
   duration_ms?: number | null;
+
+  /**
+   * Optional name of ScenarioRun.
+   */
+  name?: string | null;
 
   /**
    * The input context for the Scenario.
