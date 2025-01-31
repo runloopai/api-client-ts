@@ -49,7 +49,7 @@ describe('resource runs', () => {
     // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
     await expect(
       client.benchmarks.runs.list(
-        { limit: 0, starting_after: 'starting_after' },
+        { benchmark_id: 'benchmark_id', limit: 0, starting_after: 'starting_after' },
         { path: '/_stainless_unknown_path' },
       ),
     ).rejects.toThrow(Runloop.NotFoundError);

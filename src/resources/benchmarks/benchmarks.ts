@@ -107,6 +107,12 @@ export interface BenchmarkRunView {
    * The name of the BenchmarkRun.
    */
   name?: string | null;
+
+  /**
+   * The final score across the BenchmarkRun, present once completed. Calculated as
+   * sum of scenario scores / number of scenario runs.
+   */
+  score?: number | null;
 }
 
 /**
@@ -159,6 +165,12 @@ export interface BenchmarkListParams {
    * The limit of items to return. Default is 20.
    */
   limit?: number;
+
+  /**
+   * List public benchmarks, e.g. SWE-bench. Defaults to false, i.e. only
+   * user-defined benchmarks are listed.
+   */
+  public?: boolean;
 
   /**
    * Load the next page of data starting after the item with the given ID.
