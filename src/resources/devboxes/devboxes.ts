@@ -4,6 +4,20 @@ import { APIResource } from '../../resource';
 import { isRequestOptions } from '../../core';
 import * as Core from '../../core';
 import * as Shared from '../shared';
+import * as BrowsersAPI from './browsers';
+import { BrowserCreateParams, BrowserView, Browsers } from './browsers';
+import * as ComputersAPI from './computers';
+import {
+  ComputerCreateParams,
+  ComputerKeyboardInteractionParams,
+  ComputerKeyboardInteractionResponse,
+  ComputerMouseInteractionParams,
+  ComputerMouseInteractionResponse,
+  ComputerScreenInteractionParams,
+  ComputerScreenInteractionResponse,
+  ComputerView,
+  Computers,
+} from './computers';
 import * as ExecutionsAPI from './executions';
 import {
   ExecutionExecuteAsyncParams,
@@ -94,6 +108,8 @@ import {
 import { type Response } from '../../_shims/index';
 
 export class Devboxes extends APIResource {
+  browsers: BrowsersAPI.Browsers = new BrowsersAPI.Browsers(this._client);
+  computers: ComputersAPI.Computers = new ComputersAPI.Computers(this._client);
   lsp: LspAPI.Lsp = new LspAPI.Lsp(this._client);
   logs: LogsAPI.Logs = new LogsAPI.Logs(this._client);
   executions: ExecutionsAPI.Executions = new ExecutionsAPI.Executions(this._client);
@@ -496,6 +512,12 @@ export interface DevboxView {
   id: string;
 
   /**
+   * A list of capability groups this devbox has access to. This allows devboxes to
+   * be compatible with certain tools sets like computer usage APIs.
+   */
+  capabilities: Array<'unknown' | 'computer_usage' | 'browser_usage'>;
+
+  /**
    * Creation time of the Devbox (Unix timestamp milliseconds).
    */
   create_time_ms: number;
@@ -777,6 +799,8 @@ export interface DevboxWriteFileContentsParams {
 
 Devboxes.DevboxViewsDevboxesCursorIDPage = DevboxViewsDevboxesCursorIDPage;
 Devboxes.DevboxSnapshotViewsDiskSnapshotsCursorIDPage = DevboxSnapshotViewsDiskSnapshotsCursorIDPage;
+Devboxes.Browsers = Browsers;
+Devboxes.Computers = Computers;
 Devboxes.Lsp = Lsp;
 Devboxes.Logs = Logs;
 Devboxes.Executions = Executions;
@@ -809,6 +833,24 @@ export declare namespace Devboxes {
     type DevboxSnapshotDiskParams as DevboxSnapshotDiskParams,
     type DevboxUploadFileParams as DevboxUploadFileParams,
     type DevboxWriteFileContentsParams as DevboxWriteFileContentsParams,
+  };
+
+  export {
+    Browsers as Browsers,
+    type BrowserView as BrowserView,
+    type BrowserCreateParams as BrowserCreateParams,
+  };
+
+  export {
+    Computers as Computers,
+    type ComputerView as ComputerView,
+    type ComputerKeyboardInteractionResponse as ComputerKeyboardInteractionResponse,
+    type ComputerMouseInteractionResponse as ComputerMouseInteractionResponse,
+    type ComputerScreenInteractionResponse as ComputerScreenInteractionResponse,
+    type ComputerCreateParams as ComputerCreateParams,
+    type ComputerKeyboardInteractionParams as ComputerKeyboardInteractionParams,
+    type ComputerMouseInteractionParams as ComputerMouseInteractionParams,
+    type ComputerScreenInteractionParams as ComputerScreenInteractionParams,
   };
 
   export {

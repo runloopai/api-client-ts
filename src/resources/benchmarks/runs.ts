@@ -41,6 +41,11 @@ export class Runs extends APIResource {
 
 export interface RunListParams {
   /**
+   * The Benchmark ID to filter by.
+   */
+  benchmark_id?: string;
+
+  /**
    * The limit of items to return. Default is 20.
    */
   limit?: number;
