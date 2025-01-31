@@ -1,5 +1,24 @@
 # Changelog
 
+## 0.12.0 (2025-01-31)
+
+Full Changelog: [v0.11.0...v0.12.0](https://github.com/runloopai/api-client-ts/compare/v0.11.0...v0.12.0)
+
+### Features
+
+* **api:** api update ([#501](https://github.com/runloopai/api-client-ts/issues/501)) ([9263442](https://github.com/runloopai/api-client-ts/commit/926344205ee9e65bc5a01ef06696828f4ec5fd34))
+* **api:** api update ([#502](https://github.com/runloopai/api-client-ts/issues/502)) ([9355277](https://github.com/runloopai/api-client-ts/commit/93552777be17804433933197b7397d4ff9136497))
+* **api:** api update ([#503](https://github.com/runloopai/api-client-ts/issues/503)) ([c3cb9ec](https://github.com/runloopai/api-client-ts/commit/c3cb9ecc743acd27f80b5c3eb0002c2543b109d8))
+* **api:** api update ([#504](https://github.com/runloopai/api-client-ts/issues/504)) ([2d18d18](https://github.com/runloopai/api-client-ts/commit/2d18d18a26310e6d3551e2e33eddbe688fd1530f))
+* **api:** api update ([#505](https://github.com/runloopai/api-client-ts/issues/505)) ([e18a1f3](https://github.com/runloopai/api-client-ts/commit/e18a1f3cab03f95b491d1520987b9ce4d8e5eb4c))
+* Update tools helpers to be more ergonomic ([c77c08d](https://github.com/runloopai/api-client-ts/commit/c77c08ded7d8776c2eda7aee42de5f804d6487b9))
+
+
+### Chores
+
+* **internal:** codegen related update ([#499](https://github.com/runloopai/api-client-ts/issues/499)) ([d3bf9af](https://github.com/runloopai/api-client-ts/commit/d3bf9affe889747bf3a9d205dfc51726bc9d6333))
+* **internal:** codegen related update ([#500](https://github.com/runloopai/api-client-ts/issues/500)) ([04e53ee](https://github.com/runloopai/api-client-ts/commit/04e53ee8c52c5064f34bdec0436e6d1ab3cafb28))
+
 ## 0.11.0 (2025-01-18)
 
 Full Changelog: [v0.10.0...v0.11.0](https://github.com/runloopai/api-client-ts/compare/v0.10.0...v0.11.0)
