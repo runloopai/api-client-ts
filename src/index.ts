@@ -5,6 +5,10 @@ import * as Core from './core';
 import * as Errors from './error';
 import * as Pagination from './pagination';
 import {
+  type BenchmarkRunsCursorIDPageParams,
+  BenchmarkRunsCursorIDPageResponse,
+  type BenchmarksCursorIDPageParams,
+  BenchmarksCursorIDPageResponse,
   type BlueprintsCursorIDPageParams,
   BlueprintsCursorIDPageResponse,
   type DevboxesCursorIDPageParams,
@@ -13,6 +17,10 @@ import {
   DiskSnapshotsCursorIDPageResponse,
   type RepositoriesCursorIDPageParams,
   RepositoriesCursorIDPageResponse,
+  type ScenarioRunsCursorIDPageParams,
+  ScenarioRunsCursorIDPageResponse,
+  type ScenariosCursorIDPageParams,
+  ScenariosCursorIDPageResponse,
 } from './pagination';
 import * as Uploads from './uploads';
 import * as API from './resources/index';
@@ -50,6 +58,7 @@ import {
   BenchmarkRunView,
   BenchmarkStartRunParams,
   BenchmarkView,
+  BenchmarkViewsBenchmarksCursorIDPage,
   Benchmarks,
   StartBenchmarkRunParameters,
 } from './resources/benchmarks/benchmarks';
@@ -93,6 +102,7 @@ import {
   ScenarioRunView,
   ScenarioStartRunParams,
   ScenarioView,
+  ScenarioViewsScenariosCursorIDPage,
   Scenarios,
   ScoringContract,
   ScoringContractResultView,
@@ -258,12 +268,14 @@ export class Runloop extends Core.APIClient {
 }
 
 Runloop.Benchmarks = Benchmarks;
+Runloop.BenchmarkViewsBenchmarksCursorIDPage = BenchmarkViewsBenchmarksCursorIDPage;
 Runloop.Blueprints = Blueprints;
 Runloop.BlueprintViewsBlueprintsCursorIDPage = BlueprintViewsBlueprintsCursorIDPage;
 Runloop.Devboxes = Devboxes;
 Runloop.DevboxViewsDevboxesCursorIDPage = DevboxViewsDevboxesCursorIDPage;
 Runloop.DevboxSnapshotViewsDiskSnapshotsCursorIDPage = DevboxSnapshotViewsDiskSnapshotsCursorIDPage;
 Runloop.Scenarios = Scenarios;
+Runloop.ScenarioViewsScenariosCursorIDPage = ScenarioViewsScenariosCursorIDPage;
 Runloop.Repositories = Repositories;
 Runloop.RepositoryConnectionViewsRepositoriesCursorIDPage = RepositoryConnectionViewsRepositoriesCursorIDPage;
 export declare namespace Runloop {
@@ -293,6 +305,30 @@ export declare namespace Runloop {
     type DiskSnapshotsCursorIDPageResponse as DiskSnapshotsCursorIDPageResponse,
   };
 
+  export import BenchmarksCursorIDPage = Pagination.BenchmarksCursorIDPage;
+  export {
+    type BenchmarksCursorIDPageParams as BenchmarksCursorIDPageParams,
+    type BenchmarksCursorIDPageResponse as BenchmarksCursorIDPageResponse,
+  };
+
+  export import BenchmarkRunsCursorIDPage = Pagination.BenchmarkRunsCursorIDPage;
+  export {
+    type BenchmarkRunsCursorIDPageParams as BenchmarkRunsCursorIDPageParams,
+    type BenchmarkRunsCursorIDPageResponse as BenchmarkRunsCursorIDPageResponse,
+  };
+
+  export import ScenariosCursorIDPage = Pagination.ScenariosCursorIDPage;
+  export {
+    type ScenariosCursorIDPageParams as ScenariosCursorIDPageParams,
+    type ScenariosCursorIDPageResponse as ScenariosCursorIDPageResponse,
+  };
+
+  export import ScenarioRunsCursorIDPage = Pagination.ScenarioRunsCursorIDPage;
+  export {
+    type ScenarioRunsCursorIDPageParams as ScenarioRunsCursorIDPageParams,
+    type ScenarioRunsCursorIDPageResponse as ScenarioRunsCursorIDPageResponse,
+  };
+
   export {
     Benchmarks as Benchmarks,
     type BenchmarkCreateParameters as BenchmarkCreateParameters,
@@ -301,6 +337,7 @@ export declare namespace Runloop {
     type BenchmarkRunView as BenchmarkRunView,
     type BenchmarkView as BenchmarkView,
     type StartBenchmarkRunParameters as StartBenchmarkRunParameters,
+    BenchmarkViewsBenchmarksCursorIDPage as BenchmarkViewsBenchmarksCursorIDPage,
     type BenchmarkCreateParams as BenchmarkCreateParams,
     type BenchmarkListParams as BenchmarkListParams,
     type BenchmarkStartRunParams as BenchmarkStartRunParams,
@@ -364,6 +401,7 @@ export declare namespace Runloop {
     type ScoringFunction as ScoringFunction,
     type ScoringFunctionResultView as ScoringFunctionResultView,
     type StartScenarioRunParameters as StartScenarioRunParameters,
+    ScenarioViewsScenariosCursorIDPage as ScenarioViewsScenariosCursorIDPage,
     type ScenarioCreateParams as ScenarioCreateParams,
     type ScenarioListParams as ScenarioListParams,
     type ScenarioStartRunParams as ScenarioStartRunParams,
