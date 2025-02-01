@@ -2,6 +2,8 @@
 
 export * from './shared';
 export {
+  BenchmarkRunViewsBenchmarkRunsCursorIDPage,
+  BenchmarkViewsBenchmarksCursorIDPage,
   Benchmarks,
   type BenchmarkCreateParameters,
   type BenchmarkListView,
@@ -68,6 +70,8 @@ export {
   type RepositoryDeleteParams,
 } from './repositories';
 export {
+  ScenarioRunViewsBenchmarkRunsCursorIDPage,
+  ScenarioViewsScenariosCursorIDPage,
   Scenarios,
   type InputContext,
   type ScenarioCreateParameters,

@@ -5,6 +5,11 @@ import { isRequestOptions } from '../../core';
 import * as Core from '../../core';
 import * as RunsAPI from './runs';
 import { RunListParams, Runs } from './runs';
+import {
+  BenchmarkRunsCursorIDPage,
+  ScenariosCursorIDPage,
+  type ScenariosCursorIDPageParams,
+} from '../../pagination';
 
 export class Scenarios extends APIResource {
   runs: RunsAPI.Runs = new RunsAPI.Runs(this._client);
@@ -27,16 +32,22 @@ export class Scenarios extends APIResource {
   /**
    * List all Scenarios matching filter.
    */
-  list(query?: ScenarioListParams, options?: Core.RequestOptions): Core.APIPromise<ScenarioListView>;
-  list(options?: Core.RequestOptions): Core.APIPromise<ScenarioListView>;
+  list(
+    query?: ScenarioListParams,
+    options?: Core.RequestOptions,
+  ): Core.PagePromise<ScenarioViewsScenariosCursorIDPage, ScenarioView>;
+  list(options?: Core.RequestOptions): Core.PagePromise<ScenarioViewsScenariosCursorIDPage, ScenarioView>;
   list(
     query: ScenarioListParams | Core.RequestOptions = {},
     options?: Core.RequestOptions,
-  ): Core.APIPromise<ScenarioListView> {
+  ): Core.PagePromise<ScenarioViewsScenariosCursorIDPage, ScenarioView> {
     if (isRequestOptions(query)) {
       return this.list({}, query);
     }
-    return this._client.get('/v1/scenarios', { query, ...options });
+    return this._client.getAPIList('/v1/scenarios', ScenarioViewsScenariosCursorIDPage, {
+      query,
+      ...options,
+    });
   }
 
   /**
@@ -46,6 +57,10 @@ export class Scenarios extends APIResource {
     return this._client.post('/v1/scenarios/start_run', { body, ...options });
   }
 }
+
+export class ScenarioViewsScenariosCursorIDPage extends ScenariosCursorIDPage<ScenarioView> {}
+
+export class ScenarioRunViewsBenchmarkRunsCursorIDPage extends BenchmarkRunsCursorIDPage<ScenarioRunView> {}
 
 /**
  * InputContextView specifies the problem statement along with all additional
@@ -315,16 +330,11 @@ export interface ScenarioCreateParams {
   environment_parameters?: ScenarioEnvironment | null;
 }
 
-export interface ScenarioListParams {
+export interface ScenarioListParams extends ScenariosCursorIDPageParams {
   /**
-   * The limit of items to return. Default is 20.
+   * Query for Scenarios with a given name.
    */
-  limit?: number;
-
-  /**
-   * Load the next page of data starting after the item with the given ID.
-   */
-  starting_after?: string;
+  name?: number;
 }
 
 export interface ScenarioStartRunParams {
@@ -344,6 +354,7 @@ export interface ScenarioStartRunParams {
   run_name?: string | null;
 }
 
+Scenarios.ScenarioViewsScenariosCursorIDPage = ScenarioViewsScenariosCursorIDPage;
 Scenarios.Runs = Runs;
 
 export declare namespace Scenarios {
@@ -360,6 +371,7 @@ export declare namespace Scenarios {
     type ScoringFunction as ScoringFunction,
     type ScoringFunctionResultView as ScoringFunctionResultView,
     type StartScenarioRunParameters as StartScenarioRunParameters,
+    ScenarioViewsScenariosCursorIDPage as ScenarioViewsScenariosCursorIDPage,
     type ScenarioCreateParams as ScenarioCreateParams,
     type ScenarioListParams as ScenarioListParams,
     type ScenarioStartRunParams as ScenarioStartRunParams,
