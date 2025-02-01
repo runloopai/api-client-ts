@@ -4,6 +4,8 @@ import { APIResource } from '../../resource';
 import { isRequestOptions } from '../../core';
 import * as Core from '../../core';
 import * as ScenariosAPI from './scenarios';
+import { ScenarioRunViewsBenchmarkRunsCursorIDPage } from './scenarios';
+import { type BenchmarkRunsCursorIDPageParams } from '../../pagination';
 
 export class Runs extends APIResource {
   /**
@@ -19,16 +21,21 @@ export class Runs extends APIResource {
   list(
     query?: RunListParams,
     options?: Core.RequestOptions,
-  ): Core.APIPromise<ScenariosAPI.ScenarioRunListView>;
-  list(options?: Core.RequestOptions): Core.APIPromise<ScenariosAPI.ScenarioRunListView>;
+  ): Core.PagePromise<ScenarioRunViewsBenchmarkRunsCursorIDPage, ScenariosAPI.ScenarioRunView>;
+  list(
+    options?: Core.RequestOptions,
+  ): Core.PagePromise<ScenarioRunViewsBenchmarkRunsCursorIDPage, ScenariosAPI.ScenarioRunView>;
   list(
     query: RunListParams | Core.RequestOptions = {},
     options?: Core.RequestOptions,
-  ): Core.APIPromise<ScenariosAPI.ScenarioRunListView> {
+  ): Core.PagePromise<ScenarioRunViewsBenchmarkRunsCursorIDPage, ScenariosAPI.ScenarioRunView> {
     if (isRequestOptions(query)) {
       return this.list({}, query);
     }
-    return this._client.get('/v1/scenarios/runs', { query, ...options });
+    return this._client.getAPIList('/v1/scenarios/runs', ScenarioRunViewsBenchmarkRunsCursorIDPage, {
+      query,
+      ...options,
+    });
   }
 
   /**
@@ -46,23 +53,15 @@ export class Runs extends APIResource {
   }
 }
 
-export interface RunListParams {
-  /**
-   * The limit of items to return. Default is 20.
-   */
-  limit?: number;
-
+export interface RunListParams extends BenchmarkRunsCursorIDPageParams {
   /**
    * Filter runs associated to Scenario given ID
    */
   scenario_id?: string;
-
-  /**
-   * Load the next page of data starting after the item with the given ID.
-   */
-  starting_after?: string;
 }
 
 export declare namespace Runs {
   export { type RunListParams as RunListParams };
 }
+
+export { ScenarioRunViewsBenchmarkRunsCursorIDPage };

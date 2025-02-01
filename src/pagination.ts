@@ -265,3 +265,267 @@ export class DiskSnapshotsCursorIDPage<Item extends { id: string }>
     return { params: { starting_after: id } };
   }
 }
+
+export interface BenchmarksCursorIDPageResponse<Item> {
+  benchmarks: Array<Item>;
+
+  has_more: boolean;
+
+  total_count: number;
+}
+
+export interface BenchmarksCursorIDPageParams {
+  starting_after?: string;
+
+  limit?: number;
+}
+
+export class BenchmarksCursorIDPage<Item extends { id: string }>
+  extends AbstractPage<Item>
+  implements BenchmarksCursorIDPageResponse<Item>
+{
+  benchmarks: Array<Item>;
+
+  has_more: boolean;
+
+  total_count: number;
+
+  constructor(
+    client: APIClient,
+    response: Response,
+    body: BenchmarksCursorIDPageResponse<Item>,
+    options: FinalRequestOptions,
+  ) {
+    super(client, response, body, options);
+
+    this.benchmarks = body.benchmarks || [];
+    this.has_more = body.has_more || false;
+    this.total_count = body.total_count || 0;
+  }
+
+  getPaginatedItems(): Item[] {
+    return this.benchmarks ?? [];
+  }
+
+  // @deprecated Please use `nextPageInfo()` instead
+  nextPageParams(): Partial<BenchmarksCursorIDPageParams> | null {
+    const info = this.nextPageInfo();
+    if (!info) return null;
+    if ('params' in info) return info.params;
+    const params = Object.fromEntries(info.url.searchParams);
+    if (!Object.keys(params).length) return null;
+    return params;
+  }
+
+  nextPageInfo(): PageInfo | null {
+    const benchmarks = this.getPaginatedItems();
+    if (!benchmarks.length) {
+      return null;
+    }
+
+    const id = benchmarks[benchmarks.length - 1]?.id;
+    if (!id) {
+      return null;
+    }
+
+    return { params: { starting_after: id } };
+  }
+}
+
+export interface BenchmarkRunsCursorIDPageResponse<Item> {
+  runs: Array<Item>;
+
+  has_more: boolean;
+
+  total_count: number;
+}
+
+export interface BenchmarkRunsCursorIDPageParams {
+  starting_after?: string;
+
+  limit?: number;
+}
+
+export class BenchmarkRunsCursorIDPage<Item extends { id: string }>
+  extends AbstractPage<Item>
+  implements BenchmarkRunsCursorIDPageResponse<Item>
+{
+  runs: Array<Item>;
+
+  has_more: boolean;
+
+  total_count: number;
+
+  constructor(
+    client: APIClient,
+    response: Response,
+    body: BenchmarkRunsCursorIDPageResponse<Item>,
+    options: FinalRequestOptions,
+  ) {
+    super(client, response, body, options);
+
+    this.runs = body.runs || [];
+    this.has_more = body.has_more || false;
+    this.total_count = body.total_count || 0;
+  }
+
+  getPaginatedItems(): Item[] {
+    return this.runs ?? [];
+  }
+
+  // @deprecated Please use `nextPageInfo()` instead
+  nextPageParams(): Partial<BenchmarkRunsCursorIDPageParams> | null {
+    const info = this.nextPageInfo();
+    if (!info) return null;
+    if ('params' in info) return info.params;
+    const params = Object.fromEntries(info.url.searchParams);
+    if (!Object.keys(params).length) return null;
+    return params;
+  }
+
+  nextPageInfo(): PageInfo | null {
+    const runs = this.getPaginatedItems();
+    if (!runs.length) {
+      return null;
+    }
+
+    const id = runs[runs.length - 1]?.id;
+    if (!id) {
+      return null;
+    }
+
+    return { params: { starting_after: id } };
+  }
+}
+
+export interface ScenariosCursorIDPageResponse<Item> {
+  scenarios: Array<Item>;
+
+  has_more: boolean;
+
+  total_count: number;
+}
+
+export interface ScenariosCursorIDPageParams {
+  starting_after?: string;
+
+  limit?: number;
+}
+
+export class ScenariosCursorIDPage<Item extends { id: string }>
+  extends AbstractPage<Item>
+  implements ScenariosCursorIDPageResponse<Item>
+{
+  scenarios: Array<Item>;
+
+  has_more: boolean;
+
+  total_count: number;
+
+  constructor(
+    client: APIClient,
+    response: Response,
+    body: ScenariosCursorIDPageResponse<Item>,
+    options: FinalRequestOptions,
+  ) {
+    super(client, response, body, options);
+
+    this.scenarios = body.scenarios || [];
+    this.has_more = body.has_more || false;
+    this.total_count = body.total_count || 0;
+  }
+
+  getPaginatedItems(): Item[] {
+    return this.scenarios ?? [];
+  }
+
+  // @deprecated Please use `nextPageInfo()` instead
+  nextPageParams(): Partial<ScenariosCursorIDPageParams> | null {
+    const info = this.nextPageInfo();
+    if (!info) return null;
+    if ('params' in info) return info.params;
+    const params = Object.fromEntries(info.url.searchParams);
+    if (!Object.keys(params).length) return null;
+    return params;
+  }
+
+  nextPageInfo(): PageInfo | null {
+    const scenarios = this.getPaginatedItems();
+    if (!scenarios.length) {
+      return null;
+    }
+
+    const id = scenarios[scenarios.length - 1]?.id;
+    if (!id) {
+      return null;
+    }
+
+    return { params: { starting_after: id } };
+  }
+}
+
+export interface ScenarioRunsCursorIDPageResponse<Item> {
+  runs: Array<Item>;
+
+  has_more: boolean;
+
+  total_count: number;
+}
+
+export interface ScenarioRunsCursorIDPageParams {
+  starting_after?: string;
+
+  limit?: number;
+}
+
+export class ScenarioRunsCursorIDPage<Item extends { id: string }>
+  extends AbstractPage<Item>
+  implements ScenarioRunsCursorIDPageResponse<Item>
+{
+  runs: Array<Item>;
+
+  has_more: boolean;
+
+  total_count: number;
+
+  constructor(
+    client: APIClient,
+    response: Response,
+    body: ScenarioRunsCursorIDPageResponse<Item>,
+    options: FinalRequestOptions,
+  ) {
+    super(client, response, body, options);
+
+    this.runs = body.runs || [];
+    this.has_more = body.has_more || false;
+    this.total_count = body.total_count || 0;
+  }
+
+  getPaginatedItems(): Item[] {
+    return this.runs ?? [];
+  }
+
+  // @deprecated Please use `nextPageInfo()` instead
+  nextPageParams(): Partial<ScenarioRunsCursorIDPageParams> | null {
+    const info = this.nextPageInfo();
+    if (!info) return null;
+    if ('params' in info) return info.params;
+    const params = Object.fromEntries(info.url.searchParams);
+    if (!Object.keys(params).length) return null;
+    return params;
+  }
+
+  nextPageInfo(): PageInfo | null {
+    const runs = this.getPaginatedItems();
+    if (!runs.length) {
+      return null;
+    }
+
+    const id = runs[runs.length - 1]?.id;
+    if (!id) {
+      return null;
+    }
+
+    return { params: { starting_after: id } };
+  }
+}

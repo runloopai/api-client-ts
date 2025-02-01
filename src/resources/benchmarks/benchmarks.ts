@@ -5,6 +5,11 @@ import { isRequestOptions } from '../../core';
 import * as Core from '../../core';
 import * as RunsAPI from './runs';
 import { RunListParams, Runs } from './runs';
+import {
+  BenchmarkRunsCursorIDPage,
+  BenchmarksCursorIDPage,
+  type BenchmarksCursorIDPageParams,
+} from '../../pagination';
 
 export class Benchmarks extends APIResource {
   runs: RunsAPI.Runs = new RunsAPI.Runs(this._client);
@@ -26,16 +31,22 @@ export class Benchmarks extends APIResource {
   /**
    * List all Benchmarks matching filter.
    */
-  list(query?: BenchmarkListParams, options?: Core.RequestOptions): Core.APIPromise<BenchmarkListView>;
-  list(options?: Core.RequestOptions): Core.APIPromise<BenchmarkListView>;
+  list(
+    query?: BenchmarkListParams,
+    options?: Core.RequestOptions,
+  ): Core.PagePromise<BenchmarkViewsBenchmarksCursorIDPage, BenchmarkView>;
+  list(options?: Core.RequestOptions): Core.PagePromise<BenchmarkViewsBenchmarksCursorIDPage, BenchmarkView>;
   list(
     query: BenchmarkListParams | Core.RequestOptions = {},
     options?: Core.RequestOptions,
-  ): Core.APIPromise<BenchmarkListView> {
+  ): Core.PagePromise<BenchmarkViewsBenchmarksCursorIDPage, BenchmarkView> {
     if (isRequestOptions(query)) {
       return this.list({}, query);
     }
-    return this._client.get('/v1/benchmarks', { query, ...options });
+    return this._client.getAPIList('/v1/benchmarks', BenchmarkViewsBenchmarksCursorIDPage, {
+      query,
+      ...options,
+    });
   }
 
   /**
@@ -45,6 +56,10 @@ export class Benchmarks extends APIResource {
     return this._client.post('/v1/benchmarks/start_run', { body, ...options });
   }
 }
+
+export class BenchmarkViewsBenchmarksCursorIDPage extends BenchmarksCursorIDPage<BenchmarkView> {}
+
+export class BenchmarkRunViewsBenchmarkRunsCursorIDPage extends BenchmarkRunsCursorIDPage<BenchmarkRunView> {}
 
 /**
  * BenchmarkCreateParameters contain the set of paramters to create a Benchmark.
@@ -170,22 +185,12 @@ export interface BenchmarkCreateParams {
   scenario_ids?: Array<string> | null;
 }
 
-export interface BenchmarkListParams {
-  /**
-   * The limit of items to return. Default is 20.
-   */
-  limit?: number;
-
+export interface BenchmarkListParams extends BenchmarksCursorIDPageParams {
   /**
    * List public benchmarks, e.g. SWE-bench. Defaults to false, i.e. only
    * user-defined benchmarks are listed.
    */
   public?: boolean;
-
-  /**
-   * Load the next page of data starting after the item with the given ID.
-   */
-  starting_after?: string;
 }
 
 export interface BenchmarkStartRunParams {
@@ -200,6 +205,7 @@ export interface BenchmarkStartRunParams {
   run_name?: string | null;
 }
 
+Benchmarks.BenchmarkViewsBenchmarksCursorIDPage = BenchmarkViewsBenchmarksCursorIDPage;
 Benchmarks.Runs = Runs;
 
 export declare namespace Benchmarks {
@@ -210,6 +216,7 @@ export declare namespace Benchmarks {
     type BenchmarkRunView as BenchmarkRunView,
     type BenchmarkView as BenchmarkView,
     type StartBenchmarkRunParameters as StartBenchmarkRunParameters,
+    BenchmarkViewsBenchmarksCursorIDPage as BenchmarkViewsBenchmarksCursorIDPage,
     type BenchmarkCreateParams as BenchmarkCreateParams,
     type BenchmarkListParams as BenchmarkListParams,
     type BenchmarkStartRunParams as BenchmarkStartRunParams,
