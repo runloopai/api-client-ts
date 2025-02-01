@@ -4,6 +4,8 @@ import { APIResource } from '../../resource';
 import { isRequestOptions } from '../../core';
 import * as Core from '../../core';
 import * as BenchmarksAPI from './benchmarks';
+import { BenchmarkRunViewsBenchmarkRunsCursorIDPage } from './benchmarks';
+import { type BenchmarkRunsCursorIDPageParams } from '../../pagination';
 
 export class Runs extends APIResource {
   /**
@@ -19,16 +21,21 @@ export class Runs extends APIResource {
   list(
     query?: RunListParams,
     options?: Core.RequestOptions,
-  ): Core.APIPromise<BenchmarksAPI.BenchmarkRunListView>;
-  list(options?: Core.RequestOptions): Core.APIPromise<BenchmarksAPI.BenchmarkRunListView>;
+  ): Core.PagePromise<BenchmarkRunViewsBenchmarkRunsCursorIDPage, BenchmarksAPI.BenchmarkRunView>;
+  list(
+    options?: Core.RequestOptions,
+  ): Core.PagePromise<BenchmarkRunViewsBenchmarkRunsCursorIDPage, BenchmarksAPI.BenchmarkRunView>;
   list(
     query: RunListParams | Core.RequestOptions = {},
     options?: Core.RequestOptions,
-  ): Core.APIPromise<BenchmarksAPI.BenchmarkRunListView> {
+  ): Core.PagePromise<BenchmarkRunViewsBenchmarkRunsCursorIDPage, BenchmarksAPI.BenchmarkRunView> {
     if (isRequestOptions(query)) {
       return this.list({}, query);
     }
-    return this._client.get('/v1/benchmarks/runs', { query, ...options });
+    return this._client.getAPIList('/v1/benchmarks/runs', BenchmarkRunViewsBenchmarkRunsCursorIDPage, {
+      query,
+      ...options,
+    });
   }
 
   /**
@@ -39,23 +46,15 @@ export class Runs extends APIResource {
   }
 }
 
-export interface RunListParams {
+export interface RunListParams extends BenchmarkRunsCursorIDPageParams {
   /**
    * The Benchmark ID to filter by.
    */
   benchmark_id?: string;
-
-  /**
-   * The limit of items to return. Default is 20.
-   */
-  limit?: number;
-
-  /**
-   * Load the next page of data starting after the item with the given ID.
-   */
-  starting_after?: string;
 }
 
 export declare namespace Runs {
   export { type RunListParams as RunListParams };
 }
+
+export { BenchmarkRunViewsBenchmarkRunsCursorIDPage };

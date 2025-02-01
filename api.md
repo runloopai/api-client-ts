@@ -21,7 +21,7 @@ Methods:
 
 - <code title="post /v1/benchmarks">client.benchmarks.<a href="./src/resources/benchmarks/benchmarks.ts">create</a>({ ...params }) -> BenchmarkView</code>
 - <code title="get /v1/benchmarks/{id}">client.benchmarks.<a href="./src/resources/benchmarks/benchmarks.ts">retrieve</a>(id) -> BenchmarkView</code>
-- <code title="get /v1/benchmarks">client.benchmarks.<a href="./src/resources/benchmarks/benchmarks.ts">list</a>({ ...params }) -> BenchmarkListView</code>
+- <code title="get /v1/benchmarks">client.benchmarks.<a href="./src/resources/benchmarks/benchmarks.ts">list</a>({ ...params }) -> BenchmarkViewsBenchmarksCursorIDPage</code>
 - <code title="post /v1/benchmarks/start_run">client.benchmarks.<a href="./src/resources/benchmarks/benchmarks.ts">startRun</a>({ ...params }) -> BenchmarkRunView</code>
 
 ## Runs
@@ -29,7 +29,7 @@ Methods:
 Methods:
 
 - <code title="get /v1/benchmarks/runs/{id}">client.benchmarks.runs.<a href="./src/resources/benchmarks/runs.ts">retrieve</a>(id) -> BenchmarkRunView</code>
-- <code title="get /v1/benchmarks/runs">client.benchmarks.runs.<a href="./src/resources/benchmarks/runs.ts">list</a>({ ...params }) -> BenchmarkRunListView</code>
+- <code title="get /v1/benchmarks/runs">client.benchmarks.runs.<a href="./src/resources/benchmarks/runs.ts">list</a>({ ...params }) -> BenchmarkRunViewsBenchmarkRunsCursorIDPage</code>
 - <code title="post /v1/benchmarks/runs/{id}/complete">client.benchmarks.runs.<a href="./src/resources/benchmarks/runs.ts">complete</a>(id) -> BenchmarkRunView</code>
 
 # Blueprints
@@ -234,7 +234,7 @@ Methods:
 
 - <code title="post /v1/scenarios">client.scenarios.<a href="./src/resources/scenarios/scenarios.ts">create</a>({ ...params }) -> ScenarioView</code>
 - <code title="get /v1/scenarios/{id}">client.scenarios.<a href="./src/resources/scenarios/scenarios.ts">retrieve</a>(id) -> ScenarioView</code>
-- <code title="get /v1/scenarios">client.scenarios.<a href="./src/resources/scenarios/scenarios.ts">list</a>({ ...params }) -> ScenarioListView</code>
+- <code title="get /v1/scenarios">client.scenarios.<a href="./src/resources/scenarios/scenarios.ts">list</a>({ ...params }) -> ScenarioViewsScenariosCursorIDPage</code>
 - <code title="post /v1/scenarios/start_run">client.scenarios.<a href="./src/resources/scenarios/scenarios.ts">startRun</a>({ ...params }) -> ScenarioRunView</code>
 
 ## Runs
@@ -242,7 +242,7 @@ Methods:
 Methods:
 
 - <code title="get /v1/scenarios/runs/{id}">client.scenarios.runs.<a href="./src/resources/scenarios/runs.ts">retrieve</a>(id) -> ScenarioRunView</code>
-- <code title="get /v1/scenarios/runs">client.scenarios.runs.<a href="./src/resources/scenarios/runs.ts">list</a>({ ...params }) -> ScenarioRunListView</code>
+- <code title="get /v1/scenarios/runs">client.scenarios.runs.<a href="./src/resources/scenarios/runs.ts">list</a>({ ...params }) -> ScenarioRunViewsBenchmarkRunsCursorIDPage</code>
 - <code title="post /v1/scenarios/runs/{id}/complete">client.scenarios.runs.<a href="./src/resources/scenarios/runs.ts">complete</a>(id) -> ScenarioRunView</code>
 - <code title="post /v1/scenarios/runs/{id}/score">client.scenarios.runs.<a href="./src/resources/scenarios/runs.ts">score</a>(id) -> ScenarioRunView</code>
 

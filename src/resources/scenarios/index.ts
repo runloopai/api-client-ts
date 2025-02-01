@@ -2,6 +2,8 @@
 
 export { Runs, type RunListParams } from './runs';
 export {
+  ScenarioRunViewsBenchmarkRunsCursorIDPage,
+  ScenarioViewsScenariosCursorIDPage,
   Scenarios,
   type InputContext,
   type ScenarioCreateParameters,
