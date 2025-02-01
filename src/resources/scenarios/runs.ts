@@ -58,7 +58,7 @@ export class Runs extends APIResource {
    * Wait for a scenario run to finish scoring.
    * Polls the scenario run status until it reaches a terminal state.
    */
-  async awaitScoring(
+  async awaitScored(
     id: string,
     options?: Core.RequestOptions & { polling?: Partial<PollingOptions<ScenariosAPI.ScenarioRunView>> },
   ): Promise<ScenariosAPI.ScenarioRunView> {
@@ -92,7 +92,7 @@ export class Runs extends APIResource {
     options?: Core.RequestOptions & { polling?: Partial<PollingOptions<ScenariosAPI.ScenarioRunView>> },
   ): Promise<ScenariosAPI.ScenarioRunView> {
     const run = await this.score(id, options);
-    return this.awaitScoring(run.id, options);
+    return this.awaitScored(run.id, options);
   }
 
   /**
