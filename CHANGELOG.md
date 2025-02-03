@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.15.0 (2025-02-03)
+
+Full Changelog: [v0.14.0...v0.15.0](https://github.com/runloopai/api-client-ts/compare/v0.14.0...v0.15.0)
+
+### Features
+
+* Add helper methods to make scenario run ergonomics easier ([44b0520](https://github.com/runloopai/api-client-ts/commit/44b052023fe5f81c11fbd39aa661ba185c007f53))
+* **api:** api update ([#515](https://github.com/runloopai/api-client-ts/issues/515)) ([0761c52](https://github.com/runloopai/api-client-ts/commit/0761c52c45280f205dc9b82962baaa68e05271ce))
+
 ## 0.14.0 (2025-02-01)
 
 Full Changelog: [v0.13.0...v0.14.0](https://github.com/runloopai/api-client-ts/compare/v0.13.0...v0.14.0)
