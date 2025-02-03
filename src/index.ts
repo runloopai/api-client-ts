@@ -53,6 +53,7 @@ import {
   BenchmarkCreateParameters,
   BenchmarkCreateParams,
   BenchmarkListParams,
+  BenchmarkListPublicParams,
   BenchmarkListView,
   BenchmarkRunListView,
   BenchmarkRunView,
@@ -97,6 +98,7 @@ import {
   ScenarioCreateParams,
   ScenarioEnvironment,
   ScenarioListParams,
+  ScenarioListPublicParams,
   ScenarioListView,
   ScenarioRunListView,
   ScenarioRunView,
@@ -340,6 +342,7 @@ export declare namespace Runloop {
     BenchmarkViewsBenchmarksCursorIDPage as BenchmarkViewsBenchmarksCursorIDPage,
     type BenchmarkCreateParams as BenchmarkCreateParams,
     type BenchmarkListParams as BenchmarkListParams,
+    type BenchmarkListPublicParams as BenchmarkListPublicParams,
     type BenchmarkStartRunParams as BenchmarkStartRunParams,
   };
 
@@ -404,6 +407,7 @@ export declare namespace Runloop {
     ScenarioViewsScenariosCursorIDPage as ScenarioViewsScenariosCursorIDPage,
     type ScenarioCreateParams as ScenarioCreateParams,
     type ScenarioListParams as ScenarioListParams,
+    type ScenarioListPublicParams as ScenarioListPublicParams,
     type ScenarioStartRunParams as ScenarioStartRunParams,
   };
 

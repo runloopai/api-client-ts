@@ -51,6 +51,29 @@ export class Scenarios extends APIResource {
   }
 
   /**
+   * List all public scenarios matching filter.
+   */
+  listPublic(
+    query?: ScenarioListPublicParams,
+    options?: Core.RequestOptions,
+  ): Core.PagePromise<ScenarioViewsScenariosCursorIDPage, ScenarioView>;
+  listPublic(
+    options?: Core.RequestOptions,
+  ): Core.PagePromise<ScenarioViewsScenariosCursorIDPage, ScenarioView>;
+  listPublic(
+    query: ScenarioListPublicParams | Core.RequestOptions = {},
+    options?: Core.RequestOptions,
+  ): Core.PagePromise<ScenarioViewsScenariosCursorIDPage, ScenarioView> {
+    if (isRequestOptions(query)) {
+      return this.listPublic({}, query);
+    }
+    return this._client.getAPIList('/v1/scenarios/list_public', ScenarioViewsScenariosCursorIDPage, {
+      query,
+      ...options,
+    });
+  }
+
+  /**
    * Start a new ScenarioRun based on the provided Scenario.
    */
   startRun(body: ScenarioStartRunParams, options?: Core.RequestOptions): Core.APIPromise<ScenarioRunView> {
@@ -334,7 +357,14 @@ export interface ScenarioListParams extends ScenariosCursorIDPageParams {
   /**
    * Query for Scenarios with a given name.
    */
-  name?: number;
+  name?: string;
+}
+
+export interface ScenarioListPublicParams extends ScenariosCursorIDPageParams {
+  /**
+   * Query for Scenarios with a given name.
+   */
+  name?: string;
 }
 
 export interface ScenarioStartRunParams {
@@ -374,6 +404,7 @@ export declare namespace Scenarios {
     ScenarioViewsScenariosCursorIDPage as ScenarioViewsScenariosCursorIDPage,
     type ScenarioCreateParams as ScenarioCreateParams,
     type ScenarioListParams as ScenarioListParams,
+    type ScenarioListPublicParams as ScenarioListPublicParams,
     type ScenarioStartRunParams as ScenarioStartRunParams,
   };
 

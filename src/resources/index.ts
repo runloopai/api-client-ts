@@ -13,6 +13,7 @@ export {
   type StartBenchmarkRunParameters,
   type BenchmarkCreateParams,
   type BenchmarkListParams,
+  type BenchmarkListPublicParams,
   type BenchmarkStartRunParams,
 } from './benchmarks/benchmarks';
 export {
@@ -87,5 +88,6 @@ export {
   type StartScenarioRunParameters,
   type ScenarioCreateParams,
   type ScenarioListParams,
+  type ScenarioListPublicParams,
   type ScenarioStartRunParams,
 } from './scenarios/scenarios';
