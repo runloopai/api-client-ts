@@ -50,6 +50,29 @@ export class Benchmarks extends APIResource {
   }
 
   /**
+   * List all public benchmarks matching filter.
+   */
+  listPublic(
+    query?: BenchmarkListPublicParams,
+    options?: Core.RequestOptions,
+  ): Core.PagePromise<BenchmarkViewsBenchmarksCursorIDPage, BenchmarkView>;
+  listPublic(
+    options?: Core.RequestOptions,
+  ): Core.PagePromise<BenchmarkViewsBenchmarksCursorIDPage, BenchmarkView>;
+  listPublic(
+    query: BenchmarkListPublicParams | Core.RequestOptions = {},
+    options?: Core.RequestOptions,
+  ): Core.PagePromise<BenchmarkViewsBenchmarksCursorIDPage, BenchmarkView> {
+    if (isRequestOptions(query)) {
+      return this.listPublic({}, query);
+    }
+    return this._client.getAPIList('/v1/benchmarks/list_public', BenchmarkViewsBenchmarksCursorIDPage, {
+      query,
+      ...options,
+    });
+  }
+
+  /**
    * Start a new BenchmarkRun based on the provided Benchmark.
    */
   startRun(body: BenchmarkStartRunParams, options?: Core.RequestOptions): Core.APIPromise<BenchmarkRunView> {
@@ -134,6 +157,11 @@ export interface BenchmarkRunView {
   name?: string | null;
 
   /**
+   * List of Scenarios that need to be completed before benchmark can be completed.
+   */
+  pending_scenarios?: Array<string>;
+
+  /**
    * The final score across the BenchmarkRun, present once completed. Calculated as
    * sum of scenario scores / number of scenario runs.
    */
@@ -185,13 +213,9 @@ export interface BenchmarkCreateParams {
   scenario_ids?: Array<string> | null;
 }
 
-export interface BenchmarkListParams extends BenchmarksCursorIDPageParams {
-  /**
-   * List public benchmarks, e.g. SWE-bench. Defaults to false, i.e. only
-   * user-defined benchmarks are listed.
-   */
-  public?: boolean;
-}
+export interface BenchmarkListParams extends BenchmarksCursorIDPageParams {}
+
+export interface BenchmarkListPublicParams extends BenchmarksCursorIDPageParams {}
 
 export interface BenchmarkStartRunParams {
   /**
@@ -219,6 +243,7 @@ export declare namespace Benchmarks {
     BenchmarkViewsBenchmarksCursorIDPage as BenchmarkViewsBenchmarksCursorIDPage,
     type BenchmarkCreateParams as BenchmarkCreateParams,
     type BenchmarkListParams as BenchmarkListParams,
+    type BenchmarkListPublicParams as BenchmarkListPublicParams,
     type BenchmarkStartRunParams as BenchmarkStartRunParams,
   };
 

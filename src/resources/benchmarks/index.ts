@@ -12,6 +12,7 @@ export {
   type StartBenchmarkRunParameters,
   type BenchmarkCreateParams,
   type BenchmarkListParams,
+  type BenchmarkListPublicParams,
   type BenchmarkStartRunParams,
 } from './benchmarks';
 export { Runs, type RunListParams } from './runs';
