@@ -19,5 +19,6 @@ export {
   type StartScenarioRunParameters,
   type ScenarioCreateParams,
   type ScenarioListParams,
+  type ScenarioListPublicParams,
   type ScenarioStartRunParams,
 } from './scenarios';
