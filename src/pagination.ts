@@ -529,3 +529,69 @@ export class ScenarioRunsCursorIDPage<Item extends { id: string }>
     return { params: { starting_after: id } };
   }
 }
+
+export interface ScenarioScorersCursorIDPageResponse<Item> {
+  scorers: Array<Item>;
+
+  has_more: boolean;
+
+  total_count: number;
+}
+
+export interface ScenarioScorersCursorIDPageParams {
+  starting_after?: string;
+
+  limit?: number;
+}
+
+export class ScenarioScorersCursorIDPage<Item extends { id: string }>
+  extends AbstractPage<Item>
+  implements ScenarioScorersCursorIDPageResponse<Item>
+{
+  scorers: Array<Item>;
+
+  has_more: boolean;
+
+  total_count: number;
+
+  constructor(
+    client: APIClient,
+    response: Response,
+    body: ScenarioScorersCursorIDPageResponse<Item>,
+    options: FinalRequestOptions,
+  ) {
+    super(client, response, body, options);
+
+    this.scorers = body.scorers || [];
+    this.has_more = body.has_more || false;
+    this.total_count = body.total_count || 0;
+  }
+
+  getPaginatedItems(): Item[] {
+    return this.scorers ?? [];
+  }
+
+  // @deprecated Please use `nextPageInfo()` instead
+  nextPageParams(): Partial<ScenarioScorersCursorIDPageParams> | null {
+    const info = this.nextPageInfo();
+    if (!info) return null;
+    if ('params' in info) return info.params;
+    const params = Object.fromEntries(info.url.searchParams);
+    if (!Object.keys(params).length) return null;
+    return params;
+  }
+
+  nextPageInfo(): PageInfo | null {
+    const scorers = this.getPaginatedItems();
+    if (!scorers.length) {
+      return null;
+    }
+
+    const id = scorers[scorers.length - 1]?.id;
+    if (!id) {
+      return null;
+    }
+
+    return { params: { starting_after: id } };
+  }
+}
