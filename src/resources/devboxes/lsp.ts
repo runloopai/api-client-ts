@@ -28,7 +28,7 @@ export class Lsp extends APIResource {
     id: string,
     body: LspCodeActionsParams,
     options?: Core.RequestOptions,
-  ): Core.APIPromise<unknown> {
+  ): Core.APIPromise<CodeActionsResponse> {
     return this._client.post(`/v1/devboxes/${id}/lsp/code-actions`, { body, ...options });
   }
 
@@ -50,7 +50,7 @@ export class Lsp extends APIResource {
     id: string,
     body: LspDocumentSymbolsParams,
     options?: Core.RequestOptions,
-  ): Core.APIPromise<unknown> {
+  ): Core.APIPromise<DocumentSymbolResponse> {
     return this._client.post(`/v1/devboxes/${id}/lsp/document-symbols`, { body, ...options });
   }
 
@@ -73,7 +73,7 @@ export class Lsp extends APIResource {
     id: string,
     body: LspFileDefinitionParams,
     options?: Core.RequestOptions,
-  ): Core.APIPromise<unknown> {
+  ): Core.APIPromise<FileDefinitionResponse> {
     return this._client.post(`/v1/devboxes/${id}/lsp/file-definition`, { body, ...options });
   }
 
@@ -88,7 +88,11 @@ export class Lsp extends APIResource {
    * Get formatting changes for a given document.
    * https://microsoft.github.io/language-server-protocol/specifications/specification-current/#textDocument_formatting
    */
-  formatting(id: string, body: LspFormattingParams, options?: Core.RequestOptions): Core.APIPromise<unknown> {
+  formatting(
+    id: string,
+    body: LspFormattingParams,
+    options?: Core.RequestOptions,
+  ): Core.APIPromise<FormattingResponse> {
     return this._client.post(`/v1/devboxes/${id}/lsp/formatting`, { body, ...options });
   }
 
@@ -141,7 +145,11 @@ export class Lsp extends APIResource {
    * language server to retrieve references for a given symbol in the document.
    * https://microsoft.github.io/language-server-protocol/specifications/specification-current/#textDocument_references
    */
-  references(id: string, body: LspReferencesParams, options?: Core.RequestOptions): Core.APIPromise<unknown> {
+  references(
+    id: string,
+    body: LspReferencesParams,
+    options?: Core.RequestOptions,
+  ): Core.APIPromise<ReferencesResponse> {
     return this._client.post(`/v1/devboxes/${id}/lsp/references`, { body, ...options });
   }
 
@@ -166,6 +174,8 @@ export interface BaseCodeAction {
   edit?: BaseWorkspaceEdit;
 
   isPreferred?: boolean;
+
+  kind?: string;
 }
 
 export interface BaseCommand {
@@ -280,6 +290,7 @@ export interface CodeActionContext {
    * The reason why code actions were requested.
    */
   triggerKind?: CodeActionTriggerKind;
+  [k: string]: unknown;
 }
 
 /**
@@ -330,7 +341,7 @@ export interface CodeActionsRequestBody {
   range?: Range;
 }
 
-export type CodeActionsResponse = unknown;
+export type CodeActionsResponse = Array<BaseCodeAction | BaseCommand>;
 
 /**
  * The reason why code actions were requested.
@@ -346,6 +357,7 @@ export interface CodeDescription {
    * An URI to open with more information about the diagnostic error.
    */
   href: URi;
+  [k: string]: unknown;
 }
 
 export interface CodeSegmentInfoRequestBody {
@@ -446,6 +458,7 @@ export interface Diagnostic {
    * Additional metadata about the diagnostic.
    */
   tags?: Array<DiagnosticTag>;
+  [k: string]: unknown;
 }
 
 /**
@@ -465,6 +478,7 @@ export interface DiagnosticRelatedInformation {
    * The message of this related diagnostic information.
    */
   message: string;
+  [k: string]: unknown;
 }
 
 /**
@@ -533,9 +547,25 @@ export interface DocumentSymbol {
    * Tags for this document symbol.
    */
   tags?: Array<SymbolTag>;
+  [k: string]: unknown;
 }
 
-export type DocumentSymbolResponse = unknown;
+export type DocumentSymbolResponse = Array<DocumentSymbolResponse.DocumentSymbolResponseItem>;
+
+export namespace DocumentSymbolResponse {
+  export interface DocumentSymbolResponseItem {
+    /**
+     * A symbol kind.
+     */
+    kind: LspAPI.SymbolKind;
+
+    name: string;
+
+    range: LspAPI.BaseRange;
+
+    selectionRange: LspAPI.BaseRange;
+  }
+}
 
 /**
  * A tagging type for string properties that are actually document URIs.
@@ -558,7 +588,7 @@ export interface FileDefinitionRequestBody {
   uri: string;
 }
 
-export type FileDefinitionResponse = unknown;
+export type FileDefinitionResponse = Array<BaseLocation>;
 
 export type FilePath = string;
 
@@ -572,7 +602,7 @@ export interface FileRequestBody {
 
 export type FileUri = string;
 
-export type FormattingResponse = unknown;
+export type FormattingResponse = Array<TextEdit>;
 
 export interface HealthStatusResponse {
   dirtyFiles: Array<string>;
@@ -622,6 +652,7 @@ export interface Location {
    * A tagging type for string properties that are actually document URIs.
    */
   uri: DocumentUri;
+  [k: string]: unknown;
 }
 
 /**
@@ -704,6 +735,7 @@ export interface Position {
    * defaults to 0.
    */
   line: Uinteger;
+  [k: string]: unknown;
 }
 
 /**
@@ -733,6 +765,7 @@ export interface Range {
    * The range's start position.
    */
   start: Position;
+  [k: string]: unknown;
 }
 
 /**
@@ -748,7 +781,7 @@ export interface ReferencesRequestBody {
   uri: string;
 }
 
-export type ReferencesResponse = unknown;
+export type ReferencesResponse = Array<BaseLocation>;
 
 export interface SetWatchDirectoryRequestBody {
   path: FilePath;
@@ -823,6 +856,7 @@ export interface TextEdit {
    * create a range where start === end.
    */
   range: Range;
+  [k: string]: unknown;
 }
 
 /**
@@ -857,6 +891,8 @@ export interface LspApplyCodeActionParams {
   edit?: BaseWorkspaceEdit;
 
   isPreferred?: boolean;
+
+  kind?: string;
 }
 
 export interface LspCodeActionsParams {

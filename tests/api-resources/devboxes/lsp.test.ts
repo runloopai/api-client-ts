@@ -35,6 +35,7 @@ describe('resource lsp', () => {
         },
       },
       isPreferred: true,
+      kind: 'kind',
     });
   });
 
