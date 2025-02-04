@@ -248,6 +248,24 @@ Methods:
 - <code title="post /v1/scenarios/runs/{id}/complete">client.scenarios.runs.<a href="./src/resources/scenarios/runs.ts">complete</a>(id) -> ScenarioRunView</code>
 - <code title="post /v1/scenarios/runs/{id}/score">client.scenarios.runs.<a href="./src/resources/scenarios/runs.ts">score</a>(id) -> ScenarioRunView</code>
 
+## Scorers
+
+Types:
+
+- <code><a href="./src/resources/scenarios/scorers.ts">ScorerCreateResponse</a></code>
+- <code><a href="./src/resources/scenarios/scorers.ts">ScorerRetrieveResponse</a></code>
+- <code><a href="./src/resources/scenarios/scorers.ts">ScorerUpdateResponse</a></code>
+- <code><a href="./src/resources/scenarios/scorers.ts">ScorerListResponse</a></code>
+- <code><a href="./src/resources/scenarios/scorers.ts">ScorerValidateResponse</a></code>
+
+Methods:
+
+- <code title="post /v1/scenarios/scorers">client.scenarios.scorers.<a href="./src/resources/scenarios/scorers.ts">create</a>({ ...params }) -> ScorerCreateResponse</code>
+- <code title="get /v1/scenarios/scorers/{id}">client.scenarios.scorers.<a href="./src/resources/scenarios/scorers.ts">retrieve</a>(id) -> ScorerRetrieveResponse</code>
+- <code title="post /v1/scenarios/scorers/{id}">client.scenarios.scorers.<a href="./src/resources/scenarios/scorers.ts">update</a>(id, { ...params }) -> ScorerUpdateResponse</code>
+- <code title="get /v1/scenarios/scorers">client.scenarios.scorers.<a href="./src/resources/scenarios/scorers.ts">list</a>({ ...params }) -> ScorerListResponsesScenarioScorersCursorIDPage</code>
+- <code title="post /v1/scenarios/scorers/{id}/validate">client.scenarios.scorers.<a href="./src/resources/scenarios/scorers.ts">validate</a>(id, { ...params }) -> ScorerValidateResponse</code>
+
 # Repositories
 
 Types:

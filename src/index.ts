@@ -19,6 +19,8 @@ import {
   RepositoriesCursorIDPageResponse,
   type ScenarioRunsCursorIDPageParams,
   ScenarioRunsCursorIDPageResponse,
+  type ScenarioScorersCursorIDPageParams,
+  ScenarioScorersCursorIDPageResponse,
   type ScenariosCursorIDPageParams,
   ScenariosCursorIDPageResponse,
 } from './pagination';
@@ -329,6 +331,12 @@ export declare namespace Runloop {
   export {
     type ScenarioRunsCursorIDPageParams as ScenarioRunsCursorIDPageParams,
     type ScenarioRunsCursorIDPageResponse as ScenarioRunsCursorIDPageResponse,
+  };
+
+  export import ScenarioScorersCursorIDPage = Pagination.ScenarioScorersCursorIDPage;
+  export {
+    type ScenarioScorersCursorIDPageParams as ScenarioScorersCursorIDPageParams,
+    type ScenarioScorersCursorIDPageResponse as ScenarioScorersCursorIDPageResponse,
   };
 
   export {

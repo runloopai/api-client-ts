@@ -5,6 +5,20 @@ import { isRequestOptions } from '../../core';
 import * as Core from '../../core';
 import * as RunsAPI from './runs';
 import { RunListParams, Runs } from './runs';
+import * as ScorersAPI from './scorers';
+import {
+  ScorerCreateParams,
+  ScorerCreateResponse,
+  ScorerListParams,
+  ScorerListResponse,
+  ScorerListResponsesScenarioScorersCursorIDPage,
+  ScorerRetrieveResponse,
+  ScorerUpdateParams,
+  ScorerUpdateResponse,
+  ScorerValidateParams,
+  ScorerValidateResponse,
+  Scorers,
+} from './scorers';
 import {
   BenchmarkRunsCursorIDPage,
   ScenariosCursorIDPage,
@@ -15,6 +29,7 @@ import { DevboxView } from '../devboxes';
 
 export class Scenarios extends APIResource {
   runs: RunsAPI.Runs = new RunsAPI.Runs(this._client);
+  scorers: ScorersAPI.Scorers = new ScorersAPI.Scorers(this._client);
 
   /**
    * Create a Scenario, a repeatable AI coding evaluation test that defines the
@@ -109,6 +124,11 @@ export interface InputContext {
    * The problem statement for the Scenario.
    */
   problem_statement: string;
+
+  /**
+   * Additional JSON structured input context.
+   */
+  additional_context?: unknown | null;
 }
 
 export interface ScenarioCreateParameters {
@@ -401,6 +421,8 @@ export interface ScenarioStartRunParams {
 
 Scenarios.ScenarioViewsScenariosCursorIDPage = ScenarioViewsScenariosCursorIDPage;
 Scenarios.Runs = Runs;
+Scenarios.Scorers = Scorers;
+Scenarios.ScorerListResponsesScenarioScorersCursorIDPage = ScorerListResponsesScenarioScorersCursorIDPage;
 
 export declare namespace Scenarios {
   export {
@@ -424,4 +446,18 @@ export declare namespace Scenarios {
   };
 
   export { Runs as Runs, type RunListParams as RunListParams };
+
+  export {
+    Scorers as Scorers,
+    type ScorerCreateResponse as ScorerCreateResponse,
+    type ScorerRetrieveResponse as ScorerRetrieveResponse,
+    type ScorerUpdateResponse as ScorerUpdateResponse,
+    type ScorerListResponse as ScorerListResponse,
+    type ScorerValidateResponse as ScorerValidateResponse,
+    ScorerListResponsesScenarioScorersCursorIDPage as ScorerListResponsesScenarioScorersCursorIDPage,
+    type ScorerCreateParams as ScorerCreateParams,
+    type ScorerUpdateParams as ScorerUpdateParams,
+    type ScorerListParams as ScorerListParams,
+    type ScorerValidateParams as ScorerValidateParams,
+  };
 }
