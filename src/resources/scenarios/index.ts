@@ -22,3 +22,16 @@ export {
   type ScenarioListPublicParams,
   type ScenarioStartRunParams,
 } from './scenarios';
+export {
+  ScorerListResponsesScenarioScorersCursorIDPage,
+  Scorers,
+  type ScorerCreateResponse,
+  type ScorerRetrieveResponse,
+  type ScorerUpdateResponse,
+  type ScorerListResponse,
+  type ScorerValidateResponse,
+  type ScorerCreateParams,
+  type ScorerUpdateParams,
+  type ScorerListParams,
+  type ScorerValidateParams,
+} from './scorers';
