@@ -565,7 +565,7 @@ export interface DevboxView {
    * A list of capability groups this devbox has access to. This allows devboxes to
    * be compatible with certain tools sets like computer usage APIs.
    */
-  capabilities: Array<'unknown' | 'computer_usage' | 'browser_usage'>;
+  capabilities: Array<'unknown' | 'computer_usage' | 'browser_usage' | 'language_server'>;
 
   /**
    * Creation time of the Devbox (Unix timestamp milliseconds).
