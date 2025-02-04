@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.16.0 (2025-02-04)
+
+Full Changelog: [v0.15.0...v0.16.0](https://github.com/runloopai/api-client-ts/compare/v0.15.0...v0.16.0)
+
+### Features
+
+* add helpers for awaiting blueprints and scenario run env ready ([34cef58](https://github.com/runloopai/api-client-ts/commit/34cef58def5c9696078242e7d688606a63cdd7df))
+* **api:** api update ([#519](https://github.com/runloopai/api-client-ts/issues/519)) ([20f1f0d](https://github.com/runloopai/api-client-ts/commit/20f1f0d3aa6c28360cbfe3d008f3881f2f14e0a0))
+
 ## 0.15.0 (2025-02-03)
 
 Full Changelog: [v0.14.0...v0.15.0](https://github.com/runloopai/api-client-ts/compare/v0.14.0...v0.15.0)
