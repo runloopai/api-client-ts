@@ -108,6 +108,11 @@ export interface ComputerCreateParams {
    * Customize the dimensions of the computer display.
    */
   display_dimensions?: ComputerCreateParams.DisplayDimensions | null;
+
+  /**
+   * The name to use for the created computer.
+   */
+  name?: string | null;
 }
 
 export namespace ComputerCreateParams {
