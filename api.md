@@ -181,18 +181,18 @@ Types:
 Methods:
 
 - <code title="post /v1/devboxes/{id}/lsp/apply-code-action">client.devboxes.lsp.<a href="./src/resources/devboxes/lsp.ts">applyCodeAction</a>(id, { ...params }) -> CodeActionApplicationResult</code>
-- <code title="post /v1/devboxes/{id}/lsp/code-actions">client.devboxes.lsp.<a href="./src/resources/devboxes/lsp.ts">codeActions</a>(id, { ...params }) -> unknown</code>
+- <code title="post /v1/devboxes/{id}/lsp/code-actions">client.devboxes.lsp.<a href="./src/resources/devboxes/lsp.ts">codeActions</a>(id, { ...params }) -> CodeActionsResponse</code>
 - <code title="post /v1/devboxes/{id}/lsp/diagnostics">client.devboxes.lsp.<a href="./src/resources/devboxes/lsp.ts">diagnostics</a>(id, { ...params }) -> DiagnosticsResponse</code>
-- <code title="post /v1/devboxes/{id}/lsp/document-symbols">client.devboxes.lsp.<a href="./src/resources/devboxes/lsp.ts">documentSymbols</a>(id, { ...params }) -> unknown</code>
+- <code title="post /v1/devboxes/{id}/lsp/document-symbols">client.devboxes.lsp.<a href="./src/resources/devboxes/lsp.ts">documentSymbols</a>(id, { ...params }) -> DocumentSymbolResponse</code>
 - <code title="post /v1/devboxes/{id}/lsp/file">client.devboxes.lsp.<a href="./src/resources/devboxes/lsp.ts">file</a>(id, { ...params }) -> FileContentsResponse</code>
-- <code title="post /v1/devboxes/{id}/lsp/file-definition">client.devboxes.lsp.<a href="./src/resources/devboxes/lsp.ts">fileDefinition</a>(id, { ...params }) -> unknown</code>
+- <code title="post /v1/devboxes/{id}/lsp/file-definition">client.devboxes.lsp.<a href="./src/resources/devboxes/lsp.ts">fileDefinition</a>(id, { ...params }) -> FileDefinitionResponse</code>
 - <code title="get /v1/devboxes/{id}/lsp/files">client.devboxes.lsp.<a href="./src/resources/devboxes/lsp.ts">files</a>(id) -> LspFilesResponse</code>
-- <code title="post /v1/devboxes/{id}/lsp/formatting">client.devboxes.lsp.<a href="./src/resources/devboxes/lsp.ts">formatting</a>(id, { ...params }) -> unknown</code>
+- <code title="post /v1/devboxes/{id}/lsp/formatting">client.devboxes.lsp.<a href="./src/resources/devboxes/lsp.ts">formatting</a>(id, { ...params }) -> FormattingResponse</code>
 - <code title="post /v1/devboxes/{id}/lsp/get-code-actions-for-diagnostic">client.devboxes.lsp.<a href="./src/resources/devboxes/lsp.ts">getCodeActionsForDiagnostic</a>(id, { ...params }) -> LspGetCodeActionsForDiagnosticResponse</code>
 - <code title="post /v1/devboxes/{id}/lsp/get-code-segment-info">client.devboxes.lsp.<a href="./src/resources/devboxes/lsp.ts">getCodeSegmentInfo</a>(id, { ...params }) -> CodeSegmentInfoResponse</code>
 - <code title="post /v1/devboxes/{id}/lsp/get-signature-help">client.devboxes.lsp.<a href="./src/resources/devboxes/lsp.ts">getSignatureHelp</a>(id, { ...params }) -> SignatureHelpResponse</code>
 - <code title="get /v1/devboxes/{id}/lsp/health">client.devboxes.lsp.<a href="./src/resources/devboxes/lsp.ts">health</a>(id) -> HealthStatusResponse</code>
-- <code title="post /v1/devboxes/{id}/lsp/references">client.devboxes.lsp.<a href="./src/resources/devboxes/lsp.ts">references</a>(id, { ...params }) -> unknown</code>
+- <code title="post /v1/devboxes/{id}/lsp/references">client.devboxes.lsp.<a href="./src/resources/devboxes/lsp.ts">references</a>(id, { ...params }) -> ReferencesResponse</code>
 - <code title="post /v1/devboxes/{id}/lsp/set-watch-directory">client.devboxes.lsp.<a href="./src/resources/devboxes/lsp.ts">setWatchDirectory</a>(id, { ...params }) -> string</code>
 
 ## Logs
