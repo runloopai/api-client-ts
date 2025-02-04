@@ -1,6 +1,7 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 import { APIResource } from '../../resource';
+import { isRequestOptions } from '../../core';
 import * as Core from '../../core';
 import * as DevboxesAPI from './devboxes';
 
@@ -10,10 +11,15 @@ export class Browsers extends APIResource {
    * of booting the Devbox, the browser will automatically be started with connection
    * utilities activated.
    */
+  create(body?: BrowserCreateParams, options?: Core.RequestOptions): Core.APIPromise<BrowserView>;
+  create(options?: Core.RequestOptions): Core.APIPromise<BrowserView>;
   create(
-    body?: BrowserCreateParams | null | undefined,
+    body: BrowserCreateParams | Core.RequestOptions = {},
     options?: Core.RequestOptions,
   ): Core.APIPromise<BrowserView> {
+    if (isRequestOptions(body)) {
+      return this.create({}, body);
+    }
     return this._client.post('/v1/devboxes/browsers', { body, ...options });
   }
 }
@@ -42,7 +48,12 @@ export interface BrowserView {
   live_view_url: string;
 }
 
-export interface BrowserCreateParams {}
+export interface BrowserCreateParams {
+  /**
+   * The name to use for the created Devbox with a Browser.
+   */
+  name?: string | null;
+}
 
 export declare namespace Browsers {
   export { type BrowserView as BrowserView, type BrowserCreateParams as BrowserCreateParams };

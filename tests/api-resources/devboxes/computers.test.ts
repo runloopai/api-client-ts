@@ -31,7 +31,7 @@ describe('resource computers', () => {
     // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
     await expect(
       client.devboxes.computers.create(
-        { display_dimensions: { display_height_px: 0, display_width_px: 0 } },
+        { display_dimensions: { display_height_px: 0, display_width_px: 0 }, name: 'name' },
         { path: '/_stainless_unknown_path' },
       ),
     ).rejects.toThrow(Runloop.NotFoundError);

@@ -99,7 +99,7 @@ Types:
 
 Methods:
 
-- <code title="post /v1/devboxes/browsers">client.devboxes.browsers.<a href="./src/resources/devboxes/browsers.ts">create</a>() -> BrowserView</code>
+- <code title="post /v1/devboxes/browsers">client.devboxes.browsers.<a href="./src/resources/devboxes/browsers.ts">create</a>({ ...params }) -> BrowserView</code>
 
 ## Computers
 
