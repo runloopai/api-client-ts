@@ -10,6 +10,8 @@ import {
   ScenariosCursorIDPage,
   type ScenariosCursorIDPageParams,
 } from '../../pagination';
+import { PollingOptions } from '@runloop/api-client/lib/polling';
+import { DevboxView } from '../devboxes';
 
 export class Scenarios extends APIResource {
   runs: RunsAPI.Runs = new RunsAPI.Runs(this._client);
@@ -78,6 +80,19 @@ export class Scenarios extends APIResource {
    */
   startRun(body: ScenarioStartRunParams, options?: Core.RequestOptions): Core.APIPromise<ScenarioRunView> {
     return this._client.post('/v1/scenarios/start_run', { body, ...options });
+  }
+
+  /**
+   * Start a new ScenarioRun and wait for its environment to be ready.
+   * This is a convenience method that combines startRun() and awaitReady() on the devbox.
+   */
+  async startRunAndAwaitEnvReady(
+    body: ScenarioStartRunParams,
+    options?: Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxView>> },
+  ): Promise<ScenarioRunView> {
+    const run = await this.startRun(body, options);
+    await this._client.devboxes.awaitRunning(run.devbox_id, options);
+    return run;
   }
 }
 

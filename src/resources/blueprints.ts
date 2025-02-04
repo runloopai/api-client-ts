@@ -5,6 +5,8 @@ import { isRequestOptions } from '../core';
 import * as Core from '../core';
 import * as Shared from './shared';
 import { BlueprintsCursorIDPage, type BlueprintsCursorIDPageParams } from '../pagination';
+import { RunloopError } from '../error';
+import { PollingOptions, poll } from '../lib/polling';
 
 export class Blueprints extends APIResource {
   /**
@@ -22,6 +24,45 @@ export class Blueprints extends APIResource {
    */
   retrieve(id: string, options?: Core.RequestOptions): Core.APIPromise<BlueprintView> {
     return this._client.get(`/v1/blueprints/${id}`, options);
+  }
+
+  /**
+   * Wait for a blueprint to complete building.
+   * Polls the blueprint status until it reaches building_complete state or fails with an error.
+   */
+  async awaitBuildComplete(
+    id: string,
+    options?: Core.RequestOptions & { polling?: Partial<PollingOptions<BlueprintView>> },
+  ): Promise<BlueprintView> {
+    const finalResult = await poll(
+      () => this.retrieve(id, options),
+      () => this.retrieve(id, options),
+      {
+        ...options?.polling,
+        shouldStop: (result) => {
+          return !['provisioning', 'building'].includes(result.status);
+        },
+      },
+    );
+
+    // Now we check if the blueprint build completed successfully otherwise throw an error
+    if (finalResult.status !== 'build_complete') {
+      throw new RunloopError(`Blueprint ${id} is in non-complete state ${finalResult.status}`);
+    }
+
+    return finalResult;
+  }
+
+  /**
+   * Create a blueprint and wait for it to complete building.
+   * This is a convenience method that combines create() and awaitBuildCompleted().
+   */
+  async createAndAwaitBuildCompleted(
+    body: BlueprintCreateParams,
+    options?: Core.RequestOptions & { polling?: Partial<PollingOptions<BlueprintView>> },
+  ): Promise<BlueprintView> {
+    const blueprint = await this.create(body, options);
+    return this.awaitBuildComplete(blueprint.id, options);
   }
 
   /**
