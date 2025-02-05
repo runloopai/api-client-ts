@@ -145,7 +145,6 @@ Types:
 - <code><a href="./src/resources/devboxes/lsp.ts">DiagnosticSeverity</a></code>
 - <code><a href="./src/resources/devboxes/lsp.ts">DiagnosticsResponse</a></code>
 - <code><a href="./src/resources/devboxes/lsp.ts">DiagnosticTag</a></code>
-- <code><a href="./src/resources/devboxes/lsp.ts">DocumentSymbol</a></code>
 - <code><a href="./src/resources/devboxes/lsp.ts">DocumentSymbolResponse</a></code>
 - <code><a href="./src/resources/devboxes/lsp.ts">DocumentUri</a></code>
 - <code><a href="./src/resources/devboxes/lsp.ts">FileContentsResponse</a></code>
