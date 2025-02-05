@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.19.0 (2025-02-05)
+
+Full Changelog: [v0.18.0...v0.19.0](https://github.com/runloopai/api-client-ts/compare/v0.18.0...v0.19.0)
+
+### Features
+
+* **client:** send `X-Stainless-Timeout` header ([#527](https://github.com/runloopai/api-client-ts/issues/527)) ([0156635](https://github.com/runloopai/api-client-ts/commit/015663592e78908063f66cf57e26f1af01163b08))
+
 ## 0.18.0 (2025-02-04)
 
 Full Changelog: [v0.17.0...v0.18.0](https://github.com/runloopai/api-client-ts/compare/v0.17.0...v0.18.0)
