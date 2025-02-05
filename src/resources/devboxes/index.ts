@@ -74,7 +74,6 @@ export {
   type DiagnosticSeverity,
   type DiagnosticsResponse,
   type DiagnosticTag,
-  type DocumentSymbol,
   type DocumentSymbolResponse,
   type DocumentUri,
   type FileContentsResponse,
