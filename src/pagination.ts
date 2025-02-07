@@ -43,6 +43,14 @@ export class BlueprintsCursorIDPage<Item extends { id: string }>
     return this.blueprints ?? [];
   }
 
+  override hasNextPage() {
+    if (this.has_more === false) {
+      return false;
+    }
+
+    return super.hasNextPage();
+  }
+
   // @deprecated Please use `nextPageInfo()` instead
   nextPageParams(): Partial<BlueprintsCursorIDPageParams> | null {
     const info = this.nextPageInfo();
@@ -107,6 +115,14 @@ export class DevboxesCursorIDPage<Item extends { id: string }>
 
   getPaginatedItems(): Item[] {
     return this.devboxes ?? [];
+  }
+
+  override hasNextPage() {
+    if (this.has_more === false) {
+      return false;
+    }
+
+    return super.hasNextPage();
   }
 
   // @deprecated Please use `nextPageInfo()` instead
@@ -175,6 +191,14 @@ export class RepositoriesCursorIDPage<Item extends { id: string }>
     return this.repositories ?? [];
   }
 
+  override hasNextPage() {
+    if (this.has_more === false) {
+      return false;
+    }
+
+    return super.hasNextPage();
+  }
+
   // @deprecated Please use `nextPageInfo()` instead
   nextPageParams(): Partial<RepositoriesCursorIDPageParams> | null {
     const info = this.nextPageInfo();
@@ -239,6 +263,14 @@ export class DiskSnapshotsCursorIDPage<Item extends { id: string }>
 
   getPaginatedItems(): Item[] {
     return this.snapshots ?? [];
+  }
+
+  override hasNextPage() {
+    if (this.has_more === false) {
+      return false;
+    }
+
+    return super.hasNextPage();
   }
 
   // @deprecated Please use `nextPageInfo()` instead
@@ -307,6 +339,14 @@ export class BenchmarksCursorIDPage<Item extends { id: string }>
     return this.benchmarks ?? [];
   }
 
+  override hasNextPage() {
+    if (this.has_more === false) {
+      return false;
+    }
+
+    return super.hasNextPage();
+  }
+
   // @deprecated Please use `nextPageInfo()` instead
   nextPageParams(): Partial<BenchmarksCursorIDPageParams> | null {
     const info = this.nextPageInfo();
@@ -371,6 +411,14 @@ export class BenchmarkRunsCursorIDPage<Item extends { id: string }>
 
   getPaginatedItems(): Item[] {
     return this.runs ?? [];
+  }
+
+  override hasNextPage() {
+    if (this.has_more === false) {
+      return false;
+    }
+
+    return super.hasNextPage();
   }
 
   // @deprecated Please use `nextPageInfo()` instead
@@ -439,6 +487,14 @@ export class ScenariosCursorIDPage<Item extends { id: string }>
     return this.scenarios ?? [];
   }
 
+  override hasNextPage() {
+    if (this.has_more === false) {
+      return false;
+    }
+
+    return super.hasNextPage();
+  }
+
   // @deprecated Please use `nextPageInfo()` instead
   nextPageParams(): Partial<ScenariosCursorIDPageParams> | null {
     const info = this.nextPageInfo();
@@ -505,6 +561,14 @@ export class ScenarioRunsCursorIDPage<Item extends { id: string }>
     return this.runs ?? [];
   }
 
+  override hasNextPage() {
+    if (this.has_more === false) {
+      return false;
+    }
+
+    return super.hasNextPage();
+  }
+
   // @deprecated Please use `nextPageInfo()` instead
   nextPageParams(): Partial<ScenarioRunsCursorIDPageParams> | null {
     const info = this.nextPageInfo();
@@ -569,6 +633,14 @@ export class ScenarioScorersCursorIDPage<Item extends { id: string }>
 
   getPaginatedItems(): Item[] {
     return this.scorers ?? [];
+  }
+
+  override hasNextPage() {
+    if (this.has_more === false) {
+      return false;
+    }
+
+    return super.hasNextPage();
   }
 
   // @deprecated Please use `nextPageInfo()` instead
