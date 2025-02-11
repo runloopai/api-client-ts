@@ -22,6 +22,13 @@ export class Browsers extends APIResource {
     }
     return this._client.post('/v1/devboxes/browsers', { body, ...options });
   }
+
+  /**
+   * Get Browser Details.
+   */
+  retrieve(id: string, options?: Core.RequestOptions): Core.APIPromise<BrowserView> {
+    return this._client.get(`/v1/devboxes/browsers/${id}`, options);
+  }
 }
 
 /**
@@ -43,7 +50,9 @@ export interface BrowserView {
 
   /**
    * The url to view the browser window and enable user interactions via their own
-   * browser.
+   * browser. You can control the interactivity of the browser by adding or removing
+   * 'view_only' query parameter. view_only=1 will allow interaction and view_only=0
+   * will disable interaction.
    */
   live_view_url: string;
 }

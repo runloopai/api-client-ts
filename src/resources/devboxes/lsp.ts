@@ -386,7 +386,7 @@ export interface CodeSegmentInfoResponse {
    * ranges: one that encloses its definition and one that points to its most
    * interesting range, e.g. the range of an identifier.
    */
-  symbol: CodeSegmentInfoResponse.Symbol;
+  symbol: DocumentSymbol;
 
   uri: FileUri;
 
@@ -396,59 +396,6 @@ export interface CodeSegmentInfoResponse {
 }
 
 export namespace CodeSegmentInfoResponse {
-  /**
-   * Represents programming constructs like variables, classes, interfaces etc. that
-   * appear in a document. Document symbols can be hierarchical and they have two
-   * ranges: one that encloses its definition and one that points to its most
-   * interesting range, e.g. the range of an identifier.
-   */
-  export interface Symbol {
-    /**
-     * The kind of this symbol.
-     */
-    kind: LspAPI.SymbolKind;
-
-    /**
-     * The name of this symbol. Will be displayed in the user interface and therefore
-     * must not be an empty string or a string only consisting of white spaces.
-     */
-    name: string;
-
-    /**
-     * The range enclosing this symbol not including leading/trailing whitespace but
-     * everything else like comments. This information is typically used to determine
-     * if the clients cursor is inside the symbol to reveal in the symbol in the UI.
-     */
-    range: LspAPI.Range;
-
-    /**
-     * The range that should be selected and revealed when this symbol is being picked,
-     * e.g the name of a function. Must be contained by the `range`.
-     */
-    selectionRange: LspAPI.Range;
-
-    /**
-     * Children of this symbol, e.g. properties of a class.
-     */
-    children?: Array<unknown>;
-
-    /**
-     * @deprecated Indicates if this symbol is deprecated.
-     */
-    deprecated?: boolean;
-
-    /**
-     * More detail for this symbol, e.g the signature of a function.
-     */
-    detail?: string;
-
-    /**
-     * Tags for this document symbol.
-     */
-    tags?: Array<LspAPI.SymbolTag>;
-    [k: string]: unknown;
-  }
-
   export interface Hover {
     contents: unknown;
 
@@ -549,6 +496,59 @@ export interface DiagnosticsResponse {
  * The diagnostic tags.
  */
 export type DiagnosticTag = 1 | 2;
+
+/**
+ * Represents programming constructs like variables, classes, interfaces etc. that
+ * appear in a document. Document symbols can be hierarchical and they have two
+ * ranges: one that encloses its definition and one that points to its most
+ * interesting range, e.g. the range of an identifier.
+ */
+export interface DocumentSymbol {
+  /**
+   * The kind of this symbol.
+   */
+  kind: SymbolKind;
+
+  /**
+   * The name of this symbol. Will be displayed in the user interface and therefore
+   * must not be an empty string or a string only consisting of white spaces.
+   */
+  name: string;
+
+  /**
+   * The range enclosing this symbol not including leading/trailing whitespace but
+   * everything else like comments. This information is typically used to determine
+   * if the clients cursor is inside the symbol to reveal in the symbol in the UI.
+   */
+  range: Range;
+
+  /**
+   * The range that should be selected and revealed when this symbol is being picked,
+   * e.g the name of a function. Must be contained by the `range`.
+   */
+  selectionRange: Range;
+
+  /**
+   * Children of this symbol, e.g. properties of a class.
+   */
+  children?: Array<DocumentSymbol>;
+
+  /**
+   * @deprecated Indicates if this symbol is deprecated.
+   */
+  deprecated?: boolean;
+
+  /**
+   * More detail for this symbol, e.g the signature of a function.
+   */
+  detail?: string;
+
+  /**
+   * Tags for this document symbol.
+   */
+  tags?: Array<SymbolTag>;
+  [k: string]: unknown;
+}
 
 export type DocumentSymbolResponse = Array<DocumentSymbolResponse.DocumentSymbolResponseItem>;
 
@@ -1010,6 +1010,7 @@ export declare namespace Lsp {
     type DiagnosticSeverity as DiagnosticSeverity,
     type DiagnosticsResponse as DiagnosticsResponse,
     type DiagnosticTag as DiagnosticTag,
+    type DocumentSymbol as DocumentSymbol,
     type DocumentSymbolResponse as DocumentSymbolResponse,
     type DocumentUri as DocumentUri,
     type FileContentsResponse as FileContentsResponse,
