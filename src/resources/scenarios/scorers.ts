@@ -84,9 +84,9 @@ export interface ScorerCreateResponse {
   bash_script: string;
 
   /**
-   * Name of the scenario scorer.
+   * Name of the type of scenario scorer.
    */
-  name: string;
+  type: string;
 }
 
 /**
@@ -104,9 +104,9 @@ export interface ScorerRetrieveResponse {
   bash_script: string;
 
   /**
-   * Name of the scenario scorer.
+   * Name of the type of scenario scorer.
    */
-  name: string;
+  type: string;
 }
 
 /**
@@ -124,9 +124,9 @@ export interface ScorerUpdateResponse {
   bash_script: string;
 
   /**
-   * Name of the scenario scorer.
+   * Name of the type of scenario scorer.
    */
-  name: string;
+  type: string;
 }
 
 /**
@@ -144,9 +144,9 @@ export interface ScorerListResponse {
   bash_script: string;
 
   /**
-   * Name of the scenario scorer.
+   * Name of the type of scenario scorer.
    */
-  name: string;
+  type: string;
 }
 
 export interface ScorerValidateResponse {
@@ -179,9 +179,9 @@ export interface ScorerCreateParams {
   bash_script: string;
 
   /**
-   * Name of the custom scorer.
+   * Name of the type of custom scorer.
    */
-  name: string;
+  type: string;
 }
 
 export interface ScorerUpdateParams {
@@ -192,9 +192,9 @@ export interface ScorerUpdateParams {
   bash_script: string;
 
   /**
-   * Name of the custom scorer.
+   * Name of the type of custom scorer.
    */
-  name: string;
+  type: string;
 }
 
 export interface ScorerListParams extends ScenarioScorersCursorIDPageParams {}

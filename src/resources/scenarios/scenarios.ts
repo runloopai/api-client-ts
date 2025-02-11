@@ -315,6 +315,11 @@ export interface ScoringFunction {
   name: string;
 
   /**
+   * Type of the scoring function. Defaults to bash script.
+   */
+  type: string;
+
+  /**
    * Wight to apply to scoring function score. Weights of all scoring functions
    * should sum to 1.0.
    */
@@ -326,6 +331,12 @@ export interface ScoringFunction {
    * like "score=[0..100].
    */
   bash_script?: string | null;
+
+  /**
+   * Additional JSON structured context to pass to the scoring function if using
+   * custom scorer.
+   */
+  scorer_params?: unknown | null;
 }
 
 /**

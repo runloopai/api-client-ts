@@ -30,8 +30,8 @@ export {
   type BlueprintPreviewParams,
 } from './blueprints';
 export {
-  DevboxViewsDevboxesCursorIDPage,
   DevboxSnapshotViewsDiskSnapshotsCursorIDPage,
+  DevboxViewsDevboxesCursorIDPage,
   Devboxes,
   type DevboxAsyncExecutionDetailView,
   type DevboxExecutionDetailView,
@@ -46,6 +46,7 @@ export {
   type DevboxReadFileContentsResponse,
   type DevboxUploadFileResponse,
   type DevboxCreateParams,
+  type DevboxUpdateParams,
   type DevboxListParams,
   type DevboxCreateTunnelParams,
   type DevboxDownloadFileParams,

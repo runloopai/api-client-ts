@@ -18,6 +18,13 @@ import {
   ComputerView,
   Computers,
 } from './computers';
+import * as DiskSnapshotsAPI from './disk-snapshots';
+import {
+  DiskSnapshotDeleteResponse,
+  DiskSnapshotListParams,
+  DiskSnapshotUpdateParams,
+  DiskSnapshots,
+} from './disk-snapshots';
 import * as ExecutionsAPI from './executions';
 import {
   ExecutionExecuteAsyncParams,
@@ -53,6 +60,7 @@ import {
   DiagnosticSeverity,
   DiagnosticTag,
   DiagnosticsResponse,
+  DocumentSymbol,
   DocumentSymbolResponse,
   DocumentUri,
   FileContentsResponse,
@@ -113,6 +121,7 @@ type DevboxStatus = DevboxView['status'];
 const DEVBOX_BOOTING_STATES: DevboxStatus[] = ['provisioning', 'initializing'];
 
 export class Devboxes extends APIResource {
+  diskSnapshots: DiskSnapshotsAPI.DiskSnapshots = new DiskSnapshotsAPI.DiskSnapshots(this._client);
   browsers: BrowsersAPI.Browsers = new BrowsersAPI.Browsers(this._client);
   computers: ComputersAPI.Computers = new ComputersAPI.Computers(this._client);
   lsp: LspAPI.Lsp = new LspAPI.Lsp(this._client);
@@ -171,7 +180,6 @@ export class Devboxes extends APIResource {
 
     return finalResult;
   }
-
   /**
    * Create a devbox and wait for it to reach the running state.
    * This is a convenience method that combines create() and awaitDevboxRunning().
@@ -182,6 +190,24 @@ export class Devboxes extends APIResource {
   ): Promise<DevboxView> {
     const devbox = await this.create(body, options);
     return this.awaitRunning(devbox.id, options);
+  }
+  /**
+   * Updates a devbox by doing a complete update the existing name,metadata fields.
+   * It does not patch partial values.
+   */
+  update(id: string, body?: DevboxUpdateParams, options?: Core.RequestOptions): Core.APIPromise<DevboxView>
+;
+  update(id: string, options?: Core.RequestOptions): Core.APIPromise<DevboxView>
+;
+  update(
+    id: string,
+    body: DevboxUpdateParams | Core.RequestOptions = {},
+    options?: Core.RequestOptions,
+  ): Core.APIPromise<DevboxView> {
+    if (isRequestOptions(body)) {
+      return this.update(id, {}, body);
+    }
+    return this._client.post(`/v1/devboxes/${id}`, { body, ...options });
   }
 
   /**
@@ -725,6 +751,18 @@ export interface DevboxCreateParams {
   snapshot_id?: string | null;
 }
 
+export interface DevboxUpdateParams {
+  /**
+   * User defined metadata to attach to the devbox for organization.
+   */
+  metadata?: Record<string, string> | null;
+
+  /**
+   * (Optional) A user specified name to give the Devbox.
+   */
+  name?: string | null;
+}
+
 export interface DevboxListParams extends DevboxesCursorIDPageParams {
   /**
    * Filter by status
@@ -848,6 +886,7 @@ export interface DevboxWriteFileContentsParams {
 
 Devboxes.DevboxViewsDevboxesCursorIDPage = DevboxViewsDevboxesCursorIDPage;
 Devboxes.DevboxSnapshotViewsDiskSnapshotsCursorIDPage = DevboxSnapshotViewsDiskSnapshotsCursorIDPage;
+Devboxes.DiskSnapshots = DiskSnapshots;
 Devboxes.Browsers = Browsers;
 Devboxes.Computers = Computers;
 Devboxes.Lsp = Lsp;
@@ -871,6 +910,7 @@ export declare namespace Devboxes {
     DevboxViewsDevboxesCursorIDPage as DevboxViewsDevboxesCursorIDPage,
     DevboxSnapshotViewsDiskSnapshotsCursorIDPage as DevboxSnapshotViewsDiskSnapshotsCursorIDPage,
     type DevboxCreateParams as DevboxCreateParams,
+    type DevboxUpdateParams as DevboxUpdateParams,
     type DevboxListParams as DevboxListParams,
     type DevboxCreateTunnelParams as DevboxCreateTunnelParams,
     type DevboxDownloadFileParams as DevboxDownloadFileParams,
@@ -882,6 +922,13 @@ export declare namespace Devboxes {
     type DevboxSnapshotDiskParams as DevboxSnapshotDiskParams,
     type DevboxUploadFileParams as DevboxUploadFileParams,
     type DevboxWriteFileContentsParams as DevboxWriteFileContentsParams,
+  };
+
+  export {
+    DiskSnapshots as DiskSnapshots,
+    type DiskSnapshotDeleteResponse as DiskSnapshotDeleteResponse,
+    type DiskSnapshotUpdateParams as DiskSnapshotUpdateParams,
+    type DiskSnapshotListParams as DiskSnapshotListParams,
   };
 
   export {
@@ -928,6 +975,7 @@ export declare namespace Devboxes {
     type DiagnosticSeverity as DiagnosticSeverity,
     type DiagnosticsResponse as DiagnosticsResponse,
     type DiagnosticTag as DiagnosticTag,
+    type DocumentSymbol as DocumentSymbol,
     type DocumentSymbolResponse as DocumentSymbolResponse,
     type DocumentUri as DocumentUri,
     type FileContentsResponse as FileContentsResponse,
