@@ -1,5 +1,24 @@
 # Changelog
 
+## 0.19.0 (2025-02-11)
+
+Full Changelog: [v0.18.0...v0.19.0](https://github.com/runloopai/api-client-ts/compare/v0.18.0...v0.19.0)
+
+### Features
+
+* **api:** api update ([#531](https://github.com/runloopai/api-client-ts/issues/531)) ([04059e2](https://github.com/runloopai/api-client-ts/commit/04059e21b60912e980083dd80ea8150284957232))
+* **client:** send `X-Stainless-Timeout` header ([#527](https://github.com/runloopai/api-client-ts/issues/527)) ([0156635](https://github.com/runloopai/api-client-ts/commit/015663592e78908063f66cf57e26f1af01163b08))
+
+
+### Bug Fixes
+
+* **api:** remove recursive model for now ([#529](https://github.com/runloopai/api-client-ts/issues/529)) ([a52de26](https://github.com/runloopai/api-client-ts/commit/a52de26ec56e5bfa0bea124bb76a45448a7f8ad9))
+
+
+### Chores
+
+* **internal:** codegen related update ([#530](https://github.com/runloopai/api-client-ts/issues/530)) ([9e7f097](https://github.com/runloopai/api-client-ts/commit/9e7f0979f98753b5d2ee898e0e8070c35b47dfe8))
+
 ## 0.18.0 (2025-02-04)
 
 Full Changelog: [v0.17.0...v0.18.0](https://github.com/runloopai/api-client-ts/compare/v0.17.0...v0.18.0)
