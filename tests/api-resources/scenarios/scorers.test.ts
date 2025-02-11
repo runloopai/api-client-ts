@@ -10,7 +10,7 @@ const client = new Runloop({
 
 describe('resource scorers', () => {
   test('create: only required params', async () => {
-    const responsePromise = client.scenarios.scorers.create({ bash_script: 'bash_script', name: 'name' });
+    const responsePromise = client.scenarios.scorers.create({ bash_script: 'bash_script', type: 'type' });
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
     const response = await responsePromise;
@@ -21,7 +21,7 @@ describe('resource scorers', () => {
   });
 
   test('create: required and optional params', async () => {
-    const response = await client.scenarios.scorers.create({ bash_script: 'bash_script', name: 'name' });
+    const response = await client.scenarios.scorers.create({ bash_script: 'bash_script', type: 'type' });
   });
 
   test('retrieve', async () => {
@@ -45,7 +45,7 @@ describe('resource scorers', () => {
   test('update: only required params', async () => {
     const responsePromise = client.scenarios.scorers.update('id', {
       bash_script: 'bash_script',
-      name: 'name',
+      type: 'type',
     });
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
@@ -59,7 +59,7 @@ describe('resource scorers', () => {
   test('update: required and optional params', async () => {
     const response = await client.scenarios.scorers.update('id', {
       bash_script: 'bash_script',
-      name: 'name',
+      type: 'type',
     });
   });
 

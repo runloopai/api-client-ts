@@ -13,7 +13,7 @@ describe('resource scenarios', () => {
     const responsePromise = client.scenarios.create({
       input_context: { problem_statement: 'problem_statement' },
       name: 'name',
-      scoring_contract: { scoring_function_parameters: [{ name: 'name', weight: 0 }] },
+      scoring_contract: { scoring_function_parameters: [{ name: 'name', type: 'type', weight: 0 }] },
     });
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
@@ -29,7 +29,9 @@ describe('resource scenarios', () => {
       input_context: { problem_statement: 'problem_statement', additional_context: {} },
       name: 'name',
       scoring_contract: {
-        scoring_function_parameters: [{ name: 'name', weight: 0, bash_script: 'bash_script' }],
+        scoring_function_parameters: [
+          { name: 'name', type: 'type', weight: 0, bash_script: 'bash_script', scorer_params: {} },
+        ],
       },
       environment_parameters: {
         blueprint_id: 'blueprint_id',
