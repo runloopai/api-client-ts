@@ -73,6 +73,7 @@ Methods:
 
 - <code title="post /v1/devboxes">client.devboxes.<a href="./src/resources/devboxes/devboxes.ts">create</a>({ ...params }) -> DevboxView</code>
 - <code title="get /v1/devboxes/{id}">client.devboxes.<a href="./src/resources/devboxes/devboxes.ts">retrieve</a>(id) -> DevboxView</code>
+- <code title="post /v1/devboxes/{id}">client.devboxes.<a href="./src/resources/devboxes/devboxes.ts">update</a>(id, { ...params }) -> DevboxView</code>
 - <code title="get /v1/devboxes">client.devboxes.<a href="./src/resources/devboxes/devboxes.ts">list</a>({ ...params }) -> DevboxViewsDevboxesCursorIDPage</code>
 - <code title="post /v1/devboxes/{id}/create_ssh_key">client.devboxes.<a href="./src/resources/devboxes/devboxes.ts">createSSHKey</a>(id) -> DevboxCreateSSHKeyResponse</code>
 - <code title="post /v1/devboxes/{id}/create_tunnel">client.devboxes.<a href="./src/resources/devboxes/devboxes.ts">createTunnel</a>(id, { ...params }) -> DevboxTunnelView</code>
@@ -91,6 +92,18 @@ Methods:
 - <code title="post /v1/devboxes/{id}/upload_file">client.devboxes.<a href="./src/resources/devboxes/devboxes.ts">uploadFile</a>(id, { ...params }) -> unknown</code>
 - <code title="post /v1/devboxes/{id}/write_file_contents">client.devboxes.<a href="./src/resources/devboxes/devboxes.ts">writeFileContents</a>(id, { ...params }) -> DevboxExecutionDetailView</code>
 
+## DiskSnapshots
+
+Types:
+
+- <code><a href="./src/resources/devboxes/disk-snapshots.ts">DiskSnapshotDeleteResponse</a></code>
+
+Methods:
+
+- <code title="post /v1/devboxes/disk_snapshots/{id}">client.devboxes.diskSnapshots.<a href="./src/resources/devboxes/disk-snapshots.ts">update</a>(id, { ...params }) -> DevboxSnapshotView</code>
+- <code title="get /v1/devboxes/disk_snapshots">client.devboxes.diskSnapshots.<a href="./src/resources/devboxes/disk-snapshots.ts">list</a>({ ...params }) -> DevboxSnapshotViewsDiskSnapshotsCursorIDPage</code>
+- <code title="post /v1/devboxes/disk_snapshots/{id}/delete">client.devboxes.diskSnapshots.<a href="./src/resources/devboxes/disk-snapshots.ts">delete</a>(id) -> unknown</code>
+
 ## Browsers
 
 Types:
@@ -100,6 +113,7 @@ Types:
 Methods:
 
 - <code title="post /v1/devboxes/browsers">client.devboxes.browsers.<a href="./src/resources/devboxes/browsers.ts">create</a>({ ...params }) -> BrowserView</code>
+- <code title="get /v1/devboxes/browsers/{id}">client.devboxes.browsers.<a href="./src/resources/devboxes/browsers.ts">retrieve</a>(id) -> BrowserView</code>
 
 ## Computers
 
@@ -113,6 +127,7 @@ Types:
 Methods:
 
 - <code title="post /v1/devboxes/computers">client.devboxes.computers.<a href="./src/resources/devboxes/computers.ts">create</a>({ ...params }) -> ComputerView</code>
+- <code title="get /v1/devboxes/computers/{id}">client.devboxes.computers.<a href="./src/resources/devboxes/computers.ts">retrieve</a>(id) -> ComputerView</code>
 - <code title="post /v1/devboxes/computers/{id}/keyboard_interaction">client.devboxes.computers.<a href="./src/resources/devboxes/computers.ts">keyboardInteraction</a>(id, { ...params }) -> ComputerKeyboardInteractionResponse</code>
 - <code title="post /v1/devboxes/computers/{id}/mouse_interaction">client.devboxes.computers.<a href="./src/resources/devboxes/computers.ts">mouseInteraction</a>(id, { ...params }) -> ComputerMouseInteractionResponse</code>
 - <code title="post /v1/devboxes/computers/{id}/screen_interaction">client.devboxes.computers.<a href="./src/resources/devboxes/computers.ts">screenInteraction</a>(id, { ...params }) -> ComputerScreenInteractionResponse</code>
@@ -145,6 +160,7 @@ Types:
 - <code><a href="./src/resources/devboxes/lsp.ts">DiagnosticSeverity</a></code>
 - <code><a href="./src/resources/devboxes/lsp.ts">DiagnosticsResponse</a></code>
 - <code><a href="./src/resources/devboxes/lsp.ts">DiagnosticTag</a></code>
+- <code><a href="./src/resources/devboxes/lsp.ts">DocumentSymbol</a></code>
 - <code><a href="./src/resources/devboxes/lsp.ts">DocumentSymbolResponse</a></code>
 - <code><a href="./src/resources/devboxes/lsp.ts">DocumentUri</a></code>
 - <code><a href="./src/resources/devboxes/lsp.ts">FileContentsResponse</a></code>

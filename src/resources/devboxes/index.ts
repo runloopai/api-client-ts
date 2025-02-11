@@ -13,8 +13,8 @@ export {
   type ComputerScreenInteractionParams,
 } from './computers';
 export {
-  DevboxViewsDevboxesCursorIDPage,
   DevboxSnapshotViewsDiskSnapshotsCursorIDPage,
+  DevboxViewsDevboxesCursorIDPage,
   Devboxes,
   type DevboxAsyncExecutionDetailView,
   type DevboxExecutionDetailView,
@@ -29,6 +29,7 @@ export {
   type DevboxReadFileContentsResponse,
   type DevboxUploadFileResponse,
   type DevboxCreateParams,
+  type DevboxUpdateParams,
   type DevboxListParams,
   type DevboxCreateTunnelParams,
   type DevboxDownloadFileParams,
@@ -41,6 +42,12 @@ export {
   type DevboxUploadFileParams,
   type DevboxWriteFileContentsParams,
 } from './devboxes';
+export {
+  DiskSnapshots,
+  type DiskSnapshotDeleteResponse,
+  type DiskSnapshotUpdateParams,
+  type DiskSnapshotListParams,
+} from './disk-snapshots';
 export {
   Executions,
   type ExecutionRetrieveParams,
@@ -74,6 +81,7 @@ export {
   type DiagnosticSeverity,
   type DiagnosticsResponse,
   type DiagnosticTag,
+  type DocumentSymbol,
   type DocumentSymbolResponse,
   type DocumentUri,
   type FileContentsResponse,
