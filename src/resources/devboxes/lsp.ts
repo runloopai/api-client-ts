@@ -938,7 +938,13 @@ export interface LspFileParams {
   path: FilePath;
 }
 
-export type LspFileDefinitionParams = FileDefinitionRequestBody;
+export interface LspFileDefinitionParams {
+  character: number;
+
+  line: number;
+
+  uri: string;
+}
 
 export interface LspFormattingParams {
   uri: FileUri;
@@ -958,9 +964,21 @@ export interface LspGetCodeSegmentInfoParams {
   symbolType?: SymbolType;
 }
 
-export type LspGetSignatureHelpParams = SignatureHelpRequestBody;
+export interface LspGetSignatureHelpParams {
+  character: number;
 
-export type LspReferencesParams = ReferencesRequestBody;
+  line: number;
+
+  uri: string;
+}
+
+export interface LspReferencesParams {
+  character: number;
+
+  line: number;
+
+  uri: string;
+}
 
 export interface LspSetWatchDirectoryParams {
   path: FilePath;
