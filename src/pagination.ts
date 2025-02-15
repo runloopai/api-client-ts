@@ -43,7 +43,7 @@ export class BlueprintsCursorIDPage<Item extends { id: string }>
     return this.blueprints ?? [];
   }
 
-  override hasNextPage() {
+  override hasNextPage(): boolean {
     if (this.has_more === false) {
       return false;
     }
@@ -117,7 +117,7 @@ export class DevboxesCursorIDPage<Item extends { id: string }>
     return this.devboxes ?? [];
   }
 
-  override hasNextPage() {
+  override hasNextPage(): boolean {
     if (this.has_more === false) {
       return false;
     }
@@ -191,7 +191,7 @@ export class RepositoriesCursorIDPage<Item extends { id: string }>
     return this.repositories ?? [];
   }
 
-  override hasNextPage() {
+  override hasNextPage(): boolean {
     if (this.has_more === false) {
       return false;
     }
@@ -265,7 +265,7 @@ export class DiskSnapshotsCursorIDPage<Item extends { id: string }>
     return this.snapshots ?? [];
   }
 
-  override hasNextPage() {
+  override hasNextPage(): boolean {
     if (this.has_more === false) {
       return false;
     }
@@ -339,7 +339,7 @@ export class BenchmarksCursorIDPage<Item extends { id: string }>
     return this.benchmarks ?? [];
   }
 
-  override hasNextPage() {
+  override hasNextPage(): boolean {
     if (this.has_more === false) {
       return false;
     }
@@ -413,7 +413,7 @@ export class BenchmarkRunsCursorIDPage<Item extends { id: string }>
     return this.runs ?? [];
   }
 
-  override hasNextPage() {
+  override hasNextPage(): boolean {
     if (this.has_more === false) {
       return false;
     }
@@ -487,7 +487,7 @@ export class ScenariosCursorIDPage<Item extends { id: string }>
     return this.scenarios ?? [];
   }
 
-  override hasNextPage() {
+  override hasNextPage(): boolean {
     if (this.has_more === false) {
       return false;
     }
@@ -561,7 +561,7 @@ export class ScenarioRunsCursorIDPage<Item extends { id: string }>
     return this.runs ?? [];
   }
 
-  override hasNextPage() {
+  override hasNextPage(): boolean {
     if (this.has_more === false) {
       return false;
     }
@@ -635,7 +635,7 @@ export class ScenarioScorersCursorIDPage<Item extends { id: string }>
     return this.scorers ?? [];
   }
 
-  override hasNextPage() {
+  override hasNextPage(): boolean {
     if (this.has_more === false) {
       return false;
     }
