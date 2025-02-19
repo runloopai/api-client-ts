@@ -35,9 +35,19 @@ describe('resource scenarios', () => {
       },
       environment_parameters: {
         blueprint_id: 'blueprint_id',
+        launch_parameters: {
+          after_idle: { idle_time_seconds: 0, on_idle: 'shutdown' },
+          available_ports: [0],
+          keep_alive_time_seconds: 0,
+          launch_commands: ['string'],
+          resource_size_request: 'SMALL',
+        },
         prebuilt_id: 'prebuilt_id',
         snapshot_id: 'snapshot_id',
+        working_directory: 'working_directory',
       },
+      metadata: { foo: 'string' },
+      reference_output: 'reference_output',
     });
   });
 
@@ -130,6 +140,7 @@ describe('resource scenarios', () => {
     const response = await client.scenarios.startRun({
       scenario_id: 'scenario_id',
       benchmark_run_id: 'benchmark_run_id',
+      metadata: { foo: 'string' },
       run_name: 'run_name',
     });
   });

@@ -94,6 +94,11 @@ export interface BenchmarkCreateParameters {
   name: string;
 
   /**
+   * User defined metadata to attach to the benchmark for organization.
+   */
+  metadata?: Record<string, string> | null;
+
+  /**
    * The Scenario IDs that make up the Benchmark.
    */
   scenario_ids?: Array<string> | null;
@@ -137,6 +142,16 @@ export interface BenchmarkRunView {
   benchmark_id: string;
 
   /**
+   * User defined metadata to attach to the benchmark run for organization.
+   */
+  metadata: Record<string, string>;
+
+  /**
+   * List of Scenarios that need to be completed before benchmark can be completed.
+   */
+  pending_scenarios: Array<string>;
+
+  /**
    * The time the benchmark run execution started (Unix timestamp milliseconds).
    */
   start_time_ms: number;
@@ -157,11 +172,6 @@ export interface BenchmarkRunView {
   name?: string | null;
 
   /**
-   * List of Scenarios that need to be completed before benchmark can be completed.
-   */
-  pending_scenarios?: Array<string>;
-
-  /**
    * The final score across the BenchmarkRun, present once completed. Calculated as
    * sum of scenario scores / number of scenario runs.
    */
@@ -177,6 +187,11 @@ export interface BenchmarkView {
    * The ID of the Benchmark.
    */
   id: string;
+
+  /**
+   * User defined metadata to attach to the benchmark for organization.
+   */
+  metadata: Record<string, string>;
 
   /**
    * The name of the Benchmark.
@@ -196,6 +211,11 @@ export interface StartBenchmarkRunParameters {
   benchmark_id: string;
 
   /**
+   * User defined metadata to attach to the benchmark run for organization.
+   */
+  metadata?: Record<string, string> | null;
+
+  /**
    * Display name of the run.
    */
   run_name?: string | null;
@@ -206,6 +226,11 @@ export interface BenchmarkCreateParams {
    * The name of the Benchmark.
    */
   name: string;
+
+  /**
+   * User defined metadata to attach to the benchmark for organization.
+   */
+  metadata?: Record<string, string> | null;
 
   /**
    * The Scenario IDs that make up the Benchmark.
@@ -222,6 +247,11 @@ export interface BenchmarkStartRunParams {
    * ID of the Benchmark to run.
    */
   benchmark_id: string;
+
+  /**
+   * User defined metadata to attach to the benchmark run for organization.
+   */
+  metadata?: Record<string, string> | null;
 
   /**
    * Display name of the run.
