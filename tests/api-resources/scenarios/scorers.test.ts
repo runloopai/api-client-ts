@@ -107,8 +107,16 @@ describe('resource scorers', () => {
       scoring_context: {},
       environment_parameters: {
         blueprint_id: 'blueprint_id',
+        launch_parameters: {
+          after_idle: { idle_time_seconds: 0, on_idle: 'shutdown' },
+          available_ports: [0],
+          keep_alive_time_seconds: 0,
+          launch_commands: ['string'],
+          resource_size_request: 'SMALL',
+        },
         prebuilt_id: 'prebuilt_id',
         snapshot_id: 'snapshot_id',
+        working_directory: 'working_directory',
       },
     });
   });
