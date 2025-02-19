@@ -21,7 +21,11 @@ describe('resource benchmarks', () => {
   });
 
   test('create: required and optional params', async () => {
-    const response = await client.benchmarks.create({ name: 'name', scenario_ids: ['string'] });
+    const response = await client.benchmarks.create({
+      name: 'name',
+      metadata: { foo: 'string' },
+      scenario_ids: ['string'],
+    });
   });
 
   test('retrieve', async () => {
@@ -110,6 +114,10 @@ describe('resource benchmarks', () => {
   });
 
   test('startRun: required and optional params', async () => {
-    const response = await client.benchmarks.startRun({ benchmark_id: 'benchmark_id', run_name: 'run_name' });
+    const response = await client.benchmarks.startRun({
+      benchmark_id: 'benchmark_id',
+      metadata: { foo: 'string' },
+      run_name: 'run_name',
+    });
   });
 });
