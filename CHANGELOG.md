@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.20.1 (2025-02-19)
+
+Full Changelog: [v0.20.0...v0.20.1](https://github.com/runloopai/api-client-ts/compare/v0.20.0...v0.20.1)
+
+### Chores
+
+* **internal:** codegen related update ([#540](https://github.com/runloopai/api-client-ts/issues/540)) ([32acae1](https://github.com/runloopai/api-client-ts/commit/32acae1ff6862c90ebd61c4689b844e539da437d))
+
 ## 0.20.0 (2025-02-19)
 
 Full Changelog: [v0.19.0...v0.20.0](https://github.com/runloopai/api-client-ts/compare/v0.19.0...v0.20.0)
