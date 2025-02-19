@@ -1,5 +1,25 @@
 # Changelog
 
+## 0.20.0 (2025-02-19)
+
+Full Changelog: [v0.19.0...v0.20.0](https://github.com/runloopai/api-client-ts/compare/v0.19.0...v0.20.0)
+
+### Features
+
+* **api:** api update ([#538](https://github.com/runloopai/api-client-ts/issues/538)) ([353fb91](https://github.com/runloopai/api-client-ts/commit/353fb91b3769f3a77848943547510ff24428d690))
+
+
+### Bug Fixes
+
+* **client:** fix export map for index exports ([#536](https://github.com/runloopai/api-client-ts/issues/536)) ([4a27bf2](https://github.com/runloopai/api-client-ts/commit/4a27bf2de906170ca82faadf8cb81d667d5516fe))
+
+
+### Chores
+
+* **internal:** add missing return type annotation ([#537](https://github.com/runloopai/api-client-ts/issues/537)) ([ee54070](https://github.com/runloopai/api-client-ts/commit/ee540702768334bae8addb46c504e1188a478f46))
+* **internal:** codegen related update ([#533](https://github.com/runloopai/api-client-ts/issues/533)) ([9d7e0eb](https://github.com/runloopai/api-client-ts/commit/9d7e0eb6735e7522a492d3d66faac857de20a3e3))
+* **internal:** codegen related update ([#535](https://github.com/runloopai/api-client-ts/issues/535)) ([c3e10f7](https://github.com/runloopai/api-client-ts/commit/c3e10f78dd9b5156307393c386ddb1e90dbddca0))
+
 ## 0.19.0 (2025-02-11)
 
 Full Changelog: [v0.18.0...v0.19.0](https://github.com/runloopai/api-client-ts/compare/v0.18.0...v0.19.0)
