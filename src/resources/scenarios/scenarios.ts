@@ -3,6 +3,7 @@
 import { APIResource } from '../../resource';
 import { isRequestOptions } from '../../core';
 import * as Core from '../../core';
+import * as Shared from '../shared';
 import * as RunsAPI from './runs';
 import { RunListParams, Runs } from './runs';
 import * as ScorersAPI from './scorers';
@@ -151,6 +152,18 @@ export interface ScenarioCreateParameters {
    * The Environment in which the Scenario will run.
    */
   environment_parameters?: ScenarioEnvironment | null;
+
+  /**
+   * User defined metadata to attach to the scenario for organization.
+   */
+  metadata?: Record<string, string> | null;
+
+  /**
+   * A string representation of the reference output to solve the scenario. Commonly
+   * can be the result of a git diff or a sequence of command actions to apply to the
+   * environment.
+   */
+  reference_output?: string | null;
 }
 
 /**
@@ -164,6 +177,11 @@ export interface ScenarioEnvironment {
   blueprint_id?: string | null;
 
   /**
+   * Optional launch parameters to apply to the devbox environment at launch.
+   */
+  launch_parameters?: Shared.LaunchParameters | null;
+
+  /**
    * Use the prebuilt with matching ID.
    */
   prebuilt_id?: string | null;
@@ -172,6 +190,12 @@ export interface ScenarioEnvironment {
    * Use the snapshot with matching ID.
    */
   snapshot_id?: string | null;
+
+  /**
+   * The working directory where the agent is expected to fulfill the scenario.
+   * Scoring functions also run from the working directory.
+   */
+  working_directory?: string | null;
 }
 
 export interface ScenarioListView {
@@ -210,6 +234,11 @@ export interface ScenarioRunView {
    * ID of the Devbox on which the Scenario is running.
    */
   devbox_id: string;
+
+  /**
+   * User defined metadata to attach to the scenario run for organization.
+   */
+  metadata: Record<string, string>;
 
   /**
    * ID of the Scenario that has been run.
@@ -263,6 +292,11 @@ export interface ScenarioView {
   input_context: InputContext;
 
   /**
+   * User defined metadata to attach to the scenario for organization.
+   */
+  metadata: Record<string, string>;
+
+  /**
    * The name of the Scenario.
    */
   name: string;
@@ -276,6 +310,13 @@ export interface ScenarioView {
    * The Environment in which the Scenario is run.
    */
   environment?: ScenarioEnvironment | null;
+
+  /**
+   * A string representation of the reference output to solve the scenario. Commonly
+   * can be the result of a git diff or a sequence of command actions to apply to the
+   * environment.
+   */
+  reference_output?: string | null;
 }
 
 /**
@@ -310,12 +351,14 @@ export interface ScoringContractResultView {
  */
 export interface ScoringFunction {
   /**
-   * Name of scoring function.
+   * Name of scoring function. Names must only contain [a-zA-Z0-9_-].
    */
   name: string;
 
   /**
-   * Type of the scoring function. Defaults to bash script.
+   * Type of the scoring function. Use 'bash' as type and fill out 'bash_script'
+   * field for scoring via custom bash scripts. Otherwise use a type corresponding to
+   * a custom scorer function or a public Runloop scorer type.
    */
   type: string;
 
@@ -327,8 +370,8 @@ export interface ScoringFunction {
 
   /**
    * A single bash script that sets up the environment, scores, and prints the final
-   * score to standard out. Score should be an integer between 0 and 100, and look
-   * like "score=[0..100].
+   * score to standard out. Score should be a float between 0.0 and 1.0, and look
+   * like "score=[0.0..1.0].
    */
   bash_script?: string | null;
 
@@ -358,6 +401,11 @@ export interface ScoringFunctionResultView {
    * Scoring function name that ran.
    */
   scoring_function_name: string;
+
+  /**
+   * The state of the scoring function application.
+   */
+  state: 'unknown' | 'complete' | 'error';
 }
 
 export interface StartScenarioRunParameters {
@@ -370,6 +418,11 @@ export interface StartScenarioRunParameters {
    * Benchmark to associate the run.
    */
   benchmark_run_id?: string | null;
+
+  /**
+   * User defined metadata to attach to the run for organization.
+   */
+  metadata?: Record<string, string> | null;
 
   /**
    * Display name of the run.
@@ -397,6 +450,18 @@ export interface ScenarioCreateParams {
    * The Environment in which the Scenario will run.
    */
   environment_parameters?: ScenarioEnvironment | null;
+
+  /**
+   * User defined metadata to attach to the scenario for organization.
+   */
+  metadata?: Record<string, string> | null;
+
+  /**
+   * A string representation of the reference output to solve the scenario. Commonly
+   * can be the result of a git diff or a sequence of command actions to apply to the
+   * environment.
+   */
+  reference_output?: string | null;
 }
 
 export interface ScenarioListParams extends ScenariosCursorIDPageParams {
@@ -423,6 +488,11 @@ export interface ScenarioStartRunParams {
    * Benchmark to associate the run.
    */
   benchmark_run_id?: string | null;
+
+  /**
+   * User defined metadata to attach to the run for organization.
+   */
+  metadata?: Record<string, string> | null;
 
   /**
    * Display name of the run.
