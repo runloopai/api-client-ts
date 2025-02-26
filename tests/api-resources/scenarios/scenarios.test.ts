@@ -69,6 +69,48 @@ describe('resource scenarios', () => {
     );
   });
 
+  test('update: only required params', async () => {
+    const responsePromise = client.scenarios.update('id', {
+      input_context: { problem_statement: 'problem_statement' },
+      name: 'name',
+      scoring_contract: { scoring_function_parameters: [{ name: 'name', type: 'type', weight: 0 }] },
+    });
+    const rawResponse = await responsePromise.asResponse();
+    expect(rawResponse).toBeInstanceOf(Response);
+    const response = await responsePromise;
+    expect(response).not.toBeInstanceOf(Response);
+    const dataAndResponse = await responsePromise.withResponse();
+    expect(dataAndResponse.data).toBe(response);
+    expect(dataAndResponse.response).toBe(rawResponse);
+  });
+
+  test('update: required and optional params', async () => {
+    const response = await client.scenarios.update('id', {
+      input_context: { problem_statement: 'problem_statement', additional_context: {} },
+      name: 'name',
+      scoring_contract: {
+        scoring_function_parameters: [
+          { name: 'name', type: 'type', weight: 0, bash_script: 'bash_script', scorer_params: {} },
+        ],
+      },
+      environment_parameters: {
+        blueprint_id: 'blueprint_id',
+        launch_parameters: {
+          after_idle: { idle_time_seconds: 0, on_idle: 'shutdown' },
+          available_ports: [0],
+          keep_alive_time_seconds: 0,
+          launch_commands: ['string'],
+          resource_size_request: 'SMALL',
+        },
+        prebuilt_id: 'prebuilt_id',
+        snapshot_id: 'snapshot_id',
+        working_directory: 'working_directory',
+      },
+      metadata: { foo: 'string' },
+      reference_output: 'reference_output',
+    });
+  });
+
   test('list', async () => {
     const responsePromise = client.scenarios.list();
     const rawResponse = await responsePromise.asResponse();
