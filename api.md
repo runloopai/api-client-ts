@@ -250,6 +250,7 @@ Methods:
 
 - <code title="post /v1/scenarios">client.scenarios.<a href="./src/resources/scenarios/scenarios.ts">create</a>({ ...params }) -> ScenarioView</code>
 - <code title="get /v1/scenarios/{id}">client.scenarios.<a href="./src/resources/scenarios/scenarios.ts">retrieve</a>(id) -> ScenarioView</code>
+- <code title="post /v1/scenarios/{id}">client.scenarios.<a href="./src/resources/scenarios/scenarios.ts">update</a>(id, { ...params }) -> ScenarioView</code>
 - <code title="get /v1/scenarios">client.scenarios.<a href="./src/resources/scenarios/scenarios.ts">list</a>({ ...params }) -> ScenarioViewsScenariosCursorIDPage</code>
 - <code title="get /v1/scenarios/list_public">client.scenarios.<a href="./src/resources/scenarios/scenarios.ts">listPublic</a>({ ...params }) -> ScenarioViewsScenariosCursorIDPage</code>
 - <code title="post /v1/scenarios/start_run">client.scenarios.<a href="./src/resources/scenarios/scenarios.ts">startRun</a>({ ...params }) -> ScenarioRunView</code>

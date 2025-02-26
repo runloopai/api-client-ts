@@ -48,6 +48,18 @@ export class Scenarios extends APIResource {
   }
 
   /**
+   * Update a Scenario, a repeatable AI coding evaluation test that defines the
+   * starting environment as well as evaluation success criteria.
+   */
+  update(
+    id: string,
+    body: ScenarioUpdateParams,
+    options?: Core.RequestOptions,
+  ): Core.APIPromise<ScenarioView> {
+    return this._client.post(`/v1/scenarios/${id}`, { body, ...options });
+  }
+
+  /**
    * List all Scenarios matching filter.
    */
   list(
@@ -363,7 +375,7 @@ export interface ScoringFunction {
   type: string;
 
   /**
-   * Wight to apply to scoring function score. Weights of all scoring functions
+   * Weight to apply to scoring function score. Weights of all scoring functions
    * should sum to 1.0.
    */
   weight: number;
@@ -464,6 +476,40 @@ export interface ScenarioCreateParams {
   reference_output?: string | null;
 }
 
+export interface ScenarioUpdateParams {
+  /**
+   * The input context for the Scenario.
+   */
+  input_context: InputContext;
+
+  /**
+   * Name of the scenario.
+   */
+  name: string;
+
+  /**
+   * The scoring contract for the Scenario.
+   */
+  scoring_contract: ScoringContract;
+
+  /**
+   * The Environment in which the Scenario will run.
+   */
+  environment_parameters?: ScenarioEnvironment | null;
+
+  /**
+   * User defined metadata to attach to the scenario for organization.
+   */
+  metadata?: Record<string, string> | null;
+
+  /**
+   * A string representation of the reference output to solve the scenario. Commonly
+   * can be the result of a git diff or a sequence of command actions to apply to the
+   * environment.
+   */
+  reference_output?: string | null;
+}
+
 export interface ScenarioListParams extends ScenariosCursorIDPageParams {
   /**
    * Query for Scenarios with a given name.
@@ -521,6 +567,7 @@ export declare namespace Scenarios {
     type StartScenarioRunParameters as StartScenarioRunParameters,
     ScenarioViewsScenariosCursorIDPage as ScenarioViewsScenariosCursorIDPage,
     type ScenarioCreateParams as ScenarioCreateParams,
+    type ScenarioUpdateParams as ScenarioUpdateParams,
     type ScenarioListParams as ScenarioListParams,
     type ScenarioListPublicParams as ScenarioListPublicParams,
     type ScenarioStartRunParams as ScenarioStartRunParams,
