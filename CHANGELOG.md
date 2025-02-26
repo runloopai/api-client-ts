@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.21.0 (2025-02-26)
+
+Full Changelog: [v0.20.0...v0.21.0](https://github.com/runloopai/api-client-ts/compare/v0.20.0...v0.21.0)
+
+### Features
+
+* **api:** api update ([#543](https://github.com/runloopai/api-client-ts/issues/543)) ([dd460b6](https://github.com/runloopai/api-client-ts/commit/dd460b687a9e09c3c6b1b828b8ad3c4c75d49268))
+
+
+### Chores
+
+* **internal:** codegen related update ([#540](https://github.com/runloopai/api-client-ts/issues/540)) ([32acae1](https://github.com/runloopai/api-client-ts/commit/32acae1ff6862c90ebd61c4689b844e539da437d))
+* **internal:** fix devcontainers setup ([#542](https://github.com/runloopai/api-client-ts/issues/542)) ([8fddaf7](https://github.com/runloopai/api-client-ts/commit/8fddaf7a8d040b8872b474b7f9aafd23c153b180))
+
 ## 0.20.0 (2025-02-19)
 
 Full Changelog: [v0.19.0...v0.20.0](https://github.com/runloopai/api-client-ts/compare/v0.19.0...v0.20.0)
