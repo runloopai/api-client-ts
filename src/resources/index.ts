@@ -88,6 +88,7 @@ export {
   type ScoringFunctionResultView,
   type StartScenarioRunParameters,
   type ScenarioCreateParams,
+  type ScenarioUpdateParams,
   type ScenarioListParams,
   type ScenarioListPublicParams,
   type ScenarioStartRunParams,
