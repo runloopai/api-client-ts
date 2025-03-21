@@ -54,6 +54,16 @@ export interface LaunchParameters {
   available_ports?: Array<number> | null;
 
   /**
+   * custom resource size, number of cpu cores, must be multiple of 2.
+   */
+  custom_cpu_cores?: number | null;
+
+  /**
+   * custom memory size, number in Gi, must be a multiple of 2.
+   */
+  custom_gb_memory?: number | null;
+
+  /**
    * Time in seconds after which Devbox will automatically shutdown. Default is 1
    * hour.
    */
