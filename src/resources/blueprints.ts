@@ -135,6 +135,8 @@ export interface BlueprintListView {
 
   has_more: boolean;
 
+  remaining_count: number;
+
   total_count: number;
 }
 

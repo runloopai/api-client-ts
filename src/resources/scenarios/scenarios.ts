@@ -198,6 +198,8 @@ export interface ScenarioEnvironment {
 export interface ScenarioListView {
   has_more: boolean;
 
+  remaining_count: number;
+
   /**
    * List of Scenarios matching filter.
    */
@@ -208,6 +210,8 @@ export interface ScenarioListView {
 
 export interface ScenarioRunListView {
   has_more: boolean;
+
+  remaining_count: number;
 
   /**
    * List of ScenarioRuns matching filter.
@@ -344,7 +348,7 @@ export interface ScoringContractResultView {
 }
 
 /**
- * ScoringFunctionParameters specifies a method of scoring a Scenario.
+ * ScoringFunction specifies a method of scoring a Scenario.
  */
 export interface ScoringFunction {
   /**
@@ -353,30 +357,140 @@ export interface ScoringFunction {
   name: string;
 
   /**
-   * Type of the scoring function. Use 'bash' as type and fill out 'bash_script'
-   * field for scoring via custom bash scripts. Otherwise use a type corresponding to
-   * a custom scorer function or a public Runloop scorer type.
+   * The scoring function to use for evaluating this scenario. The type field
+   * determines which built-in function to use.
    */
-  type: string;
+  scoring_function:
+    | ScoringFunction.AstGrepScoringFunction
+    | ScoringFunction.BashScriptScoringFunction
+    | ScoringFunction.CommandScoringFunction
+    | ScoringFunction.CustomScoringFunction
+    | ScoringFunction.PythonScriptScoringFunction
+    | ScoringFunction.TestBasedScoringFunction;
 
   /**
    * Weight to apply to scoring function score. Weights of all scoring functions
    * should sum to 1.0.
    */
   weight: number;
+}
+
+export namespace ScoringFunction {
+  /**
+   * AstGrepScoringFunction utilizes structured coach search for scoring.
+   */
+  export interface AstGrepScoringFunction {
+    /**
+     * AST pattern to match.
+     */
+    pattern: string;
+
+    /**
+     * The path to search.
+     */
+    search_directory: string;
+
+    type: 'ast_grep_scorer';
+
+    /**
+     * The language of the pattern.
+     */
+    lang?: string;
+  }
 
   /**
-   * A single bash script that sets up the environment, scores, and prints the final
-   * score to standard out. Score should be a float between 0.0 and 1.0, and look
-   * like "score=[0.0..1.0].
+   * BashScriptScoringFunction is a scoring function specified by a bash script that
+   * will be run in the context of your environment.
    */
-  bash_script?: string | null;
+  export interface BashScriptScoringFunction {
+    type: 'bash_script_scorer';
+
+    /**
+     * A single bash script that sets up the environment, scores, and prints the final
+     * score to standard out. Score should be a float between 0.0 and 1.0, and look
+     * like "score=[0.0..1.0].
+     */
+    bash_script?: string;
+  }
 
   /**
-   * Additional JSON structured context to pass to the scoring function if using
-   * custom scorer.
+   * CommandScoringFunction executes a single command and checks the result.The
+   * output of the command will be printed. Scoring will passed if the command
+   * returns status code 0, otherwise it will be failed.
    */
-  scorer_params?: unknown | null;
+  export interface CommandScoringFunction {
+    type: 'command_scorer';
+
+    /**
+     * The command to execute.
+     */
+    command?: string;
+  }
+
+  /**
+   * CustomScoringFunction is a custom, user defined scoring function.
+   */
+  export interface CustomScoringFunction {
+    type: 'custom_scorer';
+
+    /**
+     * Additional JSON structured context to pass to the scoring function.
+     */
+    scorer_params?: unknown | null;
+  }
+
+  /**
+   * PythonScriptScoringFunction will run a python script in the context of your
+   * environment as a ScoringFunction.
+   */
+  export interface PythonScriptScoringFunction {
+    /**
+     * Python script to be run. The script should output the score to standard out as a
+     * float between 0.0 and 1.0.
+     */
+    python_script: string;
+
+    type: 'python_script_scorer';
+
+    /**
+     * Package dependencies to be installed. The requirements should be a valid
+     * requirements.txt file.
+     */
+    requirements_contents?: string;
+  }
+
+  /**
+   * TestBasedScoringFunction writes test files to disk and executes a test command
+   * to verify the solution.
+   */
+  export interface TestBasedScoringFunction {
+    type: 'test_based_scorer';
+
+    /**
+     * The command to execute for running the tests
+     */
+    test_command?: string;
+
+    /**
+     * List of test files to create
+     */
+    test_files?: Array<TestBasedScoringFunction.TestFile>;
+  }
+
+  export namespace TestBasedScoringFunction {
+    export interface TestFile {
+      /**
+       * Content of the test file
+       */
+      file_contents?: string;
+
+      /**
+       * Path to write content of the test file, relative to your environment's working
+       * directory
+       */
+      file_path?: string;
+    }
+  }
 }
 
 /**

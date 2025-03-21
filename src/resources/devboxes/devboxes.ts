@@ -467,11 +467,15 @@ export interface DevboxListView {
 
   has_more: boolean;
 
+  remaining_count: number;
+
   total_count: number;
 }
 
 export interface DevboxSnapshotListView {
   has_more: boolean;
+
+  remaining_count: number;
 
   /**
    * List of snapshots matching filter.
