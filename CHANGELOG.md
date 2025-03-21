@@ -1,5 +1,33 @@
 # Changelog
 
+## 0.22.0 (2025-03-21)
+
+Full Changelog: [v0.21.0...v0.22.0](https://github.com/runloopai/api-client-ts/compare/v0.21.0...v0.22.0)
+
+### Features
+
+* add SKIP_BREW env var to ./scripts/bootstrap ([#547](https://github.com/runloopai/api-client-ts/issues/547)) ([75d9ec4](https://github.com/runloopai/api-client-ts/commit/75d9ec4b58f4101f87d1df3ea76deaa68c887ffa))
+* **api:** api update ([#553](https://github.com/runloopai/api-client-ts/issues/553)) ([e289c5e](https://github.com/runloopai/api-client-ts/commit/e289c5efd7f5f9af4e85cf47f63d1d5469690940))
+* **api:** api update ([#554](https://github.com/runloopai/api-client-ts/issues/554)) ([3abfb7e](https://github.com/runloopai/api-client-ts/commit/3abfb7edf491f2bbd4bde2f8106782e4e50c10e6))
+* **client:** accept RFC6838 JSON content types ([#548](https://github.com/runloopai/api-client-ts/issues/548)) ([1f50373](https://github.com/runloopai/api-client-ts/commit/1f5037330c3e47b5e5f9d9a251751ef2daa013fa))
+
+
+### Bug Fixes
+
+* **exports:** ensure resource imports don't require /index ([#550](https://github.com/runloopai/api-client-ts/issues/550)) ([967f06f](https://github.com/runloopai/api-client-ts/commit/967f06f8eb0a3aec5577f64eda9d120d2ab955bf))
+
+
+### Chores
+
+* **exports:** cleaner resource index imports ([#551](https://github.com/runloopai/api-client-ts/issues/551)) ([1e80f6e](https://github.com/runloopai/api-client-ts/commit/1e80f6ef49a5735034777329ce64942225b73b3c))
+* **exports:** stop using path fallbacks ([#552](https://github.com/runloopai/api-client-ts/issues/552)) ([87f96eb](https://github.com/runloopai/api-client-ts/commit/87f96eb39a83f7f4a4b2a4908229bf7c97bc63ba))
+* **internal:** remove extra empty newlines ([#549](https://github.com/runloopai/api-client-ts/issues/549)) ([077c9bb](https://github.com/runloopai/api-client-ts/commit/077c9bb96eac1194f6037125920e58c6312345cf))
+
+
+### Documentation
+
+* update URLs from stainlessapi.com to stainless.com ([#545](https://github.com/runloopai/api-client-ts/issues/545)) ([86c2cf3](https://github.com/runloopai/api-client-ts/commit/86c2cf3f4f1be4849130e6fc726f1c1af34de3ea))
+
 ## 0.21.0 (2025-02-26)
 
 Full Changelog: [v0.20.0...v0.21.0](https://github.com/runloopai/api-client-ts/compare/v0.20.0...v0.21.0)
