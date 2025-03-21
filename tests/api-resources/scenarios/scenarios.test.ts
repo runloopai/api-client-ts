@@ -17,11 +17,7 @@ describe('resource scenarios', () => {
         scoring_function_parameters: [
           {
             name: 'name',
-            scoring_function: {
-              pattern: 'pattern',
-              search_directory: 'search_directory',
-              type: 'ast_grep_scorer',
-            },
+            scorer: { pattern: 'pattern', search_directory: 'search_directory', type: 'ast_grep_scorer' },
             weight: 0,
           },
         ],
@@ -44,7 +40,7 @@ describe('resource scenarios', () => {
         scoring_function_parameters: [
           {
             name: 'name',
-            scoring_function: {
+            scorer: {
               pattern: 'pattern',
               search_directory: 'search_directory',
               type: 'ast_grep_scorer',
@@ -100,11 +96,7 @@ describe('resource scenarios', () => {
         scoring_function_parameters: [
           {
             name: 'name',
-            scoring_function: {
-              pattern: 'pattern',
-              search_directory: 'search_directory',
-              type: 'ast_grep_scorer',
-            },
+            scorer: { pattern: 'pattern', search_directory: 'search_directory', type: 'ast_grep_scorer' },
             weight: 0,
           },
         ],
@@ -127,7 +119,7 @@ describe('resource scenarios', () => {
         scoring_function_parameters: [
           {
             name: 'name',
-            scoring_function: {
+            scorer: {
               pattern: 'pattern',
               search_directory: 'search_directory',
               type: 'ast_grep_scorer',
