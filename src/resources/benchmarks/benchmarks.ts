@@ -112,11 +112,15 @@ export interface BenchmarkListView {
 
   has_more: boolean;
 
+  remaining_count: number;
+
   total_count: number;
 }
 
 export interface BenchmarkRunListView {
   has_more: boolean;
+
+  remaining_count: number;
 
   /**
    * List of BenchmarkRuns matching filter.
