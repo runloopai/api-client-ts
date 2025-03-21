@@ -41,7 +41,8 @@ export class Runs extends APIResource {
   }
 
   /**
-   * Complete a currently running ScenarioRun.
+   * Complete a currently running ScenarioRun. Calling complete will shutdown
+   * underlying Devbox resource.
    */
   complete(id: string, options?: Core.RequestOptions): Core.APIPromise<ScenariosAPI.ScenarioRunView> {
     return this._client.post(`/v1/scenarios/runs/${id}/complete`, options);
