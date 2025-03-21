@@ -360,7 +360,7 @@ export interface ScoringFunction {
    * The scoring function to use for evaluating this scenario. The type field
    * determines which built-in function to use.
    */
-  scoring_function:
+  scorer:
     | ScoringFunction.AstGrepScoringFunction
     | ScoringFunction.BashScriptScoringFunction
     | ScoringFunction.CommandScoringFunction
