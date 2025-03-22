@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.22.1 (2025-03-22)
+
+Full Changelog: [v0.22.0...v0.22.1](https://github.com/runloopai/api-client-ts/compare/v0.22.0...v0.22.1)
+
+### Bug Fixes
+
+* avoid type error in certain environments ([#556](https://github.com/runloopai/api-client-ts/issues/556)) ([863c7fd](https://github.com/runloopai/api-client-ts/commit/863c7fda35f11b6637a5e9e180087cf2eded8bf3))
+
 ## 0.22.0 (2025-03-21)
 
 Full Changelog: [v0.21.0...v0.22.0](https://github.com/runloopai/api-client-ts/compare/v0.21.0...v0.22.0)
