@@ -381,7 +381,9 @@ export namespace ScoringFunction {
    */
   export interface AstGrepScoringFunction {
     /**
-     * AST pattern to match.
+     * AST pattern to match. Pattern will be passed to ast-grep using the commandline
+     * surround by double quotes ("), so make sure to use proper escaping (for example,
+     * \$\$\$).
      */
     pattern: string;
 
