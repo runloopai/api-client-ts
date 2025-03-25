@@ -448,6 +448,11 @@ export namespace ScoringFunction {
    * CustomScoringFunction is a custom, user defined scoring function.
    */
   export interface CustomScoringFunction {
+    /**
+     * Type of the scoring function, previously registered with Runloop.
+     */
+    custom_scorer_type: string;
+
     type: 'custom_scorer';
 
     /**
