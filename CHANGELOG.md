@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.23.1 (2025-03-28)
+
+Full Changelog: [v0.23.0...v0.23.1](https://github.com/runloopai/api-client-ts/compare/v0.23.0...v0.23.1)
+
+### Bug Fixes
+
+* **internal:** work around https://github.com/vercel/next.js/issues/76881 ([#561](https://github.com/runloopai/api-client-ts/issues/561)) ([3f14a08](https://github.com/runloopai/api-client-ts/commit/3f14a0866ad5b658a67a57fd6fdedf3224b78ae8))
+
 ## 0.23.0 (2025-03-25)
 
 Full Changelog: [v0.22.0...v0.23.0](https://github.com/runloopai/api-client-ts/compare/v0.22.0...v0.23.0)
