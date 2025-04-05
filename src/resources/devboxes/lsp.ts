@@ -290,6 +290,7 @@ export interface CodeActionContext {
    * The reason why code actions were requested.
    */
   triggerKind?: CodeActionTriggerKind;
+
   [k: string]: unknown;
 }
 
@@ -357,6 +358,7 @@ export interface CodeDescription {
    * An URI to open with more information about the diagnostic error.
    */
   href: URi;
+
   [k: string]: unknown;
 }
 
@@ -458,6 +460,7 @@ export interface Diagnostic {
    * Additional metadata about the diagnostic.
    */
   tags?: Array<DiagnosticTag>;
+
   [k: string]: unknown;
 }
 
@@ -478,6 +481,7 @@ export interface DiagnosticRelatedInformation {
    * The message of this related diagnostic information.
    */
   message: string;
+
   [k: string]: unknown;
 }
 
@@ -547,6 +551,7 @@ export interface DocumentSymbol {
    * Tags for this document symbol.
    */
   tags?: Array<SymbolTag>;
+
   [k: string]: unknown;
 }
 
@@ -652,6 +657,7 @@ export interface Location {
    * A tagging type for string properties that are actually document URIs.
    */
   uri: DocumentUri;
+
   [k: string]: unknown;
 }
 
@@ -735,6 +741,7 @@ export interface Position {
    * defaults to 0.
    */
   line: Uinteger;
+
   [k: string]: unknown;
 }
 
@@ -765,6 +772,7 @@ export interface Range {
    * The range's start position.
    */
   start: Position;
+
   [k: string]: unknown;
 }
 
@@ -856,6 +864,7 @@ export interface TextEdit {
    * create a range where start === end.
    */
   range: Range;
+
   [k: string]: unknown;
 }
 
