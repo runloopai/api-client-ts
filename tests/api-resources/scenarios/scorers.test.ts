@@ -114,7 +114,7 @@ describe('resource scorers', () => {
           custom_gb_memory: 0,
           keep_alive_time_seconds: 0,
           launch_commands: ['string'],
-          resource_size_request: 'SMALL',
+          resource_size_request: 'X_SMALL',
         },
         prebuilt_id: 'prebuilt_id',
         snapshot_id: 'snapshot_id',
