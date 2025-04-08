@@ -77,5 +77,13 @@ export interface LaunchParameters {
   /**
    * Manual resource configuration for Devbox. If not set, defaults will be used.
    */
-  resource_size_request?: 'SMALL' | 'MEDIUM' | 'LARGE' | 'X_LARGE' | 'XX_LARGE' | 'CUSTOM_SIZE' | null;
+  resource_size_request?:
+    | 'X_SMALL'
+    | 'SMALL'
+    | 'MEDIUM'
+    | 'LARGE'
+    | 'X_LARGE'
+    | 'XX_LARGE'
+    | 'CUSTOM_SIZE'
+    | null;
 }
