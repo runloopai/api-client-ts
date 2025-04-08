@@ -27,6 +27,7 @@ export {
   type DevboxDeleteDiskSnapshotResponse,
   type DevboxKeepAliveResponse,
   type DevboxReadFileContentsResponse,
+  type DevboxRemoveTunnelResponse,
   type DevboxUploadFileResponse,
   type DevboxCreateParams,
   type DevboxUpdateParams,

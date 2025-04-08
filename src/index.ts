@@ -54,14 +54,17 @@ import {
 import {
   BenchmarkCreateParameters,
   BenchmarkCreateParams,
+  BenchmarkCreateResponse,
   BenchmarkListParams,
   BenchmarkListPublicParams,
-  BenchmarkListView,
+  BenchmarkListPublicResponse,
+  BenchmarkListPublicResponsesBenchmarksCursorIDPage,
+  BenchmarkListResponse,
+  BenchmarkListResponsesBenchmarksCursorIDPage,
+  BenchmarkRetrieveResponse,
   BenchmarkRunListView,
   BenchmarkRunView,
   BenchmarkStartRunParams,
-  BenchmarkView,
-  BenchmarkViewsBenchmarksCursorIDPage,
   Benchmarks,
   StartBenchmarkRunParameters,
 } from './resources/benchmarks/benchmarks';
@@ -82,6 +85,7 @@ import {
   DevboxReadFileContentsParams,
   DevboxReadFileContentsResponse,
   DevboxRemoveTunnelParams,
+  DevboxRemoveTunnelResponse,
   DevboxSnapshotDiskParams,
   DevboxSnapshotListView,
   DevboxSnapshotView,
@@ -99,16 +103,20 @@ import {
   InputContext,
   ScenarioCreateParameters,
   ScenarioCreateParams,
+  ScenarioCreateResponse,
   ScenarioEnvironment,
   ScenarioListParams,
   ScenarioListPublicParams,
-  ScenarioListView,
+  ScenarioListPublicResponse,
+  ScenarioListPublicResponsesScenariosCursorIDPage,
+  ScenarioListResponse,
+  ScenarioListResponsesScenariosCursorIDPage,
+  ScenarioRetrieveResponse,
   ScenarioRunListView,
   ScenarioRunView,
   ScenarioStartRunParams,
   ScenarioUpdateParams,
-  ScenarioView,
-  ScenarioViewsScenariosCursorIDPage,
+  ScenarioUpdateResponse,
   Scenarios,
   ScoringContract,
   ScoringContractResultView,
@@ -274,14 +282,17 @@ export class Runloop extends Core.APIClient {
 }
 
 Runloop.Benchmarks = Benchmarks;
-Runloop.BenchmarkViewsBenchmarksCursorIDPage = BenchmarkViewsBenchmarksCursorIDPage;
+Runloop.BenchmarkListResponsesBenchmarksCursorIDPage = BenchmarkListResponsesBenchmarksCursorIDPage;
+Runloop.BenchmarkListPublicResponsesBenchmarksCursorIDPage =
+  BenchmarkListPublicResponsesBenchmarksCursorIDPage;
 Runloop.Blueprints = Blueprints;
 Runloop.BlueprintViewsBlueprintsCursorIDPage = BlueprintViewsBlueprintsCursorIDPage;
 Runloop.Devboxes = Devboxes;
 Runloop.DevboxViewsDevboxesCursorIDPage = DevboxViewsDevboxesCursorIDPage;
 Runloop.DevboxSnapshotViewsDiskSnapshotsCursorIDPage = DevboxSnapshotViewsDiskSnapshotsCursorIDPage;
 Runloop.Scenarios = Scenarios;
-Runloop.ScenarioViewsScenariosCursorIDPage = ScenarioViewsScenariosCursorIDPage;
+Runloop.ScenarioListResponsesScenariosCursorIDPage = ScenarioListResponsesScenariosCursorIDPage;
+Runloop.ScenarioListPublicResponsesScenariosCursorIDPage = ScenarioListPublicResponsesScenariosCursorIDPage;
 Runloop.Repositories = Repositories;
 Runloop.RepositoryConnectionViewsRepositoriesCursorIDPage = RepositoryConnectionViewsRepositoriesCursorIDPage;
 export declare namespace Runloop {
@@ -344,12 +355,15 @@ export declare namespace Runloop {
   export {
     Benchmarks as Benchmarks,
     type BenchmarkCreateParameters as BenchmarkCreateParameters,
-    type BenchmarkListView as BenchmarkListView,
     type BenchmarkRunListView as BenchmarkRunListView,
     type BenchmarkRunView as BenchmarkRunView,
-    type BenchmarkView as BenchmarkView,
     type StartBenchmarkRunParameters as StartBenchmarkRunParameters,
-    BenchmarkViewsBenchmarksCursorIDPage as BenchmarkViewsBenchmarksCursorIDPage,
+    type BenchmarkCreateResponse as BenchmarkCreateResponse,
+    type BenchmarkRetrieveResponse as BenchmarkRetrieveResponse,
+    type BenchmarkListResponse as BenchmarkListResponse,
+    type BenchmarkListPublicResponse as BenchmarkListPublicResponse,
+    BenchmarkListResponsesBenchmarksCursorIDPage as BenchmarkListResponsesBenchmarksCursorIDPage,
+    BenchmarkListPublicResponsesBenchmarksCursorIDPage as BenchmarkListPublicResponsesBenchmarksCursorIDPage,
     type BenchmarkCreateParams as BenchmarkCreateParams,
     type BenchmarkListParams as BenchmarkListParams,
     type BenchmarkListPublicParams as BenchmarkListPublicParams,
@@ -383,6 +397,7 @@ export declare namespace Runloop {
     type DevboxDeleteDiskSnapshotResponse as DevboxDeleteDiskSnapshotResponse,
     type DevboxKeepAliveResponse as DevboxKeepAliveResponse,
     type DevboxReadFileContentsResponse as DevboxReadFileContentsResponse,
+    type DevboxRemoveTunnelResponse as DevboxRemoveTunnelResponse,
     type DevboxUploadFileResponse as DevboxUploadFileResponse,
     DevboxViewsDevboxesCursorIDPage as DevboxViewsDevboxesCursorIDPage,
     DevboxSnapshotViewsDiskSnapshotsCursorIDPage as DevboxSnapshotViewsDiskSnapshotsCursorIDPage,
@@ -406,16 +421,20 @@ export declare namespace Runloop {
     type InputContext as InputContext,
     type ScenarioCreateParameters as ScenarioCreateParameters,
     type ScenarioEnvironment as ScenarioEnvironment,
-    type ScenarioListView as ScenarioListView,
     type ScenarioRunListView as ScenarioRunListView,
     type ScenarioRunView as ScenarioRunView,
-    type ScenarioView as ScenarioView,
     type ScoringContract as ScoringContract,
     type ScoringContractResultView as ScoringContractResultView,
     type ScoringFunction as ScoringFunction,
     type ScoringFunctionResultView as ScoringFunctionResultView,
     type StartScenarioRunParameters as StartScenarioRunParameters,
-    ScenarioViewsScenariosCursorIDPage as ScenarioViewsScenariosCursorIDPage,
+    type ScenarioCreateResponse as ScenarioCreateResponse,
+    type ScenarioRetrieveResponse as ScenarioRetrieveResponse,
+    type ScenarioUpdateResponse as ScenarioUpdateResponse,
+    type ScenarioListResponse as ScenarioListResponse,
+    type ScenarioListPublicResponse as ScenarioListPublicResponse,
+    ScenarioListResponsesScenariosCursorIDPage as ScenarioListResponsesScenariosCursorIDPage,
+    ScenarioListPublicResponsesScenariosCursorIDPage as ScenarioListPublicResponsesScenariosCursorIDPage,
     type ScenarioCreateParams as ScenarioCreateParams,
     type ScenarioUpdateParams as ScenarioUpdateParams,
     type ScenarioListParams as ScenarioListParams,

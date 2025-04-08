@@ -174,7 +174,7 @@ export interface ScorerValidateResponse {
 export interface ScorerCreateParams {
   /**
    * Bash script for the custom scorer taking context as a json object
-   * $RL_TEST_CONTEXT.
+   * $RL_SCORER_CONTEXT.
    */
   bash_script: string;
 
@@ -187,7 +187,7 @@ export interface ScorerCreateParams {
 export interface ScorerUpdateParams {
   /**
    * Bash script for the custom scorer taking context as a json object
-   * $RL_TEST_CONTEXT.
+   * $RL_SCORER_CONTEXT.
    */
   bash_script: string;
 

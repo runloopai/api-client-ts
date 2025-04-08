@@ -215,6 +215,11 @@ export interface BlueprintView {
   parameters: BlueprintBuildParameters;
 
   /**
+   * The state of the Blueprint.
+   */
+  state: 'created' | 'deleted';
+
+  /**
    * The status of the Blueprint build.
    */
   status: 'provisioning' | 'building' | 'failed' | 'build_complete';

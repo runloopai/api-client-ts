@@ -5,6 +5,7 @@ import { isRequestOptions } from '../../core';
 import * as Core from '../../core';
 import * as RunsAPI from './runs';
 import { RunListParams, Runs } from './runs';
+import * as ScenariosAPI from '../scenarios/scenarios';
 import {
   BenchmarkRunsCursorIDPage,
   BenchmarksCursorIDPage,
@@ -17,14 +18,17 @@ export class Benchmarks extends APIResource {
   /**
    * Create a Benchmark with a set of Scenarios.
    */
-  create(body: BenchmarkCreateParams, options?: Core.RequestOptions): Core.APIPromise<BenchmarkView> {
+  create(
+    body: BenchmarkCreateParams,
+    options?: Core.RequestOptions,
+  ): Core.APIPromise<BenchmarkCreateResponse> {
     return this._client.post('/v1/benchmarks', { body, ...options });
   }
 
   /**
    * Get a previously created Benchmark.
    */
-  retrieve(id: string, options?: Core.RequestOptions): Core.APIPromise<BenchmarkView> {
+  retrieve(id: string, options?: Core.RequestOptions): Core.APIPromise<BenchmarkRetrieveResponse> {
     return this._client.get(`/v1/benchmarks/${id}`, options);
   }
 
@@ -34,16 +38,18 @@ export class Benchmarks extends APIResource {
   list(
     query?: BenchmarkListParams,
     options?: Core.RequestOptions,
-  ): Core.PagePromise<BenchmarkViewsBenchmarksCursorIDPage, BenchmarkView>;
-  list(options?: Core.RequestOptions): Core.PagePromise<BenchmarkViewsBenchmarksCursorIDPage, BenchmarkView>;
+  ): Core.PagePromise<BenchmarkListResponsesBenchmarksCursorIDPage, BenchmarkListResponse>;
+  list(
+    options?: Core.RequestOptions,
+  ): Core.PagePromise<BenchmarkListResponsesBenchmarksCursorIDPage, BenchmarkListResponse>;
   list(
     query: BenchmarkListParams | Core.RequestOptions = {},
     options?: Core.RequestOptions,
-  ): Core.PagePromise<BenchmarkViewsBenchmarksCursorIDPage, BenchmarkView> {
+  ): Core.PagePromise<BenchmarkListResponsesBenchmarksCursorIDPage, BenchmarkListResponse> {
     if (isRequestOptions(query)) {
       return this.list({}, query);
     }
-    return this._client.getAPIList('/v1/benchmarks', BenchmarkViewsBenchmarksCursorIDPage, {
+    return this._client.getAPIList('/v1/benchmarks', BenchmarkListResponsesBenchmarksCursorIDPage, {
       query,
       ...options,
     });
@@ -55,21 +61,22 @@ export class Benchmarks extends APIResource {
   listPublic(
     query?: BenchmarkListPublicParams,
     options?: Core.RequestOptions,
-  ): Core.PagePromise<BenchmarkViewsBenchmarksCursorIDPage, BenchmarkView>;
+  ): Core.PagePromise<BenchmarkListPublicResponsesBenchmarksCursorIDPage, BenchmarkListPublicResponse>;
   listPublic(
     options?: Core.RequestOptions,
-  ): Core.PagePromise<BenchmarkViewsBenchmarksCursorIDPage, BenchmarkView>;
+  ): Core.PagePromise<BenchmarkListPublicResponsesBenchmarksCursorIDPage, BenchmarkListPublicResponse>;
   listPublic(
     query: BenchmarkListPublicParams | Core.RequestOptions = {},
     options?: Core.RequestOptions,
-  ): Core.PagePromise<BenchmarkViewsBenchmarksCursorIDPage, BenchmarkView> {
+  ): Core.PagePromise<BenchmarkListPublicResponsesBenchmarksCursorIDPage, BenchmarkListPublicResponse> {
     if (isRequestOptions(query)) {
       return this.listPublic({}, query);
     }
-    return this._client.getAPIList('/v1/benchmarks/list_public', BenchmarkViewsBenchmarksCursorIDPage, {
-      query,
-      ...options,
-    });
+    return this._client.getAPIList(
+      '/v1/benchmarks/list_public',
+      BenchmarkListPublicResponsesBenchmarksCursorIDPage,
+      { query, ...options },
+    );
   }
 
   /**
@@ -80,7 +87,9 @@ export class Benchmarks extends APIResource {
   }
 }
 
-export class BenchmarkViewsBenchmarksCursorIDPage extends BenchmarksCursorIDPage<BenchmarkView> {}
+export class BenchmarkListResponsesBenchmarksCursorIDPage extends BenchmarksCursorIDPage<BenchmarkListResponse> {}
+
+export class BenchmarkListPublicResponsesBenchmarksCursorIDPage extends BenchmarksCursorIDPage<BenchmarkListPublicResponse> {}
 
 export class BenchmarkRunViewsBenchmarkRunsCursorIDPage extends BenchmarkRunsCursorIDPage<BenchmarkRunView> {}
 
@@ -102,19 +111,6 @@ export interface BenchmarkCreateParameters {
    * The Scenario IDs that make up the Benchmark.
    */
   scenario_ids?: Array<string> | null;
-}
-
-export interface BenchmarkListView {
-  /**
-   * List of Benchmarks matching filter.
-   */
-  benchmarks: Array<BenchmarkView>;
-
-  has_more: boolean;
-
-  remaining_count: number;
-
-  total_count: number;
 }
 
 export interface BenchmarkRunListView {
@@ -156,6 +152,11 @@ export interface BenchmarkRunView {
   pending_scenarios: Array<string>;
 
   /**
+   * List of Scenarios have been completed.
+   */
+  scenario_runs: Array<BenchmarkRunView.ScenarioRun>;
+
+  /**
    * The time the benchmark run execution started (Unix timestamp milliseconds).
    */
   start_time_ms: number;
@@ -182,11 +183,51 @@ export interface BenchmarkRunView {
   score?: number | null;
 }
 
+export namespace BenchmarkRunView {
+  /**
+   * A BenchmarkRunScenariosListView represents a run of a complete set of Scenarios
+   * run, organized under a Benchmark.
+   */
+  export interface ScenarioRun {
+    /**
+     * ID of the Scenario that has been run.
+     */
+    scenario_id: string;
+
+    /**
+     * The scoring result of the ScenarioRun.
+     */
+    scoringResult: ScenariosAPI.ScoringContractResultView;
+
+    /**
+     * ID of the scenario run.
+     */
+    scenarioRunId?: string;
+  }
+}
+
+export interface StartBenchmarkRunParameters {
+  /**
+   * ID of the Benchmark to run.
+   */
+  benchmark_id: string;
+
+  /**
+   * User defined metadata to attach to the benchmark run for organization.
+   */
+  metadata?: Record<string, string> | null;
+
+  /**
+   * Display name of the run.
+   */
+  run_name?: string | null;
+}
+
 /**
  * A BenchmarkView represents a grouped set of Scenarios that together form a
  * Benchmark.
  */
-export interface BenchmarkView {
+export interface BenchmarkCreateResponse {
   /**
    * The ID of the Benchmark.
    */
@@ -208,21 +249,82 @@ export interface BenchmarkView {
   scenarioIds: Array<string>;
 }
 
-export interface StartBenchmarkRunParameters {
+/**
+ * A BenchmarkView represents a grouped set of Scenarios that together form a
+ * Benchmark.
+ */
+export interface BenchmarkRetrieveResponse {
   /**
-   * ID of the Benchmark to run.
+   * The ID of the Benchmark.
    */
-  benchmark_id: string;
+  id: string;
 
   /**
-   * User defined metadata to attach to the benchmark run for organization.
+   * User defined metadata to attach to the benchmark for organization.
    */
-  metadata?: Record<string, string> | null;
+  metadata: Record<string, string>;
 
   /**
-   * Display name of the run.
+   * The name of the Benchmark.
    */
-  run_name?: string | null;
+  name: string;
+
+  /**
+   * List of Scenario IDs that make up the benchmark.
+   */
+  scenarioIds: Array<string>;
+}
+
+/**
+ * A BenchmarkView represents a grouped set of Scenarios that together form a
+ * Benchmark.
+ */
+export interface BenchmarkListResponse {
+  /**
+   * The ID of the Benchmark.
+   */
+  id: string;
+
+  /**
+   * User defined metadata to attach to the benchmark for organization.
+   */
+  metadata: Record<string, string>;
+
+  /**
+   * The name of the Benchmark.
+   */
+  name: string;
+
+  /**
+   * List of Scenario IDs that make up the benchmark.
+   */
+  scenarioIds: Array<string>;
+}
+
+/**
+ * A BenchmarkView represents a grouped set of Scenarios that together form a
+ * Benchmark.
+ */
+export interface BenchmarkListPublicResponse {
+  /**
+   * The ID of the Benchmark.
+   */
+  id: string;
+
+  /**
+   * User defined metadata to attach to the benchmark for organization.
+   */
+  metadata: Record<string, string>;
+
+  /**
+   * The name of the Benchmark.
+   */
+  name: string;
+
+  /**
+   * List of Scenario IDs that make up the benchmark.
+   */
+  scenarioIds: Array<string>;
 }
 
 export interface BenchmarkCreateParams {
@@ -263,18 +365,23 @@ export interface BenchmarkStartRunParams {
   run_name?: string | null;
 }
 
-Benchmarks.BenchmarkViewsBenchmarksCursorIDPage = BenchmarkViewsBenchmarksCursorIDPage;
+Benchmarks.BenchmarkListResponsesBenchmarksCursorIDPage = BenchmarkListResponsesBenchmarksCursorIDPage;
+Benchmarks.BenchmarkListPublicResponsesBenchmarksCursorIDPage =
+  BenchmarkListPublicResponsesBenchmarksCursorIDPage;
 Benchmarks.Runs = Runs;
 
 export declare namespace Benchmarks {
   export {
     type BenchmarkCreateParameters as BenchmarkCreateParameters,
-    type BenchmarkListView as BenchmarkListView,
     type BenchmarkRunListView as BenchmarkRunListView,
     type BenchmarkRunView as BenchmarkRunView,
-    type BenchmarkView as BenchmarkView,
     type StartBenchmarkRunParameters as StartBenchmarkRunParameters,
-    BenchmarkViewsBenchmarksCursorIDPage as BenchmarkViewsBenchmarksCursorIDPage,
+    type BenchmarkCreateResponse as BenchmarkCreateResponse,
+    type BenchmarkRetrieveResponse as BenchmarkRetrieveResponse,
+    type BenchmarkListResponse as BenchmarkListResponse,
+    type BenchmarkListPublicResponse as BenchmarkListPublicResponse,
+    BenchmarkListResponsesBenchmarksCursorIDPage as BenchmarkListResponsesBenchmarksCursorIDPage,
+    BenchmarkListPublicResponsesBenchmarksCursorIDPage as BenchmarkListPublicResponsesBenchmarksCursorIDPage,
     type BenchmarkCreateParams as BenchmarkCreateParams,
     type BenchmarkListParams as BenchmarkListParams,
     type BenchmarkListPublicParams as BenchmarkListPublicParams,
