@@ -352,7 +352,7 @@ export class Devboxes extends APIResource {
     id: string,
     body: DevboxRemoveTunnelParams,
     options?: Core.RequestOptions,
-  ): Core.APIPromise<DevboxTunnelView> {
+  ): Core.APIPromise<unknown> {
     return this._client.post(`/v1/devboxes/${id}/remove_tunnel`, { body, ...options });
   }
 
@@ -688,6 +688,8 @@ export type DevboxKeepAliveResponse = unknown;
 
 export type DevboxReadFileContentsResponse = string;
 
+export type DevboxRemoveTunnelResponse = unknown;
+
 export type DevboxUploadFileResponse = unknown;
 
 export interface DevboxCreateParams {
@@ -910,6 +912,7 @@ export declare namespace Devboxes {
     type DevboxDeleteDiskSnapshotResponse as DevboxDeleteDiskSnapshotResponse,
     type DevboxKeepAliveResponse as DevboxKeepAliveResponse,
     type DevboxReadFileContentsResponse as DevboxReadFileContentsResponse,
+    type DevboxRemoveTunnelResponse as DevboxRemoveTunnelResponse,
     type DevboxUploadFileResponse as DevboxUploadFileResponse,
     DevboxViewsDevboxesCursorIDPage as DevboxViewsDevboxesCursorIDPage,
     DevboxSnapshotViewsDiskSnapshotsCursorIDPage as DevboxSnapshotViewsDiskSnapshotsCursorIDPage,
