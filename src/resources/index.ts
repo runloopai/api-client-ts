@@ -28,6 +28,7 @@ export {
   type BlueprintListView,
   type BlueprintPreviewView,
   type BlueprintView,
+  type BlueprintDeleteResponse,
   type BlueprintCreateParams,
   type BlueprintListParams,
   type BlueprintPreviewParams,

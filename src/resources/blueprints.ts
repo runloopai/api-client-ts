@@ -87,6 +87,13 @@ export class Blueprints extends APIResource {
   }
 
   /**
+   * Delete a previously created Blueprint.
+   */
+  delete(id: string, options?: Core.RequestOptions): Core.APIPromise<unknown> {
+    return this._client.post(`/v1/blueprints/${id}/delete`, options);
+  }
+
+  /**
    * Get all logs from the building of a Blueprint.
    */
   logs(id: string, options?: Core.RequestOptions): Core.APIPromise<BlueprintBuildLogsListView> {
@@ -230,6 +237,8 @@ export interface BlueprintView {
   failure_reason?: 'out_of_memory' | 'out_of_disk' | 'build_failed' | null;
 }
 
+export type BlueprintDeleteResponse = unknown;
+
 export interface BlueprintCreateParams {
   /**
    * Name of the Blueprint.
@@ -311,6 +320,7 @@ export declare namespace Blueprints {
     type BlueprintListView as BlueprintListView,
     type BlueprintPreviewView as BlueprintPreviewView,
     type BlueprintView as BlueprintView,
+    type BlueprintDeleteResponse as BlueprintDeleteResponse,
     BlueprintViewsBlueprintsCursorIDPage as BlueprintViewsBlueprintsCursorIDPage,
     type BlueprintCreateParams as BlueprintCreateParams,
     type BlueprintListParams as BlueprintListParams,
