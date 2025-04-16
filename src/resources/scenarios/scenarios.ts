@@ -141,6 +141,11 @@ export interface ScenarioCreateParameters {
   input_context: InputContext;
 
   /**
+   * Whether this scenario is public.
+   */
+  is_public: boolean;
+
+  /**
    * Name of the scenario.
    */
   name: string;
@@ -533,6 +538,11 @@ export interface ScenarioCreateResponse {
   environment?: ScenarioEnvironment | null;
 
   /**
+   * Whether this scenario is public.
+   */
+  is_public?: boolean;
+
+  /**
    * A string representation of the reference output to solve the scenario. Commonly
    * can be the result of a git diff or a sequence of command actions to apply to the
    * environment.
@@ -574,6 +584,11 @@ export interface ScenarioRetrieveResponse {
    * The Environment in which the Scenario is run.
    */
   environment?: ScenarioEnvironment | null;
+
+  /**
+   * Whether this scenario is public.
+   */
+  is_public?: boolean;
 
   /**
    * A string representation of the reference output to solve the scenario. Commonly
@@ -619,6 +634,11 @@ export interface ScenarioUpdateResponse {
   environment?: ScenarioEnvironment | null;
 
   /**
+   * Whether this scenario is public.
+   */
+  is_public?: boolean;
+
+  /**
    * A string representation of the reference output to solve the scenario. Commonly
    * can be the result of a git diff or a sequence of command actions to apply to the
    * environment.
@@ -660,6 +680,11 @@ export interface ScenarioListResponse {
    * The Environment in which the Scenario is run.
    */
   environment?: ScenarioEnvironment | null;
+
+  /**
+   * Whether this scenario is public.
+   */
+  is_public?: boolean;
 
   /**
    * A string representation of the reference output to solve the scenario. Commonly
@@ -705,6 +730,11 @@ export interface ScenarioListPublicResponse {
   environment?: ScenarioEnvironment | null;
 
   /**
+   * Whether this scenario is public.
+   */
+  is_public?: boolean;
+
+  /**
    * A string representation of the reference output to solve the scenario. Commonly
    * can be the result of a git diff or a sequence of command actions to apply to the
    * environment.
@@ -717,6 +747,11 @@ export interface ScenarioCreateParams {
    * The input context for the Scenario.
    */
   input_context: InputContext;
+
+  /**
+   * Whether this scenario is public.
+   */
+  is_public: boolean;
 
   /**
    * Name of the scenario.
@@ -751,6 +786,11 @@ export interface ScenarioUpdateParams {
    * The input context for the Scenario.
    */
   input_context: InputContext;
+
+  /**
+   * Whether this scenario is public.
+   */
+  is_public: boolean;
 
   /**
    * Name of the scenario.
