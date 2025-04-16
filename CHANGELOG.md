@@ -1,5 +1,32 @@
 # Changelog
 
+## 0.24.0 (2025-04-16)
+
+Full Changelog: [v0.23.0...v0.24.0](https://github.com/runloopai/api-client-ts/compare/v0.23.0...v0.24.0)
+
+### Features
+
+* **api:** api update ([d306fed](https://github.com/runloopai/api-client-ts/commit/d306fedc1d100c969136213470815ac48d4e3048))
+* **api:** api update ([fabd68a](https://github.com/runloopai/api-client-ts/commit/fabd68a584597a76d3e62da4349d17b22cb921dc))
+* **api:** api update ([#568](https://github.com/runloopai/api-client-ts/issues/568)) ([feb0184](https://github.com/runloopai/api-client-ts/commit/feb0184607874d939e82a97d61675b4a95de81d5))
+
+
+### Bug Fixes
+
+* **api:** improve type resolution when importing as a package ([#565](https://github.com/runloopai/api-client-ts/issues/565)) ([4140ae6](https://github.com/runloopai/api-client-ts/commit/4140ae68b9d4563a76c0facc1a256151977b7688))
+* **client:** correctly reuse idempotency key ([830d6d8](https://github.com/runloopai/api-client-ts/commit/830d6d87ffc52c0190e8c88353ecd5cb68155f3b))
+* **client:** send `X-Stainless-Timeout` in seconds ([#563](https://github.com/runloopai/api-client-ts/issues/563)) ([02f8ec9](https://github.com/runloopai/api-client-ts/commit/02f8ec910642613c1d67f1aa2e3ed8c618881c35))
+* **internal:** work around https://github.com/vercel/next.js/issues/76881 ([#561](https://github.com/runloopai/api-client-ts/issues/561)) ([3f14a08](https://github.com/runloopai/api-client-ts/commit/3f14a0866ad5b658a67a57fd6fdedf3224b78ae8))
+* **mcp:** remove unused tools.ts ([#567](https://github.com/runloopai/api-client-ts/issues/567)) ([9254e39](https://github.com/runloopai/api-client-ts/commit/9254e39d1dda7b2ba191639a62fa2c8bb314e61b))
+
+
+### Chores
+
+* **internal:** add aliases for Record and Array ([#564](https://github.com/runloopai/api-client-ts/issues/564)) ([befe651](https://github.com/runloopai/api-client-ts/commit/befe6510ffa0ba4f4b4ba240e7003a3884ae6e6e))
+* **internal:** improve index signature formatting ([#566](https://github.com/runloopai/api-client-ts/issues/566)) ([a8d8d57](https://github.com/runloopai/api-client-ts/commit/a8d8d578e17f4ded5693a2bd9d178be53888ae3c))
+* **internal:** reduce CI branch coverage ([632e86e](https://github.com/runloopai/api-client-ts/commit/632e86e922fabb5761b3685512d319baf478d4db))
+* **internal:** upload builds and expand CI branch coverage ([a5385a4](https://github.com/runloopai/api-client-ts/commit/a5385a49f27b58c04fe03054e4191d078c3af5a0))
+
 ## 0.23.0 (2025-03-25)
 
 Full Changelog: [v0.22.0...v0.23.0](https://github.com/runloopai/api-client-ts/compare/v0.22.0...v0.23.0)
