@@ -98,6 +98,11 @@ export class BenchmarkRunViewsBenchmarkRunsCursorIDPage extends BenchmarkRunsCur
  */
 export interface BenchmarkCreateParameters {
   /**
+   * Whether this benchmark is public.
+   */
+  is_public: boolean;
+
+  /**
    * The name of the Benchmark.
    */
   name: string;
@@ -247,6 +252,11 @@ export interface BenchmarkCreateResponse {
    * List of Scenario IDs that make up the benchmark.
    */
   scenarioIds: Array<string>;
+
+  /**
+   * Whether this benchmark is public.
+   */
+  is_public?: boolean;
 }
 
 /**
@@ -273,6 +283,11 @@ export interface BenchmarkRetrieveResponse {
    * List of Scenario IDs that make up the benchmark.
    */
   scenarioIds: Array<string>;
+
+  /**
+   * Whether this benchmark is public.
+   */
+  is_public?: boolean;
 }
 
 /**
@@ -299,6 +314,11 @@ export interface BenchmarkListResponse {
    * List of Scenario IDs that make up the benchmark.
    */
   scenarioIds: Array<string>;
+
+  /**
+   * Whether this benchmark is public.
+   */
+  is_public?: boolean;
 }
 
 /**
@@ -325,9 +345,19 @@ export interface BenchmarkListPublicResponse {
    * List of Scenario IDs that make up the benchmark.
    */
   scenarioIds: Array<string>;
+
+  /**
+   * Whether this benchmark is public.
+   */
+  is_public?: boolean;
 }
 
 export interface BenchmarkCreateParams {
+  /**
+   * Whether this benchmark is public.
+   */
+  is_public: boolean;
+
   /**
    * The name of the Benchmark.
    */
