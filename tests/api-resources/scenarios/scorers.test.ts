@@ -109,6 +109,7 @@ describe('resource scorers', () => {
         blueprint_id: 'blueprint_id',
         launch_parameters: {
           after_idle: { idle_time_seconds: 0, on_idle: 'shutdown' },
+          architecture: 'x86_64',
           available_ports: [0],
           custom_cpu_cores: 0,
           custom_gb_memory: 0,
