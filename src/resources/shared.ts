@@ -48,6 +48,11 @@ export interface LaunchParameters {
   after_idle?: AfterIdle | null;
 
   /**
+   * The target architecture for the Devbox. If unset, defaults to arm64.
+   */
+  architecture?: 'x86_64' | 'arm64' | null;
+
+  /**
    * A list of ports to make available on the Devbox. Only ports made available will
    * be surfaced to create tunnels via the 'createTunnel' API.
    */
