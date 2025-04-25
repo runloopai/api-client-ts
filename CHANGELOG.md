@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.26.0 (2025-04-25)
+
+Full Changelog: [v0.25.0...v0.26.0](https://github.com/runloopai/api-client-ts/compare/v0.25.0...v0.26.0)
+
+### Features
+
+* **api:** api update ([411476e](https://github.com/runloopai/api-client-ts/commit/411476eb45f81c47b59df427e432ebc23a6b5f66))
+
+
+### Chores
+
+* **ci:** add timeout thresholds for CI jobs ([c207659](https://github.com/runloopai/api-client-ts/commit/c20765907be2664cac35f25400544d4abdf3b569))
+* **ci:** only use depot for staging repos ([179d862](https://github.com/runloopai/api-client-ts/commit/179d8622ee080db94d5a30107f7be05056ca3e72))
+* **internal:** codegen related update ([dbec97b](https://github.com/runloopai/api-client-ts/commit/dbec97b7dcb30ac8d1963fa51672323b7662f0f8))
+
 ## 0.25.0 (2025-04-21)
 
 Full Changelog: [v0.24.0...v0.25.0](https://github.com/runloopai/api-client-ts/compare/v0.24.0...v0.25.0)
