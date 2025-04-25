@@ -91,4 +91,28 @@ export interface LaunchParameters {
     | 'XX_LARGE'
     | 'CUSTOM_SIZE'
     | null;
+
+  /**
+   * Specify the user for execution on Devbox. If not set, default `user` will be
+   * used.
+   */
+  user_parameters?: LaunchParameters.UserParameters | null;
+}
+
+export namespace LaunchParameters {
+  /**
+   * Specify the user for execution on Devbox. If not set, default `user` will be
+   * used.
+   */
+  export interface UserParameters {
+    /**
+     * User ID (UID) for the Linux user. Must be a positive integer.
+     */
+    uid: number;
+
+    /**
+     * Username for the Linux user.
+     */
+    username: string;
+  }
 }
