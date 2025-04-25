@@ -42,6 +42,7 @@ describe('resource blueprints', () => {
         keep_alive_time_seconds: 0,
         launch_commands: ['string'],
         resource_size_request: 'X_SMALL',
+        user_parameters: { uid: 0, username: 'username' },
       },
       system_setup_commands: ['string'],
     });
@@ -162,6 +163,7 @@ describe('resource blueprints', () => {
         keep_alive_time_seconds: 0,
         launch_commands: ['string'],
         resource_size_request: 'X_SMALL',
+        user_parameters: { uid: 0, username: 'username' },
       },
       system_setup_commands: ['string'],
     });

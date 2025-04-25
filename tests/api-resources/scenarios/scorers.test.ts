@@ -116,6 +116,7 @@ describe('resource scorers', () => {
           keep_alive_time_seconds: 0,
           launch_commands: ['string'],
           resource_size_request: 'X_SMALL',
+          user_parameters: { uid: 0, username: 'username' },
         },
         prebuilt_id: 'prebuilt_id',
         snapshot_id: 'snapshot_id',
