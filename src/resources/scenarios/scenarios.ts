@@ -34,14 +34,14 @@ export class Scenarios extends APIResource {
    * Create a Scenario, a repeatable AI coding evaluation test that defines the
    * starting environment as well as evaluation success criteria.
    */
-  create(body: ScenarioCreateParams, options?: Core.RequestOptions): Core.APIPromise<ScenarioCreateResponse> {
+  create(body: ScenarioCreateParams, options?: Core.RequestOptions): Core.APIPromise<ScenarioView> {
     return this._client.post('/v1/scenarios', { body, ...options });
   }
 
   /**
    * Get a previously created scenario.
    */
-  retrieve(id: string, options?: Core.RequestOptions): Core.APIPromise<ScenarioRetrieveResponse> {
+  retrieve(id: string, options?: Core.RequestOptions): Core.APIPromise<ScenarioView> {
     return this._client.get(`/v1/scenarios/${id}`, options);
   }
 
@@ -53,7 +53,7 @@ export class Scenarios extends APIResource {
     id: string,
     body: ScenarioUpdateParams,
     options?: Core.RequestOptions,
-  ): Core.APIPromise<ScenarioUpdateResponse> {
+  ): Core.APIPromise<ScenarioView> {
     return this._client.post(`/v1/scenarios/${id}`, { body, ...options });
   }
 
@@ -63,18 +63,16 @@ export class Scenarios extends APIResource {
   list(
     query?: ScenarioListParams,
     options?: Core.RequestOptions,
-  ): Core.PagePromise<ScenarioListResponsesScenariosCursorIDPage, ScenarioListResponse>;
-  list(
-    options?: Core.RequestOptions,
-  ): Core.PagePromise<ScenarioListResponsesScenariosCursorIDPage, ScenarioListResponse>;
+  ): Core.PagePromise<ScenarioViewsScenariosCursorIDPage, ScenarioView>;
+  list(options?: Core.RequestOptions): Core.PagePromise<ScenarioViewsScenariosCursorIDPage, ScenarioView>;
   list(
     query: ScenarioListParams | Core.RequestOptions = {},
     options?: Core.RequestOptions,
-  ): Core.PagePromise<ScenarioListResponsesScenariosCursorIDPage, ScenarioListResponse> {
+  ): Core.PagePromise<ScenarioViewsScenariosCursorIDPage, ScenarioView> {
     if (isRequestOptions(query)) {
       return this.list({}, query);
     }
-    return this._client.getAPIList('/v1/scenarios', ScenarioListResponsesScenariosCursorIDPage, {
+    return this._client.getAPIList('/v1/scenarios', ScenarioViewsScenariosCursorIDPage, {
       query,
       ...options,
     });
@@ -86,22 +84,21 @@ export class Scenarios extends APIResource {
   listPublic(
     query?: ScenarioListPublicParams,
     options?: Core.RequestOptions,
-  ): Core.PagePromise<ScenarioListPublicResponsesScenariosCursorIDPage, ScenarioListPublicResponse>;
+  ): Core.PagePromise<ScenarioViewsScenariosCursorIDPage, ScenarioView>;
   listPublic(
     options?: Core.RequestOptions,
-  ): Core.PagePromise<ScenarioListPublicResponsesScenariosCursorIDPage, ScenarioListPublicResponse>;
+  ): Core.PagePromise<ScenarioViewsScenariosCursorIDPage, ScenarioView>;
   listPublic(
     query: ScenarioListPublicParams | Core.RequestOptions = {},
     options?: Core.RequestOptions,
-  ): Core.PagePromise<ScenarioListPublicResponsesScenariosCursorIDPage, ScenarioListPublicResponse> {
+  ): Core.PagePromise<ScenarioViewsScenariosCursorIDPage, ScenarioView> {
     if (isRequestOptions(query)) {
       return this.listPublic({}, query);
     }
-    return this._client.getAPIList(
-      '/v1/scenarios/list_public',
-      ScenarioListPublicResponsesScenariosCursorIDPage,
-      { query, ...options },
-    );
+    return this._client.getAPIList('/v1/scenarios/list_public', ScenarioViewsScenariosCursorIDPage, {
+      query,
+      ...options,
+    });
   }
 
   /**
@@ -112,9 +109,7 @@ export class Scenarios extends APIResource {
   }
 }
 
-export class ScenarioListResponsesScenariosCursorIDPage extends ScenariosCursorIDPage<ScenarioListResponse> {}
-
-export class ScenarioListPublicResponsesScenariosCursorIDPage extends ScenariosCursorIDPage<ScenarioListPublicResponse> {}
+export class ScenarioViewsScenariosCursorIDPage extends ScenariosCursorIDPage<ScenarioView> {}
 
 export class ScenarioRunViewsBenchmarkRunsCursorIDPage extends BenchmarkRunsCursorIDPage<ScenarioRunView> {}
 
@@ -271,7 +266,55 @@ export interface ScenarioRunView {
   /**
    * The time that the scenario started
    */
-  start_time_ms?: number | null;
+  start_time_ms?: number;
+}
+
+/**
+ * A ScenarioDefinitionView represents a repeatable AI coding evaluation test,
+ * complete with initial environment and scoring contract.
+ */
+export interface ScenarioView {
+  /**
+   * The ID of the Scenario.
+   */
+  id: string;
+
+  /**
+   * The input context for the Scenario.
+   */
+  input_context: InputContext;
+
+  /**
+   * User defined metadata to attach to the scenario for organization.
+   */
+  metadata: Record<string, string>;
+
+  /**
+   * The name of the Scenario.
+   */
+  name: string;
+
+  /**
+   * The scoring contract for the Scenario.
+   */
+  scoring_contract: ScoringContract;
+
+  /**
+   * The Environment in which the Scenario is run.
+   */
+  environment?: ScenarioEnvironment | null;
+
+  /**
+   * Whether this scenario is public.
+   */
+  is_public?: boolean;
+
+  /**
+   * A string representation of the reference output to solve the scenario. Commonly
+   * can be the result of a git diff or a sequence of command actions to apply to the
+   * environment.
+   */
+  reference_output?: string | null;
 }
 
 /**
@@ -502,246 +545,6 @@ export interface StartScenarioRunParameters {
   run_name?: string | null;
 }
 
-/**
- * A ScenarioView represents a repeatable AI coding evaluation test, complete with
- * initial environment and scoring contract.
- */
-export interface ScenarioCreateResponse {
-  /**
-   * The ID of the Scenario.
-   */
-  id: string;
-
-  /**
-   * The input context for the Scenario.
-   */
-  input_context: InputContext;
-
-  /**
-   * User defined metadata to attach to the scenario for organization.
-   */
-  metadata: Record<string, string>;
-
-  /**
-   * The name of the Scenario.
-   */
-  name: string;
-
-  /**
-   * The scoring contract for the Scenario.
-   */
-  scoring_contract: ScoringContract;
-
-  /**
-   * The Environment in which the Scenario is run.
-   */
-  environment?: ScenarioEnvironment | null;
-
-  /**
-   * Whether this scenario is public.
-   */
-  is_public?: boolean;
-
-  /**
-   * A string representation of the reference output to solve the scenario. Commonly
-   * can be the result of a git diff or a sequence of command actions to apply to the
-   * environment.
-   */
-  reference_output?: string | null;
-}
-
-/**
- * A ScenarioView represents a repeatable AI coding evaluation test, complete with
- * initial environment and scoring contract.
- */
-export interface ScenarioRetrieveResponse {
-  /**
-   * The ID of the Scenario.
-   */
-  id: string;
-
-  /**
-   * The input context for the Scenario.
-   */
-  input_context: InputContext;
-
-  /**
-   * User defined metadata to attach to the scenario for organization.
-   */
-  metadata: Record<string, string>;
-
-  /**
-   * The name of the Scenario.
-   */
-  name: string;
-
-  /**
-   * The scoring contract for the Scenario.
-   */
-  scoring_contract: ScoringContract;
-
-  /**
-   * The Environment in which the Scenario is run.
-   */
-  environment?: ScenarioEnvironment | null;
-
-  /**
-   * Whether this scenario is public.
-   */
-  is_public?: boolean;
-
-  /**
-   * A string representation of the reference output to solve the scenario. Commonly
-   * can be the result of a git diff or a sequence of command actions to apply to the
-   * environment.
-   */
-  reference_output?: string | null;
-}
-
-/**
- * A ScenarioView represents a repeatable AI coding evaluation test, complete with
- * initial environment and scoring contract.
- */
-export interface ScenarioUpdateResponse {
-  /**
-   * The ID of the Scenario.
-   */
-  id: string;
-
-  /**
-   * The input context for the Scenario.
-   */
-  input_context: InputContext;
-
-  /**
-   * User defined metadata to attach to the scenario for organization.
-   */
-  metadata: Record<string, string>;
-
-  /**
-   * The name of the Scenario.
-   */
-  name: string;
-
-  /**
-   * The scoring contract for the Scenario.
-   */
-  scoring_contract: ScoringContract;
-
-  /**
-   * The Environment in which the Scenario is run.
-   */
-  environment?: ScenarioEnvironment | null;
-
-  /**
-   * Whether this scenario is public.
-   */
-  is_public?: boolean;
-
-  /**
-   * A string representation of the reference output to solve the scenario. Commonly
-   * can be the result of a git diff or a sequence of command actions to apply to the
-   * environment.
-   */
-  reference_output?: string | null;
-}
-
-/**
- * A ScenarioView represents a repeatable AI coding evaluation test, complete with
- * initial environment and scoring contract.
- */
-export interface ScenarioListResponse {
-  /**
-   * The ID of the Scenario.
-   */
-  id: string;
-
-  /**
-   * The input context for the Scenario.
-   */
-  input_context: InputContext;
-
-  /**
-   * User defined metadata to attach to the scenario for organization.
-   */
-  metadata: Record<string, string>;
-
-  /**
-   * The name of the Scenario.
-   */
-  name: string;
-
-  /**
-   * The scoring contract for the Scenario.
-   */
-  scoring_contract: ScoringContract;
-
-  /**
-   * The Environment in which the Scenario is run.
-   */
-  environment?: ScenarioEnvironment | null;
-
-  /**
-   * Whether this scenario is public.
-   */
-  is_public?: boolean;
-
-  /**
-   * A string representation of the reference output to solve the scenario. Commonly
-   * can be the result of a git diff or a sequence of command actions to apply to the
-   * environment.
-   */
-  reference_output?: string | null;
-}
-
-/**
- * A ScenarioView represents a repeatable AI coding evaluation test, complete with
- * initial environment and scoring contract.
- */
-export interface ScenarioListPublicResponse {
-  /**
-   * The ID of the Scenario.
-   */
-  id: string;
-
-  /**
-   * The input context for the Scenario.
-   */
-  input_context: InputContext;
-
-  /**
-   * User defined metadata to attach to the scenario for organization.
-   */
-  metadata: Record<string, string>;
-
-  /**
-   * The name of the Scenario.
-   */
-  name: string;
-
-  /**
-   * The scoring contract for the Scenario.
-   */
-  scoring_contract: ScoringContract;
-
-  /**
-   * The Environment in which the Scenario is run.
-   */
-  environment?: ScenarioEnvironment | null;
-
-  /**
-   * Whether this scenario is public.
-   */
-  is_public?: boolean;
-
-  /**
-   * A string representation of the reference output to solve the scenario. Commonly
-   * can be the result of a git diff or a sequence of command actions to apply to the
-   * environment.
-   */
-  reference_output?: string | null;
-}
-
 export interface ScenarioCreateParams {
   /**
    * The input context for the Scenario.
@@ -856,8 +659,7 @@ export interface ScenarioStartRunParams {
   run_name?: string | null;
 }
 
-Scenarios.ScenarioListResponsesScenariosCursorIDPage = ScenarioListResponsesScenariosCursorIDPage;
-Scenarios.ScenarioListPublicResponsesScenariosCursorIDPage = ScenarioListPublicResponsesScenariosCursorIDPage;
+Scenarios.ScenarioViewsScenariosCursorIDPage = ScenarioViewsScenariosCursorIDPage;
 Scenarios.Runs = Runs;
 Scenarios.Scorers = Scorers;
 Scenarios.ScorerListResponsesScenarioScorersCursorIDPage = ScorerListResponsesScenarioScorersCursorIDPage;
@@ -869,18 +671,13 @@ export declare namespace Scenarios {
     type ScenarioEnvironment as ScenarioEnvironment,
     type ScenarioRunListView as ScenarioRunListView,
     type ScenarioRunView as ScenarioRunView,
+    type ScenarioView as ScenarioView,
     type ScoringContract as ScoringContract,
     type ScoringContractResultView as ScoringContractResultView,
     type ScoringFunction as ScoringFunction,
     type ScoringFunctionResultView as ScoringFunctionResultView,
     type StartScenarioRunParameters as StartScenarioRunParameters,
-    type ScenarioCreateResponse as ScenarioCreateResponse,
-    type ScenarioRetrieveResponse as ScenarioRetrieveResponse,
-    type ScenarioUpdateResponse as ScenarioUpdateResponse,
-    type ScenarioListResponse as ScenarioListResponse,
-    type ScenarioListPublicResponse as ScenarioListPublicResponse,
-    ScenarioListResponsesScenariosCursorIDPage as ScenarioListResponsesScenariosCursorIDPage,
-    ScenarioListPublicResponsesScenariosCursorIDPage as ScenarioListPublicResponsesScenariosCursorIDPage,
+    ScenarioViewsScenariosCursorIDPage as ScenarioViewsScenariosCursorIDPage,
     type ScenarioCreateParams as ScenarioCreateParams,
     type ScenarioUpdateParams as ScenarioUpdateParams,
     type ScenarioListParams as ScenarioListParams,
