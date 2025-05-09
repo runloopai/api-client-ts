@@ -55,17 +55,13 @@ import {
 import {
   BenchmarkCreateParameters,
   BenchmarkCreateParams,
-  BenchmarkCreateResponse,
   BenchmarkListParams,
   BenchmarkListPublicParams,
-  BenchmarkListPublicResponse,
-  BenchmarkListPublicResponsesBenchmarksCursorIDPage,
-  BenchmarkListResponse,
-  BenchmarkListResponsesBenchmarksCursorIDPage,
-  BenchmarkRetrieveResponse,
   BenchmarkRunListView,
   BenchmarkRunView,
   BenchmarkStartRunParams,
+  BenchmarkView,
+  BenchmarkViewsBenchmarksCursorIDPage,
   Benchmarks,
   StartBenchmarkRunParameters,
 } from './resources/benchmarks/benchmarks';
@@ -104,20 +100,15 @@ import {
   InputContext,
   ScenarioCreateParameters,
   ScenarioCreateParams,
-  ScenarioCreateResponse,
   ScenarioEnvironment,
   ScenarioListParams,
   ScenarioListPublicParams,
-  ScenarioListPublicResponse,
-  ScenarioListPublicResponsesScenariosCursorIDPage,
-  ScenarioListResponse,
-  ScenarioListResponsesScenariosCursorIDPage,
-  ScenarioRetrieveResponse,
   ScenarioRunListView,
   ScenarioRunView,
   ScenarioStartRunParams,
   ScenarioUpdateParams,
-  ScenarioUpdateResponse,
+  ScenarioView,
+  ScenarioViewsScenariosCursorIDPage,
   Scenarios,
   ScoringContract,
   ScoringContractResultView,
@@ -283,17 +274,14 @@ export class Runloop extends Core.APIClient {
 }
 
 Runloop.Benchmarks = Benchmarks;
-Runloop.BenchmarkListResponsesBenchmarksCursorIDPage = BenchmarkListResponsesBenchmarksCursorIDPage;
-Runloop.BenchmarkListPublicResponsesBenchmarksCursorIDPage =
-  BenchmarkListPublicResponsesBenchmarksCursorIDPage;
+Runloop.BenchmarkViewsBenchmarksCursorIDPage = BenchmarkViewsBenchmarksCursorIDPage;
 Runloop.Blueprints = Blueprints;
 Runloop.BlueprintViewsBlueprintsCursorIDPage = BlueprintViewsBlueprintsCursorIDPage;
 Runloop.Devboxes = Devboxes;
 Runloop.DevboxViewsDevboxesCursorIDPage = DevboxViewsDevboxesCursorIDPage;
 Runloop.DevboxSnapshotViewsDiskSnapshotsCursorIDPage = DevboxSnapshotViewsDiskSnapshotsCursorIDPage;
 Runloop.Scenarios = Scenarios;
-Runloop.ScenarioListResponsesScenariosCursorIDPage = ScenarioListResponsesScenariosCursorIDPage;
-Runloop.ScenarioListPublicResponsesScenariosCursorIDPage = ScenarioListPublicResponsesScenariosCursorIDPage;
+Runloop.ScenarioViewsScenariosCursorIDPage = ScenarioViewsScenariosCursorIDPage;
 Runloop.Repositories = Repositories;
 Runloop.RepositoryConnectionViewsRepositoriesCursorIDPage = RepositoryConnectionViewsRepositoriesCursorIDPage;
 export declare namespace Runloop {
@@ -358,13 +346,9 @@ export declare namespace Runloop {
     type BenchmarkCreateParameters as BenchmarkCreateParameters,
     type BenchmarkRunListView as BenchmarkRunListView,
     type BenchmarkRunView as BenchmarkRunView,
+    type BenchmarkView as BenchmarkView,
     type StartBenchmarkRunParameters as StartBenchmarkRunParameters,
-    type BenchmarkCreateResponse as BenchmarkCreateResponse,
-    type BenchmarkRetrieveResponse as BenchmarkRetrieveResponse,
-    type BenchmarkListResponse as BenchmarkListResponse,
-    type BenchmarkListPublicResponse as BenchmarkListPublicResponse,
-    BenchmarkListResponsesBenchmarksCursorIDPage as BenchmarkListResponsesBenchmarksCursorIDPage,
-    BenchmarkListPublicResponsesBenchmarksCursorIDPage as BenchmarkListPublicResponsesBenchmarksCursorIDPage,
+    BenchmarkViewsBenchmarksCursorIDPage as BenchmarkViewsBenchmarksCursorIDPage,
     type BenchmarkCreateParams as BenchmarkCreateParams,
     type BenchmarkListParams as BenchmarkListParams,
     type BenchmarkListPublicParams as BenchmarkListPublicParams,
@@ -425,18 +409,13 @@ export declare namespace Runloop {
     type ScenarioEnvironment as ScenarioEnvironment,
     type ScenarioRunListView as ScenarioRunListView,
     type ScenarioRunView as ScenarioRunView,
+    type ScenarioView as ScenarioView,
     type ScoringContract as ScoringContract,
     type ScoringContractResultView as ScoringContractResultView,
     type ScoringFunction as ScoringFunction,
     type ScoringFunctionResultView as ScoringFunctionResultView,
     type StartScenarioRunParameters as StartScenarioRunParameters,
-    type ScenarioCreateResponse as ScenarioCreateResponse,
-    type ScenarioRetrieveResponse as ScenarioRetrieveResponse,
-    type ScenarioUpdateResponse as ScenarioUpdateResponse,
-    type ScenarioListResponse as ScenarioListResponse,
-    type ScenarioListPublicResponse as ScenarioListPublicResponse,
-    ScenarioListResponsesScenariosCursorIDPage as ScenarioListResponsesScenariosCursorIDPage,
-    ScenarioListPublicResponsesScenariosCursorIDPage as ScenarioListPublicResponsesScenariosCursorIDPage,
+    ScenarioViewsScenariosCursorIDPage as ScenarioViewsScenariosCursorIDPage,
     type ScenarioCreateParams as ScenarioCreateParams,
     type ScenarioUpdateParams as ScenarioUpdateParams,
     type ScenarioListParams as ScenarioListParams,
