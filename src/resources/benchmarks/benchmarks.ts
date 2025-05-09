@@ -95,7 +95,7 @@ export interface BenchmarkCreateParameters {
   is_public: boolean;
 
   /**
-   * The name of the Benchmark.
+   * The name of the Benchmark. This must be unique.
    */
   name: string;
 
@@ -258,7 +258,7 @@ export interface BenchmarkCreateParams {
   is_public: boolean;
 
   /**
-   * The name of the Benchmark.
+   * The name of the Benchmark. This must be unique.
    */
   name: string;
 
