@@ -236,9 +236,7 @@ export class Devboxes extends APIResource {
   }
 
   /**
-   * Create a live tunnel to an available port on the Devbox. Note the port must be
-   * made available using Devbox.create.availablePorts. Otherwise, the tunnel will
-   * not connect to any running processes on the Devbox.
+   * Create a live tunnel to an available port on the Devbox.
    */
   createTunnel(
     id: string,
@@ -305,7 +303,8 @@ export class Devboxes extends APIResource {
   }
 
   /**
-   * List all snapshots of a Devbox while optionally filtering by Devbox ID.
+   * List all snapshots of a Devbox while optionally filtering by Devbox ID and
+   * metadata.
    */
   listDiskSnapshots(
     query?: DevboxListDiskSnapshotsParams,
@@ -838,6 +837,17 @@ export interface DevboxListDiskSnapshotsParams extends DiskSnapshotsCursorIDPage
    * Devbox ID to filter by.
    */
   devbox_id?: string;
+
+  /**
+   * Filter snapshots by metadata key-value pair. Can be used multiple times for
+   * different keys.
+   */
+  'metadata[key]'?: string;
+
+  /**
+   * Filter snapshots by metadata key with multiple possible values (OR condition).
+   */
+  'metadata[key][in]'?: string;
 }
 
 export interface DevboxReadFileContentsParams {

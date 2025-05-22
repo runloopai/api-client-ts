@@ -193,7 +193,7 @@ export class Runloop extends Core.APIClient {
    *
    * @param {string | undefined} [opts.bearerToken=process.env['RUNLOOP_API_KEY'] ?? undefined]
    * @param {string} [opts.baseURL=process.env['RUNLOOP_BASE_URL'] ?? https://api.runloop.ai] - Override the default base URL for the API.
-   * @param {number} [opts.timeout=1 minute] - The maximum amount of time (in milliseconds) the client will wait for a response before timing out.
+   * @param {number} [opts.timeout=10 minutes] - The maximum amount of time (in milliseconds) the client will wait for a response before timing out.
    * @param {number} [opts.httpAgent] - An HTTP agent used to manage HTTP(s) connections.
    * @param {Core.Fetch} [opts.fetch] - Specify a custom `fetch` function implementation.
    * @param {number} [opts.maxRetries=0] - The maximum number of times the client will retry a request.
@@ -219,7 +219,7 @@ export class Runloop extends Core.APIClient {
 
     super({
       baseURL: options.baseURL!,
-      timeout: options.timeout ?? 60000 /* 1 minute */,
+      timeout: options.timeout ?? 600000 /* 10 minutes */,
       httpAgent: options.httpAgent,
       maxRetries: options.maxRetries,
       fetch: options.fetch,
@@ -253,7 +253,7 @@ export class Runloop extends Core.APIClient {
   }
 
   static Runloop = this;
-  static DEFAULT_TIMEOUT = 60000; // 1 minute
+  static DEFAULT_TIMEOUT = 600000; // 10 minutes
 
   static RunloopError = Errors.RunloopError;
   static APIError = Errors.APIError;
