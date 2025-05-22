@@ -60,7 +60,13 @@ describe('resource diskSnapshots', () => {
     // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
     await expect(
       client.devboxes.diskSnapshots.list(
-        { devbox_id: 'devbox_id', limit: 0, starting_after: 'starting_after' },
+        {
+          devbox_id: 'devbox_id',
+          limit: 0,
+          'metadata[key]': 'metadata[key]',
+          'metadata[key][in]': 'metadata[key][in]',
+          starting_after: 'starting_after',
+        },
         { path: '/_stainless_unknown_path' },
       ),
     ).rejects.toThrow(Runloop.NotFoundError);
