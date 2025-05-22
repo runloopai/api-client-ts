@@ -195,10 +195,8 @@ export class Devboxes extends APIResource {
    * Updates a devbox by doing a complete update the existing name,metadata fields.
    * It does not patch partial values.
    */
-  update(id: string, body?: DevboxUpdateParams, options?: Core.RequestOptions): Core.APIPromise<DevboxView>
-;
-  update(id: string, options?: Core.RequestOptions): Core.APIPromise<DevboxView>
-;
+  update(id: string, body?: DevboxUpdateParams, options?: Core.RequestOptions): Core.APIPromise<DevboxView>;
+  update(id: string, options?: Core.RequestOptions): Core.APIPromise<DevboxView>;
   update(
     id: string,
     body: DevboxUpdateParams | Core.RequestOptions = {},

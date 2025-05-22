@@ -38,8 +38,8 @@ async function fileFromPath(path: string, ...args: any[]): Promise<File> {
   return await _fileFromPath(path, ...args);
 }
 
-const defaultHttpAgent: Agent = new KeepAliveAgent({ keepAlive: true, timeout: 5 * 60 * 1000 });
-const defaultHttpsAgent: Agent = new KeepAliveAgent.HttpsAgent({ keepAlive: true, timeout: 5 * 60 * 1000 });
+const defaultHttpAgent: Agent = new KeepAliveAgent({ keepAlive: true, timeout: 10 * 60 * 1000 });
+const defaultHttpsAgent: Agent = new KeepAliveAgent.HttpsAgent({ keepAlive: true, timeout: 10 * 60 * 1000 });
 
 async function getMultipartRequestOptions<T = Record<string, unknown>>(
   form: fd.FormData,
