@@ -291,7 +291,11 @@ export class Devboxes extends APIResource {
     body: DevboxExecuteSyncParams,
     options?: Core.RequestOptions,
   ): Core.APIPromise<DevboxExecutionDetailView> {
-    return this._client.post(`/v1/devboxes/${id}/execute_sync`, { body, ...options });
+    return this._client.post(`/v1/devboxes/${id}/execute_sync`, {
+      body,
+      timeout: (this._client as any)._options.timeout ?? 600000,
+      ...options,
+    });
   }
 
   /**
@@ -391,7 +395,11 @@ export class Devboxes extends APIResource {
     if (isRequestOptions(body)) {
       return this.snapshotDisk(id, {}, body);
     }
-    return this._client.post(`/v1/devboxes/${id}/snapshot_disk`, { body, ...options });
+    return this._client.post(`/v1/devboxes/${id}/snapshot_disk`, {
+      body,
+      timeout: (this._client as any)._options.timeout ?? 600000,
+      ...options,
+    });
   }
 
   /**
