@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.30.0 (2025-05-27)
+
+Full Changelog: [v0.29.0...v0.30.0](https://github.com/runloopai/api-client-ts/compare/v0.29.0...v0.30.0)
+
+### Features
+
+* **api:** api update ([91c0111](https://github.com/runloopai/api-client-ts/commit/91c011111624c46041e8c33af14b11ff11cf3bb8))
+
 ## 0.29.0 (2025-05-22)
 
 * Manually updated node runtime timeout from 5 to 10 minutes.
