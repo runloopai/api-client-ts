@@ -83,6 +83,7 @@ import {
   DevboxReadFileContentsResponse,
   DevboxRemoveTunnelParams,
   DevboxRemoveTunnelResponse,
+  DevboxSnapshotDiskAsyncParams,
   DevboxSnapshotDiskParams,
   DevboxSnapshotListView,
   DevboxSnapshotView,
@@ -398,6 +399,7 @@ export declare namespace Runloop {
     type DevboxReadFileContentsParams as DevboxReadFileContentsParams,
     type DevboxRemoveTunnelParams as DevboxRemoveTunnelParams,
     type DevboxSnapshotDiskParams as DevboxSnapshotDiskParams,
+    type DevboxSnapshotDiskAsyncParams as DevboxSnapshotDiskAsyncParams,
     type DevboxUploadFileParams as DevboxUploadFileParams,
     type DevboxWriteFileContentsParams as DevboxWriteFileContentsParams,
   };

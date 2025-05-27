@@ -57,6 +57,7 @@ export {
   type DevboxReadFileContentsParams,
   type DevboxRemoveTunnelParams,
   type DevboxSnapshotDiskParams,
+  type DevboxSnapshotDiskAsyncParams,
   type DevboxUploadFileParams,
   type DevboxWriteFileContentsParams,
 } from './devboxes/devboxes';

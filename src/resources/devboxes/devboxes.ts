@@ -20,6 +20,7 @@ import {
 } from './computers';
 import * as DiskSnapshotsAPI from './disk-snapshots';
 import {
+  DevboxSnapshotAsyncStatusView,
   DiskSnapshotDeleteResponse,
   DiskSnapshotListParams,
   DiskSnapshotUpdateParams,
@@ -398,6 +399,28 @@ export class Devboxes extends APIResource {
       timeout: (this._client as any)._options.timeout ?? 600000,
       ...options,
     });
+  }
+
+  /**
+   * Start an asynchronous disk snapshot of a devbox with the specified name and
+   * metadata. The snapshot operation will continue in the background and can be
+   * monitored using the query endpoint.
+   */
+  snapshotDiskAsync(
+    id: string,
+    body?: DevboxSnapshotDiskAsyncParams,
+    options?: Core.RequestOptions,
+  ): Core.APIPromise<DevboxSnapshotView>;
+  snapshotDiskAsync(id: string, options?: Core.RequestOptions): Core.APIPromise<DevboxSnapshotView>;
+  snapshotDiskAsync(
+    id: string,
+    body: DevboxSnapshotDiskAsyncParams | Core.RequestOptions = {},
+    options?: Core.RequestOptions,
+  ): Core.APIPromise<DevboxSnapshotView> {
+    if (isRequestOptions(body)) {
+      return this.snapshotDiskAsync(id, {}, body);
+    }
+    return this._client.post(`/v1/devboxes/${id}/snapshot_disk_async`, { body, ...options });
   }
 
   /**
@@ -883,6 +906,18 @@ export interface DevboxSnapshotDiskParams {
   name?: string | null;
 }
 
+export interface DevboxSnapshotDiskAsyncParams {
+  /**
+   * (Optional) Metadata used to describe the snapshot
+   */
+  metadata?: Record<string, string> | null;
+
+  /**
+   * (Optional) A user specified name to give the snapshot
+   */
+  name?: string | null;
+}
+
 export interface DevboxUploadFileParams {
   /**
    * The path to write the file to on the Devbox. Path is relative to user home
@@ -943,12 +978,14 @@ export declare namespace Devboxes {
     type DevboxReadFileContentsParams as DevboxReadFileContentsParams,
     type DevboxRemoveTunnelParams as DevboxRemoveTunnelParams,
     type DevboxSnapshotDiskParams as DevboxSnapshotDiskParams,
+    type DevboxSnapshotDiskAsyncParams as DevboxSnapshotDiskAsyncParams,
     type DevboxUploadFileParams as DevboxUploadFileParams,
     type DevboxWriteFileContentsParams as DevboxWriteFileContentsParams,
   };
 
   export {
     DiskSnapshots as DiskSnapshots,
+    type DevboxSnapshotAsyncStatusView as DevboxSnapshotAsyncStatusView,
     type DiskSnapshotDeleteResponse as DiskSnapshotDeleteResponse,
     type DiskSnapshotUpdateParams as DiskSnapshotUpdateParams,
     type DiskSnapshotListParams as DiskSnapshotListParams,

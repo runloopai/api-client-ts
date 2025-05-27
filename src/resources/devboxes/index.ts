@@ -40,11 +40,13 @@ export {
   type DevboxReadFileContentsParams,
   type DevboxRemoveTunnelParams,
   type DevboxSnapshotDiskParams,
+  type DevboxSnapshotDiskAsyncParams,
   type DevboxUploadFileParams,
   type DevboxWriteFileContentsParams,
 } from './devboxes';
 export {
   DiskSnapshots,
+  type DevboxSnapshotAsyncStatusView,
   type DiskSnapshotDeleteResponse,
   type DiskSnapshotUpdateParams,
   type DiskSnapshotListParams,
