@@ -90,6 +90,7 @@ Methods:
 - <code title="post /v1/devboxes/{id}/resume">client.devboxes.<a href="./src/resources/devboxes/devboxes.ts">resume</a>(id) -> DevboxView</code>
 - <code title="post /v1/devboxes/{id}/shutdown">client.devboxes.<a href="./src/resources/devboxes/devboxes.ts">shutdown</a>(id) -> DevboxView</code>
 - <code title="post /v1/devboxes/{id}/snapshot_disk">client.devboxes.<a href="./src/resources/devboxes/devboxes.ts">snapshotDisk</a>(id, { ...params }) -> DevboxSnapshotView</code>
+- <code title="post /v1/devboxes/{id}/snapshot_disk_async">client.devboxes.<a href="./src/resources/devboxes/devboxes.ts">snapshotDiskAsync</a>(id, { ...params }) -> DevboxSnapshotView</code>
 - <code title="post /v1/devboxes/{id}/suspend">client.devboxes.<a href="./src/resources/devboxes/devboxes.ts">suspend</a>(id) -> DevboxView</code>
 - <code title="post /v1/devboxes/{id}/upload_file">client.devboxes.<a href="./src/resources/devboxes/devboxes.ts">uploadFile</a>(id, { ...params }) -> unknown</code>
 - <code title="post /v1/devboxes/{id}/write_file_contents">client.devboxes.<a href="./src/resources/devboxes/devboxes.ts">writeFileContents</a>(id, { ...params }) -> DevboxExecutionDetailView</code>
@@ -98,6 +99,7 @@ Methods:
 
 Types:
 
+- <code><a href="./src/resources/devboxes/disk-snapshots.ts">DevboxSnapshotAsyncStatusView</a></code>
 - <code><a href="./src/resources/devboxes/disk-snapshots.ts">DiskSnapshotDeleteResponse</a></code>
 
 Methods:
@@ -105,6 +107,7 @@ Methods:
 - <code title="post /v1/devboxes/disk_snapshots/{id}">client.devboxes.diskSnapshots.<a href="./src/resources/devboxes/disk-snapshots.ts">update</a>(id, { ...params }) -> DevboxSnapshotView</code>
 - <code title="get /v1/devboxes/disk_snapshots">client.devboxes.diskSnapshots.<a href="./src/resources/devboxes/disk-snapshots.ts">list</a>({ ...params }) -> DevboxSnapshotViewsDiskSnapshotsCursorIDPage</code>
 - <code title="post /v1/devboxes/disk_snapshots/{id}/delete">client.devboxes.diskSnapshots.<a href="./src/resources/devboxes/disk-snapshots.ts">delete</a>(id) -> unknown</code>
+- <code title="get /v1/devboxes/disk_snapshots/{id}/status">client.devboxes.diskSnapshots.<a href="./src/resources/devboxes/disk-snapshots.ts">queryStatus</a>(id) -> DevboxSnapshotAsyncStatusView</code>
 
 ## Browsers
 

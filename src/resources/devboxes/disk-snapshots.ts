@@ -60,6 +60,31 @@ export class DiskSnapshots extends APIResource {
   delete(id: string, options?: Core.RequestOptions): Core.APIPromise<unknown> {
     return this._client.post(`/v1/devboxes/disk_snapshots/${id}/delete`, options);
   }
+
+  /**
+   * Get the current status of an asynchronous disk snapshot operation, including
+   * whether it is still in progress and any error messages if it failed.
+   */
+  queryStatus(id: string, options?: Core.RequestOptions): Core.APIPromise<DevboxSnapshotAsyncStatusView> {
+    return this._client.get(`/v1/devboxes/disk_snapshots/${id}/status`, options);
+  }
+}
+
+export interface DevboxSnapshotAsyncStatusView {
+  /**
+   * The current status of the snapshot operation.
+   */
+  status: 'in_progress' | 'error' | 'complete';
+
+  /**
+   * Error message if the operation failed.
+   */
+  error_message?: string | null;
+
+  /**
+   * The snapshot details if the operation completed successfully.
+   */
+  snapshot?: DevboxesAPI.DevboxSnapshotView | null;
 }
 
 export type DiskSnapshotDeleteResponse = unknown;
@@ -96,6 +121,7 @@ export interface DiskSnapshotListParams extends DiskSnapshotsCursorIDPageParams 
 
 export declare namespace DiskSnapshots {
   export {
+    type DevboxSnapshotAsyncStatusView as DevboxSnapshotAsyncStatusView,
     type DiskSnapshotDeleteResponse as DiskSnapshotDeleteResponse,
     type DiskSnapshotUpdateParams as DiskSnapshotUpdateParams,
     type DiskSnapshotListParams as DiskSnapshotListParams,
