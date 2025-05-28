@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.30.1 (2025-05-28)
+
+Full Changelog: [v0.30.0...v0.30.1](https://github.com/runloopai/api-client-ts/compare/v0.30.0...v0.30.1)
+
+### Chores
+
+* improve publish-npm script --latest tag logic ([5b9fc34](https://github.com/runloopai/api-client-ts/commit/5b9fc344fb76441b7b565986659d9d0d46ca3e6b))
+
 ## 0.30.0 (2025-05-27)
 
 Full Changelog: [v0.29.0...v0.30.0](https://github.com/runloopai/api-client-ts/compare/v0.29.0...v0.30.0)
