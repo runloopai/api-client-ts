@@ -39,6 +39,13 @@ export class Runs extends APIResource {
   }
 
   /**
+   * Cancel a currently running Benchmark run.
+   */
+  cancel(id: string, options?: Core.RequestOptions): Core.APIPromise<BenchmarksAPI.BenchmarkRunView> {
+    return this._client.post(`/v1/benchmarks/runs/${id}/cancel`, options);
+  }
+
+  /**
    * Complete a currently running BenchmarkRun.
    */
   complete(id: string, options?: Core.RequestOptions): Core.APIPromise<BenchmarksAPI.BenchmarkRunView> {

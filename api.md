@@ -20,6 +20,7 @@ Methods:
 
 - <code title="post /v1/benchmarks">client.benchmarks.<a href="./src/resources/benchmarks/benchmarks.ts">create</a>({ ...params }) -> BenchmarkView</code>
 - <code title="get /v1/benchmarks/{id}">client.benchmarks.<a href="./src/resources/benchmarks/benchmarks.ts">retrieve</a>(id) -> BenchmarkView</code>
+- <code title="post /v1/benchmarks/{id}">client.benchmarks.<a href="./src/resources/benchmarks/benchmarks.ts">update</a>(id, { ...params }) -> BenchmarkView</code>
 - <code title="get /v1/benchmarks">client.benchmarks.<a href="./src/resources/benchmarks/benchmarks.ts">list</a>({ ...params }) -> BenchmarkViewsBenchmarksCursorIDPage</code>
 - <code title="get /v1/benchmarks/list_public">client.benchmarks.<a href="./src/resources/benchmarks/benchmarks.ts">listPublic</a>({ ...params }) -> BenchmarkViewsBenchmarksCursorIDPage</code>
 - <code title="post /v1/benchmarks/start_run">client.benchmarks.<a href="./src/resources/benchmarks/benchmarks.ts">startRun</a>({ ...params }) -> BenchmarkRunView</code>
@@ -30,6 +31,7 @@ Methods:
 
 - <code title="get /v1/benchmarks/runs/{id}">client.benchmarks.runs.<a href="./src/resources/benchmarks/runs.ts">retrieve</a>(id) -> BenchmarkRunView</code>
 - <code title="get /v1/benchmarks/runs">client.benchmarks.runs.<a href="./src/resources/benchmarks/runs.ts">list</a>({ ...params }) -> BenchmarkRunViewsBenchmarkRunsCursorIDPage</code>
+- <code title="post /v1/benchmarks/runs/{id}/cancel">client.benchmarks.runs.<a href="./src/resources/benchmarks/runs.ts">cancel</a>(id) -> BenchmarkRunView</code>
 - <code title="post /v1/benchmarks/runs/{id}/complete">client.benchmarks.runs.<a href="./src/resources/benchmarks/runs.ts">complete</a>(id) -> BenchmarkRunView</code>
 
 # Blueprints
@@ -265,6 +267,7 @@ Methods:
 
 - <code title="get /v1/scenarios/runs/{id}">client.scenarios.runs.<a href="./src/resources/scenarios/runs.ts">retrieve</a>(id) -> ScenarioRunView</code>
 - <code title="get /v1/scenarios/runs">client.scenarios.runs.<a href="./src/resources/scenarios/runs.ts">list</a>({ ...params }) -> ScenarioRunViewsBenchmarkRunsCursorIDPage</code>
+- <code title="post /v1/scenarios/runs/{id}/cancel">client.scenarios.runs.<a href="./src/resources/scenarios/runs.ts">cancel</a>(id) -> ScenarioRunView</code>
 - <code title="post /v1/scenarios/runs/{id}/complete">client.scenarios.runs.<a href="./src/resources/scenarios/runs.ts">complete</a>(id) -> ScenarioRunView</code>
 - <code title="post /v1/scenarios/runs/{id}/score">client.scenarios.runs.<a href="./src/resources/scenarios/runs.ts">score</a>(id) -> ScenarioRunView</code>
 

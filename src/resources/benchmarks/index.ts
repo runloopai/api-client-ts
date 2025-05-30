@@ -10,6 +10,7 @@ export {
   type BenchmarkView,
   type StartBenchmarkRunParameters,
   type BenchmarkCreateParams,
+  type BenchmarkUpdateParams,
   type BenchmarkListParams,
   type BenchmarkListPublicParams,
   type BenchmarkStartRunParams,
