@@ -47,6 +47,26 @@ describe('resource benchmarks', () => {
     );
   });
 
+  test('update: only required params', async () => {
+    const responsePromise = client.benchmarks.update('id', { is_public: true, name: 'name' });
+    const rawResponse = await responsePromise.asResponse();
+    expect(rawResponse).toBeInstanceOf(Response);
+    const response = await responsePromise;
+    expect(response).not.toBeInstanceOf(Response);
+    const dataAndResponse = await responsePromise.withResponse();
+    expect(dataAndResponse.data).toBe(response);
+    expect(dataAndResponse.response).toBe(rawResponse);
+  });
+
+  test('update: required and optional params', async () => {
+    const response = await client.benchmarks.update('id', {
+      is_public: true,
+      name: 'name',
+      metadata: { foo: 'string' },
+      scenario_ids: ['string'],
+    });
+  });
+
   test('list', async () => {
     const responsePromise = client.benchmarks.list();
     const rawResponse = await responsePromise.asResponse();

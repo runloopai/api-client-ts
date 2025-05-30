@@ -30,6 +30,17 @@ export class Benchmarks extends APIResource {
   }
 
   /**
+   * Update a Benchmark with a set of Scenarios.
+   */
+  update(
+    id: string,
+    body: BenchmarkUpdateParams,
+    options?: Core.RequestOptions,
+  ): Core.APIPromise<BenchmarkView> {
+    return this._client.post(`/v1/benchmarks/${id}`, { body, ...options });
+  }
+
+  /**
    * List all Benchmarks matching filter.
    */
   list(
@@ -144,7 +155,7 @@ export interface BenchmarkRunView {
   metadata: Record<string, string>;
 
   /**
-   * List of Scenarios that need to be completed before benchmark can be completed.
+   * List of Scenarios that have yet to be scored.
    */
   pending_scenarios: Array<string>;
 
@@ -161,7 +172,7 @@ export interface BenchmarkRunView {
   /**
    * The state of the BenchmarkRun.
    */
-  state: 'running' | 'completed';
+  state: 'running' | 'canceled' | 'completed';
 
   /**
    * The duration for the BenchmarkRun to complete.
@@ -273,6 +284,28 @@ export interface BenchmarkCreateParams {
   scenario_ids?: Array<string> | null;
 }
 
+export interface BenchmarkUpdateParams {
+  /**
+   * Whether this benchmark is public.
+   */
+  is_public: boolean;
+
+  /**
+   * The name of the Benchmark. This must be unique.
+   */
+  name: string;
+
+  /**
+   * User defined metadata to attach to the benchmark for organization.
+   */
+  metadata?: Record<string, string> | null;
+
+  /**
+   * The Scenario IDs that make up the Benchmark.
+   */
+  scenario_ids?: Array<string> | null;
+}
+
 export interface BenchmarkListParams extends BenchmarksCursorIDPageParams {}
 
 export interface BenchmarkListPublicParams extends BenchmarksCursorIDPageParams {}
@@ -306,6 +339,7 @@ export declare namespace Benchmarks {
     type StartBenchmarkRunParameters as StartBenchmarkRunParameters,
     BenchmarkViewsBenchmarksCursorIDPage as BenchmarkViewsBenchmarksCursorIDPage,
     type BenchmarkCreateParams as BenchmarkCreateParams,
+    type BenchmarkUpdateParams as BenchmarkUpdateParams,
     type BenchmarkListParams as BenchmarkListParams,
     type BenchmarkListPublicParams as BenchmarkListPublicParams,
     type BenchmarkStartRunParams as BenchmarkStartRunParams,
