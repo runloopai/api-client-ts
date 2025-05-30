@@ -41,6 +41,14 @@ export class Runs extends APIResource {
   }
 
   /**
+   * Cancel a currently running Scenario run. This will shutdown the underlying
+   * Devbox resource.
+   */
+  cancel(id: string, options?: Core.RequestOptions): Core.APIPromise<ScenariosAPI.ScenarioRunView> {
+    return this._client.post(`/v1/scenarios/runs/${id}/cancel`, options);
+  }
+
+  /**
    * Complete a currently running ScenarioRun. Calling complete will shutdown
    * underlying Devbox resource.
    */
