@@ -173,13 +173,13 @@ List methods in the Runloop API are paginated.
 You can use the `for await … of` syntax to iterate through items across all pages:
 
 ```ts
-async function fetchAllDevboxes(params) {
-  const allDevboxes = [];
+async function fetchAllDevboxViews(params) {
+  const allDevboxViews = [];
   // Automatically fetches more pages as needed.
   for await (const devboxView of client.devboxes.list()) {
-    allDevboxes.push(devboxView);
+    allDevboxViews.push(devboxView);
   }
-  return allDevboxes;
+  return allDevboxViews;
 }
 ```
 
