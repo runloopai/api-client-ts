@@ -295,9 +295,11 @@ Types:
 
 - <code><a href="./src/resources/repositories.ts">RepositoryConnectionListView</a></code>
 - <code><a href="./src/resources/repositories.ts">RepositoryConnectionView</a></code>
-- <code><a href="./src/resources/repositories.ts">RepositoryVersionDetails</a></code>
-- <code><a href="./src/resources/repositories.ts">RepositoryVersionListView</a></code>
+- <code><a href="./src/resources/repositories.ts">RepositoryInspectionDetails</a></code>
+- <code><a href="./src/resources/repositories.ts">RepositoryInspectionListView</a></code>
+- <code><a href="./src/resources/repositories.ts">RepositoryManifestView</a></code>
 - <code><a href="./src/resources/repositories.ts">RepositoryDeleteResponse</a></code>
+- <code><a href="./src/resources/repositories.ts">RepositoryRefreshResponse</a></code>
 
 Methods:
 
@@ -305,4 +307,5 @@ Methods:
 - <code title="get /v1/repositories/{id}">client.repositories.<a href="./src/resources/repositories.ts">retrieve</a>(id) -> RepositoryConnectionView</code>
 - <code title="get /v1/repositories">client.repositories.<a href="./src/resources/repositories.ts">list</a>({ ...params }) -> RepositoryConnectionViewsRepositoriesCursorIDPage</code>
 - <code title="post /v1/repositories/{id}/delete">client.repositories.<a href="./src/resources/repositories.ts">delete</a>(id) -> unknown</code>
-- <code title="get /v1/repositories/{id}/versions">client.repositories.<a href="./src/resources/repositories.ts">versions</a>(id) -> RepositoryVersionListView</code>
+- <code title="get /v1/repositories/{id}/inspections">client.repositories.<a href="./src/resources/repositories.ts">listInspections</a>(id) -> RepositoryInspectionListView</code>
+- <code title="post /v1/repositories/{id}/refresh">client.repositories.<a href="./src/resources/repositories.ts">refresh</a>(id) -> unknown</code>
