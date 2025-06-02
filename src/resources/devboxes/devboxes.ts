@@ -731,10 +731,35 @@ export interface DevboxCreateParams {
   prebuilt?: string | null;
 
   /**
+   * Repository connection parameters for configuring repository integration.
+   */
+  repository_connection?: DevboxCreateParams.RepositoryConnection | null;
+
+  /**
    * Snapshot ID to use for the Devbox. Only one of (Snapshot ID, Blueprint ID,
    * Blueprint name) should be specified.
    */
   snapshot_id?: string | null;
+}
+
+export namespace DevboxCreateParams {
+  /**
+   * Repository connection parameters for configuring repository integration.
+   */
+  export interface RepositoryConnection {
+    /**
+     * GitHub authentication token for accessing private repositories when using
+     * repository_connection_id.
+     */
+    github_auth_token?: string | null;
+
+    /**
+     * Repository connection ID to use for the Devbox. When specified, the latest
+     * inspection blueprint will be used and workspace maintenance commands will be run
+     * during boot.
+     */
+    repository_connection_id?: string | null;
+  }
 }
 
 export interface DevboxUpdateParams {
