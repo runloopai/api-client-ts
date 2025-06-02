@@ -61,11 +61,19 @@ export class Repositories extends APIResource {
   }
 
   /**
-   * List all analyzed versions of a repository connection including automatically
-   * generated insights for each version.
+   * List all inspections of a repository connection including automatically
+   * generated insights for each inspection.
    */
-  versions(id: string, options?: Core.RequestOptions): Core.APIPromise<RepositoryVersionListView> {
-    return this._client.get(`/v1/repositories/${id}/versions`, options);
+  listInspections(id: string, options?: Core.RequestOptions): Core.APIPromise<RepositoryInspectionListView> {
+    return this._client.get(`/v1/repositories/${id}/inspections`, options);
+  }
+
+  /**
+   * Refresh a repository connection by inspecting the latest version including
+   * repo's technical stack and developer environment requirements.
+   */
+  refresh(id: string, options?: Core.RequestOptions): Core.APIPromise<unknown> {
+    return this._client.post(`/v1/repositories/${id}/refresh`, options);
   }
 }
 
@@ -102,90 +110,173 @@ export interface RepositoryConnectionView {
    * The account owner of the Repository.
    */
   owner: string;
-
-  /**
-   * The current status of the Repository.
-   */
-  status: 'pending' | 'failure' | 'active';
-
-  /**
-   * Reason for failure, if the status is 'failure'.
-   */
-  failure_reason?: string | null;
 }
 
-export interface RepositoryVersionDetails {
+export interface RepositoryInspectionDetails {
   /**
-   * Analyzed time of the Repository Version (Unix timestamp milliseconds).
-   */
-  analyzed_at: number;
-
-  /**
-   * The sha of the analyzed version of the Repository.
+   * The sha of the inspected version of the Repository.
    */
   commit_sha: string;
 
   /**
-   * Tools discovered during inspection.
+   * Inspection time of the Repository Version (Unix timestamp milliseconds).
    */
-  extracted_tools: RepositoryVersionDetails.ExtractedTools;
+  inspected_at: number;
 
   /**
-   * Commands required to set up repository environment.
+   * Repository manifest containing container config and workspace details.
    */
-  repository_setup_details: RepositoryVersionDetails.RepositorySetupDetails;
+  repository_manifest: RepositoryManifestView;
 
   /**
-   * The account owner of the Repository.
+   * The status of the repository inspection.
    */
-  status: 'inspecting' | 'inspection_failed' | 'success';
+  status:
+    | 'invalid'
+    | 'repo_auth_pending'
+    | 'repo_authentication_failure'
+    | 'repo_access_failure'
+    | 'inspection_pending'
+    | 'inspection_failed'
+    | 'inspection_success'
+    | 'image_build_success'
+    | 'image_build_failure';
+
+  /**
+   * The blueprint ID associated with this inspection if successful.
+   */
+  blueprint_id?: string | null;
+
+  /**
+   * The blueprint name associated with this inspection if successful.
+   */
+  blueprint_name?: string | null;
 }
 
-export namespace RepositoryVersionDetails {
+export interface RepositoryInspectionListView {
   /**
-   * Tools discovered during inspection.
+   * List of inspections for this repository.
    */
-  export interface ExtractedTools {
+  inspections: Array<RepositoryInspectionDetails>;
+}
+
+/**
+ * The repository manifest contains container configuration and workspace
+ * definitions for a repository.
+ */
+export interface RepositoryManifestView {
+  /**
+   * Container configuration specifying the base image and setup commands.
+   */
+  container_config: RepositoryManifestView.ContainerConfig;
+
+  /**
+   * List of workspaces within the repository. Each workspace represents a buildable
+   * unit of code.
+   */
+  workspaces: Array<RepositoryManifestView.Workspace>;
+}
+
+export namespace RepositoryManifestView {
+  /**
+   * Container configuration specifying the base image and setup commands.
+   */
+  export interface ContainerConfig {
     /**
-     * The set of available commands on this repository such as building etc.
+     * The name of the base image. Should be one of the GitHub public images like
+     * ubuntu-latest, ubuntu-24.04, ubuntu-22.04, windows-latest, windows-2022,
+     * macos-latest etc.
      */
-    commands: Record<string, string>;
+    base_image_name: string;
 
     /**
-     * What package manager this repository uses.
+     * Commands to run to setup the base container such as installing necessary
+     * toolchains (e.g. apt install).
+     */
+    setup_commands?: Array<string> | null;
+  }
+
+  /**
+   * A workspace is a buildable unit of code within a repository and often represents
+   * a deployable unit of code like a backend service or a frontend app.
+   */
+  export interface Workspace {
+    /**
+     * Name of the package manager used (e.g. pip, npm).
      */
     package_manager: string;
+
+    /**
+     * Extracted common commands important to the developer life cycle like linting,
+     * testing, building, etc.
+     */
+    dev_commands?: Workspace.DevCommands | null;
+
+    /**
+     * Name of the workspace. Can be empty if the workspace is the root of the
+     * repository. Only necessary for monorepo style repositories.
+     */
+    name?: string | null;
+
+    /**
+     * Path to the workspace from the root of the repository. Can be empty if the
+     * workspace is the root of the repository. Only necessary for monorepo style
+     * repositories.
+     */
+    path?: string | null;
+
+    /**
+     * Environment variables that are required to be set for this workspace to run
+     * correctly.
+     */
+    required_env_vars?: Array<string> | null;
+
+    /**
+     * Commands to run to refresh this workspace after pulling the latest changes to
+     * the repository via git (e.g. npm install).
+     */
+    workspace_refresh_commands?: Array<string> | null;
+
+    /**
+     * Commands to run to setup this workspace after a fresh clone of the repository on
+     * a new container such as installing necessary toolchains and dependencies (e.g.
+     * npm install).
+     */
+    workspace_setup_commands?: Array<string> | null;
   }
 
-  /**
-   * Commands required to set up repository environment.
-   */
-  export interface RepositorySetupDetails {
+  export namespace Workspace {
     /**
-     * The blueprint built that supports setting up this repository.
+     * Extracted common commands important to the developer life cycle like linting,
+     * testing, building, etc.
      */
-    blueprint_id: string;
+    export interface DevCommands {
+      /**
+       * Build command (e.g. npm run build).
+       */
+      build?: string | null;
 
-    /**
-     * Command to initialize the env we need to run the commands for this repository.
-     */
-    env_initialization_command: string;
+      /**
+       * Installation command (e.g. pip install -r requirements.txt).
+       */
+      install?: string | null;
 
-    /**
-     * Setup commands necessary to support repository i.e. apt install XXX.
-     */
-    workspace_setup: Array<string>;
+      /**
+       * Lint command (e.g. flake8).
+       */
+      lint?: string | null;
+
+      /**
+       * Test command (e.g. pytest).
+       */
+      test?: string | null;
+    }
   }
-}
-
-export interface RepositoryVersionListView {
-  /**
-   * List of analyzed versions of this repository.
-   */
-  analyzed_versions: Array<RepositoryVersionDetails>;
 }
 
 export type RepositoryDeleteResponse = unknown;
+
+export type RepositoryRefreshResponse = unknown;
 
 export interface RepositoryCreateParams {
   /**
@@ -202,6 +293,11 @@ export interface RepositoryCreateParams {
    * ID of blueprint to use as base for resulting RepositoryVersion blueprint.
    */
   blueprint_id?: string | null;
+
+  /**
+   * GitHub authentication token for accessing private repositories.
+   */
+  github_auth_token?: string | null;
 }
 
 export interface RepositoryListParams extends RepositoriesCursorIDPageParams {
@@ -225,9 +321,11 @@ export declare namespace Repositories {
   export {
     type RepositoryConnectionListView as RepositoryConnectionListView,
     type RepositoryConnectionView as RepositoryConnectionView,
-    type RepositoryVersionDetails as RepositoryVersionDetails,
-    type RepositoryVersionListView as RepositoryVersionListView,
+    type RepositoryInspectionDetails as RepositoryInspectionDetails,
+    type RepositoryInspectionListView as RepositoryInspectionListView,
+    type RepositoryManifestView as RepositoryManifestView,
     type RepositoryDeleteResponse as RepositoryDeleteResponse,
+    type RepositoryRefreshResponse as RepositoryRefreshResponse,
     RepositoryConnectionViewsRepositoriesCursorIDPage as RepositoryConnectionViewsRepositoriesCursorIDPage,
     type RepositoryCreateParams as RepositoryCreateParams,
     type RepositoryListParams as RepositoryListParams,
