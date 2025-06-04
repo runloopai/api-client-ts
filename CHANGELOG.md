@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.34.0 (2025-06-04)
+
+Full Changelog: [v0.33.0...v0.34.0](https://github.com/runloopai/api-client-ts/compare/v0.33.0...v0.34.0)
+
+### Features
+
+* **api:** api update ([61fbc35](https://github.com/runloopai/api-client-ts/commit/61fbc35aaed5b0a6abe0095e239e67340484b923))
+
+
+### Chores
+
+* **docs:** use top-level-await in example snippets ([036e84f](https://github.com/runloopai/api-client-ts/commit/036e84f347df7f06a4c4b6398245f7ae48818da3))
+
 ## 0.33.0 (2025-06-04)
 
 Full Changelog: [v0.32.0...v0.33.0](https://github.com/runloopai/api-client-ts/compare/v0.32.0...v0.33.0)
