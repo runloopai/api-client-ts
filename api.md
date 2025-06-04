@@ -23,6 +23,7 @@ Methods:
 - <code title="get /v1/benchmarks/{id}">client.benchmarks.<a href="./src/resources/benchmarks/benchmarks.ts">retrieve</a>(id) -> BenchmarkView</code>
 - <code title="post /v1/benchmarks/{id}">client.benchmarks.<a href="./src/resources/benchmarks/benchmarks.ts">update</a>(id, { ...params }) -> BenchmarkView</code>
 - <code title="get /v1/benchmarks">client.benchmarks.<a href="./src/resources/benchmarks/benchmarks.ts">list</a>({ ...params }) -> BenchmarkViewsBenchmarksCursorIDPage</code>
+- <code title="get /v1/benchmarks/{id}/definitions">client.benchmarks.<a href="./src/resources/benchmarks/benchmarks.ts">definitions</a>(id, { ...params }) -> ScenarioDefinitionListView</code>
 - <code title="get /v1/benchmarks/list_public">client.benchmarks.<a href="./src/resources/benchmarks/benchmarks.ts">listPublic</a>({ ...params }) -> BenchmarkViewsBenchmarksCursorIDPage</code>
 - <code title="post /v1/benchmarks/start_run">client.benchmarks.<a href="./src/resources/benchmarks/benchmarks.ts">startRun</a>({ ...params }) -> BenchmarkRunView</code>
 

@@ -62,6 +62,26 @@ export class Benchmarks extends APIResource {
   }
 
   /**
+   * Get scenario definitions for a previously created Benchmark.
+   */
+  definitions(
+    id: string,
+    query?: BenchmarkDefinitionsParams,
+    options?: Core.RequestOptions,
+  ): Core.APIPromise<ScenarioDefinitionListView>;
+  definitions(id: string, options?: Core.RequestOptions): Core.APIPromise<ScenarioDefinitionListView>;
+  definitions(
+    id: string,
+    query: BenchmarkDefinitionsParams | Core.RequestOptions = {},
+    options?: Core.RequestOptions,
+  ): Core.APIPromise<ScenarioDefinitionListView> {
+    if (isRequestOptions(query)) {
+      return this.definitions(id, {}, query);
+    }
+    return this._client.get(`/v1/benchmarks/${id}/definitions`, { query, ...options });
+  }
+
+  /**
    * List all public benchmarks matching filter.
    */
   listPublic(
@@ -321,6 +341,18 @@ export interface BenchmarkUpdateParams {
 
 export interface BenchmarkListParams extends BenchmarksCursorIDPageParams {}
 
+export interface BenchmarkDefinitionsParams {
+  /**
+   * The limit of items to return. Default is 20.
+   */
+  limit?: number;
+
+  /**
+   * Load the next page of data starting after the item with the given ID.
+   */
+  starting_after?: string;
+}
+
 export interface BenchmarkListPublicParams extends BenchmarksCursorIDPageParams {}
 
 export interface BenchmarkStartRunParams {
@@ -355,6 +387,7 @@ export declare namespace Benchmarks {
     type BenchmarkCreateParams as BenchmarkCreateParams,
     type BenchmarkUpdateParams as BenchmarkUpdateParams,
     type BenchmarkListParams as BenchmarkListParams,
+    type BenchmarkDefinitionsParams as BenchmarkDefinitionsParams,
     type BenchmarkListPublicParams as BenchmarkListPublicParams,
     type BenchmarkStartRunParams as BenchmarkStartRunParams,
   };
