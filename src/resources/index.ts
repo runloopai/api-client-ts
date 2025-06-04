@@ -14,6 +14,7 @@ export {
   type BenchmarkCreateParams,
   type BenchmarkUpdateParams,
   type BenchmarkListParams,
+  type BenchmarkDefinitionsParams,
   type BenchmarkListPublicParams,
   type BenchmarkStartRunParams,
 } from './benchmarks/benchmarks';

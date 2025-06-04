@@ -57,6 +57,7 @@ import {
 import {
   BenchmarkCreateParameters,
   BenchmarkCreateParams,
+  BenchmarkDefinitionsParams,
   BenchmarkListParams,
   BenchmarkListPublicParams,
   BenchmarkRunListView,
@@ -358,6 +359,7 @@ export declare namespace Runloop {
     type BenchmarkCreateParams as BenchmarkCreateParams,
     type BenchmarkUpdateParams as BenchmarkUpdateParams,
     type BenchmarkListParams as BenchmarkListParams,
+    type BenchmarkDefinitionsParams as BenchmarkDefinitionsParams,
     type BenchmarkListPublicParams as BenchmarkListPublicParams,
     type BenchmarkStartRunParams as BenchmarkStartRunParams,
   };
