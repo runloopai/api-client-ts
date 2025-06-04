@@ -114,7 +114,7 @@ describe('resource runs', () => {
     await expect(
       client.benchmarks.runs.listScenarioRuns(
         'id',
-        { limit: 0, starting_after: 'starting_after' },
+        { limit: 0, starting_after: 'starting_after', state: 'running' },
         { path: '/_stainless_unknown_path' },
       ),
     ).rejects.toThrow(Runloop.NotFoundError);
