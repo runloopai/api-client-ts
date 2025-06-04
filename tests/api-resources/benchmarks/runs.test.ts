@@ -90,4 +90,33 @@ describe('resource runs', () => {
       Runloop.NotFoundError,
     );
   });
+
+  test('listScenarioRuns', async () => {
+    const responsePromise = client.benchmarks.runs.listScenarioRuns('id');
+    const rawResponse = await responsePromise.asResponse();
+    expect(rawResponse).toBeInstanceOf(Response);
+    const response = await responsePromise;
+    expect(response).not.toBeInstanceOf(Response);
+    const dataAndResponse = await responsePromise.withResponse();
+    expect(dataAndResponse.data).toBe(response);
+    expect(dataAndResponse.response).toBe(rawResponse);
+  });
+
+  test('listScenarioRuns: request options instead of params are passed correctly', async () => {
+    // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
+    await expect(
+      client.benchmarks.runs.listScenarioRuns('id', { path: '/_stainless_unknown_path' }),
+    ).rejects.toThrow(Runloop.NotFoundError);
+  });
+
+  test('listScenarioRuns: request options and params are passed correctly', async () => {
+    // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
+    await expect(
+      client.benchmarks.runs.listScenarioRuns(
+        'id',
+        { limit: 0, starting_after: 'starting_after' },
+        { path: '/_stainless_unknown_path' },
+      ),
+    ).rejects.toThrow(Runloop.NotFoundError);
+  });
 });
