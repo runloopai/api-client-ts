@@ -5,6 +5,8 @@ import { isRequestOptions } from '../../core';
 import * as Core from '../../core';
 import * as BenchmarksAPI from './benchmarks';
 import { BenchmarkRunViewsBenchmarkRunsCursorIDPage } from './benchmarks';
+import * as ScenariosAPI from '../scenarios/scenarios';
+import { ScenarioRunViewsBenchmarkRunsCursorIDPage } from '../scenarios/scenarios';
 import { type BenchmarkRunsCursorIDPageParams } from '../../pagination';
 
 export class Runs extends APIResource {
@@ -51,6 +53,33 @@ export class Runs extends APIResource {
   complete(id: string, options?: Core.RequestOptions): Core.APIPromise<BenchmarksAPI.BenchmarkRunView> {
     return this._client.post(`/v1/benchmarks/runs/${id}/complete`, options);
   }
+
+  /**
+   * List started scenario runs for a benchmark run.
+   */
+  listScenarioRuns(
+    id: string,
+    query?: RunListScenarioRunsParams,
+    options?: Core.RequestOptions,
+  ): Core.PagePromise<ScenarioRunViewsBenchmarkRunsCursorIDPage, ScenariosAPI.ScenarioRunView>;
+  listScenarioRuns(
+    id: string,
+    options?: Core.RequestOptions,
+  ): Core.PagePromise<ScenarioRunViewsBenchmarkRunsCursorIDPage, ScenariosAPI.ScenarioRunView>;
+  listScenarioRuns(
+    id: string,
+    query: RunListScenarioRunsParams | Core.RequestOptions = {},
+    options?: Core.RequestOptions,
+  ): Core.PagePromise<ScenarioRunViewsBenchmarkRunsCursorIDPage, ScenariosAPI.ScenarioRunView> {
+    if (isRequestOptions(query)) {
+      return this.listScenarioRuns(id, {}, query);
+    }
+    return this._client.getAPIList(
+      `/v1/benchmarks/runs/${id}/scenario_runs`,
+      ScenarioRunViewsBenchmarkRunsCursorIDPage,
+      { query, ...options },
+    );
+  }
 }
 
 export interface RunListParams extends BenchmarkRunsCursorIDPageParams {
@@ -60,8 +89,10 @@ export interface RunListParams extends BenchmarkRunsCursorIDPageParams {
   benchmark_id?: string;
 }
 
+export interface RunListScenarioRunsParams extends BenchmarkRunsCursorIDPageParams {}
+
 export declare namespace Runs {
-  export { type RunListParams as RunListParams };
+  export { type RunListParams as RunListParams, type RunListScenarioRunsParams as RunListScenarioRunsParams };
 }
 
-export { BenchmarkRunViewsBenchmarkRunsCursorIDPage };
+export { BenchmarkRunViewsBenchmarkRunsCursorIDPage, ScenarioRunViewsBenchmarkRunsCursorIDPage };

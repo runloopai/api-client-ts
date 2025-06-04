@@ -15,4 +15,4 @@ export {
   type BenchmarkListPublicParams,
   type BenchmarkStartRunParams,
 } from './benchmarks';
-export { Runs, type RunListParams } from './runs';
+export { Runs, type RunListParams, type RunListScenarioRunsParams } from './runs';
