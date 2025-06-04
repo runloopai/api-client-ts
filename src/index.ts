@@ -66,6 +66,7 @@ import {
   BenchmarkView,
   BenchmarkViewsBenchmarksCursorIDPage,
   Benchmarks,
+  ScenarioDefinitionListView,
   StartBenchmarkRunParameters,
 } from './resources/benchmarks/benchmarks';
 import {
@@ -351,6 +352,7 @@ export declare namespace Runloop {
     type BenchmarkRunListView as BenchmarkRunListView,
     type BenchmarkRunView as BenchmarkRunView,
     type BenchmarkView as BenchmarkView,
+    type ScenarioDefinitionListView as ScenarioDefinitionListView,
     type StartBenchmarkRunParameters as StartBenchmarkRunParameters,
     BenchmarkViewsBenchmarksCursorIDPage as BenchmarkViewsBenchmarksCursorIDPage,
     type BenchmarkCreateParams as BenchmarkCreateParams,
