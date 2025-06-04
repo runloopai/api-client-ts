@@ -89,7 +89,12 @@ export interface RunListParams extends BenchmarkRunsCursorIDPageParams {
   benchmark_id?: string;
 }
 
-export interface RunListScenarioRunsParams extends BenchmarkRunsCursorIDPageParams {}
+export interface RunListScenarioRunsParams extends BenchmarkRunsCursorIDPageParams {
+  /**
+   * Filter by Scenario Run state
+   */
+  state?: 'running' | 'scoring' | 'scored' | 'completed' | 'canceled' | 'timeout' | 'failed';
+}
 
 export declare namespace Runs {
   export { type RunListParams as RunListParams, type RunListScenarioRunsParams as RunListScenarioRunsParams };
