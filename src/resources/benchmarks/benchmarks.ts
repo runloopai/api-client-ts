@@ -245,6 +245,19 @@ export interface BenchmarkView {
   is_public?: boolean;
 }
 
+export interface ScenarioDefinitionListView {
+  has_more: boolean;
+
+  remaining_count: number;
+
+  /**
+   * List of Scenarios matching filter.
+   */
+  scenarios: Array<ScenariosAPI.ScenarioView>;
+
+  total_count: number;
+}
+
 export interface StartBenchmarkRunParameters {
   /**
    * ID of the Benchmark to run.
@@ -336,6 +349,7 @@ export declare namespace Benchmarks {
     type BenchmarkRunListView as BenchmarkRunListView,
     type BenchmarkRunView as BenchmarkRunView,
     type BenchmarkView as BenchmarkView,
+    type ScenarioDefinitionListView as ScenarioDefinitionListView,
     type StartBenchmarkRunParameters as StartBenchmarkRunParameters,
     BenchmarkViewsBenchmarksCursorIDPage as BenchmarkViewsBenchmarksCursorIDPage,
     type BenchmarkCreateParams as BenchmarkCreateParams,
