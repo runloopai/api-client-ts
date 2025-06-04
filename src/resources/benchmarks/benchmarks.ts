@@ -4,7 +4,7 @@ import { APIResource } from '../../resource';
 import { isRequestOptions } from '../../core';
 import * as Core from '../../core';
 import * as RunsAPI from './runs';
-import { RunListParams, Runs } from './runs';
+import { RunListParams, RunListScenarioRunsParams, Runs } from './runs';
 import * as ScenariosAPI from '../scenarios/scenarios';
 import {
   BenchmarkRunsCursorIDPage,
@@ -345,5 +345,9 @@ export declare namespace Benchmarks {
     type BenchmarkStartRunParams as BenchmarkStartRunParams,
   };
 
-  export { Runs as Runs, type RunListParams as RunListParams };
+  export {
+    Runs as Runs,
+    type RunListParams as RunListParams,
+    type RunListScenarioRunsParams as RunListScenarioRunsParams,
+  };
 }

@@ -33,6 +33,7 @@ Methods:
 - <code title="get /v1/benchmarks/runs">client.benchmarks.runs.<a href="./src/resources/benchmarks/runs.ts">list</a>({ ...params }) -> BenchmarkRunViewsBenchmarkRunsCursorIDPage</code>
 - <code title="post /v1/benchmarks/runs/{id}/cancel">client.benchmarks.runs.<a href="./src/resources/benchmarks/runs.ts">cancel</a>(id) -> BenchmarkRunView</code>
 - <code title="post /v1/benchmarks/runs/{id}/complete">client.benchmarks.runs.<a href="./src/resources/benchmarks/runs.ts">complete</a>(id) -> BenchmarkRunView</code>
+- <code title="get /v1/benchmarks/runs/{id}/scenario_runs">client.benchmarks.runs.<a href="./src/resources/benchmarks/runs.ts">listScenarioRuns</a>(id, { ...params }) -> ScenarioRunViewsBenchmarkRunsCursorIDPage</code>
 
 # Blueprints
 
