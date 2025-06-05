@@ -77,6 +77,7 @@ export {
   type RepositoryCreateParams,
   type RepositoryListParams,
   type RepositoryDeleteParams,
+  type RepositoryRefreshParams,
 } from './repositories';
 export {
   ScenarioRunViewsBenchmarkRunsCursorIDPage,

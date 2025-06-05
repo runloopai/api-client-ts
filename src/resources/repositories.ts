@@ -72,8 +72,21 @@ export class Repositories extends APIResource {
    * Refresh a repository connection by inspecting the latest version including
    * repo's technical stack and developer environment requirements.
    */
-  refresh(id: string, options?: Core.RequestOptions): Core.APIPromise<unknown> {
-    return this._client.post(`/v1/repositories/${id}/refresh`, options);
+  refresh(
+    id: string,
+    body?: RepositoryRefreshParams,
+    options?: Core.RequestOptions,
+  ): Core.APIPromise<unknown>;
+  refresh(id: string, options?: Core.RequestOptions): Core.APIPromise<unknown>;
+  refresh(
+    id: string,
+    body: RepositoryRefreshParams | Core.RequestOptions = {},
+    options?: Core.RequestOptions,
+  ): Core.APIPromise<unknown> {
+    if (isRequestOptions(body)) {
+      return this.refresh(id, {}, body);
+    }
+    return this._client.post(`/v1/repositories/${id}/refresh`, { body, ...options });
   }
 }
 
@@ -314,6 +327,18 @@ export interface RepositoryListParams extends RepositoriesCursorIDPageParams {
 
 export interface RepositoryDeleteParams {}
 
+export interface RepositoryRefreshParams {
+  /**
+   * ID of blueprint to use as base for resulting RepositoryVersion blueprint.
+   */
+  blueprint_id?: string | null;
+
+  /**
+   * GitHub authentication token for accessing private repositories.
+   */
+  github_auth_token?: string | null;
+}
+
 Repositories.RepositoryConnectionViewsRepositoriesCursorIDPage =
   RepositoryConnectionViewsRepositoriesCursorIDPage;
 
@@ -330,5 +355,6 @@ export declare namespace Repositories {
     type RepositoryCreateParams as RepositoryCreateParams,
     type RepositoryListParams as RepositoryListParams,
     type RepositoryDeleteParams as RepositoryDeleteParams,
+    type RepositoryRefreshParams as RepositoryRefreshParams,
   };
 }
