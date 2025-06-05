@@ -52,6 +52,7 @@ import {
   RepositoryInspectionListView,
   RepositoryListParams,
   RepositoryManifestView,
+  RepositoryRefreshParams,
   RepositoryRefreshResponse,
 } from './resources/repositories';
 import {
@@ -446,6 +447,7 @@ export declare namespace Runloop {
     type RepositoryCreateParams as RepositoryCreateParams,
     type RepositoryListParams as RepositoryListParams,
     type RepositoryDeleteParams as RepositoryDeleteParams,
+    type RepositoryRefreshParams as RepositoryRefreshParams,
   };
 
   export type AfterIdle = API.AfterIdle;
