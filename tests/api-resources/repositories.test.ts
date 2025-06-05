@@ -128,4 +128,15 @@ describe('resource repositories', () => {
       Runloop.NotFoundError,
     );
   });
+
+  test('refresh: request options and params are passed correctly', async () => {
+    // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
+    await expect(
+      client.repositories.refresh(
+        'id',
+        { blueprint_id: 'blueprint_id', github_auth_token: 'github_auth_token' },
+        { path: '/_stainless_unknown_path' },
+      ),
+    ).rejects.toThrow(Runloop.NotFoundError);
+  });
 });

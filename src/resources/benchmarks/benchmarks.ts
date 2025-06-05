@@ -175,16 +175,6 @@ export interface BenchmarkRunView {
   metadata: Record<string, string>;
 
   /**
-   * List of Scenarios that have yet to be scored.
-   */
-  pending_scenarios: Array<string>;
-
-  /**
-   * List of Scenarios have been completed.
-   */
-  scenario_runs: Array<BenchmarkRunView.ScenarioRun>;
-
-  /**
    * The time the benchmark run execution started (Unix timestamp milliseconds).
    */
   start_time_ms: number;
@@ -209,29 +199,6 @@ export interface BenchmarkRunView {
    * sum of scenario scores / number of scenario runs.
    */
   score?: number | null;
-}
-
-export namespace BenchmarkRunView {
-  /**
-   * A BenchmarkRunScenariosListView represents a run of a complete set of Scenarios
-   * run, organized under a Benchmark.
-   */
-  export interface ScenarioRun {
-    /**
-     * ID of the Scenario that has been run.
-     */
-    scenario_id: string;
-
-    /**
-     * The scoring result of the ScenarioRun.
-     */
-    scoringResult: ScenariosAPI.ScoringContractResultView;
-
-    /**
-     * ID of the scenario run.
-     */
-    scenarioRunId?: string;
-  }
 }
 
 /**
