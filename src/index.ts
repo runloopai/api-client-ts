@@ -55,6 +55,7 @@ import {
   RepositoryRefreshParams,
   RepositoryRefreshResponse,
 } from './resources/repositories';
+import { Secrets } from './resources/secrets';
 import {
   BenchmarkCreateParameters,
   BenchmarkCreateParams,
@@ -243,6 +244,7 @@ export class Runloop extends Core.APIClient {
   devboxes: API.Devboxes = new API.Devboxes(this);
   scenarios: API.Scenarios = new API.Scenarios(this);
   repositories: API.Repositories = new API.Repositories(this);
+  secrets: API.Secrets = new API.Secrets(this);
 
   protected override defaultQuery(): Core.DefaultQuery | undefined {
     return this._options.defaultQuery;
@@ -291,6 +293,7 @@ Runloop.Scenarios = Scenarios;
 Runloop.ScenarioViewsScenariosCursorIDPage = ScenarioViewsScenariosCursorIDPage;
 Runloop.Repositories = Repositories;
 Runloop.RepositoryConnectionViewsRepositoriesCursorIDPage = RepositoryConnectionViewsRepositoriesCursorIDPage;
+Runloop.Secrets = Secrets;
 export declare namespace Runloop {
   export type RequestOptions = Core.RequestOptions;
 
@@ -449,6 +452,8 @@ export declare namespace Runloop {
     type RepositoryDeleteParams as RepositoryDeleteParams,
     type RepositoryRefreshParams as RepositoryRefreshParams,
   };
+
+  export { Secrets as Secrets };
 
   export type AfterIdle = API.AfterIdle;
   export type CodeMountParameters = API.CodeMountParameters;
