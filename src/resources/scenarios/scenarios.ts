@@ -136,11 +136,6 @@ export interface ScenarioCreateParameters {
   input_context: InputContext;
 
   /**
-   * Whether this scenario is public.
-   */
-  is_public: boolean;
-
-  /**
    * Name of the scenario.
    */
   name: string;
@@ -552,11 +547,6 @@ export interface ScenarioCreateParams {
   input_context: InputContext;
 
   /**
-   * Whether this scenario is public.
-   */
-  is_public: boolean;
-
-  /**
    * Name of the scenario.
    */
   name: string;
@@ -589,11 +579,6 @@ export interface ScenarioUpdateParams {
    * The input context for the Scenario.
    */
   input_context: InputContext;
-
-  /**
-   * Whether this scenario is public.
-   */
-  is_public: boolean;
 
   /**
    * Name of the scenario.

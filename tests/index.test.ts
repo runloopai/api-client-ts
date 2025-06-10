@@ -223,10 +223,7 @@ describe('idempotency', () => {
       baseURL: process.env['TEST_API_BASE_URL'] ?? 'http://127.0.0.1:4010',
       bearerToken: 'My Bearer Token',
     });
-    await client.benchmarks.create(
-      { is_public: true, name: 'name' },
-      { idempotencyKey: 'my-idempotency-key' },
-    );
+    await client.benchmarks.create({ name: 'name' }, { idempotencyKey: 'my-idempotency-key' });
   });
 });
 
