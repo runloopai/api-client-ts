@@ -640,6 +640,11 @@ export interface DevboxView {
   metadata: Record<string, string>;
 
   /**
+   * A list of state transitions in order with durations
+   */
+  state_transitions: Array<DevboxView.StateTransition>;
+
+  /**
    * The current status of the Devbox.
    */
   status:
@@ -691,6 +696,35 @@ export interface DevboxView {
    * Snapshot.
    */
   snapshot_id?: string | null;
+}
+
+export namespace DevboxView {
+  export interface StateTransition {
+    /**
+     * The status of the Devbox.
+     *
+     * provisioning: Runloop is allocating and booting the necessary infrastructure
+     * resources. initializing: Runloop defined boot scripts are running to enable the
+     * environment for interaction. running: The Devbox is ready for interaction.
+     * suspending: The Devbox disk is being snaphsotted and as part of suspension.
+     * suspended: The Devbox disk is saved and no more active compute is being used for
+     * the Devbox. resuming: The Devbox disk is being loaded as part of booting a
+     * suspended Devbox. failure: The Devbox failed as part of booting or running user
+     * requested actions. shutdown: The Devbox was successfully shutdown and no more
+     * active compute is being used.
+     */
+    status?:
+      | 'provisioning'
+      | 'initializing'
+      | 'running'
+      | 'suspending'
+      | 'suspended'
+      | 'resuming'
+      | 'failure'
+      | 'shutdown';
+
+    transition_time_ms?: unknown;
+  }
 }
 
 export interface DevboxCreateSSHKeyResponse {
@@ -779,35 +813,15 @@ export interface DevboxCreateParams {
   prebuilt?: string | null;
 
   /**
-   * Repository connection parameters for configuring repository integration.
+   * Repository connection id the devbox should source its base image from.
    */
-  repository_connection?: DevboxCreateParams.RepositoryConnection | null;
+  repo_connection_id?: string | null;
 
   /**
    * Snapshot ID to use for the Devbox. Only one of (Snapshot ID, Blueprint ID,
    * Blueprint name) should be specified.
    */
   snapshot_id?: string | null;
-}
-
-export namespace DevboxCreateParams {
-  /**
-   * Repository connection parameters for configuring repository integration.
-   */
-  export interface RepositoryConnection {
-    /**
-     * GitHub authentication token for accessing private repositories when using
-     * repository_connection_id.
-     */
-    github_auth_token?: string | null;
-
-    /**
-     * Repository connection ID to use for the Devbox. When specified, the latest
-     * inspection blueprint will be used and workspace maintenance commands will be run
-     * during boot.
-     */
-    repository_connection_id?: string | null;
-  }
 }
 
 export interface DevboxUpdateParams {

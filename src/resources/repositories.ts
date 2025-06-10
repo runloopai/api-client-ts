@@ -127,6 +127,11 @@ export interface RepositoryConnectionView {
 
 export interface RepositoryInspectionDetails {
   /**
+   * The ID of the inspection.
+   */
+  id: string;
+
+  /**
    * The sha of the inspected version of the Repository.
    */
   commit_sha: string;
@@ -153,7 +158,8 @@ export interface RepositoryInspectionDetails {
     | 'inspection_failed'
     | 'inspection_success'
     | 'image_build_success'
-    | 'image_build_failure';
+    | 'image_build_failure'
+    | 'inspection_user_manifest_added';
 
   /**
    * The blueprint ID associated with this inspection if successful.
@@ -164,6 +170,12 @@ export interface RepositoryInspectionDetails {
    * The blueprint name associated with this inspection if successful.
    */
   blueprint_name?: string | null;
+
+  /**
+   * User uploaded repository manifest containing container config and workspace
+   * details.
+   */
+  user_manifest?: RepositoryManifestView | null;
 }
 
 export interface RepositoryInspectionListView {

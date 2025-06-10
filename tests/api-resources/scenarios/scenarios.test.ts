@@ -12,7 +12,6 @@ describe('resource scenarios', () => {
   test('create: only required params', async () => {
     const responsePromise = client.scenarios.create({
       input_context: { problem_statement: 'problem_statement' },
-      is_public: true,
       name: 'name',
       scoring_contract: {
         scoring_function_parameters: [
@@ -36,7 +35,6 @@ describe('resource scenarios', () => {
   test('create: required and optional params', async () => {
     const response = await client.scenarios.create({
       input_context: { problem_statement: 'problem_statement', additional_context: {} },
-      is_public: true,
       name: 'name',
       scoring_contract: {
         scoring_function_parameters: [
@@ -95,7 +93,6 @@ describe('resource scenarios', () => {
   test('update: only required params', async () => {
     const responsePromise = client.scenarios.update('id', {
       input_context: { problem_statement: 'problem_statement' },
-      is_public: true,
       name: 'name',
       scoring_contract: {
         scoring_function_parameters: [
@@ -119,7 +116,6 @@ describe('resource scenarios', () => {
   test('update: required and optional params', async () => {
     const response = await client.scenarios.update('id', {
       input_context: { problem_statement: 'problem_statement', additional_context: {} },
-      is_public: true,
       name: 'name',
       scoring_contract: {
         scoring_function_parameters: [

@@ -10,7 +10,7 @@ const client = new Runloop({
 
 describe('resource benchmarks', () => {
   test('create: only required params', async () => {
-    const responsePromise = client.benchmarks.create({ is_public: true, name: 'name' });
+    const responsePromise = client.benchmarks.create({ name: 'name' });
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
     const response = await responsePromise;
@@ -22,7 +22,6 @@ describe('resource benchmarks', () => {
 
   test('create: required and optional params', async () => {
     const response = await client.benchmarks.create({
-      is_public: true,
       name: 'name',
       metadata: { foo: 'string' },
       scenario_ids: ['string'],
@@ -48,7 +47,7 @@ describe('resource benchmarks', () => {
   });
 
   test('update: only required params', async () => {
-    const responsePromise = client.benchmarks.update('id', { is_public: true, name: 'name' });
+    const responsePromise = client.benchmarks.update('id', { name: 'name' });
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
     const response = await responsePromise;
@@ -60,7 +59,6 @@ describe('resource benchmarks', () => {
 
   test('update: required and optional params', async () => {
     const response = await client.benchmarks.update('id', {
-      is_public: true,
       name: 'name',
       metadata: { foo: 'string' },
       scenario_ids: ['string'],
