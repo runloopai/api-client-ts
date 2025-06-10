@@ -770,6 +770,14 @@ export interface DevboxCreateParams {
   repo_connection_id?: string | null;
 
   /**
+   * (Optional) Map of environment variable names to secret names. The secret values
+   * will be securely injected as environment variables in the Devbox. Example:
+   * {"DB_PASS": "DATABASE_PASSWORD"} sets environment variable 'DB_PASS' to the
+   * value of secret 'DATABASE_PASSWORD'.
+   */
+  secrets?: Record<string, string> | null;
+
+  /**
    * Snapshot ID to use for the Devbox. Only one of (Snapshot ID, Blueprint ID,
    * Blueprint name) should be specified.
    */

@@ -60,6 +60,7 @@ describe('resource devboxes', () => {
           name: 'name',
           prebuilt: 'prebuilt',
           repo_connection_id: 'repo_connection_id',
+          secrets: { foo: 'string' },
           snapshot_id: 'snapshot_id',
         },
         { path: '/_stainless_unknown_path' },
