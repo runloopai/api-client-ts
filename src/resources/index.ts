@@ -100,3 +100,4 @@ export {
   type ScenarioListPublicParams,
   type ScenarioStartRunParams,
 } from './scenarios/scenarios';
+export { Secrets } from './secrets';
