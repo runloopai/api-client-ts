@@ -59,10 +59,7 @@ describe('resource devboxes', () => {
           metadata: { foo: 'string' },
           name: 'name',
           prebuilt: 'prebuilt',
-          repository_connection: {
-            github_auth_token: 'github_auth_token',
-            repository_connection_id: 'repository_connection_id',
-          },
+          repo_connection_id: 'repo_connection_id',
           snapshot_id: 'snapshot_id',
         },
         { path: '/_stainless_unknown_path' },

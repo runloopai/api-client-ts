@@ -117,14 +117,9 @@ export class BenchmarkViewsBenchmarksCursorIDPage extends BenchmarksCursorIDPage
 export class BenchmarkRunViewsBenchmarkRunsCursorIDPage extends BenchmarkRunsCursorIDPage<BenchmarkRunView> {}
 
 /**
- * BenchmarkCreateParameters contain the set of paramters to create a Benchmark.
+ * BenchmarkCreateParameters contain the set of parameters to create a Benchmark.
  */
 export interface BenchmarkCreateParameters {
-  /**
-   * Whether this benchmark is public.
-   */
-  is_public: boolean;
-
   /**
    * The name of the Benchmark. This must be unique.
    */
@@ -264,11 +259,6 @@ export interface StartBenchmarkRunParameters {
 
 export interface BenchmarkCreateParams {
   /**
-   * Whether this benchmark is public.
-   */
-  is_public: boolean;
-
-  /**
    * The name of the Benchmark. This must be unique.
    */
   name: string;
@@ -285,11 +275,6 @@ export interface BenchmarkCreateParams {
 }
 
 export interface BenchmarkUpdateParams {
-  /**
-   * Whether this benchmark is public.
-   */
-  is_public: boolean;
-
   /**
    * The name of the Benchmark. This must be unique.
    */
