@@ -55,7 +55,16 @@ import {
   RepositoryRefreshParams,
   RepositoryRefreshResponse,
 } from './resources/repositories';
-import { Secrets } from './resources/secrets';
+import {
+  SecretCreateParameters,
+  SecretCreateParams,
+  SecretDeleteParams,
+  SecretListView,
+  SecretUpdateParameters,
+  SecretUpdateParams,
+  SecretView,
+  Secrets,
+} from './resources/secrets';
 import {
   BenchmarkCreateParameters,
   BenchmarkCreateParams,
@@ -453,7 +462,16 @@ export declare namespace Runloop {
     type RepositoryRefreshParams as RepositoryRefreshParams,
   };
 
-  export { Secrets as Secrets };
+  export {
+    Secrets as Secrets,
+    type SecretCreateParameters as SecretCreateParameters,
+    type SecretListView as SecretListView,
+    type SecretUpdateParameters as SecretUpdateParameters,
+    type SecretView as SecretView,
+    type SecretCreateParams as SecretCreateParams,
+    type SecretUpdateParams as SecretUpdateParams,
+    type SecretDeleteParams as SecretDeleteParams,
+  };
 
   export type AfterIdle = API.AfterIdle;
   export type CodeMountParameters = API.CodeMountParameters;
