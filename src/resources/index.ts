@@ -100,4 +100,13 @@ export {
   type ScenarioListPublicParams,
   type ScenarioStartRunParams,
 } from './scenarios/scenarios';
-export { Secrets } from './secrets';
+export {
+  Secrets,
+  type SecretCreateParameters,
+  type SecretListView,
+  type SecretUpdateParameters,
+  type SecretView,
+  type SecretCreateParams,
+  type SecretUpdateParams,
+  type SecretDeleteParams,
+} from './secrets';
