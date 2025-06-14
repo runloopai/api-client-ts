@@ -2,7 +2,7 @@
 
 import type { Runloop } from './index';
 
-export class APIResource {
+export abstract class APIResource {
   protected _client: Runloop;
 
   constructor(client: Runloop) {
