@@ -625,6 +625,11 @@ export interface ScenarioUpdateParams {
 
 export interface ScenarioListParams extends ScenariosCursorIDPageParams {
   /**
+   * Filter scenarios by benchmark ID.
+   */
+  benchmark_id?: string;
+
+  /**
    * Query for Scenarios with a given name.
    */
   name?: string;
