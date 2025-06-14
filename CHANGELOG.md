@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.38.1 (2025-06-14)
+
+Full Changelog: [v0.38.0...v0.38.1](https://github.com/runloopai/api-client-ts/compare/v0.38.0...v0.38.1)
+
+### Bug Fixes
+
+* publish script — handle NPM errors correctly ([f412848](https://github.com/runloopai/api-client-ts/commit/f412848cc18d763ef895006b6434d4efd579d4dd))
+
+
+### Chores
+
+* **internal:** make base APIResource abstract ([2d0d29a](https://github.com/runloopai/api-client-ts/commit/2d0d29a3e3b0c2d3d2bbea8a2aeb24a26f803198))
+
 ## 0.38.0 (2025-06-14)
 
 Full Changelog: [v0.37.0...v0.38.0](https://github.com/runloopai/api-client-ts/compare/v0.37.0...v0.38.0)
