@@ -236,6 +236,7 @@ export class Runloop extends Core.APIClient {
 
     super({
       baseURL: options.baseURL!,
+      baseURLOverridden: baseURL ? baseURL !== 'https://api.runloop.ai' : false,
       timeout: options.timeout ?? 60000 /* 1 minute */,
       httpAgent: options.httpAgent,
       maxRetries: options.maxRetries,
@@ -254,6 +255,13 @@ export class Runloop extends Core.APIClient {
   scenarios: API.Scenarios = new API.Scenarios(this);
   repositories: API.Repositories = new API.Repositories(this);
   secrets: API.Secrets = new API.Secrets(this);
+
+  /**
+   * Check whether the base URL is set to its default.
+   */
+  #baseURLOverridden(): boolean {
+    return this.baseURL !== 'https://api.runloop.ai';
+  }
 
   protected override defaultQuery(): Core.DefaultQuery | undefined {
     return this._options.defaultQuery;
