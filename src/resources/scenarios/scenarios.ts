@@ -47,13 +47,23 @@ export class Scenarios extends APIResource {
 
   /**
    * Update a Scenario, a repeatable AI coding evaluation test that defines the
-   * starting environment as well as evaluation success criteria.
+   * starting environment as well as evaluation success criteria. Only provided
+   * fields will be updated.
    */
   update(
     id: string,
-    body: ScenarioUpdateParams,
+    body?: ScenarioUpdateParams,
+    options?: Core.RequestOptions,
+  ): Core.APIPromise<ScenarioView>;
+  update(id: string, options?: Core.RequestOptions): Core.APIPromise<ScenarioView>;
+  update(
+    id: string,
+    body: ScenarioUpdateParams | Core.RequestOptions = {},
     options?: Core.RequestOptions,
   ): Core.APIPromise<ScenarioView> {
+    if (isRequestOptions(body)) {
+      return this.update(id, {}, body);
+    }
     return this._client.post(`/v1/scenarios/${id}`, { body, ...options });
   }
 
@@ -576,24 +586,14 @@ export interface ScenarioCreateParams {
 
 export interface ScenarioUpdateParams {
   /**
-   * The input context for the Scenario.
-   */
-  input_context: InputContext;
-
-  /**
-   * Name of the scenario.
-   */
-  name: string;
-
-  /**
-   * The scoring contract for the Scenario.
-   */
-  scoring_contract: ScoringContract;
-
-  /**
    * The Environment in which the Scenario will run.
    */
   environment_parameters?: ScenarioEnvironment | null;
+
+  /**
+   * The input context for the Scenario.
+   */
+  input_context?: InputContext | null;
 
   /**
    * User defined metadata to attach to the scenario for organization.
@@ -601,11 +601,21 @@ export interface ScenarioUpdateParams {
   metadata?: Record<string, string> | null;
 
   /**
+   * Name of the scenario.
+   */
+  name?: string | null;
+
+  /**
    * A string representation of the reference output to solve the scenario. Commonly
    * can be the result of a git diff or a sequence of command actions to apply to the
    * environment.
    */
   reference_output?: string | null;
+
+  /**
+   * The scoring contract for the Scenario.
+   */
+  scoring_contract?: ScoringContract | null;
 }
 
 export interface ScenarioListParams extends ScenariosCursorIDPageParams {
