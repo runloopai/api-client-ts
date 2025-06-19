@@ -274,6 +274,40 @@ export interface ScenarioRunView {
   start_time_ms?: number;
 }
 
+export interface ScenarioUpdateParameters {
+  /**
+   * The Environment in which the Scenario will run.
+   */
+  environment_parameters?: ScenarioEnvironment | null;
+
+  /**
+   * The input context for the Scenario.
+   */
+  input_context?: InputContext | null;
+
+  /**
+   * User defined metadata to attach to the scenario for organization.
+   */
+  metadata?: Record<string, string> | null;
+
+  /**
+   * Name of the scenario.
+   */
+  name?: string | null;
+
+  /**
+   * A string representation of the reference output to solve the scenario. Commonly
+   * can be the result of a git diff or a sequence of command actions to apply to the
+   * environment.
+   */
+  reference_output?: string | null;
+
+  /**
+   * The scoring contract for the Scenario.
+   */
+  scoring_contract?: ScoringContract | null;
+}
+
 /**
  * A ScenarioDefinitionView represents a repeatable AI coding evaluation test,
  * complete with initial environment and scoring contract.
@@ -671,6 +705,7 @@ export declare namespace Scenarios {
     type ScenarioEnvironment as ScenarioEnvironment,
     type ScenarioRunListView as ScenarioRunListView,
     type ScenarioRunView as ScenarioRunView,
+    type ScenarioUpdateParameters as ScenarioUpdateParameters,
     type ScenarioView as ScenarioView,
     type ScoringContract as ScoringContract,
     type ScoringContractResultView as ScoringContractResultView,
