@@ -158,63 +158,12 @@ export interface InputContextUpdate {
   /**
    * Additional JSON structured input context.
    */
-  additional_context?: InputContextUpdate.AdditionalContext | null;
+  additional_context?: unknown | null;
 
   /**
    * The problem statement for the Scenario.
    */
   problem_statement?: string | null;
-}
-
-export namespace InputContextUpdate {
-  /**
-   * Additional JSON structured input context.
-   */
-  export interface AdditionalContext {
-    array: boolean;
-
-    bigDecimal: boolean;
-
-    bigInteger: boolean;
-
-    binary: boolean;
-
-    boolean: boolean;
-
-    containerNode: boolean;
-
-    double: boolean;
-
-    empty: boolean;
-
-    float: boolean;
-
-    floatingPointNumber: boolean;
-
-    int: boolean;
-
-    integralNumber: boolean;
-
-    long: boolean;
-
-    missingNode: boolean;
-
-    null: boolean;
-
-    number: boolean;
-
-    object: boolean;
-
-    pojo: boolean;
-
-    short: boolean;
-
-    textual: boolean;
-
-    valueNode: boolean;
-
-    nodeType?: 'ARRAY' | 'BINARY' | 'BOOLEAN' | 'MISSING' | 'NULL' | 'NUMBER' | 'OBJECT' | 'POJO' | 'STRING';
-  }
 }
 
 export interface ScenarioCreateParameters {
