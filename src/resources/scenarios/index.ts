@@ -10,6 +10,7 @@ export {
   type ScenarioEnvironment,
   type ScenarioRunListView,
   type ScenarioRunView,
+  type ScenarioUpdateParameters,
   type ScenarioView,
   type ScoringContract,
   type ScoringContractResultView,

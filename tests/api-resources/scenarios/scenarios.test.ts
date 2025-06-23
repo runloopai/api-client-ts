@@ -90,20 +90,8 @@ describe('resource scenarios', () => {
     );
   });
 
-  test('update: only required params', async () => {
-    const responsePromise = client.scenarios.update('id', {
-      input_context: { problem_statement: 'problem_statement' },
-      name: 'name',
-      scoring_contract: {
-        scoring_function_parameters: [
-          {
-            name: 'name',
-            scorer: { pattern: 'pattern', search_directory: 'search_directory', type: 'ast_grep_scorer' },
-            weight: 0,
-          },
-        ],
-      },
-    });
+  test('update', async () => {
+    const responsePromise = client.scenarios.update('id');
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
     const response = await responsePromise;
@@ -113,44 +101,58 @@ describe('resource scenarios', () => {
     expect(dataAndResponse.response).toBe(rawResponse);
   });
 
-  test('update: required and optional params', async () => {
-    const response = await client.scenarios.update('id', {
-      input_context: { problem_statement: 'problem_statement', additional_context: {} },
-      name: 'name',
-      scoring_contract: {
-        scoring_function_parameters: [
-          {
-            name: 'name',
-            scorer: {
-              pattern: 'pattern',
-              search_directory: 'search_directory',
-              type: 'ast_grep_scorer',
-              lang: 'lang',
+  test('update: request options instead of params are passed correctly', async () => {
+    // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
+    await expect(client.scenarios.update('id', { path: '/_stainless_unknown_path' })).rejects.toThrow(
+      Runloop.NotFoundError,
+    );
+  });
+
+  test('update: request options and params are passed correctly', async () => {
+    // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
+    await expect(
+      client.scenarios.update(
+        'id',
+        {
+          environment_parameters: {
+            blueprint_id: 'blueprint_id',
+            launch_parameters: {
+              after_idle: { idle_time_seconds: 0, on_idle: 'shutdown' },
+              architecture: 'x86_64',
+              available_ports: [0],
+              custom_cpu_cores: 0,
+              custom_gb_memory: 0,
+              keep_alive_time_seconds: 0,
+              launch_commands: ['string'],
+              resource_size_request: 'X_SMALL',
+              user_parameters: { uid: 0, username: 'username' },
             },
-            weight: 0,
+            prebuilt_id: 'prebuilt_id',
+            snapshot_id: 'snapshot_id',
+            working_directory: 'working_directory',
           },
-        ],
-      },
-      environment_parameters: {
-        blueprint_id: 'blueprint_id',
-        launch_parameters: {
-          after_idle: { idle_time_seconds: 0, on_idle: 'shutdown' },
-          architecture: 'x86_64',
-          available_ports: [0],
-          custom_cpu_cores: 0,
-          custom_gb_memory: 0,
-          keep_alive_time_seconds: 0,
-          launch_commands: ['string'],
-          resource_size_request: 'X_SMALL',
-          user_parameters: { uid: 0, username: 'username' },
+          input_context: { problem_statement: 'problem_statement', additional_context: {} },
+          metadata: { foo: 'string' },
+          name: 'name',
+          reference_output: 'reference_output',
+          scoring_contract: {
+            scoring_function_parameters: [
+              {
+                name: 'name',
+                scorer: {
+                  pattern: 'pattern',
+                  search_directory: 'search_directory',
+                  type: 'ast_grep_scorer',
+                  lang: 'lang',
+                },
+                weight: 0,
+              },
+            ],
+          },
         },
-        prebuilt_id: 'prebuilt_id',
-        snapshot_id: 'snapshot_id',
-        working_directory: 'working_directory',
-      },
-      metadata: { foo: 'string' },
-      reference_output: 'reference_output',
-    });
+        { path: '/_stainless_unknown_path' },
+      ),
+    ).rejects.toThrow(Runloop.NotFoundError);
   });
 
   test('list', async () => {

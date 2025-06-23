@@ -248,6 +248,7 @@ Types:
 - <code><a href="./src/resources/scenarios/scenarios.ts">ScenarioEnvironment</a></code>
 - <code><a href="./src/resources/scenarios/scenarios.ts">ScenarioRunListView</a></code>
 - <code><a href="./src/resources/scenarios/scenarios.ts">ScenarioRunView</a></code>
+- <code><a href="./src/resources/scenarios/scenarios.ts">ScenarioUpdateParameters</a></code>
 - <code><a href="./src/resources/scenarios/scenarios.ts">ScenarioView</a></code>
 - <code><a href="./src/resources/scenarios/scenarios.ts">ScoringContract</a></code>
 - <code><a href="./src/resources/scenarios/scenarios.ts">ScoringContractResultView</a></code>

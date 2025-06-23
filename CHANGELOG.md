@@ -1,5 +1,26 @@
 # Changelog
 
+## 0.39.0 (2025-06-19)
+
+Full Changelog: [v0.38.0...v0.39.0](https://github.com/runloopai/api-client-ts/compare/v0.38.0...v0.39.0)
+
+### Features
+
+* **api:** api update ([0db16e9](https://github.com/runloopai/api-client-ts/commit/0db16e9eda3c5ec7e63c8f65afadef9b7c630ab3))
+* **api:** api update ([ddfd048](https://github.com/runloopai/api-client-ts/commit/ddfd048cd154d2e10456092c6465e28040515fa2))
+* **client:** add support for endpoint-specific base URLs ([a506179](https://github.com/runloopai/api-client-ts/commit/a506179f1a734e916066a31812d61f5417469395))
+
+
+### Bug Fixes
+
+* publish script — handle NPM errors correctly ([f412848](https://github.com/runloopai/api-client-ts/commit/f412848cc18d763ef895006b6434d4efd579d4dd))
+
+
+### Chores
+
+* **ci:** enable for pull requests ([504409f](https://github.com/runloopai/api-client-ts/commit/504409f05f5d0be862f6e75518234de0cedf76db))
+* **internal:** make base APIResource abstract ([2d0d29a](https://github.com/runloopai/api-client-ts/commit/2d0d29a3e3b0c2d3d2bbea8a2aeb24a26f803198))
+
 ## 0.38.0 (2025-06-14)
 
 Full Changelog: [v0.37.0...v0.38.0](https://github.com/runloopai/api-client-ts/compare/v0.37.0...v0.38.0)
