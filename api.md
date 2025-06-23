@@ -244,6 +244,7 @@ Methods:
 Types:
 
 - <code><a href="./src/resources/scenarios/scenarios.ts">InputContext</a></code>
+- <code><a href="./src/resources/scenarios/scenarios.ts">InputContextUpdate</a></code>
 - <code><a href="./src/resources/scenarios/scenarios.ts">ScenarioCreateParameters</a></code>
 - <code><a href="./src/resources/scenarios/scenarios.ts">ScenarioEnvironment</a></code>
 - <code><a href="./src/resources/scenarios/scenarios.ts">ScenarioRunListView</a></code>
@@ -252,6 +253,7 @@ Types:
 - <code><a href="./src/resources/scenarios/scenarios.ts">ScenarioView</a></code>
 - <code><a href="./src/resources/scenarios/scenarios.ts">ScoringContract</a></code>
 - <code><a href="./src/resources/scenarios/scenarios.ts">ScoringContractResultView</a></code>
+- <code><a href="./src/resources/scenarios/scenarios.ts">ScoringContractUpdate</a></code>
 - <code><a href="./src/resources/scenarios/scenarios.ts">ScoringFunction</a></code>
 - <code><a href="./src/resources/scenarios/scenarios.ts">ScoringFunctionResultView</a></code>
 - <code><a href="./src/resources/scenarios/scenarios.ts">StartScenarioRunParameters</a></code>

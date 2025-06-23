@@ -139,6 +139,69 @@ export interface InputContext {
   additional_context?: unknown | null;
 }
 
+export interface InputContextUpdate {
+  /**
+   * Additional JSON structured input context.
+   */
+  additional_context?: InputContextUpdate.AdditionalContext | null;
+
+  /**
+   * The problem statement for the Scenario.
+   */
+  problem_statement?: string | null;
+}
+
+export namespace InputContextUpdate {
+  /**
+   * Additional JSON structured input context.
+   */
+  export interface AdditionalContext {
+    array: boolean;
+
+    bigDecimal: boolean;
+
+    bigInteger: boolean;
+
+    binary: boolean;
+
+    boolean: boolean;
+
+    containerNode: boolean;
+
+    double: boolean;
+
+    empty: boolean;
+
+    float: boolean;
+
+    floatingPointNumber: boolean;
+
+    int: boolean;
+
+    integralNumber: boolean;
+
+    long: boolean;
+
+    missingNode: boolean;
+
+    null: boolean;
+
+    number: boolean;
+
+    object: boolean;
+
+    pojo: boolean;
+
+    short: boolean;
+
+    textual: boolean;
+
+    valueNode: boolean;
+
+    nodeType?: 'ARRAY' | 'BINARY' | 'BOOLEAN' | 'MISSING' | 'NULL' | 'NUMBER' | 'OBJECT' | 'POJO' | 'STRING';
+  }
+}
+
 export interface ScenarioCreateParameters {
   /**
    * The input context for the Scenario.
@@ -283,7 +346,7 @@ export interface ScenarioUpdateParameters {
   /**
    * The input context for the Scenario.
    */
-  input_context?: InputContext | null;
+  input_context?: InputContextUpdate | null;
 
   /**
    * User defined metadata to attach to the scenario for organization.
@@ -305,7 +368,7 @@ export interface ScenarioUpdateParameters {
   /**
    * The scoring contract for the Scenario.
    */
-  scoring_contract?: ScoringContract | null;
+  scoring_contract?: ScoringContractUpdate | null;
 }
 
 /**
@@ -381,6 +444,13 @@ export interface ScoringContractResultView {
    * List of all individual scoring function results.
    */
   scoring_function_results: Array<ScoringFunctionResultView>;
+}
+
+export interface ScoringContractUpdate {
+  /**
+   * A list of scoring functions used to evaluate the Scenario.
+   */
+  scoring_function_parameters?: Array<ScoringFunction> | null;
 }
 
 /**
@@ -627,7 +697,7 @@ export interface ScenarioUpdateParams {
   /**
    * The input context for the Scenario.
    */
-  input_context?: InputContext | null;
+  input_context?: InputContextUpdate | null;
 
   /**
    * User defined metadata to attach to the scenario for organization.
@@ -649,7 +719,7 @@ export interface ScenarioUpdateParams {
   /**
    * The scoring contract for the Scenario.
    */
-  scoring_contract?: ScoringContract | null;
+  scoring_contract?: ScoringContractUpdate | null;
 }
 
 export interface ScenarioListParams extends ScenariosCursorIDPageParams {
@@ -701,6 +771,7 @@ Scenarios.ScorerListResponsesScenarioScorersCursorIDPage = ScorerListResponsesSc
 export declare namespace Scenarios {
   export {
     type InputContext as InputContext,
+    type InputContextUpdate as InputContextUpdate,
     type ScenarioCreateParameters as ScenarioCreateParameters,
     type ScenarioEnvironment as ScenarioEnvironment,
     type ScenarioRunListView as ScenarioRunListView,
@@ -709,6 +780,7 @@ export declare namespace Scenarios {
     type ScenarioView as ScenarioView,
     type ScoringContract as ScoringContract,
     type ScoringContractResultView as ScoringContractResultView,
+    type ScoringContractUpdate as ScoringContractUpdate,
     type ScoringFunction as ScoringFunction,
     type ScoringFunctionResultView as ScoringFunctionResultView,
     type StartScenarioRunParameters as StartScenarioRunParameters,

@@ -115,6 +115,7 @@ import {
 } from './resources/devboxes/devboxes';
 import {
   InputContext,
+  InputContextUpdate,
   ScenarioCreateParameters,
   ScenarioCreateParams,
   ScenarioEnvironment,
@@ -130,6 +131,7 @@ import {
   Scenarios,
   ScoringContract,
   ScoringContractResultView,
+  ScoringContractUpdate,
   ScoringFunction,
   ScoringFunctionResultView,
   StartScenarioRunParameters,
@@ -437,6 +439,7 @@ export declare namespace Runloop {
   export {
     Scenarios as Scenarios,
     type InputContext as InputContext,
+    type InputContextUpdate as InputContextUpdate,
     type ScenarioCreateParameters as ScenarioCreateParameters,
     type ScenarioEnvironment as ScenarioEnvironment,
     type ScenarioRunListView as ScenarioRunListView,
@@ -445,6 +448,7 @@ export declare namespace Runloop {
     type ScenarioView as ScenarioView,
     type ScoringContract as ScoringContract,
     type ScoringContractResultView as ScoringContractResultView,
+    type ScoringContractUpdate as ScoringContractUpdate,
     type ScoringFunction as ScoringFunction,
     type ScoringFunctionResultView as ScoringFunctionResultView,
     type StartScenarioRunParameters as StartScenarioRunParameters,
