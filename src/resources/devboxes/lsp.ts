@@ -614,7 +614,7 @@ export interface HealthStatusResponse {
 
   moduleName: string;
 
-  pendingWork: Record<string, unknown>;
+  pendingWork: { [key: string]: unknown };
 
   status: string;
 
@@ -779,7 +779,7 @@ export interface Range {
 /**
  * Construct a type with a set of properties K of type T
  */
-export type RecordStringTextEditArray = Record<string, Array<TextEdit>>;
+export type RecordStringTextEditArray = { [key: string]: Array<TextEdit> };
 
 export interface ReferencesRequestBody {
   character: number;

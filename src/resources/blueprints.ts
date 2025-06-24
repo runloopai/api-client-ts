@@ -121,7 +121,7 @@ export interface BlueprintBuildParameters {
   /**
    * (Optional) Map of paths and file contents to write before setup..
    */
-  file_mounts?: Record<string, string> | null;
+  file_mounts?: { [key: string]: string } | null;
 
   /**
    * Parameters to configure your Devbox at launch time.
@@ -217,7 +217,7 @@ export interface BlueprintCreateParams {
   /**
    * (Optional) Map of paths and file contents to write before setup..
    */
-  file_mounts?: Record<string, string> | null;
+  file_mounts?: { [key: string]: string } | null;
 
   /**
    * Parameters to configure your Devbox at launch time.
@@ -256,7 +256,7 @@ export interface BlueprintPreviewParams {
   /**
    * (Optional) Map of paths and file contents to write before setup..
    */
-  file_mounts?: Record<string, string> | null;
+  file_mounts?: { [key: string]: string } | null;
 
   /**
    * Parameters to configure your Devbox at launch time.

@@ -175,7 +175,7 @@ export interface ScenarioCreateParameters {
   /**
    * User defined metadata to attach to the scenario for organization.
    */
-  metadata?: Record<string, string> | null;
+  metadata?: { [key: string]: string } | null;
 
   /**
    * A string representation of the reference output to solve the scenario. Commonly
@@ -248,7 +248,7 @@ export interface ScenarioRunView {
   /**
    * User defined metadata to attach to the scenario run for organization.
    */
-  metadata: Record<string, string>;
+  metadata: { [key: string]: string };
 
   /**
    * ID of the Scenario that has been run.
@@ -300,7 +300,7 @@ export interface ScenarioUpdateParameters {
   /**
    * User defined metadata to attach to the scenario for organization.
    */
-  metadata?: Record<string, string> | null;
+  metadata?: { [key: string]: string } | null;
 
   /**
    * Name of the scenario.
@@ -338,7 +338,7 @@ export interface ScenarioView {
   /**
    * User defined metadata to attach to the scenario for organization.
    */
-  metadata: Record<string, string>;
+  metadata: { [key: string]: string };
 
   /**
    * The name of the Scenario.
@@ -595,7 +595,7 @@ export interface StartScenarioRunParameters {
   /**
    * User defined metadata to attach to the run for organization.
    */
-  metadata?: Record<string, string> | null;
+  metadata?: { [key: string]: string } | null;
 
   /**
    * Display name of the run.
@@ -627,7 +627,7 @@ export interface ScenarioCreateParams {
   /**
    * User defined metadata to attach to the scenario for organization.
    */
-  metadata?: Record<string, string> | null;
+  metadata?: { [key: string]: string } | null;
 
   /**
    * A string representation of the reference output to solve the scenario. Commonly
@@ -651,7 +651,7 @@ export interface ScenarioUpdateParams {
   /**
    * User defined metadata to attach to the scenario for organization.
    */
-  metadata?: Record<string, string> | null;
+  metadata?: { [key: string]: string } | null;
 
   /**
    * Name of the scenario.
@@ -704,7 +704,7 @@ export interface ScenarioStartRunParams {
   /**
    * User defined metadata to attach to the run for organization.
    */
-  metadata?: Record<string, string> | null;
+  metadata?: { [key: string]: string } | null;
 
   /**
    * Display name of the run.

@@ -529,7 +529,7 @@ export interface DevboxSnapshotView {
   /**
    * User defined metadata associated with the snapshot.
    */
-  metadata: Record<string, string>;
+  metadata: { [key: string]: string };
 
   /**
    * The source Devbox ID this snapshot was created from.
@@ -589,7 +589,7 @@ export interface DevboxView {
   /**
    * The user defined Devbox metadata.
    */
-  metadata: Record<string, string>;
+  metadata: { [key: string]: string };
 
   /**
    * A list of state transitions in order with durations
@@ -736,12 +736,12 @@ export interface DevboxCreateParams {
   /**
    * (Optional) Environment variables used to configure your Devbox.
    */
-  environment_variables?: Record<string, string> | null;
+  environment_variables?: { [key: string]: string } | null;
 
   /**
    * (Optional) Map of paths and file contents to write before setup..
    */
-  file_mounts?: Record<string, string> | null;
+  file_mounts?: { [key: string]: string } | null;
 
   /**
    * Parameters to configure the resources and launch time behavior of the Devbox.
@@ -751,7 +751,7 @@ export interface DevboxCreateParams {
   /**
    * User defined metadata to attach to the devbox for organization.
    */
-  metadata?: Record<string, string> | null;
+  metadata?: { [key: string]: string } | null;
 
   /**
    * (Optional) A user specified name to give the Devbox.
@@ -775,7 +775,7 @@ export interface DevboxCreateParams {
    * {"DB_PASS": "DATABASE_PASSWORD"} sets environment variable 'DB_PASS' to the
    * value of secret 'DATABASE_PASSWORD'.
    */
-  secrets?: Record<string, string> | null;
+  secrets?: { [key: string]: string } | null;
 
   /**
    * Snapshot ID to use for the Devbox. Only one of (Snapshot ID, Blueprint ID,
@@ -788,7 +788,7 @@ export interface DevboxUpdateParams {
   /**
    * User defined metadata to attach to the devbox for organization.
    */
-  metadata?: Record<string, string> | null;
+  metadata?: { [key: string]: string } | null;
 
   /**
    * (Optional) A user specified name to give the Devbox.
@@ -897,7 +897,7 @@ export interface DevboxSnapshotDiskParams {
   /**
    * (Optional) Metadata used to describe the snapshot
    */
-  metadata?: Record<string, string> | null;
+  metadata?: { [key: string]: string } | null;
 
   /**
    * (Optional) A user specified name to give the snapshot
@@ -909,7 +909,7 @@ export interface DevboxSnapshotDiskAsyncParams {
   /**
    * (Optional) Metadata used to describe the snapshot
    */
-  metadata?: Record<string, string> | null;
+  metadata?: { [key: string]: string } | null;
 
   /**
    * (Optional) A user specified name to give the snapshot

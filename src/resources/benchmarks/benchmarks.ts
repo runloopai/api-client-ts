@@ -128,7 +128,7 @@ export interface BenchmarkCreateParameters {
   /**
    * User defined metadata to attach to the benchmark for organization.
    */
-  metadata?: Record<string, string> | null;
+  metadata?: { [key: string]: string } | null;
 
   /**
    * The Scenario IDs that make up the Benchmark.
@@ -167,7 +167,7 @@ export interface BenchmarkRunView {
   /**
    * User defined metadata to attach to the benchmark run for organization.
    */
-  metadata: Record<string, string>;
+  metadata: { [key: string]: string };
 
   /**
    * The time the benchmark run execution started (Unix timestamp milliseconds).
@@ -209,7 +209,7 @@ export interface BenchmarkView {
   /**
    * User defined metadata to attach to the benchmark for organization.
    */
-  metadata: Record<string, string>;
+  metadata: { [key: string]: string };
 
   /**
    * The name of the Benchmark.
@@ -249,7 +249,7 @@ export interface StartBenchmarkRunParameters {
   /**
    * User defined metadata to attach to the benchmark run for organization.
    */
-  metadata?: Record<string, string> | null;
+  metadata?: { [key: string]: string } | null;
 
   /**
    * Display name of the run.
@@ -266,7 +266,7 @@ export interface BenchmarkCreateParams {
   /**
    * User defined metadata to attach to the benchmark for organization.
    */
-  metadata?: Record<string, string> | null;
+  metadata?: { [key: string]: string } | null;
 
   /**
    * The Scenario IDs that make up the Benchmark.
@@ -283,7 +283,7 @@ export interface BenchmarkUpdateParams {
   /**
    * User defined metadata to attach to the benchmark for organization.
    */
-  metadata?: Record<string, string> | null;
+  metadata?: { [key: string]: string } | null;
 
   /**
    * The Scenario IDs that make up the Benchmark.
@@ -316,7 +316,7 @@ export interface BenchmarkStartRunParams {
   /**
    * User defined metadata to attach to the benchmark run for organization.
    */
-  metadata?: Record<string, string> | null;
+  metadata?: { [key: string]: string } | null;
 
   /**
    * Display name of the run.
