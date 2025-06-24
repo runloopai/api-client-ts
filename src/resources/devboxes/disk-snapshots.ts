@@ -93,7 +93,7 @@ export interface DiskSnapshotUpdateParams {
   /**
    * (Optional) Metadata used to describe the snapshot
    */
-  metadata?: Record<string, string> | null;
+  metadata?: { [key: string]: string } | null;
 
   /**
    * (Optional) A user specified name to give the snapshot
