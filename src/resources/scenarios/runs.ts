@@ -6,6 +6,7 @@ import * as Core from '../../core';
 import * as ScenariosAPI from './scenarios';
 import { ScenarioRunViewsBenchmarkRunsCursorIDPage } from './scenarios';
 import { type BenchmarkRunsCursorIDPageParams } from '../../pagination';
+import { type Response } from '../../_shims/index';
 
 export class Runs extends APIResource {
   /**
@@ -52,6 +53,18 @@ export class Runs extends APIResource {
    */
   complete(id: string, options?: Core.RequestOptions): Core.APIPromise<ScenariosAPI.ScenarioRunView> {
     return this._client.post(`/v1/scenarios/runs/${id}/complete`, options);
+  }
+
+  /**
+   * Download a zip file containing all logs for a Scenario run from the associated
+   * devbox.
+   */
+  downloadLogs(id: string, options?: Core.RequestOptions): Core.APIPromise<Response> {
+    return this._client.post(`/v1/scenarios/runs/${id}/download_logs`, {
+      ...options,
+      headers: { Accept: 'application/zip', ...options?.headers },
+      __binaryResponse: true,
+    });
   }
 
   /**
