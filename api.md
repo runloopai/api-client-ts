@@ -275,6 +275,7 @@ Methods:
 - <code title="get /v1/scenarios/runs">client.scenarios.runs.<a href="./src/resources/scenarios/runs.ts">list</a>({ ...params }) -> ScenarioRunViewsBenchmarkRunsCursorIDPage</code>
 - <code title="post /v1/scenarios/runs/{id}/cancel">client.scenarios.runs.<a href="./src/resources/scenarios/runs.ts">cancel</a>(id) -> ScenarioRunView</code>
 - <code title="post /v1/scenarios/runs/{id}/complete">client.scenarios.runs.<a href="./src/resources/scenarios/runs.ts">complete</a>(id) -> ScenarioRunView</code>
+- <code title="post /v1/scenarios/runs/{id}/download_logs">client.scenarios.runs.<a href="./src/resources/scenarios/runs.ts">downloadLogs</a>(id) -> Response</code>
 - <code title="post /v1/scenarios/runs/{id}/score">client.scenarios.runs.<a href="./src/resources/scenarios/runs.ts">score</a>(id) -> ScenarioRunView</code>
 
 ## Scorers
