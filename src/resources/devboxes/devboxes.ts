@@ -220,6 +220,7 @@ export class Devboxes extends APIResource {
   ): Core.APIPromise<Response> {
     return this._client.post(`/v1/devboxes/${id}/download_file`, {
       body,
+      timeout: (this._client as any)._options.timeout ?? 600000,
       ...options,
       headers: { Accept: 'application/octet-stream', ...options?.headers },
       __binaryResponse: true,
@@ -299,6 +300,7 @@ export class Devboxes extends APIResource {
   ): Core.APIPromise<string> {
     return this._client.post(`/v1/devboxes/${id}/read_file_contents`, {
       body,
+      timeout: (this._client as any)._options.timeout ?? 600000,
       ...options,
       headers: { Accept: 'text/plain', ...options?.headers },
     });
@@ -401,7 +403,11 @@ export class Devboxes extends APIResource {
   ): Core.APIPromise<unknown> {
     return this._client.post(
       `/v1/devboxes/${id}/upload_file`,
-      Core.multipartFormRequestOptions({ body, ...options }),
+      Core.multipartFormRequestOptions({
+        body,
+        timeout: (this._client as any)._options.timeout ?? 600000,
+        ...options,
+      }),
     );
   }
 
@@ -414,7 +420,11 @@ export class Devboxes extends APIResource {
     body: DevboxWriteFileContentsParams,
     options?: Core.RequestOptions,
   ): Core.APIPromise<DevboxExecutionDetailView> {
-    return this._client.post(`/v1/devboxes/${id}/write_file_contents`, { body, ...options });
+    return this._client.post(`/v1/devboxes/${id}/write_file_contents`, {
+      body,
+      timeout: (this._client as any)._options.timeout ?? 600000,
+      ...options,
+    });
   }
 }
 
