@@ -216,12 +216,12 @@ describe('instantiate client', () => {
   });
 
   test('maxRetries option is correctly set', () => {
-    const client = new Runloop({ maxRetries: 6, bearerToken: 'My Bearer Token' });
-    expect(client.maxRetries).toEqual(6);
+    const client = new Runloop({ maxRetries: 10, bearerToken: 'My Bearer Token' });
+    expect(client.maxRetries).toEqual(10);
 
     // default
     const client2 = new Runloop({ bearerToken: 'My Bearer Token' });
-    expect(client2.maxRetries).toEqual(3);
+    expect(client2.maxRetries).toEqual(5);
   });
 
   test('with environment variable arguments', () => {
