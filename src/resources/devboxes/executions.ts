@@ -80,7 +80,11 @@ export class Executions extends APIResource {
     body: ExecutionExecuteSyncParams,
     options?: Core.RequestOptions,
   ): Core.APIPromise<DevboxesAPI.DevboxExecutionDetailView> {
-    return this._client.post(`/v1/devboxes/${id}/execute_sync`, { body, ...options });
+    return this._client.post(`/v1/devboxes/${id}/execute_sync`, {
+      body,
+      timeout: (this._client as any)._options.timeout ?? 600000,
+      ...options,
+    });
   }
 
   /**
