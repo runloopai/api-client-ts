@@ -216,12 +216,12 @@ describe('instantiate client', () => {
   });
 
   test('maxRetries option is correctly set', () => {
-    const client = new Runloop({ maxRetries: 0, bearerToken: 'My Bearer Token' });
-    expect(client.maxRetries).toEqual(0);
+    const client = new Runloop({ maxRetries: 6, bearerToken: 'My Bearer Token' });
+    expect(client.maxRetries).toEqual(6);
 
     // default
     const client2 = new Runloop({ bearerToken: 'My Bearer Token' });
-    expect(client2.maxRetries).toEqual(0);
+    expect(client2.maxRetries).toEqual(3);
   });
 
   test('with environment variable arguments', () => {
@@ -281,6 +281,30 @@ describe('request building', () => {
 });
 
 describe('retries', () => {
+  test('retry on timeout', async () => {
+    let count = 0;
+    const testFetch = async (url: RequestInfo, { signal }: RequestInit = {}): Promise<Response> => {
+      if (count++ === 0) {
+        return new Promise(
+          (resolve, reject) => signal?.addEventListener('abort', () => reject(new Error('timed out'))),
+        );
+      }
+      return new Response(JSON.stringify({ a: 1 }), { headers: { 'Content-Type': 'application/json' } });
+    };
+
+    const client = new Runloop({ bearerToken: 'My Bearer Token', timeout: 10, fetch: testFetch });
+
+    expect(await client.request({ path: '/foo', method: 'get' })).toEqual({ a: 1 });
+    expect(count).toEqual(2);
+    expect(
+      await client
+        .request({ path: '/foo', method: 'get' })
+        .asResponse()
+        .then((r) => r.text()),
+    ).toEqual(JSON.stringify({ a: 1 }));
+    expect(count).toEqual(3);
+  });
+
   test('retry count header', async () => {
     let count = 0;
     let capturedRequest: RequestInit | undefined;
@@ -411,7 +435,7 @@ describe('retries', () => {
       return new Response(JSON.stringify({ a: 1 }), { headers: { 'Content-Type': 'application/json' } });
     };
 
-    const client = new Runloop({ bearerToken: 'My Bearer Token', fetch: testFetch, maxRetries: 3 });
+    const client = new Runloop({ bearerToken: 'My Bearer Token', fetch: testFetch });
 
     expect(await client.request({ path: '/foo', method: 'get' })).toEqual({ a: 1 });
     expect(count).toEqual(2);
@@ -438,7 +462,7 @@ describe('retries', () => {
       return new Response(JSON.stringify({ a: 1 }), { headers: { 'Content-Type': 'application/json' } });
     };
 
-    const client = new Runloop({ bearerToken: 'My Bearer Token', fetch: testFetch, maxRetries: 3 });
+    const client = new Runloop({ bearerToken: 'My Bearer Token', fetch: testFetch });
 
     expect(await client.request({ path: '/foo', method: 'get' })).toEqual({ a: 1 });
     expect(count).toEqual(2);

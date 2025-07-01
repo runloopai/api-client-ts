@@ -530,6 +530,11 @@ export namespace ScoringFunction {
     type: 'python_script_scorer';
 
     /**
+     * Python version to run scoring. Default is "==3.12.10"
+     */
+    python_version_constraint?: string | null;
+
+    /**
      * Package dependencies to be installed. The requirements should be a valid
      * requirements.txt file.
      */

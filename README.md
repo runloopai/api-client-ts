@@ -115,7 +115,7 @@ Error codes are as follows:
 
 ### Retries
 
-Certain errors will be automatically retried 0 times by default, with a short exponential backoff.
+Certain errors will be automatically retried 3 times by default, with a short exponential backoff.
 Connection errors (for example, due to a network connectivity problem), 408 Request Timeout, 409 Conflict,
 429 Rate Limit, and >=500 Internal errors will all be retried by default.
 
@@ -136,13 +136,13 @@ await client.devboxes.create({
 
 ### Timeouts
 
-Requests time out after 1 minute by default. You can configure this with a `timeout` option:
+Requests time out after 30 seconds by default. You can configure this with a `timeout` option:
 
 <!-- prettier-ignore -->
 ```ts
 // Configure the default for all requests:
 const client = new Runloop({
-  timeout: 20 * 1000, // 20 seconds (default is 1 minute)
+  timeout: 20 * 1000, // 20 seconds (default is 30 seconds)
 });
 
 // Override per-request:
