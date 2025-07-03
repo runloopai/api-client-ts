@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.42.1 (2025-07-03)
+
+Full Changelog: [v0.42.0...v0.42.1](https://github.com/runloopai/api-client-ts/compare/v0.42.0...v0.42.1)
+
+### Bug Fixes
+
+* **client:** don't send `Content-Type` for bodyless methods ([e53b31f](https://github.com/runloopai/api-client-ts/commit/e53b31fe7ec7bd5879499d28bc8960fed03a23cf))
+
+
+### Chores
+
+* mention unit type in timeout docs ([4c9542a](https://github.com/runloopai/api-client-ts/commit/4c9542a9ac6dfe394bef91c162436f0cddfe6355))
+
 ## 0.42.0 (2025-07-01)
 
 Full Changelog: [v0.41.0...v0.42.0](https://github.com/runloopai/api-client-ts/compare/v0.41.0...v0.42.0)
