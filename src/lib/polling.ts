@@ -1,3 +1,5 @@
+import { APIError } from '../error';
+
 export interface PollingOptions<T> {
   /** Initial delay before starting polling (in milliseconds) */
   initialDelayMs?: number;
@@ -14,6 +16,11 @@ export interface PollingOptions<T> {
   shouldStop?: (result: T) => boolean;
   /** Optional callback for each polling attempt */
   onPollingAttempt?: (attempt: number, result: T) => void;
+  /**
+   * Optional error handler for polling requests
+   * Return a result to continue polling with that result, or throw to stop polling
+   */
+  onError?: (error: APIError) => T;
 }
 
 const DEFAULT_OPTIONS: Partial<PollingOptions<any>> = {
@@ -59,10 +66,11 @@ export async function poll<T>(
   pollingRequest: () => Promise<T>,
   options: PollingOptions<T> = {},
 ): Promise<T> {
-  const { initialDelayMs, pollingIntervalMs, maxAttempts, timeoutMs, shouldStop, onPollingAttempt } = {
-    ...DEFAULT_OPTIONS,
-    ...options,
-  };
+  const { initialDelayMs, pollingIntervalMs, maxAttempts, timeoutMs, shouldStop, onPollingAttempt, onError } =
+    {
+      ...DEFAULT_OPTIONS,
+      ...options,
+    };
 
   // Start timeout timer if specified
   const timeoutPromise =
@@ -75,7 +83,16 @@ export async function poll<T>(
     : null;
 
   // Initial request
-  let result = await initialRequest();
+  let result: T;
+  try {
+    result = await initialRequest();
+  } catch (error) {
+    if (onError && error instanceof APIError) {
+      result = onError(error);
+    } else {
+      throw error;
+    }
+  }
 
   // Check if we should stop after initial request
   if (shouldStop?.(result)) {
@@ -92,7 +109,16 @@ export async function poll<T>(
 
     // Create polling promise
     const pollingPromise = async () => {
-      result = await pollingRequest();
+      try {
+        result = await pollingRequest();
+      } catch (error) {
+        if (onError && error instanceof APIError) {
+          result = onError(error);
+        } else {
+          throw error;
+        }
+      }
+
       onPollingAttempt?.(attempts, result);
 
       if (shouldStop?.(result)) {
