@@ -114,9 +114,9 @@ import {
   type DiskSnapshotsCursorIDPageParams,
 } from '../../pagination';
 import { type Response } from '../../_shims/index';
-import { PollingOptions, poll } from '@runloop/api-client/lib/polling';
-import { RunloopError } from '../..';
+import { poll, PollingOptions } from '@runloop/api-client/lib/polling';
 import { DevboxTools } from './tools';
+import { RunloopError } from '../..';
 
 type DevboxStatus = DevboxView['status'];
 const DEVBOX_BOOTING_STATES: DevboxStatus[] = ['provisioning', 'initializing'];
@@ -163,13 +163,31 @@ export class Devboxes extends APIResource {
     id: string,
     options?: Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxView>> },
   ): Promise<DevboxView> {
+    const longPoll = (): Promise<DevboxView> => {
+      // This either returns a DevboxView when status is running or failure;
+      // Otherwise it throws an 408 error when times out.
+      return this._client.post(`/v1/devboxes/${id}/wait_for_status`, {
+        body: { statuses: ['running', 'failure'] },
+        ...options,
+      });
+    };
+
     const finalResult = await poll(
-      () => this.retrieve(id, options),
-      () => this.retrieve(id, options),
+      () => longPoll(),
+      () => longPoll(),
       {
         ...options?.polling,
         shouldStop: (result) => {
           return !DEVBOX_BOOTING_STATES.includes(result.status);
+        },
+        onError: (error) => {
+          if (error.status === 408) {
+            // Return a placeholder result to continue polling
+            return { status: 'provisioning' } as DevboxView;
+          }
+
+          // For any other error, rethrow it
+          throw error;
         },
       },
     );
