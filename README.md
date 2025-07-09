@@ -117,7 +117,8 @@ Error codes are as follows:
 
 Certain errors will be automatically retried 5 times by default, with a short exponential backoff.
 Connection errors (for example, due to a network connectivity problem), 408 Request Timeout, 409 Conflict,
-429 Rate Limit, and >=500 Internal errors will all be retried by default.
+429 Rate Limit, and >=500 Internal errors will all be retried by default for GET requests. For POST requests, 
+only 429 errors will be retried.
 
 You can use the `maxRetries` option to configure or disable this:
 
@@ -125,12 +126,12 @@ You can use the `maxRetries` option to configure or disable this:
 ```js
 // Configure the default for all requests:
 const client = new Runloop({
-  maxRetries: 0, // default is 2
+  maxRetries: 0, // default is 5
 });
 
 // Or, configure per-request:
 await client.devboxes.create({
-  maxRetries: 5,
+  maxRetries: 10,
 });
 ```
 
