@@ -158,6 +158,9 @@ export class Devboxes extends APIResource {
   /**
    * Wait for a devbox to reach the running state.
    * Polls the devbox status until it reaches running state or fails with an error.
+   *
+   * @param id - Devbox ID
+   * @param options - request options to specify retries, timeout, polling, etc.
    */
   async awaitRunning(
     id: string,
@@ -168,7 +171,6 @@ export class Devboxes extends APIResource {
       // Otherwise it throws an 408 error when times out.
       return this._client.post(`/v1/devboxes/${id}/wait_for_status`, {
         body: { statuses: ['running', 'failure'] },
-        ...options,
       });
     };
 
@@ -202,6 +204,9 @@ export class Devboxes extends APIResource {
   /**
    * Create a devbox and wait for it to reach the running state.
    * This is a convenience method that combines create() and awaitDevboxRunning().
+   *
+   * @param body - DevboxCreateParams
+   * @param options - request options to specify retries, timeout, polling, etc.
    */
   async createAndAwaitRunning(
     body?: DevboxCreateParams,

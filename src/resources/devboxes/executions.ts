@@ -49,6 +49,10 @@ export class Executions extends APIResource {
   /**
    * Wait for an async execution to complete.
    * Polls the execution status until it reaches completed state.
+   *
+   * @param id - Devbox ID
+   * @param executionId - Execution ID
+   * @param options - request options to specify retries, timeout, polling, etc.
    */
   async awaitCompleted(
     id: string,
@@ -57,13 +61,30 @@ export class Executions extends APIResource {
       polling?: Partial<PollingOptions<DevboxesAPI.DevboxAsyncExecutionDetailView>>;
     },
   ): Promise<DevboxesAPI.DevboxAsyncExecutionDetailView> {
+    const longPoll = (): Promise<DevboxesAPI.DevboxAsyncExecutionDetailView> => {
+      // This either returns a DevboxAsyncExecutionDetailView when execution status is completed;
+      // Otherwise it throws an 408 error when times out.
+      return this._client.post(`/v1/devboxes/${id}/executions/${executionId}/wait_for_status`, {
+        body: { statuses: ['completed'] },
+      });
+    };
+
     const finalResult = await poll(
-      () => this.retrieve(id, executionId, options),
-      () => this.retrieve(id, executionId, options),
+      () => longPoll(),
+      () => longPoll(),
       {
         ...options?.polling,
         shouldStop: (result: DevboxesAPI.DevboxAsyncExecutionDetailView) => {
           return result.status === 'completed';
+        },
+        onError: (error) => {
+          if (error.status === 408) {
+            // Return a placeholder result to continue polling
+            return { status: 'running' } as DevboxesAPI.DevboxAsyncExecutionDetailView;
+          }
+
+          // For any other error, rethrow it
+          throw error;
         },
       },
     );
