@@ -2,6 +2,7 @@
 
 import Runloop from '@runloop/api-client';
 import { Response } from 'node-fetch';
+import { APIError } from '../../../src/error';
 
 const client = new Runloop({
   bearerToken: 'My Bearer Token',
@@ -91,5 +92,135 @@ describe('resource executions', () => {
     await expect(
       client.devboxes.executions.kill('devbox_id', 'execution_id', { path: '/_stainless_unknown_path' }),
     ).rejects.toThrow(Runloop.NotFoundError);
+  });
+
+  test('awaitCompleted: polls until execution reaches completed state', async () => {
+    const mockPost = jest.spyOn(client.devboxes.executions['_client'], 'post');
+
+    // Mock the polling responses - first running, then completed
+    mockPost
+      .mockResolvedValueOnce({
+        devbox_id: 'devbox-id',
+        execution_id: 'exec-id',
+        status: 'running',
+      })
+      .mockResolvedValueOnce({
+        devbox_id: 'devbox-id',
+        execution_id: 'exec-id',
+        status: 'completed',
+        exit_status: 0,
+        stdout: 'Success',
+        stderr: '',
+      });
+
+    const result = await client.devboxes.executions.awaitCompleted('devbox-id', 'exec-id');
+
+    expect(result).toEqual({
+      devbox_id: 'devbox-id',
+      execution_id: 'exec-id',
+      status: 'completed',
+      exit_status: 0,
+      stdout: 'Success',
+      stderr: '',
+    });
+    expect(mockPost).toHaveBeenCalledTimes(2);
+    expect(mockPost).toHaveBeenCalledWith('/v1/devboxes/devbox-id/executions/exec-id/wait_for_status', {
+      body: { statuses: ['completed'] },
+    });
+
+    mockPost.mockRestore();
+  });
+
+  test('awaitCompleted: handles 408 timeout errors and continues polling', async () => {
+    const mockPost = jest.spyOn(client.devboxes.executions['_client'], 'post');
+
+    // Mock 408 error followed by success
+    const timeoutError = new APIError(408, undefined, 'Request timeout', {});
+
+    mockPost.mockRejectedValueOnce(timeoutError).mockResolvedValueOnce({
+      devbox_id: 'devbox-id',
+      execution_id: 'exec-id',
+      status: 'completed',
+      exit_status: 0,
+      stdout: 'Success',
+      stderr: '',
+    });
+
+    const result = await client.devboxes.executions.awaitCompleted('devbox-id', 'exec-id');
+
+    expect(result).toEqual({
+      devbox_id: 'devbox-id',
+      execution_id: 'exec-id',
+      status: 'completed',
+      exit_status: 0,
+      stdout: 'Success',
+      stderr: '',
+    });
+    expect(mockPost).toHaveBeenCalledTimes(2);
+
+    mockPost.mockRestore();
+  });
+
+  test('awaitCompleted: rethrows non-408 errors', async () => {
+    const mockPost = jest.spyOn(client.devboxes.executions['_client'], 'post');
+
+    const serverError = new APIError(500, undefined, 'Server error', {});
+
+    mockPost.mockRejectedValueOnce(serverError);
+
+    await expect(client.devboxes.executions.awaitCompleted('devbox-id', 'exec-id')).rejects.toThrow(
+      'Server error',
+    );
+
+    mockPost.mockRestore();
+  });
+
+  test('awaitCompleted: stops polling when execution status is completed', async () => {
+    const mockPost = jest.spyOn(client.devboxes.executions['_client'], 'post');
+
+    // Mock immediate success
+    mockPost.mockResolvedValueOnce({
+      devbox_id: 'devbox-id',
+      execution_id: 'exec-id',
+      status: 'completed',
+      exit_status: 0,
+      stdout: 'Success',
+      stderr: '',
+    });
+
+    const result = await client.devboxes.executions.awaitCompleted('devbox-id', 'exec-id');
+
+    expect(result.status).toBe('completed');
+    // The poll function calls the longPoll function for both initial and polling - but since it's immediately completed, it should only call once
+    expect(mockPost).toHaveBeenCalledTimes(1);
+
+    mockPost.mockRestore();
+  });
+
+  test('awaitCompleted: continues polling when execution status is queued', async () => {
+    const mockPost = jest.spyOn(client.devboxes.executions['_client'], 'post');
+
+    // Mock queued then completed
+    mockPost
+      .mockResolvedValueOnce({
+        devbox_id: 'devbox-id',
+        execution_id: 'exec-id',
+        status: 'queued',
+      })
+      .mockResolvedValueOnce({
+        devbox_id: 'devbox-id',
+        execution_id: 'exec-id',
+        status: 'completed',
+        exit_status: 0,
+        stdout: 'Success',
+        stderr: '',
+      });
+
+    const result = await client.devboxes.executions.awaitCompleted('devbox-id', 'exec-id');
+
+    expect(result.status).toBe('completed');
+    expect(mockPost).toHaveBeenCalledTimes(2);
+
+    mockPost.mockRestore();
   });
 });
