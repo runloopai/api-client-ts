@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.42.2 (2025-07-10)
+
+Full Changelog: [v0.42.1...v0.42.2](https://github.com/runloopai/api-client-ts/compare/v0.42.1...v0.42.2)
+
+### Chores
+
+* make some internal functions async ([d757491](https://github.com/runloopai/api-client-ts/commit/d757491fee3718023ef834e42b4c0fe1323f4c99))
+
 ## 0.42.1 (2025-07-08)
 
 Full Changelog: [v0.42.0...v0.42.1](https://github.com/runloopai/api-client-ts/compare/v0.42.0...v0.42.1)
