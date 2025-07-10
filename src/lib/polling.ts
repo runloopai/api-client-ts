@@ -72,75 +72,87 @@ export async function poll<T>(
       ...options,
     };
 
-  // Start timeout timer if specified
+  let result: T;
+  let timeoutId: NodeJS.Timeout | null = null;
   const timeoutPromise =
     timeoutMs ?
       new Promise<never>((_, reject) => {
-        setTimeout(() => {
+        timeoutId = setTimeout(() => {
           reject(new PollingTimeoutError(`Polling timed out after ${timeoutMs}ms`, result));
         }, timeoutMs);
       })
     : null;
 
-  // Initial request
-  let result: T;
+  const clearTimeoutIfExists = () => {
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+      timeoutId = null;
+    }
+  };
+
   try {
-    result = await initialRequest();
-  } catch (error) {
-    if (onError && error instanceof APIError) {
-      result = onError(error);
-    } else {
-      throw error;
+    // Initial request
+    try {
+      result = await initialRequest();
+    } catch (error) {
+      if (onError && error instanceof APIError) {
+        result = onError(error);
+      } else {
+        throw error;
+      }
     }
-  }
 
-  // Check if we should stop after initial request
-  if (shouldStop?.(result)) {
-    return result;
-  }
+    // Check if we should stop after initial request
+    if (shouldStop?.(result)) {
+      clearTimeoutIfExists();
+      return result;
+    }
 
-  // Wait initial delay
-  await delay(initialDelayMs!);
+    await delay(initialDelayMs!);
 
-  let attempts = 0;
+    let attempts = 0;
 
-  while (attempts < maxAttempts!) {
-    attempts++;
+    while (attempts < maxAttempts!) {
+      ++attempts;
 
-    // Create polling promise
-    const pollingPromise = async () => {
-      try {
-        result = await pollingRequest();
-      } catch (error) {
-        if (onError && error instanceof APIError) {
-          result = onError(error);
-        } else {
-          throw error;
+      const pollingPromise = async () => {
+        try {
+          result = await pollingRequest();
+        } catch (error) {
+          if (onError && error instanceof APIError) {
+            result = onError(error);
+          } else {
+            throw error;
+          }
         }
+
+        onPollingAttempt?.(attempts, result);
+
+        if (shouldStop?.(result)) {
+          return result;
+        }
+
+        if (attempts === maxAttempts) {
+          throw new MaxAttemptsExceededError(`Polling exceeded maximum attempts (${maxAttempts})`, result);
+        }
+
+        await delay(pollingIntervalMs!);
+        return null;
+      };
+
+      // Race between polling and timeout if timeout is specified
+      const pollingResult =
+        timeoutPromise ? await Promise.race([pollingPromise(), timeoutPromise]) : await pollingPromise();
+
+      if (pollingResult !== null) {
+        clearTimeoutIfExists();
+        return pollingResult as T;
       }
-
-      onPollingAttempt?.(attempts, result);
-
-      if (shouldStop?.(result)) {
-        return result;
-      }
-
-      if (attempts === maxAttempts) {
-        throw new MaxAttemptsExceededError(`Polling exceeded maximum attempts (${maxAttempts})`, result);
-      }
-
-      await delay(pollingIntervalMs!);
-      return null;
-    };
-
-    // Race between polling and timeout if timeout is specified
-    const pollingResult =
-      timeoutPromise ? await Promise.race([pollingPromise(), timeoutPromise]) : await pollingPromise();
-
-    if (pollingResult !== null) {
-      return pollingResult as T;
     }
-  }
 
-  throw new MaxAttemptsExceededError(`Polling exceeded maximum attempts (${maxAttempts})`, result);
+    throw new MaxAttemptsExceededError(`Polling exceeded maximum attempts (${maxAttempts})`, result);
+  } catch (error) {
+    clearTimeoutIfExists();
+    throw error;
+  }
 }
