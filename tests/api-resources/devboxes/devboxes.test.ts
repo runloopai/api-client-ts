@@ -2,6 +2,7 @@
 
 import Runloop, { toFile } from '@runloop/api-client';
 import { Response } from 'node-fetch';
+import { APIError } from '../../../src/error';
 
 const client = new Runloop({
   bearerToken: 'My Bearer Token',
@@ -466,5 +467,116 @@ describe('resource devboxes', () => {
       contents: 'contents',
       file_path: 'file_path',
     });
+  });
+
+  test('awaitRunning: polls until devbox reaches running state', async () => {
+    const mockPost = jest.spyOn(client.devboxes['_client'], 'post');
+
+    // Mock the polling responses - first provisioning, then running
+    mockPost
+      .mockResolvedValueOnce({ id: 'test-id', status: 'provisioning' })
+      .mockResolvedValueOnce({ id: 'test-id', status: 'running' });
+
+    const result = await client.devboxes.awaitRunning('test-id');
+
+    expect(result).toEqual({ id: 'test-id', status: 'running' });
+    expect(mockPost).toHaveBeenCalledTimes(2);
+    expect(mockPost).toHaveBeenCalledWith('/v1/devboxes/test-id/wait_for_status', {
+      body: { statuses: ['running', 'failure'] },
+    });
+
+    mockPost.mockRestore();
+  });
+
+  test('awaitRunning: handles 408 timeout errors and continues polling', async () => {
+    const mockPost = jest.spyOn(client.devboxes['_client'], 'post');
+
+    // Mock 408 error followed by success
+    const timeoutError = new APIError(408, undefined, 'Request timeout', {});
+
+    mockPost.mockRejectedValueOnce(timeoutError).mockResolvedValueOnce({ id: 'test-id', status: 'running' });
+
+    const result = await client.devboxes.awaitRunning('test-id');
+
+    expect(result).toEqual({ id: 'test-id', status: 'running' });
+    expect(mockPost).toHaveBeenCalledTimes(2);
+
+    mockPost.mockRestore();
+  });
+
+  test('awaitRunning: throws error when devbox reaches failure state', async () => {
+    const mockPost = jest.spyOn(client.devboxes['_client'], 'post');
+
+    mockPost.mockResolvedValueOnce({ id: 'test-id', status: 'failure' });
+
+    await expect(client.devboxes.awaitRunning('test-id')).rejects.toThrow(
+      'Devbox test-id is in non-running state failure',
+    );
+
+    mockPost.mockRestore();
+  });
+
+  test('awaitRunning: throws error when devbox reaches shutdown state', async () => {
+    const mockPost = jest.spyOn(client.devboxes['_client'], 'post');
+
+    mockPost.mockResolvedValueOnce({ id: 'test-id', status: 'shutdown' });
+
+    await expect(client.devboxes.awaitRunning('test-id')).rejects.toThrow(
+      'Devbox test-id is in non-running state shutdown',
+    );
+
+    mockPost.mockRestore();
+  });
+
+  test('awaitRunning: rethrows non-408 errors', async () => {
+    const mockPost = jest.spyOn(client.devboxes['_client'], 'post');
+
+    const serverError = new APIError(500, undefined, 'Server error', {});
+
+    mockPost.mockRejectedValueOnce(serverError);
+
+    await expect(client.devboxes.awaitRunning('test-id')).rejects.toThrow('Server error');
+
+    mockPost.mockRestore();
+  });
+
+  test('createAndAwaitRunning: creates devbox and waits for running state', async () => {
+    const mockPost = jest.spyOn(client.devboxes['_client'], 'post');
+
+    // Mock create response followed by polling responses
+    mockPost
+      .mockResolvedValueOnce({ id: 'new-devbox-id', status: 'provisioning' })
+      .mockResolvedValueOnce({ id: 'new-devbox-id', status: 'running' });
+
+    const result = await client.devboxes.createAndAwaitRunning({ name: 'test-devbox' });
+
+    expect(result).toEqual({ id: 'new-devbox-id', status: 'running' });
+    expect(mockPost).toHaveBeenCalledTimes(2);
+
+    // Check create call
+    expect(mockPost).toHaveBeenNthCalledWith(1, '/v1/devboxes', {
+      body: { name: 'test-devbox' },
+    });
+
+    // Check polling calls
+    expect(mockPost).toHaveBeenNthCalledWith(2, '/v1/devboxes/new-devbox-id/wait_for_status', {
+      body: { statuses: ['running', 'failure'] },
+    });
+
+    mockPost.mockRestore();
+  });
+
+  test('createAndAwaitRunning: handles creation failure', async () => {
+    const mockPost = jest.spyOn(client.devboxes['_client'], 'post');
+
+    const createError = new Error('Creation failed');
+    mockPost.mockRejectedValueOnce(createError);
+
+    await expect(client.devboxes.createAndAwaitRunning()).rejects.toThrow('Creation failed');
+
+    expect(mockPost).toHaveBeenCalledTimes(1);
+    expect(mockPost).toHaveBeenCalledWith('/v1/devboxes', { body: {} });
+
+    mockPost.mockRestore();
   });
 });
