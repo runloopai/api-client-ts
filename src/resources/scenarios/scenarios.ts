@@ -183,6 +183,12 @@ export interface ScenarioCreateParameters {
    * environment.
    */
   reference_output?: string | null;
+
+  /**
+   * Environment variables required to run the scenario. If these variables are not
+   * provided, the scenario will fail to start.
+   */
+  required_environment_variables?: Array<string> | null;
 }
 
 /**
@@ -271,9 +277,19 @@ export interface ScenarioRunView {
   duration_ms?: number | null;
 
   /**
+   * Environment variables used to run the Scenario.
+   */
+  environment_variables?: { [key: string]: string } | null;
+
+  /**
    * Optional name of ScenarioRun.
    */
   name?: string | null;
+
+  /**
+   * Purpose of the ScenarioRun.
+   */
+  purpose?: string | null;
 
   /**
    * The scoring result of the ScenarioRun.
@@ -313,6 +329,11 @@ export interface ScenarioUpdateParameters {
    * environment.
    */
   reference_output?: string | null;
+
+  /**
+   * Environment variables required to run the benchmark.
+   */
+  requiredEnvVars?: Array<string> | null;
 
   /**
    * The scoring contract for the Scenario.
@@ -366,6 +387,12 @@ export interface ScenarioView {
    * environment.
    */
   reference_output?: string | null;
+
+  /**
+   * Environment variables required to run the scenario. If any required environment
+   * variables are missing, the scenario will fail to start.
+   */
+  required_environment_variables?: Array<string>;
 }
 
 /**
@@ -606,6 +633,28 @@ export interface StartScenarioRunParameters {
    * Display name of the run.
    */
   run_name?: string | null;
+
+  /**
+   * Runtime configuration to use for this benchmark run
+   */
+  runProfile?: StartScenarioRunParameters.RunProfile | null;
+}
+
+export namespace StartScenarioRunParameters {
+  /**
+   * Runtime configuration to use for this benchmark run
+   */
+  export interface RunProfile {
+    /**
+     * Environment variables.
+     */
+    envVars?: { [key: string]: string } | null;
+
+    /**
+     * Purpose of the run.
+     */
+    purpose?: string | null;
+  }
 }
 
 export interface ScenarioCreateParams {
@@ -640,6 +689,12 @@ export interface ScenarioCreateParams {
    * environment.
    */
   reference_output?: string | null;
+
+  /**
+   * Environment variables required to run the scenario. If these variables are not
+   * provided, the scenario will fail to start.
+   */
+  required_environment_variables?: Array<string> | null;
 }
 
 export interface ScenarioUpdateParams {
@@ -669,6 +724,11 @@ export interface ScenarioUpdateParams {
    * environment.
    */
   reference_output?: string | null;
+
+  /**
+   * Environment variables required to run the benchmark.
+   */
+  requiredEnvVars?: Array<string> | null;
 
   /**
    * The scoring contract for the Scenario.
@@ -715,6 +775,28 @@ export interface ScenarioStartRunParams {
    * Display name of the run.
    */
   run_name?: string | null;
+
+  /**
+   * Runtime configuration to use for this benchmark run
+   */
+  runProfile?: ScenarioStartRunParams.RunProfile | null;
+}
+
+export namespace ScenarioStartRunParams {
+  /**
+   * Runtime configuration to use for this benchmark run
+   */
+  export interface RunProfile {
+    /**
+     * Environment variables.
+     */
+    envVars?: { [key: string]: string } | null;
+
+    /**
+     * Purpose of the run.
+     */
+    purpose?: string | null;
+  }
 }
 
 Scenarios.ScenarioViewsScenariosCursorIDPage = ScenarioViewsScenariosCursorIDPage;

@@ -24,6 +24,7 @@ describe('resource benchmarks', () => {
     const response = await client.benchmarks.create({
       name: 'name',
       metadata: { foo: 'string' },
+      required_environment_variables: ['string'],
       scenario_ids: ['string'],
     });
   });
@@ -61,6 +62,7 @@ describe('resource benchmarks', () => {
     const response = await client.benchmarks.update('id', {
       name: 'name',
       metadata: { foo: 'string' },
+      required_environment_variables: ['string'],
       scenario_ids: ['string'],
     });
   });
@@ -166,6 +168,7 @@ describe('resource benchmarks', () => {
       benchmark_id: 'benchmark_id',
       metadata: { foo: 'string' },
       run_name: 'run_name',
+      runProfile: { envVars: { foo: 'string' }, purpose: 'purpose' },
     });
   });
 });
