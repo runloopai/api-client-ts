@@ -160,7 +160,7 @@ export interface BlueprintBuildParameters {
   dockerfile?: string | null;
 
   /**
-   * (Optional) Map of paths and file contents to write before setup..
+   * (Optional) Map of paths and file contents to write before setup.
    */
   file_mounts?: { [key: string]: string } | null;
 
@@ -256,7 +256,7 @@ export interface BlueprintCreateParams {
   dockerfile?: string | null;
 
   /**
-   * (Optional) Map of paths and file contents to write before setup..
+   * (Optional) Map of paths and file contents to write before setup.
    */
   file_mounts?: { [key: string]: string } | null;
 
@@ -295,7 +295,7 @@ export interface BlueprintPreviewParams {
   dockerfile?: string | null;
 
   /**
-   * (Optional) Map of paths and file contents to write before setup..
+   * (Optional) Map of paths and file contents to write before setup.
    */
   file_mounts?: { [key: string]: string } | null;
 

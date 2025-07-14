@@ -131,6 +131,12 @@ export interface BenchmarkCreateParameters {
   metadata?: { [key: string]: string } | null;
 
   /**
+   * Environment variables required to run the benchmark. If these variables are not
+   * supplied, the benchmark will fail to start
+   */
+  required_environment_variables?: Array<string> | null;
+
+  /**
    * The Scenario IDs that make up the Benchmark.
    */
   scenario_ids?: Array<string> | null;
@@ -185,9 +191,19 @@ export interface BenchmarkRunView {
   duration_ms?: number | null;
 
   /**
+   * Environment variables used to run the benchmark.
+   */
+  environment_variables?: { [key: string]: string } | null;
+
+  /**
    * The name of the BenchmarkRun.
    */
   name?: string | null;
+
+  /**
+   * Purpose of the run.
+   */
+  purpose?: string | null;
 
   /**
    * The final score across the BenchmarkRun, present once completed. Calculated as
@@ -225,6 +241,12 @@ export interface BenchmarkView {
    * Whether this benchmark is public.
    */
   is_public?: boolean;
+
+  /**
+   * Required environment variables used to run the benchmark. If any required
+   * environment are missing, the benchmark will fail to start.
+   */
+  required_environment_variables?: Array<string>;
 }
 
 export interface ScenarioDefinitionListView {
@@ -255,6 +277,28 @@ export interface StartBenchmarkRunParameters {
    * Display name of the run.
    */
   run_name?: string | null;
+
+  /**
+   * Runtime configuration to use for this benchmark run
+   */
+  runProfile?: StartBenchmarkRunParameters.RunProfile | null;
+}
+
+export namespace StartBenchmarkRunParameters {
+  /**
+   * Runtime configuration to use for this benchmark run
+   */
+  export interface RunProfile {
+    /**
+     * Environment variables.
+     */
+    envVars?: { [key: string]: string } | null;
+
+    /**
+     * Purpose of the run.
+     */
+    purpose?: string | null;
+  }
 }
 
 export interface BenchmarkCreateParams {
@@ -267,6 +311,12 @@ export interface BenchmarkCreateParams {
    * User defined metadata to attach to the benchmark for organization.
    */
   metadata?: { [key: string]: string } | null;
+
+  /**
+   * Environment variables required to run the benchmark. If these variables are not
+   * supplied, the benchmark will fail to start
+   */
+  required_environment_variables?: Array<string> | null;
 
   /**
    * The Scenario IDs that make up the Benchmark.
@@ -284,6 +334,12 @@ export interface BenchmarkUpdateParams {
    * User defined metadata to attach to the benchmark for organization.
    */
   metadata?: { [key: string]: string } | null;
+
+  /**
+   * Environment variables required to run the benchmark. If these variables are not
+   * supplied, the benchmark will fail to start
+   */
+  required_environment_variables?: Array<string> | null;
 
   /**
    * The Scenario IDs that make up the Benchmark.
@@ -322,6 +378,28 @@ export interface BenchmarkStartRunParams {
    * Display name of the run.
    */
   run_name?: string | null;
+
+  /**
+   * Runtime configuration to use for this benchmark run
+   */
+  runProfile?: BenchmarkStartRunParams.RunProfile | null;
+}
+
+export namespace BenchmarkStartRunParams {
+  /**
+   * Runtime configuration to use for this benchmark run
+   */
+  export interface RunProfile {
+    /**
+     * Environment variables.
+     */
+    envVars?: { [key: string]: string } | null;
+
+    /**
+     * Purpose of the run.
+     */
+    purpose?: string | null;
+  }
 }
 
 Benchmarks.BenchmarkViewsBenchmarksCursorIDPage = BenchmarkViewsBenchmarksCursorIDPage;
