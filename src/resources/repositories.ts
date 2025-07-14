@@ -157,8 +157,6 @@ export interface RepositoryInspectionDetails {
     | 'inspection_pending'
     | 'inspection_failed'
     | 'inspection_success'
-    | 'image_build_success'
-    | 'image_build_failure'
     | 'inspection_user_manifest_added';
 
   /**
@@ -170,6 +168,11 @@ export interface RepositoryInspectionDetails {
    * The blueprint name associated with this inspection if successful.
    */
   blueprint_name?: string | null;
+
+  /**
+   * The status of the linked Blueprint build.
+   */
+  build_status?: 'image_building' | 'image_build_success' | 'image_build_failure' | null;
 
   /**
    * User uploaded repository manifest containing container config and workspace

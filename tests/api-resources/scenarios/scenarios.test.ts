@@ -57,6 +57,7 @@ describe('resource scenarios', () => {
           architecture: 'x86_64',
           available_ports: [0],
           custom_cpu_cores: 0,
+          custom_disk_size: 0,
           custom_gb_memory: 0,
           keep_alive_time_seconds: 0,
           launch_commands: ['string'],
@@ -69,6 +70,7 @@ describe('resource scenarios', () => {
       },
       metadata: { foo: 'string' },
       reference_output: 'reference_output',
+      required_environment_variables: ['string'],
     });
   });
 
@@ -121,6 +123,7 @@ describe('resource scenarios', () => {
               architecture: 'x86_64',
               available_ports: [0],
               custom_cpu_cores: 0,
+              custom_disk_size: 0,
               custom_gb_memory: 0,
               keep_alive_time_seconds: 0,
               launch_commands: ['string'],
@@ -135,6 +138,7 @@ describe('resource scenarios', () => {
           metadata: { foo: 'string' },
           name: 'name',
           reference_output: 'reference_output',
+          requiredEnvVars: ['string'],
           scoring_contract: {
             scoring_function_parameters: [
               {
@@ -228,6 +232,7 @@ describe('resource scenarios', () => {
       benchmark_run_id: 'benchmark_run_id',
       metadata: { foo: 'string' },
       run_name: 'run_name',
+      runProfile: { envVars: { foo: 'string' }, purpose: 'purpose' },
     });
   });
 });

@@ -64,6 +64,11 @@ export interface LaunchParameters {
   custom_cpu_cores?: number | null;
 
   /**
+   * custom disk size, number in Gi, must be a multiple of 2.
+   */
+  custom_disk_size?: number | null;
+
+  /**
    * custom memory size, number in Gi, must be a multiple of 2.
    */
   custom_gb_memory?: number | null;
