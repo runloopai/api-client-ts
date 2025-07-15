@@ -23,6 +23,7 @@ describe('resource blueprints', () => {
   test('create: required and optional params', async () => {
     const response = await client.blueprints.create({
       name: 'name',
+      base_blueprint_id: 'base_blueprint_id',
       code_mounts: [
         {
           repo_name: 'repo_name',
@@ -145,6 +146,7 @@ describe('resource blueprints', () => {
   test('preview: required and optional params', async () => {
     const response = await client.blueprints.preview({
       name: 'name',
+      base_blueprint_id: 'base_blueprint_id',
       code_mounts: [
         {
           repo_name: 'repo_name',
