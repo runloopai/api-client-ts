@@ -150,12 +150,6 @@ export interface BlueprintBuildParameters {
   name: string;
 
   /**
-   * (Optional) ID of previously built blueprint to use as a base blueprint for this
-   * build.
-   */
-  base_blueprint_id?: string | null;
-
-  /**
    * A list of code mounts to be included in the Blueprint.
    */
   code_mounts?: Array<Shared.CodeMountParameters> | null;
@@ -166,7 +160,7 @@ export interface BlueprintBuildParameters {
   dockerfile?: string | null;
 
   /**
-   * (Optional) Map of paths and file contents to write before setup.
+   * (Optional) Map of paths and file contents to write before setup..
    */
   file_mounts?: { [key: string]: string } | null;
 
@@ -238,11 +232,6 @@ export interface BlueprintView {
   status: 'provisioning' | 'building' | 'failed' | 'build_complete';
 
   /**
-   * The ID of the base Blueprint.
-   */
-  base_blueprint_id?: string | null;
-
-  /**
    * The failure reason if the Blueprint build failed, if any.
    */
   failure_reason?: 'out_of_memory' | 'out_of_disk' | 'build_failed' | null;
@@ -255,12 +244,6 @@ export interface BlueprintCreateParams {
    * Name of the Blueprint.
    */
   name: string;
-
-  /**
-   * (Optional) ID of previously built blueprint to use as a base blueprint for this
-   * build.
-   */
-  base_blueprint_id?: string | null;
 
   /**
    * A list of code mounts to be included in the Blueprint.
@@ -300,12 +283,6 @@ export interface BlueprintPreviewParams {
    * Name of the Blueprint.
    */
   name: string;
-
-  /**
-   * (Optional) ID of previously built blueprint to use as a base blueprint for this
-   * build.
-   */
-  base_blueprint_id?: string | null;
 
   /**
    * A list of code mounts to be included in the Blueprint.
