@@ -59,10 +59,6 @@
     "./shims/web.js",
     "./shims/web.mjs"
   ],
-  "imports": {
-    "@runloop/api-client": ".",
-    "@runloop/api-client/*": "./src/*"
-  },
   "exports": {
     "./_shims/auto/*": {
       "deno": {
