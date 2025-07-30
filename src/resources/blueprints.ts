@@ -205,7 +205,7 @@ export interface BlueprintView {
    * List of ContainerizedServices available in the Blueprint. Services can be
    * explicitly started when creating a Devbox.
    */
-  containerizedServices?: Array<BlueprintView.ContainerizedService> | null;
+  containerized_services?: Array<BlueprintView.ContainerizedService> | null;
 
   /**
    * The failure reason if the Blueprint build failed, if any.
