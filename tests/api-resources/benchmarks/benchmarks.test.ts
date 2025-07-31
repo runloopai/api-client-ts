@@ -25,6 +25,7 @@ describe('resource benchmarks', () => {
       name: 'name',
       metadata: { foo: 'string' },
       required_environment_variables: ['string'],
+      required_secrets: ['string'],
       scenario_ids: ['string'],
     });
   });
@@ -63,6 +64,7 @@ describe('resource benchmarks', () => {
       name: 'name',
       metadata: { foo: 'string' },
       required_environment_variables: ['string'],
+      required_secrets: ['string'],
       scenario_ids: ['string'],
     });
   });
@@ -168,7 +170,7 @@ describe('resource benchmarks', () => {
       benchmark_id: 'benchmark_id',
       metadata: { foo: 'string' },
       run_name: 'run_name',
-      runProfile: { envVars: { foo: 'string' }, purpose: 'purpose' },
+      runProfile: { envVars: { foo: 'string' }, purpose: 'purpose', secrets: { foo: 'string' } },
     });
   });
 });
