@@ -232,9 +232,72 @@ export interface BlueprintView {
   status: 'provisioning' | 'building' | 'failed' | 'build_complete';
 
   /**
+   * The ID of the base Blueprint.
+   */
+  base_blueprint_id?: string | null;
+
+  /**
+   * List of ContainerizedServices available in the Blueprint. Services can be
+   * explicitly started when creating a Devbox.
+   */
+  containerizedServices?: Array<BlueprintView.ContainerizedService> | null;
+
+  /**
    * The failure reason if the Blueprint build failed, if any.
    */
   failure_reason?: 'out_of_memory' | 'out_of_disk' | 'build_failed' | null;
+}
+
+export namespace BlueprintView {
+  export interface ContainerizedService {
+    /**
+     * The image of the container service.
+     */
+    image: string;
+
+    /**
+     * The name of the container service.
+     */
+    name: string;
+
+    /**
+     * The credentials of the container service.
+     */
+    credentials?: ContainerizedService.Credentials | null;
+
+    /**
+     * The environment variables of the container service.
+     */
+    env?: { [key: string]: string } | null;
+
+    /**
+     * Additional Docker container create options.
+     */
+    options?: string | null;
+
+    /**
+     * The port mappings of the container service. Port mappings are in the format of
+     * <host_port>:<container_port>.
+     */
+    port_mappings?: Array<string> | null;
+  }
+
+  export namespace ContainerizedService {
+    /**
+     * The credentials of the container service.
+     */
+    export interface Credentials {
+      /**
+       * The password of the container service.
+       */
+      password: string;
+
+      /**
+       * The username of the container service.
+       */
+      username: string;
+    }
+  }
 }
 
 export type BlueprintDeleteResponse = unknown;

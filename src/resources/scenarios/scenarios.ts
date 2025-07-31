@@ -204,6 +204,13 @@ export interface ScenarioCreateParameters {
    * provided, the scenario will fail to start.
    */
   required_environment_variables?: Array<string> | null;
+
+  /**
+   * Secrets required to run the scenario (user secret name to scenario required
+   * secret name). If these secrets are not provided or the mapping is incorrect, the
+   * scenario will fail to start.
+   */
+  required_secret_names?: Array<string> | null;
 }
 
 /**
@@ -292,7 +299,7 @@ export interface ScenarioRunView {
   duration_ms?: number | null;
 
   /**
-   * Environment variables used to run the Scenario.
+   * Environment variables used to run the scenario.
    */
   environment_variables?: { [key: string]: string } | null;
 
@@ -310,6 +317,11 @@ export interface ScenarioRunView {
    * The scoring result of the ScenarioRun.
    */
   scoring_contract_result?: ScoringContractResultView | null;
+
+  /**
+   * User secrets used to run the scenario.
+   */
+  secrets_provided?: { [key: string]: string } | null;
 
   /**
    * The time that the scenario started
@@ -346,9 +358,14 @@ export interface ScenarioUpdateParameters {
   reference_output?: string | null;
 
   /**
-   * Environment variables required to run the benchmark.
+   * Environment variables required to run the scenario.
    */
-  requiredEnvVars?: Array<string> | null;
+  required_environment_variables?: Array<string> | null;
+
+  /**
+   * Secrets required to run the scenario.
+   */
+  required_secrets?: Array<string> | null;
 
   /**
    * The scoring contract for the Scenario.
@@ -408,6 +425,12 @@ export interface ScenarioView {
    * variables are missing, the scenario will fail to start.
    */
   required_environment_variables?: Array<string>;
+
+  /**
+   * Environment variables required to run the scenario. If any required secrets are
+   * missing, the scenario will fail to start.
+   */
+  required_secret_names?: Array<string>;
 }
 
 /**
@@ -661,7 +684,7 @@ export namespace StartScenarioRunParameters {
    */
   export interface RunProfile {
     /**
-     * Environment variables.
+     * Environment Variables: Environment Variable to Value.
      */
     envVars?: { [key: string]: string } | null;
 
@@ -669,6 +692,11 @@ export namespace StartScenarioRunParameters {
      * Purpose of the run.
      */
     purpose?: string | null;
+
+    /**
+     * Secrets: Environment Variable to User Secret Name.
+     */
+    secrets?: { [key: string]: string } | null;
   }
 }
 
@@ -710,6 +738,13 @@ export interface ScenarioCreateParams {
    * provided, the scenario will fail to start.
    */
   required_environment_variables?: Array<string> | null;
+
+  /**
+   * Secrets required to run the scenario (user secret name to scenario required
+   * secret name). If these secrets are not provided or the mapping is incorrect, the
+   * scenario will fail to start.
+   */
+  required_secret_names?: Array<string> | null;
 }
 
 export interface ScenarioUpdateParams {
@@ -741,9 +776,14 @@ export interface ScenarioUpdateParams {
   reference_output?: string | null;
 
   /**
-   * Environment variables required to run the benchmark.
+   * Environment variables required to run the scenario.
    */
-  requiredEnvVars?: Array<string> | null;
+  required_environment_variables?: Array<string> | null;
+
+  /**
+   * Secrets required to run the scenario.
+   */
+  required_secrets?: Array<string> | null;
 
   /**
    * The scoring contract for the Scenario.
@@ -803,7 +843,7 @@ export namespace ScenarioStartRunParams {
    */
   export interface RunProfile {
     /**
-     * Environment variables.
+     * Environment Variables: Environment Variable to Value.
      */
     envVars?: { [key: string]: string } | null;
 
@@ -811,6 +851,11 @@ export namespace ScenarioStartRunParams {
      * Purpose of the run.
      */
     purpose?: string | null;
+
+    /**
+     * Secrets: Environment Variable to User Secret Name.
+     */
+    secrets?: { [key: string]: string } | null;
   }
 }
 
