@@ -61,6 +61,7 @@ describe('resource scenarios', () => {
           custom_gb_memory: 0,
           keep_alive_time_seconds: 0,
           launch_commands: ['string'],
+          required_services: ['string'],
           resource_size_request: 'X_SMALL',
           user_parameters: { uid: 0, username: 'username' },
         },
@@ -71,6 +72,7 @@ describe('resource scenarios', () => {
       metadata: { foo: 'string' },
       reference_output: 'reference_output',
       required_environment_variables: ['string'],
+      required_secret_names: ['string'],
     });
   });
 
@@ -127,6 +129,7 @@ describe('resource scenarios', () => {
               custom_gb_memory: 0,
               keep_alive_time_seconds: 0,
               launch_commands: ['string'],
+              required_services: ['string'],
               resource_size_request: 'X_SMALL',
               user_parameters: { uid: 0, username: 'username' },
             },
@@ -138,7 +141,8 @@ describe('resource scenarios', () => {
           metadata: { foo: 'string' },
           name: 'name',
           reference_output: 'reference_output',
-          requiredEnvVars: ['string'],
+          required_environment_variables: ['string'],
+          required_secrets: ['string'],
           scoring_contract: {
             scoring_function_parameters: [
               {
@@ -232,7 +236,7 @@ describe('resource scenarios', () => {
       benchmark_run_id: 'benchmark_run_id',
       metadata: { foo: 'string' },
       run_name: 'run_name',
-      runProfile: { envVars: { foo: 'string' }, purpose: 'purpose' },
+      runProfile: { envVars: { foo: 'string' }, purpose: 'purpose', secrets: { foo: 'string' } },
     });
   });
 });

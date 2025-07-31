@@ -131,10 +131,17 @@ export interface BenchmarkCreateParameters {
   metadata?: { [key: string]: string } | null;
 
   /**
-   * Environment variables required to run the benchmark. If these variables are not
-   * supplied, the benchmark will fail to start
+   * Environment variables required to run the benchmark. If any required variables
+   * are not supplied, the benchmark will fail to start
    */
   required_environment_variables?: Array<string> | null;
+
+  /**
+   * Secrets required to run the benchmark with (user secret name will be mapped to
+   * benchmark required secret name). If any of these secrets are not provided or the
+   * mapping is incorrect, the benchmark will fail to start.
+   */
+  required_secrets?: Array<string>;
 
   /**
    * The Scenario IDs that make up the Benchmark.
@@ -210,6 +217,11 @@ export interface BenchmarkRunView {
    * sum of scenario scores / number of scenario runs.
    */
   score?: number | null;
+
+  /**
+   * User secrets used to run the benchmark.
+   */
+  secrets_provided?: { [key: string]: string } | null;
 }
 
 /**
@@ -244,9 +256,15 @@ export interface BenchmarkView {
 
   /**
    * Required environment variables used to run the benchmark. If any required
-   * environment are missing, the benchmark will fail to start.
+   * environment variables are missing, the benchmark will fail to start.
    */
   required_environment_variables?: Array<string>;
+
+  /**
+   * Required secrets used to run the benchmark. If any required secrets are missing,
+   * the benchmark will fail to start.
+   */
+  required_secret_names?: Array<string>;
 }
 
 export interface ScenarioDefinitionListView {
@@ -290,7 +308,7 @@ export namespace StartBenchmarkRunParameters {
    */
   export interface RunProfile {
     /**
-     * Environment variables.
+     * Environment Variables: Environment Variable to Value.
      */
     envVars?: { [key: string]: string } | null;
 
@@ -298,6 +316,11 @@ export namespace StartBenchmarkRunParameters {
      * Purpose of the run.
      */
     purpose?: string | null;
+
+    /**
+     * Secrets: Environment Variable to User Secret Name.
+     */
+    secrets?: { [key: string]: string } | null;
   }
 }
 
@@ -313,10 +336,17 @@ export interface BenchmarkCreateParams {
   metadata?: { [key: string]: string } | null;
 
   /**
-   * Environment variables required to run the benchmark. If these variables are not
-   * supplied, the benchmark will fail to start
+   * Environment variables required to run the benchmark. If any required variables
+   * are not supplied, the benchmark will fail to start
    */
   required_environment_variables?: Array<string> | null;
+
+  /**
+   * Secrets required to run the benchmark with (user secret name will be mapped to
+   * benchmark required secret name). If any of these secrets are not provided or the
+   * mapping is incorrect, the benchmark will fail to start.
+   */
+  required_secrets?: Array<string>;
 
   /**
    * The Scenario IDs that make up the Benchmark.
@@ -336,10 +366,17 @@ export interface BenchmarkUpdateParams {
   metadata?: { [key: string]: string } | null;
 
   /**
-   * Environment variables required to run the benchmark. If these variables are not
-   * supplied, the benchmark will fail to start
+   * Environment variables required to run the benchmark. If any required variables
+   * are not supplied, the benchmark will fail to start
    */
   required_environment_variables?: Array<string> | null;
+
+  /**
+   * Secrets required to run the benchmark with (user secret name will be mapped to
+   * benchmark required secret name). If any of these secrets are not provided or the
+   * mapping is incorrect, the benchmark will fail to start.
+   */
+  required_secrets?: Array<string>;
 
   /**
    * The Scenario IDs that make up the Benchmark.
@@ -391,7 +428,7 @@ export namespace BenchmarkStartRunParams {
    */
   export interface RunProfile {
     /**
-     * Environment variables.
+     * Environment Variables: Environment Variable to Value.
      */
     envVars?: { [key: string]: string } | null;
 
@@ -399,6 +436,11 @@ export namespace BenchmarkStartRunParams {
      * Purpose of the run.
      */
     purpose?: string | null;
+
+    /**
+     * Secrets: Environment Variable to User Secret Name.
+     */
+    secrets?: { [key: string]: string } | null;
   }
 }
 

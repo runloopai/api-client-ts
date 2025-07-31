@@ -88,6 +88,12 @@ export interface LaunchParameters {
   launch_commands?: Array<string> | null;
 
   /**
+   * A list of ContainerizedService names to be started when a Devbox is created. A
+   * valid ContainerizedService must be specified in Blueprint to be started.
+   */
+  required_services?: Array<string> | null;
+
+  /**
    * Manual resource configuration for Devbox. If not set, defaults will be used.
    */
   resource_size_request?:

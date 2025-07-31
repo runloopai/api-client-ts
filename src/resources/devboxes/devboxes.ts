@@ -1005,7 +1005,19 @@ export interface DevboxUploadFileParams {
    */
   path: string;
 
+  /**
+   * File permissions in octal format (e.g., "644", "1755"). Optional. If not
+   * specified, default system permissions will be used.
+   */
+  chmod?: string | null;
+
   file?: Core.Uploadable;
+
+  /**
+   * File owner username. Optional. If not specified, the file will be owned by the
+   * current user.
+   */
+  owner?: string | null;
 }
 
 export interface DevboxWriteFileContentsParams {
@@ -1019,6 +1031,18 @@ export interface DevboxWriteFileContentsParams {
    * directory.
    */
   file_path: string;
+
+  /**
+   * File permissions in octal format (e.g., "644", "1755"). Optional. If not
+   * specified, default system permissions will be used.
+   */
+  chmod?: string | null;
+
+  /**
+   * File owner username. Optional. If not specified, the file will be owned by the
+   * current user.
+   */
+  owner?: string | null;
 }
 
 Devboxes.DevboxViewsDevboxesCursorIDPage = DevboxViewsDevboxesCursorIDPage;

@@ -55,6 +55,7 @@ describe('resource devboxes', () => {
             custom_gb_memory: 0,
             keep_alive_time_seconds: 0,
             launch_commands: ['string'],
+            required_services: ['string'],
             resource_size_request: 'X_SMALL',
             user_parameters: { uid: 0, username: 'username' },
           },
@@ -445,7 +446,9 @@ describe('resource devboxes', () => {
   test('uploadFile: required and optional params', async () => {
     const response = await client.devboxes.uploadFile('id', {
       path: 'path',
+      chmod: 'chmod',
       file: await toFile(Buffer.from('# my file contents'), 'README.md'),
+      owner: 'owner',
     });
   });
 
@@ -467,6 +470,8 @@ describe('resource devboxes', () => {
     const response = await client.devboxes.writeFileContents('id', {
       contents: 'contents',
       file_path: 'file_path',
+      chmod: 'chmod',
+      owner: 'owner',
     });
   });
 

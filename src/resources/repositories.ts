@@ -203,6 +203,12 @@ export interface RepositoryManifestView {
    * unit of code.
    */
   workspaces: Array<RepositoryManifestView.Workspace>;
+
+  /**
+   * List of discovered ContainerizedServices. Services can be explicitly started
+   * when creating a Devbox.
+   */
+  containerized_services?: Array<RepositoryManifestView.ContainerizedService> | null;
 }
 
 export namespace RepositoryManifestView {
@@ -232,7 +238,7 @@ export namespace RepositoryManifestView {
     /**
      * Name of the package manager used (e.g. pip, npm).
      */
-    package_manager: string;
+    package_manager: Array<string>;
 
     /**
      * Extracted common commands important to the developer life cycle like linting,
@@ -282,22 +288,72 @@ export namespace RepositoryManifestView {
       /**
        * Build command (e.g. npm run build).
        */
-      build?: string | null;
+      build?: Array<string> | null;
 
       /**
        * Installation command (e.g. pip install -r requirements.txt).
        */
-      install?: string | null;
+      install?: Array<string> | null;
 
       /**
        * Lint command (e.g. flake8).
        */
-      lint?: string | null;
+      lint?: Array<string> | null;
 
       /**
        * Test command (e.g. pytest).
        */
-      test?: string | null;
+      test?: Array<string> | null;
+    }
+  }
+
+  export interface ContainerizedService {
+    /**
+     * The image of the container service.
+     */
+    image: string;
+
+    /**
+     * The name of the container service.
+     */
+    name: string;
+
+    /**
+     * The credentials of the container service.
+     */
+    credentials?: ContainerizedService.Credentials | null;
+
+    /**
+     * The environment variables of the container service.
+     */
+    env?: { [key: string]: string } | null;
+
+    /**
+     * Additional Docker container create options.
+     */
+    options?: string | null;
+
+    /**
+     * The port mappings of the container service. Port mappings are in the format of
+     * <host_port>:<container_port>.
+     */
+    port_mappings?: Array<string> | null;
+  }
+
+  export namespace ContainerizedService {
+    /**
+     * The credentials of the container service.
+     */
+    export interface Credentials {
+      /**
+       * The password of the container service.
+       */
+      password: string;
+
+      /**
+       * The username of the container service.
+       */
+      username: string;
     }
   }
 }
