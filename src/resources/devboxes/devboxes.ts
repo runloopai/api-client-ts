@@ -170,7 +170,7 @@ export class Devboxes extends APIResource {
       // This either returns a DevboxView when status is running or failure;
       // Otherwise it throws an 408 error when times out.
       return this._client.post(`/v1/devboxes/${id}/wait_for_status`, {
-        body: { statuses: ['running', 'failure'] },
+        body: { statuses: ['running', 'failure', 'shutdown'] },
       });
     };
 

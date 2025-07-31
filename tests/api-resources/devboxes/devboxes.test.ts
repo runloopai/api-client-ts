@@ -483,7 +483,7 @@ describe('resource devboxes', () => {
     expect(result).toEqual({ id: 'test-id', status: 'running' });
     expect(mockPost).toHaveBeenCalledTimes(2);
     expect(mockPost).toHaveBeenCalledWith('/v1/devboxes/test-id/wait_for_status', {
-      body: { statuses: ['running', 'failure'] },
+      body: { statuses: ['running', 'failure', 'shutdown'] },
     });
 
     mockPost.mockRestore();
@@ -561,7 +561,7 @@ describe('resource devboxes', () => {
 
     // Check polling calls
     expect(mockPost).toHaveBeenNthCalledWith(2, '/v1/devboxes/new-devbox-id/wait_for_status', {
-      body: { statuses: ['running', 'failure'] },
+      body: { statuses: ['running', 'failure', 'shutdown'] },
     });
 
     mockPost.mockRestore();
