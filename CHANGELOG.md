@@ -1,5 +1,21 @@
 # Changelog
 
+## 0.44.0 (2025-08-04)
+
+Full Changelog: [v0.43.0...v0.44.0](https://github.com/runloopai/api-client-ts/compare/v0.43.0...v0.44.0)
+
+### Features
+
+* **api:** api update ([077e4a1](https://github.com/runloopai/api-client-ts/commit/077e4a104ffb6647cda16a2af10377c56b5517b4))
+* **api:** api update ([248a63a](https://github.com/runloopai/api-client-ts/commit/248a63a08493375a715549d3f9a5bd4704e58f4e))
+* **api:** api update ([f3d8941](https://github.com/runloopai/api-client-ts/commit/f3d89411aec4f2b80c1e0666cd1ff13d53bd246c))
+* **api:** api update ([8262030](https://github.com/runloopai/api-client-ts/commit/826203067b3a44a0cc0a5f0c72783780963737a4))
+
+
+### Chores
+
+* **internal:** remove redundant imports config ([20bcf30](https://github.com/runloopai/api-client-ts/commit/20bcf3007496216b53feda33bbb6581277323a54))
+
 ## 0.43.0 (2025-07-15)
 
 Full Changelog: [v0.42.2...v0.43.0](https://github.com/runloopai/api-client-ts/compare/v0.42.2...v0.43.0)
