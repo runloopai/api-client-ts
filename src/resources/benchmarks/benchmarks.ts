@@ -137,11 +137,11 @@ export interface BenchmarkCreateParameters {
   required_environment_variables?: Array<string> | null;
 
   /**
-   * Secrets required to run the benchmark with (user secret name will be mapped to
-   * benchmark required secret name). If any of these secrets are not provided or the
-   * mapping is incorrect, the benchmark will fail to start.
+   * Secrets required to run the benchmark with (environment variable name will be
+   * mapped to the your user secret by name). If any of these secrets are not
+   * provided or the mapping is incorrect, the benchmark will fail to start.
    */
-  required_secrets?: Array<string>;
+  required_secret_names?: Array<string>;
 
   /**
    * The Scenario IDs that make up the Benchmark.
@@ -219,7 +219,9 @@ export interface BenchmarkRunView {
   score?: number | null;
 
   /**
-   * User secrets used to run the benchmark.
+   * User secrets used to run the benchmark. Example: {"DB_PASS":
+   * "DATABASE_PASSWORD"} would set the environment variable 'DB_PASS' on all
+   * scenario devboxes to the value of the secret 'DATABASE_PASSWORD'.
    */
   secrets_provided?: { [key: string]: string } | null;
 }
@@ -308,7 +310,9 @@ export namespace StartBenchmarkRunParameters {
    */
   export interface RunProfile {
     /**
-     * Environment Variables: Environment Variable to Value.
+     * Mapping of Environment Variable to Value. May be shown in devbox logging.
+     * Example: {"DB_PASS": "DATABASE_PASSWORD"} would set the environment variable
+     * 'DB_PASS' to the value 'DATABASE_PASSWORD_VALUE'.
      */
     envVars?: { [key: string]: string } | null;
 
@@ -318,7 +322,9 @@ export namespace StartBenchmarkRunParameters {
     purpose?: string | null;
 
     /**
-     * Secrets: Environment Variable to User Secret Name.
+     * Mapping of Environment Variable to User Secret Name. Never shown in devbox
+     * logging. Example: {"DB_PASS": "DATABASE_PASSWORD"} would set the environment
+     * variable 'DB_PASS' to the value of the secret 'DATABASE_PASSWORD'.
      */
     secrets?: { [key: string]: string } | null;
   }
@@ -342,11 +348,11 @@ export interface BenchmarkCreateParams {
   required_environment_variables?: Array<string> | null;
 
   /**
-   * Secrets required to run the benchmark with (user secret name will be mapped to
-   * benchmark required secret name). If any of these secrets are not provided or the
-   * mapping is incorrect, the benchmark will fail to start.
+   * Secrets required to run the benchmark with (environment variable name will be
+   * mapped to the your user secret by name). If any of these secrets are not
+   * provided or the mapping is incorrect, the benchmark will fail to start.
    */
-  required_secrets?: Array<string>;
+  required_secret_names?: Array<string>;
 
   /**
    * The Scenario IDs that make up the Benchmark.
@@ -372,11 +378,11 @@ export interface BenchmarkUpdateParams {
   required_environment_variables?: Array<string> | null;
 
   /**
-   * Secrets required to run the benchmark with (user secret name will be mapped to
-   * benchmark required secret name). If any of these secrets are not provided or the
-   * mapping is incorrect, the benchmark will fail to start.
+   * Secrets required to run the benchmark with (environment variable name will be
+   * mapped to the your user secret by name). If any of these secrets are not
+   * provided or the mapping is incorrect, the benchmark will fail to start.
    */
-  required_secrets?: Array<string>;
+  required_secret_names?: Array<string>;
 
   /**
    * The Scenario IDs that make up the Benchmark.
@@ -428,7 +434,9 @@ export namespace BenchmarkStartRunParams {
    */
   export interface RunProfile {
     /**
-     * Environment Variables: Environment Variable to Value.
+     * Mapping of Environment Variable to Value. May be shown in devbox logging.
+     * Example: {"DB_PASS": "DATABASE_PASSWORD"} would set the environment variable
+     * 'DB_PASS' to the value 'DATABASE_PASSWORD_VALUE'.
      */
     envVars?: { [key: string]: string } | null;
 
@@ -438,7 +446,9 @@ export namespace BenchmarkStartRunParams {
     purpose?: string | null;
 
     /**
-     * Secrets: Environment Variable to User Secret Name.
+     * Mapping of Environment Variable to User Secret Name. Never shown in devbox
+     * logging. Example: {"DB_PASS": "DATABASE_PASSWORD"} would set the environment
+     * variable 'DB_PASS' to the value of the secret 'DATABASE_PASSWORD'.
      */
     secrets?: { [key: string]: string } | null;
   }

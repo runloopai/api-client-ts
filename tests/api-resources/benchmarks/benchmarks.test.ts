@@ -25,7 +25,7 @@ describe('resource benchmarks', () => {
       name: 'name',
       metadata: { foo: 'string' },
       required_environment_variables: ['string'],
-      required_secrets: ['string'],
+      required_secret_names: ['string'],
       scenario_ids: ['string'],
     });
   });
@@ -64,7 +64,7 @@ describe('resource benchmarks', () => {
       name: 'name',
       metadata: { foo: 'string' },
       required_environment_variables: ['string'],
-      required_secrets: ['string'],
+      required_secret_names: ['string'],
       scenario_ids: ['string'],
     });
   });

@@ -445,9 +445,7 @@ describe('resource devboxes', () => {
   test('uploadFile: required and optional params', async () => {
     const response = await client.devboxes.uploadFile('id', {
       path: 'path',
-      chmod: 'chmod',
       file: await toFile(Buffer.from('# my file contents'), 'README.md'),
-      owner: 'owner',
     });
   });
 
@@ -469,8 +467,6 @@ describe('resource devboxes', () => {
     const response = await client.devboxes.writeFileContents('id', {
       contents: 'contents',
       file_path: 'file_path',
-      chmod: 'chmod',
-      owner: 'owner',
     });
   });
 });
