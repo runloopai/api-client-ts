@@ -365,7 +365,7 @@ export interface ScenarioUpdateParameters {
   /**
    * Secrets required to run the scenario.
    */
-  required_secrets?: Array<string> | null;
+  required_secret_names?: Array<string> | null;
 
   /**
    * The scoring contract for the Scenario.
@@ -588,7 +588,7 @@ export namespace ScoringFunction {
      * Package dependencies to be installed. The requirements should be a valid
      * requirements.txt file.
      */
-    requirements_contents?: string;
+    requirements_contents?: string | null;
   }
 
   /**
@@ -684,7 +684,9 @@ export namespace StartScenarioRunParameters {
    */
   export interface RunProfile {
     /**
-     * Environment Variables: Environment Variable to Value.
+     * Mapping of Environment Variable to Value. May be shown in devbox logging.
+     * Example: {"DB_PASS": "DATABASE_PASSWORD"} would set the environment variable
+     * 'DB_PASS' to the value 'DATABASE_PASSWORD_VALUE'.
      */
     envVars?: { [key: string]: string } | null;
 
@@ -694,7 +696,9 @@ export namespace StartScenarioRunParameters {
     purpose?: string | null;
 
     /**
-     * Secrets: Environment Variable to User Secret Name.
+     * Mapping of Environment Variable to User Secret Name. Never shown in devbox
+     * logging. Example: {"DB_PASS": "DATABASE_PASSWORD"} would set the environment
+     * variable 'DB_PASS' to the value of the secret 'DATABASE_PASSWORD'.
      */
     secrets?: { [key: string]: string } | null;
   }
@@ -783,7 +787,7 @@ export interface ScenarioUpdateParams {
   /**
    * Secrets required to run the scenario.
    */
-  required_secrets?: Array<string> | null;
+  required_secret_names?: Array<string> | null;
 
   /**
    * The scoring contract for the Scenario.
@@ -843,7 +847,9 @@ export namespace ScenarioStartRunParams {
    */
   export interface RunProfile {
     /**
-     * Environment Variables: Environment Variable to Value.
+     * Mapping of Environment Variable to Value. May be shown in devbox logging.
+     * Example: {"DB_PASS": "DATABASE_PASSWORD"} would set the environment variable
+     * 'DB_PASS' to the value 'DATABASE_PASSWORD_VALUE'.
      */
     envVars?: { [key: string]: string } | null;
 
@@ -853,7 +859,9 @@ export namespace ScenarioStartRunParams {
     purpose?: string | null;
 
     /**
-     * Secrets: Environment Variable to User Secret Name.
+     * Mapping of Environment Variable to User Secret Name. Never shown in devbox
+     * logging. Example: {"DB_PASS": "DATABASE_PASSWORD"} would set the environment
+     * variable 'DB_PASS' to the value of the secret 'DATABASE_PASSWORD'.
      */
     secrets?: { [key: string]: string } | null;
   }

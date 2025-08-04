@@ -199,6 +199,16 @@ export interface RepositoryManifestView {
   container_config: RepositoryManifestView.ContainerConfig;
 
   /**
+   * List of required languages found in Repository.
+   */
+  languages: Array<RepositoryManifestView.Language>;
+
+  /**
+   * The workflow(s) that were selected to build the manifest for this repo.
+   */
+  workflows: Array<string>;
+
+  /**
    * List of workspaces within the repository. Each workspace represents a buildable
    * unit of code.
    */
@@ -228,6 +238,12 @@ export namespace RepositoryManifestView {
      * toolchains (e.g. apt install).
      */
     setup_commands?: Array<string> | null;
+  }
+
+  export interface Language {
+    language?: string;
+
+    version?: string;
   }
 
   /**
