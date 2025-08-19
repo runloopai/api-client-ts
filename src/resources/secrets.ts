@@ -1,6 +1,7 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 import { APIResource } from '../resource';
+import { isRequestOptions } from '../core';
 import * as Core from '../core';
 
 export class Secrets extends APIResource {
@@ -24,8 +25,16 @@ export class Secrets extends APIResource {
    * List all Secrets for the authenticated account. Secret values are not included
    * for security reasons.
    */
-  list(options?: Core.RequestOptions): Core.APIPromise<SecretListView> {
-    return this._client.get('/v1/secrets', options);
+  list(query?: SecretListParams, options?: Core.RequestOptions): Core.APIPromise<SecretListView>;
+  list(options?: Core.RequestOptions): Core.APIPromise<SecretListView>;
+  list(
+    query: SecretListParams | Core.RequestOptions = {},
+    options?: Core.RequestOptions,
+  ): Core.APIPromise<SecretListView> {
+    if (isRequestOptions(query)) {
+      return this.list({}, query);
+    }
+    return this._client.get('/v1/secrets', { query, ...options });
   }
 
   /**
@@ -143,6 +152,13 @@ export interface SecretUpdateParams {
   value: string;
 }
 
+export interface SecretListParams {
+  /**
+   * The limit of items to return. Default is 20.
+   */
+  limit?: number;
+}
+
 export interface SecretDeleteParams {}
 
 export declare namespace Secrets {
@@ -153,6 +169,7 @@ export declare namespace Secrets {
     type SecretView as SecretView,
     type SecretCreateParams as SecretCreateParams,
     type SecretUpdateParams as SecretUpdateParams,
+    type SecretListParams as SecretListParams,
     type SecretDeleteParams as SecretDeleteParams,
   };
 }

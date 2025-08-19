@@ -179,6 +179,52 @@ export interface RepositoryInspectionDetails {
    * details.
    */
   user_manifest?: RepositoryManifestView | null;
+
+  /**
+   * Workflow contexts mapping workflow names to their processing details.
+   */
+  workflow_contexts?: { [key: string]: RepositoryInspectionDetails.WorkflowContexts } | null;
+}
+
+export namespace RepositoryInspectionDetails {
+  /**
+   * Workflow context containing file name and details about actions processing
+   * during inspection.
+   */
+  export interface WorkflowContexts {
+    /**
+     * Details about actions processing for this workflow.
+     */
+    actions_context: WorkflowContexts.ActionsContext;
+
+    /**
+     * The file name of the workflow.
+     */
+    file_name: string;
+  }
+
+  export namespace WorkflowContexts {
+    /**
+     * Details about actions processing for this workflow.
+     */
+    export interface ActionsContext {
+      /**
+       * Actions that were skipped because they were unnecessary (e.g., upload
+       * artifacts).
+       */
+      actions_skipped_unnecessary: Array<string>;
+
+      /**
+       * Actions that were translated into commands and executed.
+       */
+      actions_taken: Array<string>;
+
+      /**
+       * Actions that were not understood and skipped because we did not know what to do.
+       */
+      actions_unknown: Array<string>;
+    }
+  }
 }
 
 export interface RepositoryInspectionListView {
@@ -204,11 +250,6 @@ export interface RepositoryManifestView {
   languages: Array<RepositoryManifestView.Language>;
 
   /**
-   * The workflow(s) that were selected to build the manifest for this repo.
-   */
-  workflows: Array<string>;
-
-  /**
    * List of workspaces within the repository. Each workspace represents a buildable
    * unit of code.
    */
@@ -219,6 +260,18 @@ export interface RepositoryManifestView {
    * when creating a Devbox.
    */
   containerized_services?: Array<RepositoryManifestView.ContainerizedService> | null;
+
+  /**
+   * Qualified environment variables and values that should be set for this
+   * repository to run correctly.
+   */
+  env_vars?: { [key: string]: string } | null;
+
+  /**
+   * Missing environment variables that (may) be required for this repository to run
+   * correctly.
+   */
+  required_env_vars?: Array<string> | null;
 }
 
 export namespace RepositoryManifestView {
@@ -232,6 +285,11 @@ export namespace RepositoryManifestView {
      * macos-latest etc.
      */
     base_image_name: string;
+
+    /**
+     * The target architecture for the Repository Container.
+     */
+    architecture?: 'x86_64' | 'arm64';
 
     /**
      * Commands to run to setup the base container such as installing necessary
@@ -252,9 +310,9 @@ export namespace RepositoryManifestView {
    */
   export interface Workspace {
     /**
-     * Name of the package manager used (e.g. pip, npm).
+     * Name of the build tool used (e.g. pip, npm).
      */
-    package_manager: Array<string>;
+    build_tool: Array<string>;
 
     /**
      * Extracted common commands important to the developer life cycle like linting,
@@ -274,12 +332,6 @@ export namespace RepositoryManifestView {
      * repositories.
      */
     path?: string | null;
-
-    /**
-     * Environment variables that are required to be set for this workspace to run
-     * correctly.
-     */
-    required_env_vars?: Array<string> | null;
 
     /**
      * Commands to run to refresh this workspace after pulling the latest changes to
@@ -315,6 +367,11 @@ export namespace RepositoryManifestView {
        * Lint command (e.g. flake8).
        */
       lint?: Array<string> | null;
+
+      /**
+       * Script commands.
+       */
+      scripts?: Array<string> | null;
 
       /**
        * Test command (e.g. pytest).

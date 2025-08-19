@@ -645,13 +645,7 @@ export interface DevboxView {
    * The shutdown reason if the Devbox shutdown, if the Devbox has a 'shutdown'
    * status.
    */
-  shutdown_reason?:
-    | 'api_shutdown'
-    | 'keep_alive_timeout'
-    | 'entrypoint_exit'
-    | 'idle'
-    | 'lambda_lifecycle'
-    | null;
+  shutdown_reason?: 'api_shutdown' | 'keep_alive_timeout' | 'entrypoint_exit' | 'idle' | null;
 
   /**
    * The Snapshot ID used in creation of the Devbox, if the devbox was created from a
@@ -767,12 +761,6 @@ export interface DevboxCreateParams {
    * (Optional) A user specified name to give the Devbox.
    */
   name?: string | null;
-
-  /**
-   * Reference to prebuilt Blueprint to create the Devbox from. Should not be used
-   * together with (Snapshot ID, Blueprint ID, or Blueprint name).
-   */
-  prebuilt?: string | null;
 
   /**
    * Repository connection id the devbox should source its base image from.

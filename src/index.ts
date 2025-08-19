@@ -59,6 +59,7 @@ import {
   SecretCreateParameters,
   SecretCreateParams,
   SecretDeleteParams,
+  SecretListParams,
   SecretListView,
   SecretUpdateParameters,
   SecretUpdateParams,
@@ -487,6 +488,7 @@ export declare namespace Runloop {
     type SecretView as SecretView,
     type SecretCreateParams as SecretCreateParams,
     type SecretUpdateParams as SecretUpdateParams,
+    type SecretListParams as SecretListParams,
     type SecretDeleteParams as SecretDeleteParams,
   };
 

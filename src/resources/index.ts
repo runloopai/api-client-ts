@@ -111,5 +111,6 @@ export {
   type SecretView,
   type SecretCreateParams,
   type SecretUpdateParams,
+  type SecretListParams,
   type SecretDeleteParams,
 } from './secrets';

@@ -135,9 +135,68 @@ export interface BlueprintBuildParameters {
   launch_parameters?: Shared.LaunchParameters | null;
 
   /**
+   * (Optional) List of containerized services to include in the Blueprint. These
+   * services will be pre-pulled during the build phase for optimized startup
+   * performance.
+   */
+  services?: Array<BlueprintBuildParameters.Service> | null;
+
+  /**
    * A list of commands to run to set up your system.
    */
   system_setup_commands?: Array<string> | null;
+}
+
+export namespace BlueprintBuildParameters {
+  export interface Service {
+    /**
+     * The image of the container service.
+     */
+    image: string;
+
+    /**
+     * The name of the container service.
+     */
+    name: string;
+
+    /**
+     * The credentials of the container service.
+     */
+    credentials?: Service.Credentials | null;
+
+    /**
+     * The environment variables of the container service.
+     */
+    env?: { [key: string]: string } | null;
+
+    /**
+     * Additional Docker container create options.
+     */
+    options?: string | null;
+
+    /**
+     * The port mappings of the container service. Port mappings are in the format of
+     * <host_port>:<container_port>.
+     */
+    port_mappings?: Array<string> | null;
+  }
+
+  export namespace Service {
+    /**
+     * The credentials of the container service.
+     */
+    export interface Credentials {
+      /**
+       * The password of the container service.
+       */
+      password: string;
+
+      /**
+       * The username of the container service.
+       */
+      username: string;
+    }
+  }
 }
 
 export interface BlueprintListView {
@@ -211,6 +270,16 @@ export interface BlueprintView {
    * The failure reason if the Blueprint build failed, if any.
    */
   failure_reason?: 'out_of_memory' | 'out_of_disk' | 'build_failed' | null;
+
+  /**
+   * Whether this Blueprint is publicly accessible to all users.
+   */
+  is_public?: boolean;
+
+  /**
+   * User defined metadata associated with the blueprint.
+   */
+  metadata?: { [key: string]: string } | null;
 }
 
 export namespace BlueprintView {
@@ -300,9 +369,68 @@ export interface BlueprintCreateParams {
   launch_parameters?: Shared.LaunchParameters | null;
 
   /**
+   * (Optional) List of containerized services to include in the Blueprint. These
+   * services will be pre-pulled during the build phase for optimized startup
+   * performance.
+   */
+  services?: Array<BlueprintCreateParams.Service> | null;
+
+  /**
    * A list of commands to run to set up your system.
    */
   system_setup_commands?: Array<string> | null;
+}
+
+export namespace BlueprintCreateParams {
+  export interface Service {
+    /**
+     * The image of the container service.
+     */
+    image: string;
+
+    /**
+     * The name of the container service.
+     */
+    name: string;
+
+    /**
+     * The credentials of the container service.
+     */
+    credentials?: Service.Credentials | null;
+
+    /**
+     * The environment variables of the container service.
+     */
+    env?: { [key: string]: string } | null;
+
+    /**
+     * Additional Docker container create options.
+     */
+    options?: string | null;
+
+    /**
+     * The port mappings of the container service. Port mappings are in the format of
+     * <host_port>:<container_port>.
+     */
+    port_mappings?: Array<string> | null;
+  }
+
+  export namespace Service {
+    /**
+     * The credentials of the container service.
+     */
+    export interface Credentials {
+      /**
+       * The password of the container service.
+       */
+      password: string;
+
+      /**
+       * The username of the container service.
+       */
+      username: string;
+    }
+  }
 }
 
 export interface BlueprintListParams extends BlueprintsCursorIDPageParams {
@@ -345,9 +473,68 @@ export interface BlueprintPreviewParams {
   launch_parameters?: Shared.LaunchParameters | null;
 
   /**
+   * (Optional) List of containerized services to include in the Blueprint. These
+   * services will be pre-pulled during the build phase for optimized startup
+   * performance.
+   */
+  services?: Array<BlueprintPreviewParams.Service> | null;
+
+  /**
    * A list of commands to run to set up your system.
    */
   system_setup_commands?: Array<string> | null;
+}
+
+export namespace BlueprintPreviewParams {
+  export interface Service {
+    /**
+     * The image of the container service.
+     */
+    image: string;
+
+    /**
+     * The name of the container service.
+     */
+    name: string;
+
+    /**
+     * The credentials of the container service.
+     */
+    credentials?: Service.Credentials | null;
+
+    /**
+     * The environment variables of the container service.
+     */
+    env?: { [key: string]: string } | null;
+
+    /**
+     * Additional Docker container create options.
+     */
+    options?: string | null;
+
+    /**
+     * The port mappings of the container service. Port mappings are in the format of
+     * <host_port>:<container_port>.
+     */
+    port_mappings?: Array<string> | null;
+  }
+
+  export namespace Service {
+    /**
+     * The credentials of the container service.
+     */
+    export interface Credentials {
+      /**
+       * The password of the container service.
+       */
+      password: string;
+
+      /**
+       * The username of the container service.
+       */
+      username: string;
+    }
+  }
 }
 
 Blueprints.BlueprintViewsBlueprintsCursorIDPage = BlueprintViewsBlueprintsCursorIDPage;
