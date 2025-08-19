@@ -30,6 +30,7 @@ export {
   type BlueprintDeleteResponse,
   type BlueprintCreateParams,
   type BlueprintListParams,
+  type BlueprintListPublicParams,
   type BlueprintPreviewParams,
 } from './blueprints';
 export {
