@@ -46,6 +46,16 @@ describe('resource blueprints', () => {
         resource_size_request: 'X_SMALL',
         user_parameters: { uid: 0, username: 'username' },
       },
+      services: [
+        {
+          image: 'image',
+          name: 'name',
+          credentials: { password: 'password', username: 'username' },
+          env: { foo: 'string' },
+          options: 'options',
+          port_mappings: ['string'],
+        },
+      ],
       system_setup_commands: ['string'],
     });
   });
@@ -169,6 +179,16 @@ describe('resource blueprints', () => {
         resource_size_request: 'X_SMALL',
         user_parameters: { uid: 0, username: 'username' },
       },
+      services: [
+        {
+          image: 'image',
+          name: 'name',
+          credentials: { password: 'password', username: 'username' },
+          env: { foo: 'string' },
+          options: 'options',
+          port_mappings: ['string'],
+        },
+      ],
       system_setup_commands: ['string'],
     });
   });

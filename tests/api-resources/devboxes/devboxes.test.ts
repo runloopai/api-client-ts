@@ -61,7 +61,6 @@ describe('resource devboxes', () => {
           },
           metadata: { foo: 'string' },
           name: 'name',
-          prebuilt: 'prebuilt',
           repo_connection_id: 'repo_connection_id',
           secrets: { foo: 'string' },
           snapshot_id: 'snapshot_id',
