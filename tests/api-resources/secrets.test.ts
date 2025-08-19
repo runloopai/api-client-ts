@@ -57,6 +57,13 @@ describe('resource secrets', () => {
     );
   });
 
+  test('list: request options and params are passed correctly', async () => {
+    // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
+    await expect(client.secrets.list({ limit: 0 }, { path: '/_stainless_unknown_path' })).rejects.toThrow(
+      Runloop.NotFoundError,
+    );
+  });
+
   test('delete', async () => {
     const responsePromise = client.secrets.delete('name');
     const rawResponse = await responsePromise.asResponse();
