@@ -124,6 +124,34 @@ describe('resource blueprints', () => {
     );
   });
 
+  test('listPublic', async () => {
+    const responsePromise = client.blueprints.listPublic();
+    const rawResponse = await responsePromise.asResponse();
+    expect(rawResponse).toBeInstanceOf(Response);
+    const response = await responsePromise;
+    expect(response).not.toBeInstanceOf(Response);
+    const dataAndResponse = await responsePromise.withResponse();
+    expect(dataAndResponse.data).toBe(response);
+    expect(dataAndResponse.response).toBe(rawResponse);
+  });
+
+  test('listPublic: request options instead of params are passed correctly', async () => {
+    // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
+    await expect(client.blueprints.listPublic({ path: '/_stainless_unknown_path' })).rejects.toThrow(
+      Runloop.NotFoundError,
+    );
+  });
+
+  test('listPublic: request options and params are passed correctly', async () => {
+    // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
+    await expect(
+      client.blueprints.listPublic(
+        { limit: 0, name: 'name', starting_after: 'starting_after' },
+        { path: '/_stainless_unknown_path' },
+      ),
+    ).rejects.toThrow(Runloop.NotFoundError);
+  });
+
   test('logs', async () => {
     const responsePromise = client.blueprints.logs('id');
     const rawResponse = await responsePromise.asResponse();

@@ -94,6 +94,29 @@ export class Blueprints extends APIResource {
   }
 
   /**
+   * List all public Blueprints that are available to all users.
+   */
+  listPublic(
+    query?: BlueprintListPublicParams,
+    options?: Core.RequestOptions,
+  ): Core.PagePromise<BlueprintViewsBlueprintsCursorIDPage, BlueprintView>;
+  listPublic(
+    options?: Core.RequestOptions,
+  ): Core.PagePromise<BlueprintViewsBlueprintsCursorIDPage, BlueprintView>;
+  listPublic(
+    query: BlueprintListPublicParams | Core.RequestOptions = {},
+    options?: Core.RequestOptions,
+  ): Core.PagePromise<BlueprintViewsBlueprintsCursorIDPage, BlueprintView> {
+    if (isRequestOptions(query)) {
+      return this.listPublic({}, query);
+    }
+    return this._client.getAPIList('/v1/blueprints/list_public', BlueprintViewsBlueprintsCursorIDPage, {
+      query,
+      ...options,
+    });
+  }
+
+  /**
    * Get all logs from the building of a Blueprint.
    */
   logs(id: string, options?: Core.RequestOptions): Core.APIPromise<BlueprintBuildLogsListView> {
@@ -469,6 +492,13 @@ export interface BlueprintListParams extends BlueprintsCursorIDPageParams {
   name?: string;
 }
 
+export interface BlueprintListPublicParams extends BlueprintsCursorIDPageParams {
+  /**
+   * Filter by name
+   */
+  name?: string;
+}
+
 export interface BlueprintPreviewParams {
   /**
    * Name of the Blueprint.
@@ -574,6 +604,7 @@ export declare namespace Blueprints {
     BlueprintViewsBlueprintsCursorIDPage as BlueprintViewsBlueprintsCursorIDPage,
     type BlueprintCreateParams as BlueprintCreateParams,
     type BlueprintListParams as BlueprintListParams,
+    type BlueprintListPublicParams as BlueprintListPublicParams,
     type BlueprintPreviewParams as BlueprintPreviewParams,
   };
 }
