@@ -130,3 +130,24 @@ export namespace LaunchParameters {
     username: string;
   }
 }
+
+export interface RunProfile {
+  /**
+   * Mapping of Environment Variable to Value. May be shown in devbox logging.
+   * Example: {"DB_PASS": "DATABASE_PASSWORD"} would set the environment variable
+   * 'DB_PASS' to the value 'DATABASE_PASSWORD_VALUE'.
+   */
+  envVars?: { [key: string]: string } | null;
+
+  /**
+   * Purpose of the run.
+   */
+  purpose?: string | null;
+
+  /**
+   * Mapping of Environment Variable to User Secret Name. Never shown in devbox
+   * logging. Example: {"DB_PASS": "DATABASE_PASSWORD"} would set the environment
+   * variable 'DB_PASS' to the value of the secret 'DATABASE_PASSWORD'.
+   */
+  secrets?: { [key: string]: string } | null;
+}

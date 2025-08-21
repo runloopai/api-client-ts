@@ -5,6 +5,7 @@ Types:
 - <code><a href="./src/resources/shared.ts">AfterIdle</a></code>
 - <code><a href="./src/resources/shared.ts">CodeMountParameters</a></code>
 - <code><a href="./src/resources/shared.ts">LaunchParameters</a></code>
+- <code><a href="./src/resources/shared.ts">RunProfile</a></code>
 
 # Benchmarks
 
@@ -296,6 +297,25 @@ Methods:
 - <code title="post /v1/scenarios/scorers/{id}">client.scenarios.scorers.<a href="./src/resources/scenarios/scorers.ts">update</a>(id, { ...params }) -> ScorerUpdateResponse</code>
 - <code title="get /v1/scenarios/scorers">client.scenarios.scorers.<a href="./src/resources/scenarios/scorers.ts">list</a>({ ...params }) -> ScorerListResponsesScenarioScorersCursorIDPage</code>
 - <code title="post /v1/scenarios/scorers/{id}/validate">client.scenarios.scorers.<a href="./src/resources/scenarios/scorers.ts">validate</a>(id, { ...params }) -> ScorerValidateResponse</code>
+
+# Objects
+
+Types:
+
+- <code><a href="./src/resources/objects.ts">ObjectCreateParameters</a></code>
+- <code><a href="./src/resources/objects.ts">ObjectDownloadURLView</a></code>
+- <code><a href="./src/resources/objects.ts">ObjectListView</a></code>
+- <code><a href="./src/resources/objects.ts">ObjectView</a></code>
+
+Methods:
+
+- <code title="post /v1/objects">client.objects.<a href="./src/resources/objects.ts">create</a>({ ...params }) -> ObjectView</code>
+- <code title="get /v1/objects/{id}">client.objects.<a href="./src/resources/objects.ts">retrieve</a>(id) -> ObjectView</code>
+- <code title="get /v1/objects">client.objects.<a href="./src/resources/objects.ts">list</a>({ ...params }) -> ObjectViewsObjectsCursorIDPage</code>
+- <code title="post /v1/objects/{id}/delete">client.objects.<a href="./src/resources/objects.ts">delete</a>(id) -> ObjectView</code>
+- <code title="post /v1/objects/{id}/complete">client.objects.<a href="./src/resources/objects.ts">complete</a>(id) -> ObjectView</code>
+- <code title="get /v1/objects/{id}/download">client.objects.<a href="./src/resources/objects.ts">download</a>(id, { ...params }) -> ObjectDownloadURLView</code>
+- <code title="get /v1/objects/list_public">client.objects.<a href="./src/resources/objects.ts">listPublic</a>({ ...params }) -> ObjectViewsObjectsCursorIDPage</code>
 
 # Repositories
 

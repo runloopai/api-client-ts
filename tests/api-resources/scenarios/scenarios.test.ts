@@ -65,7 +65,6 @@ describe('resource scenarios', () => {
           resource_size_request: 'X_SMALL',
           user_parameters: { uid: 0, username: 'username' },
         },
-        prebuilt_id: 'prebuilt_id',
         snapshot_id: 'snapshot_id',
         working_directory: 'working_directory',
       },
@@ -73,6 +72,7 @@ describe('resource scenarios', () => {
       reference_output: 'reference_output',
       required_environment_variables: ['string'],
       required_secret_names: ['string'],
+      validation_type: 'FORWARD',
     });
   });
 
@@ -133,7 +133,6 @@ describe('resource scenarios', () => {
               resource_size_request: 'X_SMALL',
               user_parameters: { uid: 0, username: 'username' },
             },
-            prebuilt_id: 'prebuilt_id',
             snapshot_id: 'snapshot_id',
             working_directory: 'working_directory',
           },
@@ -157,6 +156,7 @@ describe('resource scenarios', () => {
               },
             ],
           },
+          validation_type: 'FORWARD',
         },
         { path: '/_stainless_unknown_path' },
       ),

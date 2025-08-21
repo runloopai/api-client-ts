@@ -8,9 +8,9 @@ const client = new Runloop({
   baseURL: process.env['TEST_API_BASE_URL'] ?? 'http://127.0.0.1:4010',
 });
 
-describe('resource benchmarks', () => {
+describe('resource objects', () => {
   test('create: only required params', async () => {
-    const responsePromise = client.benchmarks.create({ name: 'name' });
+    const responsePromise = client.objects.create({ content_type: 'UNSPECIFIED', name: 'name' });
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
     const response = await responsePromise;
@@ -21,19 +21,15 @@ describe('resource benchmarks', () => {
   });
 
   test('create: required and optional params', async () => {
-    const response = await client.benchmarks.create({
+    const response = await client.objects.create({
+      content_type: 'UNSPECIFIED',
       name: 'name',
-      attribution: 'attribution',
-      description: 'description',
       metadata: { foo: 'string' },
-      required_environment_variables: ['string'],
-      required_secret_names: ['string'],
-      scenario_ids: ['string'],
     });
   });
 
   test('retrieve', async () => {
-    const responsePromise = client.benchmarks.retrieve('id');
+    const responsePromise = client.objects.retrieve('id');
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
     const response = await responsePromise;
@@ -45,36 +41,13 @@ describe('resource benchmarks', () => {
 
   test('retrieve: request options instead of params are passed correctly', async () => {
     // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
-    await expect(client.benchmarks.retrieve('id', { path: '/_stainless_unknown_path' })).rejects.toThrow(
+    await expect(client.objects.retrieve('id', { path: '/_stainless_unknown_path' })).rejects.toThrow(
       Runloop.NotFoundError,
     );
   });
 
-  test('update: only required params', async () => {
-    const responsePromise = client.benchmarks.update('id', { name: 'name' });
-    const rawResponse = await responsePromise.asResponse();
-    expect(rawResponse).toBeInstanceOf(Response);
-    const response = await responsePromise;
-    expect(response).not.toBeInstanceOf(Response);
-    const dataAndResponse = await responsePromise.withResponse();
-    expect(dataAndResponse.data).toBe(response);
-    expect(dataAndResponse.response).toBe(rawResponse);
-  });
-
-  test('update: required and optional params', async () => {
-    const response = await client.benchmarks.update('id', {
-      name: 'name',
-      attribution: 'attribution',
-      description: 'description',
-      metadata: { foo: 'string' },
-      required_environment_variables: ['string'],
-      required_secret_names: ['string'],
-      scenario_ids: ['string'],
-    });
-  });
-
   test('list', async () => {
-    const responsePromise = client.benchmarks.list();
+    const responsePromise = client.objects.list();
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
     const response = await responsePromise;
@@ -86,7 +59,7 @@ describe('resource benchmarks', () => {
 
   test('list: request options instead of params are passed correctly', async () => {
     // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
-    await expect(client.benchmarks.list({ path: '/_stainless_unknown_path' })).rejects.toThrow(
+    await expect(client.objects.list({ path: '/_stainless_unknown_path' })).rejects.toThrow(
       Runloop.NotFoundError,
     );
   });
@@ -94,15 +67,22 @@ describe('resource benchmarks', () => {
   test('list: request options and params are passed correctly', async () => {
     // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
     await expect(
-      client.benchmarks.list(
-        { limit: 0, starting_after: 'starting_after' },
+      client.objects.list(
+        {
+          content_type: 'content_type',
+          limit: 0,
+          name: 'name',
+          search: 'search',
+          starting_after: 'starting_after',
+          state: 'state',
+        },
         { path: '/_stainless_unknown_path' },
       ),
     ).rejects.toThrow(Runloop.NotFoundError);
   });
 
-  test('definitions', async () => {
-    const responsePromise = client.benchmarks.definitions('id');
+  test('delete', async () => {
+    const responsePromise = client.objects.delete('id');
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
     const response = await responsePromise;
@@ -112,26 +92,58 @@ describe('resource benchmarks', () => {
     expect(dataAndResponse.response).toBe(rawResponse);
   });
 
-  test('definitions: request options instead of params are passed correctly', async () => {
+  test('delete: request options and params are passed correctly', async () => {
     // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
-    await expect(client.benchmarks.definitions('id', { path: '/_stainless_unknown_path' })).rejects.toThrow(
+    await expect(client.objects.delete('id', {}, { path: '/_stainless_unknown_path' })).rejects.toThrow(
       Runloop.NotFoundError,
     );
   });
 
-  test('definitions: request options and params are passed correctly', async () => {
+  test('complete', async () => {
+    const responsePromise = client.objects.complete('id');
+    const rawResponse = await responsePromise.asResponse();
+    expect(rawResponse).toBeInstanceOf(Response);
+    const response = await responsePromise;
+    expect(response).not.toBeInstanceOf(Response);
+    const dataAndResponse = await responsePromise.withResponse();
+    expect(dataAndResponse.data).toBe(response);
+    expect(dataAndResponse.response).toBe(rawResponse);
+  });
+
+  test('complete: request options and params are passed correctly', async () => {
+    // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
+    await expect(client.objects.complete('id', {}, { path: '/_stainless_unknown_path' })).rejects.toThrow(
+      Runloop.NotFoundError,
+    );
+  });
+
+  test('download', async () => {
+    const responsePromise = client.objects.download('id');
+    const rawResponse = await responsePromise.asResponse();
+    expect(rawResponse).toBeInstanceOf(Response);
+    const response = await responsePromise;
+    expect(response).not.toBeInstanceOf(Response);
+    const dataAndResponse = await responsePromise.withResponse();
+    expect(dataAndResponse.data).toBe(response);
+    expect(dataAndResponse.response).toBe(rawResponse);
+  });
+
+  test('download: request options instead of params are passed correctly', async () => {
+    // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
+    await expect(client.objects.download('id', { path: '/_stainless_unknown_path' })).rejects.toThrow(
+      Runloop.NotFoundError,
+    );
+  });
+
+  test('download: request options and params are passed correctly', async () => {
     // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
     await expect(
-      client.benchmarks.definitions(
-        'id',
-        { limit: 0, starting_after: 'starting_after' },
-        { path: '/_stainless_unknown_path' },
-      ),
+      client.objects.download('id', { duration_seconds: 0 }, { path: '/_stainless_unknown_path' }),
     ).rejects.toThrow(Runloop.NotFoundError);
   });
 
   test('listPublic', async () => {
-    const responsePromise = client.benchmarks.listPublic();
+    const responsePromise = client.objects.listPublic();
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
     const response = await responsePromise;
@@ -143,7 +155,7 @@ describe('resource benchmarks', () => {
 
   test('listPublic: request options instead of params are passed correctly', async () => {
     // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
-    await expect(client.benchmarks.listPublic({ path: '/_stainless_unknown_path' })).rejects.toThrow(
+    await expect(client.objects.listPublic({ path: '/_stainless_unknown_path' })).rejects.toThrow(
       Runloop.NotFoundError,
     );
   });
@@ -151,30 +163,17 @@ describe('resource benchmarks', () => {
   test('listPublic: request options and params are passed correctly', async () => {
     // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
     await expect(
-      client.benchmarks.listPublic(
-        { limit: 0, starting_after: 'starting_after' },
+      client.objects.listPublic(
+        {
+          content_type: 'content_type',
+          limit: 0,
+          name: 'name',
+          search: 'search',
+          starting_after: 'starting_after',
+          state: 'state',
+        },
         { path: '/_stainless_unknown_path' },
       ),
     ).rejects.toThrow(Runloop.NotFoundError);
-  });
-
-  test('startRun: only required params', async () => {
-    const responsePromise = client.benchmarks.startRun({ benchmark_id: 'benchmark_id' });
-    const rawResponse = await responsePromise.asResponse();
-    expect(rawResponse).toBeInstanceOf(Response);
-    const response = await responsePromise;
-    expect(response).not.toBeInstanceOf(Response);
-    const dataAndResponse = await responsePromise.withResponse();
-    expect(dataAndResponse.data).toBe(response);
-    expect(dataAndResponse.response).toBe(rawResponse);
-  });
-
-  test('startRun: required and optional params', async () => {
-    const response = await client.benchmarks.startRun({
-      benchmark_id: 'benchmark_id',
-      metadata: { foo: 'string' },
-      run_name: 'run_name',
-      runProfile: { envVars: { foo: 'string' }, purpose: 'purpose', secrets: { foo: 'string' } },
-    });
   });
 });

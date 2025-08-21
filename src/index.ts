@@ -15,6 +15,8 @@ import {
   DevboxesCursorIDPageResponse,
   type DiskSnapshotsCursorIDPageParams,
   DiskSnapshotsCursorIDPageResponse,
+  type ObjectsCursorIDPageParams,
+  ObjectsCursorIDPageResponse,
   type RepositoriesCursorIDPageParams,
   RepositoriesCursorIDPageResponse,
   type ScenarioRunsCursorIDPageParams,
@@ -41,6 +43,20 @@ import {
   BlueprintViewsBlueprintsCursorIDPage,
   Blueprints,
 } from './resources/blueprints';
+import {
+  ObjectCompleteParams,
+  ObjectCreateParameters,
+  ObjectCreateParams,
+  ObjectDeleteParams,
+  ObjectDownloadParams,
+  ObjectDownloadURLView,
+  ObjectListParams,
+  ObjectListPublicParams,
+  ObjectListView,
+  ObjectView,
+  ObjectViewsObjectsCursorIDPage,
+  Objects,
+} from './resources/objects';
 import {
   Repositories,
   RepositoryConnectionListView,
@@ -260,6 +276,7 @@ export class Runloop extends Core.APIClient {
   blueprints: API.Blueprints = new API.Blueprints(this);
   devboxes: API.Devboxes = new API.Devboxes(this);
   scenarios: API.Scenarios = new API.Scenarios(this);
+  objects: API.Objects = new API.Objects(this);
   repositories: API.Repositories = new API.Repositories(this);
   secrets: API.Secrets = new API.Secrets(this);
 
@@ -315,6 +332,8 @@ Runloop.DevboxViewsDevboxesCursorIDPage = DevboxViewsDevboxesCursorIDPage;
 Runloop.DevboxSnapshotViewsDiskSnapshotsCursorIDPage = DevboxSnapshotViewsDiskSnapshotsCursorIDPage;
 Runloop.Scenarios = Scenarios;
 Runloop.ScenarioViewsScenariosCursorIDPage = ScenarioViewsScenariosCursorIDPage;
+Runloop.Objects = Objects;
+Runloop.ObjectViewsObjectsCursorIDPage = ObjectViewsObjectsCursorIDPage;
 Runloop.Repositories = Repositories;
 Runloop.RepositoryConnectionViewsRepositoriesCursorIDPage = RepositoryConnectionViewsRepositoriesCursorIDPage;
 Runloop.Secrets = Secrets;
@@ -374,6 +393,12 @@ export declare namespace Runloop {
   export {
     type ScenarioScorersCursorIDPageParams as ScenarioScorersCursorIDPageParams,
     type ScenarioScorersCursorIDPageResponse as ScenarioScorersCursorIDPageResponse,
+  };
+
+  export import ObjectsCursorIDPage = Pagination.ObjectsCursorIDPage;
+  export {
+    type ObjectsCursorIDPageParams as ObjectsCursorIDPageParams,
+    type ObjectsCursorIDPageResponse as ObjectsCursorIDPageResponse,
   };
 
   export {
@@ -467,6 +492,21 @@ export declare namespace Runloop {
   };
 
   export {
+    Objects as Objects,
+    type ObjectCreateParameters as ObjectCreateParameters,
+    type ObjectDownloadURLView as ObjectDownloadURLView,
+    type ObjectListView as ObjectListView,
+    type ObjectView as ObjectView,
+    ObjectViewsObjectsCursorIDPage as ObjectViewsObjectsCursorIDPage,
+    type ObjectCreateParams as ObjectCreateParams,
+    type ObjectListParams as ObjectListParams,
+    type ObjectDeleteParams as ObjectDeleteParams,
+    type ObjectCompleteParams as ObjectCompleteParams,
+    type ObjectDownloadParams as ObjectDownloadParams,
+    type ObjectListPublicParams as ObjectListPublicParams,
+  };
+
+  export {
     Repositories as Repositories,
     type RepositoryConnectionListView as RepositoryConnectionListView,
     type RepositoryConnectionView as RepositoryConnectionView,
@@ -497,6 +537,7 @@ export declare namespace Runloop {
   export type AfterIdle = API.AfterIdle;
   export type CodeMountParameters = API.CodeMountParameters;
   export type LaunchParameters = API.LaunchParameters;
+  export type RunProfile = API.RunProfile;
 }
 
 export { toFile, fileFromPath } from './uploads';
