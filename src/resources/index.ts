@@ -66,6 +66,20 @@ export {
   type DevboxWriteFileContentsParams,
 } from './devboxes/devboxes';
 export {
+  ObjectViewsObjectsCursorIDPage,
+  Objects,
+  type ObjectCreateParameters,
+  type ObjectDownloadURLView,
+  type ObjectListView,
+  type ObjectView,
+  type ObjectCreateParams,
+  type ObjectListParams,
+  type ObjectDeleteParams,
+  type ObjectCompleteParams,
+  type ObjectDownloadParams,
+  type ObjectListPublicParams,
+} from './objects';
+export {
   RepositoryConnectionViewsRepositoriesCursorIDPage,
   Repositories,
   type RepositoryConnectionListView,

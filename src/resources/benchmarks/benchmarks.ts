@@ -3,6 +3,7 @@
 import { APIResource } from '../../resource';
 import { isRequestOptions } from '../../core';
 import * as Core from '../../core';
+import * as Shared from '../shared';
 import * as RunsAPI from './runs';
 import { RunListParams, RunListScenarioRunsParams, Runs } from './runs';
 import * as ScenariosAPI from '../scenarios/scenarios';
@@ -124,6 +125,16 @@ export interface BenchmarkCreateParameters {
    * The name of the Benchmark. This must be unique.
    */
   name: string;
+
+  /**
+   * Attribution information for the benchmark.
+   */
+  attribution?: string | null;
+
+  /**
+   * Detailed description of the benchmark.
+   */
+  description?: string | null;
 
   /**
    * User defined metadata to attach to the benchmark for organization.
@@ -252,6 +263,16 @@ export interface BenchmarkView {
   scenarioIds: Array<string>;
 
   /**
+   * Attribution information for the benchmark.
+   */
+  attribution?: string;
+
+  /**
+   * Detailed description of the benchmark.
+   */
+  description?: string;
+
+  /**
    * Whether this benchmark is public.
    */
   is_public?: boolean;
@@ -301,33 +322,7 @@ export interface StartBenchmarkRunParameters {
   /**
    * Runtime configuration to use for this benchmark run
    */
-  runProfile?: StartBenchmarkRunParameters.RunProfile | null;
-}
-
-export namespace StartBenchmarkRunParameters {
-  /**
-   * Runtime configuration to use for this benchmark run
-   */
-  export interface RunProfile {
-    /**
-     * Mapping of Environment Variable to Value. May be shown in devbox logging.
-     * Example: {"DB_PASS": "DATABASE_PASSWORD"} would set the environment variable
-     * 'DB_PASS' to the value 'DATABASE_PASSWORD_VALUE'.
-     */
-    envVars?: { [key: string]: string } | null;
-
-    /**
-     * Purpose of the run.
-     */
-    purpose?: string | null;
-
-    /**
-     * Mapping of Environment Variable to User Secret Name. Never shown in devbox
-     * logging. Example: {"DB_PASS": "DATABASE_PASSWORD"} would set the environment
-     * variable 'DB_PASS' to the value of the secret 'DATABASE_PASSWORD'.
-     */
-    secrets?: { [key: string]: string } | null;
-  }
+  runProfile?: Shared.RunProfile | null;
 }
 
 export interface BenchmarkCreateParams {
@@ -335,6 +330,16 @@ export interface BenchmarkCreateParams {
    * The name of the Benchmark. This must be unique.
    */
   name: string;
+
+  /**
+   * Attribution information for the benchmark.
+   */
+  attribution?: string | null;
+
+  /**
+   * Detailed description of the benchmark.
+   */
+  description?: string | null;
 
   /**
    * User defined metadata to attach to the benchmark for organization.
@@ -365,6 +370,16 @@ export interface BenchmarkUpdateParams {
    * The name of the Benchmark. This must be unique.
    */
   name: string;
+
+  /**
+   * Attribution information for the benchmark.
+   */
+  attribution?: string | null;
+
+  /**
+   * Detailed description of the benchmark.
+   */
+  description?: string | null;
 
   /**
    * User defined metadata to attach to the benchmark for organization.
@@ -425,33 +440,7 @@ export interface BenchmarkStartRunParams {
   /**
    * Runtime configuration to use for this benchmark run
    */
-  runProfile?: BenchmarkStartRunParams.RunProfile | null;
-}
-
-export namespace BenchmarkStartRunParams {
-  /**
-   * Runtime configuration to use for this benchmark run
-   */
-  export interface RunProfile {
-    /**
-     * Mapping of Environment Variable to Value. May be shown in devbox logging.
-     * Example: {"DB_PASS": "DATABASE_PASSWORD"} would set the environment variable
-     * 'DB_PASS' to the value 'DATABASE_PASSWORD_VALUE'.
-     */
-    envVars?: { [key: string]: string } | null;
-
-    /**
-     * Purpose of the run.
-     */
-    purpose?: string | null;
-
-    /**
-     * Mapping of Environment Variable to User Secret Name. Never shown in devbox
-     * logging. Example: {"DB_PASS": "DATABASE_PASSWORD"} would set the environment
-     * variable 'DB_PASS' to the value of the secret 'DATABASE_PASSWORD'.
-     */
-    secrets?: { [key: string]: string } | null;
-  }
+  runProfile?: Shared.RunProfile | null;
 }
 
 Benchmarks.BenchmarkViewsBenchmarksCursorIDPage = BenchmarkViewsBenchmarksCursorIDPage;

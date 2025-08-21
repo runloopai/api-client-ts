@@ -120,7 +120,6 @@ describe('resource scorers', () => {
           resource_size_request: 'X_SMALL',
           user_parameters: { uid: 0, username: 'username' },
         },
-        prebuilt_id: 'prebuilt_id',
         snapshot_id: 'snapshot_id',
         working_directory: 'working_directory',
       },

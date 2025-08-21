@@ -196,6 +196,11 @@ export interface ScenarioCreateParameters {
    * scenario will fail to start.
    */
   required_secret_names?: Array<string> | null;
+
+  /**
+   * Validation strategy.
+   */
+  validation_type?: 'FORWARD' | 'REVERSE' | 'EVALUATION' | null;
 }
 
 /**
@@ -212,11 +217,6 @@ export interface ScenarioEnvironment {
    * Optional launch parameters to apply to the devbox environment at launch.
    */
   launch_parameters?: Shared.LaunchParameters | null;
-
-  /**
-   * Use the prebuilt with matching ID.
-   */
-  prebuilt_id?: string | null;
 
   /**
    * Use the snapshot with matching ID.
@@ -356,6 +356,11 @@ export interface ScenarioUpdateParameters {
    * The scoring contract for the Scenario.
    */
   scoring_contract?: ScoringContractUpdate | null;
+
+  /**
+   * Validation strategy.
+   */
+  validation_type?: 'FORWARD' | 'REVERSE' | 'EVALUATION' | null;
 }
 
 /**
@@ -416,6 +421,11 @@ export interface ScenarioView {
    * missing, the scenario will fail to start.
    */
   required_secret_names?: Array<string>;
+
+  /**
+   * Validation strategy.
+   */
+  validation_type?: 'FORWARD' | 'REVERSE' | 'EVALUATION' | null;
 }
 
 /**
@@ -660,33 +670,7 @@ export interface StartScenarioRunParameters {
   /**
    * Runtime configuration to use for this benchmark run
    */
-  runProfile?: StartScenarioRunParameters.RunProfile | null;
-}
-
-export namespace StartScenarioRunParameters {
-  /**
-   * Runtime configuration to use for this benchmark run
-   */
-  export interface RunProfile {
-    /**
-     * Mapping of Environment Variable to Value. May be shown in devbox logging.
-     * Example: {"DB_PASS": "DATABASE_PASSWORD"} would set the environment variable
-     * 'DB_PASS' to the value 'DATABASE_PASSWORD_VALUE'.
-     */
-    envVars?: { [key: string]: string } | null;
-
-    /**
-     * Purpose of the run.
-     */
-    purpose?: string | null;
-
-    /**
-     * Mapping of Environment Variable to User Secret Name. Never shown in devbox
-     * logging. Example: {"DB_PASS": "DATABASE_PASSWORD"} would set the environment
-     * variable 'DB_PASS' to the value of the secret 'DATABASE_PASSWORD'.
-     */
-    secrets?: { [key: string]: string } | null;
-  }
+  runProfile?: Shared.RunProfile | null;
 }
 
 export interface ScenarioCreateParams {
@@ -734,6 +718,11 @@ export interface ScenarioCreateParams {
    * scenario will fail to start.
    */
   required_secret_names?: Array<string> | null;
+
+  /**
+   * Validation strategy.
+   */
+  validation_type?: 'FORWARD' | 'REVERSE' | 'EVALUATION' | null;
 }
 
 export interface ScenarioUpdateParams {
@@ -778,6 +767,11 @@ export interface ScenarioUpdateParams {
    * The scoring contract for the Scenario.
    */
   scoring_contract?: ScoringContractUpdate | null;
+
+  /**
+   * Validation strategy.
+   */
+  validation_type?: 'FORWARD' | 'REVERSE' | 'EVALUATION' | null;
 }
 
 export interface ScenarioListParams extends ScenariosCursorIDPageParams {
@@ -823,33 +817,7 @@ export interface ScenarioStartRunParams {
   /**
    * Runtime configuration to use for this benchmark run
    */
-  runProfile?: ScenarioStartRunParams.RunProfile | null;
-}
-
-export namespace ScenarioStartRunParams {
-  /**
-   * Runtime configuration to use for this benchmark run
-   */
-  export interface RunProfile {
-    /**
-     * Mapping of Environment Variable to Value. May be shown in devbox logging.
-     * Example: {"DB_PASS": "DATABASE_PASSWORD"} would set the environment variable
-     * 'DB_PASS' to the value 'DATABASE_PASSWORD_VALUE'.
-     */
-    envVars?: { [key: string]: string } | null;
-
-    /**
-     * Purpose of the run.
-     */
-    purpose?: string | null;
-
-    /**
-     * Mapping of Environment Variable to User Secret Name. Never shown in devbox
-     * logging. Example: {"DB_PASS": "DATABASE_PASSWORD"} would set the environment
-     * variable 'DB_PASS' to the value of the secret 'DATABASE_PASSWORD'.
-     */
-    secrets?: { [key: string]: string } | null;
-  }
+  runProfile?: Shared.RunProfile | null;
 }
 
 Scenarios.ScenarioViewsScenariosCursorIDPage = ScenarioViewsScenariosCursorIDPage;
