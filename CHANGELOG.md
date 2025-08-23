@@ -1,5 +1,25 @@
 # Changelog
 
+## 0.45.0 (2025-08-23)
+
+Full Changelog: [v0.44.0...v0.45.0](https://github.com/runloopai/api-client-ts/compare/v0.44.0...v0.45.0)
+
+### Features
+
+* **api:** api update ([8d4cf8a](https://github.com/runloopai/api-client-ts/commit/8d4cf8a4c2288e6317d94b67bf4a9532eca16fba))
+* **api:** api update ([b03c0d2](https://github.com/runloopai/api-client-ts/commit/b03c0d22ee54d4e917bba333824d98d25585de62))
+* **api:** api update ([5ded502](https://github.com/runloopai/api-client-ts/commit/5ded502778f2e26dfd85f8efbe42efa7f6ef44fe))
+
+
+### Chores
+
+* **deps:** update dependency node-fetch to v2.6.13 ([3926bb1](https://github.com/runloopai/api-client-ts/commit/3926bb139059cb053674a8ea18a2b878b395cfab))
+* **internal:** formatting change ([6be61a0](https://github.com/runloopai/api-client-ts/commit/6be61a05cc9296663a590700e586284e06b11636))
+* **internal:** move publish config ([fd3bca4](https://github.com/runloopai/api-client-ts/commit/fd3bca47ce1857ba27b0ff147ef2731ab52fe814))
+* **internal:** update comment in script ([8ee022f](https://github.com/runloopai/api-client-ts/commit/8ee022fcf20d72b0810fb97c4752f5826989358f))
+* update @stainless-api/prism-cli to v5.15.0 ([afde436](https://github.com/runloopai/api-client-ts/commit/afde436ef589b88d5d1cdf6b63ea875de68f036d))
+* update CI script ([30db740](https://github.com/runloopai/api-client-ts/commit/30db7401f3b0fa12611cfc1ea300216a740a9b1a))
+
 ## 0.44.0 (2025-08-04)
 
 Full Changelog: [v0.43.0...v0.44.0](https://github.com/runloopai/api-client-ts/compare/v0.43.0...v0.44.0)
