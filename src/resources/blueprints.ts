@@ -193,6 +193,11 @@ export interface BlueprintBuildParameters {
   launch_parameters?: Shared.LaunchParameters | null;
 
   /**
+   * (Optional) User defined metadata for the Blueprint.
+   */
+  metadata?: { [key: string]: string } | null;
+
+  /**
    * (Optional) List of containerized services to include in the Blueprint. These
    * services will be pre-pulled during the build phase for optimized startup
    * performance.
@@ -421,6 +426,11 @@ export interface BlueprintCreateParams {
   launch_parameters?: Shared.LaunchParameters | null;
 
   /**
+   * (Optional) User defined metadata for the Blueprint.
+   */
+  metadata?: { [key: string]: string } | null;
+
+  /**
    * (Optional) List of containerized services to include in the Blueprint. These
    * services will be pre-pulled during the build phase for optimized startup
    * performance.
@@ -524,6 +534,11 @@ export interface BlueprintPreviewParams {
    * Parameters to configure your Devbox at launch time.
    */
   launch_parameters?: Shared.LaunchParameters | null;
+
+  /**
+   * (Optional) User defined metadata for the Blueprint.
+   */
+  metadata?: { [key: string]: string } | null;
 
   /**
    * (Optional) List of containerized services to include in the Blueprint. These
