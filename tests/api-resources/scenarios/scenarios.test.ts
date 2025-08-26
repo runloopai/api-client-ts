@@ -236,7 +236,24 @@ describe('resource scenarios', () => {
       benchmark_run_id: 'benchmark_run_id',
       metadata: { foo: 'string' },
       run_name: 'run_name',
-      runProfile: { envVars: { foo: 'string' }, purpose: 'purpose', secrets: { foo: 'string' } },
+      runProfile: {
+        envVars: { foo: 'string' },
+        launchParameters: {
+          after_idle: { idle_time_seconds: 0, on_idle: 'shutdown' },
+          architecture: 'x86_64',
+          available_ports: [0],
+          custom_cpu_cores: 0,
+          custom_disk_size: 0,
+          custom_gb_memory: 0,
+          keep_alive_time_seconds: 0,
+          launch_commands: ['string'],
+          required_services: ['string'],
+          resource_size_request: 'X_SMALL',
+          user_parameters: { uid: 0, username: 'username' },
+        },
+        purpose: 'purpose',
+        secrets: { foo: 'string' },
+      },
     });
   });
 });

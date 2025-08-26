@@ -46,6 +46,7 @@ describe('resource blueprints', () => {
         resource_size_request: 'X_SMALL',
         user_parameters: { uid: 0, username: 'username' },
       },
+      metadata: { foo: 'string' },
       services: [
         {
           image: 'image',
@@ -207,6 +208,7 @@ describe('resource blueprints', () => {
         resource_size_request: 'X_SMALL',
         user_parameters: { uid: 0, username: 'username' },
       },
+      metadata: { foo: 'string' },
       services: [
         {
           image: 'image',
