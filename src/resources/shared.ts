@@ -140,6 +140,11 @@ export interface RunProfile {
   envVars?: { [key: string]: string } | null;
 
   /**
+   * Additional runtime LaunchParameters to apply after the devbox starts.
+   */
+  launchParameters?: LaunchParameters | null;
+
+  /**
    * Purpose of the run.
    */
   purpose?: string | null;
