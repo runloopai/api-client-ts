@@ -10,7 +10,7 @@ const client = new Runloop({
 
 describe('resource objects', () => {
   test('create: only required params', async () => {
-    const responsePromise = client.objects.create({ content_type: 'UNSPECIFIED', name: 'name' });
+    const responsePromise = client.objects.create({ content_type: 'unspecified', name: 'name' });
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
     const response = await responsePromise;
@@ -22,7 +22,7 @@ describe('resource objects', () => {
 
   test('create: required and optional params', async () => {
     const response = await client.objects.create({
-      content_type: 'UNSPECIFIED',
+      content_type: 'unspecified',
       name: 'name',
       metadata: { foo: 'string' },
     });

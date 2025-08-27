@@ -115,27 +115,7 @@ export interface ObjectCreateParameters {
   /**
    * The content type of the Object.
    */
-  content_type:
-    | 'UNSPECIFIED'
-    | 'TEXT_PLAIN'
-    | 'TEXT_HTML'
-    | 'TEXT_CSS'
-    | 'TEXT_JAVASCRIPT'
-    | 'TEXT_YAML'
-    | 'TEXT_CSV'
-    | 'APPLICATION_JSON'
-    | 'APPLICATION_XML'
-    | 'APPLICATION_PDF'
-    | 'APPLICATION_ZIP'
-    | 'APPLICATION_GZIP'
-    | 'APPLICATION_TAR'
-    | 'APPLICATION_TAR_GZIP'
-    | 'APPLICATION_OCTET_STREAM'
-    | 'IMAGE_JPEG'
-    | 'IMAGE_PNG'
-    | 'IMAGE_GIF'
-    | 'IMAGE_SVG'
-    | 'IMAGE_WEBP';
+  content_type: 'unspecified' | 'text' | 'binary' | 'gzip' | 'tar' | 'tgz';
 
   /**
    * The name of the Object.
@@ -195,27 +175,7 @@ export interface ObjectView {
   /**
    * The content type of the Object.
    */
-  content_type:
-    | 'UNSPECIFIED'
-    | 'TEXT_PLAIN'
-    | 'TEXT_HTML'
-    | 'TEXT_CSS'
-    | 'TEXT_JAVASCRIPT'
-    | 'TEXT_YAML'
-    | 'TEXT_CSV'
-    | 'APPLICATION_JSON'
-    | 'APPLICATION_XML'
-    | 'APPLICATION_PDF'
-    | 'APPLICATION_ZIP'
-    | 'APPLICATION_GZIP'
-    | 'APPLICATION_TAR'
-    | 'APPLICATION_TAR_GZIP'
-    | 'APPLICATION_OCTET_STREAM'
-    | 'IMAGE_JPEG'
-    | 'IMAGE_PNG'
-    | 'IMAGE_GIF'
-    | 'IMAGE_SVG'
-    | 'IMAGE_WEBP';
+  content_type: 'unspecified' | 'text' | 'binary' | 'gzip' | 'tar' | 'tgz';
 
   /**
    * The name of the Object.
@@ -242,27 +202,7 @@ export interface ObjectCreateParams {
   /**
    * The content type of the Object.
    */
-  content_type:
-    | 'UNSPECIFIED'
-    | 'TEXT_PLAIN'
-    | 'TEXT_HTML'
-    | 'TEXT_CSS'
-    | 'TEXT_JAVASCRIPT'
-    | 'TEXT_YAML'
-    | 'TEXT_CSV'
-    | 'APPLICATION_JSON'
-    | 'APPLICATION_XML'
-    | 'APPLICATION_PDF'
-    | 'APPLICATION_ZIP'
-    | 'APPLICATION_GZIP'
-    | 'APPLICATION_TAR'
-    | 'APPLICATION_TAR_GZIP'
-    | 'APPLICATION_OCTET_STREAM'
-    | 'IMAGE_JPEG'
-    | 'IMAGE_PNG'
-    | 'IMAGE_GIF'
-    | 'IMAGE_SVG'
-    | 'IMAGE_WEBP';
+  content_type: 'unspecified' | 'text' | 'binary' | 'gzip' | 'tar' | 'tgz';
 
   /**
    * The name of the Object.
