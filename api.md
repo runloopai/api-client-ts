@@ -234,12 +234,17 @@ Methods:
 
 ## Executions
 
+Types:
+
+- <code><a href="./src/resources/devboxes/executions.ts">ExecutionUpdateChunk</a></code>
+
 Methods:
 
 - <code title="get /v1/devboxes/{devbox_id}/executions/{execution_id}">client.devboxes.executions.<a href="./src/resources/devboxes/executions.ts">retrieve</a>(devboxId, executionId, { ...params }) -> DevboxAsyncExecutionDetailView</code>
 - <code title="post /v1/devboxes/{id}/execute_async">client.devboxes.executions.<a href="./src/resources/devboxes/executions.ts">executeAsync</a>(id, { ...params }) -> DevboxAsyncExecutionDetailView</code>
 - <code title="post /v1/devboxes/{id}/execute_sync">client.devboxes.executions.<a href="./src/resources/devboxes/executions.ts">executeSync</a>(id, { ...params }) -> DevboxExecutionDetailView</code>
-- <code title="post /v1/devboxes/{devbox_id}/executions/{execution_id}/kill">client.devboxes.executions.<a href="./src/resources/devboxes/executions.ts">kill</a>(devboxId, executionId) -> DevboxAsyncExecutionDetailView</code>
+- <code title="post /v1/devboxes/{devbox_id}/executions/{execution_id}/kill">client.devboxes.executions.<a href="./src/resources/devboxes/executions.ts">kill</a>(devboxId, executionId, { ...params }) -> DevboxAsyncExecutionDetailView</code>
+- <code title="get /v1/devboxes/{devbox_id}/executions/{execution_id}/stream_updates">client.devboxes.executions.<a href="./src/resources/devboxes/executions.ts">streamUpdates</a>(devboxId, executionId, { ...params }) -> DevboxAsyncExecutionDetailView</code>
 
 # Scenarios
 

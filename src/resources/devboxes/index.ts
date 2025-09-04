@@ -53,9 +53,12 @@ export {
 } from './disk-snapshots';
 export {
   Executions,
+  type ExecutionUpdateChunk,
   type ExecutionRetrieveParams,
   type ExecutionExecuteAsyncParams,
   type ExecutionExecuteSyncParams,
+  type ExecutionKillParams,
+  type ExecutionStreamUpdatesParams,
 } from './executions';
 export { Logs, type DevboxLogsListView, type LogListParams } from './logs';
 export {
