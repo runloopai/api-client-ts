@@ -30,7 +30,10 @@ import * as ExecutionsAPI from './executions';
 import {
   ExecutionExecuteAsyncParams,
   ExecutionExecuteSyncParams,
+  ExecutionKillParams,
   ExecutionRetrieveParams,
+  ExecutionStreamUpdatesParams,
+  ExecutionUpdateChunk,
   Executions,
 } from './executions';
 import * as LogsAPI from './logs';
@@ -584,7 +587,9 @@ export interface DevboxView {
    * A list of capability groups this devbox has access to. This allows devboxes to
    * be compatible with certain tools sets like computer usage APIs.
    */
-  capabilities: Array<'unknown' | 'computer_usage' | 'browser_usage' | 'language_server'>;
+  capabilities: Array<
+    'unknown' | 'computer_usage' | 'browser_usage' | 'language_server' | 'docker_in_docker'
+  >;
 
   /**
    * Creation time of the Devbox (Unix timestamp milliseconds).
@@ -1082,8 +1087,11 @@ export declare namespace Devboxes {
 
   export {
     Executions as Executions,
+    type ExecutionUpdateChunk as ExecutionUpdateChunk,
     type ExecutionRetrieveParams as ExecutionRetrieveParams,
     type ExecutionExecuteAsyncParams as ExecutionExecuteAsyncParams,
     type ExecutionExecuteSyncParams as ExecutionExecuteSyncParams,
+    type ExecutionKillParams as ExecutionKillParams,
+    type ExecutionStreamUpdatesParams as ExecutionStreamUpdatesParams,
   };
 }

@@ -92,4 +92,39 @@ describe('resource executions', () => {
       client.devboxes.executions.kill('devbox_id', 'execution_id', { path: '/_stainless_unknown_path' }),
     ).rejects.toThrow(Runloop.NotFoundError);
   });
+
+  test('kill: request options and params are passed correctly', async () => {
+    // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
+    await expect(
+      client.devboxes.executions.kill(
+        'devbox_id',
+        'execution_id',
+        { kill_process_group: true },
+        { path: '/_stainless_unknown_path' },
+      ),
+    ).rejects.toThrow(Runloop.NotFoundError);
+  });
+
+  test('streamUpdates', async () => {
+    const responsePromise = client.devboxes.executions.streamUpdates('devbox_id', 'execution_id');
+    const rawResponse = await responsePromise.asResponse();
+    expect(rawResponse).toBeInstanceOf(Response);
+    const response = await responsePromise;
+    expect(response).not.toBeInstanceOf(Response);
+    const dataAndResponse = await responsePromise.withResponse();
+    expect(dataAndResponse.data).toBe(response);
+    expect(dataAndResponse.response).toBe(rawResponse);
+  });
+
+  test('streamUpdates: request options and params are passed correctly', async () => {
+    // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
+    await expect(
+      client.devboxes.executions.streamUpdates(
+        'devbox_id',
+        'execution_id',
+        { offset: 'offset' },
+        { path: '/_stainless_unknown_path' },
+      ),
+    ).rejects.toThrow(Runloop.NotFoundError);
+  });
 });

@@ -138,6 +138,14 @@ export interface BlueprintBuildParameters {
   base_blueprint_id?: string | null;
 
   /**
+   * (Optional) Name of previously built blueprint to use as a base blueprint for
+   * this build. When set, this will load the latest successfully built Blueprint
+   * with the given name. Only one of (base_blueprint_id, base_blueprint_name) should
+   * be specified.
+   */
+  base_blueprint_name?: string | null;
+
+  /**
    * A list of code mounts to be included in the Blueprint.
    */
   code_mounts?: Array<Shared.CodeMountParameters> | null;
@@ -295,6 +303,13 @@ export interface BlueprintView {
   containerized_services?: Array<BlueprintView.ContainerizedService> | null;
 
   /**
+   * Capabilities that will be available on Devbox.
+   */
+  devbox_capabilities?: Array<
+    'unknown' | 'computer_usage' | 'browser_usage' | 'language_server' | 'docker_in_docker'
+  > | null;
+
+  /**
    * The failure reason if the Blueprint build failed, if any.
    */
   failure_reason?: 'out_of_memory' | 'out_of_disk' | 'build_failed' | null;
@@ -375,6 +390,14 @@ export interface BlueprintCreateParams {
    * build.
    */
   base_blueprint_id?: string | null;
+
+  /**
+   * (Optional) Name of previously built blueprint to use as a base blueprint for
+   * this build. When set, this will load the latest successfully built Blueprint
+   * with the given name. Only one of (base_blueprint_id, base_blueprint_name) should
+   * be specified.
+   */
+  base_blueprint_name?: string | null;
 
   /**
    * A list of code mounts to be included in the Blueprint.
@@ -491,6 +514,14 @@ export interface BlueprintPreviewParams {
    * build.
    */
   base_blueprint_id?: string | null;
+
+  /**
+   * (Optional) Name of previously built blueprint to use as a base blueprint for
+   * this build. When set, this will load the latest successfully built Blueprint
+   * with the given name. Only one of (base_blueprint_id, base_blueprint_name) should
+   * be specified.
+   */
+  base_blueprint_name?: string | null;
 
   /**
    * A list of code mounts to be included in the Blueprint.
