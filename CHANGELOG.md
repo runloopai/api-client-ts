@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.47.0 (2025-09-04)
+
+Full Changelog: [v0.46.0...v0.47.0](https://github.com/runloopai/api-client-ts/compare/v0.46.0...v0.47.0)
+
+### Features
+
+* **api:** api update ([4ab0d25](https://github.com/runloopai/api-client-ts/commit/4ab0d25092bc88814058cea7ff546416bfe0bd7d))
+
+
+### Chores
+
+* configure new SDK language ([8d89624](https://github.com/runloopai/api-client-ts/commit/8d89624b661f923b5ee982d59c5b24e3d8bb12aa))
+
 ## 0.46.0 (2025-08-27)
 
 Full Changelog: [v0.45.0...v0.46.0](https://github.com/runloopai/api-client-ts/compare/v0.45.0...v0.46.0)
