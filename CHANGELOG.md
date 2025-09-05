@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.48.0 (2025-09-05)
+
+Full Changelog: [v0.47.0...v0.48.0](https://github.com/runloopai/api-client-ts/compare/v0.47.0...v0.48.0)
+
+### Features
+
+* **api:** api update ([75987e4](https://github.com/runloopai/api-client-ts/commit/75987e47819c54f6f11ac4e64c893189e0a0e5b7))
+
 ## 0.47.0 (2025-09-04)
 
 Full Changelog: [v0.46.0...v0.47.0](https://github.com/runloopai/api-client-ts/compare/v0.46.0...v0.47.0)

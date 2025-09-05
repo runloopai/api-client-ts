@@ -106,8 +106,8 @@ describe('resource executions', () => {
     ).rejects.toThrow(Runloop.NotFoundError);
   });
 
-  test('streamUpdates', async () => {
-    const responsePromise = client.devboxes.executions.streamUpdates('devbox_id', 'execution_id');
+  test('streamStderrUpdates', async () => {
+    const responsePromise = client.devboxes.executions.streamStderrUpdates('devbox_id', 'execution_id');
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
     const response = await responsePromise;
@@ -117,10 +117,33 @@ describe('resource executions', () => {
     expect(dataAndResponse.response).toBe(rawResponse);
   });
 
-  test('streamUpdates: request options and params are passed correctly', async () => {
+  test('streamStderrUpdates: request options and params are passed correctly', async () => {
     // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
     await expect(
-      client.devboxes.executions.streamUpdates(
+      client.devboxes.executions.streamStderrUpdates(
+        'devbox_id',
+        'execution_id',
+        { offset: 'offset' },
+        { path: '/_stainless_unknown_path' },
+      ),
+    ).rejects.toThrow(Runloop.NotFoundError);
+  });
+
+  test('streamStdoutUpdates', async () => {
+    const responsePromise = client.devboxes.executions.streamStdoutUpdates('devbox_id', 'execution_id');
+    const rawResponse = await responsePromise.asResponse();
+    expect(rawResponse).toBeInstanceOf(Response);
+    const response = await responsePromise;
+    expect(response).not.toBeInstanceOf(Response);
+    const dataAndResponse = await responsePromise.withResponse();
+    expect(dataAndResponse.data).toBe(response);
+    expect(dataAndResponse.response).toBe(rawResponse);
+  });
+
+  test('streamStdoutUpdates: request options and params are passed correctly', async () => {
+    // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
+    await expect(
+      client.devboxes.executions.streamStdoutUpdates(
         'devbox_id',
         'execution_id',
         { offset: 'offset' },

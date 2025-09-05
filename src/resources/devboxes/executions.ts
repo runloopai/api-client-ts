@@ -138,19 +138,37 @@ export class Executions extends APIResource {
   }
 
   /**
-   * Tails the logs for the given execution with SSE streaming
+   * Tails the stderr logs for the given execution with SSE streaming
    */
-  streamUpdates(
+  streamStderrUpdates(
     devboxId: string,
     executionId: string,
-    query: ExecutionStreamUpdatesParams | undefined = {},
+    query: ExecutionStreamStderrUpdatesParams | undefined = {},
     options?: Core.RequestOptions,
-  ): APIPromise<Stream<ExecutionUpdateChunk>> {
-    return this._client.get(`/v1/devboxes/${devboxId}/executions/${executionId}/stream_updates`, {
+  ): APIPromise<Stream<ExecutionStreamStderrUpdatesResponse>> {
+    return this._client.get(`/v1/devboxes/${devboxId}/executions/${executionId}/stream_stderr_updates`, {
       query,
       ...options,
+      headers: { Accept: 'text/plain', ...options?.headers },
       stream: true,
-    }) as APIPromise<Stream<ExecutionUpdateChunk>>;
+    }) as APIPromise<Stream<ExecutionStreamStderrUpdatesResponse>>;
+  }
+
+  /**
+   * Tails the stdout logs for the given execution with SSE streaming
+   */
+  streamStdoutUpdates(
+    devboxId: string,
+    executionId: string,
+    query: ExecutionStreamStdoutUpdatesParams | undefined = {},
+    options?: Core.RequestOptions,
+  ): APIPromise<Stream<ExecutionStreamStdoutUpdatesResponse>> {
+    return this._client.get(`/v1/devboxes/${devboxId}/executions/${executionId}/stream_stdout_updates`, {
+      query,
+      ...options,
+      headers: { Accept: 'text/plain', ...options?.headers },
+      stream: true,
+    }) as APIPromise<Stream<ExecutionStreamStdoutUpdatesResponse>>;
   }
 }
 
@@ -193,6 +211,10 @@ export interface ExecutionUpdateChunk {
    */
   stdout?: string | null;
 }
+
+export type ExecutionStreamStderrUpdatesResponse = string;
+
+export type ExecutionStreamStdoutUpdatesResponse = string;
 
 export interface ExecutionRetrieveParams {
   /**
@@ -239,7 +261,14 @@ export interface ExecutionKillParams {
   kill_process_group?: boolean | null;
 }
 
-export interface ExecutionStreamUpdatesParams {
+export interface ExecutionStreamStderrUpdatesParams {
+  /**
+   * The byte offset to start the stream from
+   */
+  offset?: string;
+}
+
+export interface ExecutionStreamStdoutUpdatesParams {
   /**
    * The byte offset to start the stream from
    */
@@ -249,10 +278,13 @@ export interface ExecutionStreamUpdatesParams {
 export declare namespace Executions {
   export {
     type ExecutionUpdateChunk as ExecutionUpdateChunk,
+    type ExecutionStreamStderrUpdatesResponse as ExecutionStreamStderrUpdatesResponse,
+    type ExecutionStreamStdoutUpdatesResponse as ExecutionStreamStdoutUpdatesResponse,
     type ExecutionRetrieveParams as ExecutionRetrieveParams,
     type ExecutionExecuteAsyncParams as ExecutionExecuteAsyncParams,
     type ExecutionExecuteSyncParams as ExecutionExecuteSyncParams,
     type ExecutionKillParams as ExecutionKillParams,
-    type ExecutionStreamUpdatesParams as ExecutionStreamUpdatesParams,
+    type ExecutionStreamStderrUpdatesParams as ExecutionStreamStderrUpdatesParams,
+    type ExecutionStreamStdoutUpdatesParams as ExecutionStreamStdoutUpdatesParams,
   };
 }
