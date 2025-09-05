@@ -54,11 +54,14 @@ export {
 export {
   Executions,
   type ExecutionUpdateChunk,
+  type ExecutionStreamStderrUpdatesResponse,
+  type ExecutionStreamStdoutUpdatesResponse,
   type ExecutionRetrieveParams,
   type ExecutionExecuteAsyncParams,
   type ExecutionExecuteSyncParams,
   type ExecutionKillParams,
-  type ExecutionStreamUpdatesParams,
+  type ExecutionStreamStderrUpdatesParams,
+  type ExecutionStreamStdoutUpdatesParams,
 } from './executions';
 export { Logs, type DevboxLogsListView, type LogListParams } from './logs';
 export {
