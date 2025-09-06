@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.48.1 (2025-09-06)
+
+Full Changelog: [v0.48.0...v0.48.1](https://github.com/runloopai/api-client-ts/compare/v0.48.0...v0.48.1)
+
+### Chores
+
+* ci build action ([933c88e](https://github.com/runloopai/api-client-ts/commit/933c88ed1e4065bb7e68254cf55a9d2be890258d))
+
 ## 0.48.0 (2025-09-05)
 
 Full Changelog: [v0.47.0...v0.48.0](https://github.com/runloopai/api-client-ts/compare/v0.47.0...v0.48.0)
