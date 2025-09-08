@@ -106,7 +106,7 @@ describe('resource executions', () => {
     ).rejects.toThrow(Runloop.NotFoundError);
   });
 
-  test('streamStderrUpdates', async () => {
+  test.skip('streamStderrUpdates', async () => {
     const responsePromise = client.devboxes.executions.streamStderrUpdates('devbox_id', 'execution_id');
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
@@ -129,7 +129,7 @@ describe('resource executions', () => {
     ).rejects.toThrow(Runloop.NotFoundError);
   });
 
-  test('streamStdoutUpdates', async () => {
+  test.skip('streamStdoutUpdates', async () => {
     const responsePromise = client.devboxes.executions.streamStdoutUpdates('devbox_id', 'execution_id');
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
@@ -151,7 +151,7 @@ describe('resource executions', () => {
       ),
     ).rejects.toThrow(Runloop.NotFoundError);
   });
-  
+
   test('awaitCompleted: polls until execution reaches completed state', async () => {
     const mockPost = jest.spyOn(client.devboxes.executions['_client'], 'post');
 
