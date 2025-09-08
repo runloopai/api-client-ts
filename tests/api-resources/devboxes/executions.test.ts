@@ -151,7 +151,7 @@ describe('resource executions', () => {
       ),
     ).rejects.toThrow(Runloop.NotFoundError);
   });
-  
+
   test('awaitCompleted: polls until execution reaches completed state', async () => {
     const mockPost = jest.spyOn(client.devboxes.executions['_client'], 'post');
 

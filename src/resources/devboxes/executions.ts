@@ -147,12 +147,12 @@ export class Executions extends APIResource {
     options?: Core.RequestOptions,
   ): APIPromise<Stream<ExecutionUpdateChunk>> {
     const defaultHeaders = {
-      "Accept": "text/event-stream",
-    }
+      Accept: 'text/event-stream',
+    };
     const mergedOptions: Core.RequestOptions = {
       headers: defaultHeaders,
-      ...options
-    }
+      ...options,
+    };
     return this._client.get(`/v1/devboxes/${devboxId}/executions/${executionId}/stream_stderr_updates`, {
       query,
       ...mergedOptions,
@@ -170,12 +170,12 @@ export class Executions extends APIResource {
     options?: Core.RequestOptions,
   ): APIPromise<Stream<ExecutionUpdateChunk>> {
     const defaultHeaders = {
-      "Accept": "text/event-stream",
-    }
+      Accept: 'text/event-stream',
+    };
     const mergedOptions: Core.RequestOptions = {
       headers: defaultHeaders,
-      ...options
-    }
+      ...options,
+    };
     return this._client.get(`/v1/devboxes/${devboxId}/executions/${executionId}/stream_stdout_updates`, {
       query,
       ...mergedOptions,
