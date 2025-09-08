@@ -247,6 +247,10 @@ export interface ExecutionExecuteSyncParams {
 }
 
 export interface ExecutionKillParams {
+  /**
+   * Whether to kill the entire process group (default: false). If true, kills all
+   * processes in the same process group as the target process.
+   */
   kill_process_group?: boolean | null;
 }
 
