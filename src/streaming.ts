@@ -32,11 +32,19 @@ export class Stream<Item> implements AsyncIterable<Item> {
       let done = false;
       try {
         for await (const sse of _iterSSEMessages(response, controller)) {
-          try {
-            if (sse.event === 'error') {
-              const error = JSON.parse(sse.data);
-              throw new APIError(error.code, error, error.message, undefined);
+          if (sse.event === 'error') {
+            let error: APIError | Error | undefined = new Error(sse.data);
+            try {
+              const errorObj = JSON.parse(sse.data);
+              error = new APIError(parseInt(errorObj.code), errorObj, errorObj.message, undefined);
+            } catch (e) {
+              console.error('Could not parse error message into JSON:', sse.data);
+              error = new Error(sse.data);
             }
+            throw error;
+          }
+
+          try {
             yield JSON.parse(sse.data);
           } catch (e) {
             console.error(`Could not parse message into JSON:`, sse.data);
