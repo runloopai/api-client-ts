@@ -33,9 +33,7 @@ import {
   ExecutionKillParams,
   ExecutionRetrieveParams,
   ExecutionStreamStderrUpdatesParams,
-  ExecutionStreamStderrUpdatesResponse,
   ExecutionStreamStdoutUpdatesParams,
-  ExecutionStreamStdoutUpdatesResponse,
   ExecutionUpdateChunk,
   Executions,
 } from './executions';
@@ -1162,8 +1160,6 @@ export declare namespace Devboxes {
   export {
     Executions as Executions,
     type ExecutionUpdateChunk as ExecutionUpdateChunk,
-    type ExecutionStreamStderrUpdatesResponse as ExecutionStreamStderrUpdatesResponse,
-    type ExecutionStreamStdoutUpdatesResponse as ExecutionStreamStdoutUpdatesResponse,
     type ExecutionRetrieveParams as ExecutionRetrieveParams,
     type ExecutionExecuteAsyncParams as ExecutionExecuteAsyncParams,
     type ExecutionExecuteSyncParams as ExecutionExecuteSyncParams,
