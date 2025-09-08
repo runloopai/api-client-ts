@@ -54,8 +54,6 @@ export {
 export {
   Executions,
   type ExecutionUpdateChunk,
-  type ExecutionStreamStderrUpdatesResponse,
-  type ExecutionStreamStdoutUpdatesResponse,
   type ExecutionRetrieveParams,
   type ExecutionExecuteAsyncParams,
   type ExecutionExecuteSyncParams,
