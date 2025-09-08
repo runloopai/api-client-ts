@@ -146,9 +146,16 @@ export class Executions extends APIResource {
     query: ExecutionStreamStderrUpdatesParams | undefined = {},
     options?: Core.RequestOptions,
   ): APIPromise<Stream<ExecutionUpdateChunk>> {
+    const defaultHeaders = {
+      "Accept": "text/event-stream",
+    }
+    const mergedOptions: Core.RequestOptions = {
+      headers: defaultHeaders,
+      ...options
+    }
     return this._client.get(`/v1/devboxes/${devboxId}/executions/${executionId}/stream_stderr_updates`, {
       query,
-      ...options,
+      ...mergedOptions,
       stream: true,
     }) as APIPromise<Stream<ExecutionUpdateChunk>>;
   }
@@ -162,9 +169,16 @@ export class Executions extends APIResource {
     query: ExecutionStreamStdoutUpdatesParams | undefined = {},
     options?: Core.RequestOptions,
   ): APIPromise<Stream<ExecutionUpdateChunk>> {
+    const defaultHeaders = {
+      "Accept": "text/event-stream",
+    }
+    const mergedOptions: Core.RequestOptions = {
+      headers: defaultHeaders,
+      ...options
+    }
     return this._client.get(`/v1/devboxes/${devboxId}/executions/${executionId}/stream_stdout_updates`, {
       query,
-      ...options,
+      ...mergedOptions,
       stream: true,
     }) as APIPromise<Stream<ExecutionUpdateChunk>>;
   }
