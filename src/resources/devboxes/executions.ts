@@ -7,6 +7,7 @@ import * as Core from '../../core';
 import * as DevboxesAPI from './devboxes';
 import { PollingOptions, poll } from '@runloop/api-client/lib/polling';
 import { Stream } from '../../streaming';
+import { withStreamAutoReconnect } from '@runloop/api-client/lib/streaming-reconnection';
 
 export class Executions extends APIResource {
   /**
@@ -153,11 +154,15 @@ export class Executions extends APIResource {
       headers: defaultHeaders,
       ...options,
     };
-    return this._client.get(`/v1/devboxes/${devboxId}/executions/${executionId}/stream_stderr_updates`, {
-      query,
-      ...mergedOptions,
-      stream: true,
-    }) as APIPromise<Stream<ExecutionUpdateChunk>>;
+    const getStream: (offset: number | undefined) => APIPromise<Stream<ExecutionUpdateChunk>> = (offset) =>
+      this._client.get(`/v1/devboxes/${devboxId}/executions/${executionId}/stream_stderr_updates`, {
+        query: { ...query, offset: offset?.toString() },
+        ...mergedOptions,
+        stream: true,
+      });
+    return withStreamAutoReconnect(getStream, (item) => item.offset) as APIPromise<
+      Stream<ExecutionUpdateChunk>
+    >;
   }
 
   /**
@@ -176,11 +181,15 @@ export class Executions extends APIResource {
       headers: defaultHeaders,
       ...options,
     };
-    return this._client.get(`/v1/devboxes/${devboxId}/executions/${executionId}/stream_stdout_updates`, {
-      query,
-      ...mergedOptions,
-      stream: true,
-    }) as APIPromise<Stream<ExecutionUpdateChunk>>;
+    const getStream: (offset: number | undefined) => APIPromise<Stream<ExecutionUpdateChunk>> = (offset) =>
+      this._client.get(`/v1/devboxes/${devboxId}/executions/${executionId}/stream_stdout_updates`, {
+        query: { ...query, offset: offset?.toString() },
+        ...mergedOptions,
+        stream: true,
+      });
+    return withStreamAutoReconnect(getStream, (item) => item.offset) as APIPromise<
+      Stream<ExecutionUpdateChunk>
+    >;
   }
 }
 

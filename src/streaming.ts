@@ -1,5 +1,5 @@
 import { ReadableStream, type Response } from './_shims/index';
-import { RunloopError } from './error';
+import { APIError, RunloopError } from './error';
 import { findDoubleNewlineIndex, LineDecoder } from './internal/decoders/line';
 import { ReadableStreamToAsyncIterable } from './internal/stream-utils';
 
@@ -32,6 +32,18 @@ export class Stream<Item> implements AsyncIterable<Item> {
       let done = false;
       try {
         for await (const sse of _iterSSEMessages(response, controller)) {
+          if (sse.event === 'error') {
+            let error: APIError | Error | undefined = new Error(sse.data);
+            try {
+              const errorObj = JSON.parse(sse.data);
+              error = new APIError(parseInt(errorObj.code), errorObj, errorObj.message, undefined);
+            } catch (e) {
+              console.error('Could not parse error message into JSON:', sse.data);
+              error = new Error(sse.data);
+            }
+            throw error;
+          }
+
           try {
             yield JSON.parse(sse.data);
           } catch (e) {
