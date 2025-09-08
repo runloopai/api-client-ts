@@ -66,6 +66,7 @@ Types:
 
 - <code><a href="./src/resources/devboxes/devboxes.ts">DevboxAsyncExecutionDetailView</a></code>
 - <code><a href="./src/resources/devboxes/devboxes.ts">DevboxExecutionDetailView</a></code>
+- <code><a href="./src/resources/devboxes/devboxes.ts">DevboxKillExecutionRequest</a></code>
 - <code><a href="./src/resources/devboxes/devboxes.ts">DevboxListView</a></code>
 - <code><a href="./src/resources/devboxes/devboxes.ts">DevboxSnapshotListView</a></code>
 - <code><a href="./src/resources/devboxes/devboxes.ts">DevboxSnapshotView</a></code>

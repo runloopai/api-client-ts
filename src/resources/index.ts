@@ -39,6 +39,7 @@ export {
   Devboxes,
   type DevboxAsyncExecutionDetailView,
   type DevboxExecutionDetailView,
+  type DevboxKillExecutionRequest,
   type DevboxListView,
   type DevboxSnapshotListView,
   type DevboxSnapshotView,
