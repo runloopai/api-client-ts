@@ -3,10 +3,6 @@ import { APIError } from '../error';
 
 /**
  * Wraps a stream with automatic reconnection on timeout.
- *
- * @param stream The stream to wrap
- * @param recreator Function that creates a new stream with the last offset
- * @returns A new stream that automatically reconnects on timeout
  */
 export async function withStreamAutoReconnect<Item>(
   streamCreator: (offset: number | undefined) => Promise<Stream<Item>>,
