@@ -89,6 +89,7 @@ Methods:
 - <code title="post /v1/devboxes/{id}/create_tunnel">client.devboxes.<a href="./src/resources/devboxes/devboxes.ts">createTunnel</a>(id, { ...params }) -> DevboxTunnelView</code>
 - <code title="post /v1/devboxes/disk_snapshots/{id}/delete">client.devboxes.<a href="./src/resources/devboxes/devboxes.ts">deleteDiskSnapshot</a>(id) -> unknown</code>
 - <code title="post /v1/devboxes/{id}/download_file">client.devboxes.<a href="./src/resources/devboxes/devboxes.ts">downloadFile</a>(id, { ...params }) -> Response</code>
+- <code title="post /v1/devboxes/{id}/execute">client.devboxes.<a href="./src/resources/devboxes/devboxes.ts">execute</a>(id, { ...params }) -> DevboxAsyncExecutionDetailView</code>
 - <code title="post /v1/devboxes/{id}/execute_async">client.devboxes.<a href="./src/resources/devboxes/devboxes.ts">executeAsync</a>(id, { ...params }) -> DevboxAsyncExecutionDetailView</code>
 - <code title="post /v1/devboxes/{id}/execute_sync">client.devboxes.<a href="./src/resources/devboxes/devboxes.ts">executeSync</a>(id, { ...params }) -> DevboxExecutionDetailView</code>
 - <code title="post /v1/devboxes/{id}/keep_alive">client.devboxes.<a href="./src/resources/devboxes/devboxes.ts">keepAlive</a>(id) -> unknown</code>
