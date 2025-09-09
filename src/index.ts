@@ -130,6 +130,7 @@ import {
   DevboxUploadFileResponse,
   DevboxView,
   DevboxViewsDevboxesCursorIDPage,
+  DevboxWaitForCommandParams,
   DevboxWriteFileContentsParams,
   Devboxes,
 } from './resources/devboxes/devboxes';
@@ -468,6 +469,7 @@ export declare namespace Runloop {
     type DevboxSnapshotDiskParams as DevboxSnapshotDiskParams,
     type DevboxSnapshotDiskAsyncParams as DevboxSnapshotDiskAsyncParams,
     type DevboxUploadFileParams as DevboxUploadFileParams,
+    type DevboxWaitForCommandParams as DevboxWaitForCommandParams,
     type DevboxWriteFileContentsParams as DevboxWriteFileContentsParams,
   };
 
