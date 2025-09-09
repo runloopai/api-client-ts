@@ -1,0 +1,36 @@
+name: Smoketests Prod
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    env:
+      RUNLOOP_API_KEY: ${{ secrets.RUNLOOP_SMOKETEST_PROD_API_KEY }}
+      RUNLOOP_BASE_URL: https://api.runloop.ai
+      DEBUG: 'false'
+      RUN_SMOKETESTS: '1'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: yarn --frozen-lockfile
+
+      - name: Build
+        run: yarn build
+
+      - name: Run smoke tests
+        run: |
+          # only run smoke tests; they require a real API key
+          ./node_modules/.bin/jest tests/smoketests --runInBand --verbose --testTimeout=1800000 | cat
+
+

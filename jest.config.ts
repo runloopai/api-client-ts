@@ -1,5 +1,7 @@
 import type { JestConfigWithTsJest } from 'ts-jest';
 
+const runSmoketests = process.env['RUN_SMOKETESTS'] === '1';
+
 const config: JestConfigWithTsJest = {
   preset: 'ts-jest/presets/default-esm',
   testEnvironment: 'node',
@@ -17,7 +19,11 @@ const config: JestConfigWithTsJest = {
     '<rootDir>/deno/',
     '<rootDir>/deno_tests/',
   ],
-  testPathIgnorePatterns: ['scripts'],
+  testPathIgnorePatterns: [
+    'scripts',
+    // Ignore smoketests unless explicitly enabled via RUN_SMOKETESTS=1
+    ...(runSmoketests ? [] : ['<rootDir>/tests/smoketests/']),
+  ],
 };
 
 export default config;
