@@ -200,6 +200,25 @@ describe('resource devboxes', () => {
     const response = await client.devboxes.downloadFile('id', { path: 'path' });
   });
 
+  test('execute: only required params', async () => {
+    const responsePromise = client.devboxes.execute('id', { command: 'command', command_id: 'command_id' });
+    const rawResponse = await responsePromise.asResponse();
+    expect(rawResponse).toBeInstanceOf(Response);
+    const response = await responsePromise;
+    expect(response).not.toBeInstanceOf(Response);
+    const dataAndResponse = await responsePromise.withResponse();
+    expect(dataAndResponse.data).toBe(response);
+    expect(dataAndResponse.response).toBe(rawResponse);
+  });
+
+  test('execute: required and optional params', async () => {
+    const response = await client.devboxes.execute('id', {
+      command: 'command',
+      command_id: 'command_id',
+      shell_name: 'shell_name',
+    });
+  });
+
   test('executeAsync: only required params', async () => {
     const responsePromise = client.devboxes.executeAsync('id', { command: 'command' });
     const rawResponse = await responsePromise.asResponse();

@@ -232,6 +232,23 @@ export class Devboxes extends APIResource {
   }
 
   /**
+   * Execute a command with a known command ID on a devbox, optimistically waiting
+   * for it to complete within the specified timeout. If it completes in time, return
+   * the result. If not, return a status indicating the command is still running.
+   */
+  execute(
+    id: string,
+    body: DevboxExecuteParams,
+    options?: Core.RequestOptions,
+  ): Core.APIPromise<DevboxAsyncExecutionDetailView> {
+    return this._client.post(`/v1/devboxes/${id}/execute`, {
+      body,
+      timeout: (this._client as any)._options.timeout ?? 600000,
+      ...options,
+    });
+  }
+
+  /**
    * Execute the given command in the Devbox shell asynchronously and returns the
    * execution that can be used to track the command's progress.
    */
@@ -838,6 +855,28 @@ export interface DevboxDownloadFileParams {
   path: string;
 }
 
+export interface DevboxExecuteParams {
+  /**
+   * The command to execute via the Devbox shell. By default, commands are run from
+   * the user home directory unless shell_name is specified. If shell_name is
+   * specified the command is run from the directory based on the recent state of the
+   * persistent shell.
+   */
+  command: string;
+
+  /**
+   * The command ID for idempotency and tracking
+   */
+  command_id: string;
+
+  /**
+   * The name of the persistent shell to create or use if already created. When using
+   * a persistent shell, the command will run from the directory at the end of the
+   * previous command and environment variables will be preserved.
+   */
+  shell_name?: string | null;
+}
+
 export interface DevboxExecuteAsyncParams {
   /**
    * The command to execute via the Devbox shell. By default, commands are run from
@@ -984,6 +1023,7 @@ export declare namespace Devboxes {
     type DevboxListParams as DevboxListParams,
     type DevboxCreateTunnelParams as DevboxCreateTunnelParams,
     type DevboxDownloadFileParams as DevboxDownloadFileParams,
+    type DevboxExecuteParams as DevboxExecuteParams,
     type DevboxExecuteAsyncParams as DevboxExecuteAsyncParams,
     type DevboxExecuteSyncParams as DevboxExecuteSyncParams,
     type DevboxListDiskSnapshotsParams as DevboxListDiskSnapshotsParams,

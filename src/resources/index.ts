@@ -56,6 +56,7 @@ export {
   type DevboxListParams,
   type DevboxCreateTunnelParams,
   type DevboxDownloadFileParams,
+  type DevboxExecuteParams,
   type DevboxExecuteAsyncParams,
   type DevboxExecuteSyncParams,
   type DevboxListDiskSnapshotsParams,
