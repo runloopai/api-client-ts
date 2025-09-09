@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.50.0 (2025-09-09)
+
+Full Changelog: [v0.49.2...v0.50.0](https://github.com/runloopai/api-client-ts/compare/v0.49.2...v0.50.0)
+
+### Features
+
+* **api:** api update ([ac9d5be](https://github.com/runloopai/api-client-ts/commit/ac9d5be939d4fc449afb173cadbc33ae752c8fdf))
+
+
+### Bug Fixes
+
+* coerce nullable values to undefined ([73237fb](https://github.com/runloopai/api-client-ts/commit/73237fb282d0c72323ce2fd399093de1ea845175))
+
 ## 0.49.2 (2025-09-08)
 
 Full Changelog: [v0.49.1...v0.49.2](https://github.com/runloopai/api-client-ts/compare/v0.49.1...v0.49.2)

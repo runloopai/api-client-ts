@@ -574,6 +574,14 @@ export interface DevboxExecutionDetailView {
   shell_name?: string | null;
 }
 
+export interface DevboxKillExecutionRequest {
+  /**
+   * Whether to kill the entire process group (default: false). If true, kills all
+   * processes in the same process group as the target process.
+   */
+  kill_process_group?: boolean | null;
+}
+
 export interface DevboxListView {
   /**
    * List of devboxes matching filter.
@@ -1028,6 +1036,7 @@ export declare namespace Devboxes {
   export {
     type DevboxAsyncExecutionDetailView as DevboxAsyncExecutionDetailView,
     type DevboxExecutionDetailView as DevboxExecutionDetailView,
+    type DevboxKillExecutionRequest as DevboxKillExecutionRequest,
     type DevboxListView as DevboxListView,
     type DevboxSnapshotListView as DevboxSnapshotListView,
     type DevboxSnapshotView as DevboxSnapshotView,
