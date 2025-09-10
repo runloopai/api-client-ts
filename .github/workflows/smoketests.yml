@@ -48,7 +48,6 @@ jobs:
 
       - name: Run smoke tests
         run: |
-          # only run smoke tests; they require a real API key
-          ./node_modules/.bin/jest tests/smoketests --runInBand --verbose --testTimeout=1800000 | cat
+          ./node_modules/.bin/jest tests/smoketests --runInBand --verbose --testTimeout=1800000
 
 
