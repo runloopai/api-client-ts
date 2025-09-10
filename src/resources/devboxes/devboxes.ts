@@ -499,15 +499,19 @@ export class Devboxes extends APIResource {
   }
 
   /**
-   * Polls the Devbox's status until it reaches one of the desired statuses or times
-   * out.
+   * Polls the asynchronous execution's status until it reaches one of the desired
+   * statuses or times out. Defaults to 60 seconds.
    */
   waitForCommand(
-    id: string,
+    devboxId: string,
+    executionId: string,
     body: DevboxWaitForCommandParams,
     options?: Core.RequestOptions,
-  ): Core.APIPromise<DevboxView> {
-    return this._client.post(`/v1/devboxes/${id}/wait_for_status`, { body, ...options });
+  ): Core.APIPromise<DevboxAsyncExecutionDetailView> {
+    return this._client.post(`/v1/devboxes/${devboxId}/executions/${executionId}/wait_for_status`, {
+      body,
+      ...options,
+    });
   }
 
   /**
@@ -1063,23 +1067,15 @@ export interface DevboxUploadFileParams {
 
 export interface DevboxWaitForCommandParams {
   /**
-   * The Devbox statuses to wait for. At least one status must be provided. The
-   * devbox will be returned as soon as it reaches any of the provided statuses.
+   * The command execution statuses to wait for. At least one status must be
+   * provided. The command will be returned as soon as it reaches any of the provided
+   * statuses.
    */
-  statuses: Array<
-    | 'provisioning'
-    | 'initializing'
-    | 'running'
-    | 'suspending'
-    | 'suspended'
-    | 'resuming'
-    | 'failure'
-    | 'shutdown'
-  >;
+  statuses: Array<'queued' | 'running' | 'completed'>;
 
   /**
-   * (Optional) Timeout in seconds to wait for the status, up to 30 seconds. Defaults
-   * to 10 seconds.
+   * (Optional) Timeout in seconds to wait for the status, up to 60 seconds. Defaults
+   * to 60 seconds.
    */
   timeout_seconds?: number | null;
 }

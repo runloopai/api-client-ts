@@ -469,7 +469,9 @@ describe('resource devboxes', () => {
   });
 
   test('waitForCommand: only required params', async () => {
-    const responsePromise = client.devboxes.waitForCommand('id', { statuses: ['provisioning'] });
+    const responsePromise = client.devboxes.waitForCommand('devbox_id', 'execution_id', {
+      statuses: ['queued'],
+    });
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
     const response = await responsePromise;
@@ -480,8 +482,8 @@ describe('resource devboxes', () => {
   });
 
   test('waitForCommand: required and optional params', async () => {
-    const response = await client.devboxes.waitForCommand('id', {
-      statuses: ['provisioning'],
+    const response = await client.devboxes.waitForCommand('devbox_id', 'execution_id', {
+      statuses: ['queued'],
       timeout_seconds: 0,
     });
   });
