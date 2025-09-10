@@ -121,6 +121,7 @@ import { type Response } from '../../_shims/index';
 import { poll, PollingOptions } from '@runloop/api-client/lib/polling';
 import { DevboxTools } from './tools';
 import { RunloopError } from '../..';
+import { uuidv7 } from 'uuidv7';
 
 type DevboxStatus = DevboxView['status'];
 const DEVBOX_BOOTING_STATES: DevboxStatus[] = ['provisioning', 'initializing'];
@@ -312,6 +313,49 @@ export class Devboxes extends APIResource {
       timeout: (this._client as any)._options.timeout ?? 600000,
       ...options,
     });
+  }
+
+  /**
+   * Execute a command and wait for it to complete with optimal latency for long running commands that can't rely on just polling.
+   */
+  async executeAndAwaitCompletion(
+    devboxId: string,
+    body: Omit<DevboxExecuteParams, 'command_id'>,
+    options?: Core.RequestOptions,
+  ): Promise<DevboxAsyncExecutionDetailView> {
+    const commandId = uuidv7();
+    const execution = await this.execute(devboxId, { ...body, command_id: commandId }, options);
+    if (execution.status === 'completed') {
+      // If the execution completes in the initial timeout, return the result
+      return execution;
+    }
+    // otherwise, keep trying to wait for the result using wait_for_status for optimal latency
+    const waitForCompletion = (): Promise<DevboxAsyncExecutionDetailView> => {
+      // This either returns a DevboxView when status is running or failure;
+      // Otherwise it throws an 408 error when times out.
+      return this.waitForCommand(devboxId, execution.execution_id, { statuses: ['completed'] });
+    };
+
+    const finalResult = await poll(
+      () => waitForCompletion(),
+      () => waitForCompletion(),
+      {
+        shouldStop: (result) => {
+          return result.status === 'completed';
+        },
+        onError: (error) => {
+          if (error.status === 408) {
+            // Return a placeholder result to continue polling
+            return execution;
+          }
+
+          // For any other error, rethrow it
+          throw error;
+        },
+      },
+    );
+
+    return finalResult;
   }
 
   /**
