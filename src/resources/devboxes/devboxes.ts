@@ -121,7 +121,7 @@ import { type Response } from '../../_shims/index';
 import { poll, PollingOptions } from '@runloop/api-client/lib/polling';
 import { DevboxTools } from './tools';
 import { RunloopError } from '../..';
-import { v7 as uuidv7 } from 'uuid';
+import { uuidv7 } from 'uuidv7';
 
 type DevboxStatus = DevboxView['status'];
 const DEVBOX_BOOTING_STATES: DevboxStatus[] = ['provisioning', 'initializing'];
@@ -322,7 +322,7 @@ export class Devboxes extends APIResource {
     id: string,
     body: Omit<DevboxExecuteParams, 'command_id'>,
     options?: Core.RequestOptions,
-  ): Core.APIPromise<DevboxAsyncExecutionDetailView> {
+  ): Promise<DevboxAsyncExecutionDetailView> {
     const commandId = uuidv7();
     const execution = await this.execute(id, { ...body, command_id: commandId }, options);
     if (execution.status === 'completed') {
