@@ -156,7 +156,7 @@ export class Executions extends APIResource {
     };
     const getStream: (offset: number | undefined) => APIPromise<Stream<ExecutionUpdateChunk>> = (offset) =>
       this._client.get(`/v1/devboxes/${devboxId}/executions/${executionId}/stream_stderr_updates`, {
-        query: { ...query, offset: offset?.toString() },
+        query: { ...query, offset: offset?.toString() || '0' },
         ...mergedOptions,
         stream: true,
       });
