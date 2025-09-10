@@ -499,6 +499,18 @@ export class Devboxes extends APIResource {
   }
 
   /**
+   * Polls the Devbox's status until it reaches one of the desired statuses or times
+   * out.
+   */
+  waitForCommand(
+    id: string,
+    body: DevboxWaitForCommandParams,
+    options?: Core.RequestOptions,
+  ): Core.APIPromise<DevboxView> {
+    return this._client.post(`/v1/devboxes/${id}/wait_for_status`, { body, ...options });
+  }
+
+  /**
    * Write UTF-8 string contents to a file at path on the Devbox. Note for large
    * files (larger than 100MB), the upload_file endpoint must be used.
    */
@@ -1049,6 +1061,29 @@ export interface DevboxUploadFileParams {
   file?: Core.Uploadable;
 }
 
+export interface DevboxWaitForCommandParams {
+  /**
+   * The Devbox statuses to wait for. At least one status must be provided. The
+   * devbox will be returned as soon as it reaches any of the provided statuses.
+   */
+  statuses: Array<
+    | 'provisioning'
+    | 'initializing'
+    | 'running'
+    | 'suspending'
+    | 'suspended'
+    | 'resuming'
+    | 'failure'
+    | 'shutdown'
+  >;
+
+  /**
+   * (Optional) Timeout in seconds to wait for the status, up to 30 seconds. Defaults
+   * to 10 seconds.
+   */
+  timeout_seconds?: number | null;
+}
+
 export interface DevboxWriteFileContentsParams {
   /**
    * The UTF-8 string contents to write to the file.
@@ -1103,6 +1138,7 @@ export declare namespace Devboxes {
     type DevboxSnapshotDiskParams as DevboxSnapshotDiskParams,
     type DevboxSnapshotDiskAsyncParams as DevboxSnapshotDiskAsyncParams,
     type DevboxUploadFileParams as DevboxUploadFileParams,
+    type DevboxWaitForCommandParams as DevboxWaitForCommandParams,
     type DevboxWriteFileContentsParams as DevboxWriteFileContentsParams,
   };
 

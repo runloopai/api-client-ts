@@ -44,6 +44,7 @@ export {
   type DevboxSnapshotDiskParams,
   type DevboxSnapshotDiskAsyncParams,
   type DevboxUploadFileParams,
+  type DevboxWaitForCommandParams,
   type DevboxWriteFileContentsParams,
 } from './devboxes';
 export {
