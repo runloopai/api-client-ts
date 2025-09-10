@@ -319,12 +319,12 @@ export class Devboxes extends APIResource {
    * Execute a command and wait for it to complete with optimal latency for long running commands that can't rely on just polling.
    */
   async executeAndAwaitCompletion(
-    id: string,
+    devboxId: string,
     body: Omit<DevboxExecuteParams, 'command_id'>,
     options?: Core.RequestOptions,
   ): Promise<DevboxAsyncExecutionDetailView> {
     const commandId = uuidv7();
-    const execution = await this.execute(id, { ...body, command_id: commandId }, options);
+    const execution = await this.execute(devboxId, { ...body, command_id: commandId }, options);
     if (execution.status === 'completed') {
       // If the execution completes in the initial timeout, return the result
       return execution;
@@ -333,7 +333,7 @@ export class Devboxes extends APIResource {
     const waitForCompletion = (): Promise<DevboxAsyncExecutionDetailView> => {
       // This either returns a DevboxView when status is running or failure;
       // Otherwise it throws an 408 error when times out.
-      return this.waitForCommand(id, execution.execution_id, { statuses: ['completed'] });
+      return this.waitForCommand(devboxId, execution.execution_id, { statuses: ['completed'] });
     };
 
     const finalResult = await poll(
