@@ -1,0 +1,54 @@
+name: Smoketests
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Target environment"
+        type: choice
+        default: dev
+        options:
+          - dev
+          - prod
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: yarn --frozen-lockfile
+
+      - name: Build
+        run: yarn build
+
+      - name: Configure environment
+        env:
+          DEV_KEY: ${{ secrets.RUNLOOP_SMOKETEST_DEV_API_KEY }}
+          PROD_KEY: ${{ secrets.RUNLOOP_SMOKETEST_PROD_API_KEY }}
+        run: |
+          if [ "${{ github.event.inputs.environment }}" = "prod" ]; then
+            echo "RUNLOOP_API_KEY=${PROD_KEY}" >> $GITHUB_ENV
+            echo "RUNLOOP_BASE_URL=https://api.runloop.ai" >> $GITHUB_ENV
+          else
+            echo "RUNLOOP_API_KEY=${DEV_KEY}" >> $GITHUB_ENV
+            echo "RUNLOOP_BASE_URL=https://api.runloop.pro" >> $GITHUB_ENV
+          fi
+          echo "DEBUG=false" >> $GITHUB_ENV
+          echo "RUN_SMOKETESTS=1" >> $GITHUB_ENV
+
+      - name: Run smoke tests
+        run: |
+          # only run smoke tests; they require a real API key
+          ./node_modules/.bin/jest tests/smoketests --runInBand --verbose --testTimeout=1800000 | cat
+
+
