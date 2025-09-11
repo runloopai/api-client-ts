@@ -9,6 +9,12 @@ describe('smoketest: devboxes', () => {
   describe('devbox lifecycle', () => {
     let devboxId: string | undefined;
 
+    afterAll(async () => {
+      if (devboxId) {
+        await client.devboxes.shutdown(devboxId);
+      }
+    });
+
     test(
       'create devbox',
       async () => {

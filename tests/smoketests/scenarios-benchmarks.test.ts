@@ -49,6 +49,7 @@ describe('smoketest: scenarios and benchmarks', () => {
         polling: { maxAttempts: 120, pollingIntervalMs: 5_000, timeoutMs: 20 * 60 * 1000 },
       });
       expect(['completed', 'scored', 'running', 'failed', 'timeout', 'canceled']).toContain(scored.state);
+      await client.devboxes.shutdown(scored.devbox_id);
     },
     THIRTY_SECOND_TIMEOUT,
   );

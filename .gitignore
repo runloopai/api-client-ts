@@ -7,4 +7,4 @@ dist
 dist-deno
 /*.tgz
 .idea/
-
+.DS_Store

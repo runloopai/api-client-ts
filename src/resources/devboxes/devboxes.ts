@@ -321,25 +321,28 @@ export class Devboxes extends APIResource {
   async executeAndAwaitCompletion(
     devboxId: string,
     body: Omit<DevboxExecuteParams, 'command_id'>,
-    options?: Core.RequestOptions,
+    options?: Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxAsyncExecutionDetailView>> },
   ): Promise<DevboxAsyncExecutionDetailView> {
     const commandId = uuidv7();
-    const execution = await this.execute(devboxId, { ...body, command_id: commandId }, options);
+    const execution = await this.execute(
+      devboxId,
+      { ...body, command_id: commandId },
+      // For first poll, if timeout is provided, use the timeout from the request options
+      // Otherwise, if polling options are provided, use the timeout from the polling options
+      // Otherwise, use the default timeout of 600 seconds
+      { ...{ timeout: options?.timeout ?? options?.polling?.timeoutMs ?? 600000 }, ...options },
+    );
+
     if (execution.status === 'completed') {
       // If the execution completes in the initial timeout, return the result
       return execution;
     }
-    // otherwise, keep trying to wait for the result using wait_for_status for optimal latency
-    const waitForCompletion = (): Promise<DevboxAsyncExecutionDetailView> => {
-      // This either returns a DevboxView when status is running or failure;
-      // Otherwise it throws an 408 error when times out.
-      return this.waitForCommand(devboxId, execution.execution_id, { statuses: ['completed'] });
-    };
 
     const finalResult = await poll(
-      () => waitForCompletion(),
-      () => waitForCompletion(),
+      () => this.waitForCommand(devboxId, execution.execution_id, { statuses: ['completed'] }),
+      () => this.waitForCommand(devboxId, execution.execution_id, { statuses: ['completed'] }),
       {
+        ...options?.polling,
         shouldStop: (result) => {
           return result.status === 'completed';
         },

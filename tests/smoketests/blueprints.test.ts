@@ -41,6 +41,7 @@ describe('smoketest: blueprints', () => {
           },
         );
         expect(devbox.blueprint_id).toBe(blueprintId);
+        await client.devboxes.shutdown(devbox.id);
       },
       THIRTY_SECOND_TIMEOUT,
     );
@@ -55,6 +56,7 @@ describe('smoketest: blueprints', () => {
           },
         );
         expect(devbox.blueprint_id).toBeTruthy();
+        await client.devboxes.shutdown(devbox.id);
       },
       THIRTY_SECOND_TIMEOUT,
     );
