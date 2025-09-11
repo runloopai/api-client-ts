@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.54.0 (2025-09-11)
+
+Full Changelog: [v0.53.0...v0.54.0](https://github.com/runloopai/api-client-ts/compare/v0.53.0...v0.54.0)
+
+### Features
+
+* **api:** manual updates - remove mcp until ready to fix ([61bdd8c](https://github.com/runloopai/api-client-ts/commit/61bdd8cafc2ec09b3a040b0c383085c3c54487a8))
+
+
+### Chores
+
+* configure new SDK language ([609ce53](https://github.com/runloopai/api-client-ts/commit/609ce5329b9d09fbb7e4e53f9dd1610579122cae))
+
 ## 0.53.0 (2025-09-10)
 
 Full Changelog: [v0.52.0...v0.53.0](https://github.com/runloopai/api-client-ts/compare/v0.52.0...v0.53.0)
