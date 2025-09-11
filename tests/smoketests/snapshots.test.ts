@@ -6,6 +6,15 @@ describe('smoketest: devbox snapshots', () => {
   let devboxId: string | undefined;
   let snapshotId: string | undefined;
 
+  afterAll(async () => {
+    if (devboxId) {
+      await client.devboxes.shutdown(devboxId);
+    }
+    if (snapshotId) {
+      await client.devboxes.diskSnapshots.delete(snapshotId);
+    }
+  });
+
   test('snapshot devbox', async () => {
     const created = await client.devboxes.createAndAwaitRunning(
       { name: uniqueName('snap-devbox') },

@@ -6,6 +6,12 @@ describe('smoketest: executions', () => {
   let devboxId: string | undefined;
   let execId: string | undefined;
 
+  afterAll(async () => {
+    if (devboxId) {
+      await client.devboxes.shutdown(devboxId);
+    }
+  });
+
   test(
     'launch devbox',
     async () => {
@@ -40,4 +46,54 @@ describe('smoketest: executions', () => {
     }
     expect(typeof received).toBe('string');
   });
+
+  test('executeAndAwaitCompletion', async () => {
+    const completed = await client.devboxes.executeAndAwaitCompletion(devboxId!, {
+      command: 'echo hello && sleep 1',
+    });
+    expect(completed.status).toBe('completed');
+  });
+
+  test(
+    'executeAndAwaitCompletion long running command',
+    async () => {
+      const completed = await client.devboxes.executeAndAwaitCompletion(devboxId!, {
+        command: 'sleep 70',
+      });
+      expect(completed.status).toBe('completed');
+    },
+    THIRTY_SECOND_TIMEOUT * 3,
+  );
+
+  test(
+    'executeAndAwaitCompletion timeout',
+    async () => {
+      // Use polling options
+      await expect(
+        client.devboxes.executeAndAwaitCompletion(
+          devboxId!,
+          {
+            command: 'sleep 30',
+          },
+          {
+            polling: { pollingIntervalMs: 100, maxAttempts: 1, timeoutMs: 3000 },
+          },
+        ),
+      ).rejects.toThrow();
+
+      // Use timeout option
+      await expect(
+        client.devboxes.executeAndAwaitCompletion(
+          devboxId!,
+          {
+            command: 'sleep 30',
+          },
+          {
+            timeout: 3000,
+          },
+        ),
+      ).rejects.toThrow();
+    },
+    THIRTY_SECOND_TIMEOUT,
+  );
 });
