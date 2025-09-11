@@ -71,7 +71,6 @@ export async function poll<T>(
       ...DEFAULT_OPTIONS,
       ...options,
     };
-  console.log('timeoutMs', timeoutMs);
 
   let result: T;
   let timeoutId: NodeJS.Timeout | null = null;

@@ -337,7 +337,6 @@ export class Devboxes extends APIResource {
       // If the execution completes in the initial timeout, return the result
       return execution;
     }
-    console.log('options', options);
 
     const finalResult = await poll(
       () => this.waitForCommand(devboxId, execution.execution_id, { statuses: ['completed'] }),
