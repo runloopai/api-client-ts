@@ -39,78 +39,6 @@ import {
 } from './executions';
 import * as LogsAPI from './logs';
 import { DevboxLogsListView, LogListParams, Logs } from './logs';
-import * as LspAPI from './lsp';
-import {
-  BaseCodeAction,
-  BaseCommand,
-  BaseDiagnostic,
-  BaseLocation,
-  BaseMarkupContent,
-  BaseParameterInformation,
-  BaseRange,
-  BaseSignature,
-  BaseWorkspaceEdit,
-  CodeActionApplicationResult,
-  CodeActionContext,
-  CodeActionKind,
-  CodeActionTriggerKind,
-  CodeActionsForDiagnosticRequestBody,
-  CodeActionsRequestBody,
-  CodeActionsResponse,
-  CodeDescription,
-  CodeSegmentInfoRequestBody,
-  CodeSegmentInfoResponse,
-  Diagnostic,
-  DiagnosticRelatedInformation,
-  DiagnosticSeverity,
-  DiagnosticTag,
-  DiagnosticsResponse,
-  DocumentSymbol,
-  DocumentSymbolResponse,
-  DocumentUri,
-  FileContentsResponse,
-  FileDefinitionRequestBody,
-  FileDefinitionResponse,
-  FilePath,
-  FileRequestBody,
-  FileUri,
-  FormattingResponse,
-  HealthStatusResponse,
-  Integer,
-  LSpAny,
-  Location,
-  Lsp,
-  LspApplyCodeActionParams,
-  LspCodeActionsParams,
-  LspDiagnosticsParams,
-  LspDocumentSymbolsParams,
-  LspFileDefinitionParams,
-  LspFileParams,
-  LspFilesResponse,
-  LspFormattingParams,
-  LspGetCodeActionsForDiagnosticParams,
-  LspGetCodeActionsForDiagnosticResponse,
-  LspGetCodeSegmentInfoParams,
-  LspGetSignatureHelpParams,
-  LspReferencesParams,
-  LspSetWatchDirectoryParams,
-  LspSetWatchDirectoryResponse,
-  Position,
-  Range,
-  RecordStringTextEditArray,
-  ReferencesRequestBody,
-  ReferencesResponse,
-  SetWatchDirectoryRequestBody,
-  SignatureHelpRequestBody,
-  SignatureHelpResponse,
-  SymbolKind,
-  SymbolTag,
-  SymbolType,
-  TextEdit,
-  URi,
-  Uinteger,
-  WatchedFileResponse,
-} from './lsp';
 import {
   DevboxesCursorIDPage,
   type DevboxesCursorIDPageParams,
@@ -130,7 +58,6 @@ export class Devboxes extends APIResource {
   diskSnapshots: DiskSnapshotsAPI.DiskSnapshots = new DiskSnapshotsAPI.DiskSnapshots(this._client);
   browsers: BrowsersAPI.Browsers = new BrowsersAPI.Browsers(this._client);
   computers: ComputersAPI.Computers = new ComputersAPI.Computers(this._client);
-  lsp: LspAPI.Lsp = new LspAPI.Lsp(this._client);
   logs: LogsAPI.Logs = new LogsAPI.Logs(this._client);
   executions: ExecutionsAPI.Executions = new ExecutionsAPI.Executions(this._client);
 
@@ -376,6 +303,8 @@ export class Devboxes extends APIResource {
   /**
    * Execute a bash command in the Devbox shell, await the command completion and
    * return the output.
+   *
+   * @deprecated
    */
   executeSync(
     id: string,
@@ -747,9 +676,7 @@ export interface DevboxView {
    * A list of capability groups this devbox has access to. This allows devboxes to
    * be compatible with certain tools sets like computer usage APIs.
    */
-  capabilities: Array<
-    'unknown' | 'computer_usage' | 'browser_usage' | 'language_server' | 'docker_in_docker'
-  >;
+  capabilities: Array<'unknown' | 'computer_usage' | 'browser_usage' | 'docker_in_docker'>;
 
   /**
    * Creation time of the Devbox (Unix timestamp milliseconds).
@@ -1004,6 +931,12 @@ export interface DevboxExecuteParams {
   command_id: string;
 
   /**
+   * Timeout in seconds to wait for command completion. Operation is not killed. Max
+   * is 600 seconds.
+   */
+  optimistic_timeout?: number | null;
+
+  /**
    * The name of the persistent shell to create or use if already created. When using
    * a persistent shell, the command will run from the directory at the end of the
    * previous command and environment variables will be preserved.
@@ -1145,7 +1078,6 @@ Devboxes.DevboxSnapshotViewsDiskSnapshotsCursorIDPage = DevboxSnapshotViewsDiskS
 Devboxes.DiskSnapshots = DiskSnapshots;
 Devboxes.Browsers = Browsers;
 Devboxes.Computers = Computers;
-Devboxes.Lsp = Lsp;
 Devboxes.Logs = Logs;
 Devboxes.Executions = Executions;
 
@@ -1209,78 +1141,6 @@ export declare namespace Devboxes {
     type ComputerKeyboardInteractionParams as ComputerKeyboardInteractionParams,
     type ComputerMouseInteractionParams as ComputerMouseInteractionParams,
     type ComputerScreenInteractionParams as ComputerScreenInteractionParams,
-  };
-
-  export {
-    Lsp as Lsp,
-    type BaseCodeAction as BaseCodeAction,
-    type BaseCommand as BaseCommand,
-    type BaseDiagnostic as BaseDiagnostic,
-    type BaseLocation as BaseLocation,
-    type BaseMarkupContent as BaseMarkupContent,
-    type BaseParameterInformation as BaseParameterInformation,
-    type BaseRange as BaseRange,
-    type BaseSignature as BaseSignature,
-    type BaseWorkspaceEdit as BaseWorkspaceEdit,
-    type CodeActionApplicationResult as CodeActionApplicationResult,
-    type CodeActionContext as CodeActionContext,
-    type CodeActionKind as CodeActionKind,
-    type CodeActionsForDiagnosticRequestBody as CodeActionsForDiagnosticRequestBody,
-    type CodeActionsRequestBody as CodeActionsRequestBody,
-    type CodeActionsResponse as CodeActionsResponse,
-    type CodeActionTriggerKind as CodeActionTriggerKind,
-    type CodeDescription as CodeDescription,
-    type CodeSegmentInfoRequestBody as CodeSegmentInfoRequestBody,
-    type CodeSegmentInfoResponse as CodeSegmentInfoResponse,
-    type Diagnostic as Diagnostic,
-    type DiagnosticRelatedInformation as DiagnosticRelatedInformation,
-    type DiagnosticSeverity as DiagnosticSeverity,
-    type DiagnosticsResponse as DiagnosticsResponse,
-    type DiagnosticTag as DiagnosticTag,
-    type DocumentSymbol as DocumentSymbol,
-    type DocumentSymbolResponse as DocumentSymbolResponse,
-    type DocumentUri as DocumentUri,
-    type FileContentsResponse as FileContentsResponse,
-    type FileDefinitionRequestBody as FileDefinitionRequestBody,
-    type FileDefinitionResponse as FileDefinitionResponse,
-    type FilePath as FilePath,
-    type FileRequestBody as FileRequestBody,
-    type FileUri as FileUri,
-    type FormattingResponse as FormattingResponse,
-    type HealthStatusResponse as HealthStatusResponse,
-    type Integer as Integer,
-    type Location as Location,
-    type LSpAny as LSpAny,
-    type Position as Position,
-    type Range as Range,
-    type RecordStringTextEditArray as RecordStringTextEditArray,
-    type ReferencesRequestBody as ReferencesRequestBody,
-    type ReferencesResponse as ReferencesResponse,
-    type SetWatchDirectoryRequestBody as SetWatchDirectoryRequestBody,
-    type SignatureHelpRequestBody as SignatureHelpRequestBody,
-    type SignatureHelpResponse as SignatureHelpResponse,
-    type SymbolKind as SymbolKind,
-    type SymbolTag as SymbolTag,
-    type SymbolType as SymbolType,
-    type TextEdit as TextEdit,
-    type Uinteger as Uinteger,
-    type URi as URi,
-    type WatchedFileResponse as WatchedFileResponse,
-    type LspFilesResponse as LspFilesResponse,
-    type LspGetCodeActionsForDiagnosticResponse as LspGetCodeActionsForDiagnosticResponse,
-    type LspSetWatchDirectoryResponse as LspSetWatchDirectoryResponse,
-    type LspApplyCodeActionParams as LspApplyCodeActionParams,
-    type LspCodeActionsParams as LspCodeActionsParams,
-    type LspDiagnosticsParams as LspDiagnosticsParams,
-    type LspDocumentSymbolsParams as LspDocumentSymbolsParams,
-    type LspFileParams as LspFileParams,
-    type LspFileDefinitionParams as LspFileDefinitionParams,
-    type LspFormattingParams as LspFormattingParams,
-    type LspGetCodeActionsForDiagnosticParams as LspGetCodeActionsForDiagnosticParams,
-    type LspGetCodeSegmentInfoParams as LspGetCodeSegmentInfoParams,
-    type LspGetSignatureHelpParams as LspGetSignatureHelpParams,
-    type LspReferencesParams as LspReferencesParams,
-    type LspSetWatchDirectoryParams as LspSetWatchDirectoryParams,
   };
 
   export { Logs as Logs, type DevboxLogsListView as DevboxLogsListView, type LogListParams as LogListParams };
