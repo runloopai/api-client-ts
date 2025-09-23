@@ -50,6 +50,8 @@ export class Executions extends APIResource {
   /**
    * Execute a bash command in the Devbox shell, await the command completion and
    * return the output.
+   *
+   * @deprecated
    */
   executeSync(
     id: string,

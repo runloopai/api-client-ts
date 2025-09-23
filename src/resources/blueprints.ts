@@ -305,9 +305,7 @@ export interface BlueprintView {
   /**
    * Capabilities that will be available on Devbox.
    */
-  devbox_capabilities?: Array<
-    'unknown' | 'computer_usage' | 'browser_usage' | 'language_server' | 'docker_in_docker'
-  > | null;
+  devbox_capabilities?: Array<'unknown' | 'computer_usage' | 'browser_usage' | 'docker_in_docker'> | null;
 
   /**
    * The failure reason if the Blueprint build failed, if any.
