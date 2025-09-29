@@ -200,7 +200,7 @@ export interface ScenarioCreateParameters {
   /**
    * Validation strategy.
    */
-  validation_type?: 'FORWARD' | 'REVERSE' | 'EVALUATION' | null;
+  validation_type?: 'UNSPECIFIED' | 'FORWARD' | 'REVERSE' | 'EVALUATION' | null;
 }
 
 /**
@@ -360,7 +360,7 @@ export interface ScenarioUpdateParameters {
   /**
    * Validation strategy.
    */
-  validation_type?: 'FORWARD' | 'REVERSE' | 'EVALUATION' | null;
+  validation_type?: 'UNSPECIFIED' | 'FORWARD' | 'REVERSE' | 'EVALUATION' | null;
 }
 
 /**
@@ -425,7 +425,7 @@ export interface ScenarioView {
   /**
    * Validation strategy.
    */
-  validation_type?: 'FORWARD' | 'REVERSE' | 'EVALUATION' | null;
+  validation_type?: 'UNSPECIFIED' | 'FORWARD' | 'REVERSE' | 'EVALUATION' | null;
 }
 
 /**
@@ -722,7 +722,7 @@ export interface ScenarioCreateParams {
   /**
    * Validation strategy.
    */
-  validation_type?: 'FORWARD' | 'REVERSE' | 'EVALUATION' | null;
+  validation_type?: 'UNSPECIFIED' | 'FORWARD' | 'REVERSE' | 'EVALUATION' | null;
 }
 
 export interface ScenarioUpdateParams {
@@ -771,7 +771,7 @@ export interface ScenarioUpdateParams {
   /**
    * Validation strategy.
    */
-  validation_type?: 'FORWARD' | 'REVERSE' | 'EVALUATION' | null;
+  validation_type?: 'UNSPECIFIED' | 'FORWARD' | 'REVERSE' | 'EVALUATION' | null;
 }
 
 export interface ScenarioListParams extends ScenariosCursorIDPageParams {

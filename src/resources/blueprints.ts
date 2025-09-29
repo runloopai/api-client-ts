@@ -146,6 +146,11 @@ export interface BlueprintBuildParameters {
   base_blueprint_name?: string | null;
 
   /**
+   * (Optional) Arbitrary Docker build args to pass during build.
+   */
+  build_args?: { [key: string]: string } | null;
+
+  /**
    * A list of code mounts to be included in the Blueprint.
    */
   code_mounts?: Array<Shared.CodeMountParameters> | null;
@@ -297,6 +302,11 @@ export interface BlueprintView {
   base_blueprint_id?: string | null;
 
   /**
+   * Build completion time of the Blueprint (Unix timestamp milliseconds).
+   */
+  build_finish_time_ms?: number | null;
+
+  /**
    * List of ContainerizedServices available in the Blueprint. Services can be
    * explicitly started when creating a Devbox.
    */
@@ -396,6 +406,11 @@ export interface BlueprintCreateParams {
    * be specified.
    */
   base_blueprint_name?: string | null;
+
+  /**
+   * (Optional) Arbitrary Docker build args to pass during build.
+   */
+  build_args?: { [key: string]: string } | null;
 
   /**
    * A list of code mounts to be included in the Blueprint.
@@ -520,6 +535,11 @@ export interface BlueprintPreviewParams {
    * be specified.
    */
   base_blueprint_name?: string | null;
+
+  /**
+   * (Optional) Arbitrary Docker build args to pass during build.
+   */
+  build_args?: { [key: string]: string } | null;
 
   /**
    * A list of code mounts to be included in the Blueprint.
