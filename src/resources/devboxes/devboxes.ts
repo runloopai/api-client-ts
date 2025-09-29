@@ -684,6 +684,12 @@ export interface DevboxView {
   create_time_ms: number;
 
   /**
+   * The time the Devbox finished execution (Unix timestamp milliseconds). Present if
+   * the Devbox is in a terminal state.
+   */
+  end_time_ms: number | null;
+
+  /**
    * The launch parameters used to create the Devbox.
    */
   launch_parameters: Shared.LaunchParameters;
@@ -718,15 +724,19 @@ export interface DevboxView {
   blueprint_id?: string | null;
 
   /**
-   * The time the Devbox finished execution (Unix timestamp milliseconds). Present if
-   * the Devbox is in a terminal state.
-   */
-  end_time_ms?: number | null;
-
-  /**
    * The failure reason if the Devbox failed, if the Devbox has a 'failure' status.
    */
   failure_reason?: 'out_of_memory' | 'out_of_disk' | 'execution_failed' | null;
+
+  /**
+   * The ID of the initiator that created the Devbox.
+   */
+  initiator_id?: string | null;
+
+  /**
+   * The type of initiator that created the Devbox.
+   */
+  initiator_type?: 'unknown' | 'api' | 'scenario';
 
   /**
    * The name of the Devbox.
