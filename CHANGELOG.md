@@ -1,5 +1,28 @@
 # Changelog
 
+## 0.54.0 (2025-09-27)
+
+Full Changelog: [v0.53.0...v0.54.0](https://github.com/runloopai/api-client-ts/compare/v0.53.0...v0.54.0)
+
+### Features
+
+* **api:** api update ([2d6d79d](https://github.com/runloopai/api-client-ts/commit/2d6d79d60749f5fa3cb37e1d0a85458655ea21be))
+* **api:** manual updates - remove mcp until ready to fix ([61bdd8c](https://github.com/runloopai/api-client-ts/commit/61bdd8cafc2ec09b3a040b0c383085c3c54487a8))
+
+
+### Performance Improvements
+
+* faster formatting ([97d843f](https://github.com/runloopai/api-client-ts/commit/97d843f1d39c36170c2abdf3925747c617f1bc9a))
+
+
+### Chores
+
+* configure new SDK language ([609ce53](https://github.com/runloopai/api-client-ts/commit/609ce5329b9d09fbb7e4e53f9dd1610579122cae))
+* do not install brew dependencies in ./scripts/bootstrap by default ([be3a8c9](https://github.com/runloopai/api-client-ts/commit/be3a8c99bb4e4540dc90567289e32ff5e0f8a022))
+* **internal:** codegen related update ([381f82a](https://github.com/runloopai/api-client-ts/commit/381f82aa1075d19e2341eef0327d65f51c9851b9))
+* **internal:** fix incremental formatting in some cases ([4646222](https://github.com/runloopai/api-client-ts/commit/4646222cc0654df397d1fee4c60e62107a18cf46))
+* **internal:** remove deprecated `compilerOptions.baseUrl` from tsconfig.json ([b2ec05b](https://github.com/runloopai/api-client-ts/commit/b2ec05b5929a4fe7b9c7892c93ad2f836f94953c))
+
 ## 0.53.0 (2025-09-10)
 
 Full Changelog: [v0.52.0...v0.53.0](https://github.com/runloopai/api-client-ts/compare/v0.52.0...v0.53.0)

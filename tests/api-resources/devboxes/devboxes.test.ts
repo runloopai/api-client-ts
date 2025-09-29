@@ -216,6 +216,7 @@ describe('resource devboxes', () => {
     const response = await client.devboxes.execute('id', {
       command: 'command',
       command_id: 'command_id',
+      optimistic_timeout: 0,
       shell_name: 'shell_name',
     });
   });
