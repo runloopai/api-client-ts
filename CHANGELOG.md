@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.55.0 (2025-09-29)
+
+Full Changelog: [v0.54.0...v0.55.0](https://github.com/runloopai/api-client-ts/compare/v0.54.0...v0.55.0)
+
+### Features
+
+* **api:** api update ([a892b60](https://github.com/runloopai/api-client-ts/commit/a892b6082a080796beb800f245fb0ada14e3963b))
+
+
+### Chores
+
+* **internal:** ignore .eslintcache ([5061c2c](https://github.com/runloopai/api-client-ts/commit/5061c2c3e619b05bda545d01e0df8d3ab41c53fc))
+
 ## 0.54.0 (2025-09-27)
 
 Full Changelog: [v0.53.0...v0.54.0](https://github.com/runloopai/api-client-ts/compare/v0.53.0...v0.54.0)

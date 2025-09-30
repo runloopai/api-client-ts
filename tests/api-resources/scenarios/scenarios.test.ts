@@ -72,7 +72,7 @@ describe('resource scenarios', () => {
       reference_output: 'reference_output',
       required_environment_variables: ['string'],
       required_secret_names: ['string'],
-      validation_type: 'FORWARD',
+      validation_type: 'UNSPECIFIED',
     });
   });
 
@@ -156,7 +156,7 @@ describe('resource scenarios', () => {
               },
             ],
           },
-          validation_type: 'FORWARD',
+          validation_type: 'UNSPECIFIED',
         },
         { path: '/_stainless_unknown_path' },
       ),
