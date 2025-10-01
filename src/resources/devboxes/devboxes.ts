@@ -236,7 +236,10 @@ export class Devboxes extends APIResource {
     options?: Core.RequestOptions,
   ): Core.APIPromise<DevboxAsyncExecutionDetailView> {
     return this._client.post(`/v1/devboxes/${id}/execute`, {
-      body,
+      body: {
+        ...body,
+        command_id: body.command_id || uuidv7(),
+      },
       timeout: (this._client as any)._options.timeout ?? 600000,
       ...options,
     });
