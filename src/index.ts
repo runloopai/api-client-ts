@@ -157,6 +157,10 @@ import {
   ScoringFunctionResultView,
   StartScenarioRunParameters,
 } from './resources/scenarios/scenarios';
+import { Devbox } from './objects/devbox';
+import { Blueprint } from './objects/blueprint';
+import { Snapshot } from './objects/snapshot';
+import { StorageObject } from './objects/storage-object';
 
 export interface ClientOptions {
   /**
@@ -562,5 +566,10 @@ export {
   PermissionDeniedError,
   UnprocessableEntityError,
 } from './error';
+
+export { Devbox } from './objects/devbox';
+export { Blueprint } from './objects/blueprint';
+export { Snapshot } from './objects/snapshot';
+export { StorageObject } from './objects/storage-object';
 
 export default Runloop;
