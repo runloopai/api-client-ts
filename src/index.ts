@@ -29,6 +29,7 @@ import {
 import * as Uploads from './uploads';
 import * as API from './resources/index';
 import {
+  BlueprintBuildFromInspectionParameters,
   BlueprintBuildLog,
   BlueprintBuildLogsListView,
   BlueprintBuildParameters,
@@ -42,6 +43,7 @@ import {
   BlueprintView,
   BlueprintViewsBlueprintsCursorIDPage,
   Blueprints,
+  InspectionSource,
 } from './resources/blueprints';
 import {
   ObjectCompleteParams,
@@ -65,6 +67,7 @@ import {
   RepositoryCreateParams,
   RepositoryDeleteParams,
   RepositoryDeleteResponse,
+  RepositoryInspectParams,
   RepositoryInspectionDetails,
   RepositoryInspectionListView,
   RepositoryListParams,
@@ -423,12 +426,14 @@ export declare namespace Runloop {
 
   export {
     Blueprints as Blueprints,
+    type BlueprintBuildFromInspectionParameters as BlueprintBuildFromInspectionParameters,
     type BlueprintBuildLog as BlueprintBuildLog,
     type BlueprintBuildLogsListView as BlueprintBuildLogsListView,
     type BlueprintBuildParameters as BlueprintBuildParameters,
     type BlueprintListView as BlueprintListView,
     type BlueprintPreviewView as BlueprintPreviewView,
     type BlueprintView as BlueprintView,
+    type InspectionSource as InspectionSource,
     type BlueprintDeleteResponse as BlueprintDeleteResponse,
     BlueprintViewsBlueprintsCursorIDPage as BlueprintViewsBlueprintsCursorIDPage,
     type BlueprintCreateParams as BlueprintCreateParams,
@@ -525,6 +530,7 @@ export declare namespace Runloop {
     type RepositoryCreateParams as RepositoryCreateParams,
     type RepositoryListParams as RepositoryListParams,
     type RepositoryDeleteParams as RepositoryDeleteParams,
+    type RepositoryInspectParams as RepositoryInspectParams,
     type RepositoryRefreshParams as RepositoryRefreshParams,
   };
 
