@@ -53,6 +53,17 @@ export class Blueprints extends APIResource {
   }
 
   /**
+   * Starts build of custom defined container Blueprint using a RepositoryConnection
+   * Inspection as a source container specification.
+   */
+  createFromInspection(
+    body: BlueprintCreateFromInspectionParams,
+    options?: Core.RequestOptions,
+  ): Core.APIPromise<BlueprintView> {
+    return this._client.post('/v1/blueprints/create_from_inspection', { body, ...options });
+  }
+
+  /**
    * List all public Blueprints that are available to all users.
    */
   listPublic(
@@ -558,6 +569,40 @@ export interface BlueprintListParams extends BlueprintsCursorIDPageParams {
   name?: string;
 }
 
+export interface BlueprintCreateFromInspectionParams {
+  /**
+   * (Optional) Use a RepositoryInspection a source of a Blueprint build. The
+   * Dockerfile will be automatically created based on the RepositoryInspection
+   * contents.
+   */
+  inspection_source: InspectionSource;
+
+  /**
+   * Name of the Blueprint.
+   */
+  name: string;
+
+  /**
+   * (Optional) Map of paths and file contents to write before setup.
+   */
+  file_mounts?: { [key: string]: string } | null;
+
+  /**
+   * Parameters to configure your Devbox at launch time.
+   */
+  launch_parameters?: Shared.LaunchParameters | null;
+
+  /**
+   * (Optional) User defined metadata for the Blueprint.
+   */
+  metadata?: { [key: string]: string } | null;
+
+  /**
+   * A list of commands to run to set up your system.
+   */
+  system_setup_commands?: Array<string> | null;
+}
+
 export interface BlueprintListPublicParams extends BlueprintsCursorIDPageParams {
   /**
    * Filter by name
@@ -696,6 +741,7 @@ export declare namespace Blueprints {
     BlueprintViewsBlueprintsCursorIDPage as BlueprintViewsBlueprintsCursorIDPage,
     type BlueprintCreateParams as BlueprintCreateParams,
     type BlueprintListParams as BlueprintListParams,
+    type BlueprintCreateFromInspectionParams as BlueprintCreateFromInspectionParams,
     type BlueprintListPublicParams as BlueprintListPublicParams,
     type BlueprintPreviewParams as BlueprintPreviewParams,
   };
