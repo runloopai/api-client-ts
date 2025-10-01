@@ -42,12 +42,14 @@ Methods:
 
 Types:
 
+- <code><a href="./src/resources/blueprints.ts">BlueprintBuildFromInspectionParameters</a></code>
 - <code><a href="./src/resources/blueprints.ts">BlueprintBuildLog</a></code>
 - <code><a href="./src/resources/blueprints.ts">BlueprintBuildLogsListView</a></code>
 - <code><a href="./src/resources/blueprints.ts">BlueprintBuildParameters</a></code>
 - <code><a href="./src/resources/blueprints.ts">BlueprintListView</a></code>
 - <code><a href="./src/resources/blueprints.ts">BlueprintPreviewView</a></code>
 - <code><a href="./src/resources/blueprints.ts">BlueprintView</a></code>
+- <code><a href="./src/resources/blueprints.ts">InspectionSource</a></code>
 - <code><a href="./src/resources/blueprints.ts">BlueprintDeleteResponse</a></code>
 
 Methods:
@@ -266,6 +268,7 @@ Methods:
 - <code title="get /v1/repositories/{id}">client.repositories.<a href="./src/resources/repositories.ts">retrieve</a>(id) -> RepositoryConnectionView</code>
 - <code title="get /v1/repositories">client.repositories.<a href="./src/resources/repositories.ts">list</a>({ ...params }) -> RepositoryConnectionViewsRepositoriesCursorIDPage</code>
 - <code title="post /v1/repositories/{id}/delete">client.repositories.<a href="./src/resources/repositories.ts">delete</a>(id) -> unknown</code>
+- <code title="post /v1/repositories/{id}/inspect">client.repositories.<a href="./src/resources/repositories.ts">inspect</a>(id, { ...params }) -> RepositoryInspectionDetails</code>
 - <code title="get /v1/repositories/{id}/inspections">client.repositories.<a href="./src/resources/repositories.ts">listInspections</a>(id) -> RepositoryInspectionListView</code>
 - <code title="post /v1/repositories/{id}/refresh">client.repositories.<a href="./src/resources/repositories.ts">refresh</a>(id, { ...params }) -> unknown</code>
 

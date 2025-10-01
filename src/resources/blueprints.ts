@@ -10,10 +10,8 @@ import { PollingOptions, poll } from '../lib/polling';
 
 export class Blueprints extends APIResource {
   /**
-   * Starts build of custom defined container Blueprint. The Blueprint will begin in
-   * the 'provisioning' step and transition to the 'building' step once it is
-   * selected off the build queue., Upon build complete it will transition to
-   * 'building_complete' if the build is successful.
+   * Starts build of custom defined container Blueprint using a RepositoryConnection
+   * Inspection as a source container specification.
    */
   create(body: BlueprintCreateParams, options?: Core.RequestOptions): Core.APIPromise<BlueprintView> {
     return this._client.post('/v1/blueprints', { body, ...options });
@@ -136,6 +134,40 @@ export class Blueprints extends APIResource {
 }
 
 export class BlueprintViewsBlueprintsCursorIDPage extends BlueprintsCursorIDPage<BlueprintView> {}
+
+export interface BlueprintBuildFromInspectionParameters {
+  /**
+   * (Optional) Use a RepositoryInspection a source of a Blueprint build. The
+   * Dockerfile will be automatically created based on the RepositoryInspection
+   * contents.
+   */
+  inspection_source: InspectionSource;
+
+  /**
+   * Name of the Blueprint.
+   */
+  name: string;
+
+  /**
+   * (Optional) Map of paths and file contents to write before setup.
+   */
+  file_mounts?: { [key: string]: string } | null;
+
+  /**
+   * Parameters to configure your Devbox at launch time.
+   */
+  launch_parameters?: Shared.LaunchParameters | null;
+
+  /**
+   * (Optional) User defined metadata for the Blueprint.
+   */
+  metadata?: { [key: string]: string } | null;
+
+  /**
+   * A list of commands to run to set up your system.
+   */
+  system_setup_commands?: Array<string> | null;
+}
 
 export interface BlueprintBuildLog {
   /**
@@ -426,42 +458,35 @@ export namespace BlueprintView {
   }
 }
 
+/**
+ * Use a RepositoryInspection a source of a Blueprint build.
+ */
+export interface InspectionSource {
+  /**
+   * The ID of a repository inspection.
+   */
+  inspection_id: string;
+
+  /**
+   * GitHub authentication token for accessing private repositories.
+   */
+  github_auth_token?: string | null;
+}
+
 export type BlueprintDeleteResponse = unknown;
 
 export interface BlueprintCreateParams {
   /**
+   * (Optional) Use a RepositoryInspection a source of a Blueprint build. The
+   * Dockerfile will be automatically created based on the RepositoryInspection
+   * contents.
+   */
+  inspection_source: InspectionSource;
+
+  /**
    * Name of the Blueprint.
    */
   name: string;
-
-  /**
-   * (Optional) ID of previously built blueprint to use as a base blueprint for this
-   * build.
-   */
-  base_blueprint_id?: string | null;
-
-  /**
-   * (Optional) Name of previously built blueprint to use as a base blueprint for
-   * this build. When set, this will load the latest successfully built Blueprint
-   * with the given name. Only one of (base_blueprint_id, base_blueprint_name) should
-   * be specified.
-   */
-  base_blueprint_name?: string | null;
-
-  /**
-   * (Optional) Arbitrary Docker build args to pass during build.
-   */
-  build_args?: { [key: string]: string } | null;
-
-  /**
-   * A list of code mounts to be included in the Blueprint.
-   */
-  code_mounts?: Array<Shared.CodeMountParameters> | null;
-
-  /**
-   * Dockerfile contents to be used to build the Blueprint.
-   */
-  dockerfile?: string | null;
 
   /**
    * (Optional) Map of paths and file contents to write before setup.
@@ -479,68 +504,9 @@ export interface BlueprintCreateParams {
   metadata?: { [key: string]: string } | null;
 
   /**
-   * (Optional) List of containerized services to include in the Blueprint. These
-   * services will be pre-pulled during the build phase for optimized startup
-   * performance.
-   */
-  services?: Array<BlueprintCreateParams.Service> | null;
-
-  /**
    * A list of commands to run to set up your system.
    */
   system_setup_commands?: Array<string> | null;
-}
-
-export namespace BlueprintCreateParams {
-  export interface Service {
-    /**
-     * The image of the container service.
-     */
-    image: string;
-
-    /**
-     * The name of the container service.
-     */
-    name: string;
-
-    /**
-     * The credentials of the container service.
-     */
-    credentials?: Service.Credentials | null;
-
-    /**
-     * The environment variables of the container service.
-     */
-    env?: { [key: string]: string } | null;
-
-    /**
-     * Additional Docker container create options.
-     */
-    options?: string | null;
-
-    /**
-     * The port mappings of the container service. Port mappings are in the format of
-     * <host_port>:<container_port>.
-     */
-    port_mappings?: Array<string> | null;
-  }
-
-  export namespace Service {
-    /**
-     * The credentials of the container service.
-     */
-    export interface Credentials {
-      /**
-       * The password of the container service.
-       */
-      password: string;
-
-      /**
-       * The username of the container service.
-       */
-      username: string;
-    }
-  }
 }
 
 export interface BlueprintListParams extends BlueprintsCursorIDPageParams {
@@ -676,12 +642,14 @@ Blueprints.BlueprintViewsBlueprintsCursorIDPage = BlueprintViewsBlueprintsCursor
 
 export declare namespace Blueprints {
   export {
+    type BlueprintBuildFromInspectionParameters as BlueprintBuildFromInspectionParameters,
     type BlueprintBuildLog as BlueprintBuildLog,
     type BlueprintBuildLogsListView as BlueprintBuildLogsListView,
     type BlueprintBuildParameters as BlueprintBuildParameters,
     type BlueprintListView as BlueprintListView,
     type BlueprintPreviewView as BlueprintPreviewView,
     type BlueprintView as BlueprintView,
+    type InspectionSource as InspectionSource,
     type BlueprintDeleteResponse as BlueprintDeleteResponse,
     BlueprintViewsBlueprintsCursorIDPage as BlueprintViewsBlueprintsCursorIDPage,
     type BlueprintCreateParams as BlueprintCreateParams,

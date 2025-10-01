@@ -10,7 +10,10 @@ const client = new Runloop({
 
 describe('resource blueprints', () => {
   test('create: only required params', async () => {
-    const responsePromise = client.blueprints.create({ name: 'name' });
+    const responsePromise = client.blueprints.create({
+      inspection_source: { inspection_id: 'inspection_id' },
+      name: 'name',
+    });
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
     const response = await responsePromise;
@@ -22,18 +25,8 @@ describe('resource blueprints', () => {
 
   test('create: required and optional params', async () => {
     const response = await client.blueprints.create({
-      name: 'name',
-      base_blueprint_name: 'base_blueprint_name',
-      build_args: { foo: 'string' },
-      code_mounts: [
-        {
-          repo_name: 'repo_name',
-          repo_owner: 'repo_owner',
-          token: 'token',
-          install_command: 'install_command',
-        },
-      ],
-      dockerfile: 'dockerfile',
+      inspection_source: { inspection_id: 'inspection_id', github_auth_token: 'github_auth_token' },
+      name: 'name',,
       file_mounts: { foo: 'string' },
       launch_parameters: {
         after_idle: { idle_time_seconds: 0, on_idle: 'shutdown' },
@@ -49,16 +42,6 @@ describe('resource blueprints', () => {
         user_parameters: { uid: 0, username: 'username' },
       },
       metadata: { foo: 'string' },
-      services: [
-        {
-          image: 'image',
-          name: 'name',
-          credentials: { password: 'password', username: 'username' },
-          env: { foo: 'string' },
-          options: 'options',
-          port_mappings: ['string'],
-        },
-      ],
       system_setup_commands: ['string'],
     });
   });
