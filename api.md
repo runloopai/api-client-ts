@@ -3,8 +3,11 @@
 Types:
 
 - <code><a href="./src/resources/shared.ts">AfterIdle</a></code>
+- <code><a href="./src/resources/shared.ts">AgentMountParameters</a></code>
 - <code><a href="./src/resources/shared.ts">CodeMountParameters</a></code>
 - <code><a href="./src/resources/shared.ts">LaunchParameters</a></code>
+- <code><a href="./src/resources/shared.ts">Mount</a></code>
+- <code><a href="./src/resources/shared.ts">ObjectMountParameters</a></code>
 - <code><a href="./src/resources/shared.ts">RunProfile</a></code>
 
 # Benchmarks
