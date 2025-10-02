@@ -307,7 +307,7 @@ export class Devboxes extends APIResource {
    * Execute a bash command in the Devbox shell, await the command completion and
    * return the output.
    *
-   * @deprecated
+   * @deprecated Use execute, executeAsync, or executeAndAwaitCompletion instead.
    */
   executeSync(
     id: string,
