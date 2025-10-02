@@ -236,7 +236,10 @@ export class Devboxes extends APIResource {
     options?: Core.RequestOptions,
   ): Core.APIPromise<DevboxAsyncExecutionDetailView> {
     return this._client.post(`/v1/devboxes/${id}/execute`, {
-      body,
+      body: {
+        ...body,
+        command_id: body.command_id || uuidv7(),
+      },
       timeout: (this._client as any)._options.timeout ?? 600000,
       ...options,
     });
@@ -304,7 +307,7 @@ export class Devboxes extends APIResource {
    * Execute a bash command in the Devbox shell, await the command completion and
    * return the output.
    *
-   * @deprecated
+   * @deprecated Use execute, executeAsync, or executeAndAwaitCompletion instead.
    */
   executeSync(
     id: string,
