@@ -863,6 +863,11 @@ export interface DevboxCreateParams {
   metadata?: { [key: string]: string } | null;
 
   /**
+   * A list of file system mounts to be included in the Devbox.
+   */
+  mounts?: Array<Shared.Mount> | null;
+
+  /**
    * (Optional) A user specified name to give the Devbox.
    */
   name?: string | null;
@@ -939,7 +944,7 @@ export interface DevboxExecuteParams {
   command: string;
 
   /**
-   * The command ID for idempotency and tracking
+   * The command ID in UUIDv7 string format for idempotency and tracking
    */
   command_id: string;
 

@@ -21,15 +21,18 @@ export {
 export {
   BlueprintViewsBlueprintsCursorIDPage,
   Blueprints,
+  type BlueprintBuildFromInspectionParameters,
   type BlueprintBuildLog,
   type BlueprintBuildLogsListView,
   type BlueprintBuildParameters,
   type BlueprintListView,
   type BlueprintPreviewView,
   type BlueprintView,
+  type InspectionSource,
   type BlueprintDeleteResponse,
   type BlueprintCreateParams,
   type BlueprintListParams,
+  type BlueprintCreateFromInspectionParams,
   type BlueprintListPublicParams,
   type BlueprintPreviewParams,
 } from './blueprints';
@@ -95,6 +98,7 @@ export {
   type RepositoryCreateParams,
   type RepositoryListParams,
   type RepositoryDeleteParams,
+  type RepositoryInspectParams,
   type RepositoryRefreshParams,
 } from './repositories';
 export {
