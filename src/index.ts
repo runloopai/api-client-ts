@@ -549,8 +549,11 @@ export declare namespace Runloop {
   };
 
   export type AfterIdle = API.AfterIdle;
+  export type AgentMountParameters = API.AgentMountParameters;
   export type CodeMountParameters = API.CodeMountParameters;
   export type LaunchParameters = API.LaunchParameters;
+  export type Mount = API.Mount;
+  export type ObjectMountParameters = API.ObjectMountParameters;
   export type RunProfile = API.RunProfile;
 }
 
