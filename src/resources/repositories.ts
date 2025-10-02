@@ -494,11 +494,6 @@ export interface RepositoryDeleteParams {}
 
 export interface RepositoryInspectParams {
   /**
-   * ID of blueprint to use as base for resulting RepositoryVersion blueprint.
-   */
-  blueprint_id?: string | null;
-
-  /**
    * GitHub authentication token for accessing private repositories.
    */
   github_auth_token?: string | null;

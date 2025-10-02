@@ -863,6 +863,11 @@ export interface DevboxCreateParams {
   metadata?: { [key: string]: string } | null;
 
   /**
+   * A list of file system mounts to be included in the Devbox.
+   */
+  mounts?: Array<DevboxCreateParams.ObjectMountParameters | DevboxCreateParams.AgentMountParameters> | null;
+
+  /**
    * (Optional) A user specified name to give the Devbox.
    */
   name?: string | null;
@@ -885,6 +890,38 @@ export interface DevboxCreateParams {
    * Blueprint name) should be specified.
    */
   snapshot_id?: string | null;
+}
+
+export namespace DevboxCreateParams {
+  export interface ObjectMountParameters {
+    /**
+     * The ID of the object to write.
+     */
+    object_id: string;
+
+    /**
+     * The path to write the object on the Devbox. Use absolute path of object (ie
+     * /home/user/object.txt, or directory if archive /home/user/archive_dir)
+     */
+    object_path: string;
+
+    type: 'object_mount';
+  }
+
+  export interface AgentMountParameters {
+    /**
+     * The ID of the agent to mount.
+     */
+    agent_id: string;
+
+    type: 'agent_mount';
+
+    /**
+     * Optional path to mount the agent on the Devbox. Required for git and object
+     * agents. Use absolute path (e.g., /home/user/agent)
+     */
+    agent_path?: string | null;
+  }
 }
 
 export interface DevboxUpdateParams {
@@ -939,7 +976,7 @@ export interface DevboxExecuteParams {
   command: string;
 
   /**
-   * The command ID for idempotency and tracking
+   * The command ID in UUIDv7 string format for idempotency and tracking
    */
   command_id: string;
 
