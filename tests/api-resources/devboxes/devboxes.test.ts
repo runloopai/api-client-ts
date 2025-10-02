@@ -59,6 +59,7 @@ describe('resource devboxes', () => {
             user_parameters: { uid: 0, username: 'username' },
           },
           metadata: { foo: 'string' },
+          mounts: [{ object_id: 'object_id', object_path: 'object_path', type: 'object_mount' }],
           name: 'name',
           repo_connection_id: 'repo_connection_id',
           secrets: { foo: 'string' },

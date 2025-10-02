@@ -116,7 +116,7 @@ describe('resource repositories', () => {
     await expect(
       client.repositories.inspect(
         'id',
-        { blueprint_id: 'blueprint_id', github_auth_token: 'github_auth_token' },
+        { github_auth_token: 'github_auth_token' },
         { path: '/_stainless_unknown_path' },
       ),
     ).rejects.toThrow(Runloop.NotFoundError);
