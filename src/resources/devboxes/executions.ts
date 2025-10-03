@@ -141,6 +141,35 @@ export class Executions extends APIResource {
   }
 
   /**
+   * Send content to the Std In of a running execution.
+   */
+  sendStdIn(
+    devboxId: string,
+    executionId: string,
+    body?: ExecutionSendStdInParams,
+    options?: Core.RequestOptions,
+  ): Core.APIPromise<DevboxesAPI.DevboxAsyncExecutionDetailView>;
+  sendStdIn(
+    devboxId: string,
+    executionId: string,
+    options?: Core.RequestOptions,
+  ): Core.APIPromise<DevboxesAPI.DevboxAsyncExecutionDetailView>;
+  sendStdIn(
+    devboxId: string,
+    executionId: string,
+    body: ExecutionSendStdInParams | Core.RequestOptions = {},
+    options?: Core.RequestOptions,
+  ): Core.APIPromise<DevboxesAPI.DevboxAsyncExecutionDetailView> {
+    if (isRequestOptions(body)) {
+      return this.sendStdIn(devboxId, executionId, {}, body);
+    }
+    return this._client.post(`/v1/devboxes/${devboxId}/executions/${executionId}/send_std_in`, {
+      body,
+      ...options,
+    });
+  }
+
+  /**
    * Tails the stderr logs for the given execution with SSE streaming
    */
   streamStderrUpdates(
@@ -256,6 +285,13 @@ export interface ExecutionKillParams {
   kill_process_group?: boolean | null;
 }
 
+export interface ExecutionSendStdInParams {
+  /**
+   * Text to send to std in of the running execution.
+   */
+  text?: string;
+}
+
 export interface ExecutionStreamStderrUpdatesParams {
   /**
    * The byte offset to start the stream from
@@ -277,6 +313,7 @@ export declare namespace Executions {
     type ExecutionExecuteAsyncParams as ExecutionExecuteAsyncParams,
     type ExecutionExecuteSyncParams as ExecutionExecuteSyncParams,
     type ExecutionKillParams as ExecutionKillParams,
+    type ExecutionSendStdInParams as ExecutionSendStdInParams,
     type ExecutionStreamStderrUpdatesParams as ExecutionStreamStderrUpdatesParams,
     type ExecutionStreamStdoutUpdatesParams as ExecutionStreamStdoutUpdatesParams,
   };
