@@ -92,6 +92,8 @@ export class Repositories extends APIResource {
   /**
    * Refresh a repository connection by inspecting the latest version including
    * repo's technical stack and developer environment requirements.
+   *
+   * @deprecated
    */
   refresh(
     id: string,
@@ -108,6 +110,16 @@ export class Repositories extends APIResource {
       return this.refresh(id, {}, body);
     }
     return this._client.post(`/v1/repositories/${id}/refresh`, { body, ...options });
+  }
+
+  /**
+   * Get a repository inspection by id.
+   */
+  retrieveInspection(
+    id: string,
+    options?: Core.RequestOptions,
+  ): Core.APIPromise<RepositoryInspectionDetails> {
+    return this._client.get(`/v1/repositories/inspections/${id}`, options);
   }
 }
 

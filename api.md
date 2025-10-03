@@ -276,6 +276,7 @@ Methods:
 - <code title="post /v1/repositories/{id}/inspect">client.repositories.<a href="./src/resources/repositories.ts">inspect</a>(id, { ...params }) -> RepositoryInspectionDetails</code>
 - <code title="get /v1/repositories/{id}/inspections">client.repositories.<a href="./src/resources/repositories.ts">listInspections</a>(id) -> RepositoryInspectionListView</code>
 - <code title="post /v1/repositories/{id}/refresh">client.repositories.<a href="./src/resources/repositories.ts">refresh</a>(id, { ...params }) -> unknown</code>
+- <code title="get /v1/repositories/inspections/{id}">client.repositories.<a href="./src/resources/repositories.ts">retrieveInspection</a>(id) -> RepositoryInspectionDetails</code>
 
 # Secrets
 

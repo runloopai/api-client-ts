@@ -287,9 +287,14 @@ export interface ExecutionKillParams {
 
 export interface ExecutionSendStdInParams {
   /**
+   * Signal to send to std in of the running execution.
+   */
+  signal?: 'EOF' | 'INTERRUPT' | null;
+
+  /**
    * Text to send to std in of the running execution.
    */
-  text?: string;
+  text?: string | null;
 }
 
 export interface ExecutionStreamStderrUpdatesParams {
