@@ -175,6 +175,7 @@ Methods:
 - <code title="post /v1/devboxes/{id}/execute_async">client.devboxes.executions.<a href="./src/resources/devboxes/executions.ts">executeAsync</a>(id, { ...params }) -> DevboxAsyncExecutionDetailView</code>
 - <code title="post /v1/devboxes/{id}/execute_sync">client.devboxes.executions.<a href="./src/resources/devboxes/executions.ts">executeSync</a>(id, { ...params }) -> DevboxExecutionDetailView</code>
 - <code title="post /v1/devboxes/{devbox_id}/executions/{execution_id}/kill">client.devboxes.executions.<a href="./src/resources/devboxes/executions.ts">kill</a>(devboxId, executionId, { ...params }) -> DevboxAsyncExecutionDetailView</code>
+- <code title="post /v1/devboxes/{devbox_id}/executions/{execution_id}/send_std_in">client.devboxes.executions.<a href="./src/resources/devboxes/executions.ts">sendStdIn</a>(devboxId, executionId, { ...params }) -> DevboxAsyncExecutionDetailView</code>
 - <code title="get /v1/devboxes/{devbox_id}/executions/{execution_id}/stream_stderr_updates">client.devboxes.executions.<a href="./src/resources/devboxes/executions.ts">streamStderrUpdates</a>(devboxId, executionId, { ...params }) -> ExecutionUpdateChunk</code>
 - <code title="get /v1/devboxes/{devbox_id}/executions/{execution_id}/stream_stdout_updates">client.devboxes.executions.<a href="./src/resources/devboxes/executions.ts">streamStdoutUpdates</a>(devboxId, executionId, { ...params }) -> ExecutionUpdateChunk</code>
 
