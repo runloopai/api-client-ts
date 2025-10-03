@@ -32,6 +32,7 @@ import {
   ExecutionExecuteSyncParams,
   ExecutionKillParams,
   ExecutionRetrieveParams,
+  ExecutionSendStdInParams,
   ExecutionStreamStderrUpdatesParams,
   ExecutionStreamStdoutUpdatesParams,
   ExecutionUpdateChunk,
@@ -1049,6 +1050,7 @@ export declare namespace Devboxes {
     type ExecutionExecuteAsyncParams as ExecutionExecuteAsyncParams,
     type ExecutionExecuteSyncParams as ExecutionExecuteSyncParams,
     type ExecutionKillParams as ExecutionKillParams,
+    type ExecutionSendStdInParams as ExecutionSendStdInParams,
     type ExecutionStreamStderrUpdatesParams as ExecutionStreamStderrUpdatesParams,
     type ExecutionStreamStdoutUpdatesParams as ExecutionStreamStdoutUpdatesParams,
   };
