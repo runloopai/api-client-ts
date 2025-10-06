@@ -130,7 +130,7 @@ describe('resource executions', () => {
       client.devboxes.executions.sendStdIn(
         'devbox_id',
         'execution_id',
-        { text: 'text' },
+        { signal: 'EOF', text: 'text' },
         { path: '/_stainless_unknown_path' },
       ),
     ).rejects.toThrow(Runloop.NotFoundError);
