@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.58.1 (2025-10-07)
+
+Full Changelog: [v0.58.0...v0.58.1](https://github.com/runloopai/api-client-ts/compare/v0.58.0...v0.58.1)
+
+### Chores
+
+* **internal:** use npm pack for build uploads ([612a62d](https://github.com/runloopai/api-client-ts/commit/612a62d03bfe83e5d6f337de7074d3e6dba7da05))
+
 ## 0.58.0 (2025-10-03)
 
 Full Changelog: [v0.57.0...v0.58.0](https://github.com/runloopai/api-client-ts/compare/v0.57.0...v0.58.0)
