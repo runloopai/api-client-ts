@@ -117,7 +117,7 @@ Error codes are as follows:
 
 Certain errors will be automatically retried 5 times by default, with a short exponential backoff.
 Connection errors (for example, due to a network connectivity problem), 408 Request Timeout, 409 Conflict,
-429 Rate Limit, and >=500 Internal errors will all be retried by default for GET requests. For POST requests, 
+429 Rate Limit, and >=500 Internal errors will all be retried by default for GET requests. For POST requests,
 only 429 errors will be retried.
 
 You can use the `maxRetries` option to configure or disable this:
@@ -132,6 +132,34 @@ const client = new Runloop({
 // Or, configure per-request:
 await client.devboxes.create({
   maxRetries: 10,
+});
+```
+
+#### File Write Rate Limiting
+
+File write operations (`writeFileContents` and `uploadFile`) are subject to rate limiting on the backend
+(approximately 80 chunks per second, equivalent to ~10MB/sec per connection). When rate limits are exceeded,
+the API returns a `429 Too Many Requests` error, which is automatically retried with exponential backoff.
+
+The retry behavior includes:
+- **Default retries**: 5 attempts (initial request + 4 retries)
+- **Backoff strategy**: Exponential with jitter to prevent thundering herd
+- **Retry-After header**: Respected when provided by the API
+- **Configurable**: Use `maxRetries` parameter to adjust retry behavior
+
+Example:
+```ts
+import Runloop from '@runloop/api-client';
+
+const client = new Runloop({
+  bearerToken: process.env['RUNLOOP_API_KEY'],
+  maxRetries: 5  // Recommended for file operations
+});
+
+// Automatically retries on rate limit errors
+const result = await client.devboxes.writeFileContents('devbox-id', {
+  contents: 'large file content...',
+  file_path: '/path/to/file.txt'
 });
 ```
 
