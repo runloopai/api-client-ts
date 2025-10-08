@@ -61,6 +61,7 @@ export {
   type ExecutionExecuteAsyncParams,
   type ExecutionExecuteSyncParams,
   type ExecutionKillParams,
+  type ExecutionSendStdInParams,
   type ExecutionStreamStderrUpdatesParams,
   type ExecutionStreamStdoutUpdatesParams,
 } from './executions';

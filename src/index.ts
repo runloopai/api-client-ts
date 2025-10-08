@@ -29,9 +29,11 @@ import {
 import * as Uploads from './uploads';
 import * as API from './resources/index';
 import {
+  BlueprintBuildFromInspectionParameters,
   BlueprintBuildLog,
   BlueprintBuildLogsListView,
   BlueprintBuildParameters,
+  BlueprintCreateFromInspectionParams,
   BlueprintCreateParams,
   BlueprintDeleteResponse,
   BlueprintListParams,
@@ -42,6 +44,7 @@ import {
   BlueprintView,
   BlueprintViewsBlueprintsCursorIDPage,
   Blueprints,
+  InspectionSource,
 } from './resources/blueprints';
 import {
   ObjectCompleteParams,
@@ -65,6 +68,7 @@ import {
   RepositoryCreateParams,
   RepositoryDeleteParams,
   RepositoryDeleteResponse,
+  RepositoryInspectParams,
   RepositoryInspectionDetails,
   RepositoryInspectionListView,
   RepositoryListParams,
@@ -427,16 +431,19 @@ export declare namespace Runloop {
 
   export {
     Blueprints as Blueprints,
+    type BlueprintBuildFromInspectionParameters as BlueprintBuildFromInspectionParameters,
     type BlueprintBuildLog as BlueprintBuildLog,
     type BlueprintBuildLogsListView as BlueprintBuildLogsListView,
     type BlueprintBuildParameters as BlueprintBuildParameters,
     type BlueprintListView as BlueprintListView,
     type BlueprintPreviewView as BlueprintPreviewView,
     type BlueprintView as BlueprintView,
+    type InspectionSource as InspectionSource,
     type BlueprintDeleteResponse as BlueprintDeleteResponse,
     BlueprintViewsBlueprintsCursorIDPage as BlueprintViewsBlueprintsCursorIDPage,
     type BlueprintCreateParams as BlueprintCreateParams,
     type BlueprintListParams as BlueprintListParams,
+    type BlueprintCreateFromInspectionParams as BlueprintCreateFromInspectionParams,
     type BlueprintListPublicParams as BlueprintListPublicParams,
     type BlueprintPreviewParams as BlueprintPreviewParams,
   };
@@ -529,6 +536,7 @@ export declare namespace Runloop {
     type RepositoryCreateParams as RepositoryCreateParams,
     type RepositoryListParams as RepositoryListParams,
     type RepositoryDeleteParams as RepositoryDeleteParams,
+    type RepositoryInspectParams as RepositoryInspectParams,
     type RepositoryRefreshParams as RepositoryRefreshParams,
   };
 
@@ -545,8 +553,11 @@ export declare namespace Runloop {
   };
 
   export type AfterIdle = API.AfterIdle;
+  export type AgentMountParameters = API.AgentMountParameters;
   export type CodeMountParameters = API.CodeMountParameters;
   export type LaunchParameters = API.LaunchParameters;
+  export type Mount = API.Mount;
+  export type ObjectMountParameters = API.ObjectMountParameters;
   export type RunProfile = API.RunProfile;
 }
 

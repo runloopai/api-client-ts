@@ -23,6 +23,7 @@ describe('resource blueprints', () => {
   test('create: required and optional params', async () => {
     const response = await client.blueprints.create({
       name: 'name',
+      base_blueprint_id: 'base_blueprint_id',
       base_blueprint_name: 'base_blueprint_name',
       build_args: { foo: 'string' },
       code_mounts: [
@@ -125,6 +126,43 @@ describe('resource blueprints', () => {
     await expect(client.blueprints.delete('id', { path: '/_stainless_unknown_path' })).rejects.toThrow(
       Runloop.NotFoundError,
     );
+  });
+
+  test('createFromInspection: only required params', async () => {
+    const responsePromise = client.blueprints.createFromInspection({
+      inspection_source: { inspection_id: 'inspection_id' },
+      name: 'name',
+    });
+    const rawResponse = await responsePromise.asResponse();
+    expect(rawResponse).toBeInstanceOf(Response);
+    const response = await responsePromise;
+    expect(response).not.toBeInstanceOf(Response);
+    const dataAndResponse = await responsePromise.withResponse();
+    expect(dataAndResponse.data).toBe(response);
+    expect(dataAndResponse.response).toBe(rawResponse);
+  });
+
+  test('createFromInspection: required and optional params', async () => {
+    const response = await client.blueprints.createFromInspection({
+      inspection_source: { inspection_id: 'inspection_id', github_auth_token: 'github_auth_token' },
+      name: 'name',
+      file_mounts: { foo: 'string' },
+      launch_parameters: {
+        after_idle: { idle_time_seconds: 0, on_idle: 'shutdown' },
+        architecture: 'x86_64',
+        available_ports: [0],
+        custom_cpu_cores: 0,
+        custom_disk_size: 0,
+        custom_gb_memory: 0,
+        keep_alive_time_seconds: 0,
+        launch_commands: ['string'],
+        required_services: ['string'],
+        resource_size_request: 'X_SMALL',
+        user_parameters: { uid: 0, username: 'username' },
+      },
+      metadata: { foo: 'string' },
+      system_setup_commands: ['string'],
+    });
   });
 
   test('listPublic', async () => {

@@ -12,6 +12,21 @@ export interface AfterIdle {
   on_idle: 'shutdown' | 'suspend';
 }
 
+export interface AgentMountParameters {
+  /**
+   * The ID of the agent to mount.
+   */
+  agent_id: string;
+
+  type: 'agent_mount';
+
+  /**
+   * Optional path to mount the agent on the Devbox. Required for git and object
+   * agents. Use absolute path (e.g., /home/user/agent)
+   */
+  agent_path?: string | null;
+}
+
 export interface CodeMountParameters {
   /**
    * The name of the repo to mount. By default, code will be mounted at
@@ -129,6 +144,23 @@ export namespace LaunchParameters {
      */
     username: string;
   }
+}
+
+export type Mount = ObjectMountParameters | AgentMountParameters;
+
+export interface ObjectMountParameters {
+  /**
+   * The ID of the object to write.
+   */
+  object_id: string;
+
+  /**
+   * The path to write the object on the Devbox. Use absolute path of object (ie
+   * /home/user/object.txt, or directory if archive /home/user/archive_dir)
+   */
+  object_path: string;
+
+  type: 'object_mount';
 }
 
 export interface RunProfile {
