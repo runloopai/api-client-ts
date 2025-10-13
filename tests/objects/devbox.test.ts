@@ -64,11 +64,7 @@ describe('Devbox', () => {
     it('should pass options to the API client', async () => {
       mockClient.devboxes.createAndAwaitRunning.mockResolvedValue(mockDevboxData);
 
-      await Devbox.create(
-        mockClient,
-        { name: 'test-devbox' },
-        { polling: { maxAttempts: 10 } },
-      );
+      await Devbox.create(mockClient, { name: 'test-devbox' }, { polling: { maxAttempts: 10 } });
 
       expect(mockClient.devboxes.createAndAwaitRunning).toHaveBeenCalledWith(
         { name: 'test-devbox' },
@@ -113,7 +109,7 @@ describe('Devbox', () => {
 
         expect(mockClient.devboxes.executeAndAwaitCompletion).toHaveBeenCalledWith(
           'devbox-123',
-          { command: 'echo "Hello World"', shell_name: undefined },
+          { command: 'echo "Hello World"', shell_name: null },
           undefined,
         );
         expect(result.stdout).toBe('Hello World');
@@ -156,7 +152,7 @@ describe('Devbox', () => {
 
         expect(mockClient.devboxes.executeAsync).toHaveBeenCalledWith(
           'devbox-123',
-          { command: 'sleep 10', shell_name: undefined },
+          { command: 'sleep 10', shell_name: null },
           undefined,
         );
         expect(result.status).toBe('running');
@@ -355,6 +351,146 @@ describe('Devbox', () => {
       it('should provide access to underlying API', () => {
         expect(devbox.api).toBe(mockClient.devboxes);
       });
+    });
+  });
+
+  describe('error handling', () => {
+    it('should handle devbox creation failure', async () => {
+      const error = new Error('Creation failed');
+      mockClient.devboxes.createAndAwaitRunning.mockRejectedValue(error);
+
+      await expect(Devbox.create(mockClient, { name: 'failing-devbox' })).rejects.toThrow('Creation failed');
+    });
+
+    it('should handle command execution errors', async () => {
+      mockClient.devboxes.createAndAwaitRunning.mockResolvedValue(mockDevboxData);
+      const devbox = await Devbox.create(mockClient, { name: 'test-devbox' });
+
+      const error = new Error('Command failed');
+      mockClient.devboxes.executeAndAwaitCompletion.mockRejectedValue(error);
+
+      await expect(devbox.exec('failing-command')).rejects.toThrow('Command failed');
+    });
+
+    it('should handle file operation errors', async () => {
+      mockClient.devboxes.createAndAwaitRunning.mockResolvedValue(mockDevboxData);
+      const devbox = await Devbox.create(mockClient, { name: 'test-devbox' });
+
+      const error = new Error('File not found');
+      mockClient.devboxes.readFileContents.mockRejectedValue(error);
+
+      await expect(devbox.file.read('nonexistent.txt')).rejects.toThrow('File not found');
+    });
+
+    it('should handle network operation errors', async () => {
+      mockClient.devboxes.createAndAwaitRunning.mockResolvedValue(mockDevboxData);
+      const devbox = await Devbox.create(mockClient, { name: 'test-devbox' });
+
+      const error = new Error('SSH key creation failed');
+      mockClient.devboxes.createSSHKey.mockRejectedValue(error);
+
+      await expect(devbox.createSSHKey()).rejects.toThrow('SSH key creation failed');
+    });
+  });
+
+  describe('edge cases', () => {
+    it('should handle devbox with no parameters', async () => {
+      mockClient.devboxes.createAndAwaitRunning.mockResolvedValue(mockDevboxData);
+
+      const devbox = await Devbox.create(mockClient);
+
+      expect(mockClient.devboxes.createAndAwaitRunning).toHaveBeenCalledWith(undefined, undefined);
+      expect(devbox.id).toBe('devbox-123');
+    });
+
+    it('should handle command with empty output', async () => {
+      mockClient.devboxes.createAndAwaitRunning.mockResolvedValue(mockDevboxData);
+      const devbox = await Devbox.create(mockClient, { name: 'test-devbox' });
+
+      const emptyResult = {
+        devbox_id: 'devbox-123',
+        execution_id: 'exec-456',
+        status: 'completed' as const,
+        exit_status: 0,
+        stdout: '',
+        stderr: '',
+      };
+
+      mockClient.devboxes.executeAndAwaitCompletion.mockResolvedValue(emptyResult);
+
+      const result = await devbox.exec('true'); // Command that produces no output
+      expect(result.stdout).toBe('');
+      expect(result.stderr).toBe('');
+    });
+
+    it('should handle command with non-zero exit status', async () => {
+      mockClient.devboxes.createAndAwaitRunning.mockResolvedValue(mockDevboxData);
+      const devbox = await Devbox.create(mockClient, { name: 'test-devbox' });
+
+      const failedResult = {
+        devbox_id: 'devbox-123',
+        execution_id: 'exec-456',
+        status: 'completed' as const,
+        exit_status: 1,
+        stdout: '',
+        stderr: 'Command failed',
+      };
+
+      mockClient.devboxes.executeAndAwaitCompletion.mockResolvedValue(failedResult);
+
+      const result = await devbox.exec('false'); // Command that fails
+      expect(result.exit_status).toBe(1);
+      expect(result.stderr).toBe('Command failed');
+    });
+
+    it('should handle empty file content', async () => {
+      mockClient.devboxes.createAndAwaitRunning.mockResolvedValue(mockDevboxData);
+      const devbox = await Devbox.create(mockClient, { name: 'test-devbox' });
+
+      mockClient.devboxes.readFileContents.mockResolvedValue('');
+
+      const content = await devbox.file.read('empty-file.txt');
+      expect(content).toBe('');
+    });
+
+    it('should handle snapshot without metadata', async () => {
+      mockClient.devboxes.createAndAwaitRunning.mockResolvedValue(mockDevboxData);
+      const devbox = await Devbox.create(mockClient, { name: 'test-devbox' });
+
+      const snapshotWithoutMetadata = {
+        id: 'snapshot-123',
+        create_time_ms: Date.now(),
+        metadata: {},
+        source_devbox_id: 'devbox-123',
+      };
+
+      mockClient.devboxes.snapshotDisk.mockResolvedValue(snapshotWithoutMetadata);
+
+      const result = await devbox.snapshotDisk();
+      expect(result.metadata).toEqual({});
+    });
+
+    it('should handle lifecycle state transitions', async () => {
+      mockClient.devboxes.createAndAwaitRunning.mockResolvedValue(mockDevboxData);
+      const devbox = await Devbox.create(mockClient, { name: 'test-devbox' });
+
+      // Test suspend
+      const suspendedData = { ...mockDevboxData, status: 'suspended' as const };
+      mockClient.devboxes.suspend.mockResolvedValue(suspendedData);
+      await devbox.suspend();
+      expect(devbox.status).toBe('suspended');
+
+      // Test resume
+      const resumedData = { ...mockDevboxData, status: 'running' as const };
+      mockClient.devboxes.resume.mockResolvedValue(resumedData);
+      await devbox.resume();
+      expect(devbox.status).toBe('running');
+
+      // Test shutdown
+      const shutdownData = { ...mockDevboxData, status: 'shutdown' as const };
+      mockClient.devboxes.shutdown.mockResolvedValue(shutdownData);
+      await devbox.shutdown();
+      expect(devbox.status).toBe('shutdown');
     });
   });
 });

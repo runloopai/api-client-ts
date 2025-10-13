@@ -161,9 +161,14 @@ import {
   ScoringFunctionResultView,
   StartScenarioRunParameters,
 } from './resources/scenarios/scenarios';
+// Object-oriented interfaces (re-exported at end of file)
+// eslint-disable-next-line unused-imports/no-unused-imports
 import { Devbox } from './objects/devbox';
+// eslint-disable-next-line unused-imports/no-unused-imports
 import { Blueprint } from './objects/blueprint';
+// eslint-disable-next-line unused-imports/no-unused-imports
 import { Snapshot } from './objects/snapshot';
+// eslint-disable-next-line unused-imports/no-unused-imports
 import { StorageObject } from './objects/storage-object';
 
 export interface ClientOptions {

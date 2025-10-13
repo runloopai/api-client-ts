@@ -63,7 +63,12 @@ describe('Snapshot', () => {
     it('should throw error if snapshot not found', async () => {
       const mockPage = {
         [Symbol.asyncIterator]: async function* () {
-          yield { id: 'other-snapshot', create_time_ms: Date.now(), metadata: {}, source_devbox_id: 'devbox-1' };
+          yield {
+            id: 'other-snapshot',
+            create_time_ms: Date.now(),
+            metadata: {},
+            source_devbox_id: 'devbox-1',
+          };
         },
       };
 

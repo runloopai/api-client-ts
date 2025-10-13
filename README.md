@@ -18,6 +18,30 @@ npm install @runloop/api-client
 
 The full API of this library can be found in [api.md](api.md).
 
+### Quick Start with Objects API (Recommended)
+
+For the most intuitive experience, use our object-oriented API:
+
+<!-- prettier-ignore -->
+```js
+import { Runloop, Devbox, Blueprint, StorageObject } from '@runloop/api-client';
+
+const client = new Runloop({
+  bearerToken: process.env['RUNLOOP_API_KEY'], // This is the default and can be omitted
+});
+
+// Create and use a devbox with the object-oriented API
+const devbox = await Devbox.create(client, { name: 'my-devbox' });
+await devbox.exec('echo "Hello, World!"');
+await devbox.file.write('test.txt', 'Hello from Runloop!');
+const content = await devbox.file.read('test.txt');
+await devbox.shutdown();
+```
+
+### Traditional Resource API
+
+You can also use the traditional resource-based API:
+
 <!-- prettier-ignore -->
 ```js
 import Runloop from '@runloop/api-client';
@@ -47,6 +71,62 @@ const devboxView: Runloop.DevboxView = await client.devboxes.create();
 ```
 
 Documentation for each method, request param, and response field are available in docstrings and will appear on hover in most modern editors.
+
+## Objects API
+
+The Objects API provides a high-level, object-oriented interface that makes working with Runloop resources more intuitive and convenient. Instead of managing resource IDs and making multiple API calls, you work directly with objects that encapsulate state and behavior.
+
+### Available Objects
+
+- **`Devbox`** - Manage cloud development environments with methods like `exec()`, `file.read()`, `file.write()`
+- **`Blueprint`** - Create reusable environment templates for faster devbox creation
+- **`Snapshot`** - Save and restore devbox state for backup and branching workflows
+- **`StorageObject`** - Store and retrieve files and data (similar to S3 objects)
+
+### Key Benefits
+
+- **Stateful**: Objects maintain their state and can be refreshed from the API
+- **Intuitive**: Method names follow object-oriented conventions (`devbox.exec()` vs `client.devboxes.executeAndAwaitCompletion()`)
+- **Convenient**: Complex workflows simplified into readable code
+- **Type-safe**: Full TypeScript support with comprehensive type definitions
+
+### Quick Example
+
+```typescript
+import { Runloop, Devbox, Blueprint } from '@runloop/api-client';
+
+const client = new Runloop();
+
+// Create a reusable blueprint
+const blueprint = await Blueprint.create(client, {
+  name: 'nodejs-dev',
+  system_setup_commands: [
+    'curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -',
+    'sudo apt-get install -y nodejs',
+  ],
+});
+
+// Create devbox from blueprint (much faster than installing each time)
+const devbox = await Devbox.create(client, {
+  name: 'my-project',
+  blueprint_id: blueprint.id,
+});
+
+// Work with files and execute commands
+await devbox.file.write('package.json', JSON.stringify({ name: 'my-app', version: '1.0.0' }));
+await devbox.exec('npm install express');
+const result = await devbox.exec('node --version');
+
+// Save state as snapshot
+const snapshot = await devbox.snapshotDisk('configured-env');
+
+// Clean up
+await devbox.shutdown();
+```
+
+**📖 [Complete Objects API Documentation](objects-api.md)**
+
+The Objects API documentation includes comprehensive guides, advanced patterns, best practices, and troubleshooting tips.
 
 ## File uploads
 
@@ -117,7 +197,7 @@ Error codes are as follows:
 
 Certain errors will be automatically retried 5 times by default, with a short exponential backoff.
 Connection errors (for example, due to a network connectivity problem), 408 Request Timeout, 409 Conflict,
-429 Rate Limit, and >=500 Internal errors will all be retried by default for GET requests. For POST requests, 
+429 Rate Limit, and >=500 Internal errors will all be retried by default for GET requests. For POST requests,
 only 429 errors will be retried.
 
 You can use the `maxRetries` option to configure or disable this:

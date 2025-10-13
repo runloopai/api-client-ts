@@ -84,7 +84,7 @@ export class StorageObject {
     client: Runloop,
     params?: ObjectListParams,
     options?: Core.RequestOptions,
-  ): Promise<Object[]> {
+  ): Promise<StorageObject[]> {
     const objects = await client.objects.list(params, options);
     const result: StorageObject[] = [];
 
@@ -172,7 +172,7 @@ export class StorageObject {
       headers['Content-Type'] = contentType;
     }
 
-    const response = await fetch(this.uploadUrl, {
+    const response = await (globalThis as any).fetch(this.uploadUrl, {
       method: 'PUT',
       body: content,
       headers,
@@ -207,7 +207,7 @@ export class StorageObject {
   ): Promise<ObjectDownloadURLView> {
     return this.client.objects.download(
       this.objectData.id,
-      { duration_seconds: durationSeconds },
+      durationSeconds !== undefined ? { duration_seconds: durationSeconds } : {},
       options,
     );
   }
@@ -221,7 +221,7 @@ export class StorageObject {
    */
   async downloadAsText(options?: Core.RequestOptions): Promise<string> {
     const { download_url } = await this.getDownloadUrl(undefined, options);
-    const response = await fetch(download_url);
+    const response = await (globalThis as any).fetch(download_url);
 
     if (!response.ok) {
       throw new Error(`Download failed: ${response.status} ${response.statusText}`);
@@ -239,7 +239,7 @@ export class StorageObject {
    */
   async downloadAsBuffer(options?: Core.RequestOptions): Promise<Buffer> {
     const { download_url } = await this.getDownloadUrl(undefined, options);
-    const response = await fetch(download_url);
+    const response = await (globalThis as any).fetch(download_url);
 
     if (!response.ok) {
       throw new Error(`Download failed: ${response.status} ${response.statusText}`);

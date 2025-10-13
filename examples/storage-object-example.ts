@@ -9,8 +9,6 @@
  */
 
 import { Runloop, StorageObject } from '@runloop/api-client';
-import * as fs from 'fs';
-import * as path from 'path';
 
 async function textStorageObjectExample() {
   const client = new Runloop({
@@ -137,9 +135,11 @@ async function binaryStorageObjectExample() {
   console.log('\nDownloading as buffer...');
   const downloadedBuffer = await binaryObj.downloadAsBuffer();
   console.log(`✓ Downloaded ${downloadedBuffer.length} bytes`);
-  console.log(`  First 10 bytes: ${Array.from(downloadedBuffer.slice(0, 10))
-    .map((b) => `0x${b.toString(16).padStart(2, '0')}`)
-    .join(', ')}`);
+  console.log(
+    `  First 10 bytes: ${Array.from(downloadedBuffer.slice(0, 10))
+      .map((b) => `0x${b.toString(16).padStart(2, '0')}`)
+      .join(', ')}`,
+  );
 
   // Clean up
   await binaryObj.delete();
@@ -336,4 +336,10 @@ if (require.main === module) {
   })();
 }
 
-export { textStorageObjectExample, binaryStorageObjectExample, listAndSearchExample, jsonDataExample, integrationExample };
+export {
+  textStorageObjectExample,
+  binaryStorageObjectExample,
+  listAndSearchExample,
+  jsonDataExample,
+  integrationExample,
+};

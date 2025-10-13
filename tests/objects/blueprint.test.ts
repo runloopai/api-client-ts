@@ -237,5 +237,103 @@ describe('Blueprint', () => {
 
       await expect(Blueprint.get(mockClient, 'non-existent')).rejects.toThrow('Blueprint not found');
     });
+
+    it('should handle preview errors', async () => {
+      const error = new Error('Preview generation failed');
+      mockClient.blueprints.preview.mockRejectedValue(error);
+
+      await expect(
+        Blueprint.preview(mockClient, {
+          name: 'invalid-blueprint',
+          system_setup_commands: ['invalid-command'],
+        }),
+      ).rejects.toThrow('Preview generation failed');
+    });
+
+    it('should handle logs retrieval errors', async () => {
+      mockClient.blueprints.createAndAwaitBuildCompleted.mockResolvedValue(mockBlueprintData);
+      const blueprint = await Blueprint.create(mockClient, {
+        name: 'test-blueprint',
+        system_setup_commands: [],
+      });
+
+      const error = new Error('Logs not available');
+      mockClient.blueprints.logs.mockRejectedValue(error);
+
+      await expect(blueprint.logs()).rejects.toThrow('Logs not available');
+    });
+
+    it('should handle delete errors', async () => {
+      mockClient.blueprints.createAndAwaitBuildCompleted.mockResolvedValue(mockBlueprintData);
+      const blueprint = await Blueprint.create(mockClient, {
+        name: 'test-blueprint',
+        system_setup_commands: [],
+      });
+
+      const error = new Error('Delete failed');
+      mockClient.blueprints.delete.mockRejectedValue(error);
+
+      await expect(blueprint.delete()).rejects.toThrow('Delete failed');
+    });
+
+    it('should handle refresh errors', async () => {
+      mockClient.blueprints.createAndAwaitBuildCompleted.mockResolvedValue(mockBlueprintData);
+      const blueprint = await Blueprint.create(mockClient, {
+        name: 'test-blueprint',
+        system_setup_commands: [],
+      });
+
+      const error = new Error('Refresh failed');
+      mockClient.blueprints.retrieve.mockRejectedValue(error);
+
+      await expect(blueprint.refresh()).rejects.toThrow('Refresh failed');
+    });
+  });
+
+  describe('edge cases', () => {
+    it('should handle blueprint with minimal configuration', async () => {
+      const minimalData = {
+        ...mockBlueprintData,
+        name: 'minimal',
+        parameters: { name: 'minimal' },
+      };
+      mockClient.blueprints.createAndAwaitBuildCompleted.mockResolvedValue(minimalData);
+
+      const blueprint = await Blueprint.create(mockClient, { name: 'minimal' });
+
+      expect(blueprint.name).toBe('minimal');
+    });
+
+    it('should handle blueprint with empty logs', async () => {
+      mockClient.blueprints.createAndAwaitBuildCompleted.mockResolvedValue(mockBlueprintData);
+      const blueprint = await Blueprint.create(mockClient, {
+        name: 'test-blueprint',
+        system_setup_commands: [],
+      });
+
+      const emptyLogs = {
+        blueprint_id: 'blueprint-123',
+        logs: [],
+      };
+      mockClient.blueprints.logs.mockResolvedValue(emptyLogs);
+
+      const logs = await blueprint.logs();
+      expect(logs.logs).toHaveLength(0);
+    });
+
+    it('should handle blueprint state transitions', async () => {
+      mockClient.blueprints.createAndAwaitBuildCompleted.mockResolvedValue(mockBlueprintData);
+      const blueprint = await Blueprint.create(mockClient, {
+        name: 'test-blueprint',
+        system_setup_commands: [],
+      });
+
+      // Simulate state change
+      const updatedData = { ...mockBlueprintData, state: 'deleted' as const };
+      mockClient.blueprints.retrieve.mockResolvedValue(updatedData);
+
+      await blueprint.refresh();
+      expect(blueprint.state).toBe('deleted');
+    });
   });
 });

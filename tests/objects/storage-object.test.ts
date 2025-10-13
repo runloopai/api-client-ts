@@ -200,9 +200,7 @@ describe('StorageObject', () => {
         mockClient.objects.retrieve.mockResolvedValue(completedData);
         const completedObj = await StorageObject.get(mockClient, 'object-123');
 
-        await expect(completedObj.uploadContent('test')).rejects.toThrow(
-          'No upload URL available',
-        );
+        await expect(completedObj.uploadContent('test')).rejects.toThrow('No upload URL available');
       });
 
       it('should throw error when upload fails', async () => {

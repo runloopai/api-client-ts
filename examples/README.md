@@ -5,6 +5,7 @@ This directory contains example programs demonstrating how to use the Runloop AP
 ## Prerequisites
 
 1. Install dependencies:
+
    ```bash
    npm install
    ```
@@ -23,6 +24,7 @@ This directory contains example programs demonstrating how to use the Runloop AP
 This example demonstrates the new object-oriented `Devbox` class, which provides a cleaner, more intuitive API for working with devboxes.
 
 **Features demonstrated:**
+
 - Creating a devbox with `Devbox.create()`
 - Executing commands with `devbox.exec()`
 - Reading and writing files with `devbox.file.read()` and `devbox.file.write()`
@@ -32,6 +34,7 @@ This example demonstrates the new object-oriented `Devbox` class, which provides
 - Shutting down devboxes
 
 **Run the example:**
+
 ```bash
 npx tsx examples/devbox-object-example.ts
 ```
@@ -43,6 +46,7 @@ npx tsx examples/devbox-object-example.ts
 This example demonstrates the Blueprint and Snapshot classes for creating reusable devbox configurations and saving/restoring devbox state.
 
 **Features demonstrated:**
+
 - Creating blueprints with custom configurations using `Blueprint.create()`
 - Previewing blueprint Dockerfiles with `Blueprint.preview()`
 - Viewing build logs with `blueprint.logs()`
@@ -53,24 +57,23 @@ This example demonstrates the Blueprint and Snapshot classes for creating reusab
 - Full workflow: Blueprint → Devbox → Snapshot → New Devbox
 
 **Run the example:**
+
 ```bash
 npx tsx examples/blueprint-snapshot-example.ts
 ```
 
 **Example workflow:**
+
 ```typescript
 // Create a reusable blueprint
 const blueprint = await Blueprint.create(client, {
   name: 'nodejs-dev',
-  system_setup_commands: [
-    'apt-get update',
-    'apt-get install -y nodejs npm'
-  ]
+  system_setup_commands: ['apt-get update', 'apt-get install -y nodejs npm'],
 });
 
 // Create devbox from blueprint
 const devbox = await Devbox.create(client, {
-  blueprint_id: blueprint.id
+  blueprint_id: blueprint.id,
 });
 
 // Do some work
@@ -82,7 +85,7 @@ const snapshot = new Snapshot(client, snapshotView);
 
 // Create new devbox from snapshot
 const newDevbox = await Devbox.create(client, {
-  snapshot_id: snapshot.id
+  snapshot_id: snapshot.id,
 });
 ```
 
@@ -93,6 +96,7 @@ const newDevbox = await Devbox.create(client, {
 This example demonstrates the StorageObject class for storing and retrieving data objects (similar to S3).
 
 **Features demonstrated:**
+
 - Creating storage objects with `StorageObject.create()`
 - Uploading content with `uploadContent()`
 - Marking uploads complete with `complete()`
@@ -103,17 +107,45 @@ This example demonstrates the StorageObject class for storing and retrieving dat
 - Integration example with devbox logs
 
 **Run the example:**
+
 ```bash
 npx tsx examples/storage-object-example.ts
 ```
 
+### Complete Integration Workflow
+
+**File:** `objects-integration-example.ts`
+
+This comprehensive example demonstrates how all object types work together in realistic development workflows.
+
+**Features demonstrated:**
+
+- End-to-end data science project workflow
+- Blueprint → Devbox → Analysis → Snapshot → Results storage
+- Multi-environment deployment (dev/prod)
+- Configuration sharing between environments
+- Data persistence and restoration
+- Resource cleanup patterns
+
+**Run the example:**
+
+```bash
+npx tsx examples/objects-integration-example.ts
+```
+
+**Example workflows:**
+
+- **Data Science Pipeline**: Create Python environment, run analysis, store results, create snapshots
+- **Multi-Environment Setup**: Deploy same application to dev and production environments with shared configuration
+
 **Example workflow:**
+
 ```typescript
 // Create and upload a text file
 const obj = await StorageObject.create(client, {
   name: 'data.txt',
   content_type: 'text',
-  metadata: { project: 'demo' }
+  metadata: { project: 'demo' },
 });
 
 // Upload content
@@ -160,7 +192,7 @@ const client = new Runloop();
 // Create devbox (automatically waits for running state)
 const devbox = await Devbox.create(client, {
   name: 'my-devbox',
-  metadata: { project: 'example' }
+  metadata: { project: 'example' },
 });
 
 // Execute commands
@@ -211,13 +243,13 @@ const blueprint = await Blueprint.create(client, {
   system_setup_commands: [
     'apt-get update',
     'apt-get install -y python3-pip',
-    'pip3 install numpy pandas scikit-learn'
-  ]
+    'pip3 install numpy pandas scikit-learn',
+  ],
 });
 
 // Create devbox from blueprint (much faster than installing each time!)
 const devbox = await Devbox.create(client, {
-  blueprint_id: blueprint.id
+  blueprint_id: blueprint.id,
 });
 
 // Get build logs if needed
@@ -242,13 +274,13 @@ const snapshot = new Snapshot(client, snapshotView);
 
 // Later: restore from snapshot
 const restoredDevbox = await Devbox.create(client, {
-  snapshot_id: snapshot.id
+  snapshot_id: snapshot.id,
 });
 // All your files and setup are already there!
 
 // Update snapshot metadata
 await snapshot.update({
-  metadata: { version: '2.0', updated: new Date().toISOString() }
+  metadata: { version: '2.0', updated: new Date().toISOString() },
 });
 
 // List snapshots for a devbox
@@ -266,7 +298,7 @@ const client = new Runloop();
 const textObj = await StorageObject.create(client, {
   name: 'config.json',
   content_type: 'text',
-  metadata: { version: '1.0' }
+  metadata: { version: '1.0' },
 });
 
 await textObj.uploadContent(JSON.stringify({ foo: 'bar' }));
@@ -279,7 +311,7 @@ const config = JSON.parse(content);
 // Store binary data
 const binaryObj = await StorageObject.create(client, {
   name: 'data.bin',
-  content_type: 'binary'
+  content_type: 'binary',
 });
 
 const buffer = Buffer.from([0x89, 0x50, 0x4e, 0x47]);

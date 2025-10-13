@@ -103,7 +103,7 @@ export class Devbox {
   ): Promise<DevboxAsyncExecutionDetailView> {
     return this.client.devboxes.executeAndAwaitCompletion(
       this.devboxData.id,
-      { command, shell_name: shellName ?? undefined },
+      { command, shell_name: shellName ?? null },
       options,
     );
   }
@@ -123,7 +123,7 @@ export class Devbox {
   ): Promise<DevboxAsyncExecutionDetailView> {
     return this.client.devboxes.executeAsync(
       this.devboxData.id,
-      { command, shell_name: shellName ?? undefined },
+      { command, shell_name: shellName ?? null },
       options,
     );
   }
@@ -140,7 +140,7 @@ export class Devbox {
   ): Promise<DevboxExecutionDetailView> {
     return this.client.devboxes.executeSync(
       this.devboxData.id,
-      { command, shell_name: shellName ?? undefined },
+      { command, shell_name: shellName ?? null },
       options,
     );
   }
@@ -242,7 +242,7 @@ export class Devbox {
   async snapshotDisk(name?: string, metadata?: { [key: string]: string }, options?: Core.RequestOptions) {
     return this.client.devboxes.snapshotDisk(
       this.devboxData.id,
-      { name: name ?? undefined, metadata: metadata ?? undefined },
+      { name: name ?? null, metadata: metadata ?? null },
       options,
     );
   }
