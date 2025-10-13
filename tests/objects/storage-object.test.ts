@@ -370,9 +370,6 @@ describe('StorageObject', () => {
         expect(storageObject.data).toEqual(mockObjectData);
       });
 
-      it('should provide access to underlying API', () => {
-        expect(storageObject.api).toBe(mockClient.objects);
-      });
     });
   });
 

@@ -17,7 +17,6 @@ describe('Devbox', () => {
         retrieve: jest.fn(),
         executeAndAwaitCompletion: jest.fn(),
         executeAsync: jest.fn(),
-        executeSync: jest.fn(),
         readFileContents: jest.fn(),
         writeFileContents: jest.fn(),
         downloadFile: jest.fn(),
@@ -348,9 +347,6 @@ describe('Devbox', () => {
         expect(devbox.data).toEqual(mockDevboxData);
       });
 
-      it('should provide access to underlying API', () => {
-        expect(devbox.api).toBe(mockClient.devboxes);
-      });
     });
   });
 

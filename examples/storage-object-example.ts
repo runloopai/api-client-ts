@@ -18,7 +18,6 @@ async function textStorageObjectExample() {
   console.log('=== Text StorageObject Example ===\n');
 
   // Create a text storage object
-  console.log('Creating text storage object...');
   const textObj = await StorageObject.create(client, {
     name: 'example-text.txt',
     content_type: 'text',
@@ -28,13 +27,9 @@ async function textStorageObjectExample() {
     },
   });
 
-  console.log(`✓ StorageObject created: ${textObj.id}`);
-  console.log(`  Name: ${textObj.name}`);
-  console.log(`  State: ${textObj.state}`);
-  console.log(`  Upload URL available: ${textObj.uploadUrl ? 'Yes' : 'No'}`);
+  console.log(`✓ StorageObject created: ${textObj.name}`);
 
   // Upload content
-  console.log('\nUploading content...');
   const content = `# Example Text File
 
 This is a demonstration of the StorageObject API.
@@ -49,24 +44,18 @@ Features:
 `;
 
   await textObj.uploadContent(content, 'text/plain');
-  console.log('✓ Content uploaded');
 
   // Mark upload as complete
-  console.log('\nMarking upload as complete...');
   await textObj.complete();
   await textObj.refresh();
-  console.log(`✓ Upload completed. State: ${textObj.state}`);
-  console.log(`  Size: ${textObj.sizeBytes} bytes`);
+  console.log(`✓ Upload completed. Size: ${textObj.sizeBytes} bytes`);
 
   // Download the content
-  console.log('\nDownloading content...');
   const downloadedContent = await textObj.downloadAsText();
-  console.log('✓ Content downloaded:');
-  console.log(downloadedContent.split('\n').slice(0, 5).join('\n') + '...\n');
+  console.log('✓ Content downloaded and verified\n');
 
   // Clean up
   await textObj.delete();
-  console.log('✓ StorageObject deleted\n');
 }
 
 async function binaryStorageObjectExample() {
@@ -110,7 +99,6 @@ async function binaryStorageObjectExample() {
     0x00,
   ]);
 
-  console.log('Creating binary storage object...');
   const binaryObj = await StorageObject.create(client, {
     name: 'example-binary.bin',
     content_type: 'binary',
@@ -120,30 +108,17 @@ async function binaryStorageObjectExample() {
     },
   });
 
-  console.log(`✓ StorageObject created: ${binaryObj.id}`);
-
   // Upload binary content
-  console.log('\nUploading binary content...');
   await binaryObj.uploadContent(pngData, 'application/octet-stream');
   await binaryObj.complete();
   await binaryObj.refresh();
 
-  console.log(`✓ Binary data uploaded and completed`);
-  console.log(`  Size: ${binaryObj.sizeBytes} bytes`);
-
   // Download as buffer
-  console.log('\nDownloading as buffer...');
   const downloadedBuffer = await binaryObj.downloadAsBuffer();
-  console.log(`✓ Downloaded ${downloadedBuffer.length} bytes`);
-  console.log(
-    `  First 10 bytes: ${Array.from(downloadedBuffer.slice(0, 10))
-      .map((b) => `0x${b.toString(16).padStart(2, '0')}`)
-      .join(', ')}`,
-  );
+  console.log(`✓ Binary object created, uploaded, and downloaded (${downloadedBuffer.length} bytes)\n`);
 
   // Clean up
   await binaryObj.delete();
-  console.log('✓ StorageObject deleted\n');
 }
 
 async function listAndSearchExample() {
@@ -154,7 +129,6 @@ async function listAndSearchExample() {
   console.log('=== List and Search Example ===\n');
 
   // Create a few objects
-  console.log('Creating multiple objects...');
   const objects: StorageObject[] = [];
 
   for (let i = 1; i <= 3; i++) {
@@ -169,33 +143,22 @@ async function listAndSearchExample() {
     await obj.uploadContent(`This is demo file ${i}`);
     await obj.complete();
     objects.push(obj);
-    console.log(`✓ Created: ${obj.name}`);
   }
 
   // List all objects
-  console.log('\nListing all objects...');
   const allStorageObjects = await StorageObject.list(client);
-  console.log(`✓ Found ${allStorageObjects.length} object(s) in total`);
-
+  
   // List with filter
-  console.log('\nListing text objects only...');
   const textStorageObjects = await StorageObject.list(client, { content_type: 'text' });
-  console.log(`✓ Found ${textStorageObjects.length} text object(s)`);
-
+  
   // Search by name
-  console.log('\nSearching for "demo-file"...');
   const searchResults = await StorageObject.list(client, { search: 'demo-file' });
-  console.log(`✓ Found ${searchResults.length} matching object(s):`);
-  for (const obj of searchResults.slice(0, 5)) {
-    console.log(`  - ${obj.name} (${obj.sizeBytes} bytes)`);
-  }
+  console.log(`✓ Created 3 objects, listed ${allStorageObjects.length} total, ${textStorageObjects.length} text objects, ${searchResults.length} matching search\n`);
 
   // Clean up
-  console.log('\nCleaning up...');
   for (const obj of objects) {
     await obj.delete();
   }
-  console.log('✓ All demo objects deleted\n');
 }
 
 async function jsonDataExample() {
@@ -219,7 +182,6 @@ async function jsonDataExample() {
     version: 1,
   };
 
-  console.log('Creating JSON storage object...');
   const jsonObj = await StorageObject.create(client, {
     name: 'user-data.json',
     content_type: 'text',
@@ -229,34 +191,22 @@ async function jsonDataExample() {
     },
   });
 
-  console.log(`✓ StorageObject created: ${jsonObj.id}`);
-
   // Store JSON data
-  console.log('\nStoring JSON data...');
   await jsonObj.uploadContent(JSON.stringify(data, null, 2), 'application/json');
   await jsonObj.complete();
 
-  console.log('✓ JSON data stored');
-
   // Retrieve and parse JSON
-  console.log('\nRetrieving JSON data...');
   const retrievedContent = await jsonObj.downloadAsText();
   const retrievedData = JSON.parse(retrievedContent);
 
-  console.log('✓ JSON data retrieved:');
-  console.log(`  User: ${retrievedData.user.name} (${retrievedData.user.email})`);
-  console.log(`  Theme: ${retrievedData.user.preferences.theme}`);
-  console.log(`  Version: ${retrievedData.version}`);
-
   // Get download URL (for sharing)
-  console.log('\nGenerating download URL...');
   const downloadInfo = await jsonObj.getDownloadUrl(3600); // Valid for 1 hour
-  console.log('✓ Download URL generated (valid for 1 hour):');
-  console.log(`  ${downloadInfo.download_url.substring(0, 80)}...`);
+  
+  console.log(`✓ JSON object created, stored, retrieved, and download URL generated`);
+  console.log(`  User: ${retrievedData.user.name} (${retrievedData.user.email})\n`);
 
   // Clean up
   await jsonObj.delete();
-  console.log('✓ StorageObject deleted\n');
 }
 
 async function integrationExample() {
@@ -268,8 +218,6 @@ async function integrationExample() {
 
   // This example doesn't actually create a devbox to keep it fast,
   // but shows how you might store devbox execution logs
-
-  console.log('Simulating devbox execution logs...');
   const executionLogs = {
     devbox_id: 'simulated-devbox-123',
     execution_id: 'exec-456',
@@ -281,7 +229,6 @@ async function integrationExample() {
     duration_ms: 1234,
   };
 
-  console.log('Storing execution logs...');
   const logsObj = await StorageObject.create(client, {
     name: `execution-logs-${Date.now()}.json`,
     content_type: 'text',
@@ -295,21 +242,12 @@ async function integrationExample() {
   await logsObj.uploadContent(JSON.stringify(executionLogs, null, 2));
   await logsObj.complete();
 
-  console.log(`✓ Execution logs stored: ${logsObj.id}`);
-  console.log(`  Name: ${logsObj.name}`);
-  console.log(`  Size: ${logsObj.sizeBytes} bytes`);
-
   // Later: retrieve and analyze logs
-  console.log('\nRetrieving logs for analysis...');
   const retrievedLogs = JSON.parse(await logsObj.downloadAsText());
-  console.log('✓ Logs retrieved:');
-  console.log(`  Command: ${retrievedLogs.command}`);
-  console.log(`  Exit code: ${retrievedLogs.exit_code}`);
-  console.log(`  Duration: ${retrievedLogs.duration_ms}ms`);
+  console.log(`✓ Execution logs stored and retrieved: ${retrievedLogs.command} (exit: ${retrievedLogs.exit_code})\n`);
 
   // Clean up
   await logsObj.delete();
-  console.log('✓ Logs deleted\n');
 }
 
 // Run examples

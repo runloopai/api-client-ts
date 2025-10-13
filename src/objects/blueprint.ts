@@ -143,10 +143,4 @@ export class Blueprint {
     return result;
   }
 
-  /**
-   * Access to the underlying blueprints API resource for advanced operations.
-   */
-  get api() {
-    return this.client.blueprints;
-  }
 }

@@ -287,9 +287,6 @@ describe('Snapshot', () => {
         expect(snapshotWithoutName.name).toBeNull();
       });
 
-      it('should provide access to underlying API', () => {
-        expect(snapshot.api).toBe(mockClient.devboxes.diskSnapshots);
-      });
     });
   });
 

@@ -212,9 +212,6 @@ describe('Blueprint', () => {
         expect(blueprint.data).toEqual(mockBlueprintData);
       });
 
-      it('should provide access to underlying API', () => {
-        expect(blueprint.api).toBe(mockClient.blueprints);
-      });
     });
   });
 

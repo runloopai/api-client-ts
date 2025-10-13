@@ -165,10 +165,4 @@ export class Snapshot {
     return this.client.devboxes.diskSnapshots.queryStatus(this.snapshotData.id, options);
   }
 
-  /**
-   * Access to the underlying disk snapshots API resource for advanced operations.
-   */
-  get api() {
-    return this.client.devboxes.diskSnapshots;
-  }
 }

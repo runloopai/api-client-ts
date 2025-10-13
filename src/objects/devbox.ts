@@ -4,7 +4,6 @@ import type {
   DevboxView,
   DevboxCreateParams,
   DevboxAsyncExecutionDetailView,
-  DevboxExecutionDetailView,
 } from '../resources/devboxes/devboxes';
 import { PollingOptions } from '../lib/polling';
 
@@ -129,23 +128,6 @@ export class Devbox {
   }
 
   /**
-   * Execute a command synchronously (deprecated - use exec instead).
-   *
-   * @deprecated Use exec() instead
-   */
-  async execSync(
-    command: string,
-    shellName?: string,
-    options?: Core.RequestOptions,
-  ): Promise<DevboxExecutionDetailView> {
-    return this.client.devboxes.executeSync(
-      this.devboxData.id,
-      { command, shell_name: shellName ?? null },
-      options,
-    );
-  }
-
-  /**
    * File operations on the devbox.
    */
   get file() {
@@ -169,11 +151,7 @@ export class Devbox {
        * @param options - Request options
        * @returns Execution result
        */
-      write: async (
-        path: string,
-        contents: string,
-        options?: Core.RequestOptions,
-      ): Promise<DevboxExecutionDetailView> => {
+      write: async (path: string, contents: string, options?: Core.RequestOptions) => {
         return this.client.devboxes.writeFileContents(
           this.devboxData.id,
           { file_path: path, contents },
@@ -266,12 +244,5 @@ export class Devbox {
    */
   async removeTunnel(port: number, options?: Core.RequestOptions) {
     return this.client.devboxes.removeTunnel(this.devboxData.id, { port }, options);
-  }
-
-  /**
-   * Access to the underlying devboxes API resource for advanced operations.
-   */
-  get api() {
-    return this.client.devboxes;
   }
 }

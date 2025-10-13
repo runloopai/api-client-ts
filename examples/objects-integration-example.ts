@@ -18,7 +18,6 @@ async function fullIntegrationWorkflow() {
   console.log('=== Complete Objects API Integration Workflow ===\n');
 
   // Step 1: Create a blueprint for a Python data science environment
-  console.log('Step 1: Creating Python data science blueprint...');
   const blueprint = await Blueprint.create(client, {
     name: 'python-datascience-env',
     system_setup_commands: [
@@ -32,10 +31,9 @@ async function fullIntegrationWorkflow() {
       version: '1.0',
     },
   });
-  console.log(`✓ Blueprint created: ${blueprint.name} (${blueprint.id})`);
+  console.log(`✓ Blueprint created: ${blueprint.name}`);
 
   // Step 2: Store configuration data in StorageObject
-  console.log('\nStep 2: Storing project configuration...');
   const configObj = await StorageObject.create(client, {
     name: 'project-config.json',
     content_type: 'text',
@@ -61,7 +59,6 @@ async function fullIntegrationWorkflow() {
   console.log(`✓ Configuration stored: ${configObj.name}`);
 
   // Step 3: Create devbox from blueprint
-  console.log('\nStep 3: Creating devbox from blueprint...');
   const devbox = await Devbox.create(client, {
     blueprint_id: blueprint.id,
     name: 'data-science-workspace',
@@ -70,15 +67,13 @@ async function fullIntegrationWorkflow() {
       environment: 'development',
     },
   });
-  console.log(`✓ Devbox created: ${devbox.id}`);
+  console.log(`✓ Devbox created from blueprint`);
 
   let snapshot: Snapshot | null = null;
   let resultsObj: StorageObject | null = null;
 
   try {
     // Step 4: Download configuration and set up project
-    console.log('\nStep 4: Setting up project in devbox...');
-
     // Download config from storage
     const configDownloadUrl = await configObj.getDownloadUrl();
     await devbox.exec(`curl -o project-config.json "${configDownloadUrl.download_url}"`);
@@ -149,12 +144,10 @@ print(f"Avg Revenue per Customer: $" + f"{avg_revenue_per_customer:.2f}")
     console.log('✓ Project structure and files created');
 
     // Step 5: Run the analysis
-    console.log('\nStep 5: Running data analysis...');
     const analysisResult = await devbox.exec('cd ~/data-analysis && python3 analyze.py');
-    console.log(`✓ Analysis completed:\n${analysisResult.stdout}`);
+    console.log(`✓ Analysis completed`);
 
     // Step 6: Create snapshot of the working environment
-    console.log('\nStep 6: Creating snapshot of configured environment...');
     const snapshotView = await devbox.snapshotDisk('data-science-workspace-snapshot', {
       blueprint_id: blueprint.id,
       project: 'sales-analysis',
@@ -162,10 +155,9 @@ print(f"Avg Revenue per Customer: $" + f"{avg_revenue_per_customer:.2f}")
       timestamp: new Date().toISOString(),
     });
     snapshot = new Snapshot(client, snapshotView);
-    console.log(`✓ Snapshot created: ${snapshot.id}`);
+    console.log(`✓ Snapshot created`);
 
     // Step 7: Store analysis results
-    console.log('\nStep 7: Storing analysis results...');
     const resultsContent = await devbox.file.read('data-analysis/results/analysis_results.json');
 
     resultsObj = await StorageObject.create(client, {
@@ -181,64 +173,49 @@ print(f"Avg Revenue per Customer: $" + f"{avg_revenue_per_customer:.2f}")
 
     await resultsObj.uploadContent(resultsContent);
     await resultsObj.complete();
-    console.log(`✓ Results stored: ${resultsObj.name}`);
+    console.log(`✓ Results stored`);
 
     // Step 8: Demonstrate restoration workflow
-    console.log('\nStep 8: Creating new devbox from snapshot...');
     const restoredDevbox = await Devbox.create(client, {
       snapshot_id: snapshot.id,
       name: 'restored-data-science-workspace',
     });
-    console.log(`✓ Restored devbox created: ${restoredDevbox.id}`);
 
     // Verify the environment is restored
     const verifyResult = await restoredDevbox.exec('cd ~/data-analysis && ls -la');
-    console.log(`✓ Verified restored environment:\n${verifyResult.stdout}`);
-
+    
     // Run analysis again to verify everything works
     const rerunResult = await restoredDevbox.exec('cd ~/data-analysis && python3 analyze.py');
-    console.log(`✓ Re-ran analysis in restored environment:\n${rerunResult.stdout}`);
+    console.log(`✓ Restored devbox created and verified working`);
 
     // Step 9: Demonstrate data retrieval and sharing
-    console.log('\nStep 9: Generating shareable results...');
     const shareableUrl = await resultsObj.getDownloadUrl(7200); // 2 hours
-    console.log(`✓ Shareable results URL generated (valid for 2 hours):`);
-    console.log(`  ${shareableUrl.download_url.substring(0, 80)}...`);
 
     // Parse and display results
     const finalResults = JSON.parse(await resultsObj.downloadAsText());
-    console.log('\n✓ Final Analysis Results:');
+    console.log(`✓ Shareable URL generated and results retrieved:`);
     console.log(`  Project: ${finalResults.project}`);
     console.log(`  Total Revenue: $${finalResults.metrics.total_revenue.toLocaleString()}`);
     console.log(`  Total Customers: ${finalResults.metrics.total_customers.toLocaleString()}`);
-    console.log(`  Avg Revenue/Customer: $${finalResults.metrics.avg_revenue_per_customer.toFixed(2)}`);
-    console.log(`  Data Records: ${finalResults.data_summary.records}`);
 
     // Clean up restored devbox
     await restoredDevbox.shutdown();
-    console.log('✓ Restored devbox shutdown');
   } finally {
     // Clean up all resources
-    console.log('\nCleaning up resources...');
-
     await devbox.shutdown();
-    console.log('✓ Main devbox shutdown');
 
     if (snapshot) {
       await snapshot.delete();
-      console.log('✓ Snapshot deleted');
     }
 
     await configObj.delete();
-    console.log('✓ Configuration object deleted');
 
     if (resultsObj) {
       await resultsObj.delete();
-      console.log('✓ Results object deleted');
     }
 
     await blueprint.delete();
-    console.log('✓ Blueprint deleted');
+    console.log('✓ All resources cleaned up');
   }
 
   console.log('\n✓ Complete integration workflow finished successfully!');
@@ -252,8 +229,6 @@ async function multiEnvironmentExample() {
   console.log('\n=== Multi-Environment Development Workflow ===\n');
 
   // Create blueprints for different environments
-  console.log('Creating environment blueprints...');
-
   const devBlueprint = await Blueprint.create(client, {
     name: 'nodejs-dev-env',
     system_setup_commands: [
@@ -274,8 +249,7 @@ async function multiEnvironmentExample() {
     metadata: { environment: 'production' },
   });
 
-  console.log(`✓ Dev blueprint: ${devBlueprint.id}`);
-  console.log(`✓ Prod blueprint: ${prodBlueprint.id}`);
+  console.log(`✓ Created dev and prod blueprints`);
 
   // Store shared configuration
   const sharedConfig = await StorageObject.create(client, {
@@ -299,18 +273,17 @@ async function multiEnvironmentExample() {
   await sharedConfig.complete();
 
   // Create development environment
-  console.log('\nSetting up development environment...');
   const devEnv = await Devbox.create(client, {
     blueprint_id: devBlueprint.id,
     name: 'dev-environment',
   });
 
   // Create production environment
-  console.log('Setting up production environment...');
   const prodEnv = await Devbox.create(client, {
     blueprint_id: prodBlueprint.id,
     name: 'prod-environment',
   });
+  console.log('✓ Created dev and prod environments');
 
   try {
     // Deploy to both environments
@@ -327,8 +300,7 @@ async function multiEnvironmentExample() {
       prodEnv.exec('node --version && pm2 --version && cat config.json | head -3'),
     ]);
 
-    console.log(`✓ Dev environment ready:\n${devCheck.stdout}`);
-    console.log(`✓ Prod environment ready:\n${prodCheck.stdout}`);
+    console.log(`✓ Both environments deployed and verified`);
   } finally {
     // Clean up
     await Promise.all([

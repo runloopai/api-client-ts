@@ -258,10 +258,4 @@ export class StorageObject {
     this.objectData = await this.client.objects.delete(this.objectData.id, {}, options);
   }
 
-  /**
-   * Access to the underlying objects API resource for advanced operations.
-   */
-  get api() {
-    return this.client.objects;
-  }
 }
