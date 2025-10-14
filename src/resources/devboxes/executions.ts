@@ -49,7 +49,8 @@ export class Executions extends APIResource {
 
   /**
    * Execute a bash command in the Devbox shell, await the command completion and
-   * return the output.
+   * return the output. Note: attach_stdin parameter is not supported for synchronous
+   * execution.
    *
    * @deprecated
    */
@@ -100,18 +101,18 @@ export class Executions extends APIResource {
     executionId: string,
     body?: ExecutionSendStdInParams,
     options?: Core.RequestOptions,
-  ): Core.APIPromise<DevboxesAPI.DevboxAsyncExecutionDetailView>;
+  ): Core.APIPromise<DevboxesAPI.DevboxSendStdInResult>;
   sendStdIn(
     devboxId: string,
     executionId: string,
     options?: Core.RequestOptions,
-  ): Core.APIPromise<DevboxesAPI.DevboxAsyncExecutionDetailView>;
+  ): Core.APIPromise<DevboxesAPI.DevboxSendStdInResult>;
   sendStdIn(
     devboxId: string,
     executionId: string,
     body: ExecutionSendStdInParams | Core.RequestOptions = {},
     options?: Core.RequestOptions,
-  ): Core.APIPromise<DevboxesAPI.DevboxAsyncExecutionDetailView> {
+  ): Core.APIPromise<DevboxesAPI.DevboxSendStdInResult> {
     if (isRequestOptions(body)) {
       return this.sendStdIn(devboxId, executionId, {}, body);
     }
@@ -168,7 +169,7 @@ export interface ExecutionUpdateChunk {
 
 export interface ExecutionRetrieveParams {
   /**
-   * Last n lines of standard error / standard out to return
+   * Last n lines of standard error / standard out to return (default: 100)
    */
   last_n?: string;
 }
@@ -181,6 +182,12 @@ export interface ExecutionExecuteAsyncParams {
    * persistent shell.
    */
   command: string;
+
+  /**
+   * Whether to attach stdin streaming for async commands. Not valid for execute_sync
+   * endpoint. Defaults to false if not specified.
+   */
+  attach_stdin?: boolean | null;
 
   /**
    * The name of the persistent shell to create or use if already created. When using
@@ -198,6 +205,12 @@ export interface ExecutionExecuteSyncParams {
    * persistent shell.
    */
   command: string;
+
+  /**
+   * Whether to attach stdin streaming for async commands. Not valid for execute_sync
+   * endpoint. Defaults to false if not specified.
+   */
+  attach_stdin?: boolean | null;
 
   /**
    * The name of the persistent shell to create or use if already created. When using
