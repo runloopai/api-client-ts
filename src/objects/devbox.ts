@@ -4,6 +4,15 @@ import type {
   DevboxView,
   DevboxCreateParams,
   DevboxAsyncExecutionDetailView,
+  DevboxSnapshotDiskParams,
+  DevboxCreateTunnelParams,
+  DevboxRemoveTunnelParams,
+  DevboxReadFileContentsParams,
+  DevboxWriteFileContentsParams,
+  DevboxDownloadFileParams,
+  DevboxUploadFileParams,
+  DevboxExecuteParams,
+  DevboxExecuteAsyncParams,
 } from '../resources/devboxes/devboxes';
 import { PollingOptions } from '../lib/polling';
 
@@ -13,10 +22,12 @@ import { PollingOptions } from '../lib/polling';
  * Example usage:
  * ```typescript
  * const devbox = await Devbox.create(client, { name: 'my-devbox' });
- * const result = await devbox.exec('echo "Hello World"');
- * const contents = await devbox.file.read('myfile.txt');
- * await devbox.file.write('output.txt', 'Hello World');
- * await devbox.shutdown();
+ * const result = await devbox.exec({ command: 'echo "Hello World"' });
+ * const contents = await devbox.file.read({ file_path: 'myfile.txt' });
+ * await devbox.file.write({ file_path: 'output.txt', contents: 'Hello World' });
+ * 
+ * // Lifecycle methods return the devbox instance for chaining
+ * await devbox.suspend().then(d => d.resume()).then(d => d.shutdown());
  * ```
  */
 export class Devbox {
@@ -90,41 +101,29 @@ export class Devbox {
   /**
    * Execute a command on the devbox and wait for it to complete.
    *
-   * @param command - The command to execute
-   * @param shellName - Optional persistent shell name
+   * @param params - Parameters containing the command and optional shell name
    * @param options - Request options with optional polling configuration
    * @returns Execution result with stdout, stderr, and exit status
    */
   async exec(
-    command: string,
-    shellName?: string,
+    params: DevboxExecuteParams,
     options?: Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxAsyncExecutionDetailView>> },
   ): Promise<DevboxAsyncExecutionDetailView> {
-    return this.client.devboxes.executeAndAwaitCompletion(
-      this.devboxData.id,
-      { command, shell_name: shellName ?? null },
-      options,
-    );
+    return this.client.devboxes.execute(this.devboxData.id, params, options);
   }
 
   /**
    * Execute a command asynchronously without waiting for completion.
    *
-   * @param command - The command to execute
-   * @param shellName - Optional persistent shell name
+   * @param params - Parameters containing the command and optional shell name
    * @param options - Request options
    * @returns Execution details with execution_id for tracking
    */
   async execAsync(
-    command: string,
-    shellName?: string,
+    params: DevboxExecuteAsyncParams,
     options?: Core.RequestOptions,
   ): Promise<DevboxAsyncExecutionDetailView> {
-    return this.client.devboxes.executeAsync(
-      this.devboxData.id,
-      { command, shell_name: shellName ?? null },
-      options,
-    );
+    return this.client.devboxes.executeAsync(this.devboxData.id, params, options);
   }
 
   /**
@@ -135,50 +134,44 @@ export class Devbox {
       /**
        * Read file contents from the devbox as a UTF-8 string.
        *
-       * @param path - The file path relative to user home directory
+       * @param params - Parameters containing the file path
        * @param options - Request options
        * @returns File contents as a string
        */
-      read: async (path: string, options?: Core.RequestOptions): Promise<string> => {
-        return this.client.devboxes.readFileContents(this.devboxData.id, { file_path: path }, options);
+      read: async (params: DevboxReadFileContentsParams, options?: Core.RequestOptions): Promise<string> => {
+        return this.client.devboxes.readFileContents(this.devboxData.id, params, options);
       },
 
       /**
        * Write UTF-8 string contents to a file on the devbox.
        *
-       * @param path - The file path relative to user home directory
-       * @param contents - The contents to write
+       * @param params - Parameters containing the file path and contents
        * @param options - Request options
        * @returns Execution result
        */
-      write: async (path: string, contents: string, options?: Core.RequestOptions) => {
-        return this.client.devboxes.writeFileContents(
-          this.devboxData.id,
-          { file_path: path, contents },
-          options,
-        );
+      write: async (params: DevboxWriteFileContentsParams, options?: Core.RequestOptions) => {
+        return this.client.devboxes.writeFileContents(this.devboxData.id, params, options);
       },
 
       /**
        * Download file contents (supports binary files).
        *
-       * @param path - The file path relative to user home directory
+       * @param params - Parameters containing the file path
        * @param options - Request options
        * @returns Response with file contents
        */
-      download: async (path: string, options?: Core.RequestOptions) => {
-        return this.client.devboxes.downloadFile(this.devboxData.id, { path }, options);
+      download: async (params: DevboxDownloadFileParams, options?: Core.RequestOptions) => {
+        return this.client.devboxes.downloadFile(this.devboxData.id, params, options);
       },
 
       /**
        * Upload a file to the devbox.
        *
-       * @param path - The destination path relative to user home directory
-       * @param file - The file to upload
+       * @param params - Parameters containing the file path and file to upload
        * @param options - Request options
        */
-      upload: async (path: string, file: Core.Uploadable, options?: Core.RequestOptions) => {
-        return this.client.devboxes.uploadFile(this.devboxData.id, { path, file }, options);
+      upload: async (params: DevboxUploadFileParams, options?: Core.RequestOptions) => {
+        return this.client.devboxes.uploadFile(this.devboxData.id, params, options);
       },
     };
   }
@@ -186,25 +179,25 @@ export class Devbox {
   /**
    * Shutdown the devbox.
    */
-  async shutdown(options?: Core.RequestOptions): Promise<DevboxView> {
+  async shutdown(options?: Core.RequestOptions): Promise<Devbox> {
     this.devboxData = await this.client.devboxes.shutdown(this.devboxData.id, options);
-    return this.devboxData;
+    return this;
   }
 
   /**
    * Suspend the devbox and create a disk snapshot.
    */
-  async suspend(options?: Core.RequestOptions): Promise<DevboxView> {
+  async suspend(options?: Core.RequestOptions): Promise<Devbox> {
     this.devboxData = await this.client.devboxes.suspend(this.devboxData.id, options);
-    return this.devboxData;
+    return this;
   }
 
   /**
    * Resume a suspended devbox.
    */
-  async resume(options?: Core.RequestOptions): Promise<DevboxView> {
+  async resume(options?: Core.RequestOptions): Promise<Devbox> {
     this.devboxData = await this.client.devboxes.resume(this.devboxData.id, options);
-    return this.devboxData;
+    return this;
   }
 
   /**
@@ -217,12 +210,8 @@ export class Devbox {
   /**
    * Create a disk snapshot of the devbox.
    */
-  async snapshotDisk(name?: string, metadata?: { [key: string]: string }, options?: Core.RequestOptions) {
-    return this.client.devboxes.snapshotDisk(
-      this.devboxData.id,
-      { name: name ?? null, metadata: metadata ?? null },
-      options,
-    );
+  async snapshotDisk(params?: DevboxSnapshotDiskParams, options?: Core.RequestOptions) {
+    return this.client.devboxes.snapshotDisk(this.devboxData.id, params, options);
   }
 
   /**
@@ -235,14 +224,14 @@ export class Devbox {
   /**
    * Create a tunnel to a port on the devbox.
    */
-  async createTunnel(port: number, options?: Core.RequestOptions) {
-    return this.client.devboxes.createTunnel(this.devboxData.id, { port }, options);
+  async createTunnel(params: DevboxCreateTunnelParams, options?: Core.RequestOptions) {
+    return this.client.devboxes.createTunnel(this.devboxData.id, params, options);
   }
 
   /**
    * Remove a tunnel from the devbox.
    */
-  async removeTunnel(port: number, options?: Core.RequestOptions) {
-    return this.client.devboxes.removeTunnel(this.devboxData.id, { port }, options);
+  async removeTunnel(params: DevboxRemoveTunnelParams, options?: Core.RequestOptions) {
+    return this.client.devboxes.removeTunnel(this.devboxData.id, params, options);
   }
 }

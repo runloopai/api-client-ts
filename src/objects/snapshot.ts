@@ -1,7 +1,15 @@
 import type { Runloop } from '../index';
 import type * as Core from '../core';
-import type { DevboxSnapshotView } from '../resources/devboxes/devboxes';
-import type { DevboxSnapshotAsyncStatusView } from '../resources/devboxes/disk-snapshots';
+import type {
+  DevboxSnapshotView,
+  DevboxListDiskSnapshotsParams,
+  DevboxCreateParams,
+} from '../resources/devboxes/devboxes';
+import type {
+  DevboxSnapshotAsyncStatusView,
+  DiskSnapshotUpdateParams,
+} from '../resources/devboxes/disk-snapshots';
+import { Devbox } from './devbox';
 
 /**
  * Object-oriented interface for working with Disk Snapshots.
@@ -14,6 +22,12 @@ import type { DevboxSnapshotAsyncStatusView } from '../resources/devboxes/disk-s
  *
  * // Or load from existing snapshot
  * const snapshot = await Snapshot.get(client, 'snapshot-id');
+ *
+ * // Create a new devbox from this snapshot
+ * const newDevbox = await snapshot.createDevbox({
+ *   name: 'restored-devbox',
+ *   metadata: { restored_from: snapshot.id }
+ * });
  *
  * // Update metadata
  * await snapshot.update({ metadata: { updated: 'true' } });
@@ -63,19 +77,10 @@ export class Snapshot {
    */
   static async list(
     client: Runloop,
-    params?: { devboxId?: string; metadata?: Record<string, string> },
+    params?: DevboxListDiskSnapshotsParams,
     options?: Core.RequestOptions,
   ): Promise<Snapshot[]> {
-    const queryParams: any = {};
-
-    if (params?.devboxId) {
-      queryParams.devbox_id = params.devboxId;
-    }
-
-    // Note: metadata filtering would need to be handled per the API spec
-    // which uses metadata[key] syntax
-
-    const snapshots = await client.devboxes.listDiskSnapshots(queryParams, options);
+    const snapshots = await client.devboxes.listDiskSnapshots(params, options);
     const result: Snapshot[] = [];
 
     for await (const snapshot of snapshots) {
@@ -134,10 +139,7 @@ export class Snapshot {
    * @param params - New name and/or metadata
    * @param options - Request options
    */
-  async update(
-    params?: { name?: string | null; metadata?: { [key: string]: string } | null },
-    options?: Core.RequestOptions,
-  ): Promise<void> {
+  async update(params?: DiskSnapshotUpdateParams, options?: Core.RequestOptions): Promise<void> {
     this.snapshotData = await this.client.devboxes.diskSnapshots.update(
       this.snapshotData.id,
       params,
@@ -165,4 +167,28 @@ export class Snapshot {
     return this.client.devboxes.diskSnapshots.queryStatus(this.snapshotData.id, options);
   }
 
+  /**
+   * Create a new devbox from this snapshot.
+   * This is a convenience method that calls Devbox.create() with the snapshot ID
+   * and any additional parameters you want to layer on top.
+   *
+   * @param params - Additional devbox creation parameters (optional)
+   * @param options - Request options with optional polling configuration
+   * @returns A new Devbox instance created from this snapshot
+   */
+  async createDevbox(
+    params?: Omit<DevboxCreateParams, 'snapshot_id'>,
+    options?: Core.RequestOptions & {
+      polling?: Partial<
+        import('../lib/polling').PollingOptions<import('../resources/devboxes/devboxes').DevboxView>
+      >;
+    },
+  ): Promise<Devbox> {
+    const createParams: DevboxCreateParams = {
+      ...params,
+      snapshot_id: this.snapshotData.id,
+    };
+
+    return Devbox.create(this.client, createParams, options);
+  }
 }

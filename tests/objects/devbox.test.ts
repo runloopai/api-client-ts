@@ -15,6 +15,7 @@ describe('Devbox', () => {
       devboxes: {
         createAndAwaitRunning: jest.fn(),
         retrieve: jest.fn(),
+        execute: jest.fn(),
         executeAndAwaitCompletion: jest.fn(),
         executeAsync: jest.fn(),
         readFileContents: jest.fn(),
@@ -102,13 +103,13 @@ describe('Devbox', () => {
           stderr: '',
         };
 
-        mockClient.devboxes.executeAndAwaitCompletion.mockResolvedValue(mockExecution);
+        mockClient.devboxes.execute.mockResolvedValue(mockExecution);
 
-        const result = await devbox.exec('echo "Hello World"');
+        const result = await devbox.exec({ command: 'echo "Hello World"' });
 
-        expect(mockClient.devboxes.executeAndAwaitCompletion).toHaveBeenCalledWith(
+        expect(mockClient.devboxes.execute).toHaveBeenCalledWith(
           'devbox-123',
-          { command: 'echo "Hello World"', shell_name: null },
+          { command: 'echo "Hello World"' },
           undefined,
         );
         expect(result.stdout).toBe('Hello World');
@@ -125,13 +126,34 @@ describe('Devbox', () => {
           stderr: '',
         };
 
-        mockClient.devboxes.executeAndAwaitCompletion.mockResolvedValue(mockExecution);
+        mockClient.devboxes.execute.mockResolvedValue(mockExecution);
 
-        await devbox.exec('pwd', 'my-shell');
+        await devbox.exec({ command: 'pwd', shell_name: 'my-shell' });
 
-        expect(mockClient.devboxes.executeAndAwaitCompletion).toHaveBeenCalledWith(
+        expect(mockClient.devboxes.execute).toHaveBeenCalledWith(
           'devbox-123',
           { command: 'pwd', shell_name: 'my-shell' },
+          undefined,
+        );
+      });
+
+      it('should support optional command ID', async () => {
+        const mockExecution: DevboxAsyncExecutionDetailView = {
+          devbox_id: 'devbox-123',
+          execution_id: 'exec-456',
+          status: 'completed',
+          exit_status: 0,
+          stdout: 'test output',
+          stderr: '',
+        };
+
+        mockClient.devboxes.execute.mockResolvedValue(mockExecution);
+
+        await devbox.exec({ command: 'echo test', command_id: 'my-command-123' });
+
+        expect(mockClient.devboxes.execute).toHaveBeenCalledWith(
+          'devbox-123',
+          { command: 'echo test', command_id: 'my-command-123' },
           undefined,
         );
       });
@@ -147,11 +169,30 @@ describe('Devbox', () => {
 
         mockClient.devboxes.executeAsync.mockResolvedValue(mockExecution);
 
-        const result = await devbox.execAsync('sleep 10');
+        const result = await devbox.execAsync({ command: 'sleep 10' });
 
         expect(mockClient.devboxes.executeAsync).toHaveBeenCalledWith(
           'devbox-123',
-          { command: 'sleep 10', shell_name: null },
+          { command: 'sleep 10' },
+          undefined,
+        );
+        expect(result.status).toBe('running');
+      });
+
+      it('should support optional command ID for async execution', async () => {
+        const mockExecution: DevboxAsyncExecutionDetailView = {
+          devbox_id: 'devbox-123',
+          execution_id: 'exec-789',
+          status: 'running',
+        };
+
+        mockClient.devboxes.executeAsync.mockResolvedValue(mockExecution);
+
+        const result = await devbox.execAsync({ command: 'long-running-task', command_id: 'task-456' });
+
+        expect(mockClient.devboxes.executeAsync).toHaveBeenCalledWith(
+          'devbox-123',
+          { command: 'long-running-task', command_id: 'task-456' },
           undefined,
         );
         expect(result.status).toBe('running');
@@ -162,7 +203,7 @@ describe('Devbox', () => {
       it('should read file contents', async () => {
         mockClient.devboxes.readFileContents.mockResolvedValue('file contents');
 
-        const contents = await devbox.file.read('test.txt');
+        const contents = await devbox.file.read({ file_path: 'test.txt' });
 
         expect(mockClient.devboxes.readFileContents).toHaveBeenCalledWith(
           'devbox-123',
@@ -182,7 +223,7 @@ describe('Devbox', () => {
 
         mockClient.devboxes.writeFileContents.mockResolvedValue(mockResult);
 
-        await devbox.file.write('test.txt', 'new contents');
+        await devbox.file.write({ file_path: 'test.txt', contents: 'new contents' });
 
         expect(mockClient.devboxes.writeFileContents).toHaveBeenCalledWith(
           'devbox-123',
@@ -195,7 +236,7 @@ describe('Devbox', () => {
         const mockResponse = new Response('file data');
         mockClient.devboxes.downloadFile.mockResolvedValue(mockResponse as any);
 
-        const result = await devbox.file.download('data.bin');
+        const result = await devbox.file.download({ path: 'data.bin' });
 
         expect(mockClient.devboxes.downloadFile).toHaveBeenCalledWith(
           'devbox-123',
@@ -209,7 +250,7 @@ describe('Devbox', () => {
         mockClient.devboxes.uploadFile.mockResolvedValue(undefined);
 
         const file = Buffer.from('file data');
-        await devbox.file.upload('data.bin', file);
+        await devbox.file.upload({ path: 'data.bin', file });
 
         expect(mockClient.devboxes.uploadFile).toHaveBeenCalledWith(
           'devbox-123',
@@ -227,7 +268,7 @@ describe('Devbox', () => {
         const result = await devbox.shutdown();
 
         expect(mockClient.devboxes.shutdown).toHaveBeenCalledWith('devbox-123', undefined);
-        expect(result.status).toBe('shutdown');
+        expect(result).toBe(devbox); // Should return the same instance
         expect(devbox.status).toBe('shutdown');
       });
 
@@ -235,18 +276,20 @@ describe('Devbox', () => {
         const suspendedData = { ...mockDevboxData, status: 'suspended' as const };
         mockClient.devboxes.suspend.mockResolvedValue(suspendedData);
 
-        await devbox.suspend();
+        const result = await devbox.suspend();
 
         expect(mockClient.devboxes.suspend).toHaveBeenCalledWith('devbox-123', undefined);
+        expect(result).toBe(devbox); // Should return the same instance
         expect(devbox.status).toBe('suspended');
       });
 
       it('should resume the devbox', async () => {
         mockClient.devboxes.resume.mockResolvedValue(mockDevboxData);
 
-        await devbox.resume();
+        const result = await devbox.resume();
 
         expect(mockClient.devboxes.resume).toHaveBeenCalledWith('devbox-123', undefined);
+        expect(result).toBe(devbox); // Should return the same instance
       });
 
       it('should send keep alive signal', async () => {
@@ -269,7 +312,7 @@ describe('Devbox', () => {
 
         mockClient.devboxes.snapshotDisk.mockResolvedValue(mockSnapshot);
 
-        const result = await devbox.snapshotDisk('my-snapshot', { version: '1.0' });
+        const result = await devbox.snapshotDisk({ name: 'my-snapshot', metadata: { version: '1.0' } });
 
         expect(mockClient.devboxes.snapshotDisk).toHaveBeenCalledWith(
           'devbox-123',
@@ -305,7 +348,7 @@ describe('Devbox', () => {
 
         mockClient.devboxes.createTunnel.mockResolvedValue(mockTunnel);
 
-        const result = await devbox.createTunnel(8080);
+        const result = await devbox.createTunnel({ port: 8080 });
 
         expect(mockClient.devboxes.createTunnel).toHaveBeenCalledWith(
           'devbox-123',
@@ -318,7 +361,7 @@ describe('Devbox', () => {
       it('should remove tunnel', async () => {
         mockClient.devboxes.removeTunnel.mockResolvedValue(undefined);
 
-        await devbox.removeTunnel(8080);
+        await devbox.removeTunnel({ port: 8080 });
 
         expect(mockClient.devboxes.removeTunnel).toHaveBeenCalledWith(
           'devbox-123',
@@ -363,9 +406,9 @@ describe('Devbox', () => {
       const devbox = await Devbox.create(mockClient, { name: 'test-devbox' });
 
       const error = new Error('Command failed');
-      mockClient.devboxes.executeAndAwaitCompletion.mockRejectedValue(error);
+      mockClient.devboxes.execute.mockRejectedValue(error);
 
-      await expect(devbox.exec('failing-command')).rejects.toThrow('Command failed');
+      await expect(devbox.exec({ command: 'failing-command' })).rejects.toThrow('Command failed');
     });
 
     it('should handle file operation errors', async () => {
@@ -412,9 +455,9 @@ describe('Devbox', () => {
         stderr: '',
       };
 
-      mockClient.devboxes.executeAndAwaitCompletion.mockResolvedValue(emptyResult);
+      mockClient.devboxes.execute.mockResolvedValue(emptyResult);
 
-      const result = await devbox.exec('true'); // Command that produces no output
+      const result = await devbox.exec({ command: 'true' }); // Command that produces no output
       expect(result.stdout).toBe('');
       expect(result.stderr).toBe('');
     });
@@ -432,9 +475,9 @@ describe('Devbox', () => {
         stderr: 'Command failed',
       };
 
-      mockClient.devboxes.executeAndAwaitCompletion.mockResolvedValue(failedResult);
+      mockClient.devboxes.execute.mockResolvedValue(failedResult);
 
-      const result = await devbox.exec('false'); // Command that fails
+      const result = await devbox.exec({ command: 'false' }); // Command that fails
       expect(result.exit_status).toBe(1);
       expect(result.stderr).toBe('Command failed');
     });

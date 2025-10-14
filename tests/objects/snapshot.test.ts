@@ -1,4 +1,5 @@
 import { Snapshot } from '../../src/objects/snapshot';
+import { Devbox } from '../../src/objects/devbox';
 import { Runloop } from '../../src/index';
 import type { DevboxSnapshotView } from '../../src/resources/devboxes/devboxes';
 import type { DevboxSnapshotAsyncStatusView } from '../../src/resources/devboxes/disk-snapshots';
@@ -107,7 +108,7 @@ describe('Snapshot', () => {
 
       const snapshots = await Snapshot.list(mockClient);
 
-      expect(mockClient.devboxes.listDiskSnapshots).toHaveBeenCalledWith({}, undefined);
+      expect(mockClient.devboxes.listDiskSnapshots).toHaveBeenCalledWith(undefined, undefined);
       expect(snapshots).toHaveLength(2);
       expect(snapshots[0].id).toBe('snapshot-1');
       expect(snapshots[1].id).toBe('snapshot-2');
@@ -122,7 +123,7 @@ describe('Snapshot', () => {
 
       mockClient.devboxes.listDiskSnapshots.mockResolvedValue(mockPage as any);
 
-      await Snapshot.list(mockClient, { devboxId: 'devbox-456' });
+      await Snapshot.list(mockClient, { devbox_id: 'devbox-456' });
 
       expect(mockClient.devboxes.listDiskSnapshots).toHaveBeenCalledWith(
         { devbox_id: 'devbox-456' },
@@ -287,6 +288,64 @@ describe('Snapshot', () => {
         expect(snapshotWithoutName.name).toBeNull();
       });
 
+    });
+
+    describe('createDevbox', () => {
+      it('should create a devbox from the snapshot', async () => {
+        const mockDevboxData = {
+          id: 'devbox-789',
+          status: 'running' as const,
+          capabilities: [],
+          create_time_ms: Date.now(),
+          end_time_ms: null,
+          launch_parameters: {},
+          metadata: {},
+          state_transitions: [],
+        };
+
+        // Mock Devbox.create static method
+        jest.spyOn(Devbox, 'create').mockResolvedValue(new Devbox(mockClient as any, mockDevboxData as any));
+
+        const result = await snapshot.createDevbox({
+          name: 'restored-devbox',
+          metadata: { restored_from: 'snapshot-123' },
+        });
+
+        expect(Devbox.create).toHaveBeenCalledWith(
+          mockClient,
+          {
+            name: 'restored-devbox',
+            metadata: { restored_from: 'snapshot-123' },
+            snapshot_id: 'snapshot-123',
+          },
+          undefined,
+        );
+        expect(result).toBeInstanceOf(Devbox);
+      });
+
+      it('should create a devbox with only snapshot ID when no params provided', async () => {
+        const mockDevboxData = {
+          id: 'devbox-789',
+          status: 'running' as const,
+          capabilities: [],
+          create_time_ms: Date.now(),
+          end_time_ms: null,
+          launch_parameters: {},
+          metadata: {},
+          state_transitions: [],
+        };
+
+        jest.spyOn(Devbox, 'create').mockResolvedValue(new Devbox(mockClient as any, mockDevboxData as any));
+
+        const result = await snapshot.createDevbox();
+
+        expect(Devbox.create).toHaveBeenCalledWith(
+          mockClient,
+          { snapshot_id: 'snapshot-123' },
+          undefined,
+        );
+        expect(result).toBeInstanceOf(Devbox);
+      });
     });
   });
 
