@@ -44,6 +44,8 @@ export {
   type DevboxExecutionDetailView,
   type DevboxKillExecutionRequest,
   type DevboxListView,
+  type DevboxSendStdInRequest,
+  type DevboxSendStdInResult,
   type DevboxSnapshotListView,
   type DevboxSnapshotView,
   type DevboxTunnelView,

@@ -178,6 +178,11 @@ export interface ObjectView {
   content_type: 'unspecified' | 'text' | 'binary' | 'gzip' | 'tar' | 'tgz';
 
   /**
+   * The creation time of the Object in milliseconds since epoch.
+   */
+  create_time_ms: number;
+
+  /**
    * The name of the Object.
    */
   name: string;
