@@ -23,6 +23,10 @@ import { ObjectOptions } from './types';
  *   metadata: { project: 'demo' }
  * });
  *
+ * // Get object information
+ * const info = await obj.getInfo();
+ * console.log(info.name, info.state);
+ *
  * // Upload content to the presigned URL
  * await obj.uploadContent('Hello, World!');
  *
@@ -35,11 +39,11 @@ import { ObjectOptions } from './types';
  */
 export class StorageObject {
   private client: Runloop;
-  private objectData: ObjectView;
+  private _id: string;
 
-  private constructor(client: Runloop, objectData: ObjectView) {
+  private constructor(client: Runloop, id: string) {
     this.client = client;
-    this.objectData = objectData;
+    this._id = id;
   }
 
   /**
@@ -50,46 +54,12 @@ export class StorageObject {
    * @param options - Request options with optional client override
    * @returns An Object instance with upload URL
    */
-  static async create(params: ObjectCreateParams, options?: ObjectOptions): Promise<StorageObject>;
-  /**
-   * Create a new Storage Object.
-   * This returns an object with an upload URL that you can use to upload content.
-   *
-   * @param client - The Runloop API client
-   * @param params - Parameters for creating the object
-   * @param options - Request options
-   * @returns An Object instance with upload URL
-   */
-  static async create(
-    client: Runloop,
-    params: ObjectCreateParams,
-    options?: Core.RequestOptions,
-  ): Promise<StorageObject>;
-  static async create(
-    clientOrParams: Runloop | ObjectCreateParams,
-    paramsOrOptions?: ObjectCreateParams | ObjectOptions,
-    options?: Core.RequestOptions,
-  ): Promise<StorageObject> {
-    let client: Runloop;
-    let params: ObjectCreateParams;
-    let requestOptions: Core.RequestOptions | undefined;
-
-    // Handle overloaded signatures
-    if (clientOrParams && typeof clientOrParams === 'object' && 'bearerToken' in clientOrParams) {
-      // Old signature: create(client, params, options)
-      client = clientOrParams;
-      params = paramsOrOptions as ObjectCreateParams;
-      requestOptions = options;
-    } else {
-      // New signature: create(params, options)
-      const opts = paramsOrOptions as ObjectOptions | undefined;
-      client = opts?.client || Runloop.getDefaultClient();
-      params = clientOrParams as ObjectCreateParams;
-      requestOptions = opts;
-    }
+  static async create(params: ObjectCreateParams, options?: ObjectOptions): Promise<StorageObject> {
+    const client = options?.client || Runloop.getDefaultClient();
+    const requestOptions = options;
 
     const objectData = await client.objects.create(params, requestOptions);
-    return new StorageObject(client, objectData);
+    return new StorageObject(client, objectData.id);
   }
 
   /**
@@ -99,41 +69,13 @@ export class StorageObject {
    * @param options - Request options with optional client override
    * @returns An Object instance
    */
-  static async get(id: string, options?: ObjectOptions): Promise<StorageObject>;
-  /**
-   * Load an existing Storage Object by ID.
-   *
-   * @param client - The Runloop API client
-   * @param id - The object ID
-   * @param options - Request options
-   * @returns An Object instance
-   */
-  static async get(client: Runloop, id: string, options?: Core.RequestOptions): Promise<StorageObject>;
-  static async get(
-    clientOrId: Runloop | string,
-    idOrOptions?: string | ObjectOptions,
-    options?: Core.RequestOptions,
-  ): Promise<StorageObject> {
-    let client: Runloop;
-    let id: string;
-    let requestOptions: Core.RequestOptions | undefined;
+  static async get(id: string, options?: ObjectOptions): Promise<StorageObject> {
+    const client = options?.client || Runloop.getDefaultClient();
+    const requestOptions = options;
 
-    // Handle overloaded signatures
-    if (typeof clientOrId === 'string') {
-      // New signature: get(id, options)
-      const opts = idOrOptions as ObjectOptions | undefined;
-      client = opts?.client || Runloop.getDefaultClient();
-      id = clientOrId;
-      requestOptions = opts;
-    } else {
-      // Old signature: get(client, id, options)
-      client = clientOrId;
-      id = idOrOptions as string;
-      requestOptions = options;
-    }
-
-    const objectData = await client.objects.retrieve(id, requestOptions);
-    return new StorageObject(client, objectData);
+    // Verify the object exists by retrieving it
+    await client.objects.retrieve(id, requestOptions);
+    return new StorageObject(client, id);
   }
 
   /**
@@ -143,48 +85,15 @@ export class StorageObject {
    * @param options - Request options with optional client override
    * @returns Array of Object instances
    */
-  static async list(params?: ObjectListParams, options?: ObjectOptions): Promise<StorageObject[]>;
-  /**
-   * List all storage objects with optional filters.
-   *
-   * @param client - The Runloop API client
-   * @param params - Optional filter parameters
-   * @param options - Request options
-   * @returns Array of Object instances
-   */
-  static async list(
-    client: Runloop,
-    params?: ObjectListParams,
-    options?: Core.RequestOptions,
-  ): Promise<StorageObject[]>;
-  static async list(
-    clientOrParams?: Runloop | ObjectListParams,
-    paramsOrOptions?: ObjectListParams | ObjectOptions,
-    options?: Core.RequestOptions,
-  ): Promise<StorageObject[]> {
-    let client: Runloop;
-    let params: ObjectListParams | undefined;
-    let requestOptions: Core.RequestOptions | undefined;
-
-    // Handle overloaded signatures
-    if (clientOrParams && typeof clientOrParams === 'object' && 'bearerToken' in clientOrParams) {
-      // Old signature: list(client, params, options)
-      client = clientOrParams;
-      params = paramsOrOptions as ObjectListParams | undefined;
-      requestOptions = options;
-    } else {
-      // New signature: list(params, options)
-      const opts = paramsOrOptions as ObjectOptions | undefined;
-      client = opts?.client || Runloop.getDefaultClient();
-      params = clientOrParams as ObjectListParams | undefined;
-      requestOptions = opts;
-    }
+  static async list(params?: ObjectListParams, options?: ObjectOptions): Promise<StorageObject[]> {
+    const client = options?.client || Runloop.getDefaultClient();
+    const requestOptions = options;
 
     const objects = await client.objects.list(params, requestOptions);
     const result: StorageObject[] = [];
 
     for await (const obj of objects) {
-      result.push(new StorageObject(client, obj));
+      result.push(new StorageObject(client, obj.id));
     }
 
     return result;
@@ -194,56 +103,14 @@ export class StorageObject {
    * Get the object ID.
    */
   get id(): string {
-    return this.objectData.id;
+    return this._id;
   }
 
   /**
-   * Get the object name.
+   * Get the complete object data from the API.
    */
-  get name(): string {
-    return this.objectData.name;
-  }
-
-  /**
-   * Get the content type.
-   */
-  get contentType(): ObjectView['content_type'] {
-    return this.objectData.content_type;
-  }
-
-  /**
-   * Get the current state (UPLOADING, READ_ONLY, DELETED).
-   */
-  get state(): string {
-    return this.objectData.state;
-  }
-
-  /**
-   * Get the size in bytes (null until uploaded and completed).
-   */
-  get sizeBytes(): number | null {
-    return this.objectData.size_bytes ?? null;
-  }
-
-  /**
-   * Get the presigned upload URL (only available after creation, before completion).
-   */
-  get uploadUrl(): string | null {
-    return this.objectData.upload_url ?? null;
-  }
-
-  /**
-   * Get the complete object data.
-   */
-  get data(): ObjectView {
-    return this.objectData;
-  }
-
-  /**
-   * Refresh the object data from the API.
-   */
-  async refresh(options?: Core.RequestOptions): Promise<void> {
-    this.objectData = await this.client.objects.retrieve(this.objectData.id, options);
+  async getInfo(options?: Core.RequestOptions): Promise<ObjectView> {
+    return this.client.objects.retrieve(this._id, options);
   }
 
   /**
@@ -258,7 +125,10 @@ export class StorageObject {
    * @returns Promise that resolves when upload is complete
    */
   async uploadContent(content: string | Buffer, contentType?: string): Promise<void> {
-    if (!this.uploadUrl) {
+    const objectInfo = await this.getInfo();
+    const uploadUrl = objectInfo.upload_url;
+
+    if (!uploadUrl) {
       throw new Error('No upload URL available. Object may already be completed or deleted.');
     }
 
@@ -267,7 +137,7 @@ export class StorageObject {
       headers['Content-Type'] = contentType;
     }
 
-    const response = await (globalThis as any).fetch(this.uploadUrl, {
+    const response = await (globalThis as any).fetch(uploadUrl, {
       method: 'PUT',
       body: content,
       headers,
@@ -285,7 +155,7 @@ export class StorageObject {
    * @param options - Request options
    */
   async complete(options?: Core.RequestOptions): Promise<void> {
-    this.objectData = await this.client.objects.complete(this.objectData.id, {}, options);
+    await this.client.objects.complete(this._id, {}, options);
   }
 
   /**
@@ -301,7 +171,7 @@ export class StorageObject {
     options?: Core.RequestOptions,
   ): Promise<ObjectDownloadURLView> {
     return this.client.objects.download(
-      this.objectData.id,
+      this._id,
       durationSeconds !== undefined ? { duration_seconds: durationSeconds } : {},
       options,
     );
@@ -350,6 +220,6 @@ export class StorageObject {
    * @param options - Request options
    */
   async delete(options?: Core.RequestOptions): Promise<void> {
-    this.objectData = await this.client.objects.delete(this.objectData.id, {}, options);
+    await this.client.objects.delete(this._id, {}, options);
   }
 }

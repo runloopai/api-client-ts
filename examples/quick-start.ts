@@ -20,14 +20,14 @@ async function quickStart() {
   });
 
   // 3. Use the devbox
-  await devbox.exec({ command: 'npm init -y' });
+  await devbox.cmd.exec({ command: 'npm init -y' });
   await devbox.file.write({ file_path: 'app.js', contents: 'console.log("Hello World");' });
-  const result = await devbox.exec({ command: 'node app.js' });
+  const result = await devbox.cmd.exec({ command: 'node app.js' });
   // result.stdout contains "Hello World"
 
   // 4. Create a snapshot
   const snapshotData = await devbox.snapshotDisk({ name: 'configured-state' });
-  const snapshot = new Snapshot(Runloop.getDefaultClient(), snapshotData);
+  const snapshot = new Snapshot(Runloop.getDefaultClient(), snapshotData.id);
 
   // 5. Create new devbox from snapshot
   const newDevbox = await snapshot.createDevbox({ name: 'cloned-devbox' });

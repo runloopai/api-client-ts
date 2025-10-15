@@ -20,8 +20,10 @@ async function main() {
     `,
   });
 
-  // Blueprint is now created with ID and status available
-  // blueprint.id, blueprint.status, blueprint.name
+  // Blueprint is now created and ready to use
+  // Get blueprint information
+  const blueprintInfo = await blueprint.getInfo();
+  console.log(`Blueprint ${blueprintInfo.name} status: ${blueprintInfo.status}`);
 
   // Get build logs to check the build process
   const logs = await blueprint.logs();
@@ -42,10 +44,12 @@ async function main() {
   );
 
   // Devbox is now running and ready to use
-  // devbox.id, devbox.status, devbox.data
+  // Get devbox information
+  const devboxInfo = await devbox.getInfo();
+  console.log(`Devbox ${devboxInfo.name} status: ${devboxInfo.status}`);
 
   // Execute commands on the devbox
-  const result = await devbox.exec({ command: 'node --version' });
+  const result = await devbox.cmd.exec({ command: 'node --version' });
   // result.stdout contains the command output
 
   // File operations - write a file to the devbox
@@ -59,7 +63,7 @@ async function main() {
   // fileContent contains the file contents as a string
 
   // Execute the JavaScript file
-  const output = await devbox.exec({ command: 'node hello.js' });
+  const output = await devbox.cmd.exec({ command: 'node hello.js' });
   // output.stdout contains "Hello from devbox!"
 
   // Create a tunnel to expose port 3000
@@ -74,8 +78,10 @@ async function main() {
   });
 
   // Create a Snapshot object to work with the snapshot
-  const snapshot = new Snapshot(client, snapshotData);
-  // snapshot.id, snapshot.name, snapshot.metadata are now available
+  const snapshot = new Snapshot(Runloop.getDefaultClient(), snapshotData.id);
+  // Get snapshot information
+  const snapshotInfo = await snapshot.getInfo();
+  console.log(`Snapshot ${snapshotInfo.name} created at: ${snapshotInfo.create_time_ms}`);
 
   // Lifecycle management - suspend the devbox to save resources
   await devbox.suspend();

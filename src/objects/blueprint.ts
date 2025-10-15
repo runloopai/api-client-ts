@@ -8,7 +8,6 @@ import type {
   BlueprintPreviewParams,
 } from '../resources/blueprints';
 import type { DevboxCreateParams } from '../resources/devboxes/devboxes';
-import { PollingOptions } from '../lib/polling';
 import { Devbox } from './devbox';
 import { ObjectCreateOptions, ObjectOptions } from './types';
 
@@ -32,6 +31,10 @@ import { ObjectCreateOptions, ObjectOptions } from './types';
  *   { client: customClient }
  * );
  *
+ * // Get blueprint information
+ * const info = await blueprint.getInfo();
+ * console.log(info.name, info.status);
+ *
  * // Create a devbox from this blueprint
  * const devbox = await blueprint.createDevbox({
  *   name: 'my-devbox',
@@ -44,11 +47,11 @@ import { ObjectCreateOptions, ObjectOptions } from './types';
  */
 export class Blueprint {
   private client: Runloop;
-  private blueprintData: BlueprintView;
+  private _id: string;
 
-  private constructor(client: Runloop, blueprintData: BlueprintView) {
+  private constructor(client: Runloop, id: string) {
     this.client = client;
-    this.blueprintData = blueprintData;
+    this._id = id;
   }
 
   /**
@@ -62,48 +65,12 @@ export class Blueprint {
   static async create(
     params: BlueprintCreateParams,
     options?: ObjectCreateOptions<BlueprintView>,
-  ): Promise<Blueprint>;
-  /**
-   * Create a new Blueprint and wait for it to complete building.
-   * This is the recommended way to create a blueprint as it ensures it's ready to use.
-   *
-   * @param client - The Runloop API client
-   * @param params - Parameters for creating the blueprint
-   * @param options - Request options with optional polling configuration
-   * @returns A Blueprint instance with completed build
-   */
-  static async create(
-    client: Runloop,
-    params: BlueprintCreateParams,
-    options?: Core.RequestOptions & { polling?: Partial<PollingOptions<BlueprintView>> },
-  ): Promise<Blueprint>;
-  static async create(
-    clientOrParams: Runloop | BlueprintCreateParams,
-    paramsOrOptions?: BlueprintCreateParams | ObjectCreateOptions<BlueprintView>,
-    options?: Core.RequestOptions & { polling?: Partial<PollingOptions<BlueprintView>> },
   ): Promise<Blueprint> {
-    let client: Runloop;
-    let params: BlueprintCreateParams;
-    let requestOptions:
-      | (Core.RequestOptions & { polling?: Partial<PollingOptions<BlueprintView>> })
-      | undefined;
-
-    // Handle overloaded signatures
-    if (clientOrParams && typeof clientOrParams === 'object' && 'bearerToken' in clientOrParams) {
-      // Old signature: create(client, params, options)
-      client = clientOrParams;
-      params = paramsOrOptions as BlueprintCreateParams;
-      requestOptions = options;
-    } else {
-      // New signature: create(params, options)
-      const opts = paramsOrOptions as ObjectCreateOptions<BlueprintView> | undefined;
-      client = opts?.client || Runloop.getDefaultClient();
-      params = clientOrParams as BlueprintCreateParams;
-      requestOptions = opts;
-    }
+    const client = options?.client || Runloop.getDefaultClient();
+    const requestOptions = options;
 
     const blueprintData = await client.blueprints.createAndAwaitBuildCompleted(params, requestOptions);
-    return new Blueprint(client, blueprintData);
+    return new Blueprint(client, blueprintData.id);
   }
 
   /**
@@ -113,57 +80,28 @@ export class Blueprint {
    * @param options - Request options with optional client override
    * @returns A Blueprint instance
    */
-  static async get(id: string, options?: ObjectOptions): Promise<Blueprint>;
-  /**
-   * Load an existing Blueprint by ID.
-   *
-   * @param client - The Runloop API client
-   * @param id - The blueprint ID
-   * @param options - Request options
-   * @returns A Blueprint instance
-   */
-  static async get(client: Runloop, id: string, options?: Core.RequestOptions): Promise<Blueprint>;
-  static async get(
-    clientOrId: Runloop | string,
-    idOrOptions?: string | ObjectOptions,
-    options?: Core.RequestOptions,
-  ): Promise<Blueprint> {
-    let client: Runloop;
-    let id: string;
-    let requestOptions: Core.RequestOptions | undefined;
+  static async get(id: string, options?: ObjectOptions): Promise<Blueprint> {
+    const client = options?.client || Runloop.getDefaultClient();
+    const requestOptions = options;
 
-    // Handle overloaded signatures
-    if (typeof clientOrId === 'string') {
-      // New signature: get(id, options)
-      const opts = idOrOptions as ObjectOptions | undefined;
-      client = opts?.client || Runloop.getDefaultClient();
-      id = clientOrId;
-      requestOptions = opts;
-    } else {
-      // Old signature: get(client, id, options)
-      client = clientOrId;
-      id = idOrOptions as string;
-      requestOptions = options;
-    }
-
-    const blueprintData = await client.blueprints.retrieve(id, requestOptions);
-    return new Blueprint(client, blueprintData);
+    // Verify the blueprint exists by retrieving it
+    await client.blueprints.retrieve(id, requestOptions);
+    return new Blueprint(client, id);
   }
 
   /**
    * Preview a blueprint configuration without building it.
    * Returns the Dockerfile that would be built.
    *
-   * @param client - The Runloop API client
    * @param params - Blueprint preview parameters
-   * @param options - Request options
+   * @param options - Request options with optional client override
    * @returns Preview with generated Dockerfile
    */
   static async preview(
-    client: Runloop,
     params: BlueprintPreviewParams,
-    options?: Core.RequestOptions,
+    options?: ObjectOptions,
   ): Promise<BlueprintPreviewView> {
+    const client = options?.client || Runloop.getDefaultClient();
     return client.blueprints.preview(params, options);
   }
 
@@ -171,42 +109,14 @@ export class Blueprint {
    * Get the blueprint ID.
    */
   get id(): string {
-    return this.blueprintData.id;
+    return this._id;
   }
 
   /**
-   * Get the blueprint name.
+   * Get the complete blueprint data from the API.
    */
-  get name(): string {
-    return this.blueprintData.name;
-  }
-
-  /**
-   * Get the current blueprint build status.
-   */
-  get status(): BlueprintView['status'] {
-    return this.blueprintData.status;
-  }
-
-  /**
-   * Get the blueprint state.
-   */
-  get state(): BlueprintView['state'] {
-    return this.blueprintData.state;
-  }
-
-  /**
-   * Get the complete blueprint data.
-   */
-  get data(): BlueprintView {
-    return this.blueprintData;
-  }
-
-  /**
-   * Refresh the blueprint data from the API.
-   */
-  async refresh(options?: Core.RequestOptions): Promise<void> {
-    this.blueprintData = await this.client.blueprints.retrieve(this.blueprintData.id, options);
+  async getInfo(options?: Core.RequestOptions): Promise<BlueprintView> {
+    return this.client.blueprints.retrieve(this._id, options);
   }
 
   /**
@@ -216,7 +126,7 @@ export class Blueprint {
    * @returns Build logs
    */
   async logs(options?: Core.RequestOptions): Promise<BlueprintBuildLogsListView> {
-    return this.client.blueprints.logs(this.blueprintData.id, options);
+    return this.client.blueprints.logs(this._id, options);
   }
 
   /**
@@ -225,10 +135,7 @@ export class Blueprint {
    * @param options - Request options
    */
   async delete(options?: Core.RequestOptions): Promise<unknown> {
-    const result = await this.client.blueprints.delete(this.blueprintData.id, options);
-    // Update local state
-    this.blueprintData = { ...this.blueprintData, state: 'deleted' };
-    return result;
+    return this.client.blueprints.delete(this._id, options);
   }
 
   /**
@@ -250,9 +157,9 @@ export class Blueprint {
   ): Promise<Devbox> {
     const createParams: DevboxCreateParams = {
       ...params,
-      blueprint_id: this.blueprintData.id,
+      blueprint_id: this._id,
     };
 
-    return Devbox.create(this.client, createParams, options);
+    return Devbox.create(createParams, { ...options, client: this.client });
   }
 }
