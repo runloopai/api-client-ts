@@ -1,12 +1,11 @@
-import { Runloop } from '../src/index';
 import { Devbox } from '../src/objects/devbox';
 import { Blueprint } from '../src/objects/blueprint';
 import { Snapshot } from '../src/objects/snapshot';
 import { StorageObject } from '../src/objects/storage-object';
 
 async function main() {
-  // Set up default client (recommended approach)
-  Runloop.setDefaultClient(new Runloop({ bearerToken: 'your-api-key' }));
+  // Set the environment RUNLOOP_API_KEY variable with your API key
+  // export RUNLOOP_API_KEY=apk_
 
   // === Blueprint Example ===
   // Create a blueprint with a Node.js Dockerfile (using default client)
@@ -14,10 +13,7 @@ async function main() {
     name: 'my-nodejs-app',
     dockerfile: `
       FROM node:18
-      WORKDIR /app
-      COPY package*.json ./
-      RUN npm install
-      COPY . .
+      RUN apt-get update && apt-get install -y ffmpeg
     `,
   });
 
@@ -36,10 +32,6 @@ async function main() {
     blueprint_id: blueprint.id,
     metadata: { project: 'demo', environment: 'development' },
   });
-
-  // Alternative: Create devbox with custom client and polling options
-  const explicitClient = new Runloop({ bearerToken: 'custom-token' });
-  const devboxWithExplicitClient = await Devbox.create({ name: 'custom-devbox' }, { client: explicitClient });
 
   // Devbox is now running and ready to use
   // Get devbox information using getInfo()
