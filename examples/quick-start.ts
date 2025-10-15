@@ -1,28 +1,15 @@
-import { Runloop } from '../src/index';
 import { Devbox } from '../src/objects/devbox';
-import { Blueprint } from '../src/objects/blueprint';
 import { Snapshot } from '../src/objects/snapshot';
 import { StorageObject } from '../src/objects/storage-object';
 
 async function quickStart() {
-  // Set up default client (recommended)
-  Runloop.setDefaultClient(new Runloop({ bearerToken: 'your-api-key' }));
-
+  // Set the environment RUNLOOP_API_KEY variable with your API key
   console.log('🚀 Quick Start: Runloop API Client with Object-Oriented API');
-
-  // 1. Create a blueprint (using default client)
-  console.log('📦 Creating blueprint...');
-  const blueprint = await Blueprint.create({
-    name: 'ubuntu-dev',
-    dockerfile: 'FROM ubuntu:22.04\nRUN apt-get update && apt-get install -y nodejs npm',
-  });
-  console.log(`✅ Blueprint created: ${blueprint.id}`);
 
   // 2. Create a devbox from the blueprint (using default client)
   console.log('🖥️  Creating devbox...');
   const devbox = await Devbox.create({
     name: 'my-devbox',
-    blueprint_id: blueprint.id,
   });
   console.log(`✅ Devbox created: ${devbox.id}`);
 
@@ -59,9 +46,7 @@ async function quickStart() {
 
   // 6. Demonstrate ID-only storage and getInfo()
   console.log('🆔 Demonstrating ID-only storage...');
-  const blueprintInfo = await blueprint.getInfo();
   const devboxInfo = await devbox.getInfo();
-  console.log(`📊 Blueprint status: ${blueprintInfo.status}`);
   console.log(`📊 Devbox status: ${devboxInfo.status}`);
 
   // 7. Create new devbox from snapshot
