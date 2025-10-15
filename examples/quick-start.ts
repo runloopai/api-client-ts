@@ -29,13 +29,12 @@ async function quickStart() {
 
   // 4. Storage operations - file upload
   console.log('💾 Uploading file to storage...');
-  const storageObject = await StorageObject.uploadFromFile('./package.json', { name: 'my-package.json' });
+  const storageObject = await StorageObject.uploadFromFile('./package.json', 'my-package.json');
   console.log(`✅ File uploaded: ${storageObject.id}`);
 
   // Upload an archive file (auto-detects content type)
   console.log('📦 Uploading archive...');
-  const archiveObject = await StorageObject.uploadFromFile('./dist.tar.gz', {
-    name: 'project-archive.tar.gz',
+  const archiveObject = await StorageObject.uploadFromFile('./dist.tar.gz', 'project-archive.tar.gz', {
     metadata: { type: 'build-artifact' },
   });
   console.log(`✅ Archive uploaded: ${archiveObject.id}`);

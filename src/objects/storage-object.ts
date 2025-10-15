@@ -55,10 +55,10 @@ function assertNodeEnvironment(): void {
  * // export RUNLOOP_API_KEY="your-api-key"
  *
  * // Upload a file directly (Node.js only)
- * const obj = await StorageObject.uploadFromFile('./data.txt');
+ * const obj = await StorageObject.uploadFromFile('./data.txt', 'my-data.txt');
  *
  * // Upload archive files (auto-detects content type)
- * const archive = await StorageObject.uploadFromFile('./project.tar.gz');
+ * const archive = await StorageObject.uploadFromFile('./project.tar.gz', 'my-archive.tar.gz');
  *
  * // Upload from buffer
  * const buffer = Buffer.from('content');
@@ -147,14 +147,15 @@ export class StorageObject {
    * 3. Mark upload as complete
    *
    * @param filePath - Path to the file to upload
-   * @param options - Request options with optional client, name, content type, and metadata
+   * @param name - Name for the uploaded object
+   * @param options - Request options with optional client, content type, and metadata
    * @returns A completed StorageObject instance
    */
   static async uploadFromFile(
     filePath: string,
+    name: string,
     options?: Core.RequestOptions & {
       client?: Runloop;
-      name?: string;
       contentType?: string;
       metadata?: Record<string, string>;
     },
@@ -176,8 +177,7 @@ export class StorageObject {
       );
     }
 
-    // Determine name and content type
-    const name = options?.name || path.basename(filePath);
+    // Determine content type
     const contentType = options?.contentType || detectContentType(filePath);
 
     // Step 1: Create the object

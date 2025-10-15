@@ -460,7 +460,7 @@ describe('StorageObject (New API)', () => {
         statusText: 'OK',
       });
 
-      const result = await StorageObject.uploadFromFile('./test.txt', { client: mockClient });
+      const result = await StorageObject.uploadFromFile('./test.txt', 'test.txt', { client: mockClient });
 
       expect(mockClient.objects.create).toHaveBeenCalledWith(
         { name: 'test.txt', content_type: 'text', metadata: null },
@@ -490,16 +490,15 @@ describe('StorageObject (New API)', () => {
         statusText: 'OK',
       });
 
-      const result = await StorageObject.uploadFromFile('./data.bin', {
+      const result = await StorageObject.uploadFromFile('./data.bin', 'custom.bin', {
         client: mockClient,
-        name: 'custom.bin',
         contentType: 'binary',
         metadata: { source: 'test' },
       });
 
       expect(mockClient.objects.create).toHaveBeenCalledWith(
         { name: 'custom.bin', content_type: 'binary', metadata: { source: 'test' } },
-        { client: mockClient, name: 'custom.bin', contentType: 'binary', metadata: { source: 'test' } },
+        { client: mockClient, contentType: 'binary', metadata: { source: 'test' } },
       );
       expect(result.id).toBe('file-456');
     });
@@ -509,7 +508,7 @@ describe('StorageObject (New API)', () => {
       const originalProcess = global.process;
       delete (global as any).process;
 
-      await expect(StorageObject.uploadFromFile('./test.txt')).rejects.toThrow(
+      await expect(StorageObject.uploadFromFile('./test.txt', 'test.txt')).rejects.toThrow(
         'File upload methods are only available in Node.js environment',
       );
 
@@ -522,9 +521,9 @@ describe('StorageObject (New API)', () => {
         throw new Error('File not found');
       });
 
-      await expect(StorageObject.uploadFromFile('./nonexistent.txt', { client: mockClient })).rejects.toThrow(
-        'Failed to access file ./nonexistent.txt: File not found',
-      );
+      await expect(
+        StorageObject.uploadFromFile('./nonexistent.txt', 'nonexistent.txt', { client: mockClient }),
+      ).rejects.toThrow('Failed to access file ./nonexistent.txt: File not found');
     });
 
     it('should handle upload failures gracefully', async () => {
@@ -544,9 +543,9 @@ describe('StorageObject (New API)', () => {
         statusText: 'Internal Server Error',
       });
 
-      await expect(StorageObject.uploadFromFile('./test.txt', { client: mockClient })).rejects.toThrow(
-        'Failed to upload file: Upload failed: 500 Internal Server Error',
-      );
+      await expect(
+        StorageObject.uploadFromFile('./test.txt', 'test.txt', { client: mockClient }),
+      ).rejects.toThrow('Failed to upload file: Upload failed: 500 Internal Server Error');
     });
 
     it('should upload an archive file with auto-detected content-type', async () => {
@@ -568,7 +567,9 @@ describe('StorageObject (New API)', () => {
         statusText: 'OK',
       });
 
-      const result = await StorageObject.uploadFromFile('./project.tar.gz', { client: mockClient });
+      const result = await StorageObject.uploadFromFile('./project.tar.gz', 'project.tar.gz', {
+        client: mockClient,
+      });
 
       expect(mockClient.objects.create).toHaveBeenCalledWith(
         { name: 'project.tar.gz', content_type: 'tgz', metadata: null },

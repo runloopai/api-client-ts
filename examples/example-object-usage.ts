@@ -90,8 +90,7 @@ async function main() {
 
   // === Storage Object - File Upload Example ===
   // Upload a file directly from filesystem (Node.js only)
-  const fileStorageObject = await StorageObject.uploadFromFile('./package.json', {
-    name: 'uploaded-package.json',
+  const fileStorageObject = await StorageObject.uploadFromFile('./package.json', 'uploaded-package.json', {
     metadata: { source: 'filesystem' },
   });
   console.log(`Uploaded file: ${fileStorageObject.id}`);
@@ -104,8 +103,7 @@ async function main() {
   console.log(`Uploaded buffer: ${bufferStorageObject.id}`);
 
   // Upload archive files (auto-detects content type)
-  const archiveStorageObject = await StorageObject.uploadFromFile('./dist.tar.gz', {
-    name: 'my-archive.tar.gz',
+  const archiveStorageObject = await StorageObject.uploadFromFile('./dist.tar.gz', 'my-archive.tar.gz', {
     metadata: { type: 'archive' },
   });
   console.log(`Uploaded archive: ${archiveStorageObject.id}`);
