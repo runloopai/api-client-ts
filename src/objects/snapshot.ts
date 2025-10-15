@@ -96,18 +96,9 @@ export class Snapshot {
 
   /**
    * Get the complete snapshot data from the API.
-   * Note: This searches through all snapshots to find the matching ID.
    */
-  async getInfo(options?: Core.RequestOptions): Promise<DevboxSnapshotView> {
-    const snapshots = await this.client.devboxes.listDiskSnapshots({}, options);
-
-    for await (const snapshot of snapshots) {
-      if (snapshot.id === this._id) {
-        return snapshot;
-      }
-    }
-
-    throw new Error(`Snapshot with ID ${this._id} not found`);
+  async getInfo(options?: Core.RequestOptions) {
+    return await this.client.devboxes.diskSnapshots.queryStatus(this._id, options);
   }
 
   /**
