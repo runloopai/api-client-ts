@@ -1,6 +1,5 @@
 import { Devbox } from '../src/objects/devbox';
 import { Blueprint } from '../src/objects/blueprint';
-import { Snapshot } from '../src/objects/snapshot';
 import { StorageObject } from '../src/objects/storage-object';
 
 async function main() {
@@ -120,7 +119,7 @@ async function main() {
 
   // Get snapshot information using getInfo()
   const snapshotInfo = await snapshot.getInfo();
-  console.log(`Snapshot ${snapshotInfo.name} created at: ${snapshotInfo.create_time_ms}`);
+  console.log(`Snapshot ${snapshotInfo.snapshot?.name} created at: ${snapshotInfo.snapshot?.create_time_ms}`);
 
   // === ID-Only Storage Example ===
   // Demonstrate how objects only store IDs and fetch data on demand

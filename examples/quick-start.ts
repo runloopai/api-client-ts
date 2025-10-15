@@ -1,5 +1,4 @@
 import { Devbox } from '../src/objects/devbox';
-import { Snapshot } from '../src/objects/snapshot';
 import { StorageObject } from '../src/objects/storage-object';
 
 async function quickStart() {

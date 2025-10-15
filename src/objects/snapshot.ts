@@ -1,10 +1,6 @@
 import { Runloop } from '../index';
 import type * as Core from '../core';
-import type {
-  DevboxSnapshotView,
-  DevboxListDiskSnapshotsParams,
-  DevboxCreateParams,
-} from '../resources/devboxes/devboxes';
+import type { DevboxListDiskSnapshotsParams, DevboxCreateParams } from '../resources/devboxes/devboxes';
 import type {
   DevboxSnapshotAsyncStatusView,
   DiskSnapshotUpdateParams,
