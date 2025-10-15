@@ -26,16 +26,48 @@ For the most intuitive experience, use our object-oriented API:
 ```js
 import { Runloop, Devbox, Blueprint, StorageObject } from '@runloop/api-client';
 
-const client = new Runloop({
+// Set up default client (optional, can be done once at app startup)
+Runloop.setDefaultClient(new Runloop({
   bearerToken: process.env['RUNLOOP_API_KEY'], // This is the default and can be omitted
-});
+}));
 
-// Create and use a devbox with the object-oriented API
-const devbox = await Devbox.create(client, { name: 'my-devbox' });
-await devbox.exec('echo "Hello, World!"');
-await devbox.file.write('test.txt', 'Hello from Runloop!');
-const content = await devbox.file.read('test.txt');
+// Create and use a devbox with the object-oriented API (using default client)
+const devbox = await Devbox.create({ name: 'my-devbox' });
+await devbox.exec({ command: 'echo "Hello, World!"' });
+await devbox.file.write({ file_path: 'test.txt', contents: 'Hello from Runloop!' });
+const content = await devbox.file.read({ file_path: 'test.txt' });
 await devbox.shutdown();
+
+// Or provide a custom client for specific operations
+const customClient = new Runloop({ bearerToken: 'different-token' });
+const devbox2 = await Devbox.create(
+  { name: 'my-other-devbox' },
+  { client: customClient }
+);
+```
+
+#### Default Client Pattern
+
+The object-oriented API supports a convenient default client pattern:
+
+```js
+// Option 1: Set default client once at app startup
+Runloop.setDefaultClient(new Runloop({ bearerToken: 'your-token' }));
+
+// Then use object classes without passing client explicitly
+const devbox = await Devbox.create({ name: 'my-devbox' });
+const blueprint = await Blueprint.create({ name: 'my-blueprint', dockerfile: '...' });
+const snapshot = await Snapshot.get('snapshot-id');
+
+// Option 2: Pass client explicitly (backward compatible)
+const client = new Runloop({ bearerToken: 'your-token' });
+const devbox = await Devbox.create(client, { name: 'my-devbox' });
+
+// Option 3: Override default client for specific operations
+const devbox = await Devbox.create(
+  { name: 'my-devbox' },
+  { client: customClient, polling: { maxAttempts: 10 } },
+);
 ```
 
 ### Traditional Resource API

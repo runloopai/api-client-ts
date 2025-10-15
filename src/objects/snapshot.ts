@@ -1,4 +1,4 @@
-import type { Runloop } from '../index';
+import { Runloop } from '../index';
 import type * as Core from '../core';
 import type {
   DevboxSnapshotView,
@@ -10,6 +10,7 @@ import type {
   DiskSnapshotUpdateParams,
 } from '../resources/devboxes/disk-snapshots';
 import { Devbox } from './devbox';
+import { ObjectOptions } from './types';
 
 /**
  * Object-oriented interface for working with Disk Snapshots.
@@ -47,16 +48,49 @@ export class Snapshot {
    * Load an existing Snapshot by ID.
    * Note: This searches through all snapshots to find the matching ID.
    *
+   * @param id - The snapshot ID
+   * @param options - Request options with optional client override
+   * @returns A Snapshot instance
+   * @throws Error if snapshot not found
+   */
+  static async get(id: string, options?: ObjectOptions): Promise<Snapshot>;
+  /**
+   * Load an existing Snapshot by ID.
+   * Note: This searches through all snapshots to find the matching ID.
+   *
    * @param client - The Runloop API client
    * @param id - The snapshot ID
    * @param options - Request options
    * @returns A Snapshot instance
    * @throws Error if snapshot not found
    */
-  static async get(client: Runloop, id: string, options?: Core.RequestOptions): Promise<Snapshot> {
+  static async get(client: Runloop, id: string, options?: Core.RequestOptions): Promise<Snapshot>;
+  static async get(
+    clientOrId: Runloop | string,
+    idOrOptions?: string | ObjectOptions,
+    options?: Core.RequestOptions,
+  ): Promise<Snapshot> {
+    let client: Runloop;
+    let id: string;
+    let requestOptions: Core.RequestOptions | undefined;
+
+    // Handle overloaded signatures
+    if (typeof clientOrId === 'string') {
+      // New signature: get(id, options)
+      const opts = idOrOptions as ObjectOptions | undefined;
+      client = opts?.client || Runloop.getDefaultClient();
+      id = clientOrId;
+      requestOptions = opts;
+    } else {
+      // Old signature: get(client, id, options)
+      client = clientOrId;
+      id = idOrOptions as string;
+      requestOptions = options;
+    }
+
     // List all snapshots and find the one with matching ID
     // Note: The API doesn't provide a direct retrieve by ID endpoint
-    const snapshots = await client.devboxes.listDiskSnapshots({}, options);
+    const snapshots = await client.devboxes.listDiskSnapshots({}, requestOptions);
 
     for await (const snapshot of snapshots) {
       if (snapshot.id === id) {
@@ -70,6 +104,14 @@ export class Snapshot {
   /**
    * List all snapshots, optionally filtered by devbox ID or metadata.
    *
+   * @param params - Optional filter parameters
+   * @param options - Request options with optional client override
+   * @returns Array of Snapshot instances
+   */
+  static async list(params?: DevboxListDiskSnapshotsParams, options?: ObjectOptions): Promise<Snapshot[]>;
+  /**
+   * List all snapshots, optionally filtered by devbox ID or metadata.
+   *
    * @param client - The Runloop API client
    * @param params - Optional filter parameters
    * @param options - Request options
@@ -79,8 +121,31 @@ export class Snapshot {
     client: Runloop,
     params?: DevboxListDiskSnapshotsParams,
     options?: Core.RequestOptions,
+  ): Promise<Snapshot[]>;
+  static async list(
+    clientOrParams?: Runloop | DevboxListDiskSnapshotsParams,
+    paramsOrOptions?: DevboxListDiskSnapshotsParams | ObjectOptions,
+    options?: Core.RequestOptions,
   ): Promise<Snapshot[]> {
-    const snapshots = await client.devboxes.listDiskSnapshots(params, options);
+    let client: Runloop;
+    let params: DevboxListDiskSnapshotsParams | undefined;
+    let requestOptions: Core.RequestOptions | undefined;
+
+    // Handle overloaded signatures
+    if (clientOrParams && typeof clientOrParams === 'object' && 'bearerToken' in clientOrParams) {
+      // Old signature: list(client, params, options)
+      client = clientOrParams;
+      params = paramsOrOptions as DevboxListDiskSnapshotsParams | undefined;
+      requestOptions = options;
+    } else {
+      // New signature: list(params, options)
+      const opts = paramsOrOptions as ObjectOptions | undefined;
+      client = opts?.client || Runloop.getDefaultClient();
+      params = clientOrParams as DevboxListDiskSnapshotsParams | undefined;
+      requestOptions = opts;
+    }
+
+    const snapshots = await client.devboxes.listDiskSnapshots(params, requestOptions);
     const result: Snapshot[] = [];
 
     for await (const snapshot of snapshots) {

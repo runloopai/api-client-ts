@@ -369,7 +369,6 @@ describe('StorageObject', () => {
         expect(storageObject.uploadUrl).toBeTruthy();
         expect(storageObject.data).toEqual(mockObjectData);
       });
-
     });
   });
 

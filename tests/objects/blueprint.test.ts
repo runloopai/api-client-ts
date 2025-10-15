@@ -1,4 +1,5 @@
 import { Blueprint } from '../../src/objects/blueprint';
+import { Devbox } from '../../src/objects/devbox';
 import { Runloop } from '../../src/index';
 import type {
   BlueprintView,
@@ -211,7 +212,6 @@ describe('Blueprint', () => {
         expect(blueprint.state).toBe('created');
         expect(blueprint.data).toEqual(mockBlueprintData);
       });
-
     });
   });
 
@@ -331,6 +331,66 @@ describe('Blueprint', () => {
 
       await blueprint.refresh();
       expect(blueprint.state).toBe('deleted');
+    });
+
+    describe('createDevbox', () => {
+      it('should create a devbox from the blueprint', async () => {
+        mockClient.blueprints.createAndAwaitBuildCompleted.mockResolvedValue(mockBlueprintData);
+        const blueprint = await Blueprint.create(mockClient, { name: 'test-blueprint' });
+
+        const mockDevboxData = {
+          id: 'devbox-789',
+          status: 'running' as const,
+          capabilities: [],
+          create_time_ms: Date.now(),
+          end_time_ms: null,
+          launch_parameters: {},
+          metadata: {},
+          state_transitions: [],
+        };
+
+        // Mock Devbox.create static method
+        jest.spyOn(Devbox, 'create').mockResolvedValue(new Devbox(mockClient as any, mockDevboxData as any));
+
+        const result = await blueprint.createDevbox({
+          name: 'blueprint-devbox',
+          metadata: { created_from: 'blueprint-123' },
+        });
+
+        expect(Devbox.create).toHaveBeenCalledWith(
+          mockClient,
+          {
+            name: 'blueprint-devbox',
+            metadata: { created_from: 'blueprint-123' },
+            blueprint_id: 'blueprint-123',
+          },
+          undefined,
+        );
+        expect(result).toBeInstanceOf(Devbox);
+      });
+
+      it('should create a devbox with only blueprint ID when no params provided', async () => {
+        mockClient.blueprints.createAndAwaitBuildCompleted.mockResolvedValue(mockBlueprintData);
+        const blueprint = await Blueprint.create(mockClient, { name: 'test-blueprint' });
+
+        const mockDevboxData = {
+          id: 'devbox-789',
+          status: 'running' as const,
+          capabilities: [],
+          create_time_ms: Date.now(),
+          end_time_ms: null,
+          launch_parameters: {},
+          metadata: {},
+          state_transitions: [],
+        };
+
+        jest.spyOn(Devbox, 'create').mockResolvedValue(new Devbox(mockClient as any, mockDevboxData as any));
+
+        const result = await blueprint.createDevbox();
+
+        expect(Devbox.create).toHaveBeenCalledWith(mockClient, { blueprint_id: 'blueprint-123' }, undefined);
+        expect(result).toBeInstanceOf(Devbox);
+      });
     });
   });
 });

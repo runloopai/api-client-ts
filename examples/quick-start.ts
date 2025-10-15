@@ -4,18 +4,19 @@ import { Blueprint } from '../src/objects/blueprint';
 import { Snapshot } from '../src/objects/snapshot';
 
 async function quickStart() {
-  const client = new Runloop({ apiKey: 'your-api-key' });
+  // Set up default client (recommended)
+  Runloop.setDefaultClient(new Runloop({ bearerToken: 'your-api-key' }));
 
-  // 1. Create a blueprint
-  const blueprint = await Blueprint.create(client, {
+  // 1. Create a blueprint (using default client)
+  const blueprint = await Blueprint.create({
     name: 'ubuntu-dev',
-    dockerfile: 'FROM ubuntu:22.04\nRUN apt-get update && apt-get install -y nodejs npm'
+    dockerfile: 'FROM ubuntu:22.04\nRUN apt-get update && apt-get install -y nodejs npm',
   });
 
-  // 2. Create a devbox from the blueprint
-  const devbox = await Devbox.create(client, {
+  // 2. Create a devbox from the blueprint (using default client)
+  const devbox = await Devbox.create({
     name: 'my-devbox',
-    blueprint_id: blueprint.id
+    blueprint_id: blueprint.id,
   });
 
   // 3. Use the devbox
@@ -26,13 +27,16 @@ async function quickStart() {
 
   // 4. Create a snapshot
   const snapshotData = await devbox.snapshotDisk({ name: 'configured-state' });
-  const snapshot = new Snapshot(client, snapshotData);
+  const snapshot = new Snapshot(Runloop.getDefaultClient(), snapshotData);
 
   // 5. Create new devbox from snapshot
   const newDevbox = await snapshot.createDevbox({ name: 'cloned-devbox' });
 
   // 6. Lifecycle management (returns devbox instance for chaining)
-  await devbox.suspend().then(d => d.resume()).then(d => d.shutdown());
+  await devbox
+    .suspend()
+    .then((d) => d.resume())
+    .then((d) => d.shutdown());
   await newDevbox.shutdown();
 }
 

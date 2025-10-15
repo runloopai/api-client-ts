@@ -4,12 +4,12 @@ import { Blueprint } from '../src/objects/blueprint';
 import { Snapshot } from '../src/objects/snapshot';
 
 async function main() {
-  // Initialize the client
-  const client = new Runloop();
+  // Set up default client (recommended approach)
+  Runloop.setDefaultClient(new Runloop());
 
   // === Blueprint Example ===
-  // Create a blueprint with a Node.js Dockerfile
-  const blueprint = await Blueprint.create(client, {
+  // Create a blueprint with a Node.js Dockerfile (using default client)
+  const blueprint = await Blueprint.create({
     name: 'my-nodejs-app',
     dockerfile: `
       FROM node:18
@@ -27,12 +27,19 @@ async function main() {
   const logs = await blueprint.logs();
 
   // === Devbox Example ===
-  // Create a devbox from the blueprint
-  const devbox = await Devbox.create(client, {
+  // Create a devbox from the blueprint (using default client)
+  const devbox = await Devbox.create({
     name: 'my-dev-environment',
     blueprint_id: blueprint.id,
     metadata: { project: 'demo', environment: 'development' },
   });
+
+  // Alternative: Create devbox with custom client and polling options
+  const customClient = new Runloop({ bearerToken: 'custom-token' });
+  const devboxWithCustomClient = await Devbox.create(
+    { name: 'custom-devbox' },
+    { client: customClient, polling: { maxAttempts: 10 } },
+  );
 
   // Devbox is now running and ready to use
   // devbox.id, devbox.status, devbox.data

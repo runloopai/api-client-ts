@@ -287,7 +287,6 @@ describe('Snapshot', () => {
 
         expect(snapshotWithoutName.name).toBeNull();
       });
-
     });
 
     describe('createDevbox', () => {
@@ -339,11 +338,7 @@ describe('Snapshot', () => {
 
         const result = await snapshot.createDevbox();
 
-        expect(Devbox.create).toHaveBeenCalledWith(
-          mockClient,
-          { snapshot_id: 'snapshot-123' },
-          undefined,
-        );
+        expect(Devbox.create).toHaveBeenCalledWith(mockClient, { snapshot_id: 'snapshot-123' }, undefined);
         expect(result).toBeInstanceOf(Devbox);
       });
     });

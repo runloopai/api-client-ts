@@ -389,7 +389,6 @@ describe('Devbox', () => {
         expect(devbox.status).toBe('running');
         expect(devbox.data).toEqual(mockDevboxData);
       });
-
     });
   });
 

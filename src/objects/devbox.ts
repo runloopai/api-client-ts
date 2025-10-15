@@ -1,4 +1,4 @@
-import type { Runloop } from '../index';
+import { Runloop } from '../index';
 import type * as Core from '../core';
 import type {
   DevboxView,
@@ -15,17 +15,29 @@ import type {
   DevboxExecuteAsyncParams,
 } from '../resources/devboxes/devboxes';
 import { PollingOptions } from '../lib/polling';
+import { ObjectCreateOptions, ObjectOptions } from './types';
 
 /**
  * Object-oriented interface for working with Devboxes.
  *
  * Example usage:
  * ```typescript
- * const devbox = await Devbox.create(client, { name: 'my-devbox' });
+ * // Set default client (optional, can be done once at app startup)
+ * Runloop.setDefaultClient(new Runloop({ bearerToken: 'your-token' }));
+ *
+ * // Use with default client
+ * const devbox = await Devbox.create({ name: 'my-devbox' });
+ *
+ * // Or provide custom client
+ * const devbox = await Devbox.create(
+ *   { name: 'my-devbox' },
+ *   { client: customClient }
+ * );
+ *
  * const result = await devbox.exec({ command: 'echo "Hello World"' });
  * const contents = await devbox.file.read({ file_path: 'myfile.txt' });
  * await devbox.file.write({ file_path: 'output.txt', contents: 'Hello World' });
- * 
+ *
  * // Lifecycle methods return the devbox instance for chaining
  * await devbox.suspend().then(d => d.resume()).then(d => d.shutdown());
  * ```
@@ -43,6 +55,18 @@ export class Devbox {
    * Create a new Devbox and wait for it to reach the running state.
    * This is the recommended way to create a devbox as it ensures it's ready to use.
    *
+   * @param params - Parameters for creating the devbox
+   * @param options - Request options with optional polling configuration and client override
+   * @returns A Devbox instance in the running state
+   */
+  static async create(
+    params?: DevboxCreateParams,
+    options?: ObjectCreateOptions<DevboxView>,
+  ): Promise<Devbox>;
+  /**
+   * Create a new Devbox and wait for it to reach the running state.
+   * This is the recommended way to create a devbox as it ensures it's ready to use.
+   *
    * @param client - The Runloop API client
    * @param params - Parameters for creating the devbox
    * @param options - Request options with optional polling configuration
@@ -52,11 +76,42 @@ export class Devbox {
     client: Runloop,
     params?: DevboxCreateParams,
     options?: Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxView>> },
+  ): Promise<Devbox>;
+  static async create(
+    clientOrParams?: Runloop | DevboxCreateParams,
+    paramsOrOptions?: DevboxCreateParams | ObjectCreateOptions<DevboxView>,
+    options?: Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxView>> },
   ): Promise<Devbox> {
-    const devboxData = await client.devboxes.createAndAwaitRunning(params, options);
+    let client: Runloop;
+    let params: DevboxCreateParams | undefined;
+    let requestOptions: (Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxView>> }) | undefined;
+
+    // Handle overloaded signatures
+    if (clientOrParams && typeof clientOrParams === 'object' && 'bearerToken' in clientOrParams) {
+      // Old signature: create(client, params, options)
+      client = clientOrParams;
+      params = paramsOrOptions as DevboxCreateParams | undefined;
+      requestOptions = options;
+    } else {
+      // New signature: create(params, options)
+      const opts = paramsOrOptions as ObjectCreateOptions<DevboxView> | undefined;
+      client = opts?.client || Runloop.getDefaultClient();
+      params = clientOrParams as DevboxCreateParams | undefined;
+      requestOptions = opts;
+    }
+
+    const devboxData = await client.devboxes.createAndAwaitRunning(params, requestOptions);
     return new Devbox(client, devboxData);
   }
 
+  /**
+   * Load an existing Devbox by ID.
+   *
+   * @param id - The devbox ID
+   * @param options - Request options with optional client override
+   * @returns A Devbox instance
+   */
+  static async get(id: string, options?: ObjectOptions): Promise<Devbox>;
   /**
    * Load an existing Devbox by ID.
    *
@@ -65,8 +120,31 @@ export class Devbox {
    * @param options - Request options
    * @returns A Devbox instance
    */
-  static async get(client: Runloop, id: string, options?: Core.RequestOptions): Promise<Devbox> {
-    const devboxData = await client.devboxes.retrieve(id, options);
+  static async get(client: Runloop, id: string, options?: Core.RequestOptions): Promise<Devbox>;
+  static async get(
+    clientOrId: Runloop | string,
+    idOrOptions?: string | ObjectOptions,
+    options?: Core.RequestOptions,
+  ): Promise<Devbox> {
+    let client: Runloop;
+    let id: string;
+    let requestOptions: Core.RequestOptions | undefined;
+
+    // Handle overloaded signatures
+    if (typeof clientOrId === 'string') {
+      // New signature: get(id, options)
+      const opts = idOrOptions as ObjectOptions | undefined;
+      client = opts?.client || Runloop.getDefaultClient();
+      id = clientOrId;
+      requestOptions = opts;
+    } else {
+      // Old signature: get(client, id, options)
+      client = clientOrId;
+      id = idOrOptions as string;
+      requestOptions = options;
+    }
+
+    const devboxData = await client.devboxes.retrieve(id, requestOptions);
     return new Devbox(client, devboxData);
   }
 
