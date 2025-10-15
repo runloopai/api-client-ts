@@ -15,20 +15,13 @@ import { Devbox } from './devbox';
  *
  * Example usage:
  * ```typescript
- * // Set default client (optional, can be done once at app startup)
- * Runloop.setDefaultClient(new Runloop({ bearerToken: 'your-token' }));
+ * // Make sure to set RUNLOOP_API_KEY environment variable
+ * // export RUNLOOP_API_KEY="your-api-key"
  *
- * // Use with default client
  * const blueprint = await Blueprint.create({
  *   name: 'my-blueprint',
  *   dockerfile: 'FROM ubuntu:22.04\nRUN apt-get update',
  * });
- *
- * // Or provide custom client
- * const blueprint = await Blueprint.create(
- *   { name: 'my-blueprint', dockerfile: 'FROM ubuntu:22.04' },
- *   { client: customClient }
- * );
  *
  * // Get blueprint information
  * const info = await blueprint.getInfo();

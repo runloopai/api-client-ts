@@ -21,17 +21,10 @@ import { PollingOptions } from '../lib/polling';
  *
  * Example usage:
  * ```typescript
- * // Set default client (optional, can be done once at app startup)
- * Runloop.setDefaultClient(new Runloop({ bearerToken: 'your-token' }));
+ * // Make sure to set RUNLOOP_API_KEY environment variable
+ * // export RUNLOOP_API_KEY="your-api-key"
  *
- * // Use with default client
  * const devbox = await Devbox.create({ name: 'my-devbox' });
- *
- * // Or provide custom client
- * const devbox = await Devbox.create(
- *   { name: 'my-devbox' },
- *   { client: customClient }
- * );
  *
  * const result = await devbox.cmd.exec({ command: 'echo "Hello World"' });
  * const contents = await devbox.file.read({ file_path: 'myfile.txt' });

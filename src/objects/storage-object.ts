@@ -15,8 +15,11 @@ import type {
  *
  * Example usage:
  * ```typescript
+ * // Make sure to set RUNLOOP_API_KEY environment variable
+ * // export RUNLOOP_API_KEY="your-api-key"
+ *
  * // Create and upload a text object
- * const obj = await StorageObject.create(client, {
+ * const obj = await StorageObject.create({
  *   name: 'my-data.txt',
  *   content_type: 'text',
  *   metadata: { project: 'demo' }
