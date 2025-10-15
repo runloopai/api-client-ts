@@ -217,6 +217,7 @@ describe('resource devboxes', () => {
     const response = await client.devboxes.execute('id', {
       command: 'command',
       command_id: 'command_id',
+      last_n: 'last_n',
       optimistic_timeout: 0,
       shell_name: 'shell_name',
     });
@@ -236,6 +237,7 @@ describe('resource devboxes', () => {
   test('executeAsync: required and optional params', async () => {
     const response = await client.devboxes.executeAsync('id', {
       command: 'command',
+      attach_stdin: true,
       shell_name: 'shell_name',
     });
   });
@@ -254,6 +256,7 @@ describe('resource devboxes', () => {
   test('executeSync: required and optional params', async () => {
     const response = await client.devboxes.executeSync('id', {
       command: 'command',
+      attach_stdin: true,
       shell_name: 'shell_name',
     });
   });
@@ -399,7 +402,7 @@ describe('resource devboxes', () => {
     await expect(
       client.devboxes.snapshotDisk(
         'id',
-        { metadata: { foo: 'string' }, name: 'name' },
+        { commit_message: 'commit_message', metadata: { foo: 'string' }, name: 'name' },
         { path: '/_stainless_unknown_path' },
       ),
     ).rejects.toThrow(Runloop.NotFoundError);
@@ -428,7 +431,7 @@ describe('resource devboxes', () => {
     await expect(
       client.devboxes.snapshotDiskAsync(
         'id',
-        { metadata: { foo: 'string' }, name: 'name' },
+        { commit_message: 'commit_message', metadata: { foo: 'string' }, name: 'name' },
         { path: '/_stainless_unknown_path' },
       ),
     ).rejects.toThrow(Runloop.NotFoundError);
@@ -486,6 +489,7 @@ describe('resource devboxes', () => {
   test('waitForCommand: required and optional params', async () => {
     const response = await client.devboxes.waitForCommand('devbox_id', 'execution_id', {
       statuses: ['queued'],
+      last_n: 'last_n',
       timeout_seconds: 0,
     });
   });

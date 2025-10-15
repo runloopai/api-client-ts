@@ -230,17 +230,21 @@ export class Devboxes extends APIResource {
    * Execute a command with a known command ID on a devbox, optimistically waiting
    * for it to complete within the specified timeout. If it completes in time, return
    * the result. If not, return a status indicating the command is still running.
+   * Note: attach_stdin parameter is not supported; use execute_async for stdin
+   * support.
    */
   execute(
     id: string,
-    body: DevboxExecuteParams,
+    params: DevboxExecuteParams,
     options?: Core.RequestOptions,
   ): Core.APIPromise<DevboxAsyncExecutionDetailView> {
+    const { last_n, ...body } = params;
     return this._client.post(`/v1/devboxes/${id}/execute`, {
       body: {
         ...body,
         command_id: body.command_id || uuidv7(),
       },
+      query: { last_n },
       timeout: (this._client as any)._options.timeout ?? 600000,
       ...options,
     });
@@ -306,7 +310,8 @@ export class Devboxes extends APIResource {
 
   /**
    * Execute a bash command in the Devbox shell, await the command completion and
-   * return the output.
+   * return the output. Note: attach_stdin parameter is not supported for synchronous
+   * execution.
    *
    * @deprecated Use execute, executeAsync, or executeAndAwaitCompletion instead.
    */
@@ -485,10 +490,12 @@ export class Devboxes extends APIResource {
   waitForCommand(
     devboxId: string,
     executionId: string,
-    body: DevboxWaitForCommandParams,
+    params: DevboxWaitForCommandParams,
     options?: Core.RequestOptions,
   ): Core.APIPromise<DevboxAsyncExecutionDetailView> {
+    const { last_n, ...body } = params;
     return this._client.post(`/v1/devboxes/${devboxId}/executions/${executionId}/wait_for_status`, {
+      query: { last_n },
       body,
       ...options,
     });
@@ -608,6 +615,35 @@ export interface DevboxListView {
   total_count: number;
 }
 
+export interface DevboxSendStdInRequest {
+  /**
+   * Signal to send to std in of the running execution.
+   */
+  signal?: 'EOF' | 'INTERRUPT' | null;
+
+  /**
+   * Text to send to std in of the running execution.
+   */
+  text?: string | null;
+}
+
+export interface DevboxSendStdInResult {
+  /**
+   * Devbox id where command is executing.
+   */
+  devbox_id: string;
+
+  /**
+   * Execution id that received the stdin.
+   */
+  execution_id: string;
+
+  /**
+   * Whether the stdin was successfully sent.
+   */
+  success: boolean;
+}
+
 export interface DevboxSnapshotListView {
   has_more: boolean;
 
@@ -641,6 +677,11 @@ export interface DevboxSnapshotView {
    * The source Devbox ID this snapshot was created from.
    */
   source_devbox_id: string;
+
+  /**
+   * (Optional) The commit message of the snapshot (max 1000 characters).
+   */
+  commit_message?: string | null;
 
   /**
    * (Optional) The custom name of the snapshot.
@@ -937,28 +978,34 @@ export interface DevboxDownloadFileParams {
 
 export interface DevboxExecuteParams {
   /**
-   * The command to execute via the Devbox shell. By default, commands are run from
-   * the user home directory unless shell_name is specified. If shell_name is
-   * specified the command is run from the directory based on the recent state of the
-   * persistent shell.
+   * Body param: The command to execute via the Devbox shell. By default, commands
+   * are run from the user home directory unless shell_name is specified. If
+   * shell_name is specified the command is run from the directory based on the
+   * recent state of the persistent shell.
    */
   command: string;
 
   /**
-   * The command ID in UUIDv7 string format for idempotency and tracking
+   * Body param: The command ID in UUIDv7 string format for idempotency and tracking
    */
   command_id: string;
 
   /**
-   * Timeout in seconds to wait for command completion. Operation is not killed. Max
-   * is 600 seconds.
+   * Query param: Last n lines of standard error / standard out to return
+   * (default: 100)
+   */
+  last_n?: string;
+
+  /**
+   * Body param: Timeout in seconds to wait for command completion. Operation is not
+   * killed. Max is 600 seconds.
    */
   optimistic_timeout?: number | null;
 
   /**
-   * The name of the persistent shell to create or use if already created. When using
-   * a persistent shell, the command will run from the directory at the end of the
-   * previous command and environment variables will be preserved.
+   * Body param: The name of the persistent shell to create or use if already
+   * created. When using a persistent shell, the command will run from the directory
+   * at the end of the previous command and environment variables will be preserved.
    */
   shell_name?: string | null;
 }
@@ -971,6 +1018,12 @@ export interface DevboxExecuteAsyncParams {
    * persistent shell.
    */
   command: string;
+
+  /**
+   * Whether to attach stdin streaming for async commands. Not valid for execute_sync
+   * endpoint. Defaults to false if not specified.
+   */
+  attach_stdin?: boolean | null;
 
   /**
    * The name of the persistent shell to create or use if already created. When using
@@ -988,6 +1041,12 @@ export interface DevboxExecuteSyncParams {
    * persistent shell.
    */
   command: string;
+
+  /**
+   * Whether to attach stdin streaming for async commands. Not valid for execute_sync
+   * endpoint. Defaults to false if not specified.
+   */
+  attach_stdin?: boolean | null;
 
   /**
    * The name of the persistent shell to create or use if already created. When using
@@ -1032,6 +1091,11 @@ export interface DevboxRemoveTunnelParams {
 
 export interface DevboxSnapshotDiskParams {
   /**
+   * (Optional) Commit message associated with the snapshot (max 1000 characters)
+   */
+  commit_message?: string | null;
+
+  /**
    * (Optional) Metadata used to describe the snapshot
    */
   metadata?: { [key: string]: string } | null;
@@ -1043,6 +1107,11 @@ export interface DevboxSnapshotDiskParams {
 }
 
 export interface DevboxSnapshotDiskAsyncParams {
+  /**
+   * (Optional) Commit message associated with the snapshot (max 1000 characters)
+   */
+  commit_message?: string | null;
+
   /**
    * (Optional) Metadata used to describe the snapshot
    */
@@ -1066,15 +1135,21 @@ export interface DevboxUploadFileParams {
 
 export interface DevboxWaitForCommandParams {
   /**
-   * The command execution statuses to wait for. At least one status must be
-   * provided. The command will be returned as soon as it reaches any of the provided
-   * statuses.
+   * Body param: The command execution statuses to wait for. At least one status must
+   * be provided. The command will be returned as soon as it reaches any of the
+   * provided statuses.
    */
   statuses: Array<'queued' | 'running' | 'completed'>;
 
   /**
-   * (Optional) Timeout in seconds to wait for the status, up to 60 seconds. Defaults
-   * to 60 seconds.
+   * Query param: Last n lines of standard error / standard out to return
+   * (default: 100)
+   */
+  last_n?: string;
+
+  /**
+   * Body param: (Optional) Timeout in seconds to wait for the status, up to 60
+   * seconds. Defaults to 60 seconds.
    */
   timeout_seconds?: number | null;
 }
@@ -1106,6 +1181,8 @@ export declare namespace Devboxes {
     type DevboxExecutionDetailView as DevboxExecutionDetailView,
     type DevboxKillExecutionRequest as DevboxKillExecutionRequest,
     type DevboxListView as DevboxListView,
+    type DevboxSendStdInRequest as DevboxSendStdInRequest,
+    type DevboxSendStdInResult as DevboxSendStdInResult,
     type DevboxSnapshotListView as DevboxSnapshotListView,
     type DevboxSnapshotView as DevboxSnapshotView,
     type DevboxTunnelView as DevboxTunnelView,
