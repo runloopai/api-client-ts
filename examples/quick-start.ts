@@ -35,7 +35,7 @@ async function quickStart() {
   // Upload an archive file (auto-detects content type)
   console.log('📦 Uploading archive...');
   const archiveObject = await StorageObject.uploadFromFile(
-    './examples/test-archive.tar.gz',
+    './files/test-archive.tar.gz',
     'project-archive.tar.gz',
     {
       metadata: { type: 'build-artifact' },

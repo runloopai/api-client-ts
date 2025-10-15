@@ -104,7 +104,7 @@ async function main() {
 
   // Upload archive files (auto-detects content type)
   const archiveStorageObject = await StorageObject.uploadFromFile(
-    './examples/test-archive.tar.gz',
+    './files/test-archive.tar.gz',
     'test-archive.tar.gz',
   );
   console.log(`Uploaded archive: ${archiveStorageObject.id}`);

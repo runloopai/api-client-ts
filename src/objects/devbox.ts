@@ -192,6 +192,7 @@ export class Devbox {
    */
   async suspend(options?: Core.RequestOptions) {
     return this.client.devboxes.suspend(this._id, options);
+    this.client.devboxes.snap
   }
 
   /**

@@ -58,7 +58,7 @@ function assertNodeEnvironment(): void {
  * const obj = await StorageObject.uploadFromFile('./data.txt', 'my-data.txt');
  *
  * // Upload archive files (auto-detects content type)
- * const archive = await StorageObject.uploadFromFile('./examples/test-archive.tar.gz', 'my-archive.tar.gz');
+ * const archive = await StorageObject.uploadFromFile('./files/test-archive.tar.gz', 'my-archive.tar.gz');
  *
  * // Upload from buffer
  * const buffer = Buffer.from('content');
