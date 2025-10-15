@@ -244,7 +244,7 @@ export class Runloop extends Core.APIClient {
 
   private _options: ClientOptions;
 
-  private static _defaultClient: Runloop | null = null;
+  private static _defaultClient: Runloop = new Runloop({});
 
   /**
    * API Client for interfacing with the Runloop API.
@@ -340,11 +340,6 @@ export class Runloop extends Core.APIClient {
    * @throws Error if no default client has been set
    */
   static getDefaultClient(): Runloop {
-    if (!this._defaultClient) {
-      throw new Errors.RunloopError(
-        'No default client has been set. Either call Runloop.setDefaultClient() or pass a client explicitly in the options parameter.',
-      );
-    }
     return this._defaultClient;
   }
 
