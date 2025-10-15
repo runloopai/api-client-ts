@@ -89,6 +89,28 @@ async function main() {
   const content = await storageObject.downloadAsText();
   console.log('Downloaded content:', content);
 
+  // === Storage Object - File Upload Example ===
+  // Upload a file directly from filesystem (Node.js only)
+  const fileStorageObject = await StorageObject.uploadFromFile('./package.json', {
+    name: 'uploaded-package.json',
+    metadata: { source: 'filesystem' },
+  });
+  console.log(`Uploaded file: ${fileStorageObject.id}`);
+
+  // Upload from buffer with explicit content type
+  const bufferData = Buffer.from('Binary data here', 'utf-8');
+  const bufferStorageObject = await StorageObject.uploadFromBuffer(bufferData, 'buffer-data.bin', 'binary', {
+    metadata: { source: 'buffer' },
+  });
+  console.log(`Uploaded buffer: ${bufferStorageObject.id}`);
+
+  // Upload archive files (auto-detects content type)
+  const archiveStorageObject = await StorageObject.uploadFromFile('./dist.tar.gz', {
+    name: 'my-archive.tar.gz',
+    metadata: { type: 'archive' },
+  });
+  console.log(`Uploaded archive: ${archiveStorageObject.id}`);
+
   // === Snapshot Example ===
   // Create a snapshot of the current devbox state (returns Snapshot object directly)
   const snapshot = await devbox.snapshotDisk({

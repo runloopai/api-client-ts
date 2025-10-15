@@ -8,11 +8,31 @@ jest.mock('../../src/index');
 // Mock fetch globally
 global.fetch = jest.fn();
 
+// Mock fs and path modules
+jest.mock('node:fs', () => ({
+  statSync: jest.fn(),
+  readFileSync: jest.fn(),
+}));
+
+jest.mock('node:path', () => ({
+  basename: jest.fn((path) => path.split('/').pop()),
+  extname: jest.fn((path) => {
+    const ext = path.split('.').pop();
+    return ext ? `.${ext}` : '';
+  }),
+}));
+
 describe('StorageObject (New API)', () => {
   let mockClient: jest.Mocked<Runloop>;
   let mockObjectData: ObjectView;
+  let mockFs: any;
+  let mockPath: any;
 
   beforeEach(() => {
+    // Get mocked modules
+    mockFs = require('node:fs');
+    mockPath = require('node:path');
+
     // Create mock client instance
     mockClient = {
       objects: {
@@ -412,6 +432,247 @@ describe('StorageObject (New API)', () => {
 
       const content = await obj.downloadAsText();
       expect(content).toBe('Test content');
+    });
+  });
+
+  describe('uploadFromFile', () => {
+    beforeEach(() => {
+      // Clear all mocks
+      jest.clearAllMocks();
+    });
+
+    it('should upload a text file with auto-detected content-type', async () => {
+      const mockFileBuffer = Buffer.from('test content');
+      mockFs.statSync.mockReturnValue({ isFile: () => true });
+      mockFs.readFileSync.mockReturnValue(mockFileBuffer);
+
+      const mockObjectData = { id: 'file-123', upload_url: 'https://upload.example.com/file' };
+      const mockObjectInfo = { ...mockObjectData, name: 'test.txt', state: 'UPLOADING' };
+      const mockCompletedData = { ...mockObjectInfo, state: 'READ_ONLY' };
+
+      mockClient.objects.create.mockResolvedValue(mockObjectData);
+      mockClient.objects.retrieve.mockResolvedValue(mockObjectInfo);
+      mockClient.objects.complete.mockResolvedValue(mockCompletedData);
+
+      (global.fetch as jest.Mock).mockResolvedValue({
+        ok: true,
+        status: 200,
+        statusText: 'OK',
+      });
+
+      const result = await StorageObject.uploadFromFile('./test.txt', { client: mockClient });
+
+      expect(mockClient.objects.create).toHaveBeenCalledWith(
+        { name: 'test.txt', content_type: 'text', metadata: null },
+        { client: mockClient },
+      );
+      expect(mockFs.readFileSync).toHaveBeenCalledWith('./test.txt');
+      expect(result).toBeInstanceOf(StorageObject);
+      expect(result.id).toBe('file-123');
+    });
+
+    it('should upload a file with explicit content-type and custom name', async () => {
+      const mockFileBuffer = Buffer.from('binary content');
+      mockFs.statSync.mockReturnValue({ isFile: () => true });
+      mockFs.readFileSync.mockReturnValue(mockFileBuffer);
+
+      const mockObjectData = { id: 'file-456', upload_url: 'https://upload.example.com/file' };
+      const mockObjectInfo = { ...mockObjectData, name: 'custom.bin', state: 'UPLOADING' };
+      const mockCompletedData = { ...mockObjectInfo, state: 'READ_ONLY' };
+
+      mockClient.objects.create.mockResolvedValue(mockObjectData);
+      mockClient.objects.retrieve.mockResolvedValue(mockObjectInfo);
+      mockClient.objects.complete.mockResolvedValue(mockCompletedData);
+
+      (global.fetch as jest.Mock).mockResolvedValue({
+        ok: true,
+        status: 200,
+        statusText: 'OK',
+      });
+
+      const result = await StorageObject.uploadFromFile('./data.bin', {
+        client: mockClient,
+        name: 'custom.bin',
+        contentType: 'binary',
+        metadata: { source: 'test' },
+      });
+
+      expect(mockClient.objects.create).toHaveBeenCalledWith(
+        { name: 'custom.bin', content_type: 'binary', metadata: { source: 'test' } },
+        { client: mockClient, name: 'custom.bin', contentType: 'binary', metadata: { source: 'test' } },
+      );
+      expect(result.id).toBe('file-456');
+    });
+
+    it('should throw error in browser environment', async () => {
+      // Mock browser environment
+      const originalProcess = global.process;
+      delete (global as any).process;
+
+      await expect(StorageObject.uploadFromFile('./test.txt')).rejects.toThrow(
+        'File upload methods are only available in Node.js environment',
+      );
+
+      // Restore process
+      global.process = originalProcess;
+    });
+
+    it('should handle file read errors gracefully', async () => {
+      mockFs.statSync.mockImplementation(() => {
+        throw new Error('File not found');
+      });
+
+      await expect(StorageObject.uploadFromFile('./nonexistent.txt', { client: mockClient })).rejects.toThrow(
+        'Failed to access file ./nonexistent.txt: File not found',
+      );
+    });
+
+    it('should handle upload failures gracefully', async () => {
+      const mockFileBuffer = Buffer.from('test content');
+      mockFs.statSync.mockReturnValue({ isFile: () => true });
+      mockFs.readFileSync.mockReturnValue(mockFileBuffer);
+
+      const mockObjectData = { id: 'file-789', upload_url: 'https://upload.example.com/file' };
+      const mockObjectInfo = { ...mockObjectData, name: 'test.txt', state: 'UPLOADING' };
+
+      mockClient.objects.create.mockResolvedValue(mockObjectData);
+      mockClient.objects.retrieve.mockResolvedValue(mockObjectInfo);
+
+      (global.fetch as jest.Mock).mockResolvedValue({
+        ok: false,
+        status: 500,
+        statusText: 'Internal Server Error',
+      });
+
+      await expect(StorageObject.uploadFromFile('./test.txt', { client: mockClient })).rejects.toThrow(
+        'Failed to upload file: Upload failed: 500 Internal Server Error',
+      );
+    });
+
+    it('should upload an archive file with auto-detected content-type', async () => {
+      const mockArchiveBuffer = Buffer.from('compressed archive content');
+      mockFs.statSync.mockReturnValue({ isFile: () => true });
+      mockFs.readFileSync.mockReturnValue(mockArchiveBuffer);
+
+      const mockObjectData = { id: 'archive-123', upload_url: 'https://upload.example.com/archive' };
+      const mockObjectInfo = { ...mockObjectData, name: 'project.tar.gz', state: 'UPLOADING' };
+      const mockCompletedData = { ...mockObjectInfo, state: 'READ_ONLY' };
+
+      mockClient.objects.create.mockResolvedValue(mockObjectData);
+      mockClient.objects.retrieve.mockResolvedValue(mockObjectInfo);
+      mockClient.objects.complete.mockResolvedValue(mockCompletedData);
+
+      (global.fetch as jest.Mock).mockResolvedValue({
+        ok: true,
+        status: 200,
+        statusText: 'OK',
+      });
+
+      const result = await StorageObject.uploadFromFile('./project.tar.gz', { client: mockClient });
+
+      expect(mockClient.objects.create).toHaveBeenCalledWith(
+        { name: 'project.tar.gz', content_type: 'tgz', metadata: null },
+        { client: mockClient },
+      );
+      expect(mockFs.readFileSync).toHaveBeenCalledWith('./project.tar.gz');
+      expect(result).toBeInstanceOf(StorageObject);
+      expect(result.id).toBe('archive-123');
+    });
+  });
+
+  describe('uploadFromBuffer', () => {
+    it('should upload buffer with specified content-type and name', async () => {
+      const buffer = Buffer.from('buffer content');
+      const mockObjectData = { id: 'buffer-123', upload_url: 'https://upload.example.com/buffer' };
+      const mockObjectInfo = { ...mockObjectData, name: 'buffer.txt', state: 'UPLOADING' };
+      const mockCompletedData = { ...mockObjectInfo, state: 'READ_ONLY' };
+
+      mockClient.objects.create.mockResolvedValue(mockObjectData);
+      mockClient.objects.retrieve.mockResolvedValue(mockObjectInfo);
+      mockClient.objects.complete.mockResolvedValue(mockCompletedData);
+
+      (global.fetch as jest.Mock).mockResolvedValue({
+        ok: true,
+        status: 200,
+        statusText: 'OK',
+      });
+
+      const result = await StorageObject.uploadFromBuffer(buffer, 'buffer.txt', 'text', {
+        client: mockClient,
+        metadata: { source: 'buffer' },
+      });
+
+      expect(mockClient.objects.create).toHaveBeenCalledWith(
+        { name: 'buffer.txt', content_type: 'text', metadata: { source: 'buffer' } },
+        { client: mockClient, metadata: { source: 'buffer' } },
+      );
+      expect(global.fetch).toHaveBeenCalledWith('https://upload.example.com/buffer', {
+        method: 'PUT',
+        body: buffer,
+        headers: { 'Content-Length': buffer.length.toString() },
+      });
+      expect(result).toBeInstanceOf(StorageObject);
+      expect(result.id).toBe('buffer-123');
+    });
+
+    it('should throw error in browser environment', async () => {
+      // Mock browser environment
+      const originalProcess = global.process;
+      delete (global as any).process;
+
+      const buffer = Buffer.from('test');
+      await expect(StorageObject.uploadFromBuffer(buffer, 'test.txt', 'text')).rejects.toThrow(
+        'File upload methods are only available in Node.js environment',
+      );
+
+      // Restore process
+      global.process = originalProcess;
+    });
+
+    it('should handle upload failures gracefully', async () => {
+      const buffer = Buffer.from('test content');
+      const mockObjectData = { id: 'buffer-456', upload_url: 'https://upload.example.com/buffer' };
+      const mockObjectInfo = { ...mockObjectData, name: 'test.txt', state: 'UPLOADING' };
+
+      mockClient.objects.create.mockResolvedValue(mockObjectData);
+      mockClient.objects.retrieve.mockResolvedValue(mockObjectInfo);
+
+      (global.fetch as jest.Mock).mockResolvedValue({
+        ok: false,
+        status: 403,
+        statusText: 'Forbidden',
+      });
+
+      await expect(
+        StorageObject.uploadFromBuffer(buffer, 'test.txt', 'text', { client: mockClient }),
+      ).rejects.toThrow('Failed to upload buffer: Upload failed: 403 Forbidden');
+    });
+
+    it('should complete full upload lifecycle', async () => {
+      const buffer = Buffer.from('lifecycle test');
+      const mockObjectData = { id: 'lifecycle-123', upload_url: 'https://upload.example.com/lifecycle' };
+      const mockObjectInfo = { ...mockObjectData, name: 'lifecycle.txt', state: 'UPLOADING' };
+      const mockCompletedData = { ...mockObjectInfo, state: 'READ_ONLY' };
+
+      mockClient.objects.create.mockResolvedValue(mockObjectData);
+      mockClient.objects.retrieve.mockResolvedValue(mockObjectInfo);
+      mockClient.objects.complete.mockResolvedValue(mockCompletedData);
+
+      (global.fetch as jest.Mock).mockResolvedValue({
+        ok: true,
+        status: 200,
+        statusText: 'OK',
+      });
+
+      const result = await StorageObject.uploadFromBuffer(buffer, 'lifecycle.txt', 'text', {
+        client: mockClient,
+      });
+
+      // Verify all three steps were called
+      expect(mockClient.objects.create).toHaveBeenCalledTimes(1);
+      expect(global.fetch).toHaveBeenCalledTimes(1);
+      expect(mockClient.objects.complete).toHaveBeenCalledTimes(1);
+      expect(result).toBeInstanceOf(StorageObject);
     });
   });
 

@@ -6,6 +6,42 @@ import type {
   ObjectDownloadURLView,
   ObjectListParams,
 } from '../resources/objects';
+import * as fs from 'node:fs';
+import * as path from 'node:path';
+
+// Content-type mapping for file extensions
+const CONTENT_TYPE_MAP: Record<string, string> = {
+  // Text
+  '.txt': 'text',
+  '.html': 'text',
+  '.css': 'text',
+  '.js': 'text',
+  '.json': 'text',
+  '.xml': 'text',
+  '.yaml': 'text',
+  '.yml': 'text',
+  '.md': 'text',
+  '.csv': 'text',
+  // Archives
+  '.gz': 'gzip',
+  '.tar': 'tar',
+  '.tgz': 'tgz',
+  '.tar.gz': 'tgz',
+  // Default to unspecified for unknown
+};
+
+function detectContentType(filePath: string): string {
+  const lower = filePath.toLowerCase();
+  if (lower.endsWith('.tar.gz') || lower.endsWith('.tgz')) return 'tgz';
+  const ext = path.extname(lower);
+  return CONTENT_TYPE_MAP[ext] || 'unspecified';
+}
+
+function assertNodeEnvironment(): void {
+  if (typeof process === 'undefined' || !process.versions?.node) {
+    throw new Error('File upload methods are only available in Node.js environment');
+  }
+}
 
 /**
  * Object-oriented interface for working with Storage Objects.
@@ -18,25 +54,24 @@ import type {
  * // Make sure to set RUNLOOP_API_KEY environment variable
  * // export RUNLOOP_API_KEY="your-api-key"
  *
- * // Create and upload a text object
+ * // Upload a file directly (Node.js only)
+ * const obj = await StorageObject.uploadFromFile('./data.txt');
+ *
+ * // Upload archive files (auto-detects content type)
+ * const archive = await StorageObject.uploadFromFile('./project.tar.gz');
+ *
+ * // Upload from buffer
+ * const buffer = Buffer.from('content');
+ * const obj = await StorageObject.uploadFromBuffer(buffer, 'data.txt', 'text');
+ *
+ * // Traditional approach - create, upload, complete
  * const obj = await StorageObject.create({
  *   name: 'my-data.txt',
  *   content_type: 'text',
  *   metadata: { project: 'demo' }
  * });
- *
- * // Get object information
- * const info = await obj.getInfo();
- * console.log(info.name, info.state);
- *
- * // Upload content to the presigned URL
  * await obj.uploadContent('Hello, World!');
- *
- * // Mark upload as complete
  * await obj.complete();
- *
- * // Later: download the object
- * const downloadUrl = await obj.getDownloadUrl();
  * ```
  */
 export class StorageObject {
@@ -102,6 +137,155 @@ export class StorageObject {
     }
 
     return result;
+  }
+
+  /**
+   * Upload a file directly from the filesystem (Node.js only).
+   * This method handles the complete three-step upload process:
+   * 1. Create object and get upload URL
+   * 2. Upload file content to the provided URL
+   * 3. Mark upload as complete
+   *
+   * @param filePath - Path to the file to upload
+   * @param options - Request options with optional client, name, content type, and metadata
+   * @returns A completed StorageObject instance
+   */
+  static async uploadFromFile(
+    filePath: string,
+    options?: Core.RequestOptions & {
+      client?: Runloop;
+      name?: string;
+      contentType?: string;
+      metadata?: Record<string, string>;
+    },
+  ): Promise<StorageObject> {
+    assertNodeEnvironment();
+
+    const client = options?.client || Runloop.getDefaultClient();
+    const requestOptions = options;
+
+    // Check if file exists and get stats
+    try {
+      const stats = fs.statSync(filePath);
+      if (!stats.isFile()) {
+        throw new Error(`Path is not a file: ${filePath}`);
+      }
+    } catch (error) {
+      throw new Error(
+        `Failed to access file ${filePath}: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      );
+    }
+
+    // Determine name and content type
+    const name = options?.name || path.basename(filePath);
+    const contentType = options?.contentType || detectContentType(filePath);
+
+    // Step 1: Create the object
+    const createParams: ObjectCreateParams = {
+      name,
+      content_type: contentType as any,
+      metadata: options?.metadata || null,
+    };
+
+    const objectData = await client.objects.create(createParams, requestOptions);
+    const storageObject = new StorageObject(client, objectData.id);
+
+    // Step 2: Upload the file content
+    const objectInfo = await storageObject.getInfo();
+    const uploadUrl = objectInfo.upload_url;
+
+    if (!uploadUrl) {
+      throw new Error('No upload URL available. Object may already be completed or deleted.');
+    }
+
+    try {
+      const fileBuffer = fs.readFileSync(filePath);
+      const response = await (globalThis as any).fetch(uploadUrl, {
+        method: 'PUT',
+        body: fileBuffer,
+        headers: {
+          'Content-Length': fileBuffer.length.toString(),
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Upload failed: ${response.status} ${response.statusText}`);
+      }
+    } catch (error) {
+      throw new Error(`Failed to upload file: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+
+    // Step 3: Mark upload as complete
+    await storageObject.complete();
+
+    return storageObject;
+  }
+
+  /**
+   * Upload content from a Buffer (Node.js only).
+   * This method handles the complete three-step upload process:
+   * 1. Create object and get upload URL
+   * 2. Upload buffer content to the provided URL
+   * 3. Mark upload as complete
+   *
+   * @param buffer - The buffer content to upload
+   * @param name - Name for the object
+   * @param contentType - Content type for the object
+   * @param options - Request options with optional client and metadata
+   * @returns A completed StorageObject instance
+   */
+  static async uploadFromBuffer(
+    buffer: Buffer,
+    name: string,
+    contentType: string,
+    options?: Core.RequestOptions & {
+      client?: Runloop;
+      metadata?: Record<string, string>;
+    },
+  ): Promise<StorageObject> {
+    assertNodeEnvironment();
+
+    const client = options?.client || Runloop.getDefaultClient();
+    const requestOptions = options;
+
+    // Step 1: Create the object
+    const createParams: ObjectCreateParams = {
+      name,
+      content_type: contentType as any,
+      metadata: options?.metadata || null,
+    };
+
+    const objectData = await client.objects.create(createParams, requestOptions);
+    const storageObject = new StorageObject(client, objectData.id);
+
+    // Step 2: Upload the buffer content
+    const objectInfo = await storageObject.getInfo();
+    const uploadUrl = objectInfo.upload_url;
+
+    if (!uploadUrl) {
+      throw new Error('No upload URL available. Object may already be completed or deleted.');
+    }
+
+    try {
+      const response = await (globalThis as any).fetch(uploadUrl, {
+        method: 'PUT',
+        body: buffer,
+        headers: {
+          'Content-Length': buffer.length.toString(),
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Upload failed: ${response.status} ${response.statusText}`);
+      }
+    } catch (error) {
+      throw new Error(`Failed to upload buffer: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+
+    // Step 3: Mark upload as complete
+    await storageObject.complete();
+
+    return storageObject;
   }
 
   /**
