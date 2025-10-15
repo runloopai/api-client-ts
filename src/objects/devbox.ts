@@ -15,7 +15,6 @@ import type {
   DevboxExecuteAsyncParams,
 } from '../resources/devboxes/devboxes';
 import { PollingOptions } from '../lib/polling';
-import { ObjectCreateOptions, ObjectOptions } from './types';
 
 /**
  * Object-oriented interface for working with Devboxes.
@@ -37,6 +36,7 @@ import { ObjectCreateOptions, ObjectOptions } from './types';
  * const result = await devbox.cmd.exec({ command: 'echo "Hello World"' });
  * const contents = await devbox.file.read({ file_path: 'myfile.txt' });
  * await devbox.file.write({ file_path: 'output.txt', contents: 'Hello World' });
+ * const tunnel = await devbox.net.createTunnel({ port: 3000 });
  *
  * // Get devbox information
  * const info = await devbox.getInfo();
@@ -65,7 +65,7 @@ export class Devbox {
    */
   static async create(
     params?: DevboxCreateParams,
-    options?: ObjectCreateOptions<DevboxView>,
+    options?: Core.RequestOptions & { client?: Runloop; polling?: Partial<PollingOptions<DevboxView>> },
   ): Promise<Devbox> {
     const client = options?.client || Runloop.getDefaultClient();
     const requestOptions = options;
@@ -75,18 +75,15 @@ export class Devbox {
   }
 
   /**
-   * Load an existing Devbox by ID.
+   * Create a Devbox instance by ID without retrieving from API.
+   * Use getInfo() to fetch the actual data when needed.
    *
    * @param id - The devbox ID
    * @param options - Request options with optional client override
    * @returns A Devbox instance
    */
-  static async get(id: string, options?: ObjectOptions): Promise<Devbox> {
+  static fromId(id: string, options?: Core.RequestOptions & { client?: Runloop }): Devbox {
     const client = options?.client || Runloop.getDefaultClient();
-    const requestOptions = options;
-
-    // Verify the devbox exists by retrieving it
-    await client.devboxes.retrieve(id, requestOptions);
     return new Devbox(client, id);
   }
 
@@ -192,25 +189,22 @@ export class Devbox {
   /**
    * Shutdown the devbox.
    */
-  async shutdown(options?: Core.RequestOptions): Promise<Devbox> {
-    await this.client.devboxes.shutdown(this._id, options);
-    return this;
+  async shutdown(options?: Core.RequestOptions) {
+    return await this.client.devboxes.shutdown(this._id, options);
   }
 
   /**
    * Suspend the devbox and create a disk snapshot.
    */
-  async suspend(options?: Core.RequestOptions): Promise<Devbox> {
-    await this.client.devboxes.suspend(this._id, options);
-    return this;
+  async suspend(options?: Core.RequestOptions) {
+    return this.client.devboxes.suspend(this._id, options);
   }
 
   /**
    * Resume a suspended devbox.
    */
-  async resume(options?: Core.RequestOptions): Promise<Devbox> {
-    await this.client.devboxes.resume(this._id, options);
-    return this;
+  async resume(options?: Core.RequestOptions) {
+    return this.client.devboxes.resume(this._id, options);
   }
 
   /**
@@ -228,23 +222,30 @@ export class Devbox {
   }
 
   /**
-   * Create an SSH key for remote access to the devbox.
+   * Network operations on the devbox.
    */
-  async createSSHKey(options?: Core.RequestOptions) {
-    return this.client.devboxes.createSSHKey(this._id, options);
-  }
+  get net() {
+    return {
+      /**
+       * Create an SSH key for remote access to the devbox.
+       */
+      createSSHKey: async (options?: Core.RequestOptions) => {
+        return this.client.devboxes.createSSHKey(this._id, options);
+      },
 
-  /**
-   * Create a tunnel to a port on the devbox.
-   */
-  async createTunnel(params: DevboxCreateTunnelParams, options?: Core.RequestOptions) {
-    return this.client.devboxes.createTunnel(this._id, params, options);
-  }
+      /**
+       * Create a tunnel to a port on the devbox.
+       */
+      createTunnel: async (params: DevboxCreateTunnelParams, options?: Core.RequestOptions) => {
+        return this.client.devboxes.createTunnel(this._id, params, options);
+      },
 
-  /**
-   * Remove a tunnel from the devbox.
-   */
-  async removeTunnel(params: DevboxRemoveTunnelParams, options?: Core.RequestOptions) {
-    return this.client.devboxes.removeTunnel(this._id, params, options);
+      /**
+       * Remove a tunnel from the devbox.
+       */
+      removeTunnel: async (params: DevboxRemoveTunnelParams, options?: Core.RequestOptions) => {
+        return this.client.devboxes.removeTunnel(this._id, params, options);
+      },
+    };
   }
 }

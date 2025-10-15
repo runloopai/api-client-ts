@@ -947,7 +947,7 @@ export interface DevboxExecuteParams {
   /**
    * The command ID in UUIDv7 string format for idempotency and tracking
    */
-  command_id?: string;
+  command_id?: string; // This is optional as the client will generate a command_id if not provided
 
   /**
    * Timeout in seconds to wait for command completion. Operation is not killed. Max

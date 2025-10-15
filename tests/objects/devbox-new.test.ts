@@ -1,0 +1,242 @@
+import { Devbox } from '../../src/objects/devbox';
+import { Runloop } from '../../src/index';
+import type { DevboxView, DevboxAsyncExecutionDetailView } from '../../src/resources/devboxes/devboxes';
+
+// Mock the Runloop client
+jest.mock('../../src/index');
+
+describe('Devbox (New API)', () => {
+  let mockClient: jest.Mocked<Runloop>;
+  let mockDevboxData: DevboxView;
+
+  beforeEach(() => {
+    // Create mock client instance
+    mockClient = {
+      devboxes: {
+        createAndAwaitRunning: jest.fn(),
+        retrieve: jest.fn(),
+        execute: jest.fn(),
+        executeAsync: jest.fn(),
+        readFileContents: jest.fn(),
+        writeFileContents: jest.fn(),
+        downloadFile: jest.fn(),
+        uploadFile: jest.fn(),
+        shutdown: jest.fn(),
+        suspend: jest.fn(),
+        resume: jest.fn(),
+        keepAlive: jest.fn(),
+        snapshotDisk: jest.fn(),
+        createSSHKey: jest.fn(),
+        createTunnel: jest.fn(),
+        removeTunnel: jest.fn(),
+      },
+    } as any;
+
+    // Mock devbox data
+    mockDevboxData = {
+      id: 'devbox-123',
+      status: 'running',
+      capabilities: [],
+      create_time_ms: Date.now(),
+      end_time_ms: null,
+      launch_parameters: {},
+      metadata: {},
+      state_transitions: [],
+    };
+  });
+
+  describe('create', () => {
+    it('should create a devbox and return a Devbox instance', async () => {
+      mockClient.devboxes.createAndAwaitRunning.mockResolvedValue(mockDevboxData);
+
+      const devbox = await Devbox.create({ name: 'test-devbox' }, { client: mockClient });
+
+      expect(mockClient.devboxes.createAndAwaitRunning).toHaveBeenCalledWith(
+        { name: 'test-devbox' },
+        { client: mockClient },
+      );
+      expect(devbox).toBeInstanceOf(Devbox);
+      expect(devbox.id).toBe('devbox-123');
+    });
+
+    it('should pass options to the API client', async () => {
+      mockClient.devboxes.createAndAwaitRunning.mockResolvedValue(mockDevboxData);
+
+      await Devbox.create({ name: 'test-devbox' }, { client: mockClient, polling: { maxAttempts: 10 } });
+
+      expect(mockClient.devboxes.createAndAwaitRunning).toHaveBeenCalledWith(
+        { name: 'test-devbox' },
+        { client: mockClient, polling: { maxAttempts: 10 } },
+      );
+    });
+  });
+
+  describe('get', () => {
+    it('should retrieve an existing devbox by ID', async () => {
+      mockClient.devboxes.retrieve.mockResolvedValue(mockDevboxData);
+
+      const devbox = await Devbox.get('devbox-123', { client: mockClient });
+
+      expect(mockClient.devboxes.retrieve).toHaveBeenCalledWith('devbox-123', { client: mockClient });
+      expect(devbox.id).toBe('devbox-123');
+    });
+  });
+
+  describe('instance methods', () => {
+    let devbox: Devbox;
+
+    beforeEach(async () => {
+      mockClient.devboxes.createAndAwaitRunning.mockResolvedValue(mockDevboxData);
+      devbox = await Devbox.create({ name: 'test-devbox' }, { client: mockClient });
+    });
+
+    describe('cmd.exec', () => {
+      it('should execute a command and return the result', async () => {
+        const mockExecution: DevboxAsyncExecutionDetailView = {
+          devbox_id: 'devbox-123',
+          execution_id: 'exec-456',
+          status: 'completed',
+          exit_status: 0,
+          stdout: 'Hello World',
+          stderr: '',
+        };
+
+        mockClient.devboxes.execute.mockResolvedValue(mockExecution);
+
+        const result = await devbox.cmd.exec({ command: 'echo "Hello World"' });
+
+        expect(mockClient.devboxes.execute).toHaveBeenCalledWith(
+          'devbox-123',
+          { command: 'echo "Hello World"' },
+          undefined,
+        );
+        expect(result.stdout).toBe('Hello World');
+        expect(result.exit_status).toBe(0);
+      });
+    });
+
+    describe('cmd.execAsync', () => {
+      it('should execute a command asynchronously', async () => {
+        const mockExecution: DevboxAsyncExecutionDetailView = {
+          devbox_id: 'devbox-123',
+          execution_id: 'exec-456',
+          status: 'running',
+        };
+
+        mockClient.devboxes.executeAsync.mockResolvedValue(mockExecution);
+
+        const result = await devbox.cmd.execAsync({ command: 'sleep 10' });
+
+        expect(mockClient.devboxes.executeAsync).toHaveBeenCalledWith(
+          'devbox-123',
+          { command: 'sleep 10' },
+          undefined,
+        );
+        expect(result.status).toBe('running');
+      });
+    });
+
+    describe('file operations', () => {
+      it('should read file contents', async () => {
+        mockClient.devboxes.readFileContents.mockResolvedValue('file contents');
+
+        const contents = await devbox.file.read({ file_path: 'test.txt' });
+
+        expect(mockClient.devboxes.readFileContents).toHaveBeenCalledWith(
+          'devbox-123',
+          { file_path: 'test.txt' },
+          undefined,
+        );
+        expect(contents).toBe('file contents');
+      });
+
+      it('should write file contents', async () => {
+        const mockResult = {
+          devbox_id: 'devbox-123',
+          exit_status: 0,
+          stdout: '',
+          stderr: '',
+        };
+
+        mockClient.devboxes.writeFileContents.mockResolvedValue(mockResult);
+
+        await devbox.file.write({ file_path: 'test.txt', contents: 'new contents' });
+
+        expect(mockClient.devboxes.writeFileContents).toHaveBeenCalledWith(
+          'devbox-123',
+          { file_path: 'test.txt', contents: 'new contents' },
+          undefined,
+        );
+      });
+    });
+
+    describe('lifecycle methods', () => {
+      it('should shutdown the devbox', async () => {
+        mockClient.devboxes.shutdown.mockResolvedValue(undefined);
+
+        const result = await devbox.shutdown();
+
+        expect(mockClient.devboxes.shutdown).toHaveBeenCalledWith('devbox-123', undefined);
+        expect(result).toBe(devbox); // Should return the same instance
+      });
+
+      it('should suspend the devbox', async () => {
+        mockClient.devboxes.suspend.mockResolvedValue(undefined);
+
+        const result = await devbox.suspend();
+
+        expect(mockClient.devboxes.suspend).toHaveBeenCalledWith('devbox-123', undefined);
+        expect(result).toBe(devbox); // Should return the same instance
+      });
+
+      it('should resume the devbox', async () => {
+        mockClient.devboxes.resume.mockResolvedValue(undefined);
+
+        const result = await devbox.resume();
+
+        expect(mockClient.devboxes.resume).toHaveBeenCalledWith('devbox-123', undefined);
+        expect(result).toBe(devbox); // Should return the same instance
+      });
+    });
+
+    describe('getInfo', () => {
+      it('should get devbox information from API', async () => {
+        const updatedData = { ...mockDevboxData, status: 'suspended' as const };
+        mockClient.devboxes.retrieve.mockResolvedValue(updatedData);
+
+        const info = await devbox.getInfo();
+
+        expect(mockClient.devboxes.retrieve).toHaveBeenCalledWith('devbox-123', undefined);
+        expect(info.status).toBe('suspended');
+        expect(info.id).toBe('devbox-123');
+      });
+    });
+
+    describe('id property', () => {
+      it('should expose devbox ID', () => {
+        expect(devbox.id).toBe('devbox-123');
+      });
+    });
+  });
+
+  describe('error handling', () => {
+    it('should handle devbox creation failure', async () => {
+      const error = new Error('Creation failed');
+      mockClient.devboxes.createAndAwaitRunning.mockRejectedValue(error);
+
+      await expect(Devbox.create({ name: 'failing-devbox' }, { client: mockClient })).rejects.toThrow(
+        'Creation failed',
+      );
+    });
+
+    it('should handle command execution errors', async () => {
+      mockClient.devboxes.createAndAwaitRunning.mockResolvedValue(mockDevboxData);
+      const devbox = await Devbox.create({ name: 'test-devbox' }, { client: mockClient });
+
+      const error = new Error('Command failed');
+      mockClient.devboxes.execute.mockRejectedValue(error);
+
+      await expect(devbox.cmd.exec({ command: 'failing-command' })).rejects.toThrow('Command failed');
+    });
+  });
+});

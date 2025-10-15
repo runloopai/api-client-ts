@@ -9,7 +9,6 @@ import type {
 } from '../resources/blueprints';
 import type { DevboxCreateParams } from '../resources/devboxes/devboxes';
 import { Devbox } from './devbox';
-import { ObjectCreateOptions, ObjectOptions } from './types';
 
 /**
  * Object-oriented interface for working with Blueprints.
@@ -64,7 +63,10 @@ export class Blueprint {
    */
   static async create(
     params: BlueprintCreateParams,
-    options?: ObjectCreateOptions<BlueprintView>,
+    options?: Core.RequestOptions & {
+      client?: Runloop;
+      polling?: Partial<import('../lib/polling').PollingOptions<BlueprintView>>;
+    },
   ): Promise<Blueprint> {
     const client = options?.client || Runloop.getDefaultClient();
     const requestOptions = options;
@@ -74,18 +76,15 @@ export class Blueprint {
   }
 
   /**
-   * Load an existing Blueprint by ID.
+   * Create a Blueprint instance by ID without retrieving from API.
+   * Use getInfo() to fetch the actual data when needed.
    *
    * @param id - The blueprint ID
    * @param options - Request options with optional client override
    * @returns A Blueprint instance
    */
-  static async get(id: string, options?: ObjectOptions): Promise<Blueprint> {
+  static fromId(id: string, options?: Core.RequestOptions & { client?: Runloop }): Blueprint {
     const client = options?.client || Runloop.getDefaultClient();
-    const requestOptions = options;
-
-    // Verify the blueprint exists by retrieving it
-    await client.blueprints.retrieve(id, requestOptions);
     return new Blueprint(client, id);
   }
 
@@ -99,7 +98,7 @@ export class Blueprint {
    */
   static async preview(
     params: BlueprintPreviewParams,
-    options?: ObjectOptions,
+    options?: Core.RequestOptions & { client?: Runloop },
   ): Promise<BlueprintPreviewView> {
     const client = options?.client || Runloop.getDefaultClient();
     return client.blueprints.preview(params, options);

@@ -6,7 +6,6 @@ import type {
   ObjectDownloadURLView,
   ObjectListParams,
 } from '../resources/objects';
-import { ObjectOptions } from './types';
 
 /**
  * Object-oriented interface for working with Storage Objects.
@@ -54,7 +53,10 @@ export class StorageObject {
    * @param options - Request options with optional client override
    * @returns An Object instance with upload URL
    */
-  static async create(params: ObjectCreateParams, options?: ObjectOptions): Promise<StorageObject> {
+  static async create(
+    params: ObjectCreateParams,
+    options?: Core.RequestOptions & { client?: Runloop },
+  ): Promise<StorageObject> {
     const client = options?.client || Runloop.getDefaultClient();
     const requestOptions = options;
 
@@ -63,18 +65,15 @@ export class StorageObject {
   }
 
   /**
-   * Load an existing Storage Object by ID.
+   * Create a StorageObject instance by ID without retrieving from API.
+   * Use getInfo() to fetch the actual data when needed.
    *
    * @param id - The object ID
    * @param options - Request options with optional client override
    * @returns An Object instance
    */
-  static async get(id: string, options?: ObjectOptions): Promise<StorageObject> {
+  static fromId(id: string, options?: Core.RequestOptions & { client?: Runloop }): StorageObject {
     const client = options?.client || Runloop.getDefaultClient();
-    const requestOptions = options;
-
-    // Verify the object exists by retrieving it
-    await client.objects.retrieve(id, requestOptions);
     return new StorageObject(client, id);
   }
 
@@ -85,7 +84,10 @@ export class StorageObject {
    * @param options - Request options with optional client override
    * @returns Array of Object instances
    */
-  static async list(params?: ObjectListParams, options?: ObjectOptions): Promise<StorageObject[]> {
+  static async list(
+    params?: ObjectListParams,
+    options?: Core.RequestOptions & { client?: Runloop },
+  ): Promise<StorageObject[]> {
     const client = options?.client || Runloop.getDefaultClient();
     const requestOptions = options;
 

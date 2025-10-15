@@ -10,7 +10,6 @@ import type {
   DiskSnapshotUpdateParams,
 } from '../resources/devboxes/disk-snapshots';
 import { Devbox } from './devbox';
-import { ObjectOptions } from './types';
 
 /**
  * Object-oriented interface for working with Disk Snapshots.
@@ -19,10 +18,10 @@ import { ObjectOptions } from './types';
  * ```typescript
  * // Typically created from a Devbox:
  * const snapshotView = await devbox.snapshotDisk('my-snapshot');
- * const snapshot = new Snapshot(client, snapshotView.id);
+ * const snapshot = Snapshot.fromId(snapshotView.id, { client });
  *
  * // Or load from existing snapshot
- * const snapshot = await Snapshot.get(client, 'snapshot-id');
+ * const snapshot = Snapshot.fromId('snapshot-id', { client });
  *
  * // Get snapshot information
  * const info = await snapshot.getInfo();
@@ -49,29 +48,16 @@ export class Snapshot {
   }
 
   /**
-   * Load an existing Snapshot by ID.
-   * Note: This searches through all snapshots to find the matching ID.
+   * Create a Snapshot instance by ID without retrieving from API.
+   * Use getInfo() to fetch the actual data when needed.
    *
    * @param id - The snapshot ID
    * @param options - Request options with optional client override
    * @returns A Snapshot instance
-   * @throws Error if snapshot not found
    */
-  static async get(id: string, options?: ObjectOptions): Promise<Snapshot> {
+  static fromId(id: string, options?: Core.RequestOptions & { client?: Runloop }): Snapshot {
     const client = options?.client || Runloop.getDefaultClient();
-    const requestOptions = options;
-
-    // List all snapshots and find the one with matching ID
-    // Note: The API doesn't provide a direct retrieve by ID endpoint
-    const snapshots = await client.devboxes.listDiskSnapshots({}, requestOptions);
-
-    for await (const snapshot of snapshots) {
-      if (snapshot.id === id) {
-        return new Snapshot(client, id);
-      }
-    }
-
-    throw new Error(`Snapshot with ID ${id} not found`);
+    return new Snapshot(client, id);
   }
 
   /**
@@ -81,7 +67,10 @@ export class Snapshot {
    * @param options - Request options with optional client override
    * @returns Array of Snapshot instances
    */
-  static async list(params?: DevboxListDiskSnapshotsParams, options?: ObjectOptions): Promise<Snapshot[]> {
+  static async list(
+    params?: DevboxListDiskSnapshotsParams,
+    options?: Core.RequestOptions & { client?: Runloop },
+  ): Promise<Snapshot[]> {
     const client = options?.client || Runloop.getDefaultClient();
     const requestOptions = options;
 
