@@ -48,8 +48,8 @@ import {
 } from '../../pagination';
 import { type Response } from '../../_shims/index';
 import { poll, PollingOptions } from '@runloop/api-client/lib/polling';
+import { awaitDevboxState } from '@runloop/api-client/lib/devbox-state';
 import { DevboxTools } from './tools';
-import { RunloopError } from '../..';
 import { uuidv7 } from 'uuidv7';
 
 type DevboxStatus = DevboxView['status'];
@@ -99,41 +99,39 @@ export class Devboxes extends APIResource {
     id: string,
     options?: Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxView>> },
   ): Promise<DevboxView> {
-    const longPoll = (): Promise<DevboxView> => {
-      // This either returns a DevboxView when status is running or failure;
-      // Otherwise it throws an 408 error when times out.
-      return this._client.post(`/v1/devboxes/${id}/wait_for_status`, {
-        body: { statuses: ['running', 'failure', 'shutdown'] },
-      });
-    };
-
-    const finalResult = await poll(
-      () => longPoll(),
-      () => longPoll(),
-      {
-        ...options?.polling,
-        shouldStop: (result) => {
-          return !DEVBOX_BOOTING_STATES.includes(result.status);
-        },
-        onError: (error) => {
-          if (error.status === 408) {
-            // Return a placeholder result to continue polling
-            return { status: 'provisioning' } as DevboxView;
-          }
-
-          // For any other error, rethrow it
-          throw error;
-        },
-      },
-    );
-
-    // Now we check if the devbox is 'running' otherwise we throw an error
-    if (finalResult.status !== 'running') {
-      throw new RunloopError(`Devbox ${id} is in non-running state ${finalResult.status}`);
-    }
-
-    return finalResult;
+    return awaitDevboxState<DevboxView>({
+      client: this._client,
+      devboxId: id,
+      targetState: 'running',
+      statesToCheck: ['running', 'failure', 'shutdown'],
+      transitionStates: DEVBOX_BOOTING_STATES,
+      pollingOptions: options?.polling as Partial<PollingOptions<DevboxView>> | undefined,
+      errorMessage: (devboxId, actualState) => `Devbox ${devboxId} is in non-running state ${actualState}`,
+    });
   }
+
+  /**
+   * Wait for a devbox to reach the suspended state.
+   * Polls the devbox status until it reaches suspended state or fails with an error.
+   *
+   * @param id - Devbox ID
+   * @param options - request options to specify retries, timeout, polling, etc.
+   */
+  async awaitSuspended(
+    id: string,
+    options?: Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxView>> },
+  ): Promise<DevboxView> {
+    return awaitDevboxState<DevboxView>({
+      client: this._client,
+      devboxId: id,
+      targetState: 'suspended',
+      statesToCheck: ['suspended', 'failure', 'shutdown'],
+      transitionStates: ['suspending'],
+      pollingOptions: options?.polling as Partial<PollingOptions<DevboxView>> | undefined,
+      errorMessage: (devboxId, actualState) => `Devbox ${devboxId} is in non-suspended state ${actualState}`,
+    });
+  }
+
   /**
    * Create a devbox and wait for it to reach the running state.
    * This is a convenience method that combines create() and awaitDevboxRunning().

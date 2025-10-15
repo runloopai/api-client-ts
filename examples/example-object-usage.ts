@@ -120,6 +120,13 @@ async function main() {
   const snapshotInfo = await snapshot.getInfo();
   console.log(`Snapshot ${snapshotInfo.snapshot?.name} created at: ${snapshotInfo.snapshot?.create_time_ms}`);
 
+  // === State Management Demo ===
+  // Wait for specific devbox states
+  console.log('=== State Management Demo ===');
+  console.log('⏳ Waiting for devbox to be running...');
+  await devbox.awaitRunning();
+  console.log('✅ Devbox is running');
+
   // === ID-Only Storage Example ===
   // Demonstrate how objects only store IDs and fetch data on demand
   console.log('=== ID-Only Storage Demo ===');
@@ -177,6 +184,7 @@ async function main() {
 
   // Cleanup resources
   await restoredDevbox.shutdown();
+  await devbox.awaitSuspended();
   await devbox.resume();
   await devbox.shutdown();
 

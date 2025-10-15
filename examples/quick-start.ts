@@ -62,6 +62,7 @@ async function quickStart() {
   console.log('♻️  Managing lifecycle...');
   await devbox.suspend();
   console.log('⏸️  Devbox suspended');
+  await devbox.awaitSuspended();
   await devbox.resume();
   console.log('▶️  Devbox resumed');
   await devbox.shutdown();

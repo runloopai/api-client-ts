@@ -36,6 +36,10 @@ import { Snapshot } from './snapshot';
  * const info = await devbox.getInfo();
  * console.log(info.status, info.name);
  *
+ * // Wait for specific states
+ * await devbox.awaitRunning();
+ * await devbox.awaitSuspended();
+ *
  * // Lifecycle methods return the devbox instance for chaining
  * await devbox.suspend().then(d => d.resume()).then(d => d.shutdown());
  * ```
@@ -93,6 +97,32 @@ export class Devbox {
    */
   async getInfo(options?: Core.RequestOptions): Promise<DevboxView> {
     return this.client.devboxes.retrieve(this._id, options);
+  }
+
+  /**
+   * Wait for the devbox to reach the running state.
+   * Uses optimized server-side polling for better performance.
+   *
+   * @param options - Request options with optional polling configuration
+   * @returns The devbox data when running state is reached
+   */
+  async awaitRunning(
+    options?: Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxView>> },
+  ): Promise<DevboxView> {
+    return this.client.devboxes.awaitRunning(this._id, options);
+  }
+
+  /**
+   * Wait for the devbox to reach the suspended state.
+   * Uses optimized server-side polling for better performance.
+   *
+   * @param options - Request options with optional polling configuration
+   * @returns The devbox data when suspended state is reached
+   */
+  async awaitSuspended(
+    options?: Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxView>> },
+  ): Promise<DevboxView> {
+    return this.client.devboxes.awaitSuspended(this._id, options);
   }
 
   /**
@@ -192,7 +222,6 @@ export class Devbox {
    */
   async suspend(options?: Core.RequestOptions) {
     return this.client.devboxes.suspend(this._id, options);
-    this.client.devboxes.snap
   }
 
   /**
