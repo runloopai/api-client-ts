@@ -103,9 +103,10 @@ async function main() {
   console.log(`Uploaded buffer: ${bufferStorageObject.id}`);
 
   // Upload archive files (auto-detects content type)
-  const archiveStorageObject = await StorageObject.uploadFromFile('./dist.tar.gz', 'my-archive.tar.gz', {
-    metadata: { type: 'archive' },
-  });
+  const archiveStorageObject = await StorageObject.uploadFromFile(
+    './examples/test-archive.tar.gz',
+    'test-archive.tar.gz',
+  );
   console.log(`Uploaded archive: ${archiveStorageObject.id}`);
 
   // === Snapshot Example ===

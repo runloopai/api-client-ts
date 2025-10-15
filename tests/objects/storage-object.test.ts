@@ -567,15 +567,19 @@ describe('StorageObject (New API)', () => {
         statusText: 'OK',
       });
 
-      const result = await StorageObject.uploadFromFile('./project.tar.gz', 'project.tar.gz', {
-        client: mockClient,
-      });
+      const result = await StorageObject.uploadFromFile(
+        './examples/test-archive.tar.gz',
+        'test-archive.tar.gz',
+        {
+          client: mockClient,
+        },
+      );
 
       expect(mockClient.objects.create).toHaveBeenCalledWith(
-        { name: 'project.tar.gz', content_type: 'tgz', metadata: null },
+        { name: 'test-archive.tar.gz', content_type: 'tgz', metadata: null },
         { client: mockClient },
       );
-      expect(mockFs.readFileSync).toHaveBeenCalledWith('./project.tar.gz');
+      expect(mockFs.readFileSync).toHaveBeenCalledWith('./examples/test-archive.tar.gz');
       expect(result).toBeInstanceOf(StorageObject);
       expect(result.id).toBe('archive-123');
     });

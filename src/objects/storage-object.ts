@@ -58,7 +58,7 @@ function assertNodeEnvironment(): void {
  * const obj = await StorageObject.uploadFromFile('./data.txt', 'my-data.txt');
  *
  * // Upload archive files (auto-detects content type)
- * const archive = await StorageObject.uploadFromFile('./project.tar.gz', 'my-archive.tar.gz');
+ * const archive = await StorageObject.uploadFromFile('./examples/test-archive.tar.gz', 'my-archive.tar.gz');
  *
  * // Upload from buffer
  * const buffer = Buffer.from('content');
@@ -177,6 +177,16 @@ export class StorageObject {
       );
     }
 
+    // Read file content immediately to fail fast if file doesn't exist
+    let fileBuffer: Buffer;
+    try {
+      fileBuffer = fs.readFileSync(filePath);
+    } catch (error) {
+      throw new Error(
+        `Failed to read file ${filePath}: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      );
+    }
+
     // Determine content type
     const contentType = options?.contentType || detectContentType(filePath);
 
@@ -190,16 +200,13 @@ export class StorageObject {
     const objectData = await client.objects.create(createParams, requestOptions);
     const storageObject = new StorageObject(client, objectData.id);
 
-    // Step 2: Upload the file content
-    const objectInfo = await storageObject.getInfo();
-    const uploadUrl = objectInfo.upload_url;
+    const uploadUrl = objectData.upload_url;
 
     if (!uploadUrl) {
       throw new Error('No upload URL available. Object may already be completed or deleted.');
     }
 
     try {
-      const fileBuffer = fs.readFileSync(filePath);
       const response = await (globalThis as any).fetch(uploadUrl, {
         method: 'PUT',
         body: fileBuffer,
