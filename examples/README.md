@@ -51,25 +51,16 @@ Detailed examples for each object type:
 
 ## API Changes Summary
 
-### Before (Old API)
-```typescript
-// Old way - direct property access
-const devbox = await Devbox.create(client, { name: 'test' });
-console.log(devbox.status); // Direct property access
-await devbox.exec({ command: 'ls' }); // Direct method call
-```
-
-### After (New API)
 ```typescript
 // New way - ID-only storage with getInfo()
-const devbox = await Devbox.create({ name: 'test' }, { client });
+const devbox = await Devbox.create({ name: 'test' });
 const info = await devbox.getInfo(); // Fetch fresh data
 console.log(info.status); // Access via getInfo()
 await devbox.cmd.exec({ command: 'ls' }); // Organized under cmd object
 await devbox.net.createTunnel({ port: 3000 }); // Organized under net object
 
 // Create object by ID without API call
-const existingDevbox = Devbox.fromId('devbox-123', { client });
+const existingDevbox = Devbox.fromId('devbox-123');
 const devboxInfo = await existingDevbox.getInfo(); // Fetch when needed
 ```
 
@@ -104,4 +95,4 @@ npx ts-node examples/quick-start.ts
 npx ts-node examples/example-object-usage.ts
 ```
 
-Make sure to set your API key in the examples before running them.
+Make sure to set your `export RUNLOOP_API_KEY` API key in the examples before running them.
