@@ -7,7 +7,7 @@ import type { DevboxSnapshotAsyncStatusView } from '../../src/resources/devboxes
 // Mock the Runloop client
 jest.mock('../../src/index');
 
-describe('Snapshot', () => {
+describe('Snapshot (New API)', () => {
   let mockClient: jest.Mocked<Runloop>;
   let mockSnapshotData: DevboxSnapshotView;
 
@@ -34,50 +34,12 @@ describe('Snapshot', () => {
     };
   });
 
-  describe('constructor', () => {
-    it('should create a Snapshot instance', () => {
-      const snapshot = new Snapshot(mockClient, mockSnapshotData);
+  describe('fromId', () => {
+    it('should create a Snapshot instance by ID without API call', () => {
+      const snapshot = Snapshot.fromId('snapshot-123', { client: mockClient });
 
+      expect(snapshot).toBeInstanceOf(Snapshot);
       expect(snapshot.id).toBe('snapshot-123');
-      expect(snapshot.name).toBe('test-snapshot');
-      expect(snapshot.sourceDevboxId).toBe('devbox-456');
-    });
-  });
-
-  describe('get', () => {
-    it('should retrieve an existing snapshot by ID', async () => {
-      const mockPage = {
-        [Symbol.asyncIterator]: async function* () {
-          yield mockSnapshotData;
-        },
-      };
-
-      mockClient.devboxes.listDiskSnapshots.mockResolvedValue(mockPage as any);
-
-      const snapshot = await Snapshot.get(mockClient, 'snapshot-123');
-
-      expect(mockClient.devboxes.listDiskSnapshots).toHaveBeenCalledWith({}, undefined);
-      expect(snapshot.id).toBe('snapshot-123');
-      expect(snapshot.name).toBe('test-snapshot');
-    });
-
-    it('should throw error if snapshot not found', async () => {
-      const mockPage = {
-        [Symbol.asyncIterator]: async function* () {
-          yield {
-            id: 'other-snapshot',
-            create_time_ms: Date.now(),
-            metadata: {},
-            source_devbox_id: 'devbox-1',
-          };
-        },
-      };
-
-      mockClient.devboxes.listDiskSnapshots.mockResolvedValue(mockPage as any);
-
-      await expect(Snapshot.get(mockClient, 'non-existent')).rejects.toThrow(
-        'Snapshot with ID non-existent not found',
-      );
     });
   });
 
@@ -106,9 +68,9 @@ describe('Snapshot', () => {
 
       mockClient.devboxes.listDiskSnapshots.mockResolvedValue(mockPage as any);
 
-      const snapshots = await Snapshot.list(mockClient);
+      const snapshots = await Snapshot.list(undefined, { client: mockClient });
 
-      expect(mockClient.devboxes.listDiskSnapshots).toHaveBeenCalledWith(undefined, undefined);
+      expect(mockClient.devboxes.listDiskSnapshots).toHaveBeenCalledWith(undefined, { client: mockClient });
       expect(snapshots).toHaveLength(2);
       expect(snapshots[0].id).toBe('snapshot-1');
       expect(snapshots[1].id).toBe('snapshot-2');
@@ -123,11 +85,11 @@ describe('Snapshot', () => {
 
       mockClient.devboxes.listDiskSnapshots.mockResolvedValue(mockPage as any);
 
-      await Snapshot.list(mockClient, { devbox_id: 'devbox-456' });
+      await Snapshot.list({ devbox_id: 'devbox-456' }, { client: mockClient });
 
       expect(mockClient.devboxes.listDiskSnapshots).toHaveBeenCalledWith(
         { devbox_id: 'devbox-456' },
-        undefined,
+        { client: mockClient },
       );
     });
 
@@ -140,7 +102,7 @@ describe('Snapshot', () => {
 
       mockClient.devboxes.listDiskSnapshots.mockResolvedValue(mockPage as any);
 
-      const snapshots = await Snapshot.list(mockClient);
+      const snapshots = await Snapshot.list(undefined, { client: mockClient });
 
       expect(snapshots).toHaveLength(0);
     });
@@ -150,7 +112,42 @@ describe('Snapshot', () => {
     let snapshot: Snapshot;
 
     beforeEach(() => {
-      snapshot = new Snapshot(mockClient, mockSnapshotData);
+      snapshot = Snapshot.fromId('snapshot-123', { client: mockClient });
+    });
+
+    describe('getInfo', () => {
+      it('should get snapshot information from API', async () => {
+        const mockPage = {
+          [Symbol.asyncIterator]: async function* () {
+            yield mockSnapshotData;
+          },
+        };
+
+        mockClient.devboxes.listDiskSnapshots.mockResolvedValue(mockPage as any);
+
+        const info = await snapshot.getInfo();
+
+        expect(mockClient.devboxes.listDiskSnapshots).toHaveBeenCalledWith({}, undefined);
+        expect(info.id).toBe('snapshot-123');
+        expect(info.name).toBe('test-snapshot');
+      });
+
+      it('should throw error if snapshot not found in getInfo', async () => {
+        const mockPage = {
+          [Symbol.asyncIterator]: async function* () {
+            yield {
+              id: 'other-snapshot',
+              create_time_ms: Date.now(),
+              metadata: {},
+              source_devbox_id: 'devbox-1',
+            };
+          },
+        };
+
+        mockClient.devboxes.listDiskSnapshots.mockResolvedValue(mockPage as any);
+
+        await expect(snapshot.getInfo()).rejects.toThrow('Snapshot with ID snapshot-123 not found');
+      });
     });
 
     describe('update', () => {
@@ -176,8 +173,6 @@ describe('Snapshot', () => {
           },
           undefined,
         );
-        expect(snapshot.name).toBe('updated-snapshot');
-        expect(snapshot.metadata).toEqual({ version: '2.0' });
       });
 
       it('should update only name', async () => {
@@ -269,26 +264,6 @@ describe('Snapshot', () => {
       });
     });
 
-    describe('property accessors', () => {
-      it('should expose snapshot properties', () => {
-        expect(snapshot.id).toBe('snapshot-123');
-        expect(snapshot.name).toBe('test-snapshot');
-        expect(snapshot.sourceDevboxId).toBe('devbox-456');
-        expect(snapshot.metadata).toEqual({ version: '1.0', author: 'test' });
-        expect(snapshot.createTimeMs).toBe(mockSnapshotData.create_time_ms);
-        expect(snapshot.data).toEqual(mockSnapshotData);
-      });
-
-      it('should return null for name when not set', () => {
-        const snapshotWithoutName = new Snapshot(mockClient, {
-          ...mockSnapshotData,
-          name: null,
-        });
-
-        expect(snapshotWithoutName.name).toBeNull();
-      });
-    });
-
     describe('createDevbox', () => {
       it('should create a devbox from the snapshot', async () => {
         const mockDevboxData = {
@@ -303,7 +278,7 @@ describe('Snapshot', () => {
         };
 
         // Mock Devbox.create static method
-        jest.spyOn(Devbox, 'create').mockResolvedValue(new Devbox(mockClient as any, mockDevboxData as any));
+        jest.spyOn(Devbox, 'create').mockResolvedValue(new Devbox(mockClient as any, 'devbox-789'));
 
         const result = await snapshot.createDevbox({
           name: 'restored-devbox',
@@ -311,13 +286,12 @@ describe('Snapshot', () => {
         });
 
         expect(Devbox.create).toHaveBeenCalledWith(
-          mockClient,
           {
             name: 'restored-devbox',
             metadata: { restored_from: 'snapshot-123' },
             snapshot_id: 'snapshot-123',
           },
-          undefined,
+          { client: mockClient },
         );
         expect(result).toBeInstanceOf(Devbox);
       });
@@ -334,19 +308,28 @@ describe('Snapshot', () => {
           state_transitions: [],
         };
 
-        jest.spyOn(Devbox, 'create').mockResolvedValue(new Devbox(mockClient as any, mockDevboxData as any));
+        jest.spyOn(Devbox, 'create').mockResolvedValue(new Devbox(mockClient as any, 'devbox-789'));
 
         const result = await snapshot.createDevbox();
 
-        expect(Devbox.create).toHaveBeenCalledWith(mockClient, { snapshot_id: 'snapshot-123' }, undefined);
+        expect(Devbox.create).toHaveBeenCalledWith(
+          { snapshot_id: 'snapshot-123' },
+          { client: mockClient },
+        );
         expect(result).toBeInstanceOf(Devbox);
+      });
+    });
+
+    describe('id property', () => {
+      it('should expose snapshot ID', () => {
+        expect(snapshot.id).toBe('snapshot-123');
       });
     });
   });
 
   describe('error handling', () => {
     it('should handle update errors', async () => {
-      const snapshot = new Snapshot(mockClient, mockSnapshotData);
+      const snapshot = Snapshot.fromId('snapshot-123', { client: mockClient });
       const error = new Error('Update failed');
       mockClient.devboxes.diskSnapshots.update.mockRejectedValue(error);
 
@@ -354,7 +337,7 @@ describe('Snapshot', () => {
     });
 
     it('should handle delete errors', async () => {
-      const snapshot = new Snapshot(mockClient, mockSnapshotData);
+      const snapshot = Snapshot.fromId('snapshot-123', { client: mockClient });
       const error = new Error('Delete failed');
       mockClient.devboxes.diskSnapshots.delete.mockRejectedValue(error);
 
@@ -365,7 +348,7 @@ describe('Snapshot', () => {
       const error = new Error('List failed');
       mockClient.devboxes.listDiskSnapshots.mockRejectedValue(error);
 
-      await expect(Snapshot.list(mockClient)).rejects.toThrow('List failed');
+      await expect(Snapshot.list(undefined, { client: mockClient })).rejects.toThrow('List failed');
     });
   });
 });

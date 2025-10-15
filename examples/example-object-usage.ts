@@ -38,8 +38,8 @@ async function main() {
   });
 
   // Alternative: Create devbox with custom client and polling options
-  const customClient = new Runloop({ bearerToken: 'custom-token' });
-  const devboxWithCustomClient = await Devbox.create({ name: 'custom-devbox' }, { client: customClient });
+  const explicitClient = new Runloop({ bearerToken: 'custom-token' });
+  const devboxWithExplicitClient = await Devbox.create({ name: 'custom-devbox' }, { client: explicitClient });
 
   // Devbox is now running and ready to use
   // Get devbox information using getInfo()

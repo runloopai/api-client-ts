@@ -8,7 +8,7 @@ jest.mock('../../src/index');
 // Mock fetch globally
 global.fetch = jest.fn();
 
-describe('StorageObject', () => {
+describe('StorageObject (New API)', () => {
   let mockClient: jest.Mocked<Runloop>;
   let mockObjectData: ObjectView;
 
@@ -43,11 +43,11 @@ describe('StorageObject', () => {
     it('should create a storage object and return a StorageObject instance', async () => {
       mockClient.objects.create.mockResolvedValue(mockObjectData);
 
-      const obj = await StorageObject.create(mockClient, {
+      const obj = await StorageObject.create({
         name: 'test-file.txt',
         content_type: 'text',
         metadata: { project: 'demo' },
-      });
+      }, { client: mockClient });
 
       expect(mockClient.objects.create).toHaveBeenCalledWith(
         {
@@ -55,37 +55,31 @@ describe('StorageObject', () => {
           content_type: 'text',
           metadata: { project: 'demo' },
         },
-        undefined,
+        { client: mockClient },
       );
       expect(obj).toBeInstanceOf(StorageObject);
       expect(obj.id).toBe('object-123');
-      expect(obj.name).toBe('test-file.txt');
-      expect(obj.uploadUrl).toBeTruthy();
     });
 
     it('should support different content types', async () => {
       const binaryObjectData = { ...mockObjectData, content_type: 'binary' as const };
       mockClient.objects.create.mockResolvedValue(binaryObjectData);
 
-      const obj = await StorageObject.create(mockClient, {
+      const obj = await StorageObject.create({
         name: 'data.bin',
         content_type: 'binary',
-      });
+      }, { client: mockClient });
 
-      expect(obj.contentType).toBe('binary');
+      expect(obj.id).toBe('object-123');
     });
   });
 
-  describe('get', () => {
-    it('should retrieve an existing storage object by ID', async () => {
-      const completedData = { ...mockObjectData, state: 'READ_ONLY', upload_url: null };
-      mockClient.objects.retrieve.mockResolvedValue(completedData);
+  describe('fromId', () => {
+    it('should create a StorageObject instance by ID without API call', () => {
+      const obj = StorageObject.fromId('object-123', { client: mockClient });
 
-      const obj = await StorageObject.get(mockClient, 'object-123');
-
-      expect(mockClient.objects.retrieve).toHaveBeenCalledWith('object-123', undefined);
+      expect(obj).toBeInstanceOf(StorageObject);
       expect(obj.id).toBe('object-123');
-      expect(obj.state).toBe('READ_ONLY');
     });
   });
 
@@ -114,9 +108,9 @@ describe('StorageObject', () => {
 
       mockClient.objects.list.mockResolvedValue(mockPage as any);
 
-      const objects = await StorageObject.list(mockClient);
+      const objects = await StorageObject.list(undefined, { client: mockClient });
 
-      expect(mockClient.objects.list).toHaveBeenCalledWith(undefined, undefined);
+      expect(mockClient.objects.list).toHaveBeenCalledWith(undefined, { client: mockClient });
       expect(objects).toHaveLength(2);
       expect(objects[0].id).toBe('object-1');
       expect(objects[1].id).toBe('object-2');
@@ -131,17 +125,17 @@ describe('StorageObject', () => {
 
       mockClient.objects.list.mockResolvedValue(mockPage as any);
 
-      await StorageObject.list(mockClient, {
+      await StorageObject.list({
         content_type: 'text',
         search: 'test',
-      });
+      }, { client: mockClient });
 
       expect(mockClient.objects.list).toHaveBeenCalledWith(
         {
           content_type: 'text',
           search: 'test',
         },
-        undefined,
+        { client: mockClient },
       );
     });
   });
@@ -151,14 +145,30 @@ describe('StorageObject', () => {
 
     beforeEach(async () => {
       mockClient.objects.create.mockResolvedValue(mockObjectData);
-      storageObject = await StorageObject.create(mockClient, {
+      storageObject = await StorageObject.create({
         name: 'test-file.txt',
         content_type: 'text',
+      }, { client: mockClient });
+    });
+
+    describe('getInfo', () => {
+      it('should get object information from API', async () => {
+        const updatedData = { ...mockObjectData, state: 'READ_ONLY' as const };
+        mockClient.objects.retrieve.mockResolvedValue(updatedData);
+
+        const info = await storageObject.getInfo();
+
+        expect(mockClient.objects.retrieve).toHaveBeenCalledWith('object-123', undefined);
+        expect(info.state).toBe('READ_ONLY');
+        expect(info.id).toBe('object-123');
       });
     });
 
     describe('uploadContent', () => {
       it('should upload string content', async () => {
+        // Mock getInfo to return object data with upload_url
+        mockClient.objects.retrieve.mockResolvedValue(mockObjectData);
+        
         const mockFetchResponse = {
           ok: true,
           status: 200,
@@ -177,6 +187,9 @@ describe('StorageObject', () => {
       });
 
       it('should upload buffer content', async () => {
+        // Mock getInfo to return object data with upload_url
+        mockClient.objects.retrieve.mockResolvedValue(mockObjectData);
+        
         const mockFetchResponse = {
           ok: true,
           status: 200,
@@ -198,12 +211,15 @@ describe('StorageObject', () => {
       it('should throw error when upload URL is not available', async () => {
         const completedData = { ...mockObjectData, upload_url: null };
         mockClient.objects.retrieve.mockResolvedValue(completedData);
-        const completedObj = await StorageObject.get(mockClient, 'object-123');
+        const completedObj = StorageObject.fromId('object-123', { client: mockClient });
 
         await expect(completedObj.uploadContent('test')).rejects.toThrow('No upload URL available');
       });
 
       it('should throw error when upload fails', async () => {
+        // Mock getInfo to return object data with upload_url
+        mockClient.objects.retrieve.mockResolvedValue(mockObjectData);
+        
         const mockFetchResponse = {
           ok: false,
           status: 403,
@@ -230,8 +246,6 @@ describe('StorageObject', () => {
         await storageObject.complete();
 
         expect(mockClient.objects.complete).toHaveBeenCalledWith('object-123', {}, undefined);
-        expect(storageObject.state).toBe('READ_ONLY');
-        expect(storageObject.sizeBytes).toBe(13);
       });
     });
 
@@ -342,32 +356,12 @@ describe('StorageObject', () => {
         await storageObject.delete();
 
         expect(mockClient.objects.delete).toHaveBeenCalledWith('object-123', {}, undefined);
-        expect(storageObject.state).toBe('DELETED');
       });
     });
 
-    describe('refresh', () => {
-      it('should refresh object data from API', async () => {
-        const updatedData = { ...mockObjectData, state: 'READ_ONLY', size_bytes: 100 };
-        mockClient.objects.retrieve.mockResolvedValue(updatedData);
-
-        await storageObject.refresh();
-
-        expect(mockClient.objects.retrieve).toHaveBeenCalledWith('object-123', undefined);
-        expect(storageObject.state).toBe('READ_ONLY');
-        expect(storageObject.sizeBytes).toBe(100);
-      });
-    });
-
-    describe('property accessors', () => {
-      it('should expose object properties', () => {
+    describe('id property', () => {
+      it('should expose object ID', () => {
         expect(storageObject.id).toBe('object-123');
-        expect(storageObject.name).toBe('test-file.txt');
-        expect(storageObject.contentType).toBe('text');
-        expect(storageObject.state).toBe('UPLOADING');
-        expect(storageObject.sizeBytes).toBeNull();
-        expect(storageObject.uploadUrl).toBeTruthy();
-        expect(storageObject.data).toEqual(mockObjectData);
       });
     });
   });
@@ -376,12 +370,13 @@ describe('StorageObject', () => {
     it('should create, upload, complete, and download an object', async () => {
       // Create
       mockClient.objects.create.mockResolvedValue(mockObjectData);
-      const obj = await StorageObject.create(mockClient, {
+      const obj = await StorageObject.create({
         name: 'workflow-test.txt',
         content_type: 'text',
-      });
+      }, { client: mockClient });
 
-      // Upload
+      // Upload - mock getInfo for uploadContent
+      mockClient.objects.retrieve.mockResolvedValue(mockObjectData);
       (global.fetch as jest.Mock).mockResolvedValue({ ok: true });
       await obj.uploadContent('Test content');
 
@@ -389,9 +384,6 @@ describe('StorageObject', () => {
       const completedData = { ...mockObjectData, state: 'READ_ONLY', size_bytes: 12 };
       mockClient.objects.complete.mockResolvedValue(completedData);
       await obj.complete();
-
-      expect(obj.state).toBe('READ_ONLY');
-      expect(obj.sizeBytes).toBe(12);
 
       // Download
       const mockDownloadUrl: ObjectDownloadURLView = {
@@ -414,25 +406,26 @@ describe('StorageObject', () => {
       mockClient.objects.create.mockRejectedValue(error);
 
       await expect(
-        StorageObject.create(mockClient, {
+        StorageObject.create({
           name: 'test.txt',
           content_type: 'text',
-        }),
+        }, { client: mockClient }),
       ).rejects.toThrow('Create failed');
     });
 
-    it('should handle retrieval errors', async () => {
+    it('should handle retrieval errors in getInfo', async () => {
       const error = new Error('Not found');
       mockClient.objects.retrieve.mockRejectedValue(error);
-
-      await expect(StorageObject.get(mockClient, 'non-existent')).rejects.toThrow('Not found');
+      
+      const obj = StorageObject.fromId('non-existent', { client: mockClient });
+      await expect(obj.getInfo()).rejects.toThrow('Not found');
     });
 
     it('should handle list errors', async () => {
       const error = new Error('List failed');
       mockClient.objects.list.mockRejectedValue(error);
 
-      await expect(StorageObject.list(mockClient)).rejects.toThrow('List failed');
+      await expect(StorageObject.list(undefined, { client: mockClient })).rejects.toThrow('List failed');
     });
   });
 });
