@@ -15,6 +15,7 @@ import type {
   DevboxExecuteAsyncParams,
 } from '../resources/devboxes/devboxes';
 import { PollingOptions } from '../lib/polling';
+import { Snapshot } from './snapshot';
 
 /**
  * Object-oriented interface for working with Devboxes.
@@ -210,8 +211,9 @@ export class Devbox {
   /**
    * Create a disk snapshot of the devbox.
    */
-  async snapshotDisk(params?: DevboxSnapshotDiskParams, options?: Core.RequestOptions) {
-    return this.client.devboxes.snapshotDisk(this._id, params, options);
+  async snapshotDisk(params?: DevboxSnapshotDiskParams, options?: Core.RequestOptions): Promise<Snapshot> {
+    const snapshotData = await this.client.devboxes.snapshotDisk(this._id, params, options);
+    return Snapshot.fromId(snapshotData.id, { client: this.client });
   }
 
   /**

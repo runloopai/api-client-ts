@@ -116,37 +116,45 @@ describe('Snapshot (New API)', () => {
     });
 
     describe('getInfo', () => {
-      it('should get snapshot information from API', async () => {
-        const mockPage = {
-          [Symbol.asyncIterator]: async function* () {
-            yield mockSnapshotData;
-          },
+      it('should get snapshot status from API using queryStatus', async () => {
+        const mockStatus = {
+          status: 'complete',
+          snapshot: mockSnapshotData,
         };
 
-        mockClient.devboxes.listDiskSnapshots.mockResolvedValue(mockPage as any);
+        mockClient.devboxes.diskSnapshots.queryStatus.mockResolvedValue(mockStatus);
 
-        const info = await snapshot.getInfo();
+        const status = await snapshot.getInfo();
 
-        expect(mockClient.devboxes.listDiskSnapshots).toHaveBeenCalledWith({}, undefined);
-        expect(info.id).toBe('snapshot-123');
-        expect(info.name).toBe('test-snapshot');
+        expect(mockClient.devboxes.diskSnapshots.queryStatus).toHaveBeenCalledWith('snapshot-123', undefined);
+        expect(status.status).toBe('complete');
+        expect(status.snapshot).toEqual(mockSnapshotData);
       });
 
-      it('should throw error if snapshot not found in getInfo', async () => {
-        const mockPage = {
-          [Symbol.asyncIterator]: async function* () {
-            yield {
-              id: 'other-snapshot',
-              create_time_ms: Date.now(),
-              metadata: {},
-              source_devbox_id: 'devbox-1',
-            };
-          },
+      it('should return error status when snapshot operation failed', async () => {
+        const mockStatus = {
+          status: 'error',
+          error_message: 'Snapshot creation failed',
         };
 
-        mockClient.devboxes.listDiskSnapshots.mockResolvedValue(mockPage as any);
+        mockClient.devboxes.diskSnapshots.queryStatus.mockResolvedValue(mockStatus);
 
-        await expect(snapshot.getInfo()).rejects.toThrow('Snapshot with ID snapshot-123 not found');
+        const status = await snapshot.getInfo();
+
+        expect(status.status).toBe('error');
+        expect(status.error_message).toBe('Snapshot creation failed');
+      });
+
+      it('should return in-progress status when snapshot is still processing', async () => {
+        const mockStatus = {
+          status: 'in_progress',
+        };
+
+        mockClient.devboxes.diskSnapshots.queryStatus.mockResolvedValue(mockStatus);
+
+        const status = await snapshot.getInfo();
+
+        expect(status.status).toBe('in_progress');
       });
     });
 

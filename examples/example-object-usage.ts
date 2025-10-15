@@ -16,7 +16,7 @@ async function main() {
       RUN apt-get update && apt-get install -y ffmpeg
     `,
   });
-  blueprint.createDevbox({})
+  blueprint.createDevbox({});
   // Blueprint is now created and ready to use
   // Get blueprint information using getInfo()
   const blueprintInfo = await blueprint.getInfo();
@@ -90,14 +90,12 @@ async function main() {
   console.log('Downloaded content:', content);
 
   // === Snapshot Example ===
-  // Create a snapshot of the current devbox state
-  const snapshotData = await devbox.snapshotDisk({
+  // Create a snapshot of the current devbox state (returns Snapshot object directly)
+  const snapshot = await devbox.snapshotDisk({
     name: 'dev-checkpoint',
     metadata: { version: '1.0', stage: 'configured' },
   });
 
-  // Create a Snapshot object to work with the snapshot
-  const snapshot = Snapshot.fromId(snapshotData.id);
   // Get snapshot information using getInfo()
   const snapshotInfo = await snapshot.getInfo();
   console.log(`Snapshot ${snapshotInfo.name} created at: ${snapshotInfo.create_time_ms}`);

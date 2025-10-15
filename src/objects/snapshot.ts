@@ -19,9 +19,8 @@ import { Devbox } from './devbox';
  * // Make sure to set RUNLOOP_API_KEY environment variable
  * // export RUNLOOP_API_KEY="your-api-key"
  *
- * // Typically created from a Devbox:
- * const snapshotView = await devbox.snapshotDisk('my-snapshot');
- * const snapshot = Snapshot.fromId(snapshotView.id);
+ * // Typically created from a Devbox (returns Snapshot object directly):
+ * const snapshot = await devbox.snapshotDisk({ name: 'my-snapshot' });
  *
  * // Or load from existing snapshot
  * const snapshot = Snapshot.fromId('snapshot-id');

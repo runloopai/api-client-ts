@@ -40,8 +40,7 @@ async function quickStart() {
 
   // 5. Snapshot operations
   console.log('📸 Creating snapshot...');
-  const snapshotData = await devbox.snapshotDisk({ name: 'configured-state' });
-  const snapshot = Snapshot.fromId(snapshotData.id);
+  const snapshot = await devbox.snapshotDisk({ name: 'configured-state' });
   console.log(`✅ Snapshot created: ${snapshot.id}`);
 
   // 6. Demonstrate ID-only storage and getInfo()

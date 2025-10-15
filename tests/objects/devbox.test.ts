@@ -215,6 +215,34 @@ describe('Devbox (New API)', () => {
         expect(devbox.id).toBe('devbox-123');
       });
     });
+
+    describe('snapshotDisk', () => {
+      it('should create a disk snapshot and return Snapshot object', async () => {
+        const mockSnapshotData = { id: 'snapshot-456', name: 'test-snapshot' };
+        mockClient.devboxes.snapshotDisk.mockResolvedValue(mockSnapshotData);
+
+        const snapshot = await devbox.snapshotDisk({ name: 'test-snapshot' });
+
+        expect(mockClient.devboxes.snapshotDisk).toHaveBeenCalledWith(
+          'devbox-123',
+          { name: 'test-snapshot' },
+          undefined,
+        );
+        expect(snapshot).toBeInstanceOf(require('../../src/objects/snapshot').Snapshot);
+        expect(snapshot.id).toBe('snapshot-456');
+      });
+
+      it('should create snapshot without parameters', async () => {
+        const mockSnapshotData = { id: 'snapshot-789' };
+        mockClient.devboxes.snapshotDisk.mockResolvedValue(mockSnapshotData);
+
+        const snapshot = await devbox.snapshotDisk();
+
+        expect(mockClient.devboxes.snapshotDisk).toHaveBeenCalledWith('devbox-123', undefined, undefined);
+        expect(snapshot).toBeInstanceOf(require('../../src/objects/snapshot').Snapshot);
+        expect(snapshot.id).toBe('snapshot-789');
+      });
+    });
   });
 
   describe('error handling', () => {
