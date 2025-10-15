@@ -312,10 +312,7 @@ describe('Snapshot (New API)', () => {
 
         const result = await snapshot.createDevbox();
 
-        expect(Devbox.create).toHaveBeenCalledWith(
-          { snapshot_id: 'snapshot-123' },
-          { client: mockClient },
-        );
+        expect(Devbox.create).toHaveBeenCalledWith({ snapshot_id: 'snapshot-123' }, { client: mockClient });
         expect(result).toBeInstanceOf(Devbox);
       });
     });

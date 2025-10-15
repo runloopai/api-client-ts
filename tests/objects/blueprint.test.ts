@@ -44,10 +44,13 @@ describe('Blueprint (New API)', () => {
     it('should create a blueprint and return a Blueprint instance', async () => {
       mockClient.blueprints.createAndAwaitBuildCompleted.mockResolvedValue(mockBlueprintData);
 
-      const blueprint = await Blueprint.create({
-        name: 'test-blueprint',
-        system_setup_commands: ['apt-get update'],
-      }, { client: mockClient });
+      const blueprint = await Blueprint.create(
+        {
+          name: 'test-blueprint',
+          system_setup_commands: ['apt-get update'],
+        },
+        { client: mockClient },
+      );
 
       expect(mockClient.blueprints.createAndAwaitBuildCompleted).toHaveBeenCalledWith(
         {
@@ -63,10 +66,13 @@ describe('Blueprint (New API)', () => {
     it('should pass polling options to the API client', async () => {
       mockClient.blueprints.createAndAwaitBuildCompleted.mockResolvedValue(mockBlueprintData);
 
-      await Blueprint.create({
-        name: 'test-blueprint',
-        system_setup_commands: [],
-      }, { client: mockClient, polling: { maxAttempts: 5 } });
+      await Blueprint.create(
+        {
+          name: 'test-blueprint',
+          system_setup_commands: [],
+        },
+        { client: mockClient, polling: { maxAttempts: 5 } },
+      );
 
       expect(mockClient.blueprints.createAndAwaitBuildCompleted).toHaveBeenCalledWith(
         {
@@ -80,12 +86,15 @@ describe('Blueprint (New API)', () => {
     it('should support complex blueprint configurations', async () => {
       mockClient.blueprints.createAndAwaitBuildCompleted.mockResolvedValue(mockBlueprintData);
 
-      await Blueprint.create({
-        name: 'complex-blueprint',
-        dockerfile: 'FROM ubuntu:22.04\nRUN apt-get update',
-        system_setup_commands: ['npm install'],
-        metadata: { version: '1.0' },
-      }, { client: mockClient });
+      await Blueprint.create(
+        {
+          name: 'complex-blueprint',
+          dockerfile: 'FROM ubuntu:22.04\nRUN apt-get update',
+          system_setup_commands: ['npm install'],
+          metadata: { version: '1.0' },
+        },
+        { client: mockClient },
+      );
 
       expect(mockClient.blueprints.createAndAwaitBuildCompleted).toHaveBeenCalledWith(
         {
@@ -116,10 +125,13 @@ describe('Blueprint (New API)', () => {
 
       mockClient.blueprints.preview.mockResolvedValue(mockPreview);
 
-      const preview = await Blueprint.preview({
-        name: 'preview-blueprint',
-        system_setup_commands: ['apt-get install -y nodejs'],
-      }, { client: mockClient });
+      const preview = await Blueprint.preview(
+        {
+          name: 'preview-blueprint',
+          system_setup_commands: ['apt-get install -y nodejs'],
+        },
+        { client: mockClient },
+      );
 
       expect(mockClient.blueprints.preview).toHaveBeenCalledWith(
         {
@@ -138,10 +150,13 @@ describe('Blueprint (New API)', () => {
 
     beforeEach(async () => {
       mockClient.blueprints.createAndAwaitBuildCompleted.mockResolvedValue(mockBlueprintData);
-      blueprint = await Blueprint.create({
-        name: 'test-blueprint',
-        system_setup_commands: [],
-      }, { client: mockClient });
+      blueprint = await Blueprint.create(
+        {
+          name: 'test-blueprint',
+          system_setup_commands: [],
+        },
+        { client: mockClient },
+      );
     });
 
     describe('getInfo', () => {
@@ -243,10 +258,7 @@ describe('Blueprint (New API)', () => {
 
         const result = await blueprint.createDevbox();
 
-        expect(Devbox.create).toHaveBeenCalledWith(
-          { blueprint_id: 'blueprint-123' },
-          { client: mockClient },
-        );
+        expect(Devbox.create).toHaveBeenCalledWith({ blueprint_id: 'blueprint-123' }, { client: mockClient });
         expect(result).toBeInstanceOf(Devbox);
       });
     });
@@ -264,17 +276,20 @@ describe('Blueprint (New API)', () => {
       mockClient.blueprints.createAndAwaitBuildCompleted.mockRejectedValue(error);
 
       await expect(
-        Blueprint.create({
-          name: 'failing-blueprint',
-          system_setup_commands: [],
-        }, { client: mockClient }),
+        Blueprint.create(
+          {
+            name: 'failing-blueprint',
+            system_setup_commands: [],
+          },
+          { client: mockClient },
+        ),
       ).rejects.toThrow('Build failed');
     });
 
     it('should handle retrieval errors in getInfo', async () => {
       const error = new Error('Blueprint not found');
       mockClient.blueprints.retrieve.mockRejectedValue(error);
-      
+
       const blueprint = Blueprint.fromId('non-existent', { client: mockClient });
       await expect(blueprint.getInfo()).rejects.toThrow('Blueprint not found');
     });
@@ -284,19 +299,25 @@ describe('Blueprint (New API)', () => {
       mockClient.blueprints.preview.mockRejectedValue(error);
 
       await expect(
-        Blueprint.preview({
-          name: 'invalid-blueprint',
-          system_setup_commands: ['invalid-command'],
-        }, { client: mockClient }),
+        Blueprint.preview(
+          {
+            name: 'invalid-blueprint',
+            system_setup_commands: ['invalid-command'],
+          },
+          { client: mockClient },
+        ),
       ).rejects.toThrow('Preview generation failed');
     });
 
     it('should handle logs retrieval errors', async () => {
       mockClient.blueprints.createAndAwaitBuildCompleted.mockResolvedValue(mockBlueprintData);
-      const blueprint = await Blueprint.create({
-        name: 'test-blueprint',
-        system_setup_commands: [],
-      }, { client: mockClient });
+      const blueprint = await Blueprint.create(
+        {
+          name: 'test-blueprint',
+          system_setup_commands: [],
+        },
+        { client: mockClient },
+      );
 
       const error = new Error('Logs not available');
       mockClient.blueprints.logs.mockRejectedValue(error);
@@ -306,10 +327,13 @@ describe('Blueprint (New API)', () => {
 
     it('should handle delete errors', async () => {
       mockClient.blueprints.createAndAwaitBuildCompleted.mockResolvedValue(mockBlueprintData);
-      const blueprint = await Blueprint.create({
-        name: 'test-blueprint',
-        system_setup_commands: [],
-      }, { client: mockClient });
+      const blueprint = await Blueprint.create(
+        {
+          name: 'test-blueprint',
+          system_setup_commands: [],
+        },
+        { client: mockClient },
+      );
 
       const error = new Error('Delete failed');
       mockClient.blueprints.delete.mockRejectedValue(error);
@@ -334,10 +358,13 @@ describe('Blueprint (New API)', () => {
 
     it('should handle blueprint with empty logs', async () => {
       mockClient.blueprints.createAndAwaitBuildCompleted.mockResolvedValue(mockBlueprintData);
-      const blueprint = await Blueprint.create({
-        name: 'test-blueprint',
-        system_setup_commands: [],
-      }, { client: mockClient });
+      const blueprint = await Blueprint.create(
+        {
+          name: 'test-blueprint',
+          system_setup_commands: [],
+        },
+        { client: mockClient },
+      );
 
       const emptyLogs = {
         blueprint_id: 'blueprint-123',
