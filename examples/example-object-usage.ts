@@ -16,7 +16,7 @@ async function main() {
       RUN apt-get update && apt-get install -y ffmpeg
     `,
   });
-
+  blueprint.createDevbox({})
   // Blueprint is now created and ready to use
   // Get blueprint information using getInfo()
   const blueprintInfo = await blueprint.getInfo();

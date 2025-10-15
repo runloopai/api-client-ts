@@ -16,12 +16,15 @@ import { Devbox } from './devbox';
  *
  * Example usage:
  * ```typescript
+ * // Make sure to set RUNLOOP_API_KEY environment variable
+ * // export RUNLOOP_API_KEY="your-api-key"
+ *
  * // Typically created from a Devbox:
  * const snapshotView = await devbox.snapshotDisk('my-snapshot');
- * const snapshot = Snapshot.fromId(snapshotView.id, { client });
+ * const snapshot = Snapshot.fromId(snapshotView.id);
  *
  * // Or load from existing snapshot
- * const snapshot = Snapshot.fromId('snapshot-id', { client });
+ * const snapshot = Snapshot.fromId('snapshot-id');
  *
  * // Get snapshot information
  * const info = await snapshot.getInfo();
@@ -148,7 +151,7 @@ export class Snapshot {
    * @returns A new Devbox instance created from this snapshot
    */
   async createDevbox(
-    params?: Omit<DevboxCreateParams, 'snapshot_id'>,
+    params?: Omit<DevboxCreateParams, 'snapshot_id' | 'blueprint_id' | 'blueprint_name'>,
     options?: Core.RequestOptions & {
       polling?: Partial<
         import('../lib/polling').PollingOptions<import('../resources/devboxes/devboxes').DevboxView>

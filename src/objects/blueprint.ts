@@ -140,7 +140,7 @@ export class Blueprint {
    * @returns A new Devbox instance created from this blueprint
    */
   async createDevbox(
-    params?: Omit<DevboxCreateParams, 'blueprint_id'>,
+    params?: Omit<DevboxCreateParams, 'blueprint_id' | 'snapshot_id' | 'blueprint_name'>,
     options?: Core.RequestOptions & {
       polling?: Partial<
         import('../lib/polling').PollingOptions<import('../resources/devboxes/devboxes').DevboxView>
