@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       environment:
-        description: "Target environment"
+        description: 'Target environment'
         type: choice
         default: dev
         options:
@@ -49,5 +49,3 @@ jobs:
       - name: Run smoke tests
         run: |
           ./node_modules/.bin/jest tests/smoketests --runInBand --verbose --testTimeout=1800000
-
-
