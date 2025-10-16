@@ -3,6 +3,10 @@ import { Devbox } from './objects/devbox';
 import { Blueprint } from './objects/blueprint';
 import { Snapshot } from './objects/snapshot';
 import { StorageObject } from './objects/storage-object';
+import type * as Core from './core';
+import type { DevboxCreateParams, DevboxListDiskSnapshotsParams } from './resources/devboxes/devboxes';
+import type { BlueprintCreateParams } from './resources/blueprints';
+import type { ObjectCreateParams, ObjectListParams } from './resources/objects';
 
 /**
  * Runloop SDK - The recommended way to interact with Runloop.
@@ -31,15 +35,15 @@ export namespace RunloopSDK {
   export class DevboxInterface {
     constructor(private client: Runloop) {}
 
-    async create(params?, options?): Promise<Devbox> {
+    async create(params?: DevboxCreateParams, options?: Core.RequestOptions): Promise<Devbox> {
       return Devbox.create(this.client, params, options);
     }
 
-    async fromId(id: string, options?): Promise<Devbox> {
+    async fromId(id: string, options?: Core.RequestOptions): Promise<Devbox> {
       return Devbox.fromId(this.client, id, options);
     }
 
-    async list(params?, options?): Promise<Devbox[]> {
+    async list(params?: DevboxListDiskSnapshotsParams, options?: Core.RequestOptions): Promise<Devbox[]> {
       // TODO: Implement list functionality
       throw new Error('List not yet implemented');
     }
@@ -51,15 +55,15 @@ export namespace RunloopSDK {
   export class BlueprintInterface {
     constructor(private client: Runloop) {}
 
-    async create(params, options?): Promise<Blueprint> {
+    async create(params: BlueprintCreateParams, options?: Core.RequestOptions): Promise<Blueprint> {
       return Blueprint.create(this.client, params, options);
     }
 
-    async fromId(id: string, options?): Promise<Blueprint> {
+    async fromId(id: string, options?: Core.RequestOptions): Promise<Blueprint> {
       return Blueprint.fromId(this.client, id, options);
     }
 
-    async list(params?, options?): Promise<Blueprint[]> {
+    async list(params?: BlueprintCreateParams, options?: Core.RequestOptions): Promise<Blueprint[]> {
       // TODO: Implement list functionality
       throw new Error('List not yet implemented');
     }
@@ -71,11 +75,11 @@ export namespace RunloopSDK {
   export class SnapshotInterface {
     constructor(private client: Runloop) {}
 
-    async fromId(id: string, options?): Promise<Snapshot> {
+    async fromId(id: string, options?: Core.RequestOptions): Promise<Snapshot> {
       return Snapshot.fromId(this.client, id, options);
     }
 
-    async list(params?, options?): Promise<Snapshot[]> {
+    async list(params?: DevboxListDiskSnapshotsParams, options?: Core.RequestOptions): Promise<Snapshot[]> {
       return Snapshot.list(this.client, params, options);
     }
   }
@@ -86,19 +90,18 @@ export namespace RunloopSDK {
   export class StorageObjectInterface {
     constructor(private client: Runloop) {}
 
-    async create(params, options?): Promise<StorageObject> {
+    async create(params: ObjectCreateParams, options?: Core.RequestOptions): Promise<StorageObject> {
       return StorageObject.create(this.client, params, options);
     }
 
-    async fromId(id: string, options?): Promise<StorageObject> {
+    async fromId(id: string, options?: Core.RequestOptions): Promise<StorageObject> {
       return StorageObject.fromId(this.client, id, options);
     }
 
-    async list(params?, options?): Promise<StorageObject[]> {
+    async list(params?: ObjectListParams, options?: Core.RequestOptions): Promise<StorageObject[]> {
       return StorageObject.list(this.client, params, options);
     }
   }
 }
 
 export default RunloopSDK;
-
