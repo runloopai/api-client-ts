@@ -55,6 +55,7 @@ describe('resource executions', () => {
     const response = await client.devboxes.executions.executeAsync('id', {
       command: 'command',
       shell_name: 'shell_name',
+      attach_stdin: true,
     });
   });
 

@@ -238,6 +238,7 @@ describe('resource devboxes', () => {
     const response = await client.devboxes.executeAsync('id', {
       command: 'command',
       shell_name: 'shell_name',
+      attach_stdin: true,
     });
   });
 
@@ -256,6 +257,7 @@ describe('resource devboxes', () => {
     const response = await client.devboxes.executeSync('id', {
       command: 'command',
       shell_name: 'shell_name',
+      attach_stdin: true,
     });
   });
 
