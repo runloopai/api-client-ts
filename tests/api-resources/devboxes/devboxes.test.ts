@@ -673,7 +673,7 @@ describe('resource devboxes', () => {
           command: 'echo hello',
           command_id: expect.any(String),
         }),
-        query: { last_n: 10 },
+        query: { last_n: '10' },
         polling: {
           maxAttempts: 1,
           pollingIntervalMs: 10,
@@ -686,7 +686,7 @@ describe('resource devboxes', () => {
         2,
         '/v1/devboxes/devbox-123/executions/exec-123/wait_for_status',
         {
-          query: { last_n: 10 },
+          query: { last_n: '10' },
           body: {
             statuses: ['completed'],
           },
