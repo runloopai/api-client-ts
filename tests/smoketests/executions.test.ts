@@ -108,14 +108,14 @@ describe('smoketest: executions', () => {
     // Execute a command that produces multiple lines of output
     const completed = await client.devboxes.executeAndAwaitCompletion(devboxId, {
       command: 'echo "line 1" && echo "line 2" && echo "line 3" && echo "line 4" && echo "line 5"',
-      last_n: 3, // Only get the last 3 lines
+      last_n: '3', // Only get the last 3 lines
     });
 
     expect(completed.status).toBe('completed');
     expect(completed.stdout).toBeDefined();
 
     // The output should contain only the last 3 lines (lines 3, 4, 5)
-    const outputLines = completed.stdout.trim().split('\n');
+    const outputLines = completed.stdout?.trim().split('\n') || [];
     expect(outputLines).toHaveLength(3);
     expect(outputLines[0]).toBe('line 3');
     expect(outputLines[1]).toBe('line 4');
@@ -140,7 +140,7 @@ describe('smoketest: executions', () => {
     expect(completed.stdout).toBeDefined();
 
     // The output should contain all 5 lines
-    const outputLines = completed.stdout.trim().split('\n');
+    const outputLines = completed.stdout?.trim().split('\n') || [];
     expect(outputLines).toHaveLength(5);
     expect(outputLines[0]).toBe('line 1');
     expect(outputLines[1]).toBe('line 2');
