@@ -1,12 +1,11 @@
 import { Devbox } from '../../src/objects/devbox';
-import { Runloop } from '../../src/index';
 import type { DevboxView, DevboxAsyncExecutionDetailView } from '../../src/resources/devboxes/devboxes';
 
 // Mock the Runloop client
 jest.mock('../../src/index');
 
 describe('Devbox (New API)', () => {
-  let mockClient: jest.Mocked<Runloop>;
+  let mockClient: any;
   let mockDevboxData: DevboxView;
 
   beforeEach(() => {

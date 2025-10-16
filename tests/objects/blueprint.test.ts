@@ -1,6 +1,5 @@
 import { Blueprint } from '../../src/objects/blueprint';
 import { Devbox } from '../../src/objects/devbox';
-import { Runloop } from '../../src/index';
 import type {
   BlueprintView,
   BlueprintBuildLogsListView,
@@ -11,7 +10,7 @@ import type {
 jest.mock('../../src/index');
 
 describe('Blueprint (New API)', () => {
-  let mockClient: jest.Mocked<Runloop>;
+  let mockClient: any;
   let mockBlueprintData: BlueprintView;
 
   beforeEach(() => {
@@ -213,8 +212,8 @@ describe('Blueprint (New API)', () => {
         const logs = await blueprint.logs();
 
         expect(mockClient.blueprints.logs).toHaveBeenCalledWith('blueprint-123', undefined);
-        expect(logs.logs).toHaveLength(2);
-        expect(logs.logs[0].message).toBe('Building blueprint...');
+        expect(logs.logs!).toHaveLength(2);
+        expect(logs.logs![0]!.message).toBe('Building blueprint...');
       });
     });
 
@@ -242,7 +241,7 @@ describe('Blueprint (New API)', () => {
         };
 
         // Mock Devbox.create static method
-        jest.spyOn(Devbox, 'create').mockResolvedValue(new Devbox(mockClient as any, 'devbox-789'));
+        jest.spyOn(Devbox, 'create').mockResolvedValue(Devbox.fromId(mockClient as any, 'devbox-789'));
 
         const result = await blueprint.createDevbox({
           name: 'blueprint-devbox',
@@ -273,7 +272,7 @@ describe('Blueprint (New API)', () => {
           state_transitions: [],
         };
 
-        jest.spyOn(Devbox, 'create').mockResolvedValue(new Devbox(mockClient as any, 'devbox-789'));
+        jest.spyOn(Devbox, 'create').mockResolvedValue(Devbox.fromId(mockClient as any, 'devbox-789'));
 
         const result = await blueprint.createDevbox();
 
@@ -301,7 +300,7 @@ describe('Blueprint (New API)', () => {
             name: 'failing-blueprint',
             system_setup_commands: [],
           },
-          { client: mockClient },
+          {},
         ),
       ).rejects.toThrow('Build failed');
     });

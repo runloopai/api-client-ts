@@ -1,6 +1,5 @@
 import { Snapshot } from '../../src/objects/snapshot';
 import { Devbox } from '../../src/objects/devbox';
-import { Runloop } from '../../src/index';
 import type { DevboxSnapshotView } from '../../src/resources/devboxes/devboxes';
 import type { DevboxSnapshotAsyncStatusView } from '../../src/resources/devboxes/disk-snapshots';
 
@@ -8,7 +7,7 @@ import type { DevboxSnapshotAsyncStatusView } from '../../src/resources/devboxes
 jest.mock('../../src/index');
 
 describe('Snapshot (New API)', () => {
-  let mockClient: jest.Mocked<Runloop>;
+  let mockClient: any;
   let mockSnapshotData: DevboxSnapshotView;
 
   beforeEach(() => {
@@ -101,8 +100,8 @@ describe('Snapshot (New API)', () => {
 
       expect(mockClient.devboxes.listDiskSnapshots).toHaveBeenCalledWith(undefined, undefined);
       expect(snapshots).toHaveLength(2);
-      expect(snapshots[0].id).toBe('snapshot-1');
-      expect(snapshots[1].id).toBe('snapshot-2');
+      expect(snapshots[0]!.id).toBe('snapshot-1');
+      expect(snapshots[1]!.id).toBe('snapshot-2');
     });
 
     it('should filter by devbox ID', async () => {
@@ -315,7 +314,7 @@ describe('Snapshot (New API)', () => {
         };
 
         // Mock Devbox.create static method
-        jest.spyOn(Devbox, 'create').mockResolvedValue(new Devbox(mockClient as any, 'devbox-789'));
+        jest.spyOn(Devbox, 'create').mockResolvedValue(Devbox.fromId(mockClient as any, 'devbox-789'));
 
         const result = await snapshot.createDevbox({
           name: 'restored-devbox',
@@ -346,7 +345,7 @@ describe('Snapshot (New API)', () => {
           state_transitions: [],
         };
 
-        jest.spyOn(Devbox, 'create').mockResolvedValue(new Devbox(mockClient as any, 'devbox-789'));
+        jest.spyOn(Devbox, 'create').mockResolvedValue(Devbox.fromId(mockClient as any, 'devbox-789'));
 
         const result = await snapshot.createDevbox();
 

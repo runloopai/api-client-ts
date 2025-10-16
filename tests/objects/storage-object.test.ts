@@ -1,12 +1,11 @@
 import { StorageObject } from '../../src/objects/storage-object';
-import { Runloop } from '../../src/index';
 import type { ObjectView, ObjectDownloadURLView } from '../../src/resources/objects';
 
 // Mock the Runloop client
 jest.mock('../../src/index');
 
 // Mock fetch globally
-global.fetch = jest.fn();
+(global as any).fetch = jest.fn();
 
 // Mock fs and path modules
 jest.mock('node:fs', () => ({
@@ -23,7 +22,7 @@ jest.mock('node:path', () => ({
 }));
 
 describe('StorageObject (New API)', () => {
-  let mockClient: jest.Mocked<Runloop>;
+  let mockClient: any;
   let mockObjectData: ObjectView;
   let mockFs: any;
   let mockPath: any;
@@ -87,7 +86,7 @@ describe('StorageObject (New API)', () => {
     };
 
     // Reset fetch mock
-    (global.fetch as jest.Mock).mockReset();
+    ((global as any).fetch as jest.Mock).mockReset();
   });
 
   describe('create', () => {
@@ -159,12 +158,12 @@ describe('StorageObject (New API)', () => {
 
       mockClient.objects.list.mockResolvedValue(mockPage as any);
 
-      const objects = await StorageObject.list(mockClient, undefined, { client: mockClient });
+      const objects = await StorageObject.list(mockClient, undefined, {});
 
-      expect(mockClient.objects.list).toHaveBeenCalledWith(undefined, { client: mockClient });
+      expect(mockClient.objects.list).toHaveBeenCalledWith(undefined, {});
       expect(objects).toHaveLength(2);
-      expect(objects[0].id).toBe('object-1');
-      expect(objects[1].id).toBe('object-2');
+      expect(objects[0]!.id).toBe('object-1');
+      expect(objects[1]!.id).toBe('object-2');
     });
 
     it('should support filtering', async () => {
@@ -226,11 +225,11 @@ describe('StorageObject (New API)', () => {
           statusText: 'OK',
         };
 
-        (global.fetch as jest.Mock).mockResolvedValue(mockFetchResponse);
+        ((global as any).fetch as jest.Mock).mockResolvedValue(mockFetchResponse);
 
         await storageObject.uploadContent('Hello, World!', 'text/plain');
 
-        expect(global.fetch).toHaveBeenCalledWith(mockObjectData.upload_url, {
+        expect((global as any).fetch).toHaveBeenCalledWith(mockObjectData.upload_url, {
           method: 'PUT',
           body: 'Hello, World!',
           headers: { 'Content-Type': 'text/plain' },
@@ -247,12 +246,12 @@ describe('StorageObject (New API)', () => {
           statusText: 'OK',
         };
 
-        (global.fetch as jest.Mock).mockResolvedValue(mockFetchResponse);
+        ((global as any).fetch as jest.Mock).mockResolvedValue(mockFetchResponse);
 
         const buffer = Buffer.from([0x89, 0x50, 0x4e, 0x47]);
         await storageObject.uploadContent(buffer);
 
-        expect(global.fetch).toHaveBeenCalledWith(mockObjectData.upload_url, {
+        expect((global as any).fetch).toHaveBeenCalledWith(mockObjectData.upload_url, {
           method: 'PUT',
           body: buffer,
           headers: {},
@@ -277,7 +276,7 @@ describe('StorageObject (New API)', () => {
           statusText: 'Forbidden',
         };
 
-        (global.fetch as jest.Mock).mockResolvedValue(mockFetchResponse);
+        ((global as any).fetch as jest.Mock).mockResolvedValue(mockFetchResponse);
 
         await expect(storageObject.uploadContent('test')).rejects.toThrow('Upload failed: 403 Forbidden');
       });
@@ -348,11 +347,11 @@ describe('StorageObject (New API)', () => {
           text: jest.fn().mockResolvedValue('File contents'),
         };
 
-        (global.fetch as jest.Mock).mockResolvedValue(mockFetchResponse);
+        ((global as any).fetch as jest.Mock).mockResolvedValue(mockFetchResponse);
 
         const content = await storageObject.downloadAsText();
 
-        expect(global.fetch).toHaveBeenCalledWith(mockDownloadUrl.download_url);
+        expect((global as any).fetch).toHaveBeenCalledWith(mockDownloadUrl.download_url);
         expect(content).toBe('File contents');
       });
 
@@ -369,7 +368,7 @@ describe('StorageObject (New API)', () => {
           statusText: 'Not Found',
         };
 
-        (global.fetch as jest.Mock).mockResolvedValue(mockFetchResponse);
+        ((global as any).fetch as jest.Mock).mockResolvedValue(mockFetchResponse);
 
         await expect(storageObject.downloadAsText()).rejects.toThrow('Download failed: 404 Not Found');
       });
@@ -389,11 +388,11 @@ describe('StorageObject (New API)', () => {
           arrayBuffer: jest.fn().mockResolvedValue(mockArrayBuffer),
         };
 
-        (global.fetch as jest.Mock).mockResolvedValue(mockFetchResponse);
+        ((global as any).fetch as jest.Mock).mockResolvedValue(mockFetchResponse);
 
         const buffer = await storageObject.downloadAsBuffer();
 
-        expect(global.fetch).toHaveBeenCalledWith(mockDownloadUrl.download_url);
+        expect((global as any).fetch).toHaveBeenCalledWith(mockDownloadUrl.download_url);
         expect(Buffer.isBuffer(buffer)).toBe(true);
         expect(buffer.length).toBe(4);
       });
@@ -428,7 +427,7 @@ describe('StorageObject (New API)', () => {
 
       // Upload - mock getInfo for uploadContent
       mockClient.objects.retrieve.mockResolvedValue(mockObjectData);
-      (global.fetch as jest.Mock).mockResolvedValue({ ok: true });
+      ((global as any).fetch as jest.Mock).mockResolvedValue({ ok: true });
       await obj.uploadContent('Test content');
 
       // Complete
@@ -441,7 +440,7 @@ describe('StorageObject (New API)', () => {
         download_url: 'https://s3.example.com/download/workflow-test.txt',
       };
       mockClient.objects.download.mockResolvedValue(mockDownloadUrl);
-      (global.fetch as jest.Mock).mockResolvedValue({
+      ((global as any).fetch as jest.Mock).mockResolvedValue({
         ok: true,
         text: jest.fn().mockResolvedValue('Test content'),
       });
@@ -456,7 +455,7 @@ describe('StorageObject (New API)', () => {
       // Clear all mocks
       jest.clearAllMocks();
       // Reset global fetch mock
-      (global.fetch as jest.Mock).mockClear();
+      ((global as any).fetch as jest.Mock).mockClear();
     });
 
     it('should upload a text file with auto-detected content-type', async () => {
@@ -472,7 +471,7 @@ describe('StorageObject (New API)', () => {
       mockClient.objects.retrieve.mockResolvedValue(mockObjectInfo);
       mockClient.objects.complete.mockResolvedValue(mockCompletedData);
 
-      (global.fetch as jest.Mock).mockResolvedValue({
+      ((global as any).fetch as jest.Mock).mockResolvedValue({
         ok: true,
         status: 200,
         statusText: 'OK',
@@ -502,21 +501,20 @@ describe('StorageObject (New API)', () => {
       mockClient.objects.retrieve.mockResolvedValue(mockObjectInfo);
       mockClient.objects.complete.mockResolvedValue(mockCompletedData);
 
-      (global.fetch as jest.Mock).mockResolvedValue({
+      ((global as any).fetch as jest.Mock).mockResolvedValue({
         ok: true,
         status: 200,
         statusText: 'OK',
       });
 
       const result = await StorageObject.uploadFromFile(mockClient, './data.bin', 'custom.bin', {
-        client: mockClient,
         contentType: 'binary',
         metadata: { source: 'test' },
       });
 
       expect(mockClient.objects.create).toHaveBeenCalledWith(
         { name: 'custom.bin', content_type: 'binary', metadata: { source: 'test' } },
-        { client: mockClient, contentType: 'binary', metadata: { source: 'test' } },
+        { contentType: 'binary', metadata: { source: 'test' } },
       );
       expect(result.id).toBe('file-456');
     });
@@ -540,9 +538,7 @@ describe('StorageObject (New API)', () => {
       });
 
       await expect(
-        StorageObject.uploadFromFile(mockClient, './nonexistent.txt', 'nonexistent.txt', {
-          client: mockClient,
-        }),
+        StorageObject.uploadFromFile(mockClient, './nonexistent.txt', 'nonexistent.txt', {}),
       ).rejects.toThrow('Failed to access file ./nonexistent.txt: File not found');
     });
 
@@ -557,15 +553,15 @@ describe('StorageObject (New API)', () => {
       mockClient.objects.create.mockResolvedValue(mockObjectData);
       mockClient.objects.retrieve.mockResolvedValue(mockObjectInfo);
 
-      (global.fetch as jest.Mock).mockResolvedValue({
+      ((global as any).fetch as jest.Mock).mockResolvedValue({
         ok: false,
         status: 500,
         statusText: 'Internal Server Error',
       });
 
-      await expect(
-        StorageObject.uploadFromFile(mockClient, './test.txt', 'test.txt', { client: mockClient }),
-      ).rejects.toThrow('Failed to upload file: Upload failed: 500 Internal Server Error');
+      await expect(StorageObject.uploadFromFile(mockClient, './test.txt', 'test.txt', {})).rejects.toThrow(
+        'Failed to upload file: Upload failed: 500 Internal Server Error',
+      );
     });
 
     it('should upload an archive file with auto-detected content-type', async () => {
@@ -581,7 +577,7 @@ describe('StorageObject (New API)', () => {
       mockClient.objects.retrieve.mockResolvedValue(mockObjectInfo);
       mockClient.objects.complete.mockResolvedValue(mockCompletedData);
 
-      (global.fetch as jest.Mock).mockResolvedValue({
+      ((global as any).fetch as jest.Mock).mockResolvedValue({
         ok: true,
         status: 200,
         statusText: 'OK',
@@ -608,7 +604,7 @@ describe('StorageObject (New API)', () => {
       // Clear all mocks
       jest.clearAllMocks();
       // Reset global fetch mock
-      (global.fetch as jest.Mock).mockClear();
+      ((global as any).fetch as jest.Mock).mockClear();
     });
 
     it('should upload buffer with specified content-type and name', async () => {
@@ -621,7 +617,7 @@ describe('StorageObject (New API)', () => {
       mockClient.objects.retrieve.mockResolvedValue(mockObjectInfo);
       mockClient.objects.complete.mockResolvedValue(mockCompletedData);
 
-      (global.fetch as jest.Mock).mockResolvedValue({
+      ((global as any).fetch as jest.Mock).mockResolvedValue({
         ok: true,
         status: 200,
         statusText: 'OK',
@@ -635,7 +631,7 @@ describe('StorageObject (New API)', () => {
         { name: 'buffer.txt', content_type: 'text', metadata: { source: 'buffer' } },
         { metadata: { source: 'buffer' } },
       );
-      expect(global.fetch).toHaveBeenCalledWith('https://upload.example.com/buffer', {
+      expect((global as any).fetch).toHaveBeenCalledWith('https://upload.example.com/buffer', {
         method: 'PUT',
         body: buffer,
         headers: { 'Content-Length': buffer.length.toString() },
@@ -666,7 +662,7 @@ describe('StorageObject (New API)', () => {
       mockClient.objects.create.mockResolvedValue(mockObjectData);
       mockClient.objects.retrieve.mockResolvedValue(mockObjectInfo);
 
-      (global.fetch as jest.Mock).mockResolvedValue({
+      ((global as any).fetch as jest.Mock).mockResolvedValue({
         ok: false,
         status: 403,
         statusText: 'Forbidden',
@@ -687,7 +683,7 @@ describe('StorageObject (New API)', () => {
       mockClient.objects.retrieve.mockResolvedValue(mockObjectInfo);
       mockClient.objects.complete.mockResolvedValue(mockCompletedData);
 
-      (global.fetch as jest.Mock).mockResolvedValue({
+      ((global as any).fetch as jest.Mock).mockResolvedValue({
         ok: true,
         status: 200,
         statusText: 'OK',
@@ -697,7 +693,7 @@ describe('StorageObject (New API)', () => {
 
       // Verify all three steps were called
       expect(mockClient.objects.create).toHaveBeenCalledTimes(1);
-      expect(global.fetch).toHaveBeenCalledTimes(1);
+      expect((global as any).fetch).toHaveBeenCalledTimes(1);
       expect(mockClient.objects.complete).toHaveBeenCalledTimes(1);
       expect(result).toBeInstanceOf(StorageObject);
     });
@@ -715,7 +711,7 @@ describe('StorageObject (New API)', () => {
             name: 'test.txt',
             content_type: 'text',
           },
-          { client: mockClient },
+          {},
         ),
       ).rejects.toThrow('Create failed');
     });
@@ -732,9 +728,7 @@ describe('StorageObject (New API)', () => {
       const error = new Error('List failed');
       mockClient.objects.list.mockRejectedValue(error);
 
-      await expect(StorageObject.list(mockClient, undefined, { client: mockClient })).rejects.toThrow(
-        'List failed',
-      );
+      await expect(StorageObject.list(mockClient, undefined, {})).rejects.toThrow('List failed');
     });
   });
 });
