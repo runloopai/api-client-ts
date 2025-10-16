@@ -92,10 +92,14 @@ describe('Blueprint (New API)', () => {
     it('should pass polling options to the API client', async () => {
       mockClient.blueprints.createAndAwaitBuildCompleted.mockResolvedValue(mockBlueprintData);
 
-      await Blueprint.create(mockClient, {
-        name: 'test-blueprint',
-        system_setup_commands: [],
-      }, { polling: { maxAttempts: 5 } });
+      await Blueprint.create(
+        mockClient,
+        {
+          name: 'test-blueprint',
+          system_setup_commands: [],
+        },
+        { polling: { maxAttempts: 5 } },
+      );
 
       expect(mockClient.blueprints.createAndAwaitBuildCompleted).toHaveBeenCalledWith(
         {
@@ -109,13 +113,12 @@ describe('Blueprint (New API)', () => {
     it('should support complex blueprint configurations', async () => {
       mockClient.blueprints.createAndAwaitBuildCompleted.mockResolvedValue(mockBlueprintData);
 
-      await Blueprint.create(mockClient,
-        {
-          name: 'complex-blueprint',
-          dockerfile: 'FROM ubuntu:22.04\nRUN apt-get update',
-          system_setup_commands: ['npm install'],
-          metadata: { version: '1.0' },
-        });
+      await Blueprint.create(mockClient, {
+        name: 'complex-blueprint',
+        dockerfile: 'FROM ubuntu:22.04\nRUN apt-get update',
+        system_setup_commands: ['npm install'],
+        metadata: { version: '1.0' },
+      });
 
       expect(mockClient.blueprints.createAndAwaitBuildCompleted).toHaveBeenCalledWith(
         {
@@ -292,7 +295,8 @@ describe('Blueprint (New API)', () => {
       mockClient.blueprints.createAndAwaitBuildCompleted.mockRejectedValue(error);
 
       await expect(
-        Blueprint.create(mockClient,
+        Blueprint.create(
+          mockClient,
           {
             name: 'failing-blueprint',
             system_setup_commands: [],
@@ -324,11 +328,10 @@ describe('Blueprint (New API)', () => {
 
     it('should handle logs retrieval errors', async () => {
       mockClient.blueprints.createAndAwaitBuildCompleted.mockResolvedValue(mockBlueprintData);
-      const blueprint = await Blueprint.create(mockClient,
-        {
-          name: 'test-blueprint',
-          system_setup_commands: [],
-        });
+      const blueprint = await Blueprint.create(mockClient, {
+        name: 'test-blueprint',
+        system_setup_commands: [],
+      });
 
       const error = new Error('Logs not available');
       mockClient.blueprints.logs.mockRejectedValue(error);
@@ -338,11 +341,10 @@ describe('Blueprint (New API)', () => {
 
     it('should handle delete errors', async () => {
       mockClient.blueprints.createAndAwaitBuildCompleted.mockResolvedValue(mockBlueprintData);
-      const blueprint = await Blueprint.create(mockClient,
-        {
-          name: 'test-blueprint',
-          system_setup_commands: [],
-        });
+      const blueprint = await Blueprint.create(mockClient, {
+        name: 'test-blueprint',
+        system_setup_commands: [],
+      });
 
       const error = new Error('Delete failed');
       mockClient.blueprints.delete.mockRejectedValue(error);
@@ -367,11 +369,10 @@ describe('Blueprint (New API)', () => {
 
     it('should handle blueprint with empty logs', async () => {
       mockClient.blueprints.createAndAwaitBuildCompleted.mockResolvedValue(mockBlueprintData);
-      const blueprint = await Blueprint.create(mockClient,
-        {
-          name: 'test-blueprint',
-          system_setup_commands: [],
-        });
+      const blueprint = await Blueprint.create(mockClient, {
+        name: 'test-blueprint',
+        system_setup_commands: [],
+      });
 
       const emptyLogs = {
         blueprint_id: 'blueprint-123',

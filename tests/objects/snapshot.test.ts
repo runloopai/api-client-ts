@@ -366,7 +366,7 @@ describe('Snapshot (New API)', () => {
     it('should handle update errors', async () => {
       const snapshot = Snapshot.fromId(mockClient, 'snapshot-123');
       const error = new Error('Update failed');
-        mockClient.devboxes.diskSnapshots.update.mockRejectedValue(error);
+      mockClient.devboxes.diskSnapshots.update.mockRejectedValue(error);
 
       await expect(snapshot.update({ name: 'new-name' })).rejects.toThrow('Update failed');
     });
@@ -374,7 +374,7 @@ describe('Snapshot (New API)', () => {
     it('should handle delete errors', async () => {
       const snapshot = Snapshot.fromId(mockClient, 'snapshot-123');
       const error = new Error('Delete failed');
-        mockClient.devboxes.diskSnapshots.delete.mockRejectedValue(error);
+      mockClient.devboxes.diskSnapshots.delete.mockRejectedValue(error);
 
       await expect(snapshot.delete()).rejects.toThrow('Delete failed');
     });
