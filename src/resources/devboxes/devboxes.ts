@@ -273,9 +273,17 @@ export class Devboxes extends APIResource {
       return execution;
     }
 
+    const makeWaitParams = (): DevboxWaitForCommandParams => {
+      const params: DevboxWaitForCommandParams = { statuses: ['completed'] };
+      if (body.last_n !== undefined) {
+        params.last_n = body.last_n;
+      }
+      return params;
+    };
+
     const finalResult = await poll(
-      () => this.waitForCommand(devboxId, execution.execution_id, { statuses: ['completed'] }),
-      () => this.waitForCommand(devboxId, execution.execution_id, { statuses: ['completed'] }),
+      () => this.waitForCommand(devboxId, execution.execution_id, makeWaitParams()),
+      () => this.waitForCommand(devboxId, execution.execution_id, makeWaitParams()),
       {
         ...options?.polling,
         shouldStop: (result) => {
