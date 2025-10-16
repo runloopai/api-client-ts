@@ -255,13 +255,13 @@ export class Devboxes extends APIResource {
    */
   async executeAndAwaitCompletion(
     devboxId: string,
-    body: Omit<DevboxExecuteParams, 'command_id'>,
+    params: Omit<DevboxExecuteParams, 'command_id'>,
     options?: Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxAsyncExecutionDetailView>> },
   ): Promise<DevboxAsyncExecutionDetailView> {
     const commandId = uuidv7();
     const execution = await this.execute(
       devboxId,
-      { ...body, command_id: commandId },
+      { ...params, command_id: commandId },
       // For first poll, if timeout is provided, use the timeout from the request options
       // Otherwise, if polling options are provided, use the timeout from the polling options
       // Otherwise, use the default timeout of 600 seconds
@@ -273,9 +273,17 @@ export class Devboxes extends APIResource {
       return execution;
     }
 
+    const waitForCommandBody: DevboxWaitForCommandParams = {
+      statuses: ['completed'],
+    };
+
+    if (params.last_n) {
+      waitForCommandBody.last_n = params.last_n;
+    }
+
     const finalResult = await poll(
-      () => this.waitForCommand(devboxId, execution.execution_id, { statuses: ['completed'] }),
-      () => this.waitForCommand(devboxId, execution.execution_id, { statuses: ['completed'] }),
+      () => this.waitForCommand(devboxId, execution.execution_id, waitForCommandBody),
+      () => this.waitForCommand(devboxId, execution.execution_id, waitForCommandBody),
       {
         ...options?.polling,
         shouldStop: (result) => {

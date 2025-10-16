@@ -96,4 +96,56 @@ describe('smoketest: executions', () => {
     },
     THIRTY_SECOND_TIMEOUT,
   );
+
+  test('executeAndAwaitCompletion with last_n parameter', async () => {
+    // Skip if devbox wasn't created
+    if (!devboxId) {
+      console.log('Skipping test: devbox not created');
+      return;
+    }
+
+    // This test verifies that the last_n parameter correctly limits output to the last N lines
+    // Execute a command that produces multiple lines of output
+    const completed = await client.devboxes.executeAndAwaitCompletion(devboxId, {
+      command: 'echo "line 1" && echo "line 2" && echo "line 3" && echo "line 4" && echo "line 5"',
+      last_n: 3, // Only get the last 3 lines
+    });
+
+    expect(completed.status).toBe('completed');
+    expect(completed.stdout).toBeDefined();
+
+    // The output should contain only the last 3 lines (lines 3, 4, 5)
+    const outputLines = completed.stdout.trim().split('\n');
+    expect(outputLines).toHaveLength(3);
+    expect(outputLines[0]).toBe('line 3');
+    expect(outputLines[1]).toBe('line 4');
+    expect(outputLines[2]).toBe('line 5');
+  });
+
+  test('executeAndAwaitCompletion without last_n parameter', async () => {
+    // Skip if devbox wasn't created
+    if (!devboxId) {
+      console.log('Skipping test: devbox not created');
+      return;
+    }
+
+    // This test verifies that without last_n, all output is returned
+    // Execute the same command without last_n to compare
+    const completed = await client.devboxes.executeAndAwaitCompletion(devboxId, {
+      command: 'echo "line 1" && echo "line 2" && echo "line 3" && echo "line 4" && echo "line 5"',
+      // No last_n parameter - should return all output
+    });
+
+    expect(completed.status).toBe('completed');
+    expect(completed.stdout).toBeDefined();
+
+    // The output should contain all 5 lines
+    const outputLines = completed.stdout.trim().split('\n');
+    expect(outputLines).toHaveLength(5);
+    expect(outputLines[0]).toBe('line 1');
+    expect(outputLines[1]).toBe('line 2');
+    expect(outputLines[2]).toBe('line 3');
+    expect(outputLines[3]).toBe('line 4');
+    expect(outputLines[4]).toBe('line 5');
+  });
 });
