@@ -161,15 +161,6 @@ import {
   ScoringFunctionResultView,
   StartScenarioRunParameters,
 } from './resources/scenarios/scenarios';
-// Object-oriented interfaces (re-exported at end of file)
-// eslint-disable-next-line unused-imports/no-unused-imports
-import { Devbox } from './objects/devbox';
-// eslint-disable-next-line unused-imports/no-unused-imports
-import { Blueprint } from './objects/blueprint';
-// eslint-disable-next-line unused-imports/no-unused-imports
-import { Snapshot } from './objects/snapshot';
-// eslint-disable-next-line unused-imports/no-unused-imports
-import { StorageObject } from './objects/storage-object';
 
 export interface ClientOptions {
   /**
@@ -583,12 +574,15 @@ export {
   UnprocessableEntityError,
 } from './error';
 
-export { Devbox } from './objects/devbox';
-export { Blueprint } from './objects/blueprint';
-export { Snapshot } from './objects/snapshot';
-export { StorageObject } from './objects/storage-object';
-
 // Export the new SDK
 export { RunloopSDK } from './sdk';
 
+/**
+ * @deprecated Use named imports instead of default import. This is the old api client. Use the new SDK instead.
+ * @example
+ * ```typescript
+ * // Instead of: import Runloop from '@runloop/api-client'
+ * import { RunloopSDK } from '@runloop/api-client'
+ * ```
+ */
 export default Runloop;
