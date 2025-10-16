@@ -18,56 +18,47 @@ npm install @runloop/api-client
 
 The full API of this library can be found in [api.md](api.md).
 
-### Quick Start with Objects API (Recommended)
+### Quick Start with SDK (Recommended)
 
-For the most intuitive experience, use our object-oriented API:
+For the most intuitive experience, use our new SDK:
 
 <!-- prettier-ignore -->
 ```js
-import { Runloop, Devbox, Blueprint, StorageObject } from '@runloop/api-client';
+import { RunloopSDK } from '@runloop/api-client';
 
-// Set up default client (optional, can be done once at app startup)
-Runloop.setDefaultClient(new Runloop({
+// Initialize the SDK
+const sdk = new RunloopSDK({
   bearerToken: process.env['RUNLOOP_API_KEY'], // This is the default and can be omitted
-}));
+});
 
-// Create and use a devbox with the object-oriented API (using default client)
-const devbox = await Devbox.create({ name: 'my-devbox' });
-await devbox.exec({ command: 'echo "Hello, World!"' });
+// Create and use a devbox with the SDK
+const devbox = await sdk.devbox.create({ name: 'my-devbox' });
+await devbox.cmd.exec({ command: 'echo "Hello, World!"' });
 await devbox.file.write({ file_path: 'test.txt', contents: 'Hello from Runloop!' });
 const content = await devbox.file.read({ file_path: 'test.txt' });
 await devbox.shutdown();
 
-// Or provide a custom client for specific operations
-const customClient = new Runloop({ bearerToken: 'different-token' });
-const devbox2 = await Devbox.create(
-  { name: 'my-other-devbox' },
-  { client: customClient }
-);
+// Create blueprints and storage objects
+const blueprint = await sdk.blueprint.create({ name: 'my-blueprint' });
+const storageObject = await sdk.storageObject.create({ name: 'my-file.txt' });
 ```
 
-#### Default Client Pattern
+#### SDK Pattern
 
-The object-oriented API supports a convenient default client pattern:
+The SDK provides a clean, object-oriented interface:
 
 ```js
-// Option 1: Set default client once at app startup
-Runloop.setDefaultClient(new Runloop({ bearerToken: 'your-token' }));
+// Initialize SDK once at app startup
+const sdk = new RunloopSDK({ bearerToken: 'your-token' });
 
-// Then use object classes without passing client explicitly
-const devbox = await Devbox.create({ name: 'my-devbox' });
-const blueprint = await Blueprint.create({ name: 'my-blueprint', dockerfile: '...' });
-const snapshot = await Snapshot.get('snapshot-id');
+// Use the SDK's object-oriented interfaces
+const devbox = await sdk.devbox.create({ name: 'my-devbox' });
+const blueprint = await sdk.blueprint.create({ name: 'my-blueprint', dockerfile: '...' });
+const snapshot = await sdk.snapshot.fromId('snapshot-id');
 
-// Option 2: Pass client explicitly (backward compatible)
-const client = new Runloop({ bearerToken: 'your-token' });
-const devbox = await Devbox.create(client, { name: 'my-devbox' });
-
-// Option 3: Override default client for specific operations
-const devbox = await Devbox.create(
-  { name: 'my-devbox' },
-  { client: customClient, polling: { maxAttempts: 10 } },
-);
+// Access the underlying API client if needed
+const apiClient = sdk.api;
+const devboxView = await apiClient.devboxes.create();
 ```
 
 ### Traditional Resource API
@@ -125,12 +116,12 @@ The Objects API provides a high-level, object-oriented interface that makes work
 ### Quick Example
 
 ```typescript
-import { Runloop, Devbox, Blueprint } from '@runloop/api-client';
+import { RunloopSDK } from '@runloop/api-client';
 
-const client = new Runloop();
+const sdk = new RunloopSDK();
 
 // Create a reusable blueprint
-const blueprint = await Blueprint.create(client, {
+const blueprint = await sdk.blueprint.create({
   name: 'nodejs-dev',
   system_setup_commands: [
     'curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -',
@@ -139,15 +130,15 @@ const blueprint = await Blueprint.create(client, {
 });
 
 // Create devbox from blueprint (much faster than installing each time)
-const devbox = await Devbox.create(client, {
+const devbox = await sdk.devbox.create({
   name: 'my-project',
   blueprint_id: blueprint.id,
 });
 
 // Work with files and execute commands
 await devbox.file.write('package.json', JSON.stringify({ name: 'my-app', version: '1.0.0' }));
-await devbox.exec('npm install express');
-const result = await devbox.exec('node --version');
+await devbox.cmd.exec('npm install express');
+const result = await devbox.cmd.exec('node --version');
 
 // Save state as snapshot
 const snapshot = await devbox.snapshotDisk('configured-env');

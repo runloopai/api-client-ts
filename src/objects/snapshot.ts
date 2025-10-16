@@ -49,30 +49,29 @@ export class Snapshot {
    * Create a Snapshot instance by ID without retrieving from API.
    * Use getInfo() to fetch the actual data when needed.
    *
+   * @param client - The Runloop client instance
    * @param id - The snapshot ID
-   * @param options - Request options with optional client override
+   * @param options - Request options
    * @returns A Snapshot instance
    */
-  static fromId(id: string, options?: Core.RequestOptions & { client?: Runloop }): Snapshot {
-    const client = options?.client || Runloop.getDefaultClient();
+  static fromId(client: Runloop, id: string, options?: Core.RequestOptions): Snapshot {
     return new Snapshot(client, id);
   }
 
   /**
    * List all snapshots, optionally filtered by devbox ID or metadata.
    *
+   * @param client - The Runloop client instance
    * @param params - Optional filter parameters
-   * @param options - Request options with optional client override
+   * @param options - Request options
    * @returns Array of Snapshot instances
    */
   static async list(
+    client: Runloop,
     params?: DevboxListDiskSnapshotsParams,
-    options?: Core.RequestOptions & { client?: Runloop },
+    options?: Core.RequestOptions,
   ): Promise<Snapshot[]> {
-    const client = options?.client || Runloop.getDefaultClient();
-    const requestOptions = options;
-
-    const snapshots = await client.devboxes.listDiskSnapshots(params, requestOptions);
+    const snapshots = await client.devboxes.listDiskSnapshots(params, options);
     const result: Snapshot[] = [];
 
     for await (const snapshot of snapshots) {
@@ -149,6 +148,6 @@ export class Snapshot {
       snapshot_id: this._id,
     };
 
-    return Devbox.create(createParams, { ...options, client: this.client });
+    return Devbox.create(this.client, createParams, options);
   }
 }

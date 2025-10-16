@@ -12,15 +12,44 @@ describe('Snapshot (New API)', () => {
   let mockSnapshotData: DevboxSnapshotView;
 
   beforeEach(() => {
-    // Create mock client instance
+    // Create mock client instance with proper structure
     mockClient = {
       devboxes: {
+        createAndAwaitRunning: jest.fn(),
+        retrieve: jest.fn(),
+        execute: jest.fn(),
+        executeAsync: jest.fn(),
+        readFileContents: jest.fn(),
+        writeFileContents: jest.fn(),
+        downloadFile: jest.fn(),
+        uploadFile: jest.fn(),
+        shutdown: jest.fn(),
+        suspend: jest.fn(),
+        resume: jest.fn(),
+        keepAlive: jest.fn(),
+        snapshotDisk: jest.fn(),
+        createSSHKey: jest.fn(),
+        createTunnel: jest.fn(),
+        removeTunnel: jest.fn(),
         listDiskSnapshots: jest.fn(),
         diskSnapshots: {
+          queryStatus: jest.fn(),
           update: jest.fn(),
           delete: jest.fn(),
-          queryStatus: jest.fn(),
         },
+      },
+      blueprints: {
+        createAndAwaitBuildCompleted: jest.fn(),
+        retrieve: jest.fn(),
+        preview: jest.fn(),
+        logs: jest.fn(),
+        delete: jest.fn(),
+      },
+      objects: {
+        create: jest.fn(),
+        retrieve: jest.fn(),
+        list: jest.fn(),
+        delete: jest.fn(),
       },
     } as any;
 
@@ -36,7 +65,7 @@ describe('Snapshot (New API)', () => {
 
   describe('fromId', () => {
     it('should create a Snapshot instance by ID without API call', () => {
-      const snapshot = Snapshot.fromId('snapshot-123', { client: mockClient });
+      const snapshot = Snapshot.fromId(mockClient, 'snapshot-123');
 
       expect(snapshot).toBeInstanceOf(Snapshot);
       expect(snapshot.id).toBe('snapshot-123');
@@ -68,9 +97,9 @@ describe('Snapshot (New API)', () => {
 
       mockClient.devboxes.listDiskSnapshots.mockResolvedValue(mockPage as any);
 
-      const snapshots = await Snapshot.list(undefined, { client: mockClient });
+      const snapshots = await Snapshot.list(mockClient, undefined);
 
-      expect(mockClient.devboxes.listDiskSnapshots).toHaveBeenCalledWith(undefined, { client: mockClient });
+      expect(mockClient.devboxes.listDiskSnapshots).toHaveBeenCalledWith(undefined, undefined);
       expect(snapshots).toHaveLength(2);
       expect(snapshots[0].id).toBe('snapshot-1');
       expect(snapshots[1].id).toBe('snapshot-2');
@@ -85,11 +114,11 @@ describe('Snapshot (New API)', () => {
 
       mockClient.devboxes.listDiskSnapshots.mockResolvedValue(mockPage as any);
 
-      await Snapshot.list({ devbox_id: 'devbox-456' }, { client: mockClient });
+      await Snapshot.list(mockClient, { devbox_id: 'devbox-456' });
 
       expect(mockClient.devboxes.listDiskSnapshots).toHaveBeenCalledWith(
         { devbox_id: 'devbox-456' },
-        { client: mockClient },
+        undefined,
       );
     });
 
@@ -102,7 +131,7 @@ describe('Snapshot (New API)', () => {
 
       mockClient.devboxes.listDiskSnapshots.mockResolvedValue(mockPage as any);
 
-      const snapshots = await Snapshot.list(undefined, { client: mockClient });
+      const snapshots = await Snapshot.list(mockClient, undefined);
 
       expect(snapshots).toHaveLength(0);
     });
@@ -112,7 +141,7 @@ describe('Snapshot (New API)', () => {
     let snapshot: Snapshot;
 
     beforeEach(() => {
-      snapshot = Snapshot.fromId('snapshot-123', { client: mockClient });
+      snapshot = Snapshot.fromId(mockClient, 'snapshot-123');
     });
 
     describe('getInfo', () => {
@@ -294,12 +323,13 @@ describe('Snapshot (New API)', () => {
         });
 
         expect(Devbox.create).toHaveBeenCalledWith(
+          mockClient,
           {
             name: 'restored-devbox',
             metadata: { restored_from: 'snapshot-123' },
             snapshot_id: 'snapshot-123',
           },
-          { client: mockClient },
+          undefined,
         );
         expect(result).toBeInstanceOf(Devbox);
       });
@@ -320,7 +350,7 @@ describe('Snapshot (New API)', () => {
 
         const result = await snapshot.createDevbox();
 
-        expect(Devbox.create).toHaveBeenCalledWith({ snapshot_id: 'snapshot-123' }, { client: mockClient });
+        expect(Devbox.create).toHaveBeenCalledWith(mockClient, { snapshot_id: 'snapshot-123' }, undefined);
         expect(result).toBeInstanceOf(Devbox);
       });
     });
@@ -334,17 +364,17 @@ describe('Snapshot (New API)', () => {
 
   describe('error handling', () => {
     it('should handle update errors', async () => {
-      const snapshot = Snapshot.fromId('snapshot-123', { client: mockClient });
+      const snapshot = Snapshot.fromId(mockClient, 'snapshot-123');
       const error = new Error('Update failed');
-      mockClient.devboxes.diskSnapshots.update.mockRejectedValue(error);
+        mockClient.devboxes.diskSnapshots.update.mockRejectedValue(error);
 
       await expect(snapshot.update({ name: 'new-name' })).rejects.toThrow('Update failed');
     });
 
     it('should handle delete errors', async () => {
-      const snapshot = Snapshot.fromId('snapshot-123', { client: mockClient });
+      const snapshot = Snapshot.fromId(mockClient, 'snapshot-123');
       const error = new Error('Delete failed');
-      mockClient.devboxes.diskSnapshots.delete.mockRejectedValue(error);
+        mockClient.devboxes.diskSnapshots.delete.mockRejectedValue(error);
 
       await expect(snapshot.delete()).rejects.toThrow('Delete failed');
     });
@@ -353,7 +383,7 @@ describe('Snapshot (New API)', () => {
       const error = new Error('List failed');
       mockClient.devboxes.listDiskSnapshots.mockRejectedValue(error);
 
-      await expect(Snapshot.list(undefined, { client: mockClient })).rejects.toThrow('List failed');
+      await expect(Snapshot.list(mockClient, undefined)).rejects.toThrow('List failed');
     });
   });
 });

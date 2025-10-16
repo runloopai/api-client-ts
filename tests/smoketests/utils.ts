@@ -1,4 +1,4 @@
-import Runloop from '@runloop/api-client';
+import { Runloop } from '@runloop/api-client';
 
 export function makeClient(overrides: Partial<ConstructorParameters<typeof Runloop>[0]> = {}) {
   const baseURL = process.env['RUNLOOP_BASE_URL'];

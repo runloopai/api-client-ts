@@ -57,18 +57,17 @@ export class Devbox {
    * Create a new Devbox and wait for it to reach the running state.
    * This is the recommended way to create a devbox as it ensures it's ready to use.
    *
+   * @param client - The Runloop client instance
    * @param params - Parameters for creating the devbox
-   * @param options - Request options with optional polling configuration and client override
+   * @param options - Request options with optional polling configuration
    * @returns A Devbox instance in the running state
    */
   static async create(
+    client: Runloop,
     params?: DevboxCreateParams,
-    options?: Core.RequestOptions & { client?: Runloop; polling?: Partial<PollingOptions<DevboxView>> },
+    options?: Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxView>> },
   ): Promise<Devbox> {
-    const client = options?.client || Runloop.getDefaultClient();
-    const requestOptions = options;
-
-    const devboxData = await client.devboxes.createAndAwaitRunning(params, requestOptions);
+    const devboxData = await client.devboxes.createAndAwaitRunning(params, options);
     return new Devbox(client, devboxData.id);
   }
 
@@ -76,12 +75,12 @@ export class Devbox {
    * Create a Devbox instance by ID without retrieving from API.
    * Use getInfo() to fetch the actual data when needed.
    *
+   * @param client - The Runloop client instance
    * @param id - The devbox ID
-   * @param options - Request options with optional client override
+   * @param options - Request options
    * @returns A Devbox instance
    */
-  static fromId(id: string, options?: Core.RequestOptions & { client?: Runloop }): Devbox {
-    const client = options?.client || Runloop.getDefaultClient();
+  static fromId(client: Runloop, id: string, options?: Core.RequestOptions): Devbox {
     return new Devbox(client, id);
   }
 
@@ -243,7 +242,7 @@ export class Devbox {
    */
   async snapshotDisk(params?: DevboxSnapshotDiskParams, options?: Core.RequestOptions): Promise<Snapshot> {
     const snapshotData = await this.client.devboxes.snapshotDisk(this._id, params, options);
-    return Snapshot.fromId(snapshotData.id, { client: this.client });
+    return Snapshot.fromId(this.client, snapshotData.id);
   }
 
   /**

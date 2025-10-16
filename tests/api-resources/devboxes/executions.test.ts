@@ -1,6 +1,6 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-import Runloop from '@runloop/api-client';
+import { Runloop } from '@runloop/api-client';
 import { Response } from 'node-fetch';
 import { APIError } from '../../../src/error';
 

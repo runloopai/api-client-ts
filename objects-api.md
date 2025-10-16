@@ -1,6 +1,6 @@
 # Objects API Reference
 
-The Runloop Objects API provides a high-level, object-oriented interface for working with Runloop resources. This API offers a more intuitive and convenient way to interact with devboxes, blueprints, snapshots, and storage objects compared to the traditional resource-based API.
+The Runloop SDK provides a high-level, object-oriented interface for working with Runloop resources. This SDK offers a more intuitive and convenient way to interact with devboxes, blueprints, snapshots, and storage objects compared to the traditional resource-based API.
 
 ## Table of Contents
 
@@ -17,14 +17,14 @@ The Runloop Objects API provides a high-level, object-oriented interface for wor
 
 ## Overview
 
-The Objects API provides four main classes:
+The Runloop SDK provides four main interfaces:
 
-- **`Devbox`** - Manage cloud development environments
-- **`Blueprint`** - Create reusable environment templates
-- **`Snapshot`** - Save and restore environment state
-- **`StorageObject`** - Store and retrieve arbitrary data
+- **`sdk.devbox`** - Manage cloud development environments
+- **`sdk.blueprint`** - Create reusable environment templates
+- **`sdk.snapshot`** - Save and restore environment state
+- **`sdk.storageObject`** - Store and retrieve arbitrary data
 
-Each object class encapsulates the underlying API calls and provides a clean, stateful interface for working with resources.
+Each interface encapsulates the underlying API calls and provides a clean, stateful interface for working with resources.
 
 ### Key Benefits
 
@@ -32,587 +32,369 @@ Each object class encapsulates the underlying API calls and provides a clean, st
 - **Intuitive**: Method names and patterns follow common object-oriented conventions
 - **Convenient**: Complex operations are simplified into single method calls
 - **Type-safe**: Full TypeScript support with comprehensive type definitions
-- **Consistent**: All objects follow the same patterns for creation, retrieval, and manipulation
+- **Consistent**: All interfaces follow the same patterns for creation, retrieval, and manipulation
 
 ## Getting Started
 
 ```typescript
-import { Runloop, Devbox, Blueprint, Snapshot, StorageObject } from '@runloop/api-client';
+import { RunloopSDK } from '@runloop/api-client';
 
-const client = new Runloop({
+const sdk = new RunloopSDK({
   bearerToken: process.env.RUNLOOP_API_KEY,
 });
 
-// Create a devbox using the object-oriented API
-const devbox = await Devbox.create(client, {
+// Create a devbox using the SDK
+const devbox = await sdk.devbox.create({
   name: 'my-development-environment',
 });
 
-// Execute commands
-const result = await devbox.exec('echo "Hello, World!"');
-console.log(result.stdout); // "Hello, World!"
+// Work with the devbox
+await devbox.cmd.exec({ command: 'echo "Hello, World!"' });
+await devbox.file.write({ file_path: 'test.txt', contents: 'Hello from Runloop!' });
+const content = await devbox.file.read({ file_path: 'test.txt' });
 
 // Clean up
 await devbox.shutdown();
 ```
 
+### SDK vs Traditional API
+
+```typescript
+// SDK approach (recommended)
+const sdk = new RunloopSDK();
+const devbox = await sdk.devbox.create({ name: 'my-devbox' });
+await devbox.cmd.exec({ command: 'npm install' });
+
+// Traditional API approach
+const client = new Runloop();
+const devboxView = await client.devboxes.create({ name: 'my-devbox' });
+await client.devboxes.executeAndAwaitCompletion(devboxView.id, { command: 'npm install' });
+```
+
 ## Devbox
 
-The `Devbox` class provides a complete interface for managing cloud development environments.
+The `sdk.devbox` interface provides methods for managing cloud development environments.
 
-### Creation and Retrieval
+### Creating Devboxes
 
 ```typescript
-// Create a new devbox (waits for running state)
-const devbox = await Devbox.create(client, {
+// Basic devbox creation
+const devbox = await sdk.devbox.create({
   name: 'my-devbox',
-  metadata: { project: 'example' },
 });
 
-// Load an existing devbox
-const existingDevbox = await Devbox.get(client, 'devbox-id');
+// Create from blueprint (faster startup)
+const devbox = await sdk.devbox.create({
+  name: 'my-devbox',
+  blueprint_id: 'blueprint-123',
+});
 
 // Create with custom configuration
-const customDevbox = await Devbox.create(client, {
-  name: 'custom-env',
+const devbox = await sdk.devbox.create({
+  name: 'my-devbox',
   blueprint_id: 'blueprint-123',
-  launch_parameters: {
-    resource_size_request: 'LARGE',
-  },
+  region: 'us-west-2',
+  instance_type: 'gpu-1x-a10',
 });
 ```
 
-### Command Execution
+### Working with Devboxes
 
 ```typescript
-// Execute a command and wait for completion
-const result = await devbox.exec('npm install');
-console.log(`Exit code: ${result.exit_status}`);
-console.log(`Output: ${result.stdout}`);
+// Get devbox by ID
+const devbox = await sdk.devbox.fromId('devbox-123');
 
-// Use persistent shells to maintain state
-await devbox.exec('cd /project', 'main-shell');
-await devbox.exec('export NODE_ENV=production', 'main-shell');
-const env = await devbox.exec('echo $NODE_ENV && pwd', 'main-shell');
-// Output: production\n/project
+// Execute commands
+const result = await devbox.cmd.exec({ command: 'ls -la' });
+console.log(result.stdout);
 
-// Execute asynchronously (don't wait for completion)
-const asyncExecution = await devbox.execAsync('sleep 60');
-console.log(`Execution ID: ${asyncExecution.execution_id}`);
-```
+// File operations
+await devbox.file.write({ file_path: 'app.js', contents: 'console.log("Hello");' });
+const content = await devbox.file.read({ file_path: 'app.js' });
+await devbox.file.delete({ file_path: 'temp.txt' });
 
-### File Operations
+// Network operations
+const tunnel = await devbox.net.createTunnel({ port: 3000 });
+const sshKey = await devbox.net.createSSHKey();
 
-```typescript
-// Write text files
-await devbox.file.write(
-  'config.json',
-  JSON.stringify({
-    database: { host: 'localhost', port: 5432 },
-  }),
-);
-
-// Read text files
-const config = await devbox.file.read('config.json');
-const parsedConfig = JSON.parse(config);
-
-// Upload binary files
-const imageBuffer = await fs.readFile('logo.png');
-await devbox.file.upload('assets/logo.png', imageBuffer);
-
-// Download files (supports binary)
-const response = await devbox.file.download('assets/logo.png');
-const downloadedBuffer = await response.arrayBuffer();
-```
-
-### Lifecycle Management
-
-```typescript
-// Suspend devbox (saves state and stops billing)
+// Lifecycle management
 await devbox.suspend();
-
-// Resume from suspended state
+await devbox.awaitSuspended();
 await devbox.resume();
-
-// Keep devbox alive (prevent idle shutdown)
-await devbox.keepAlive();
-
-// Shutdown permanently
 await devbox.shutdown();
 ```
 
-### Snapshots and Networking
+### Devbox State Management
 
 ```typescript
-// Create a disk snapshot
-const snapshotView = await devbox.snapshotDisk('backup-v1', {
-  version: '1.0',
-  description: 'Pre-deployment backup',
-});
+// Get current information
+const info = await devbox.getInfo();
+console.log(`Status: ${info.status}, ID: ${info.id}`);
 
-// Create SSH access
-const sshKey = await devbox.createSSHKey();
-console.log(`SSH to: ${sshKey.url}`);
-
-// Create port tunnels
-const tunnel = await devbox.createTunnel(8080);
-console.log(`Access app at: ${tunnel.url}`);
-
-// Remove tunnel when done
-await devbox.removeTunnel(8080);
-```
-
-### Properties and State
-
-```typescript
-console.log(`Devbox ID: ${devbox.id}`);
-console.log(`Status: ${devbox.status}`); // 'running', 'suspended', etc.
-
-// Refresh state from API
+// Refresh state
 await devbox.refresh();
 
-// Access complete data
-console.log(devbox.data);
-
-// Access underlying API for advanced operations
-await devbox.api.executeSync(devbox.id, { command: 'whoami' });
+// Check if devbox is running
+if (info.status === 'running') {
+  await devbox.cmd.exec({ command: 'npm start' });
+}
 ```
 
 ## Blueprint
 
-The `Blueprint` class manages reusable environment templates that can significantly speed up devbox creation.
+The `sdk.blueprint` interface provides methods for creating and managing reusable environment templates.
 
-### Creation and Management
+### Creating Blueprints
 
 ```typescript
-// Create a blueprint with system setup
-const blueprint = await Blueprint.create(client, {
+// Basic blueprint creation
+const blueprint = await sdk.blueprint.create({
   name: 'nodejs-development',
   system_setup_commands: [
     'curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -',
     'sudo apt-get install -y nodejs',
-    'npm install -g typescript ts-node',
   ],
-  metadata: {
-    language: 'nodejs',
-    version: '18',
-  },
 });
 
-// Create from Dockerfile
-const dockerBlueprint = await Blueprint.create(client, {
-  name: 'custom-environment',
+// Dockerfile-based blueprint
+const blueprint = await sdk.blueprint.create({
+  name: 'docker-app',
   dockerfile: `
-FROM ubuntu:22.04
-RUN apt-get update && apt-get install -y python3 python3-pip
-RUN pip3 install numpy pandas matplotlib
-WORKDIR /workspace
-  `.trim(),
+    FROM node:18
+    WORKDIR /app
+    COPY package*.json ./
+    RUN npm install
+    COPY . .
+    CMD ["npm", "start"]
+  `,
 });
 
-// Load existing blueprint
-const existingBlueprint = await Blueprint.get(client, 'blueprint-id');
-```
-
-### Preview and Validation
-
-```typescript
-// Preview the generated Dockerfile before building
-const preview = await Blueprint.preview(client, {
-  name: 'preview-test',
-  system_setup_commands: ['apt-get update', 'apt-get install -y git curl'],
+// Blueprint with custom configuration
+const blueprint = await sdk.blueprint.create({
+  name: 'ml-environment',
+  system_setup_commands: [
+    'pip install torch tensorflow scikit-learn',
+    'pip install jupyter notebook',
+  ],
+  instance_type: 'gpu-1x-a10',
+  region: 'us-west-2',
 });
-
-console.log('Generated Dockerfile:');
-console.log(preview.dockerfile);
 ```
 
-### Build Monitoring
+### Working with Blueprints
 
 ```typescript
+// Get blueprint by ID
+const blueprint = await sdk.blueprint.fromId('blueprint-123');
+
+// Get blueprint information
+const info = await blueprint.getInfo();
+console.log(`Name: ${info.name}, Status: ${info.status}`);
+
 // Get build logs
 const logs = await blueprint.logs();
-logs.logs.forEach((log) => {
-  console.log(`[${log.level}] ${log.message}`);
-});
+console.log(logs);
 
-// Check build status
-console.log(`Build status: ${blueprint.status}`); // 'build_complete', 'build_failed', etc.
-console.log(`Blueprint state: ${blueprint.state}`); // 'created', 'deleted'
+// Create devbox from blueprint
+const devbox = await blueprint.createDevbox({
+  name: 'my-devbox',
+});
 ```
 
-### Using Blueprints
+### Blueprint Preview
 
 ```typescript
-// Create devbox from blueprint (much faster than installing packages each time)
-const devbox = await Devbox.create(client, {
-  name: 'from-blueprint',
-  blueprint_id: blueprint.id,
+// Preview blueprint without creating
+const preview = await sdk.blueprint.preview({
+  name: 'preview-blueprint',
+  system_setup_commands: ['apt-get update'],
 });
 
-// Blueprint is ready to use immediately
-await devbox.exec('node --version'); // Already installed via blueprint
-```
-
-### Blueprint Cleanup
-
-```typescript
-// Delete blueprint when no longer needed
-await blueprint.delete();
-console.log(blueprint.state); // 'deleted'
+console.log(`Preview ID: ${preview.id}`);
 ```
 
 ## Snapshot
 
-The `Snapshot` class manages disk snapshots for saving and restoring devbox state.
+The `sdk.snapshot` interface provides methods for saving and restoring environment state.
 
 ### Creating Snapshots
 
 ```typescript
 // Create snapshot from devbox
-const devbox = await Devbox.create(client, { name: 'work-env' });
+const devbox = await sdk.devbox.fromId('devbox-123');
+const snapshot = await devbox.snapshotDisk({ name: 'configured-state' });
 
-// Do some work
-await devbox.exec('git clone https://github.com/user/project.git');
-await devbox.exec('cd project && npm install');
-
-// Save state as snapshot
-const snapshotView = await devbox.snapshotDisk('project-setup', {
-  version: '1.0',
-  project: 'my-project',
+// Create snapshot with description
+const snapshot = await devbox.snapshotDisk({
+  name: 'production-ready',
+  description: 'Environment with all dependencies installed',
 });
-
-const snapshot = new Snapshot(client, snapshotView);
 ```
 
-### Loading and Listing
+### Working with Snapshots
 
 ```typescript
-// Load existing snapshot
-const snapshot = await Snapshot.get(client, 'snapshot-id');
+// Get snapshot by ID
+const snapshot = await sdk.snapshot.fromId('snapshot-123');
 
-// List all snapshots
-const allSnapshots = await Snapshot.list(client);
+// Get snapshot information
+const info = await snapshot.getInfo();
+console.log(`Name: ${info.name}, Size: ${info.size}`);
 
-// List snapshots for specific devbox
-const devboxSnapshots = await Snapshot.list(client, {
-  devboxId: 'devbox-123',
+// Create devbox from snapshot
+const devbox = await snapshot.createDevbox({
+  name: 'restored-devbox',
 });
 
-// Filter by metadata (if supported by API)
-const v1Snapshots = await Snapshot.list(client, {
-  metadata: { version: '1.0' },
+// List snapshots
+const snapshots = await sdk.snapshot.list({
+  devbox_id: 'devbox-123',
 });
 ```
 
-### Snapshot Properties
-
-```typescript
-console.log(`Snapshot ID: ${snapshot.id}`);
-console.log(`Name: ${snapshot.name}`);
-console.log(`Source devbox: ${snapshot.sourceDevboxId}`);
-console.log(`Created: ${new Date(snapshot.createTimeMs)}`);
-console.log(`Metadata:`, snapshot.metadata);
-```
-
-### Restoring from Snapshots
-
-```typescript
-// Create new devbox from snapshot
-const restoredDevbox = await Devbox.create(client, {
-  name: 'restored-environment',
-  snapshot_id: snapshot.id,
-});
-
-// All files and state from snapshot are immediately available
-const files = await restoredDevbox.exec('ls -la project/');
-```
-
-### Updating and Cleanup
+### Snapshot Management
 
 ```typescript
 // Update snapshot metadata
 await snapshot.update({
-  name: 'updated-snapshot-name',
-  metadata: {
-    version: '2.0',
-    updated: new Date().toISOString(),
-  },
+  name: 'updated-name',
+  description: 'Updated description',
 });
 
 // Delete snapshot
 await snapshot.delete();
 ```
 
-### Async Operations
-
-```typescript
-// Query status of async snapshot operations
-const status = await snapshot.queryStatus();
-console.log(`Snapshot status: ${status.status}`);
-```
-
 ## StorageObject
 
-The `StorageObject` class provides S3-like object storage for arbitrary data.
+The `sdk.storageObject` interface provides methods for storing and retrieving arbitrary data.
 
-### Creating and Uploading
+### Creating Storage Objects
 
 ```typescript
-// Create storage object
-const textObj = await StorageObject.create(client, {
+// Create text object
+const textObj = await sdk.storageObject.create({
   name: 'config.json',
-  content_type: 'text',
-  metadata: {
-    project: 'my-app',
-    version: '1.0',
-  },
+  content_type: 'application/json',
+  metadata: { type: 'configuration' },
 });
 
-// Upload text content
-await textObj.uploadContent(
-  JSON.stringify({
-    database: { host: 'localhost', port: 5432 },
-    redis: { host: 'localhost', port: 6379 },
-  }),
+// Create binary object
+const binaryObj = await sdk.storageObject.create({
+  name: 'data.bin',
+  content_type: 'application/octet-stream',
+  metadata: { type: 'binary-data' },
+});
+```
+
+### Working with Storage Objects
+
+```typescript
+// Get object by ID
+const obj = await sdk.storageObject.fromId('object-123');
+
+// Get object information
+const info = await obj.getInfo();
+console.log(`Name: ${info.name}, Size: ${info.size}`);
+
+// Upload data
+await obj.upload('Hello, World!');
+
+// Download data
+const data = await obj.download();
+console.log(data);
+
+// List objects
+const objects = await sdk.storageObject.list({
+  limit: 10,
+});
+```
+
+### File Upload/Download
+
+```typescript
+// Upload from file
+const obj = await StorageObject.uploadFromFile(
+  sdk.api,
+  './package.json',
+  'my-package.json',
+  { metadata: { type: 'package-file' } }
 );
 
-// Mark upload complete (transitions to read-only)
-await textObj.complete();
-```
+// Upload from buffer
+const buffer = Buffer.from('Hello, World!');
+const obj = await StorageObject.uploadFromBuffer(
+  sdk.api,
+  buffer,
+  'hello.txt',
+  { content_type: 'text/plain' }
+);
 
-### Binary Data
-
-```typescript
-// Create binary object
-const binaryObj = await StorageObject.create(client, {
-  name: 'image.png',
-  content_type: 'binary',
-});
-
-// Upload binary data
-const imageBuffer = await fs.readFile('local-image.png');
-await binaryObj.uploadContent(imageBuffer, 'image/png');
-await binaryObj.complete();
-```
-
-### Downloading
-
-```typescript
-// Download as text
-const configText = await textObj.downloadAsText();
-const config = JSON.parse(configText);
-
-// Download as buffer (for binary data)
-const imageBuffer = await binaryObj.downloadAsBuffer();
-await fs.writeFile('downloaded-image.png', imageBuffer);
-
-// Get presigned download URL (for sharing)
-const { download_url } = await textObj.getDownloadUrl(3600); // Valid for 1 hour
-console.log(`Share this URL: ${download_url}`);
-```
-
-### Listing and Management
-
-```typescript
-// List all objects
-const allObjects = await StorageObject.list(client);
-
-// Filter by content type
-const textObjects = await StorageObject.list(client, {
-  content_type: 'text',
-});
-
-// Search by name
-const configObjects = await StorageObject.list(client, {
-  search: 'config',
-});
-
-// Load existing object
-const existingObj = await StorageObject.get(client, 'object-id');
-```
-
-### Object Properties
-
-```typescript
-console.log(`Object ID: ${obj.id}`);
-console.log(`Name: ${obj.name}`);
-console.log(`Content type: ${obj.contentType}`);
-console.log(`State: ${obj.state}`); // 'UPLOADING', 'READ_ONLY', 'DELETED'
-console.log(`Size: ${obj.sizeBytes} bytes`);
-console.log(`Upload URL: ${obj.uploadUrl}`); // Only available during upload
-```
-
-### Advanced Upload Patterns
-
-```typescript
-// Large file upload with custom logic
-const largeObj = await StorageObject.create(client, {
-  name: 'large-dataset.csv',
-  content_type: 'text',
-});
-
-// Use the presigned URL directly for custom upload logic
-const uploadUrl = largeObj.uploadUrl!;
-const response = await fetch(uploadUrl, {
-  method: 'PUT',
-  body: largeFileStream,
-  headers: {
-    'Content-Type': 'text/csv',
-    'Content-Length': fileSize.toString(),
-  },
-});
-
-if (response.ok) {
-  await largeObj.complete();
-}
-```
-
-### Object Cleanup
-
-```typescript
-// Delete object (irreversible)
-await obj.delete();
-console.log(obj.state); // 'DELETED'
+// Download to file
+await obj.downloadToFile('./downloaded-file.txt');
 ```
 
 ## Advanced Patterns
 
-### Devbox + Blueprint Workflow
+### Parallel Operations
 
 ```typescript
-// Create a reusable development environment
-const blueprint = await Blueprint.create(client, {
-  name: 'fullstack-dev',
-  system_setup_commands: [
-    'curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -',
-    'sudo apt-get install -y nodejs postgresql-client',
-    'npm install -g @nestjs/cli @angular/cli',
-  ],
-});
+// Create multiple devboxes in parallel
+const [devbox1, devbox2, devbox3] = await Promise.all([
+  sdk.devbox.create({ name: 'worker-1' }),
+  sdk.devbox.create({ name: 'worker-2' }),
+  sdk.devbox.create({ name: 'worker-3' }),
+]);
 
-// Create multiple devboxes from the same blueprint
-const frontendDevbox = await Devbox.create(client, {
-  name: 'frontend-dev',
-  blueprint_id: blueprint.id,
-});
-
-const backendDevbox = await Devbox.create(client, {
-  name: 'backend-dev',
-  blueprint_id: blueprint.id,
-});
-
-// Both devboxes have the same base setup, ready to use
-await frontendDevbox.exec('ng new my-app');
-await backendDevbox.exec('nest new my-api');
+// Execute commands in parallel
+const [result1, result2] = await Promise.all([
+  devbox1.cmd.exec({ command: 'npm install' }),
+  devbox2.cmd.exec({ command: 'pip install -r requirements.txt' }),
+]);
 ```
 
-### Snapshot-Based Development
+### Workflow Management
 
 ```typescript
-// Set up base environment
-const devbox = await Devbox.create(client, { name: 'project-base' });
-await devbox.exec('git clone https://github.com/user/project.git');
-await devbox.exec('cd project && npm install && npm run build');
-
-// Create snapshot of configured environment
-const baseSnapshot = new Snapshot(client, await devbox.snapshotDisk('project-base-v1'));
-
-// Create feature branch environments from snapshot
-const featureDevbox1 = await Devbox.create(client, {
-  name: 'feature-auth',
-  snapshot_id: baseSnapshot.id,
-});
-
-const featureDevbox2 = await Devbox.create(client, {
-  name: 'feature-ui',
-  snapshot_id: baseSnapshot.id,
-});
-
-// Each starts with the same base setup
-await featureDevbox1.exec('cd project && git checkout -b feature/auth');
-await featureDevbox2.exec('cd project && git checkout -b feature/new-ui');
-```
-
-### Data Pipeline with Storage Objects
-
-```typescript
-// Store configuration
-const configObj = await StorageObject.create(client, {
-  name: 'pipeline-config.json',
-  content_type: 'text',
-});
-
-await configObj.uploadContent(
-  JSON.stringify({
-    input_bucket: 'raw-data',
-    output_bucket: 'processed-data',
-    batch_size: 1000,
-  }),
-);
-await configObj.complete();
-
-// Create processing environment
-const processingDevbox = await Devbox.create(client, {
-  name: 'data-processor',
-});
-
-// Download config in devbox
-await processingDevbox.exec(`
-  curl -o config.json "${(await configObj.getDownloadUrl()).download_url}"
-`);
-
-// Process data and store results
-await processingDevbox.exec('python process_data.py --config config.json');
-
-// Upload results
-const resultsObj = await StorageObject.create(client, {
-  name: 'processing-results.json',
-  content_type: 'text',
-});
-
-const results = await processingDevbox.file.read('results.json');
-await resultsObj.uploadContent(results);
-await resultsObj.complete();
-```
-
-### Multi-Environment Testing
-
-```typescript
-// Create test environments for different Node.js versions
-const nodeVersions = ['16', '18', '20'];
-const testResults = [];
-
-for (const version of nodeVersions) {
-  const blueprint = await Blueprint.create(client, {
-    name: `node-${version}-test`,
-    system_setup_commands: [
-      `curl -fsSL https://deb.nodesource.com/setup_${version}.x | sudo -E bash -`,
-      'sudo apt-get install -y nodejs',
-    ],
+// Complete development workflow
+async function developmentWorkflow() {
+  // 1. Create blueprint
+  const blueprint = await sdk.blueprint.create({
+    name: 'nodejs-app',
+    system_setup_commands: ['npm install -g nodemon'],
   });
 
-  const testDevbox = await Devbox.create(client, {
-    name: `test-node-${version}`,
+  // 2. Create devbox from blueprint
+  const devbox = await sdk.devbox.create({
+    name: 'my-app',
     blueprint_id: blueprint.id,
   });
 
-  // Run tests
-  await testDevbox.exec('git clone https://github.com/user/project.git');
-  const testResult = await testDevbox.exec('cd project && npm test');
-
-  testResults.push({
-    version,
-    success: testResult.exit_status === 0,
-    output: testResult.stdout,
+  // 3. Set up project
+  await devbox.file.write({
+    file_path: 'package.json',
+    contents: JSON.stringify({ name: 'my-app', version: '1.0.0' }),
   });
+  await devbox.cmd.exec({ command: 'npm install express' });
 
-  // Cleanup
-  await testDevbox.shutdown();
-  await blueprint.delete();
+  // 4. Create snapshot
+  const snapshot = await devbox.snapshotDisk({ name: 'initial-setup' });
+
+  // 5. Clean up
+  await devbox.shutdown();
+
+  return { blueprint, snapshot };
 }
+```
 
-console.log('Test Results:', testResults);
+### Error Handling
+
+The SDK automatically handles retries for transient failures, so you don't need to implement manual retry logic:
+
+```typescript
+// SDK automatically retries on transient failures
+const devbox = await sdk.devbox.create({ name: 'my-devbox' });
+// No need for manual retry logic - the SDK handles this automatically
 ```
 
 ## Best Practices
@@ -621,349 +403,174 @@ console.log('Test Results:', testResults);
 
 ```typescript
 // Always clean up resources
-try {
-  const devbox = await Devbox.create(client, { name: 'temp-work' });
-
-  // Do work...
-  await devbox.exec('some-command');
-} finally {
-  // Ensure cleanup happens even if errors occur
-  if (devbox) {
-    await devbox.shutdown();
-  }
-}
-
-// Use try-with-resources pattern for multiple resources
-async function withDevbox<T>(
-  client: Runloop,
-  params: DevboxCreateParams,
-  fn: (devbox: Devbox) => Promise<T>,
-): Promise<T> {
-  const devbox = await Devbox.create(client, params);
+async function useDevbox() {
+  const devbox = await sdk.devbox.create({ name: 'temp-work' });
   try {
-    return await fn(devbox);
+    // Do work
+    await devbox.cmd.exec({ command: 'npm test' });
   } finally {
+    // Always clean up
     await devbox.shutdown();
   }
 }
-
-// Usage
-const result = await withDevbox(client, { name: 'temp' }, async (devbox) => {
-  return await devbox.exec('echo "Hello World"');
-});
 ```
 
-### Exception Handling
+### Blueprint Reuse
 
 ```typescript
-// Handle specific error types
-try {
-  const devbox = await Devbox.create(client, { name: 'test' });
-} catch (error) {
-  if (error instanceof Runloop.APIError) {
-    console.log(`API Error: ${error.status} - ${error.message}`);
-  } else if (error instanceof Runloop.APIConnectionError) {
-    console.log('Network connection failed');
-  } else {
-    console.log('Unexpected error:', error);
-  }
-}
-
-// Retry patterns
-async function createDevboxWithRetry(
-  client: Runloop,
-  params: DevboxCreateParams,
-  maxRetries = 3,
-): Promise<Devbox> {
-  for (let i = 0; i < maxRetries; i++) {
-    try {
-      return await Devbox.create(client, params);
-    } catch (error) {
-      if (i === maxRetries - 1) throw error;
-
-      console.log(`Attempt ${i + 1} failed, retrying...`);
-      await new Promise((resolve) => setTimeout(resolve, 1000 * (i + 1)));
-    }
-  }
-  throw new Error('Max retries exceeded');
-}
-```
-
-### Performance Optimization
-
-```typescript
-// Use blueprints for repeated setups
-const blueprint = await Blueprint.create(client, {
-  name: 'common-setup',
+// Create reusable blueprints for common setups
+const nodeBlueprint = await sdk.blueprint.create({
+  name: 'nodejs-base',
   system_setup_commands: [
-    // Common setup commands
+    'curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -',
+    'sudo apt-get install -y nodejs',
   ],
 });
 
-// Create multiple devboxes quickly
-const devboxes = await Promise.all([
-  Devbox.create(client, { name: 'worker-1', blueprint_id: blueprint.id }),
-  Devbox.create(client, { name: 'worker-2', blueprint_id: blueprint.id }),
-  Devbox.create(client, { name: 'worker-3', blueprint_id: blueprint.id }),
-]);
+// Use blueprint for multiple devboxes
+const devbox1 = await sdk.devbox.create({
+  name: 'frontend',
+  blueprint_id: nodeBlueprint.id,
+});
 
-// Use persistent shells for related commands
-await devbox.exec('cd /project', 'build-shell');
-await devbox.exec('export NODE_ENV=production', 'build-shell');
-await devbox.exec('npm run build', 'build-shell');
-
-// Batch file operations
-const files = ['config.json', 'package.json', 'README.md'];
-const contents = await Promise.all(files.map((file) => devbox.file.read(file)));
+const devbox2 = await sdk.devbox.create({
+  name: 'backend',
+  blueprint_id: nodeBlueprint.id,
+});
 ```
 
-### State Management
+### Snapshot Strategy
 
 ```typescript
-// Refresh object state when needed
-const devbox = await Devbox.get(client, 'existing-id');
+// Create snapshots at key points
+const devbox = await sdk.devbox.create({ name: 'project' });
 
-// Check if refresh is needed
-if (Date.now() - lastRefresh > 30000) {
-  // 30 seconds
-  await devbox.refresh();
-  lastRefresh = Date.now();
-}
+// Initial setup
+await devbox.cmd.exec({ command: 'npm install' });
+const initialSnapshot = await devbox.snapshotDisk({ name: 'dependencies-installed' });
 
-// Use snapshots for checkpoints
-const devbox = await Devbox.create(client, { name: 'development' });
+// After configuration
+await devbox.file.write({ file_path: 'config.json', contents: '{}' });
+const configuredSnapshot = await devbox.snapshotDisk({ name: 'configured' });
 
-// Checkpoint 1: Base setup
-await devbox.exec('git clone repo && cd repo && npm install');
-const checkpoint1 = new Snapshot(client, await devbox.snapshotDisk('checkpoint-1'));
-
-// Checkpoint 2: After feature work
-await devbox.exec('cd repo && git checkout -b feature && npm run build');
-const checkpoint2 = new Snapshot(client, await devbox.snapshotDisk('checkpoint-2'));
-
-// Can restore to any checkpoint if needed
-const restoredDevbox = await Devbox.create(client, {
-  name: 'restored',
-  snapshot_id: checkpoint1.id,
-});
+// After development
+await devbox.cmd.exec({ command: 'npm run build' });
+const productionSnapshot = await devbox.snapshotDisk({ name: 'production-ready' });
 ```
 
 ## Error Handling
 
-### Common Error Scenarios
+### Common Error Patterns
 
 ```typescript
-// Handle devbox creation failures
 try {
-  const devbox = await Devbox.create(client, {
-    name: 'test-devbox',
-    blueprint_id: 'invalid-blueprint-id',
-  });
+  const devbox = await sdk.devbox.create({ name: 'my-devbox' });
 } catch (error) {
-  if (error instanceof Runloop.NotFoundError) {
-    console.log('Blueprint not found, creating without blueprint');
-    const devbox = await Devbox.create(client, { name: 'test-devbox' });
+  if (error.status === 400) {
+    console.error('Invalid request:', error.message);
+  } else if (error.status === 401) {
+    console.error('Authentication failed:', error.message);
+  } else if (error.status === 429) {
+    console.error('Rate limit exceeded:', error.message);
+  } else {
+    console.error('Unexpected error:', error.message);
   }
-}
-
-// Handle command execution failures
-const result = await devbox.exec('some-command-that-might-fail');
-if (result.exit_status !== 0) {
-  console.log('Command failed:');
-  console.log('STDOUT:', result.stdout);
-  console.log('STDERR:', result.stderr);
-
-  // Take corrective action
-  await devbox.exec('cleanup-command');
-}
-
-// Handle file operation errors
-try {
-  const content = await devbox.file.read('nonexistent-file.txt');
-} catch (error) {
-  console.log('File not found, creating default');
-  await devbox.file.write('nonexistent-file.txt', 'default content');
-}
-
-// Handle storage object upload failures
-const obj = await StorageObject.create(client, {
-  name: 'test-file.txt',
-  content_type: 'text',
-});
-
-try {
-  await obj.uploadContent('test content');
-  await obj.complete();
-} catch (error) {
-  console.log('Upload failed, cleaning up object');
-  await obj.delete();
-  throw error;
 }
 ```
 
-### Timeout and Polling Configuration
+### Automatic Retries
+
+The SDK automatically retries failed requests with exponential backoff, so you don't need to implement manual retry logic:
 
 ```typescript
-// Configure polling for long-running operations
-const devbox = await Devbox.create(
-  client,
-  {
-    name: 'slow-setup',
-  },
-  {
-    polling: {
-      maxAttempts: 20, // Try up to 20 times
-      intervalMs: 5000, // Wait 5 seconds between attempts
-      timeoutMs: 300000, // Total timeout of 5 minutes
-    },
-  },
-);
-
-// Configure timeouts for individual requests
-const result = await devbox.exec('long-running-command', undefined, {
-  timeout: 60000, // 60 second timeout
-});
+// SDK handles retries automatically
+const devbox = await sdk.devbox.create({ name: 'my-devbox' });
+// Transient failures are automatically retried with exponential backoff
 ```
 
 ## Troubleshooting
 
 ### Common Issues
 
-#### Devbox Creation Hangs
+#### Devbox Creation Fails
 
 ```typescript
-// Issue: Devbox.create() never resolves
-// Solution: Check polling configuration and add timeout
-
-const devbox = await Devbox.create(
-  client,
-  {
-    name: 'test-devbox',
-  },
-  {
-    polling: {
-      maxAttempts: 10,
-      intervalMs: 3000,
-      timeoutMs: 120000, // 2 minute timeout
-    },
-  },
-);
+// Check for common issues
+try {
+  const devbox = await sdk.devbox.create({ name: 'my-devbox' });
+} catch (error) {
+  console.error('Devbox creation failed:', error.message);
+  
+  // Check if name is already in use
+  if (error.message.includes('already exists')) {
+    console.log('Try a different name');
+  }
+  
+  // Check if region is available
+  if (error.message.includes('region')) {
+    console.log('Try a different region');
+  }
+}
 ```
 
-#### Command Execution Fails
+#### Command Execution Issues
 
 ```typescript
-// Issue: Commands fail with permission errors
-// Solution: Check user context and use sudo if needed
-
-// Wrong: Assuming root access
-await devbox.exec('apt-get install package');
-
-// Right: Use sudo for system operations
-await devbox.exec('sudo apt-get install package');
-
-// Or: Switch to root shell
-await devbox.exec('sudo su -', 'root-shell');
-await devbox.exec('apt-get install package', 'root-shell');
+// Debug command execution
+try {
+  const result = await devbox.cmd.exec({ command: 'npm install' });
+  console.log('Success:', result.stdout);
+} catch (error) {
+  console.error('Command failed:', error.message);
+  console.error('Exit code:', error.exitCode);
+  console.error('Stderr:', error.stderr);
+}
 ```
 
-#### File Operations Fail
+#### File Operations
 
 ```typescript
-// Issue: File paths not found
-// Solution: Use absolute paths or check working directory
-
-// Check current directory
-const pwd = await devbox.exec('pwd');
-console.log('Current directory:', pwd.stdout.trim());
-
-// Use absolute paths
-await devbox.file.write('/home/user/config.json', content);
-
-// Or change directory first
-await devbox.exec('cd /project', 'main-shell');
-await devbox.file.write('config.json', content); // Relative to /project
+// Check file operations
+try {
+  await devbox.file.write({ file_path: 'test.txt', contents: 'Hello' });
+  const content = await devbox.file.read({ file_path: 'test.txt' });
+  console.log('File content:', content);
+} catch (error) {
+  console.error('File operation failed:', error.message);
+}
 ```
 
-#### Storage Object Upload Issues
+### Performance Optimization
 
 ```typescript
-// Issue: Upload fails silently
-// Solution: Check object state and handle errors properly
-
-const obj = await StorageObject.create(client, {
-  name: 'test.txt',
-  content_type: 'text',
+// Use blueprints for faster devbox creation
+const blueprint = await sdk.blueprint.create({
+  name: 'pre-configured',
+  system_setup_commands: ['npm install -g nodemon'],
 });
 
-// Check if upload URL is available
-if (!obj.uploadUrl) {
-  throw new Error('No upload URL available');
-}
-
-try {
-  await obj.uploadContent('content');
-
-  // Verify upload succeeded before completing
-  await obj.refresh();
-  if (obj.state !== 'UPLOADING') {
-    throw new Error(`Unexpected state: ${obj.state}`);
-  }
-
-  await obj.complete();
-} catch (error) {
-  console.log('Upload failed:', error);
-  await obj.delete(); // Clean up failed object
-  throw error;
-}
+// Create devboxes from blueprint (much faster)
+const devbox = await sdk.devbox.create({
+  name: 'my-app',
+  blueprint_id: blueprint.id,
+});
 ```
 
-### Debugging Tips
+### Debugging
 
 ```typescript
-// Enable debug logging
-process.env.DEBUG = 'true';
+// Enable verbose logging
+const sdk = new RunloopSDK({
+  bearerToken: process.env.RUNLOOP_API_KEY,
+  // Add debug options if available
+});
 
-// Check object state
-console.log('Devbox status:', devbox.status);
-console.log('Devbox data:', JSON.stringify(devbox.data, null, 2));
-
-// Use the underlying API for debugging
-const rawResult = await devbox.api.retrieve(devbox.id);
-console.log('Raw API response:', rawResult);
-
-// Test connectivity
-try {
-  const devboxes = await client.devboxes.list();
-  console.log('API connection OK, found', devboxes.length, 'devboxes');
-} catch (error) {
-  console.log('API connection failed:', error);
-}
+// Check devbox status
+const devbox = await sdk.devbox.fromId('devbox-123');
+const info = await devbox.getInfo();
+console.log('Devbox status:', info.status);
+console.log('Devbox region:', info.region);
+console.log('Devbox instance type:', info.instance_type);
 ```
 
-### Performance Monitoring
-
-```typescript
-// Monitor operation timing
-const startTime = Date.now();
-const devbox = await Devbox.create(client, { name: 'perf-test' });
-console.log(`Devbox creation took ${Date.now() - startTime}ms`);
-
-// Monitor command execution time
-const execStart = Date.now();
-const result = await devbox.exec('npm install');
-console.log(`Command took ${Date.now() - execStart}ms`);
-console.log(`Exit code: ${result.exit_status}`);
-
-// Monitor resource usage
-const stats = await devbox.exec('top -bn1 | head -5');
-console.log('System stats:', stats.stdout);
-```
-
----
-
-For more examples and detailed API documentation, see:
-
-- [Examples Directory](./examples/)
-- [Main API Documentation](./api.md)
-- [Contributing Guide](./CONTRIBUTING.md)
+This comprehensive guide covers all aspects of using the Runloop SDK with the new object-oriented interfaces. The SDK provides a clean, intuitive way to work with Runloop resources while maintaining full TypeScript support and error handling capabilities.

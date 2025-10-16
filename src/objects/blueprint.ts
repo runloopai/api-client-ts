@@ -50,21 +50,19 @@ export class Blueprint {
    * Create a new Blueprint and wait for it to complete building.
    * This is the recommended way to create a blueprint as it ensures it's ready to use.
    *
+   * @param client - The Runloop client instance
    * @param params - Parameters for creating the blueprint
-   * @param options - Request options with optional polling configuration and client override
+   * @param options - Request options with optional polling configuration
    * @returns A Blueprint instance with completed build
    */
   static async create(
+    client: Runloop,
     params: BlueprintCreateParams,
     options?: Core.RequestOptions & {
-      client?: Runloop;
       polling?: Partial<import('../lib/polling').PollingOptions<BlueprintView>>;
     },
   ): Promise<Blueprint> {
-    const client = options?.client || Runloop.getDefaultClient();
-    const requestOptions = options;
-
-    const blueprintData = await client.blueprints.createAndAwaitBuildCompleted(params, requestOptions);
+    const blueprintData = await client.blueprints.createAndAwaitBuildCompleted(params, options);
     return new Blueprint(client, blueprintData.id);
   }
 
@@ -72,12 +70,12 @@ export class Blueprint {
    * Create a Blueprint instance by ID without retrieving from API.
    * Use getInfo() to fetch the actual data when needed.
    *
+   * @param client - The Runloop client instance
    * @param id - The blueprint ID
-   * @param options - Request options with optional client override
+   * @param options - Request options
    * @returns A Blueprint instance
    */
-  static fromId(id: string, options?: Core.RequestOptions & { client?: Runloop }): Blueprint {
-    const client = options?.client || Runloop.getDefaultClient();
+  static fromId(client: Runloop, id: string, options?: Core.RequestOptions): Blueprint {
     return new Blueprint(client, id);
   }
 
@@ -85,15 +83,16 @@ export class Blueprint {
    * Preview a blueprint configuration without building it.
    * Returns the Dockerfile that would be built.
    *
+   * @param client - The Runloop client instance
    * @param params - Blueprint preview parameters
-   * @param options - Request options with optional client override
+   * @param options - Request options
    * @returns Preview with generated Dockerfile
    */
   static async preview(
+    client: Runloop,
     params: BlueprintPreviewParams,
-    options?: Core.RequestOptions & { client?: Runloop },
+    options?: Core.RequestOptions,
   ): Promise<BlueprintPreviewView> {
-    const client = options?.client || Runloop.getDefaultClient();
     return client.blueprints.preview(params, options);
   }
 
@@ -152,6 +151,6 @@ export class Blueprint {
       blueprint_id: this._id,
     };
 
-    return Devbox.create(createParams, { ...options, client: this.client });
+    return Devbox.create(this.client, createParams, options);
   }
 }

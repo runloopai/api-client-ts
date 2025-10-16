@@ -10,7 +10,7 @@ describe('Devbox (New API)', () => {
   let mockDevboxData: DevboxView;
 
   beforeEach(() => {
-    // Create mock client instance
+    // Create mock client instance with proper structure
     mockClient = {
       devboxes: {
         createAndAwaitRunning: jest.fn(),
@@ -29,6 +29,24 @@ describe('Devbox (New API)', () => {
         createSSHKey: jest.fn(),
         createTunnel: jest.fn(),
         removeTunnel: jest.fn(),
+      },
+      blueprints: {
+        createAndAwaitBuildCompleted: jest.fn(),
+        retrieve: jest.fn(),
+        preview: jest.fn(),
+        logs: jest.fn(),
+        delete: jest.fn(),
+      },
+      objects: {
+        create: jest.fn(),
+        retrieve: jest.fn(),
+        list: jest.fn(),
+        delete: jest.fn(),
+      },
+      diskSnapshots: {
+        queryStatus: jest.fn(),
+        update: jest.fn(),
+        delete: jest.fn(),
       },
     } as any;
 
@@ -49,11 +67,11 @@ describe('Devbox (New API)', () => {
     it('should create a devbox and return a Devbox instance', async () => {
       mockClient.devboxes.createAndAwaitRunning.mockResolvedValue(mockDevboxData);
 
-      const devbox = await Devbox.create({ name: 'test-devbox' }, { client: mockClient });
+      const devbox = await Devbox.create(mockClient, { name: 'test-devbox' });
 
       expect(mockClient.devboxes.createAndAwaitRunning).toHaveBeenCalledWith(
         { name: 'test-devbox' },
-        { client: mockClient },
+        undefined,
       );
       expect(devbox).toBeInstanceOf(Devbox);
       expect(devbox.id).toBe('devbox-123');
@@ -62,18 +80,18 @@ describe('Devbox (New API)', () => {
     it('should pass options to the API client', async () => {
       mockClient.devboxes.createAndAwaitRunning.mockResolvedValue(mockDevboxData);
 
-      await Devbox.create({ name: 'test-devbox' }, { client: mockClient, polling: { maxAttempts: 10 } });
+      await Devbox.create(mockClient, { name: 'test-devbox' }, { polling: { maxAttempts: 10 } });
 
       expect(mockClient.devboxes.createAndAwaitRunning).toHaveBeenCalledWith(
         { name: 'test-devbox' },
-        { client: mockClient, polling: { maxAttempts: 10 } },
+        { polling: { maxAttempts: 10 } },
       );
     });
   });
 
   describe('fromId', () => {
     it('should create a Devbox instance by ID without API call', () => {
-      const devbox = Devbox.fromId('devbox-123', { client: mockClient });
+      const devbox = Devbox.fromId(mockClient, 'devbox-123');
 
       expect(devbox).toBeInstanceOf(Devbox);
       expect(devbox.id).toBe('devbox-123');
@@ -85,7 +103,7 @@ describe('Devbox (New API)', () => {
 
     beforeEach(async () => {
       mockClient.devboxes.createAndAwaitRunning.mockResolvedValue(mockDevboxData);
-      devbox = await Devbox.create({ name: 'test-devbox' }, { client: mockClient });
+      devbox = await Devbox.create(mockClient, { name: 'test-devbox' });
     });
 
     describe('cmd.exec', () => {
@@ -250,14 +268,12 @@ describe('Devbox (New API)', () => {
       const error = new Error('Creation failed');
       mockClient.devboxes.createAndAwaitRunning.mockRejectedValue(error);
 
-      await expect(Devbox.create({ name: 'failing-devbox' }, { client: mockClient })).rejects.toThrow(
-        'Creation failed',
-      );
+      await expect(Devbox.create(mockClient, { name: 'failing-devbox' })).rejects.toThrow('Creation failed');
     });
 
     it('should handle command execution errors', async () => {
       mockClient.devboxes.createAndAwaitRunning.mockResolvedValue(mockDevboxData);
-      const devbox = await Devbox.create({ name: 'test-devbox' }, { client: mockClient });
+      const devbox = await Devbox.create(mockClient, { name: 'test-devbox' });
 
       const error = new Error('Command failed');
       mockClient.devboxes.execute.mockRejectedValue(error);

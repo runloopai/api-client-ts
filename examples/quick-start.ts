@@ -1,13 +1,16 @@
-import { Devbox } from '../src/objects/devbox';
+import { RunloopSDK } from '../src/sdk';
 import { StorageObject } from '../src/objects/storage-object';
 
 async function quickStart() {
   // Set the environment RUNLOOP_API_KEY variable with your API key
   console.log('🚀 Quick Start: Runloop API Client with Object-Oriented API');
 
-  // 2. Create a devbox from the blueprint (using default client)
+  // Initialize the SDK
+  const sdk = new RunloopSDK();
+
+  // 2. Create a devbox from the blueprint (using SDK)
   console.log('🖥️  Creating devbox...');
-  const devbox = await Devbox.create({
+  const devbox = await sdk.devbox.create({
     name: 'my-devbox',
   });
   console.log(`✅ Devbox created: ${devbox.id}`);
@@ -29,12 +32,13 @@ async function quickStart() {
 
   // 4. Storage operations - file upload
   console.log('💾 Uploading package.json to storage...');
-  const storageObject = await StorageObject.uploadFromFile('./package.json', 'my-package.json');
+  const storageObject = await StorageObject.uploadFromFile(sdk.api, './package.json', 'my-package.json');
   console.log(`✅ File uploaded: ${storageObject.id}`);
 
   // Upload an archive file (auto-detects content type)
   console.log('📦 Uploading test-archive.tar.gz to storage...');
   const archiveObject = await StorageObject.uploadFromFile(
+    sdk.api,
     './files/test-archive.tar.gz',
     'project-archive.tar.gz',
     {

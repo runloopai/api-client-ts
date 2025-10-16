@@ -87,18 +87,17 @@ export class StorageObject {
    * Create a new Storage Object.
    * This returns an object with an upload URL that you can use to upload content.
    *
+   * @param client - The Runloop client instance
    * @param params - Parameters for creating the object
-   * @param options - Request options with optional client override
+   * @param options - Request options
    * @returns An Object instance with upload URL
    */
   static async create(
+    client: Runloop,
     params: ObjectCreateParams,
-    options?: Core.RequestOptions & { client?: Runloop },
+    options?: Core.RequestOptions,
   ): Promise<StorageObject> {
-    const client = options?.client || Runloop.getDefaultClient();
-    const requestOptions = options;
-
-    const objectData = await client.objects.create(params, requestOptions);
+    const objectData = await client.objects.create(params, options);
     return new StorageObject(client, objectData.id);
   }
 
@@ -106,30 +105,29 @@ export class StorageObject {
    * Create a StorageObject instance by ID without retrieving from API.
    * Use getInfo() to fetch the actual data when needed.
    *
+   * @param client - The Runloop client instance
    * @param id - The object ID
-   * @param options - Request options with optional client override
+   * @param options - Request options
    * @returns An Object instance
    */
-  static fromId(id: string, options?: Core.RequestOptions & { client?: Runloop }): StorageObject {
-    const client = options?.client || Runloop.getDefaultClient();
+  static fromId(client: Runloop, id: string, options?: Core.RequestOptions): StorageObject {
     return new StorageObject(client, id);
   }
 
   /**
    * List all storage objects with optional filters.
    *
+   * @param client - The Runloop client instance
    * @param params - Optional filter parameters
-   * @param options - Request options with optional client override
+   * @param options - Request options
    * @returns Array of Object instances
    */
   static async list(
+    client: Runloop,
     params?: ObjectListParams,
-    options?: Core.RequestOptions & { client?: Runloop },
+    options?: Core.RequestOptions,
   ): Promise<StorageObject[]> {
-    const client = options?.client || Runloop.getDefaultClient();
-    const requestOptions = options;
-
-    const objects = await client.objects.list(params, requestOptions);
+    const objects = await client.objects.list(params, options);
     const result: StorageObject[] = [];
 
     for await (const obj of objects) {
@@ -152,18 +150,15 @@ export class StorageObject {
    * @returns A completed StorageObject instance
    */
   static async uploadFromFile(
+    client: Runloop,
     filePath: string,
     name: string,
     options?: Core.RequestOptions & {
-      client?: Runloop;
       contentType?: string;
       metadata?: Record<string, string>;
     },
   ): Promise<StorageObject> {
     assertNodeEnvironment();
-
-    const client = options?.client || Runloop.getDefaultClient();
-    const requestOptions = options;
 
     // Check if file exists and get stats
     try {
@@ -197,7 +192,7 @@ export class StorageObject {
       metadata: options?.metadata || null,
     };
 
-    const objectData = await client.objects.create(createParams, requestOptions);
+    const objectData = await client.objects.create(createParams, options);
     const storageObject = new StorageObject(client, objectData.id);
 
     const uploadUrl = objectData.upload_url;
@@ -242,18 +237,15 @@ export class StorageObject {
    * @returns A completed StorageObject instance
    */
   static async uploadFromBuffer(
+    client: Runloop,
     buffer: Buffer,
     name: string,
     contentType: string,
     options?: Core.RequestOptions & {
-      client?: Runloop;
       metadata?: Record<string, string>;
     },
   ): Promise<StorageObject> {
     assertNodeEnvironment();
-
-    const client = options?.client || Runloop.getDefaultClient();
-    const requestOptions = options;
 
     // Step 1: Create the object
     const createParams: ObjectCreateParams = {
@@ -262,7 +254,7 @@ export class StorageObject {
       metadata: options?.metadata || null,
     };
 
-    const objectData = await client.objects.create(createParams, requestOptions);
+    const objectData = await client.objects.create(createParams, options);
     const storageObject = new StorageObject(client, objectData.id);
 
     // Step 2: Upload the buffer content
