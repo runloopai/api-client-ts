@@ -653,7 +653,7 @@ describe('resource devboxes', () => {
         'devbox-123',
         {
           command: 'echo hello',
-          last_n: 10, // This should be passed to waitForCommand
+          last_n: '10', // This should be passed to waitForCommand
         },
         {
           polling: {
