@@ -54,7 +54,6 @@ describe('resource executions', () => {
   test('executeAsync: required and optional params', async () => {
     const response = await client.devboxes.executions.executeAsync('id', {
       command: 'command',
-      attach_stdin: true,
       shell_name: 'shell_name',
     });
   });

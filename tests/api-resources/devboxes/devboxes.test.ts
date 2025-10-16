@@ -237,7 +237,6 @@ describe('resource devboxes', () => {
   test('executeAsync: required and optional params', async () => {
     const response = await client.devboxes.executeAsync('id', {
       command: 'command',
-      attach_stdin: true,
       shell_name: 'shell_name',
     });
   });
@@ -256,7 +255,6 @@ describe('resource devboxes', () => {
   test('executeSync: required and optional params', async () => {
     const response = await client.devboxes.executeSync('id', {
       command: 'command',
-      attach_stdin: true,
       shell_name: 'shell_name',
     });
   });
