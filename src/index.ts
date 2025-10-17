@@ -249,26 +249,26 @@ export class Runloop extends Core.APIClient {
    * @param {Core.Headers} opts.defaultHeaders - Default headers to include with every request to the API.
    * @param {Core.DefaultQuery} opts.defaultQuery - Default query parameters to include with every request to the API.
    */
-  constructor({ baseURL, bearerToken, ...opts }: ClientOptions = {}) {
-    // Only use environment variables if no explicit values are provided
-    const finalBaseURL = baseURL ?? Core.readEnv('RUNLOOP_BASE_URL');
-    const finalBearerToken = bearerToken ?? Core.readEnv('RUNLOOP_API_KEY');
-
-    if (finalBearerToken === undefined) {
+  constructor({
+    baseURL = Core.readEnv('RUNLOOP_BASE_URL'),
+    bearerToken = Core.readEnv('RUNLOOP_API_KEY'),
+    ...opts
+  }: ClientOptions = {}) {
+    if (bearerToken === undefined) {
       throw new Errors.RunloopError(
         "The RUNLOOP_API_KEY environment variable is missing or empty; either provide it, or instantiate the Runloop client with an bearerToken option, like new Runloop({ bearerToken: 'My Bearer Token' }).",
       );
     }
 
     const options: ClientOptions = {
-      bearerToken: finalBearerToken,
+      bearerToken,
       ...opts,
-      baseURL: finalBaseURL || `https://api.runloop.ai`,
+      baseURL: baseURL || `https://api.runloop.ai`,
     };
 
     super({
       baseURL: options.baseURL!,
-      baseURLOverridden: finalBaseURL ? finalBaseURL !== 'https://api.runloop.ai' : false,
+      baseURLOverridden: baseURL ? baseURL !== 'https://api.runloop.ai' : false,
       timeout: options.timeout ?? 30000 /* 30 seconds */,
       httpAgent: options.httpAgent,
       maxRetries: options.maxRetries,
@@ -278,7 +278,7 @@ export class Runloop extends Core.APIClient {
     this._options = options;
     this.idempotencyHeader = 'x-request-id';
 
-    this.bearerToken = finalBearerToken;
+    this.bearerToken = bearerToken;
   }
 
   benchmarks: API.Benchmarks = new API.Benchmarks(this);
