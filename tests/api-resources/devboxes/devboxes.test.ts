@@ -217,6 +217,7 @@ describe('resource devboxes', () => {
     const response = await client.devboxes.execute('id', {
       command: 'command',
       command_id: 'command_id',
+      last_n: 'last_n',
       optimistic_timeout: 0,
       shell_name: 'shell_name',
     });
@@ -237,6 +238,7 @@ describe('resource devboxes', () => {
     const response = await client.devboxes.executeAsync('id', {
       command: 'command',
       shell_name: 'shell_name',
+      attach_stdin: true,
     });
   });
 
@@ -255,6 +257,7 @@ describe('resource devboxes', () => {
     const response = await client.devboxes.executeSync('id', {
       command: 'command',
       shell_name: 'shell_name',
+      attach_stdin: true,
     });
   });
 
@@ -399,7 +402,7 @@ describe('resource devboxes', () => {
     await expect(
       client.devboxes.snapshotDisk(
         'id',
-        { metadata: { foo: 'string' }, name: 'name' },
+        { commit_message: 'commit_message', metadata: { foo: 'string' }, name: 'name' },
         { path: '/_stainless_unknown_path' },
       ),
     ).rejects.toThrow(Runloop.NotFoundError);
@@ -428,7 +431,7 @@ describe('resource devboxes', () => {
     await expect(
       client.devboxes.snapshotDiskAsync(
         'id',
-        { metadata: { foo: 'string' }, name: 'name' },
+        { commit_message: 'commit_message', metadata: { foo: 'string' }, name: 'name' },
         { path: '/_stainless_unknown_path' },
       ),
     ).rejects.toThrow(Runloop.NotFoundError);
@@ -486,6 +489,7 @@ describe('resource devboxes', () => {
   test('waitForCommand: required and optional params', async () => {
     const response = await client.devboxes.waitForCommand('devbox_id', 'execution_id', {
       statuses: ['queued'],
+      last_n: 'last_n',
       timeout_seconds: 0,
     });
   });
@@ -618,6 +622,147 @@ describe('resource devboxes', () => {
 
     expect(mockPost).toHaveBeenCalledTimes(1);
     expect(mockPost).toHaveBeenCalledWith('/v1/devboxes', { body: {} });
+
+    mockPost.mockRestore();
+  });
+
+  test('executeAndAwaitCompletion: passes last_n to waitForCommand when execute is not completed', async () => {
+    const mockPost = jest.spyOn(client.devboxes['_client'], 'post');
+    try {
+      // Mock the execute call to return a non-completed status
+      const executeResponse = {
+        execution_id: 'exec-123',
+        status: 'running', // Not completed
+        command_id: 'cmd-123',
+      };
+      mockPost.mockResolvedValueOnce(executeResponse);
+
+      // Mock the waitForCommand call to return completed status (both initial and polling calls)
+      const waitForCommandResponse = {
+        devbox_id: 'devbox-123',
+        execution_id: 'exec-123',
+        status: 'completed',
+        shell_name: 'bash',
+        stdout: 'hello',
+        stderr: '',
+        exit_status: 0,
+      };
+      mockPost.mockResolvedValueOnce(waitForCommandResponse);
+
+      const result = await client.devboxes.executeAndAwaitCompletion(
+        'devbox-123',
+        {
+          command: 'echo hello',
+          last_n: '10', // This should be passed to waitForCommand
+        },
+        {
+          polling: {
+            maxAttempts: 1,
+            pollingIntervalMs: 10,
+          },
+        },
+      );
+
+      expect(result.status).toBe('completed');
+      expect(result.execution_id).toBe('exec-123');
+
+      // Verify execute was called
+      expect(mockPost).toHaveBeenCalledTimes(2); // execute + waitForCommand
+      expect(mockPost).toHaveBeenNthCalledWith(1, '/v1/devboxes/devbox-123/execute', {
+        body: expect.objectContaining({
+          command: 'echo hello',
+          command_id: expect.any(String),
+        }),
+        query: { last_n: '10' },
+        polling: {
+          maxAttempts: 1,
+          pollingIntervalMs: 10,
+        },
+        timeout: 600000,
+      });
+
+      // Verify waitForCommand was called with last_n
+      expect(mockPost).toHaveBeenNthCalledWith(
+        2,
+        '/v1/devboxes/devbox-123/executions/exec-123/wait_for_status',
+        {
+          query: { last_n: '10' },
+          body: {
+            statuses: ['completed'],
+          },
+        },
+      );
+    } finally {
+      mockPost.mockRestore();
+    }
+  });
+
+  test('executeAndAwaitCompletion: does not pass last_n to waitForCommand when not provided', async () => {
+    const mockPost = jest.spyOn(client.devboxes['_client'], 'post');
+
+    // Mock the execute call to return a non-completed status
+    const executeResponse = {
+      execution_id: 'exec-123',
+      status: 'running', // Not completed
+      command_id: 'cmd-123',
+    };
+    mockPost.mockResolvedValueOnce(executeResponse);
+
+    // Mock the waitForCommand call to return completed status (both initial and polling calls)
+    const waitForCommandResponse = {
+      devbox_id: 'devbox-123',
+      execution_id: 'exec-123',
+      status: 'completed',
+      shell_name: 'bash',
+      stdout: 'hello',
+      stderr: '',
+      exit_status: 0,
+    };
+    mockPost.mockResolvedValueOnce(waitForCommandResponse);
+
+    const result = await client.devboxes.executeAndAwaitCompletion(
+      'devbox-123',
+      {
+        command: 'echo hello',
+        // No last_n parameter
+      },
+      {
+        polling: {
+          maxAttempts: 1,
+          pollingIntervalMs: 10,
+        },
+      },
+    );
+
+    expect(result.status).toBe('completed');
+    expect(result.execution_id).toBe('exec-123');
+
+    // Verify execute was called
+    expect(mockPost).toHaveBeenCalledTimes(2); // execute + waitForCommand
+    expect(mockPost).toHaveBeenNthCalledWith(1, '/v1/devboxes/devbox-123/execute', {
+      body: expect.objectContaining({
+        command: 'echo hello',
+        command_id: expect.any(String),
+      }),
+      query: { last_n: undefined },
+      polling: {
+        maxAttempts: 1,
+        pollingIntervalMs: 10,
+      },
+      timeout: 600000,
+    });
+
+    // Verify waitForCommand was called without last_n
+    expect(mockPost).toHaveBeenNthCalledWith(
+      2,
+      '/v1/devboxes/devbox-123/executions/exec-123/wait_for_status',
+      {
+        query: { last_n: undefined }, // Should be undefined when not provided
+        body: {
+          statuses: ['completed'],
+        },
+      },
+    );
 
     mockPost.mockRestore();
   });

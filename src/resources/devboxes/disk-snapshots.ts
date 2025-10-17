@@ -126,6 +126,11 @@ export type DiskSnapshotDeleteResponse = unknown;
 
 export interface DiskSnapshotUpdateParams {
   /**
+   * (Optional) Commit message associated with the snapshot (max 1000 characters)
+   */
+  commit_message?: string | null;
+
+  /**
    * (Optional) Metadata used to describe the snapshot
    */
   metadata?: { [key: string]: string } | null;

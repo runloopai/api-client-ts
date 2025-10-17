@@ -1,5 +1,22 @@
 # Changelog
 
+## 0.59.1 (2025-10-16)
+
+Full Changelog: [v0.59.0...v0.59.1](https://github.com/runloopai/api-client-ts/compare/v0.59.0...v0.59.1)
+
+## 0.59.0 (2025-10-14)
+
+Full Changelog: [v0.58.0...v0.59.0](https://github.com/runloopai/api-client-ts/compare/v0.58.0...v0.59.0)
+
+### Features
+
+* **api:** api update ([4987133](https://github.com/runloopai/api-client-ts/commit/4987133fd538627c7d2f8cc278488f1a2c306391))
+
+
+### Chores
+
+* **internal:** use npm pack for build uploads ([612a62d](https://github.com/runloopai/api-client-ts/commit/612a62d03bfe83e5d6f337de7074d3e6dba7da05))
+
 ## 0.58.0 (2025-10-03)
 
 Full Changelog: [v0.57.0...v0.58.0](https://github.com/runloopai/api-client-ts/compare/v0.57.0...v0.58.0)
