@@ -217,7 +217,20 @@ export class Devbox {
    * Create a disk snapshot of the devbox.
    */
   async snapshotDisk(params?: DevboxSnapshotDiskParams, options?: Core.RequestOptions): Promise<Snapshot> {
-    const snapshotData = await this.client.devboxes.snapshotDisk(this._id, params, options);
+    const snapshotData = await this.client.devboxes.snapshotDiskAsync(this._id, params, options);
+    const snapshot = Snapshot.fromId(this.client, snapshotData.id);
+    await snapshot.awaitCompleted();
+    return snapshot;
+  }
+
+  /**
+   * Create a disk snapshot of the devbox.
+   */
+  async snapshotDiskAsync(
+    params?: DevboxSnapshotDiskParams,
+    options?: Core.RequestOptions,
+  ): Promise<Snapshot> {
+    const snapshotData = await this.client.devboxes.snapshotDiskAsync(this._id, params, options);
     return Snapshot.fromId(this.client, snapshotData.id);
   }
 

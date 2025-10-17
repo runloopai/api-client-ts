@@ -101,6 +101,16 @@ export class Snapshot {
   }
 
   /**
+   * Wait for the snapshot to be completed.
+   *
+   * @param options - Request options
+   * @returns Snapshot data
+   */
+  async awaitCompleted(options?: Core.RequestOptions): Promise<Snapshot> {
+    //return this.client.devboxes.diskSnapshots.queryStatus(this._id, options);
+  }
+
+  /**
    * Create a new devbox from this snapshot.
    * This is a convenience method that calls Devbox.create() with the snapshot ID
    * and any additional parameters you want to layer on top.
