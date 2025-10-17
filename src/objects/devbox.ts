@@ -197,7 +197,7 @@ export class Devbox {
   }
 
   /**
-   * Suspend the devbox and create a disk snapshot.
+   * Suspend the devbox and create a disk snapshot. 
    */
   async suspend(options?: Core.RequestOptions) {
     return this.client.devboxes.suspend(this._id, options);
@@ -211,14 +211,14 @@ export class Devbox {
   }
 
   /**
-   * Send a keep-alive signal to prevent idle shutdown.
+   * Send a keep-alive signal to prevent idle shutdown. 
    */
   async keepAlive(options?: Core.RequestOptions): Promise<unknown> {
     return this.client.devboxes.keepAlive(this._id, options);
   }
 
   /**
-   * Create a disk snapshot of the devbox.
+   * Create a disk snapshot of the devbox. Returns a snapshot that is completed. If you don't want to block on completion, use snapshotDiskAsync().
    */
   async snapshotDisk(params?: DevboxSnapshotDiskParams, options?: Core.RequestOptions): Promise<Snapshot> {
     const snapshotData = await this.client.devboxes.snapshotDiskAsync(this._id, params, options);
@@ -228,7 +228,7 @@ export class Devbox {
   }
 
   /**
-   * Create a disk snapshot of the devbox.
+   * Create a disk snapshot of the devbox asynchronously. Returns a snapshot that is not yet completed but has started. You can await completion using snapshot.awaitCompleted().
    */
   async snapshotDiskAsync(
     params?: DevboxSnapshotDiskParams,

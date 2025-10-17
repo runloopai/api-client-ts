@@ -49,7 +49,7 @@ export class ExecutionResult {
    */
   async stderr(numLines?: number): Promise<string> {
     // For now, just return the stderr from the result
-    // In the future, this will support pagination when output is truncated
+    // In the future, this will collecting all of the stderr output until the execution completes. If output is truncated, it will return the truncated output.
     return this._result.stderr ?? '';
   }
 
