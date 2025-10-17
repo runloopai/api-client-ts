@@ -574,7 +574,6 @@ export {
   UnprocessableEntityError,
 } from './error';
 
-// Export the new SDK
 export { RunloopSDK } from './sdk';
 
 /**
@@ -583,6 +582,10 @@ export { RunloopSDK } from './sdk';
  * ```typescript
  * // Instead of: import Runloop from '@runloop/api-client'
  * import { RunloopSDK } from '@runloop/api-client'
+ * const sdk = new RunloopSDK();
+ * //For existing api client, use the api property
+ * const client = new RunloopSDK();
+ * const devbox = await client.api.devboxes.create({ name: 'my-devbox' });
  * ```
  */
 export default Runloop;
