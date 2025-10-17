@@ -6,6 +6,7 @@ import * as Core from '../../core';
 import * as DevboxesAPI from './devboxes';
 import { DevboxSnapshotViewsDiskSnapshotsCursorIDPage } from './devboxes';
 import { type DiskSnapshotsCursorIDPageParams } from '../../pagination';
+import { poll, PollingOptions } from '../../lib/polling';
 
 export class DiskSnapshots extends APIResource {
   /**
@@ -67,6 +68,40 @@ export class DiskSnapshots extends APIResource {
    */
   queryStatus(id: string, options?: Core.RequestOptions): Core.APIPromise<DevboxSnapshotAsyncStatusView> {
     return this._client.get(`/v1/devboxes/disk_snapshots/${id}/status`, options);
+  }
+
+  /**
+   * Wait for a disk snapshot to be completed.
+   * Polls the snapshot status until it reaches completed state or fails with an error.
+   *
+   * @param id - Snapshot ID
+   * @param options - request options to specify retries, timeout, polling, etc.
+   */
+  async awaitCompleted(
+    id: string,
+    options?: Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxSnapshotAsyncStatusView>> },
+  ): Promise<DevboxSnapshotAsyncStatusView> {
+    const finalResult = await poll(
+      () => this.queryStatus(id, options),
+      () => this.queryStatus(id, options),
+      {
+        ...options?.polling,
+        shouldStop: (result) => {
+          return result.status === 'complete' || result.status === 'error';
+        },
+        onError: (error: any) => {
+          // For any error, rethrow it
+          throw error;
+        },
+      },
+    );
+
+    // Check if the snapshot completed successfully
+    if (finalResult.status === 'error') {
+      throw new Error(`Snapshot ${id} failed: ${finalResult.error_message || 'Unknown error'}`);
+    }
+
+    return finalResult;
   }
 }
 
