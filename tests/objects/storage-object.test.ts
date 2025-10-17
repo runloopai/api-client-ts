@@ -83,6 +83,7 @@ describe('StorageObject (New API)', () => {
       state: 'UPLOADING',
       size_bytes: null,
       upload_url: 'https://s3.example.com/upload/test-file.txt?signature=...',
+      create_time_ms: Date.now(),
     };
 
     // Reset fetch mock
@@ -140,6 +141,7 @@ describe('StorageObject (New API)', () => {
         content_type: 'text',
         name: 'file1.txt',
         state: 'READ_ONLY',
+        create_time_ms: Date.now(),
       };
 
       const obj2: ObjectView = {
@@ -147,6 +149,7 @@ describe('StorageObject (New API)', () => {
         content_type: 'binary',
         name: 'file2.bin',
         state: 'READ_ONLY',
+        create_time_ms: Date.now(),
       };
 
       const mockPage = {
@@ -594,6 +597,117 @@ describe('StorageObject (New API)', () => {
       expect(mockFs.readFileSync).toHaveBeenCalledWith('./files/test-archive.tar.gz');
       expect(result).toBeInstanceOf(StorageObject);
       expect(result.id).toBe('archive-123');
+    });
+  });
+
+  describe('uploadFromText', () => {
+    beforeEach(() => {
+      // Clear all mocks
+      jest.clearAllMocks();
+      // Reset global fetch mock
+      ((global as any).fetch as jest.Mock).mockClear();
+    });
+
+    it('should upload text content with text content-type', async () => {
+      const textContent = 'Hello, World!';
+      const mockObjectData = { id: 'text-123', upload_url: 'https://upload.example.com/text' };
+      const mockObjectInfo = { ...mockObjectData, name: 'hello.txt', state: 'UPLOADING' };
+      const mockCompletedData = { ...mockObjectInfo, state: 'READ_ONLY' };
+
+      mockClient.objects.create.mockResolvedValue(mockObjectData);
+      mockClient.objects.retrieve.mockResolvedValue(mockObjectInfo);
+      mockClient.objects.complete.mockResolvedValue(mockCompletedData);
+
+      ((global as any).fetch as jest.Mock).mockResolvedValue({
+        ok: true,
+        status: 200,
+        statusText: 'OK',
+      });
+
+      const result = await StorageObject.uploadFromText(mockClient, textContent, 'hello.txt');
+
+      expect(mockClient.objects.create).toHaveBeenCalledWith(
+        { name: 'hello.txt', content_type: 'text', metadata: null },
+        undefined,
+      );
+      expect((global as any).fetch).toHaveBeenCalledWith('https://upload.example.com/text', {
+        method: 'PUT',
+        body: textContent,
+        headers: { 'Content-Length': Buffer.byteLength(textContent, 'utf8').toString() },
+      });
+      expect(result).toBeInstanceOf(StorageObject);
+      expect(result.id).toBe('text-123');
+    });
+
+    it('should upload text content with custom metadata', async () => {
+      const textContent = '{"key": "value"}';
+      const mockObjectData = { id: 'json-123', upload_url: 'https://upload.example.com/json' };
+      const mockObjectInfo = { ...mockObjectData, name: 'data.json', state: 'UPLOADING' };
+      const mockCompletedData = { ...mockObjectInfo, state: 'READ_ONLY' };
+
+      mockClient.objects.create.mockResolvedValue(mockObjectData);
+      mockClient.objects.retrieve.mockResolvedValue(mockObjectInfo);
+      mockClient.objects.complete.mockResolvedValue(mockCompletedData);
+
+      ((global as any).fetch as jest.Mock).mockResolvedValue({
+        ok: true,
+        status: 200,
+        statusText: 'OK',
+      });
+
+      const result = await StorageObject.uploadFromText(mockClient, textContent, 'data.json', {
+        metadata: { format: 'json' },
+      });
+
+      expect(mockClient.objects.create).toHaveBeenCalledWith(
+        { name: 'data.json', content_type: 'text', metadata: { format: 'json' } },
+        { metadata: { format: 'json' } },
+      );
+      expect(result.id).toBe('json-123');
+    });
+
+    it('should handle upload failures gracefully', async () => {
+      const textContent = 'test content';
+      const mockObjectData = { id: 'text-456', upload_url: 'https://upload.example.com/text' };
+      const mockObjectInfo = { ...mockObjectData, name: 'test.txt', state: 'UPLOADING' };
+
+      mockClient.objects.create.mockResolvedValue(mockObjectData);
+      mockClient.objects.retrieve.mockResolvedValue(mockObjectInfo);
+
+      ((global as any).fetch as jest.Mock).mockResolvedValue({
+        ok: false,
+        status: 403,
+        statusText: 'Forbidden',
+      });
+
+      await expect(StorageObject.uploadFromText(mockClient, textContent, 'test.txt')).rejects.toThrow(
+        'Failed to upload text: Upload failed: 403 Forbidden',
+      );
+    });
+
+    it('should complete full upload lifecycle', async () => {
+      const textContent = 'lifecycle test content';
+      const mockObjectData = { id: 'lifecycle-text-123', upload_url: 'https://upload.example.com/lifecycle' };
+      const mockObjectInfo = { ...mockObjectData, name: 'lifecycle.txt', state: 'UPLOADING' };
+      const mockCompletedData = { ...mockObjectInfo, state: 'READ_ONLY' };
+
+      mockClient.objects.create.mockResolvedValue(mockObjectData);
+      mockClient.objects.retrieve.mockResolvedValue(mockObjectInfo);
+      mockClient.objects.complete.mockResolvedValue(mockCompletedData);
+
+      ((global as any).fetch as jest.Mock).mockResolvedValue({
+        ok: true,
+        status: 200,
+        statusText: 'OK',
+      });
+
+      const result = await StorageObject.uploadFromText(mockClient, textContent, 'lifecycle.txt');
+
+      // Verify all three steps were called
+      expect(mockClient.objects.create).toHaveBeenCalledTimes(1);
+      expect((global as any).fetch).toHaveBeenCalledTimes(1);
+      expect(mockClient.objects.complete).toHaveBeenCalledTimes(1);
+      expect(result).toBeInstanceOf(StorageObject);
     });
   });
 

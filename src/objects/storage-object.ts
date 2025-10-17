@@ -9,8 +9,11 @@ import type {
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 
+// Extract the content type from the API types
+type ContentType = ObjectCreateParams['content_type'];
+
 // Content-type mapping for file extensions
-const CONTENT_TYPE_MAP: Record<string, string> = {
+const CONTENT_TYPE_MAP: Record<string, ContentType> = {
   // Text
   '.txt': 'text',
   '.html': 'text',
@@ -30,7 +33,7 @@ const CONTENT_TYPE_MAP: Record<string, string> = {
   // Default to unspecified for unknown
 };
 
-function detectContentType(filePath: string): string {
+function detectContentType(filePath: string): ContentType {
   const lower = filePath.toLowerCase();
   if (lower.endsWith('.tar.gz') || lower.endsWith('.tgz')) return 'tgz';
   const ext = path.extname(lower);
@@ -148,7 +151,7 @@ export class StorageObject {
     filePath: string,
     name: string,
     options?: Core.RequestOptions & {
-      contentType?: string;
+      contentType?: ContentType;
       metadata?: Record<string, string>;
     },
   ): Promise<StorageObject> {
@@ -182,7 +185,7 @@ export class StorageObject {
     // Step 1: Create the object
     const createParams: ObjectCreateParams = {
       name,
-      content_type: contentType as any,
+      content_type: contentType,
       metadata: options?.metadata || null,
     };
 
@@ -218,6 +221,66 @@ export class StorageObject {
   }
 
   /**
+   * Upload text content directly.
+   * This method handles the complete three-step upload process:
+   * 1. Create object and get upload URL
+   * 2. Upload text content to the provided URL
+   * 3. Mark upload as complete
+   *
+   * @param text - The text content to upload
+   * @param name - Name for the object
+   * @param options - Request options with optional metadata
+   * @returns A completed StorageObject instance
+   */
+  static async uploadFromText(
+    client: Runloop,
+    text: string,
+    name: string,
+    options?: Core.RequestOptions & {
+      metadata?: Record<string, string>;
+    },
+  ): Promise<StorageObject> {
+    // Step 1: Create the object
+    const createParams: ObjectCreateParams = {
+      name,
+      content_type: 'text',
+      metadata: options?.metadata || null,
+    };
+
+    const objectData = await client.objects.create(createParams, options);
+    const storageObject = new StorageObject(client, objectData.id);
+
+    // Step 2: Upload the text content
+    const objectInfo = await storageObject.getInfo();
+    const uploadUrl = objectInfo.upload_url;
+
+    if (!uploadUrl) {
+      throw new Error('No upload URL available. Object may already be completed or deleted.');
+    }
+
+    try {
+      const response = await (globalThis as any).fetch(uploadUrl, {
+        method: 'PUT',
+        body: text,
+        headers: {
+          'Content-Length': Buffer.byteLength(text, 'utf8').toString(),
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Upload failed: ${response.status} ${response.statusText}`);
+      }
+    } catch (error) {
+      throw new Error(`Failed to upload text: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+
+    // Step 3: Mark upload as complete
+    await storageObject.complete();
+
+    return storageObject;
+  }
+
+  /**
    * Upload content from a Buffer (Node.js only).
    * This method handles the complete three-step upload process:
    * 1. Create object and get upload URL
@@ -234,7 +297,7 @@ export class StorageObject {
     client: Runloop,
     buffer: Buffer,
     name: string,
-    contentType: string,
+    contentType: ContentType,
     options?: Core.RequestOptions & {
       metadata?: Record<string, string>;
     },
@@ -244,7 +307,7 @@ export class StorageObject {
     // Step 1: Create the object
     const createParams: ObjectCreateParams = {
       name,
-      content_type: contentType as any,
+      content_type: contentType,
       metadata: options?.metadata || null,
     };
 

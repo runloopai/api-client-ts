@@ -12,6 +12,9 @@ import type {
 import type { BlueprintCreateParams, BlueprintListParams } from './resources/blueprints';
 import type { ObjectCreateParams, ObjectListParams } from './resources/objects';
 
+// Extract the content type from the API types
+type ContentType = ObjectCreateParams['content_type'];
+
 /**
  * Runloop SDK - The recommended way to interact with Runloop.
  * Provides both low-level API access and high-level object-oriented interfaces.
@@ -126,11 +129,25 @@ export namespace RunloopSDK {
       filePath: string,
       name: string,
       options?: Core.RequestOptions & {
-        contentType?: string;
+        contentType?: ContentType;
         metadata?: Record<string, string>;
       },
     ): Promise<StorageObject> {
       return StorageObject.uploadFromFile(this.client, filePath, name, options);
+    }
+
+    /**
+     * Upload text content directly.
+     * This method handles the complete three-step upload process.
+     */
+    async uploadFromText(
+      text: string,
+      name: string,
+      options?: Core.RequestOptions & {
+        metadata?: Record<string, string>;
+      },
+    ): Promise<StorageObject> {
+      return StorageObject.uploadFromText(this.client, text, name, options);
     }
 
     /**
@@ -140,7 +157,7 @@ export namespace RunloopSDK {
     async uploadFromBuffer(
       buffer: Buffer,
       name: string,
-      contentType: string,
+      contentType: ContentType,
       options?: Core.RequestOptions & {
         metadata?: Record<string, string>;
       },
