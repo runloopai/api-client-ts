@@ -25,9 +25,16 @@ describe('Devbox (New API)', () => {
         resume: jest.fn(),
         keepAlive: jest.fn(),
         snapshotDisk: jest.fn(),
+        snapshotDiskAsync: jest.fn(),
         createSSHKey: jest.fn(),
         createTunnel: jest.fn(),
         removeTunnel: jest.fn(),
+        diskSnapshots: {
+          queryStatus: jest.fn(),
+          update: jest.fn(),
+          delete: jest.fn(),
+          awaitCompleted: jest.fn(),
+        },
       },
       blueprints: {
         createAndAwaitBuildCompleted: jest.fn(),
@@ -40,11 +47,6 @@ describe('Devbox (New API)', () => {
         create: jest.fn(),
         retrieve: jest.fn(),
         list: jest.fn(),
-        delete: jest.fn(),
-      },
-      diskSnapshots: {
-        queryStatus: jest.fn(),
-        update: jest.fn(),
         delete: jest.fn(),
       },
     } as any;
@@ -236,11 +238,13 @@ describe('Devbox (New API)', () => {
     describe('snapshotDisk', () => {
       it('should create a disk snapshot and return Snapshot object', async () => {
         const mockSnapshotData = { id: 'snapshot-456', name: 'test-snapshot' };
-        mockClient.devboxes.snapshotDisk.mockResolvedValue(mockSnapshotData);
+        const mockStatus = { status: 'complete', snapshot: mockSnapshotData };
+        mockClient.devboxes.snapshotDiskAsync.mockResolvedValue(mockSnapshotData);
+        mockClient.devboxes.diskSnapshots.awaitCompleted.mockResolvedValue(mockStatus);
 
         const snapshot = await devbox.snapshotDisk({ name: 'test-snapshot' });
 
-        expect(mockClient.devboxes.snapshotDisk).toHaveBeenCalledWith(
+        expect(mockClient.devboxes.snapshotDiskAsync).toHaveBeenCalledWith(
           'devbox-123',
           { name: 'test-snapshot' },
           undefined,
@@ -251,11 +255,17 @@ describe('Devbox (New API)', () => {
 
       it('should create snapshot without parameters', async () => {
         const mockSnapshotData = { id: 'snapshot-789' };
-        mockClient.devboxes.snapshotDisk.mockResolvedValue(mockSnapshotData);
+        const mockStatus = { status: 'complete', snapshot: mockSnapshotData };
+        mockClient.devboxes.snapshotDiskAsync.mockResolvedValue(mockSnapshotData);
+        mockClient.devboxes.diskSnapshots.awaitCompleted.mockResolvedValue(mockStatus);
 
         const snapshot = await devbox.snapshotDisk();
 
-        expect(mockClient.devboxes.snapshotDisk).toHaveBeenCalledWith('devbox-123', undefined, undefined);
+        expect(mockClient.devboxes.snapshotDiskAsync).toHaveBeenCalledWith(
+          'devbox-123',
+          undefined,
+          undefined,
+        );
         expect(snapshot).toBeInstanceOf(require('../../src/objects/snapshot').Snapshot);
         expect(snapshot.id).toBe('snapshot-789');
       });

@@ -103,11 +103,19 @@ export class Snapshot {
   /**
    * Wait for the snapshot to be completed.
    *
-   * @param options - Request options
+   * @param options - Request options with optional polling configuration
    * @returns Snapshot data
    */
-  async awaitCompleted(options?: Core.RequestOptions): Promise<Snapshot> {
-    //return this.client.devboxes.diskSnapshots.queryStatus(this._id, options);
+  async awaitCompleted(
+    options?: Core.RequestOptions & {
+      polling?: Partial<
+        import('../lib/polling').PollingOptions<
+          import('../resources/devboxes/disk-snapshots').DevboxSnapshotAsyncStatusView
+        >
+      >;
+    },
+  ): Promise<DevboxSnapshotAsyncStatusView> {
+    return this.client.devboxes.diskSnapshots.awaitCompleted(this._id, options);
   }
 
   /**

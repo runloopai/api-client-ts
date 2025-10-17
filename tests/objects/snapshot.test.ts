@@ -35,6 +35,7 @@ describe('Snapshot (New API)', () => {
           queryStatus: jest.fn(),
           update: jest.fn(),
           delete: jest.fn(),
+          awaitCompleted: jest.fn(),
         },
       },
       blueprints: {
@@ -297,6 +298,64 @@ describe('Snapshot (New API)', () => {
 
         expect(status.status).toBe('error');
         expect(status.error_message).toBe('Snapshot creation failed');
+      });
+    });
+
+    describe('awaitCompleted', () => {
+      it('should wait for snapshot completion and return status', async () => {
+        const mockStatus: DevboxSnapshotAsyncStatusView = {
+          status: 'complete',
+          snapshot: mockSnapshotData,
+        };
+
+        mockClient.devboxes.diskSnapshots.awaitCompleted.mockResolvedValue(mockStatus);
+
+        const result = await snapshot.awaitCompleted();
+
+        expect(mockClient.devboxes.diskSnapshots.awaitCompleted).toHaveBeenCalledWith(
+          'snapshot-123',
+          undefined,
+        );
+        expect(result.status).toBe('complete');
+        expect(result.snapshot).toEqual(mockSnapshotData);
+      });
+
+      it('should pass polling options to awaitCompleted', async () => {
+        const mockStatus: DevboxSnapshotAsyncStatusView = {
+          status: 'complete',
+          snapshot: mockSnapshotData,
+        };
+
+        const pollingOptions = {
+          polling: {
+            pollingIntervalMs: 2000,
+            maxAttempts: 60,
+          },
+        };
+
+        mockClient.devboxes.diskSnapshots.awaitCompleted.mockResolvedValue(mockStatus);
+
+        const result = await snapshot.awaitCompleted(pollingOptions);
+
+        expect(mockClient.devboxes.diskSnapshots.awaitCompleted).toHaveBeenCalledWith(
+          'snapshot-123',
+          pollingOptions,
+        );
+        expect(result.status).toBe('complete');
+      });
+
+      it('should handle error status from awaitCompleted', async () => {
+        const mockStatus: DevboxSnapshotAsyncStatusView = {
+          status: 'error',
+          error_message: 'Snapshot creation failed',
+        };
+
+        mockClient.devboxes.diskSnapshots.awaitCompleted.mockResolvedValue(mockStatus);
+
+        const result = await snapshot.awaitCompleted();
+
+        expect(result.status).toBe('error');
+        expect(result.error_message).toBe('Snapshot creation failed');
       });
     });
 
