@@ -227,12 +227,11 @@ describe('StorageObject (New API)', () => {
 
         ((global as any).fetch as jest.Mock).mockResolvedValue(mockFetchResponse);
 
-        await storageObject.uploadContent('Hello, World!', 'text/plain');
+        await storageObject.uploadContent('Hello, World!');
 
         expect((global as any).fetch).toHaveBeenCalledWith(mockObjectData.upload_url, {
           method: 'PUT',
           body: 'Hello, World!',
-          headers: { 'Content-Type': 'text/plain' },
         });
       });
 
@@ -254,7 +253,6 @@ describe('StorageObject (New API)', () => {
         expect((global as any).fetch).toHaveBeenCalledWith(mockObjectData.upload_url, {
           method: 'PUT',
           body: buffer,
-          headers: {},
         });
       });
 

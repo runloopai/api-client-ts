@@ -576,16 +576,18 @@ export {
 
 export { RunloopSDK } from './sdk';
 
-/**
- * @deprecated Use named imports instead of default import. This is the old api client. Use the new SDK instead.
- * @example
- * ```typescript
- * // Instead of: import Runloop from '@runloop/api-client'
- * import { RunloopSDK } from '@runloop/api-client'
- * const sdk = new RunloopSDK();
- * //For existing api client, use the api property
- * const client = new RunloopSDK();
- * const devbox = await client.api.devboxes.create({ name: 'my-devbox' });
- * ```
- */
+// /**
+//  * @deprecated Use named imports instead of default import. This is the old api client. Use the new SDK instead.
+//  * @example
+//  * ```typescript
+//  * // Instead of: import Runloop from '@runloop/api-client'
+//  * import { RunloopSDK } from '@runloop/api-client'
+//  * const sdk = new RunloopSDK();
+//  * //For existing api client, use the api property
+//  * const client = new RunloopSDK();
+//  * const devbox = await client.api.devboxes.create({ name: 'my-devbox' });
+//  * ```
+//  */
+// This WILL be deprecated soon.. not yet though.
+
 export default Runloop;

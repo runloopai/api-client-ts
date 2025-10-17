@@ -57,7 +57,29 @@ export class StorageObject {
 
   /**
    * Create a new Storage Object.
-   * This returns an object with an upload URL that you can use to upload content.
+   * This method returns a StorageObject instance that you can use to upload content.
+   *
+   * You should use the uploadFromFile() or uploadFromBuffer() methods to upload content and handle the complete process for you. If you need more control, you can use the uploadContent() method.
+   *
+   * To upload content:
+   * 1. To upload you call uploadContent() or use the getDownloadUrl() method to get the upload URL and upload the content manually.
+   * 2. You must call complete() to mark the upload as complete.
+   *
+   * Example:
+   * ```typescript
+   * const storageObject = await StorageObject.create(client, {
+   *   name: 'my-upload.txt',
+   *   content_type: 'text',
+   *   metadata: { project: 'demo' },
+   * });
+   * await storageObject.uploadContent('Hello, World!');
+   * await storageObject.complete();
+   *
+   * Upload from file example:
+   * ```typescript
+   * const storageObject = await StorageObject.uploadFromFile(client, './my-file.txt', 'my-upload.txt');
+   * console.log(storageObject.id);
+   * ```
    *
    * @param client - The Runloop client instance
    * @param params - Parameters for creating the object
@@ -281,10 +303,9 @@ export class StorageObject {
    * with your own upload logic.
    *
    * @param content - The content to upload (string or Buffer)
-   * @param contentType - Optional content type header
    * @returns Promise that resolves when upload is complete
    */
-  async uploadContent(content: string | Buffer, contentType?: string): Promise<void> {
+  async uploadContent(content: string | Buffer): Promise<void> {
     const objectInfo = await this.getInfo();
     const uploadUrl = objectInfo.upload_url;
 
@@ -292,15 +313,9 @@ export class StorageObject {
       throw new Error('No upload URL available. Object may already be completed or deleted.');
     }
 
-    const headers: Record<string, string> = {};
-    if (contentType) {
-      headers['Content-Type'] = contentType;
-    }
-
     const response = await (globalThis as any).fetch(uploadUrl, {
       method: 'PUT',
       body: content,
-      headers,
     });
 
     if (!response.ok) {
