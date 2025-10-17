@@ -18,53 +18,6 @@ npm install @runloop/api-client
 
 The full API of this library can be found in [api.md](api.md).
 
-### Quick Start with SDK (Recommended)
-
-For the most intuitive experience, use our new SDK:
-
-<!-- prettier-ignore -->
-```js
-import { RunloopSDK } from '@runloop/api-client';
-
-// Initialize the SDK
-const sdk = new RunloopSDK({
-  bearerToken: process.env['RUNLOOP_API_KEY'], // This is the default and can be omitted
-});
-
-// Create and use a devbox with the SDK
-const devbox = await sdk.devbox.create({ name: 'my-devbox' });
-await devbox.cmd.exec({ command: 'echo "Hello, World!"' });
-await devbox.file.write({ file_path: 'test.txt', contents: 'Hello from Runloop!' });
-const content = await devbox.file.read({ file_path: 'test.txt' });
-await devbox.shutdown();
-
-// Create blueprints and storage objects
-const blueprint = await sdk.blueprint.create({ name: 'my-blueprint' });
-const storageObject = await sdk.storageObject.create({ name: 'my-file.txt' });
-```
-
-#### SDK Pattern
-
-The SDK provides a clean, object-oriented interface:
-
-```js
-// Initialize SDK once at app startup
-const sdk = new RunloopSDK({ bearerToken: 'your-token' });
-
-// Use the SDK's object-oriented interfaces
-const devbox = await sdk.devbox.create({ name: 'my-devbox' });
-const blueprint = await sdk.blueprint.create({ name: 'my-blueprint', dockerfile: '...' });
-const snapshot = await sdk.snapshot.fromId('snapshot-id');
-
-// Access the underlying API client if needed
-const apiClient = sdk.api;
-const devboxView = await apiClient.devboxes.create();
-```
-
-### Traditional Resource API
-
-You can also use the traditional resource-based API:
-
 <!-- prettier-ignore -->
 ```js
 import Runloop from '@runloop/api-client';
@@ -94,62 +47,6 @@ const devboxView: Runloop.DevboxView = await client.devboxes.create();
 ```
 
 Documentation for each method, request param, and response field are available in docstrings and will appear on hover in most modern editors.
-
-## Objects API
-
-The Objects API provides a high-level, object-oriented interface that makes working with Runloop resources more intuitive and convenient. Instead of managing resource IDs and making multiple API calls, you work directly with objects that encapsulate state and behavior.
-
-### Available Objects
-
-- **`Devbox`** - Manage cloud development environments with methods like `exec()`, `file.read()`, `file.write()`
-- **`Blueprint`** - Create reusable environment templates for faster devbox creation
-- **`Snapshot`** - Save and restore devbox state for backup and branching workflows
-- **`StorageObject`** - Store and retrieve files and data (similar to S3 objects)
-
-### Key Benefits
-
-- **Stateful**: Objects maintain their state and can be refreshed from the API
-- **Intuitive**: Method names follow object-oriented conventions (`devbox.exec()` vs `client.devboxes.executeAndAwaitCompletion()`)
-- **Convenient**: Complex workflows simplified into readable code
-- **Type-safe**: Full TypeScript support with comprehensive type definitions
-
-### Quick Example
-
-```typescript
-import { RunloopSDK } from '@runloop/api-client';
-
-const sdk = new RunloopSDK();
-
-// Create a reusable blueprint
-const blueprint = await sdk.blueprint.create({
-  name: 'nodejs-dev',
-  system_setup_commands: [
-    'curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -',
-    'sudo apt-get install -y nodejs',
-  ],
-});
-
-// Create devbox from blueprint (much faster than installing each time)
-const devbox = await sdk.devbox.create({
-  name: 'my-project',
-  blueprint_id: blueprint.id,
-});
-
-// Work with files and execute commands
-await devbox.file.write('package.json', JSON.stringify({ name: 'my-app', version: '1.0.0' }));
-await devbox.cmd.exec('npm install express');
-const result = await devbox.cmd.exec('node --version');
-
-// Save state as snapshot
-const snapshot = await devbox.snapshotDisk('configured-env');
-
-// Clean up
-await devbox.shutdown();
-```
-
-**📖 [Complete Objects API Documentation](objects-api.md)**
-
-The Objects API documentation includes comprehensive guides, advanced patterns, best practices, and troubleshooting tips.
 
 ## File uploads
 
