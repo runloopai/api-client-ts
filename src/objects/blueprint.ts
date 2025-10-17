@@ -12,29 +12,6 @@ import { Devbox } from './devbox';
 
 /**
  * Object-oriented interface for working with Blueprints.
- *
- * Example usage:
- * ```typescript
- * // Make sure to set RUNLOOP_API_KEY environment variable
- * // export RUNLOOP_API_KEY="your-api-key"
- *
- * const blueprint = await Blueprint.create({
- *   name: 'my-blueprint',
- *   dockerfile: 'FROM ubuntu:22.04\nRUN apt-get update',
- * });
- *
- * // Get blueprint information
- * const info = await blueprint.getInfo();
- * console.log(info.name, info.status);
- *
- * // Create a devbox from this blueprint
- * const devbox = await blueprint.createDevbox({
- *   name: 'my-devbox',
- *   metadata: { created_from: blueprint.id }
- * });
- *
- * const logs = await blueprint.logs();
- * await blueprint.delete();
  * ```
  */
 export class Blueprint {

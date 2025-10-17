@@ -19,30 +19,6 @@ import { Snapshot } from './snapshot';
 
 /**
  * Object-oriented interface for working with Devboxes.
- *
- * Example usage:
- * ```typescript
- * // Make sure to set RUNLOOP_API_KEY environment variable
- * // export RUNLOOP_API_KEY="your-api-key"
- *
- * const devbox = await Devbox.create({ name: 'my-devbox' });
- *
- * const result = await devbox.cmd.exec({ command: 'echo "Hello World"' });
- * const contents = await devbox.file.read({ file_path: 'myfile.txt' });
- * await devbox.file.write({ file_path: 'output.txt', contents: 'Hello World' });
- * const tunnel = await devbox.net.createTunnel({ port: 3000 });
- *
- * // Get devbox information
- * const info = await devbox.getInfo();
- * console.log(info.status, info.name);
- *
- * // Wait for specific states
- * await devbox.awaitRunning();
- * await devbox.awaitSuspended();
- *
- * // Lifecycle methods return the devbox instance for chaining
- * await devbox.suspend().then(d => d.resume()).then(d => d.shutdown());
- * ```
  */
 export class Devbox {
   private client: Runloop;

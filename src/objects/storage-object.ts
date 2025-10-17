@@ -45,34 +45,6 @@ function assertNodeEnvironment(): void {
 
 /**
  * Object-oriented interface for working with Storage Objects.
- *
- * Storage Objects are similar to S3 objects - they allow you to store
- * arbitrary data with metadata for later retrieval.
- *
- * Example usage:
- * ```typescript
- * // Make sure to set RUNLOOP_API_KEY environment variable
- * // export RUNLOOP_API_KEY="your-api-key"
- *
- * // Upload a file directly (Node.js only)
- * const obj = await StorageObject.uploadFromFile('./data.txt', 'my-data.txt');
- *
- * // Upload archive files (auto-detects content type)
- * const archive = await StorageObject.uploadFromFile('./files/test-archive.tar.gz', 'my-archive.tar.gz');
- *
- * // Upload from buffer
- * const buffer = Buffer.from('content');
- * const obj = await StorageObject.uploadFromBuffer(buffer, 'data.txt', 'text');
- *
- * // Traditional approach - create, upload, complete
- * const obj = await StorageObject.create({
- *   name: 'my-data.txt',
- *   content_type: 'text',
- *   metadata: { project: 'demo' }
- * });
- * await obj.uploadContent('Hello, World!');
- * await obj.complete();
- * ```
  */
 export class StorageObject {
   private client: Runloop;

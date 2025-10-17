@@ -9,32 +9,6 @@ import { Devbox } from './devbox';
 
 /**
  * Object-oriented interface for working with Disk Snapshots.
- *
- * Example usage:
- * ```typescript
- * // Make sure to set RUNLOOP_API_KEY environment variable
- * // export RUNLOOP_API_KEY="your-api-key"
- *
- * // Typically created from a Devbox (returns Snapshot object directly):
- * const snapshot = await devbox.snapshotDisk({ name: 'my-snapshot' });
- *
- * // Or load from existing snapshot
- * const snapshot = Snapshot.fromId('snapshot-id');
- *
- * // Get snapshot information
- * const info = await snapshot.getInfo();
- * console.log(info.name, info.create_time_ms);
- *
- * // Create a new devbox from this snapshot
- * const newDevbox = await snapshot.createDevbox({
- *   name: 'restored-devbox',
- *   metadata: { restored_from: snapshot.id }
- * });
- *
- * // Update metadata
- * await snapshot.update({ metadata: { updated: 'true' } });
- * await snapshot.delete();
- * ```
  */
 export class Snapshot {
   private client: Runloop;
