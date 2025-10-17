@@ -4,12 +4,12 @@ import { Blueprint } from './objects/blueprint';
 import { Snapshot } from './objects/snapshot';
 import { StorageObject } from './objects/storage-object';
 import type * as Core from './core';
-import type { DevboxCreateParams, DevboxListDiskSnapshotsParams } from './resources/devboxes/devboxes';
 import type {
-  BlueprintCreateParams,
-  BlueprintPreviewParams,
-  BlueprintPreviewView,
-} from './resources/blueprints';
+  DevboxCreateParams,
+  DevboxListDiskSnapshotsParams,
+  DevboxListParams,
+} from './resources/devboxes/devboxes';
+import type { BlueprintCreateParams, BlueprintListParams } from './resources/blueprints';
 import type { ObjectCreateParams, ObjectListParams } from './resources/objects';
 
 /**
@@ -47,9 +47,15 @@ export namespace RunloopSDK {
       return Devbox.fromId(this.client, id, options);
     }
 
-    async list(params?: DevboxListDiskSnapshotsParams, options?: Core.RequestOptions): Promise<Devbox[]> {
-      // TODO: Implement list functionality
-      throw new Error('List not yet implemented');
+    async list(params?: DevboxListParams, options?: Core.RequestOptions): Promise<Devbox[]> {
+      const devboxes = await this.client.devboxes.list(params, options);
+      const result: Devbox[] = [];
+
+      for await (const devbox of devboxes) {
+        result.push(Devbox.fromId(this.client, devbox.id));
+      }
+
+      return result;
     }
   }
 
@@ -67,9 +73,15 @@ export namespace RunloopSDK {
       return Blueprint.fromId(this.client, id, options);
     }
 
-    async list(params?: BlueprintCreateParams, options?: Core.RequestOptions): Promise<Blueprint[]> {
-      // TODO: Implement list functionality
-      throw new Error('List not yet implemented');
+    async list(params?: BlueprintListParams, options?: Core.RequestOptions): Promise<Blueprint[]> {
+      const blueprints = await this.client.blueprints.list(params, options);
+      const result: Blueprint[] = [];
+
+      for await (const blueprint of blueprints) {
+        result.push(Blueprint.fromId(this.client, blueprint.id));
+      }
+
+      return result;
     }
   }
 
