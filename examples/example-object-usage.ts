@@ -80,7 +80,7 @@ async function main() {
   });
 
   // Upload content to the object
-  await storageObject.uploadContent('Hello, World!', 'text/plain');
+  await storageObject.uploadContent('Hello, World!');
 
   // Mark upload as complete
   await storageObject.complete();
