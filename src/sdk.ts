@@ -5,7 +5,11 @@ import { Snapshot } from './objects/snapshot';
 import { StorageObject } from './objects/storage-object';
 import type * as Core from './core';
 import type { DevboxCreateParams, DevboxListDiskSnapshotsParams } from './resources/devboxes/devboxes';
-import type { BlueprintCreateParams } from './resources/blueprints';
+import type {
+  BlueprintCreateParams,
+  BlueprintPreviewParams,
+  BlueprintPreviewView,
+} from './resources/blueprints';
 import type { ObjectCreateParams, ObjectListParams } from './resources/objects';
 
 /**
@@ -100,6 +104,36 @@ export namespace RunloopSDK {
 
     async list(params?: ObjectListParams, options?: Core.RequestOptions): Promise<StorageObject[]> {
       return StorageObject.list(this.client, params, options);
+    }
+
+    /**
+     * Upload a file directly from the filesystem (Node.js only).
+     * This method handles the complete three-step upload process.
+     */
+    async uploadFromFile(
+      filePath: string,
+      name: string,
+      options?: Core.RequestOptions & {
+        contentType?: string;
+        metadata?: Record<string, string>;
+      },
+    ): Promise<StorageObject> {
+      return StorageObject.uploadFromFile(this.client, filePath, name, options);
+    }
+
+    /**
+     * Upload content from a Buffer (Node.js only).
+     * This method handles the complete three-step upload process.
+     */
+    async uploadFromBuffer(
+      buffer: Buffer,
+      name: string,
+      contentType: string,
+      options?: Core.RequestOptions & {
+        metadata?: Record<string, string>;
+      },
+    ): Promise<StorageObject> {
+      return StorageObject.uploadFromBuffer(this.client, buffer, name, contentType, options);
     }
   }
 }
