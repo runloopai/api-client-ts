@@ -16,6 +16,8 @@ import type {
 } from '../resources/devboxes/devboxes';
 import { PollingOptions } from '../lib/polling';
 import { Snapshot } from './snapshot';
+import { Execution } from './execution';
+import { ExecutionResult } from './execution-result';
 
 /**
  * Object-oriented interface for working with Devboxes.
@@ -110,13 +112,14 @@ export class Devbox {
        *
        * @param params - Parameters containing the command and optional shell name
        * @param options - Request options with optional polling configuration
-       * @returns Execution result with stdout, stderr, and exit status
+       * @returns ExecutionResult with stdout, stderr, and exit status
        */
       exec: async (
         params: DevboxExecuteParams,
         options?: Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxAsyncExecutionDetailView>> },
-      ): Promise<DevboxAsyncExecutionDetailView> => {
-        return this.client.devboxes.execute(this._id, params, options);
+      ): Promise<ExecutionResult> => {
+        const result = await this.client.devboxes.executeAndAwaitCompletion(this._id, params, options);
+        return new ExecutionResult(this.client, this._id, result.execution_id, result);
       },
 
       /**
@@ -124,13 +127,14 @@ export class Devbox {
        *
        * @param params - Parameters containing the command and optional shell name
        * @param options - Request options
-       * @returns Execution details with execution_id for tracking
+       * @returns Execution object for tracking and controlling the command
        */
       execAsync: async (
         params: DevboxExecuteAsyncParams,
         options?: Core.RequestOptions,
-      ): Promise<DevboxAsyncExecutionDetailView> => {
-        return this.client.devboxes.executeAsync(this._id, params, options);
+      ): Promise<Execution> => {
+        const execution = await this.client.devboxes.executeAsync(this._id, params, options);
+        return new Execution(this.client, this._id, execution.execution_id, execution);
       },
     };
   }

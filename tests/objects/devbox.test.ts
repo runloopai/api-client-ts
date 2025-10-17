@@ -16,6 +16,7 @@ describe('Devbox (New API)', () => {
         retrieve: jest.fn(),
         execute: jest.fn(),
         executeAsync: jest.fn(),
+        executeAndAwaitCompletion: jest.fn(),
         readFileContents: jest.fn(),
         writeFileContents: jest.fn(),
         downloadFile: jest.fn(),
@@ -118,17 +119,17 @@ describe('Devbox (New API)', () => {
           stderr: '',
         };
 
-        mockClient.devboxes.execute.mockResolvedValue(mockExecution);
+        mockClient.devboxes.executeAndAwaitCompletion.mockResolvedValue(mockExecution);
 
         const result = await devbox.cmd.exec({ command: 'echo "Hello World"' });
 
-        expect(mockClient.devboxes.execute).toHaveBeenCalledWith(
+        expect(mockClient.devboxes.executeAndAwaitCompletion).toHaveBeenCalledWith(
           'devbox-123',
           { command: 'echo "Hello World"' },
           undefined,
         );
-        expect(result.stdout).toBe('Hello World');
-        expect(result.exit_status).toBe(0);
+        expect(result).toBeInstanceOf(require('../../src/objects/execution-result').ExecutionResult);
+        expect(result.exitCode).toBe(0);
       });
     });
 
@@ -149,7 +150,8 @@ describe('Devbox (New API)', () => {
           { command: 'sleep 10' },
           undefined,
         );
-        expect(result.status).toBe('running');
+        expect(result).toBeInstanceOf(require('../../src/objects/execution').Execution);
+        expect(result.executionId).toBe('exec-456');
       });
     });
 
@@ -285,7 +287,7 @@ describe('Devbox (New API)', () => {
       const devbox = await Devbox.create(mockClient, { name: 'test-devbox' });
 
       const error = new Error('Command failed');
-      mockClient.devboxes.execute.mockRejectedValue(error);
+      mockClient.devboxes.executeAndAwaitCompletion.mockRejectedValue(error);
 
       await expect(devbox.cmd.exec({ command: 'failing-command' })).rejects.toThrow('Command failed');
     });
