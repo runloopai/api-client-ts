@@ -82,14 +82,130 @@ const devbox = await sdk.devbox.create({ name: 'my-devbox' });
 
 // Or get an existing one
 const devbox = await sdk.devbox.fromId('devbox-id');
+
+// List all devboxes
+const devboxes = await sdk.devbox.list({ limit: 10 });
+
+// Get devbox information
+const info = await devbox.getInfo();
+console.log(`Devbox ${info.name} is ${info.status}`);
+```
+
+#### Command Execution
+
+```typescript
+// Synchronous command execution
+const result = await devbox.cmd.exec({ command: 'ls -la' });
+console.log('Output:', await result.stdout());
+console.log('Exit code:', result.exitCode);
+
+// Asynchronous command execution
+const execution = await devbox.cmd.execAsync({ 
+  command: 'npm run dev',
+  attach_stdin: true 
+});
+
+// Check execution status
+const status = await execution.status();
+console.log('Status:', status.status);
+
+// Wait for completion and get result
+const result = await execution.result();
+console.log('Final output:', await result.stdout());
+
+// Send input to running process
+await execution.sendStdIn('some input\n');
+
+// Kill the process
+await execution.kill();
+```
+
+#### File Operations
+
+```typescript
+// Write files
+await devbox.file.write({ 
+  file_path: '/home/user/app.js', 
+  contents: 'console.log("Hello from devbox!");' 
+});
+
+// Read files
+const content = await devbox.file.read({ file_path: '/home/user/app.js' });
+console.log(content); // "console.log("Hello from devbox!");"
+
+// Upload files (Node.js only)
+await devbox.file.upload({ 
+  path: '/home/user/upload.txt', 
+  file: new File(['content'], 'upload.txt') 
+});
+
+// Download files
+const response = await devbox.file.download({ path: '/home/user/download.txt' });
+```
+
+#### Network Operations
+
+```typescript
+// Create SSH key for remote access
+const sshKey = await devbox.net.createSSHKey();
+console.log('SSH URL:', sshKey.url);
+
+// Create tunnel to expose port
+const tunnel = await devbox.net.createTunnel({ port: 8080 });
+console.log('Public URL:', tunnel.url);
+
+// Remove tunnel when done
+await devbox.net.removeTunnel({ port: 8080 });
+```
+
+#### Snapshot Operations
+
+```typescript
+// Create a snapshot
+const snapshot = await devbox.snapshotDisk({ 
+  name: 'my-snapshot',
+  commit_message: 'Added new features'
+});
+
+// Create new devbox from snapshot
+const newDevbox = await sdk.devbox.create({ 
+  snapshot_id: snapshot.id,
+  name: 'devbox-from-snapshot'
+});
+```
+
+#### Devbox Management
+
+```typescript
+// Suspend devbox (pause without losing state)
+await devbox.suspend();
+
+// Resume suspended devbox
+await devbox.resume();
+
+// Keep devbox alive (extend timeout)
+await devbox.keepAlive();
+
+// Shutdown devbox
+await devbox.shutdown();
 ```
 
 **Key methods:**
 
+- `devbox.getInfo()` - Get devbox details and status
 - `devbox.cmd.exec()` - Execute commands synchronously
 - `devbox.cmd.execAsync()` - Execute commands asynchronously  
 - `devbox.file.read()` - Read file contents
 - `devbox.file.write()` - Write file contents
+- `devbox.file.upload()` - Upload files (Node.js only)
+- `devbox.file.download()` - Download files
+- `devbox.net.createSSHKey()` - Create SSH key for remote access
+- `devbox.net.createTunnel()` - Create network tunnel
+- `devbox.net.removeTunnel()` - Remove network tunnel
+- `devbox.snapshotDisk()` - Create disk snapshot
+- `devbox.suspend()` - Suspend devbox
+- `devbox.resume()` - Resume suspended devbox
+- `devbox.keepAlive()` - Extend devbox timeout
 - `devbox.shutdown()` - Shutdown the devbox
 
 ### Blueprint
@@ -332,103 +448,6 @@ const result = await sdk.api.devboxes.execute(devboxData.id, { command: 'echo he
 
 - **SDK methods** (`sdk.devbox.*`) - For most common operations, better error handling, automatic polling
 - **Legacy API** (`sdk.api.*`) - For advanced use cases, direct control over request parameters, accessing new endpoints not yet in SDK
-
-## Common Patterns
-
-### File Operations
-
-```typescript
-// Read a file
-const content = await devbox.file.read({ file_path: 'app.js' });
-
-// Write a file
-await devbox.file.write({ 
-  file_path: 'hello.txt', 
-  contents: 'Hello from Runloop!' 
-});
-
-// Upload a file
-await devbox.file.upload({ 
-  path: 'upload.txt', 
-  file: new File(['content'], 'upload.txt') 
-});
-
-// Download a file
-const response = await devbox.file.download({ path: 'download.txt' });
-```
-
-### Command Execution Patterns
-
-```typescript
-// Synchronous execution (wait for completion)
-const result = await devbox.cmd.exec({ 
-  command: 'npm install express',
-  shell_name: 'my-shell' // Use persistent shell
-});
-
-// Asynchronous execution (fire and forget)
-const execution = await devbox.cmd.execAsync({ 
-  command: 'npm run dev',
-  attach_stdin: true // Enable stdin streaming
-});
-
-// Send input to running process
-await execution.sendStdIn('some input');
-
-// Wait for completion
-const finalResult = await execution.result();
-```
-
-### Managing Long-Running Processes
-
-```typescript
-// Start a web server
-const serverExec = await devbox.cmd.execAsync({ 
-  command: 'npx http-server -p 8080' 
-});
-
-// Do other work...
-await new Promise(resolve => setTimeout(resolve, 5000));
-
-// Check if still running
-const status = await serverExec.status();
-if (status.status === 'running') {
-  console.log('Server is still running');
-}
-
-// Stop the server
-await serverExec.kill();
-```
-
-### Network Operations
-
-```typescript
-// Create SSH key for remote access
-const sshKey = await devbox.net.createSSHKey();
-console.log('SSH URL:', sshKey.url);
-
-// Create tunnel to expose port
-const tunnel = await devbox.net.createTunnel({ port: 8080 });
-console.log('Public URL:', tunnel.url);
-
-// Remove tunnel when done
-await devbox.net.removeTunnel({ port: 8080 });
-```
-
-### Working with Snapshots
-
-```typescript
-// Create a snapshot
-const snapshot = await devbox.snapshotDisk({ 
-  name: 'my-snapshot',
-  commit_message: 'Added new features'
-});
-
-// Create devbox from snapshot
-const newDevbox = await sdk.devbox.create({ 
-  snapshot_id: snapshot.id 
-});
-```
 
 ## Error Handling
 
