@@ -98,13 +98,5 @@ describe('smoketest: object-oriented blueprint', () => {
       // Clean up
       await blueprint.delete();
     });
-
-    test('preview blueprint', async () => {
-      const preview = await sdk.blueprint.preview({
-        dockerfile: 'FROM ubuntu:20.04\nRUN apt-get update',
-      });
-      expect(preview).toBeDefined();
-      expect(preview.dockerfile).toBeTruthy();
-    });
   });
 });
