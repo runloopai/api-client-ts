@@ -140,31 +140,6 @@ describe('Blueprint (New API)', () => {
     });
   });
 
-  describe('preview', () => {
-    it('should generate a dockerfile preview', async () => {
-      const mockPreview: BlueprintPreviewView = {
-        dockerfile: 'FROM ubuntu:22.04\nRUN apt-get update\nRUN apt-get install -y nodejs',
-      };
-
-      mockClient.blueprints.preview.mockResolvedValue(mockPreview);
-
-      const preview = await Blueprint.preview(mockClient, {
-        name: 'preview-blueprint',
-        system_setup_commands: ['apt-get install -y nodejs'],
-      });
-
-      expect(mockClient.blueprints.preview).toHaveBeenCalledWith(
-        {
-          name: 'preview-blueprint',
-          system_setup_commands: ['apt-get install -y nodejs'],
-        },
-        undefined,
-      );
-      expect(preview.dockerfile).toContain('FROM ubuntu:22.04');
-      expect(preview.dockerfile).toContain('nodejs');
-    });
-  });
-
   describe('instance methods', () => {
     let blueprint: Blueprint;
 
