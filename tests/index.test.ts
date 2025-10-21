@@ -1,6 +1,6 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-import Runloop from '@runloop/api-client';
+import { Runloop } from '@runloop/api-client';
 import { APIUserAbortError } from '@runloop/api-client';
 import { Headers } from '@runloop/api-client/core';
 import defaultFetch, { Response, type RequestInit, type RequestInfo } from 'node-fetch';
@@ -285,8 +285,8 @@ describe('retries', () => {
     let count = 0;
     const testFetch = async (url: RequestInfo, { signal }: RequestInit = {}): Promise<Response> => {
       if (count++ === 0) {
-        return new Promise(
-          (resolve, reject) => signal?.addEventListener('abort', () => reject(new Error('timed out'))),
+        return new Promise((resolve, reject) =>
+          signal?.addEventListener('abort', () => reject(new Error('timed out'))),
         );
       }
       return new Response(JSON.stringify({ a: 1 }), { headers: { 'Content-Type': 'application/json' } });

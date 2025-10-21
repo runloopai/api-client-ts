@@ -16,7 +16,10 @@ describe('smoketest: executions', () => {
     'launch devbox',
     async () => {
       const created = await client.devboxes.createAndAwaitRunning(
-        { name: uniqueName('exec-devbox') },
+        {
+          name: uniqueName('exec-devbox'),
+          launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 }, // 5 minutes
+        },
         {
           polling: { maxAttempts: 120, pollingIntervalMs: 5_000, timeoutMs: 20 * 60 * 1000 },
         },

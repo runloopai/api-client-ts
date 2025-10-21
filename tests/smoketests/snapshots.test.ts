@@ -17,7 +17,10 @@ describe('smoketest: devbox snapshots', () => {
 
   test('snapshot devbox', async () => {
     const created = await client.devboxes.createAndAwaitRunning(
-      { name: uniqueName('snap-devbox') },
+      {
+        name: uniqueName('snap-devbox'),
+        launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 }, // 5 minutes
+      },
       {
         polling: { maxAttempts: 120, pollingIntervalMs: 5_000, timeoutMs: 20 * 60 * 1000 },
       },
@@ -31,7 +34,10 @@ describe('smoketest: devbox snapshots', () => {
 
   test('launch devbox from snapshot', async () => {
     const launched = await client.devboxes.createAndAwaitRunning(
-      { snapshot_id: snapshotId! },
+      {
+        snapshot_id: snapshotId!,
+        launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 }, // 5 minutes
+      },
       {
         polling: { maxAttempts: 120, pollingIntervalMs: 5_000, timeoutMs: 20 * 60 * 1000 },
       },

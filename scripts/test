@@ -9,6 +9,23 @@ GREEN='\033[0;32m'
 YELLOW='\033[0;33m'
 NC='\033[0m' # No Color
 
+# Parse command line arguments
+RUN_SMOKE_TESTS=false
+JEST_ARGS=()
+
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    --smoke)
+      RUN_SMOKE_TESTS=true
+      shift
+      ;;
+    *)
+      JEST_ARGS+=("$1")
+      shift
+      ;;
+  esac
+done
+
 function prism_is_running() {
   curl --silent "http://localhost:4010" >/dev/null 2>&1
 }
@@ -52,5 +69,10 @@ else
   echo
 fi
 
-echo "==> Running tests"
-./node_modules/.bin/jest "$@"
+if [ "$RUN_SMOKE_TESTS" = true ]; then
+  echo -e "${YELLOW}==> Running smoke tests${NC}"
+  RUN_SMOKETESTS=1 ./node_modules/.bin/jest "${JEST_ARGS[@]}"
+else
+  echo "==> Running tests"
+  ./node_modules/.bin/jest "${JEST_ARGS[@]}"
+fi

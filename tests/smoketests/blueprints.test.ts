@@ -35,7 +35,10 @@ describe('smoketest: blueprints', () => {
       'start devbox from base blueprint by ID',
       async () => {
         const devbox = await client.devboxes.createAndAwaitRunning(
-          { blueprint_id: blueprintId! },
+          {
+            blueprint_id: blueprintId!,
+            launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 }, // 5 minutes
+          },
           {
             polling: { maxAttempts: 120, pollingIntervalMs: 5_000, timeoutMs: 20 * 60 * 1000 },
           },
@@ -50,7 +53,10 @@ describe('smoketest: blueprints', () => {
       'start devbox from base blueprint by Name',
       async () => {
         const devbox = await client.devboxes.createAndAwaitRunning(
-          { blueprint_name: blueprintName },
+          {
+            blueprint_name: blueprintName,
+            launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 }, // 5 minutes
+          },
           {
             polling: { maxAttempts: 120, pollingIntervalMs: 5_000, timeoutMs: 20 * 60 * 1000 },
           },

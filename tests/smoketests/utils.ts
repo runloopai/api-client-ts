@@ -1,4 +1,4 @@
-import Runloop from '@runloop/api-client';
+import { Runloop } from '@runloop/api-client';
 
 export function makeClient(overrides: Partial<ConstructorParameters<typeof Runloop>[0]> = {}) {
   const baseURL = process.env['RUNLOOP_BASE_URL'];
@@ -16,4 +16,4 @@ export function makeClient(overrides: Partial<ConstructorParameters<typeof Runlo
 export const uniqueName = (prefix: string) =>
   `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 
-export const THIRTY_SECOND_TIMEOUT = 30_000;
+export const THIRTY_SECOND_TIMEOUT = 120_000;
