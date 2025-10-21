@@ -1,13 +1,6 @@
 name: Smoke Tests
 
 on:
-  pull_request:
-    paths:
-      - 'src/**'
-      - 'tests/smoketests/**'
-  push:
-    branches:
-      - main
   workflow_dispatch:
     inputs:
       environment:
