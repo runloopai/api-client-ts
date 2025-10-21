@@ -53,7 +53,7 @@ jobs:
       - name: Run smoke tests (without coverage)
         id: tests
         continue-on-error: true
-        run: RUN_SMOKETESTS=1 yarn jest --config jest.config.objects.js --verbose 2>&1 | tee test-output.log
+        run: RUN_SMOKETESTS=1 yarn jest --config jest.config.objects.js --verbose --runInBand=false 2>&1 | tee test-output.log
 
       - name: Run coverage analysis
         id: coverage

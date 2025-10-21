@@ -27,4 +27,7 @@ module.exports = {
   },
   collectCoverage: true,
   displayName: 'Object Coverage Tests',
+  // Parallel execution settings
+  maxWorkers: '50%', // Use 50% of available CPU cores for parallel execution
+  maxConcurrency: 5, // Allow up to 5 test files to run concurrently
 };
