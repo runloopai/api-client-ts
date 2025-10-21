@@ -1,4 +1,4 @@
-name: Object Coverage Check
+name: Object Smoke Test & Coverage Check
 
 on:
   pull_request:
@@ -51,11 +51,9 @@ jobs:
           echo "RUN_SMOKETESTS=1" >> $GITHUB_ENV
 
       - name: Run smoke tests with coverage
+        id: coverage
         run: yarn test:objects-coverage
-
-      - name: Check coverage threshold
-        run: |
-          echo "✅ Coverage check passed - all object methods are covered in smoke tests!"
+        continue-on-error: true
 
       - name: Upload coverage report
         uses: actions/upload-artifact@v4
@@ -66,42 +64,70 @@ jobs:
           retention-days: 30
 
       - name: Comment coverage on PR
-        if: github.event_name == 'pull_request'
+        if: always() && github.event_name == 'pull_request'
         uses: actions/github-script@v7
         with:
           script: |
             const fs = require('fs');
-            const coverageSummary = JSON.parse(fs.readFileSync('coverage-objects/coverage-summary.json', 'utf8'));
+            let coverageExists = false;
+            let coverageSummary = null;
 
-            const total = coverageSummary.total;
-            const functions = total.functions.pct;
-            const lines = total.lines.pct;
-            const branches = total.branches.pct;
-            const statements = total.statements.pct;
+            try {
+              coverageSummary = JSON.parse(fs.readFileSync('coverage-objects/coverage-summary.json', 'utf8'));
+              coverageExists = true;
+            } catch (error) {
+              console.log('Coverage summary not found:', error.message);
+            }
 
-            const statusEmoji = (functions === 100) ? '✅' : '⚠️';
+            const testsPassed = '${{ steps.coverage.outcome }}' === 'success';
 
-            const comment = `## ${statusEmoji} Object Coverage Report
+            let comment = '';
 
-            | Metric | Coverage | Required |
-            |--------|----------|----------|
-            | **Functions** | **${functions}%** | **100%** ✅ |
-            | Lines | ${lines}% | - |
-            | Branches | ${branches}% | - |
-            | Statements | ${statements}% | - |
+            if (!coverageExists) {
+              comment = `## ❌ Object Coverage Report
+              
+              **Tests failed to run or coverage data was not generated.**
+              
+              Please check the workflow logs for details.`;
+            } else {
+              const total = coverageSummary.total;
+              const functions = total.functions.pct;
+              const lines = total.lines.pct;
+              const branches = total.branches.pct;
+              const statements = total.statements.pct;
 
-            **Coverage Requirement:** 100% function coverage (all public methods must be called in smoke tests)
+              const coveragePassed = functions === 100;
+              const allPassed = testsPassed && coveragePassed;
+              const statusEmoji = allPassed ? '✅' : '❌';
 
-            ${functions === 100 
-              ? '✅ All object methods are covered in smoke tests!' 
-              : '⚠️ Some object methods are not covered in smoke tests. Please add tests that call all public methods.'}
+              comment = `## ${statusEmoji} Object Smoke Tests & Coverage Report
 
-            <details>
-            <summary>View detailed coverage report</summary>
+              ### Test Results
+              ${testsPassed ? '✅ All smoke tests passed' : '❌ Some smoke tests failed'}
 
-            Coverage reports are available in the workflow artifacts. Lines/branches/statements coverage is tracked but not required to be 100%.
+              ### Coverage Results
+              | Metric | Coverage | Required | Status |
+              |--------|----------|----------|--------|
+              | **Functions** | **${functions}%** | **100%** | ${coveragePassed ? '✅' : '❌'} |
+              | Lines | ${lines}% | - | ℹ️ |
+              | Branches | ${branches}% | - | ℹ️ |
+              | Statements | ${statements}% | - | ℹ️ |
 
-            </details>`;
+              **Coverage Requirement:** 100% function coverage (all public methods must be called in smoke tests)
+
+              ${allPassed 
+                ? '✅ All tests passed and all object methods are covered!' 
+                : !testsPassed 
+                  ? '❌ Some tests failed. Please fix the failing tests before checking coverage.'
+                  : '❌ Some object methods are not covered in smoke tests. Please add tests that call all public methods.'}
+
+              <details>
+              <summary>View detailed coverage report</summary>
+
+              Coverage reports are available in the workflow artifacts. Lines/branches/statements coverage is tracked but not required to be 100%.
+
+              </details>`;
+            }
 
             github.rest.issues.createComment({
               issue_number: context.issue.number,
@@ -109,3 +135,9 @@ jobs:
               repo: context.repo.repo,
               body: comment
             });
+
+      - name: Check final status
+        if: steps.coverage.outcome != 'success'
+        run: |
+          echo "❌ Tests failed or coverage threshold not met"
+          exit 1
