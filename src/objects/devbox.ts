@@ -55,10 +55,9 @@ export class Devbox {
    *
    * @param client - The Runloop client instance
    * @param id - The devbox ID
-   * @param options - Request options
    * @returns A Devbox instance
    */
-  static fromId(client: Runloop, id: string, options?: Core.RequestOptions): Devbox {
+  static fromId(client: Runloop, id: string): Devbox {
     return new Devbox(client, id);
   }
 

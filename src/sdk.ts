@@ -8,9 +8,11 @@ import type {
   DevboxCreateParams,
   DevboxListDiskSnapshotsParams,
   DevboxListParams,
+  DevboxView,
 } from './resources/devboxes/devboxes';
 import type { BlueprintCreateParams, BlueprintListParams } from './resources/blueprints';
 import type { ObjectCreateParams, ObjectListParams } from './resources/objects';
+import { PollingOptions } from './lib/polling';
 
 // Extract the content type from the API types
 type ContentType = ObjectCreateParams['content_type'];
@@ -50,12 +52,15 @@ export namespace RunloopSDK {
   export class DevboxInterface {
     constructor(private client: Runloop) {}
 
-    async create(params?: DevboxCreateParams, options?: Core.RequestOptions): Promise<Devbox> {
+    async create(
+      params?: DevboxCreateParams,
+      options?: Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxView>> },
+    ): Promise<Devbox> {
       return Devbox.create(this.client, params, options);
     }
 
-    async fromId(id: string, options?: Core.RequestOptions): Promise<Devbox> {
-      return Devbox.fromId(this.client, id, options);
+    fromId(id: string): Devbox {
+      return Devbox.fromId(this.client, id);
     }
 
     async list(params?: DevboxListParams, options?: Core.RequestOptions): Promise<Devbox[]> {
@@ -80,8 +85,8 @@ export namespace RunloopSDK {
       return Blueprint.create(this.client, params, options);
     }
 
-    async fromId(id: string, options?: Core.RequestOptions): Promise<Blueprint> {
-      return Blueprint.fromId(this.client, id, options);
+    fromId(id: string): Blueprint {
+      return Blueprint.fromId(this.client, id);
     }
 
     async list(params?: BlueprintListParams, options?: Core.RequestOptions): Promise<Blueprint[]> {
@@ -102,8 +107,8 @@ export namespace RunloopSDK {
   export class SnapshotInterface {
     constructor(private client: Runloop) {}
 
-    async fromId(id: string, options?: Core.RequestOptions): Promise<Snapshot> {
-      return Snapshot.fromId(this.client, id, options);
+    fromId(id: string): Snapshot {
+      return Snapshot.fromId(this.client, id);
     }
 
     async list(params?: DevboxListDiskSnapshotsParams, options?: Core.RequestOptions): Promise<Snapshot[]> {
@@ -121,7 +126,7 @@ export namespace RunloopSDK {
       return StorageObject.create(this.client, params, options);
     }
 
-    async fromId(id: string, options?: Core.RequestOptions): Promise<StorageObject> {
+    fromId(id: string): StorageObject {
       return StorageObject.fromId(this.client, id);
     }
 

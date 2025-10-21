@@ -1,6 +1,7 @@
 import { Runloop } from '../index';
 import type * as Core from '../core';
 import type { DevboxAsyncExecutionDetailView } from '../resources/devboxes/devboxes';
+import type { PollingOptions } from '../lib/polling';
 import { ExecutionResult } from './execution-result';
 
 /**
@@ -48,7 +49,7 @@ export class Execution {
    */
   async result(
     options?: Core.RequestOptions & {
-      polling?: Partial<import('../lib/polling').PollingOptions<DevboxAsyncExecutionDetailView>>;
+      polling?: Partial<PollingOptions<DevboxAsyncExecutionDetailView>>;
     },
   ): Promise<ExecutionResult> {
     // Use the existing waitForCommand method to poll for completion

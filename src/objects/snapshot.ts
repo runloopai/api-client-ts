@@ -1,10 +1,15 @@
 import { Runloop } from '../index';
 import type * as Core from '../core';
-import type { DevboxListDiskSnapshotsParams, DevboxCreateParams } from '../resources/devboxes/devboxes';
+import type {
+  DevboxListDiskSnapshotsParams,
+  DevboxCreateParams,
+  DevboxView,
+} from '../resources/devboxes/devboxes';
 import type {
   DevboxSnapshotAsyncStatusView,
   DiskSnapshotUpdateParams,
 } from '../resources/devboxes/disk-snapshots';
+import type { PollingOptions } from '../lib/polling';
 import { Devbox } from './devbox';
 
 /**
@@ -25,10 +30,9 @@ export class Snapshot {
    *
    * @param client - The Runloop client instance
    * @param id - The snapshot ID
-   * @param options - Request options
    * @returns A Snapshot instance
    */
-  static fromId(client: Runloop, id: string, options?: Core.RequestOptions): Snapshot {
+  static fromId(client: Runloop, id: string): Snapshot {
     return new Snapshot(client, id);
   }
 
@@ -108,11 +112,7 @@ export class Snapshot {
    */
   async awaitCompleted(
     options?: Core.RequestOptions & {
-      polling?: Partial<
-        import('../lib/polling').PollingOptions<
-          import('../resources/devboxes/disk-snapshots').DevboxSnapshotAsyncStatusView
-        >
-      >;
+      polling?: Partial<PollingOptions<DevboxSnapshotAsyncStatusView>>;
     },
   ): Promise<DevboxSnapshotAsyncStatusView> {
     return this.client.devboxes.diskSnapshots.awaitCompleted(this._id, options);
@@ -130,9 +130,7 @@ export class Snapshot {
   async createDevbox(
     params?: Omit<DevboxCreateParams, 'snapshot_id' | 'blueprint_id' | 'blueprint_name'>,
     options?: Core.RequestOptions & {
-      polling?: Partial<
-        import('../lib/polling').PollingOptions<import('../resources/devboxes/devboxes').DevboxView>
-      >;
+      polling?: Partial<PollingOptions<DevboxView>>;
     },
   ): Promise<Devbox> {
     const createParams: DevboxCreateParams = {

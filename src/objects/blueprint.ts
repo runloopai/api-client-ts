@@ -5,7 +5,8 @@ import type {
   BlueprintCreateParams,
   BlueprintBuildLogsListView,
 } from '../resources/blueprints';
-import type { DevboxCreateParams } from '../resources/devboxes/devboxes';
+import type { DevboxCreateParams, DevboxView } from '../resources/devboxes/devboxes';
+import type { PollingOptions } from '../lib/polling';
 import { Devbox } from './devbox';
 
 /**
@@ -34,7 +35,7 @@ export class Blueprint {
     client: Runloop,
     params: BlueprintCreateParams,
     options?: Core.RequestOptions & {
-      polling?: Partial<import('../lib/polling').PollingOptions<BlueprintView>>;
+      polling?: Partial<PollingOptions<BlueprintView>>;
     },
   ): Promise<Blueprint> {
     const blueprintData = await client.blueprints.createAndAwaitBuildCompleted(params, options);
@@ -47,10 +48,9 @@ export class Blueprint {
    *
    * @param client - The Runloop client instance
    * @param id - The blueprint ID
-   * @param options - Request options
    * @returns A Blueprint instance
    */
-  static fromId(client: Runloop, id: string, options?: Core.RequestOptions): Blueprint {
+  static fromId(client: Runloop, id: string): Blueprint {
     return new Blueprint(client, id);
   }
 
@@ -117,9 +117,7 @@ export class Blueprint {
   async createDevbox(
     params?: Omit<DevboxCreateParams, 'blueprint_id' | 'snapshot_id' | 'blueprint_name'>,
     options?: Core.RequestOptions & {
-      polling?: Partial<
-        import('../lib/polling').PollingOptions<import('../resources/devboxes/devboxes').DevboxView>
-      >;
+      polling?: Partial<PollingOptions<DevboxView>>;
     },
   ): Promise<Devbox> {
     const createParams: DevboxCreateParams = {
