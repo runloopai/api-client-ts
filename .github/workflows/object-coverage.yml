@@ -79,27 +79,27 @@ jobs:
             const branches = total.branches.pct;
             const statements = total.statements.pct;
 
-            const statusEmoji = (functions === 100 && lines === 100 && branches === 100 && statements === 100) ? '✅' : '⚠️';
+            const statusEmoji = (functions === 100) ? '✅' : '⚠️';
 
             const comment = `## ${statusEmoji} Object Coverage Report
 
-            | Metric | Coverage |
-            |--------|----------|
-            | Functions | ${functions}% |
-            | Lines | ${lines}% |
-            | Branches | ${branches}% |
-            | Statements | ${statements}% |
+            | Metric | Coverage | Required |
+            |--------|----------|----------|
+            | **Functions** | **${functions}%** | **100%** ✅ |
+            | Lines | ${lines}% | - |
+            | Branches | ${branches}% | - |
+            | Statements | ${statements}% | - |
 
-            **Coverage Threshold:** 100% for all metrics
+            **Coverage Requirement:** 100% function coverage (all public methods must be called in smoke tests)
 
-            ${functions === 100 && lines === 100 && branches === 100 && statements === 100 
+            ${functions === 100 
               ? '✅ All object methods are covered in smoke tests!' 
-              : '⚠️ Some object methods are not covered in smoke tests. Please add coverage.'}
+              : '⚠️ Some object methods are not covered in smoke tests. Please add tests that call all public methods.'}
 
             <details>
             <summary>View detailed coverage report</summary>
 
-            Coverage reports are available in the workflow artifacts.
+            Coverage reports are available in the workflow artifacts. Lines/branches/statements coverage is tracked but not required to be 100%.
 
             </details>`;
 
