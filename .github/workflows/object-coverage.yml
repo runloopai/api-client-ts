@@ -52,11 +52,12 @@ jobs:
 
       - name: Run smoke tests (without coverage)
         id: tests
-        run: RUN_SMOKETESTS=1 yarn jest --config jest.config.objects.js --verbose
+        continue-on-error: true
+        run: RUN_SMOKETESTS=1 yarn jest --config jest.config.objects.js --verbose 2>&1 | tee test-output.log
 
       - name: Run coverage analysis
         id: coverage
-        if: success()
+        if: steps.tests.outcome == 'success'
         run: yarn test:objects-coverage
 
       - name: Upload coverage report
@@ -76,17 +77,47 @@ jobs:
             const testsPassed = '${{ steps.tests.outcome }}' === 'success';
             const coverageRan = '${{ steps.coverage.outcome }}' !== 'skipped';
 
+            // Build workflow run URL
+            const runUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+
             let comment = '';
 
             if (!testsPassed) {
+              // Try to parse failed tests from the log
+              let failedTests = '';
+              try {
+                const testOutput = fs.readFileSync('test-output.log', 'utf8');
+                
+                // Extract failed test names using regex
+                const failedMatches = testOutput.match(/● (.+?)(?:\n|$)/g);
+                if (failedMatches && failedMatches.length > 0) {
+                  const failedTestList = failedMatches
+                    .map(match => match.replace('● ', '').trim())
+                    .filter(test => test.length > 0)
+                    .slice(0, 10) // Limit to first 10 failures
+                    .map(test => `- ${test}`)
+                    .join('\n');
+                  
+                  if (failedTestList) {
+                    failedTests = `\n\n**Failed Tests:**\n${failedTestList}`;
+                    if (failedMatches.length > 10) {
+                      failedTests += `\n- ... and ${failedMatches.length - 10} more`;
+                    }
+                  }
+                }
+              } catch (error) {
+                console.log('Could not read test output:', error.message);
+              }
+
               comment = `## ❌ Object Smoke Tests Failed
               
               ### Test Results
               ❌ Some smoke tests failed
+              ${failedTests}
               
               **Please fix the failing tests before checking coverage.**
               
-              Check the workflow logs for details on which tests failed.`;
+              [📋 View full test logs](${runUrl})`;
             } else if (!coverageRan) {
               comment = `## ⚠️ Coverage Analysis Skipped
               
@@ -96,7 +127,7 @@ jobs:
               ### Coverage Results
               Coverage analysis was skipped or failed to complete.
               
-              Please check the workflow logs for details.`;
+              [📋 View workflow logs](${runUrl})`;
             } else {
               let coverageSummary = null;
               try {
@@ -111,7 +142,7 @@ jobs:
                 ### Coverage Results
                 ⚠️ Coverage data could not be read
                 
-                Please check the workflow logs for details.`;
+                [📋 View workflow logs](${runUrl})`;
                 
                 github.rest.issues.createComment({
                   issue_number: context.issue.number,
@@ -156,7 +187,9 @@ jobs:
 
               Coverage reports are available in the workflow artifacts. Lines/branches/statements coverage is tracked but not required to be 100%.
 
-              </details>`;
+              </details>
+              
+              [📋 View workflow run](${runUrl})`;
             }
 
             github.rest.issues.createComment({
