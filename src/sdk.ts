@@ -81,7 +81,10 @@ export namespace RunloopSDK {
   export class BlueprintInterface {
     constructor(private client: Runloop) {}
 
-    async create(params: BlueprintCreateParams, options?: Core.RequestOptions): Promise<Blueprint> {
+    async create(
+      params: BlueprintCreateParams,
+      options?: Core.RequestOptions & { polling?: Partial<PollingOptions<Runloop.Blueprints.BlueprintView>> },
+    ): Promise<Blueprint> {
       return Blueprint.create(this.client, params, options);
     }
 
@@ -122,7 +125,10 @@ export namespace RunloopSDK {
   export class StorageObjectInterface {
     constructor(private client: Runloop) {}
 
-    async create(params: ObjectCreateParams, options?: Core.RequestOptions): Promise<StorageObject> {
+    async create(
+      params: ObjectCreateParams,
+      options?: Core.RequestOptions & { polling?: Partial<PollingOptions<Runloop.Objects.ObjectView>> },
+    ): Promise<StorageObject> {
       return StorageObject.create(this.client, params, options);
     }
 
