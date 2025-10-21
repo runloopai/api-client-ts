@@ -88,7 +88,8 @@ describe('smoketest: object-oriented snapshot', () => {
 
     test('create devbox from snapshot', async () => {
       expect(snapshot).toBeDefined();
-      const newDevbox = await snapshot.createDevbox({
+      // Use SDK method to create devbox from snapshot
+      const newDevbox = await sdk.devbox.createFromSnapshot(snapshot.id, {
         name: uniqueName('devbox-from-snapshot'),
       });
       expect(newDevbox).toBeDefined();

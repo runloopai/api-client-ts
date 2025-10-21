@@ -59,6 +59,22 @@ export namespace RunloopSDK {
       return Devbox.create(this.client, params, options);
     }
 
+    async createFromBlueprint(
+      blueprintId: string,
+      params?: Omit<DevboxCreateParams, 'blueprint_id' | 'snapshot_id' | 'blueprint_name'>,
+      options?: Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxView>> },
+    ): Promise<Devbox> {
+      return Devbox.createFromBlueprint(this.client, blueprintId, params, options);
+    }
+
+    async createFromSnapshot(
+      snapshotId: string,
+      params?: Omit<DevboxCreateParams, 'snapshot_id' | 'blueprint_id' | 'blueprint_name'>,
+      options?: Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxView>> },
+    ): Promise<Devbox> {
+      return Devbox.createFromSnapshot(this.client, snapshotId, params, options);
+    }
+
     fromId(id: string): Devbox {
       return Devbox.fromId(this.client, id);
     }

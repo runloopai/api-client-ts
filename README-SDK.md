@@ -31,8 +31,8 @@ console.log('Output:', await result.stdout()); // "Hello, World!"
 console.log('Exit code:', result.exitCode); // 0
 
 // Start a long-running HTTP server asynchronously
-const serverExec = await devbox.cmd.execAsync({ 
-command: 'npx http-server -p 8080' 
+const serverExec = await devbox.cmd.execAsync({
+  command: 'npx http-server -p 8080',
 });
 console.log(`Started server with execution ID: ${serverExec.executionId}`);
 
@@ -44,7 +44,6 @@ console.log('Server status:', status.status); // "running"
 await serverExec.kill();
 
 await devbox.shutdown();
-
 ```
 
 ## Core Concepts
@@ -67,21 +66,33 @@ const sdk = new RunloopSDK({
 The SDK provides object-oriented interfaces for all major Runloop resources:
 
 - **`sdk.devbox`** - Devbox management (create, list, execute commands, file operations)
-- **`sdk.blueprint`** - Blueprint management (create, list, build blueprints)  
+- **`sdk.blueprint`** - Blueprint management (create, list, build blueprints)
 - **`sdk.snapshot`** - Snapshot management (list disk snapshots)
 - **`sdk.storageObject`** - Storage object management (upload, download, list objects)
 - **`sdk.api`** - Direct access to the legacy REST API client
 
 ### Devbox
 
-Object-oriented interface for working with devboxes. Created via `sdk.devbox.create()` or `sdk.devbox.fromId()`:
+Object-oriented interface for working with devboxes. Created via `sdk.devbox.create()`, `sdk.devbox.createFromBlueprint()`, `sdk.devbox.createFromSnapshot()`, or `sdk.devbox.fromId()`:
 
 ```typescript
 // Create a new devbox
 const devbox = await sdk.devbox.create({ name: 'my-devbox' });
 
+// Create a devbox from a blueprint
+const devboxFromBlueprint = await sdk.devbox.createFromBlueprint(
+  'blueprint-id',
+  { name: 'my-devbox-from-blueprint' }
+);
+
+// Create a devbox from a snapshot
+const devboxFromSnapshot = await sdk.devbox.createFromSnapshot(
+  'snapshot-id',
+  { name: 'my-devbox-from-snapshot' }
+);
+
 // Or get an existing one
-const devbox = await sdk.devbox.fromId('devbox-id');
+const existingDevbox = sdk.devbox.fromId('devbox-id');
 
 // List all devboxes
 const devboxes = await sdk.devbox.list({ limit: 10 });
@@ -100,9 +111,8 @@ console.log('Output:', await result.stdout());
 console.log('Exit code:', result.exitCode);
 
 // Asynchronous command execution
-const execution = await devbox.cmd.execAsync({ 
+const execution = await devbox.cmd.execAsync({
   command: 'npm run dev',
-  attach_stdin: true 
 });
 
 // Check execution status
@@ -124,9 +134,9 @@ await execution.kill();
 
 ```typescript
 // Write files
-await devbox.file.write({ 
-  file_path: '/home/user/app.js', 
-  contents: 'console.log("Hello from devbox!");' 
+await devbox.file.write({
+  file_path: '/home/user/app.js',
+  contents: 'console.log("Hello from devbox!");',
 });
 
 // Read files
@@ -134,9 +144,9 @@ const content = await devbox.file.read({ file_path: '/home/user/app.js' });
 console.log(content); // "console.log("Hello from devbox!");"
 
 // Upload files (Node.js only)
-await devbox.file.upload({ 
-  path: '/home/user/upload.txt', 
-  file: new File(['content'], 'upload.txt') 
+await devbox.file.upload({
+  path: '/home/user/upload.txt',
+  file: new File(['content'], 'upload.txt'),
 });
 
 // Download files
@@ -162,16 +172,21 @@ await devbox.net.removeTunnel({ port: 8080 });
 
 ```typescript
 // Create a snapshot
-const snapshot = await devbox.snapshotDisk({ 
+const snapshot = await devbox.snapshotDisk({
   name: 'my-snapshot',
-  commit_message: 'Added new features'
+  commit_message: 'Added new features',
 });
 
-// Create new devbox from snapshot
-const newDevbox = await sdk.devbox.create({ 
-  snapshot_id: snapshot.id,
-  name: 'devbox-from-snapshot'
+// Create new devbox from snapshot (using snapshot object)
+const newDevbox = await snapshot.createDevbox({
+  name: 'devbox-from-snapshot',
 });
+
+// Or create new devbox from snapshot (using SDK method)
+const anotherDevbox = await sdk.devbox.createFromSnapshot(
+  snapshot.id,
+  { name: 'another-devbox' }
+);
 ```
 
 #### Devbox Management
@@ -194,7 +209,7 @@ await devbox.shutdown();
 
 - `devbox.getInfo()` - Get devbox details and status
 - `devbox.cmd.exec()` - Execute commands synchronously
-- `devbox.cmd.execAsync()` - Execute commands asynchronously  
+- `devbox.cmd.execAsync()` - Execute commands asynchronously
 - `devbox.file.read()` - Read file contents
 - `devbox.file.write()` - Write file contents
 - `devbox.file.upload()` - Upload files (Node.js only)
@@ -214,7 +229,7 @@ Object-oriented interface for working with blueprints. Created via `sdk.blueprin
 
 ```typescript
 // Create a new blueprint
-const blueprint = await sdk.blueprint.create({ 
+const blueprint = await sdk.blueprint.create({
   name: 'my-blueprint',
   // ... other parameters
 });
@@ -229,10 +244,16 @@ const blueprints = await sdk.blueprint.list();
 const info = await blueprint.getInfo();
 const logs = await blueprint.logs();
 
-// Create a devbox from this blueprint
-const devbox = await blueprint.createDevbox({ 
-  name: 'devbox-from-blueprint' 
+// Create a devbox from this blueprint (using blueprint object)
+const devbox = await blueprint.createDevbox({
+  name: 'devbox-from-blueprint',
 });
+
+// Or create devbox from blueprint (using SDK method)
+const anotherDevbox = await sdk.devbox.createFromBlueprint(
+  blueprint.id,
+  { name: 'another-devbox' }
+);
 
 // Delete the blueprint when done
 await blueprint.delete();
@@ -264,17 +285,17 @@ const info = await snapshot.getInfo();
 const status = await snapshot.queryStatus();
 
 // Update snapshot metadata
-await snapshot.update({ 
+await snapshot.update({
   name: 'updated-snapshot-name',
-  metadata: { version: 'v2.0' }
+  metadata: { version: 'v2.0' },
 });
 
 // Wait for async snapshot to complete
 await snapshot.awaitCompleted();
 
 // Create a devbox from this snapshot
-const devbox = await snapshot.createDevbox({ 
-  name: 'devbox-from-snapshot' 
+const devbox = await snapshot.createDevbox({
+  name: 'devbox-from-snapshot',
 });
 
 // Delete the snapshot when done
@@ -299,7 +320,7 @@ Object-oriented interface for working with storage objects. Created via `sdk.sto
 const storageObject = await sdk.storageObject.create({
   name: 'my-file.txt',
   content_type: 'text',
-  metadata: { project: 'demo' }
+  metadata: { project: 'demo' },
 });
 
 // Upload content to the object
@@ -308,25 +329,20 @@ await storageObject.complete();
 
 // Upload from file (Node.js only)
 const uploaded = await sdk.storageObject.uploadFromFile(
-  '/path/to/file.txt', 
+  '/path/to/file.txt',
   'my-file.txt',
-  { metadata: { source: 'file' } } //  contentType: 'text',  is assumed based on the filename
+  { metadata: { source: 'file' } }, //  contentType: 'text',  is assumed based on the filename
 );
 
 // Upload text content directly
-const uploaded = await sdk.storageObject.uploadFromText(
-  'Hello, World!', 
-  'my-text.txt',
-  { metadata: { source: 'text' } }
-);
+const uploaded = await sdk.storageObject.uploadFromText('Hello, World!', 'my-text.txt', {
+  metadata: { source: 'text' },
+});
 
 // Upload from buffer (Node.js only)
-const uploaded = await sdk.storageObject.uploadFromBuffer(
-  Buffer.from('content'), 
-  'my-file.txt', 
-  'text',
-  { metadata: { source: 'buffer' } }
-);
+const uploaded = await sdk.storageObject.uploadFromBuffer(Buffer.from('content'), 'my-file.txt', 'text', {
+  metadata: { source: 'buffer' },
+});
 
 // Get object details and download
 const info = await storageObject.getInfo();
@@ -356,9 +372,9 @@ const devbox = await sdk.devbox.create({
     {
       type: 'object_mount',
       object_id: storageObject.id,
-      object_path: '/home/user/data'
-    }
-  ]
+      object_path: '/home/user/data',
+    },
+  ],
 });
 
 // The storage object is now accessible at /home/user/data in the devbox
@@ -366,10 +382,7 @@ const result = await devbox.cmd.exec({ command: 'ls -la /home/user/data' });
 console.log(await result.stdout());
 
 // Mount archived objects (tar, tgz, gzip) - they get extracted to a directory
-const archiveObject = await sdk.storageObject.uploadFromFile(
-  './project.tar.gz', 
-  'project.tar.gz'
-);
+const archiveObject = await sdk.storageObject.uploadFromFile('./project.tar.gz', 'project.tar.gz');
 
 const devboxWithArchive = await sdk.devbox.create({
   name: 'archive-devbox',
@@ -377,9 +390,9 @@ const devboxWithArchive = await sdk.devbox.create({
     {
       type: 'object_mount',
       object_id: archiveObject.id,
-      object_path: '/home/user/project' // Archive gets extracted here
-    }
-  ]
+      object_path: '/home/user/project', // Archive gets extracted here
+    },
+  ],
 });
 
 // Access extracted archive contents
@@ -425,8 +438,8 @@ Result object containing command output and metadata:
 
 ```typescript
 const result = await devbox.cmd.exec({ command: 'ls -la' });
-console.log(await result.stdout());    // Standard output
-console.log(await result.stderr());    // Standard error  
+console.log(await result.stdout()); // Standard output
+console.log(await result.stderr()); // Standard error
 console.log(result.exitCode); // Exit code
 ```
 
@@ -477,8 +490,8 @@ const sdk = new RunloopSDK({
   timeout: 60000, // 60 second timeout
   maxRetries: 3, // Retry failed requests
   defaultHeaders: {
-    'X-Custom-Header': 'value'
-  }
+    'X-Custom-Header': 'value',
+  },
 });
 ```
 

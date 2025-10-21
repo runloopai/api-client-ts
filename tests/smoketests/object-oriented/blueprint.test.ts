@@ -52,7 +52,8 @@ describe('smoketest: object-oriented blueprint', () => {
 
     test('create devbox from blueprint', async () => {
       expect(blueprint).toBeDefined();
-      const devbox = await blueprint.createDevbox({
+      // Use SDK method to create devbox from blueprint
+      const devbox = await sdk.devbox.createFromBlueprint(blueprint.id, {
         name: uniqueName('devbox-from-blueprint'),
         launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 }, // 5 minutes
       });

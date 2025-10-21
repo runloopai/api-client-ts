@@ -203,9 +203,8 @@ describe('smoketest: object-oriented devbox', () => {
       });
       expect(blueprint).toBeDefined();
 
-      // Create devbox from blueprint using static method
-      const { Devbox } = await import('@runloop/api-client/objects');
-      const devbox = await Devbox.createFromBlueprint(client, blueprint.id, {
+      // Create devbox from blueprint using SDK method
+      const devbox = await sdk.devbox.createFromBlueprint(blueprint.id, {
         name: uniqueName('sdk-devbox-from-blueprint'),
         launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 },
       });
@@ -236,9 +235,8 @@ describe('smoketest: object-oriented devbox', () => {
       });
       expect(snapshot).toBeDefined();
 
-      // Create devbox from snapshot using static method
-      const { Devbox } = await import('@runloop/api-client/objects');
-      const devbox = await Devbox.createFromSnapshot(client, snapshot.id, {
+      // Create devbox from snapshot using SDK method
+      const devbox = await sdk.devbox.createFromSnapshot(snapshot.id, {
         name: uniqueName('sdk-devbox-from-snapshot'),
         launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 },
       });
