@@ -18,6 +18,14 @@ type ContentType = ObjectCreateParams['content_type'];
 /**
  * Runloop SDK - The recommended way to interact with Runloop.
  * Provides both low-level API access and high-level object-oriented interfaces.
+ *
+ * @example
+ * ```typescript
+ * const sdk = new RunloopSDK(); // export RUNLOOP_API_KEY will automatically be used.
+ * const devbox = await sdk.devbox.create({ name: 'my-devbox' });
+ * const result = await devbox.cmd.exec({ command: 'echo "Hello, World!"' });
+ * console.log(result.exitCode);
+ * ```
  */
 export class RunloopSDK {
   public readonly api: Runloop;
