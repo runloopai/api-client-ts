@@ -86,11 +86,24 @@ describe('smoketest: object-oriented snapshot', () => {
       expect(info.snapshot?.name).toBe('updated-sdk-snapshot');
     });
 
-    test('create devbox from snapshot', async () => {
+    test('create devbox from snapshot (SDK method)', async () => {
       expect(snapshot).toBeDefined();
       // Use SDK method to create devbox from snapshot
       const newDevbox = await sdk.devbox.createFromSnapshot(snapshot.id, {
-        name: uniqueName('devbox-from-snapshot'),
+        name: uniqueName('devbox-from-snapshot-sdk'),
+      });
+      expect(newDevbox).toBeDefined();
+      expect(newDevbox.id).toBeTruthy();
+
+      // Clean up the devbox
+      await newDevbox.shutdown();
+    });
+
+    test('create devbox from snapshot (instance method)', async () => {
+      expect(snapshot).toBeDefined();
+      // Use snapshot instance method to create devbox
+      const newDevbox = await snapshot.createDevbox({
+        name: uniqueName('devbox-from-snapshot-instance'),
       });
       expect(newDevbox).toBeDefined();
       expect(newDevbox.id).toBeTruthy();

@@ -50,11 +50,25 @@ describe('smoketest: object-oriented blueprint', () => {
       expect(result.logs!.length).toBeGreaterThan(0);
     });
 
-    test('create devbox from blueprint', async () => {
+    test('create devbox from blueprint (SDK method)', async () => {
       expect(blueprint).toBeDefined();
       // Use SDK method to create devbox from blueprint
       const devbox = await sdk.devbox.createFromBlueprint(blueprint.id, {
-        name: uniqueName('devbox-from-blueprint'),
+        name: uniqueName('devbox-from-blueprint-sdk'),
+        launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 }, // 5 minutes
+      });
+      expect(devbox).toBeDefined();
+      expect(devbox.id).toBeTruthy();
+
+      // Clean up the devbox
+      await devbox.shutdown();
+    });
+
+    test('create devbox from blueprint (instance method)', async () => {
+      expect(blueprint).toBeDefined();
+      // Use blueprint instance method to create devbox
+      const devbox = await blueprint.createDevbox({
+        name: uniqueName('devbox-from-blueprint-instance'),
         launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 }, // 5 minutes
       });
       expect(devbox).toBeDefined();
