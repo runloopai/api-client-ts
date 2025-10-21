@@ -114,7 +114,7 @@ export namespace RunloopSDK {
     }
 
     async fromId(id: string, options?: Core.RequestOptions): Promise<StorageObject> {
-      return StorageObject.fromId(this.client, id, options);
+      return StorageObject.fromId(this.client, id);
     }
 
     async list(params?: ObjectListParams, options?: Core.RequestOptions): Promise<StorageObject[]> {

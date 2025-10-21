@@ -24,20 +24,21 @@ export class Execution {
     this._initialResult = initialResult;
   }
 
-  /**
-   * Send input to the execution's stdin.
-   *
-   * @param input - The input to send
-   * @param options - Request options
-   */
-  async sendStdIn(input: string, options?: Core.RequestOptions): Promise<void> {
-    await this.client.devboxes.executions.sendStdIn(
-      this._devboxId,
-      this._executionId,
-      { text: input },
-      options,
-    );
-  }
+  // Doesn't work as expected, the execution is killed when the stdin is sent.
+  // /**
+  //  * Send input to the execution's stdin.
+  //  *
+  //  * @param input - The input to send
+  //  * @param options - Request options
+  //  */
+  // async sendStdIn(input: string, options?: Core.RequestOptions): Promise<void> {
+  //   await this.client.devboxes.executions.sendStdIn(
+  //     this._devboxId,
+  //     this._executionId,
+  //     { text: input },
+  //     options,
+  //   );
+  // }
 
   /**
    * Wait for the execution to complete and return the result.
@@ -62,9 +63,9 @@ export class Execution {
   }
 
   /**
-   * Get the current status of the execution.
+   * Get the current state of the execution.
    */
-  async status(options?: Core.RequestOptions): Promise<DevboxAsyncExecutionDetailView> {
+  async getState(options?: Core.RequestOptions): Promise<DevboxAsyncExecutionDetailView> {
     return this.client.devboxes.executions.retrieve(this._devboxId, this._executionId, options);
   }
 

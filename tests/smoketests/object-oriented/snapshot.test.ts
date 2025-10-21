@@ -45,6 +45,22 @@ describe('smoketest: object-oriented snapshot', () => {
       snapshotId = snapshot.id;
     });
 
+    test('create snapshot async from devbox', async () => {
+      expect(devbox).toBeDefined();
+      const asyncSnapshot = await devbox.snapshotDiskAsync({
+        name: uniqueName('sdk-snapshot-async'),
+        commit_message: 'Test async snapshot from SDK',
+      });
+      expect(asyncSnapshot).toBeDefined();
+      expect(asyncSnapshot.id).toBeTruthy();
+
+      // Wait for it to complete
+      await asyncSnapshot.awaitCompleted();
+
+      // Clean up
+      await asyncSnapshot.delete();
+    });
+
     test('get snapshot info', async () => {
       expect(snapshot).toBeDefined();
       const result = await snapshot.getInfo();

@@ -170,11 +170,47 @@ describe('smoketest: object-oriented storage object', () => {
       // Clean up
       await uploaded.delete();
     });
+
+    test('upload from file', async () => {
+      const fs = require('fs');
+      const path = require('path');
+      const os = require('os');
+
+      // Create a temporary file
+      const tmpFile = path.join(os.tmpdir(), `test-upload-${Date.now()}.txt`);
+      fs.writeFileSync(tmpFile, 'Hello from uploadFromFile!');
+
+      try {
+        const uploaded = await sdk.storageObject.uploadFromFile(tmpFile, uniqueName('sdk-file-upload'), {
+          metadata: { source: 'uploadFromFile' },
+        });
+        expect(uploaded).toBeDefined();
+        expect(uploaded.id).toBeTruthy();
+
+        // Verify content
+        const content = await uploaded.downloadAsText();
+        expect(content).toBe('Hello from uploadFromFile!');
+
+        // Clean up
+        await uploaded.delete();
+      } finally {
+        // Clean up temp file
+        if (fs.existsSync(tmpFile)) {
+          fs.unlinkSync(tmpFile);
+        }
+      }
+    });
   });
 
   describe('storage object list and retrieval', () => {
-    test('list storage objects', async () => {
+    test('list storage objects via SDK', async () => {
       const objects = await sdk.storageObject.list({ limit: 10 });
+      expect(Array.isArray(objects)).toBe(true);
+    });
+
+    test('list storage objects via static method', async () => {
+      const { StorageObject } = await import('@runloop/api-client/objects');
+      const objects = await StorageObject.list(client, { limit: 5 });
       expect(Array.isArray(objects)).toBe(true);
     });
 

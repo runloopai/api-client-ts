@@ -56,22 +56,23 @@ export class Blueprint {
     return new Blueprint(client, id);
   }
 
-  /**
-   * Preview a blueprint configuration without building it.
-   * Returns the Dockerfile that would be built.
-   *
-   * @param client - The Runloop client instance
-   * @param params - Blueprint preview parameters
-   * @param options - Request options
-   * @returns Preview with generated Dockerfile
-   */
-  static async preview(
-    client: Runloop,
-    params: BlueprintPreviewParams,
-    options?: Core.RequestOptions,
-  ): Promise<BlueprintPreviewView> {
-    return client.blueprints.preview(params, options);
-  }
+  // BETA the preview is not available in the API.
+  // /**
+  //  * Preview a blueprint configuration without building it.
+  //  * Returns the Dockerfile that would be built.
+  //  *
+  //  * @param client - The Runloop client instance
+  //  * @param params - Blueprint preview parameters
+  //  * @param options - Request options
+  //  * @returns Preview with generated Dockerfile
+  //  */
+  // static async preview(
+  //   client: Runloop,
+  //   params: BlueprintPreviewParams,
+  //   options?: Core.RequestOptions,
+  // ): Promise<BlueprintPreviewView> {
+  //   return client.blueprints.preview(params, options);
+  // }
 
   /**
    * Get the blueprint ID.

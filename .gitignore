@@ -9,3 +9,5 @@ dist-deno
 .idea/
 .eslintcache
 .DS_Store
+coverage-objects
+object-coverage-report.json

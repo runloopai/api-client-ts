@@ -1,4 +1,4 @@
-import { RunloopSDK } from '@runloop/api-client';
+import { RunloopSDK, toFile } from '@runloop/api-client';
 import { Devbox } from '@runloop/api-client/objects';
 import { makeClient, THIRTY_SECOND_TIMEOUT, uniqueName } from '../utils';
 
@@ -76,6 +76,18 @@ describe('smoketest: object-oriented devbox', () => {
       // Read the file
       const content = await devbox.file.read({ file_path: '/tmp/test.txt' });
       expect(content).toBe('Hello from SDK file operations!');
+
+      // Download the file
+      const downloadResponse = await devbox.file.download({ path: '/tmp/test.txt' });
+      expect(downloadResponse).toBeDefined();
+
+      // Upload a file
+      await devbox.file.upload({
+        path: '~/uploaded.txt',
+        file: await toFile(Buffer.from('Uploaded content'), 'uploaded.txt'),
+      });
+      const content2 = await devbox.file.read({ file_path: '~/uploaded.txt' });
+      expect(content2).toBe('Uploaded content');
     });
 
     test('shutdown devbox', async () => {
@@ -106,6 +118,76 @@ describe('smoketest: object-oriented devbox', () => {
       // Retrieve it by ID
       const retrieved = await sdk.devbox.fromId(devbox.id);
       expect(retrieved.id).toBe(devbox.id);
+
+      // Clean up
+      await devbox.shutdown();
+    });
+  });
+
+  describe('devbox suspend and resume', () => {
+    test('suspend and resume devbox', async () => {
+      const devbox = await sdk.devbox.create({
+        name: uniqueName('sdk-devbox-suspend'),
+        launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 }, // 5 minutes
+      });
+
+      // Suspend the devbox
+      await devbox.suspend();
+      await devbox.awaitSuspended();
+      const suspendedInfo = await devbox.getInfo();
+      expect(suspendedInfo.status).toBe('suspended');
+
+      // Resume the devbox
+      await devbox.resume();
+      await devbox.awaitRunning();
+      const resumedInfo = await devbox.getInfo();
+      expect(resumedInfo.status).toBe('running');
+
+      // Clean up
+      await devbox.shutdown();
+    });
+
+    test('keep alive', async () => {
+      const devbox = await sdk.devbox.create({
+        name: uniqueName('sdk-devbox-keepalive'),
+        launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 }, // 5 minutes
+      });
+
+      // Send keep alive signal
+      const result = await devbox.keepAlive();
+      expect(result).toBeDefined();
+
+      // Clean up
+      await devbox.shutdown();
+    });
+  });
+
+  describe('devbox networking', () => {
+    test('create SSH key', async () => {
+      const devbox = await sdk.devbox.create({
+        name: uniqueName('sdk-devbox-ssh'),
+        launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 }, // 5 minutes
+      });
+
+      const sshKey = await devbox.net.createSSHKey();
+      expect(sshKey).toBeDefined();
+
+      // Clean up
+      await devbox.shutdown();
+    });
+
+    test('create and remove tunnel', async () => {
+      const devbox = await sdk.devbox.create({
+        name: uniqueName('sdk-devbox-tunnel'),
+        launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 }, // 5 minutes
+      });
+
+      // Create tunnel
+      const tunnel = await devbox.net.createTunnel({ port: 8080 });
+      expect(tunnel).toBeDefined();
+
+      // Remove tunnel
+      await devbox.net.removeTunnel({ port: 8080 });
 
       // Clean up
       await devbox.shutdown();

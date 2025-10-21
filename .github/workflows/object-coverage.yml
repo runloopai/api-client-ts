@@ -1,0 +1,111 @@
+name: Object Coverage Check
+
+on:
+  pull_request:
+    paths:
+      - 'src/objects/**'
+      - 'tests/smoketests/object-oriented/**'
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Target environment'
+        type: choice
+        default: dev
+        options:
+          - dev
+          - prod
+
+jobs:
+  coverage:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: yarn --frozen-lockfile
+
+      - name: Build
+        run: yarn build
+
+      - name: Configure environment
+        env:
+          DEV_KEY: ${{ secrets.RUNLOOP_SMOKETEST_DEV_API_KEY }}
+          PROD_KEY: ${{ secrets.RUNLOOP_SMOKETEST_PROD_API_KEY }}
+        run: |
+          if [ "${{ github.event.inputs.environment }}" = "prod" ]; then
+            echo "RUNLOOP_API_KEY=${PROD_KEY}" >> $GITHUB_ENV
+            echo "RUNLOOP_BASE_URL=https://api.runloop.ai" >> $GITHUB_ENV
+          else
+            echo "RUNLOOP_API_KEY=${DEV_KEY}" >> $GITHUB_ENV
+            echo "RUNLOOP_BASE_URL=https://api.runloop.pro" >> $GITHUB_ENV
+          fi
+          echo "DEBUG=false" >> $GITHUB_ENV
+          echo "RUN_SMOKETESTS=1" >> $GITHUB_ENV
+
+      - name: Run smoke tests with coverage
+        run: yarn test:objects-coverage
+
+      - name: Check coverage threshold
+        run: |
+          echo "✅ Coverage check passed - all object methods are covered in smoke tests!"
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage-report
+          path: coverage-objects/
+          retention-days: 30
+
+      - name: Comment coverage on PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const coverageSummary = JSON.parse(fs.readFileSync('coverage-objects/coverage-summary.json', 'utf8'));
+
+            const total = coverageSummary.total;
+            const functions = total.functions.pct;
+            const lines = total.lines.pct;
+            const branches = total.branches.pct;
+            const statements = total.statements.pct;
+
+            const statusEmoji = (functions === 100 && lines === 100 && branches === 100 && statements === 100) ? '✅' : '⚠️';
+
+            const comment = `## ${statusEmoji} Object Coverage Report
+
+            | Metric | Coverage |
+            |--------|----------|
+            | Functions | ${functions}% |
+            | Lines | ${lines}% |
+            | Branches | ${branches}% |
+            | Statements | ${statements}% |
+
+            **Coverage Threshold:** 100% for all metrics
+
+            ${functions === 100 && lines === 100 && branches === 100 && statements === 100 
+              ? '✅ All object methods are covered in smoke tests!' 
+              : '⚠️ Some object methods are not covered in smoke tests. Please add coverage.'}
+
+            <details>
+            <summary>View detailed coverage report</summary>
+
+            Coverage reports are available in the workflow artifacts.
+
+            </details>`;
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
