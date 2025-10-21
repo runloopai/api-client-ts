@@ -16,4 +16,4 @@ export function makeClient(overrides: Partial<ConstructorParameters<typeof Runlo
 export const uniqueName = (prefix: string) =>
   `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 
-export const THIRTY_SECOND_TIMEOUT = 30_000;
+export const THIRTY_SECOND_TIMEOUT = 120_000;

@@ -51,14 +51,14 @@ export namespace RunloopSDK {
     }
 
     async list(params?: DevboxListParams, options?: Core.RequestOptions): Promise<Devbox[]> {
-      const devboxes = await this.client.devboxes.list(params, options);
-      const result: Devbox[] = [];
+      const result = await this.client.devboxes.list(params, options);
+      const devboxes: Devbox[] = [];
 
-      for await (const devbox of devboxes) {
-        result.push(Devbox.fromId(this.client, devbox.id));
+      for (const devbox of result.devboxes) {
+        devboxes.push(Devbox.fromId(this.client, devbox.id));
       }
 
-      return result;
+      return devboxes;
     }
   }
 
@@ -77,14 +77,14 @@ export namespace RunloopSDK {
     }
 
     async list(params?: BlueprintListParams, options?: Core.RequestOptions): Promise<Blueprint[]> {
-      const blueprints = await this.client.blueprints.list(params, options);
-      const result: Blueprint[] = [];
+      const result = await this.client.blueprints.list(params, options);
+      const blueprints: Blueprint[] = [];
 
-      for await (const blueprint of blueprints) {
-        result.push(Blueprint.fromId(this.client, blueprint.id));
+      for (const blueprint of result.blueprints) {
+        blueprints.push(Blueprint.fromId(this.client, blueprint.id));
       }
 
-      return result;
+      return blueprints;
     }
   }
 
@@ -118,7 +118,12 @@ export namespace RunloopSDK {
     }
 
     async list(params?: ObjectListParams, options?: Core.RequestOptions): Promise<StorageObject[]> {
-      return StorageObject.list(this.client, params, options);
+      const result = await this.client.objects.list(params, options);
+      const storageObjects: StorageObject[] = [];
+      for (const storageObject of result.objects) {
+        storageObjects.push(StorageObject.fromId(this.client, storageObject.id));
+      }
+      return storageObjects;
     }
 
     /**

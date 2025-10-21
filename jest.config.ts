@@ -5,6 +5,7 @@ const runSmoketests = process.env['RUN_SMOKETESTS'] === '1';
 const config: JestConfigWithTsJest = {
   preset: 'ts-jest/presets/default-esm',
   testEnvironment: 'node',
+  testTimeout: runSmoketests ? 300000 : 120000, // 5 minutes for smoke tests, 2 minutes for regular tests
   transform: {
     '^.+\\.(t|j)sx?$': ['@swc/jest', { sourceMaps: 'inline' }],
   },
@@ -21,9 +22,13 @@ const config: JestConfigWithTsJest = {
   ],
   testPathIgnorePatterns: [
     'scripts',
-    // Ignore smoketests unless explicitly enabled via RUN_SMOKETESTS=1
-    ...(runSmoketests ? [] : ['<rootDir>/tests/smoketests/']),
+    // When running smoke tests, ignore regular tests; when running regular tests, ignore smoke tests
+    ...(runSmoketests ?
+      ['<rootDir>/tests/(?!smoketests).*'] // Ignore all test files except those in smoketests/
+    : ['<rootDir>/tests/smoketests/']), // Ignore smoke tests when running regular tests
   ],
+  // Add display name for smoke tests to make it clearer in output
+  ...(runSmoketests && { displayName: 'Smoke Tests' }),
 };
 
 export default config;

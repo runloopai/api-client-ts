@@ -52,10 +52,12 @@ function assertNodeEnvironment(): void {
 export class StorageObject {
   private client: Runloop;
   private _id: string;
+  private _uploadUrl?: string | null;
 
-  private constructor(client: Runloop, id: string) {
+  private constructor(client: Runloop, id: string, uploadUrl?: string | null) {
     this.client = client;
     this._id = id;
+    this._uploadUrl = uploadUrl ?? null;
   }
 
   /**
@@ -95,7 +97,7 @@ export class StorageObject {
     options?: Core.RequestOptions,
   ): Promise<StorageObject> {
     const objectData = await client.objects.create(params, options);
-    return new StorageObject(client, objectData.id);
+    return new StorageObject(client, objectData.id, objectData.upload_url);
   }
 
   /**
@@ -104,11 +106,10 @@ export class StorageObject {
    *
    * @param client - The Runloop client instance
    * @param id - The object ID
-   * @param options - Request options
    * @returns An Object instance
    */
-  static fromId(client: Runloop, id: string, options?: Core.RequestOptions): StorageObject {
-    return new StorageObject(client, id);
+  static fromId(client: Runloop, id: string): StorageObject {
+    return new StorageObject(client, id, null);
   }
 
   /**
@@ -128,7 +129,7 @@ export class StorageObject {
     const result: StorageObject[] = [];
 
     for await (const obj of objects) {
-      result.push(new StorageObject(client, obj.id));
+      result.push(new StorageObject(client, obj.id, null));
     }
 
     return result;
@@ -190,7 +191,7 @@ export class StorageObject {
     };
 
     const objectData = await client.objects.create(createParams, options);
-    const storageObject = new StorageObject(client, objectData.id);
+    const storageObject = new StorageObject(client, objectData.id, objectData.upload_url);
 
     const uploadUrl = objectData.upload_url;
 
@@ -199,12 +200,9 @@ export class StorageObject {
     }
 
     try {
-      const response = await (globalThis as any).fetch(uploadUrl, {
+      const response = await fetch(uploadUrl, {
         method: 'PUT',
         body: fileBuffer,
-        headers: {
-          'Content-Length': fileBuffer.length.toString(),
-        },
       });
 
       if (!response.ok) {
@@ -240,7 +238,6 @@ export class StorageObject {
       metadata?: Record<string, string>;
     },
   ): Promise<StorageObject> {
-    // Step 1: Create the object
     const createParams: ObjectCreateParams = {
       name,
       content_type: 'text',
@@ -248,23 +245,18 @@ export class StorageObject {
     };
 
     const objectData = await client.objects.create(createParams, options);
-    const storageObject = new StorageObject(client, objectData.id);
+    const storageObject = new StorageObject(client, objectData.id, objectData.upload_url);
 
-    // Step 2: Upload the text content
-    const objectInfo = await storageObject.getInfo();
-    const uploadUrl = objectInfo.upload_url;
+    const uploadUrl = objectData.upload_url;
 
     if (!uploadUrl) {
       throw new Error('No upload URL available. Object may already be completed or deleted.');
     }
 
     try {
-      const response = await (globalThis as any).fetch(uploadUrl, {
+      const response = await fetch(uploadUrl, {
         method: 'PUT',
-        body: text,
-        headers: {
-          'Content-Length': Buffer.byteLength(text, 'utf8').toString(),
-        },
+        body: new Blob([text]),
       });
 
       if (!response.ok) {
@@ -312,23 +304,18 @@ export class StorageObject {
     };
 
     const objectData = await client.objects.create(createParams, options);
-    const storageObject = new StorageObject(client, objectData.id);
+    const storageObject = new StorageObject(client, objectData.id, objectData.upload_url);
 
-    // Step 2: Upload the buffer content
-    const objectInfo = await storageObject.getInfo();
-    const uploadUrl = objectInfo.upload_url;
+    const uploadUrl = objectData.upload_url;
 
     if (!uploadUrl) {
       throw new Error('No upload URL available. Object may already be completed or deleted.');
     }
 
     try {
-      const response = await (globalThis as any).fetch(uploadUrl, {
+      const response = await fetch(uploadUrl, {
         method: 'PUT',
-        body: buffer,
-        headers: {
-          'Content-Length': buffer.length.toString(),
-        },
+        body: new Blob([buffer]),
       });
 
       if (!response.ok) {
@@ -365,24 +352,35 @@ export class StorageObject {
    * Note: For large files or binary content, you may want to use the uploadUrl directly
    * with your own upload logic.
    *
+   * When this is done call complete() to mark the upload as complete.
+   *
    * @param content - The content to upload (string or Buffer)
    * @returns Promise that resolves when upload is complete
    */
   async uploadContent(content: string | Buffer): Promise<void> {
-    const objectInfo = await this.getInfo();
-    const uploadUrl = objectInfo.upload_url;
-
-    if (!uploadUrl) {
+    if (!this._uploadUrl) {
       throw new Error('No upload URL available. Object may already be completed or deleted.');
     }
 
-    const response = await (globalThis as any).fetch(uploadUrl, {
-      method: 'PUT',
-      body: content,
-    });
+    try {
+      // Always convert to Buffer to ensure consistent handling
+      const buffer = Buffer.isBuffer(content) ? content : Buffer.from(content, 'utf-8');
 
-    if (!response.ok) {
-      throw new Error(`Upload failed: ${response.status} ${response.statusText}`);
+      // Use fetch with absolutely minimal configuration
+      const response = await fetch(this._uploadUrl, {
+        method: 'PUT',
+        body: buffer,
+        // Absolutely no headers - let the presigned URL handle everything
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Upload failed: ${response.status} ${errorText}`);
+      }
+    } catch (error) {
+      throw new Error(
+        `Upload failed to ${this._uploadUrl}: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      );
     }
   }
 
@@ -424,7 +422,7 @@ export class StorageObject {
    */
   async downloadAsText(options?: Core.RequestOptions): Promise<string> {
     const { download_url } = await this.getDownloadUrl(undefined, options);
-    const response = await (globalThis as any).fetch(download_url);
+    const response = await fetch(download_url);
 
     if (!response.ok) {
       throw new Error(`Download failed: ${response.status} ${response.statusText}`);
@@ -442,7 +440,7 @@ export class StorageObject {
    */
   async downloadAsBuffer(options?: Core.RequestOptions): Promise<Buffer> {
     const { download_url } = await this.getDownloadUrl(undefined, options);
-    const response = await (globalThis as any).fetch(download_url);
+    const response = await fetch(download_url);
 
     if (!response.ok) {
       throw new Error(`Download failed: ${response.status} ${response.statusText}`);

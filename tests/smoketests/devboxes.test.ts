@@ -18,7 +18,10 @@ describe('smoketest: devboxes', () => {
     test(
       'create devbox',
       async () => {
-        const created = await client.devboxes.create({ name: uniqueName('smoke-devbox') });
+        const created = await client.devboxes.create({
+          name: uniqueName('smoke-devbox'),
+          launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 }, // 5 minutes
+        });
         expect(created?.id).toBeTruthy();
         await client.devboxes.shutdown(created.id);
       },
@@ -27,7 +30,10 @@ describe('smoketest: devboxes', () => {
 
     test('await running (createAndAwaitRunning)', async () => {
       const created = await client.devboxes.createAndAwaitRunning(
-        { name: uniqueName('smoketest-devbox2') },
+        {
+          name: uniqueName('smoketest-devbox2'),
+          launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 }, // 5 minutes
+        },
         {
           polling: { maxAttempts: 120, pollingIntervalMs: 5_000, timeoutMs: 20 * 60 * 1000 },
         },
