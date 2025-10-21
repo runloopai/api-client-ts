@@ -1,10 +1,6 @@
 import { Blueprint } from '../../src/objects/blueprint';
 import { Devbox } from '../../src/objects/devbox';
-import type {
-  BlueprintView,
-  BlueprintBuildLogsListView,
-  BlueprintPreviewView,
-} from '../../src/resources/blueprints';
+import type { BlueprintView, BlueprintBuildLogsListView } from '../../src/resources/blueprints';
 
 // Mock the Runloop client
 jest.mock('../../src/index');
