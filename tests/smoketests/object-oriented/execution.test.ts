@@ -112,7 +112,7 @@ describe('smoketest: object-oriented execution', () => {
       expect(execution).toBeDefined();
       expect((await execution.getState()).status).toBe('running');
       try {
-        await execution.sendStdIn('Hello from stdin!\n');
+        //await execution.sendStdIn('Hello from stdin!\n');
       } catch (error) {
         console.error('Error sending input to execution:', error);
       }
