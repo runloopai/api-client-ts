@@ -197,7 +197,7 @@ export class Devbox {
   }
 
   /**
-   * Suspend the devbox and create a disk snapshot. 
+   * Suspend the devbox and create a disk snapshot.
    */
   async suspend(options?: Core.RequestOptions) {
     return this.client.devboxes.suspend(this._id, options);
@@ -211,7 +211,7 @@ export class Devbox {
   }
 
   /**
-   * Send a keep-alive signal to prevent idle shutdown. 
+   * Send a keep-alive signal to prevent idle shutdown.
    */
   async keepAlive(options?: Core.RequestOptions): Promise<unknown> {
     return this.client.devboxes.keepAlive(this._id, options);

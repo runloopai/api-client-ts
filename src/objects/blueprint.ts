@@ -4,8 +4,6 @@ import type {
   BlueprintView,
   BlueprintCreateParams,
   BlueprintBuildLogsListView,
-  BlueprintPreviewView,
-  BlueprintPreviewParams,
 } from '../resources/blueprints';
 import type { DevboxCreateParams } from '../resources/devboxes/devboxes';
 import { Devbox } from './devbox';

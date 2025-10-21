@@ -17,12 +17,7 @@ module.exports = {
     '<rootDir>/deno_tests/',
   ],
   testMatch: ['**/tests/smoketests/object-oriented/**/*.test.ts'],
-  collectCoverageFrom: [
-    'src/objects/**/*.ts',
-    '!src/objects/index.ts',
-    '!**/*.d.ts',
-    '!**/node_modules/**',
-  ],
+  collectCoverageFrom: ['src/objects/**/*.ts', '!src/objects/index.ts', '!**/*.d.ts', '!**/node_modules/**'],
   coverageDirectory: 'coverage-objects',
   coverageReporters: ['text', 'lcov', 'json-summary', 'html'],
   coverageThreshold: {
