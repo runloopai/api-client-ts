@@ -37,8 +37,8 @@ const serverExec = await devbox.cmd.execAsync({
 console.log(`Started server with execution ID: ${serverExec.executionId}`);
 
 // Check server status
-const status = await serverExec.status();
-console.log('Server status:', status.status); // "running"
+const state = await serverExec.getState();
+console.log('Server status:', state.status); // "running"
 
 // Later... kill the server when done
 await serverExec.kill();
@@ -116,19 +116,90 @@ const execution = await devbox.cmd.execAsync({
 });
 
 // Check execution status
-const status = await execution.status();
-console.log('Status:', status.status);
+const state = await execution.getState();
+console.log('Status:', state.status);
 
 // Wait for completion and get result
 const result = await execution.result();
 console.log('Final output:', await result.stdout());
 
-// Send input to running process
-await execution.sendStdIn('some input\n');
-
 // Kill the process
 await execution.kill();
 ```
+
+#### Execution Management
+
+The `Execution` object provides fine-grained control over asynchronous command execution:
+
+```typescript
+// Start a long-running process
+const execution = await devbox.cmd.execAsync({
+  command: 'python train_model.py',
+});
+
+// Get the execution ID
+console.log('Execution ID:', execution.executionId);
+console.log('Devbox ID:', execution.devboxId);
+
+// Poll for current state
+const state = await execution.getState();
+console.log('Status:', state.status); // "running", "completed", etc.
+console.log('Exit code:', state.exit_code);
+
+// Wait for completion and get results
+const result = await execution.result();
+console.log('Exit code:', result.exitCode);
+console.log('Output:', await result.stdout());
+console.log('Errors:', await result.stderr());
+
+// Or kill the process early
+await execution.kill();
+```
+
+**Key methods:**
+
+- `execution.getState()` - Get current execution state (status, exit_code, etc.)
+- `execution.result()` - Wait for completion and return `ExecutionResult`
+- `execution.kill()` - Terminate the running process
+- `execution.executionId` - Get the execution ID (getter)
+- `execution.devboxId` - Get the devbox ID (getter)
+
+#### Execution Results
+
+The `ExecutionResult` object contains the output and exit status of a completed command:
+
+```typescript
+// From synchronous execution
+const result = await devbox.cmd.exec({ command: 'ls -la /tmp' });
+
+// Or from asynchronous execution
+const execution = await devbox.cmd.execAsync({ command: 'echo "test"' });
+const result = await execution.result();
+
+// Access execution results
+console.log('Exit code:', result.exitCode);
+console.log('Success:', result.success); // true if exit code is 0
+console.log('Failed:', result.failed); // true if exit code is non-zero
+
+// Get output streams
+const stdout = await result.stdout();
+const stderr = await result.stderr();
+console.log('Standard output:', stdout);
+console.log('Standard error:', stderr);
+
+// Access raw result data
+const rawResult = result.result;
+console.log('Raw result:', rawResult);
+```
+
+**Key methods and properties:**
+
+- `result.exitCode` - The process exit code (getter)
+- `result.success` - Boolean indicating success (exit code 0) (getter)
+- `result.failed` - Boolean indicating failure (non-zero exit code) (getter)
+- `result.stdout()` - Get standard output as string
+- `result.stderr()` - Get standard error as string
+- `result.result` - Get the raw result data (getter)
 
 #### File Operations
 
@@ -414,34 +485,6 @@ await devboxWithArchive.cmd.exec({ command: 'ls -la /home/user/project/' });
 - `StorageObject.uploadFromFile()` - Upload from filesystem (Node.js only)
 - `StorageObject.uploadFromText()` - Upload text content directly
 - `StorageObject.uploadFromBuffer()` - Upload from Buffer (Node.js only)
-
-### Execution
-
-Object for tracking and controlling async command execution:
-
-```typescript
-const execution = await devbox.cmd.execAsync({ command: 'long-running-process' });
-
-// Check status
-const status = await execution.status();
-
-// Wait for completion and get result
-const result = await execution.result();
-
-// Kill the process
-await execution.kill();
-```
-
-### ExecutionResult
-
-Result object containing command output and metadata:
-
-```typescript
-const result = await devbox.cmd.exec({ command: 'ls -la' });
-console.log(await result.stdout()); // Standard output
-console.log(await result.stderr()); // Standard error
-console.log(result.exitCode); // Exit code
-```
 
 ## Accessing the Legacy API
 
