@@ -50,19 +50,14 @@ jobs:
           echo "DEBUG=false" >> $GITHUB_ENV
           echo "RUN_SMOKETESTS=1" >> $GITHUB_ENV
 
-      - name: Run smoke tests (without coverage)
+      - name: Run smoke tests with coverage
         id: tests
         continue-on-error: true
-        run: RUN_SMOKETESTS=1 yarn jest --config jest.config.objects.js --verbose --runInBand=false 2>&1 | tee test-output.log
-
-      - name: Run coverage analysis
-        id: coverage
-        if: steps.tests.outcome == 'success'
-        run: yarn test:objects-coverage
+        run: yarn test:objects-coverage 2>&1 | tee test-output.log
 
       - name: Upload coverage report
         uses: actions/upload-artifact@v4
-        if: steps.coverage.outcome == 'success' || steps.coverage.outcome == 'failure'
+        if: always()
         with:
           name: coverage-report
           path: coverage-objects/
@@ -75,7 +70,6 @@ jobs:
           script: |
             const fs = require('fs');
             const testsPassed = '${{ steps.tests.outcome }}' === 'success';
-            const coverageRan = '${{ steps.coverage.outcome }}' !== 'skipped';
 
             // Build workflow run URL
             const runUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
@@ -118,16 +112,6 @@ jobs:
               **Please fix the failing tests before checking coverage.**
               
               [📋 View full test logs](${runUrl})`;
-            } else if (!coverageRan) {
-              comment = `## ⚠️ Coverage Analysis Skipped
-              
-              ### Test Results
-              ✅ All smoke tests passed
-              
-              ### Coverage Results
-              Coverage analysis was skipped or failed to complete.
-              
-              [📋 View workflow logs](${runUrl})`;
             } else {
               let coverageSummary = null;
               try {
