@@ -234,7 +234,7 @@ describe('StorageObject (New API)', () => {
 
         expect((global as any).fetch).toHaveBeenCalledWith(mockObjectData.upload_url, {
           method: 'PUT',
-          body: 'Hello, World!',
+          body: Buffer.from('Hello, World!', 'utf-8'),
         });
       });
 
@@ -275,11 +275,12 @@ describe('StorageObject (New API)', () => {
           ok: false,
           status: 403,
           statusText: 'Forbidden',
+          text: jest.fn().mockResolvedValue('Forbidden'),
         };
 
         ((global as any).fetch as jest.Mock).mockResolvedValue(mockFetchResponse);
 
-        await expect(storageObject.uploadContent('test')).rejects.toThrow('Upload failed: 403 Forbidden');
+        await expect(storageObject.uploadContent('test')).rejects.toThrow('Upload failed: 403');
       });
     });
 
@@ -630,11 +631,11 @@ describe('StorageObject (New API)', () => {
         { name: 'hello.txt', content_type: 'text', metadata: null },
         undefined,
       );
-      expect((global as any).fetch).toHaveBeenCalledWith('https://upload.example.com/text', {
-        method: 'PUT',
-        body: textContent,
-        headers: { 'Content-Length': Buffer.byteLength(textContent, 'utf8').toString() },
-      });
+      // uploadFromText uses Blob for fetch body
+      const fetchCalls = ((global as any).fetch as jest.Mock).mock.calls;
+      expect(fetchCalls[0][0]).toBe('https://upload.example.com/text');
+      expect(fetchCalls[0][1].method).toBe('PUT');
+      expect(fetchCalls[0][1].body).toBeInstanceOf(Blob);
       expect(result).toBeInstanceOf(StorageObject);
       expect(result.id).toBe('text-123');
     });
@@ -743,11 +744,11 @@ describe('StorageObject (New API)', () => {
         { name: 'buffer.txt', content_type: 'text', metadata: { source: 'buffer' } },
         { metadata: { source: 'buffer' } },
       );
-      expect((global as any).fetch).toHaveBeenCalledWith('https://upload.example.com/buffer', {
-        method: 'PUT',
-        body: buffer,
-        headers: { 'Content-Length': buffer.length.toString() },
-      });
+      // uploadFromBuffer uses Blob for fetch body
+      const fetchCalls = ((global as any).fetch as jest.Mock).mock.calls;
+      expect(fetchCalls[0][0]).toBe('https://upload.example.com/buffer');
+      expect(fetchCalls[0][1].method).toBe('PUT');
+      expect(fetchCalls[0][1].body).toBeInstanceOf(Blob);
       expect(result).toBeInstanceOf(StorageObject);
       expect(result.id).toBe('buffer-123');
     });

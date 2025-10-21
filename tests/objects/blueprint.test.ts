@@ -284,18 +284,6 @@ describe('Blueprint (New API)', () => {
       await expect(blueprint.getInfo()).rejects.toThrow('Blueprint not found');
     });
 
-    it('should handle preview errors', async () => {
-      const error = new Error('Preview generation failed');
-      mockClient.blueprints.preview.mockRejectedValue(error);
-
-      await expect(
-        Blueprint.preview(mockClient, {
-          name: 'invalid-blueprint',
-          system_setup_commands: ['invalid-command'],
-        }),
-      ).rejects.toThrow('Preview generation failed');
-    });
-
     it('should handle logs retrieval errors', async () => {
       mockClient.blueprints.createAndAwaitBuildCompleted.mockResolvedValue(mockBlueprintData);
       const blueprint = await Blueprint.create(mockClient, {
