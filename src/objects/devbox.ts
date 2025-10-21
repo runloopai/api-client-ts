@@ -50,6 +50,52 @@ export class Devbox {
   }
 
   /**
+   * Create a new Devbox from a Blueprint and wait for it to reach the running state.
+   *
+   * @param client - The Runloop client instance
+   * @param blueprintId - The blueprint ID to create from
+   * @param params - Additional devbox creation parameters
+   * @param options - Request options with optional polling configuration
+   * @returns A Devbox instance in the running state
+   */
+  static async createFromBlueprint(
+    client: Runloop,
+    blueprintId: string,
+    params?: Omit<DevboxCreateParams, 'blueprint_id' | 'snapshot_id' | 'blueprint_name'>,
+    options?: Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxView>> },
+  ): Promise<Devbox> {
+    const createParams: DevboxCreateParams = {
+      ...params,
+      blueprint_id: blueprintId,
+    };
+    const devboxData = await client.devboxes.createAndAwaitRunning(createParams, options);
+    return new Devbox(client, devboxData.id);
+  }
+
+  /**
+   * Create a new Devbox from a Snapshot and wait for it to reach the running state.
+   *
+   * @param client - The Runloop client instance
+   * @param snapshotId - The snapshot ID to create from
+   * @param params - Additional devbox creation parameters
+   * @param options - Request options with optional polling configuration
+   * @returns A Devbox instance in the running state
+   */
+  static async createFromSnapshot(
+    client: Runloop,
+    snapshotId: string,
+    params?: Omit<DevboxCreateParams, 'snapshot_id' | 'blueprint_id' | 'blueprint_name'>,
+    options?: Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxView>> },
+  ): Promise<Devbox> {
+    const createParams: DevboxCreateParams = {
+      ...params,
+      snapshot_id: snapshotId,
+    };
+    const devboxData = await client.devboxes.createAndAwaitRunning(createParams, options);
+    return new Devbox(client, devboxData.id);
+  }
+
+  /**
    * Create a Devbox instance by ID without retrieving from API.
    * Use getInfo() to fetch the actual data when needed.
    *

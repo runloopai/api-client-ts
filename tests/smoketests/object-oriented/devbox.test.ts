@@ -193,4 +193,66 @@ describe('smoketest: object-oriented devbox', () => {
       await devbox.shutdown();
     });
   });
+
+  describe('devbox creation from blueprint and snapshot', () => {
+    test('create devbox from blueprint', async () => {
+      // First create a blueprint
+      const blueprint = await sdk.blueprint.create({
+        name: uniqueName('sdk-blueprint-for-devbox'),
+        dockerfile: 'FROM ubuntu:20.04\nRUN apt-get update && apt-get install -y curl',
+      });
+      expect(blueprint).toBeDefined();
+
+      // Create devbox from blueprint using static method
+      const { Devbox } = await import('@runloop/api-client/objects');
+      const devbox = await Devbox.createFromBlueprint(client, blueprint.id, {
+        name: uniqueName('sdk-devbox-from-blueprint'),
+        launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 },
+      });
+      expect(devbox).toBeDefined();
+      expect(devbox.id).toBeTruthy();
+
+      // Verify it's running
+      const info = await devbox.getInfo();
+      expect(info.status).toBe('running');
+
+      // Clean up
+      await devbox.shutdown();
+      await blueprint.delete();
+    });
+
+    test('create devbox from snapshot', async () => {
+      // First create a devbox
+      const sourceDevbox = await sdk.devbox.create({
+        name: uniqueName('sdk-devbox-for-snapshot'),
+        launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 },
+      });
+      expect(sourceDevbox).toBeDefined();
+
+      // Create a snapshot
+      const snapshot = await sourceDevbox.snapshotDisk({
+        name: uniqueName('sdk-snapshot-for-devbox'),
+        commit_message: 'Test snapshot for devbox creation',
+      });
+      expect(snapshot).toBeDefined();
+
+      // Create devbox from snapshot using static method
+      const { Devbox } = await import('@runloop/api-client/objects');
+      const devbox = await Devbox.createFromSnapshot(client, snapshot.id, {
+        name: uniqueName('sdk-devbox-from-snapshot'),
+        launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 },
+      });
+      expect(devbox).toBeDefined();
+      expect(devbox.id).toBeTruthy();
+
+      // Verify it's running
+      const info = await devbox.getInfo();
+      expect(info.status).toBe('running');
+
+      // Clean up
+      await devbox.shutdown();
+      await sourceDevbox.shutdown();
+      await snapshot.delete();
+    });
+  });
 });
