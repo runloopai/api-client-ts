@@ -59,7 +59,7 @@ export class Devbox {
    * @param options - Request options with optional polling configuration
    * @returns A Devbox instance in the running state
    */
-  static async createFromBlueprint(
+  static async createFromBlueprintId(
     client: Runloop,
     blueprintId: string,
     params?: Omit<DevboxCreateParams, 'blueprint_id' | 'snapshot_id' | 'blueprint_name'>,
@@ -68,6 +68,29 @@ export class Devbox {
     const createParams: DevboxCreateParams = {
       ...params,
       blueprint_id: blueprintId,
+    };
+    const devboxData = await client.devboxes.createAndAwaitRunning(createParams, options);
+    return new Devbox(client, devboxData.id);
+  }
+
+  /**
+   * Create a new Devbox from a Blueprint name and wait for it to reach the running state.
+   *
+   * @param client - The Runloop client instance
+   * @param blueprintName - The blueprint name to create from
+   * @param params - Additional devbox creation parameters
+   * @param options - Request options with optional polling configuration
+   * @returns A Devbox instance in the running state
+   */
+  static async createFromBlueprintName(
+    client: Runloop,
+    blueprintName: string,
+    params?: Omit<DevboxCreateParams, 'blueprint_id' | 'snapshot_id' | 'blueprint_name'>,
+    options?: Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxView>> },
+  ): Promise<Devbox> {
+    const createParams: DevboxCreateParams = {
+      ...params,
+      blueprint_name: blueprintName,
     };
     const devboxData = await client.devboxes.createAndAwaitRunning(createParams, options);
     return new Devbox(client, devboxData.id);

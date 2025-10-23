@@ -73,21 +73,27 @@ The SDK provides object-oriented interfaces for all major Runloop resources:
 
 ### Devbox
 
-Object-oriented interface for working with devboxes. Created via `sdk.devbox.create()`, `sdk.devbox.createFromBlueprint()`, `sdk.devbox.createFromSnapshot()`, or `sdk.devbox.fromId()`:
+Object-oriented interface for working with devboxes. Created via `sdk.devbox.create()`, `sdk.devbox.createFromBlueprintId()`, `sdk.devbox.createFromBlueprintName()`, `sdk.devbox.createFromSnapshot()`, or `sdk.devbox.fromId()`:
 
 ```typescript
 // Create a new devbox
 const devbox = await sdk.devbox.create({ name: 'my-devbox' });
 
-// Create a devbox from a blueprint
-const devboxFromBlueprint = await sdk.devbox.createFromBlueprint(
-  'blueprint-id',
+// Create a devbox from a blueprint ID
+const devboxFromBlueprint = await sdk.devbox.createFromBlueprintId(
+  'bpt-',
+  { name: 'my-devbox-from-blueprint' }
+);
+
+// Create a devbox from a blueprint name
+const devboxFromBlueprintName = await sdk.devbox.createFromBlueprintName(
+  'my-blueprint-name',
   { name: 'my-devbox-from-blueprint' }
 );
 
 // Create a devbox from a snapshot
 const devboxFromSnapshot = await sdk.devbox.createFromSnapshot(
-  'snapshot-id',
+  'snp-',
   { name: 'my-devbox-from-snapshot' }
 );
 
@@ -320,10 +326,16 @@ const devbox = await blueprint.createDevbox({
   name: 'devbox-from-blueprint',
 });
 
-// Or create devbox from blueprint (using SDK method)
-const anotherDevbox = await sdk.devbox.createFromBlueprint(
+// Or create devbox from blueprint (using SDK method with ID)
+const anotherDevbox = await sdk.devbox.createFromBlueprintId(
   blueprint.id,
   { name: 'another-devbox' }
+);
+
+// Or create devbox from blueprint (using SDK method with name)
+const yetAnotherDevbox = await sdk.devbox.createFromBlueprintName(
+  'my-blueprint-name',
+  { name: 'yet-another-devbox' }
 );
 
 // Delete the blueprint when done

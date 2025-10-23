@@ -200,7 +200,7 @@ describe('smoketest: object-oriented devbox', () => {
   });
 
   describe('devbox creation from blueprint and snapshot', () => {
-    test('create devbox from blueprint', async () => {
+    test('create devbox from blueprint ID', async () => {
       // First create a blueprint
       const blueprint = await sdk.blueprint.create({
         name: uniqueName('sdk-blueprint-for-devbox'),
@@ -208,9 +208,35 @@ describe('smoketest: object-oriented devbox', () => {
       });
       expect(blueprint).toBeDefined();
 
-      // Create devbox from blueprint using SDK method
-      const devbox = await sdk.devbox.createFromBlueprint(blueprint.id, {
-        name: uniqueName('sdk-devbox-from-blueprint'),
+      // Create devbox from blueprint using SDK method with blueprint ID
+      const devbox = await sdk.devbox.createFromBlueprintId(blueprint.id, {
+        name: uniqueName('sdk-devbox-from-blueprint-id'),
+        launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 },
+      });
+      expect(devbox).toBeDefined();
+      expect(devbox.id).toBeTruthy();
+
+      // Verify it's running
+      const info = await devbox.getInfo();
+      expect(info.status).toBe('running');
+
+      // Clean up
+      await devbox.shutdown();
+      await blueprint.delete();
+    });
+
+    test('create devbox from blueprint name', async () => {
+      // First create a blueprint with a specific name
+      const blueprintName = uniqueName('sdk-blueprint-name-test');
+      const blueprint = await sdk.blueprint.create({
+        name: blueprintName,
+        dockerfile: 'FROM ubuntu:20.04\nRUN apt-get update && apt-get install -y wget',
+      });
+      expect(blueprint).toBeDefined();
+
+      // Create devbox from blueprint using SDK method with blueprint name
+      const devbox = await sdk.devbox.createFromBlueprintName(blueprintName, {
+        name: uniqueName('sdk-devbox-from-blueprint-name'),
         launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 },
       });
       expect(devbox).toBeDefined();
