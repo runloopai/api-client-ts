@@ -82,15 +82,9 @@ describe('smoketest: blueprints', () => {
     );
   });
 
-  describe('blueprint secrets', () => {
-    let secretsBlueprintId: string | undefined;
+  // Only run secrets test in CI where the secret is available
+  (process.env['RUN_SMOKETESTS'] ? describe : describe.skip)('blueprint secrets', () => {
     const secretsBlueprintName = uniqueName('bp-secrets');
-
-    afterAll(async () => {
-      if (secretsBlueprintId) {
-        await client.blueprints.delete(secretsBlueprintId);
-      }
-    });
 
     test(
       'create blueprint with secret in Dockerfile and await build',
@@ -110,9 +104,9 @@ describe('smoketest: blueprints', () => {
               polling: { maxAttempts: 180, pollingIntervalMs: 5_000, timeoutMs: 30 * 60 * 1000 },
             },
           );
+
           expect(bpt.status).toBe('build_complete');
           expect(bpt.parameters.secrets?.['GITHUB_TOKEN']).toBe('GITHUB_TOKEN_FOR_SMOKETESTS');
-          secretsBlueprintId = bpt.id;
         } finally {
           if (bpt) {
             await client.blueprints.delete(bpt.id);

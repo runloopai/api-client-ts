@@ -150,12 +150,12 @@ describe('smoketest: object-oriented snapshot', () => {
           name: uniqueName('sdk-devbox-snapshot-list'),
           launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 }, // 5 minutes
         });
+
         snapshot = await devbox.snapshotDisk({
           name: uniqueName('sdk-snapshot-list'),
           commit_message: 'Test snapshot for list',
         });
 
-        // List snapshots for this devbox
         const snapshots = await sdk.snapshot.list({ devbox_id: devbox.id });
         expect(Array.isArray(snapshots)).toBe(true);
         expect(snapshots.length).toBeGreaterThan(0);
@@ -177,10 +177,14 @@ describe('smoketest: object-oriented snapshot', () => {
           name: uniqueName('sdk-devbox-snapshot-retrieve'),
           launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 }, // 5 minutes
         });
+
         snapshot = await devbox.snapshotDisk({
           name: uniqueName('sdk-snapshot-retrieve'),
           commit_message: 'Test snapshot for retrieve',
         });
+
+        const retrieved = sdk.snapshot.fromId(snapshot.id);
+        expect(retrieved.id).toBe(snapshot.id);
       } finally {
         if (devbox) {
           await devbox.shutdown();
