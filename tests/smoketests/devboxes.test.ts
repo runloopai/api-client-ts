@@ -1,3 +1,4 @@
+import { DevboxView } from '@runloop/api-client/resources/devboxes';
 import { makeClient, THIRTY_SECOND_TIMEOUT, uniqueName } from './utils';
 
 const client = makeClient();
@@ -18,12 +19,18 @@ describe('smoketest: devboxes', () => {
     test(
       'create devbox',
       async () => {
-        const created = await client.devboxes.create({
-          name: uniqueName('smoke-devbox'),
-          launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 }, // 5 minutes
-        });
-        expect(created?.id).toBeTruthy();
-        await client.devboxes.shutdown(created.id);
+        let devbox: DevboxView | undefined;
+        try {
+          devbox = await client.devboxes.create({
+            name: uniqueName('smoke-devbox'),
+            launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 }, // 5 minutes
+          });
+          expect(devbox?.id).toBeTruthy();
+        } finally {
+          if (devbox) {
+            await client.devboxes.shutdown(devbox.id);
+          }
+        }
       },
       THIRTY_SECOND_TIMEOUT,
     );

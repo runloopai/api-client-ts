@@ -1,4 +1,6 @@
+import { BlueprintView } from '@runloop/api-client/resources/blueprints';
 import { makeClient, THIRTY_SECOND_TIMEOUT, uniqueName } from './utils';
+import { DevboxView } from '@runloop/api-client/resources/devboxes';
 
 const client = makeClient();
 
@@ -34,17 +36,23 @@ describe('smoketest: blueprints', () => {
     test(
       'start devbox from base blueprint by ID',
       async () => {
-        const devbox = await client.devboxes.createAndAwaitRunning(
-          {
-            blueprint_id: blueprintId!,
-            launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 }, // 5 minutes
-          },
-          {
-            polling: { maxAttempts: 120, pollingIntervalMs: 5_000, timeoutMs: 20 * 60 * 1000 },
-          },
-        );
-        expect(devbox.blueprint_id).toBe(blueprintId);
-        await client.devboxes.shutdown(devbox.id);
+        let devbox: DevboxView | undefined;
+        try {
+          devbox = await client.devboxes.createAndAwaitRunning(
+            {
+              blueprint_id: blueprintId!,
+              launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 }, // 5 minutes
+            },
+            {
+              polling: { maxAttempts: 120, pollingIntervalMs: 5_000, timeoutMs: 20 * 60 * 1000 },
+            },
+          );
+          expect(devbox.blueprint_id).toBe(blueprintId);
+        } finally {
+          if (devbox) {
+            await client.devboxes.shutdown(devbox.id);
+          }
+        }
       },
       THIRTY_SECOND_TIMEOUT,
     );
@@ -52,17 +60,23 @@ describe('smoketest: blueprints', () => {
     test(
       'start devbox from base blueprint by Name',
       async () => {
-        const devbox = await client.devboxes.createAndAwaitRunning(
-          {
-            blueprint_name: blueprintName,
-            launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 }, // 5 minutes
-          },
-          {
-            polling: { maxAttempts: 120, pollingIntervalMs: 5_000, timeoutMs: 20 * 60 * 1000 },
-          },
-        );
-        expect(devbox.blueprint_id).toBeTruthy();
-        await client.devboxes.shutdown(devbox.id);
+        let devbox: DevboxView | undefined;
+        try {
+          devbox = await client.devboxes.createAndAwaitRunning(
+            {
+              blueprint_name: blueprintName,
+              launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 }, // 5 minutes
+            },
+            {
+              polling: { maxAttempts: 120, pollingIntervalMs: 5_000, timeoutMs: 20 * 60 * 1000 },
+            },
+          );
+          expect(devbox.blueprint_id).toBeTruthy();
+        } finally {
+          if (devbox) {
+            await client.devboxes.shutdown(devbox.id);
+          }
+        }
       },
       THIRTY_SECOND_TIMEOUT,
     );
@@ -81,22 +95,29 @@ describe('smoketest: blueprints', () => {
     test(
       'create blueprint with secret in Dockerfile and await build',
       async () => {
-        const created = await client.blueprints.createAndAwaitBuildCompleted(
-          {
-            name: secretsBlueprintName,
-            dockerfile:
-              'FROM runloop:runloop/starter-arm64\nARG GITHUB_TOKEN\nRUN git config --global credential.helper \'!f() { echo "username=x-access-token"; echo "password=$GITHUB_TOKEN"; }; f\' && git clone https://github.com/runloopai/runloop-fe.git /workspace/runloop-fe && git config --global --unset credential.helper\nWORKDIR /workspace/runloop-fe',
-            secrets: {
-              GITHUB_TOKEN: 'GITHUB_TOKEN_FOR_SMOKETESTS',
+        let bpt: BlueprintView | undefined;
+        try {
+          bpt = await client.blueprints.createAndAwaitBuildCompleted(
+            {
+              name: secretsBlueprintName,
+              dockerfile:
+                'FROM runloop:runloop/starter-arm64\nARG GITHUB_TOKEN\nRUN git config --global credential.helper \'!f() { echo "username=x-access-token"; echo "password=$GITHUB_TOKEN"; }; f\' && git clone https://github.com/runloopai/runloop-fe.git /workspace/runloop-fe && git config --global --unset credential.helper\nWORKDIR /workspace/runloop-fe',
+              secrets: {
+                GITHUB_TOKEN: 'GITHUB_TOKEN_FOR_SMOKETESTS',
+              },
             },
-          },
-          {
-            polling: { maxAttempts: 180, pollingIntervalMs: 5_000, timeoutMs: 30 * 60 * 1000 },
-          },
-        );
-        expect(created.status).toBe('build_complete');
-        expect(created.parameters.secrets?.['GITHUB_TOKEN']).toBe('GITHUB_TOKEN_FOR_SMOKETESTS');
-        secretsBlueprintId = created.id;
+            {
+              polling: { maxAttempts: 180, pollingIntervalMs: 5_000, timeoutMs: 30 * 60 * 1000 },
+            },
+          );
+          expect(bpt.status).toBe('build_complete');
+          expect(bpt.parameters.secrets?.['GITHUB_TOKEN']).toBe('GITHUB_TOKEN_FOR_SMOKETESTS');
+          secretsBlueprintId = bpt.id;
+        } finally {
+          if (bpt) {
+            await client.blueprints.delete(bpt.id);
+          }
+        }
       },
       THIRTY_SECOND_TIMEOUT,
     );

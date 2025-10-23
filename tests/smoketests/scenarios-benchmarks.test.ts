@@ -1,3 +1,4 @@
+import { ScenarioRunView } from '@runloop/api-client/resources/scenarios';
 import { makeClient, THIRTY_SECOND_TIMEOUT, uniqueName } from './utils';
 
 const client = makeClient();
@@ -45,11 +46,17 @@ describe('smoketest: scenarios and benchmarks', () => {
   test(
     'score and complete scenario run',
     async () => {
-      const scored = await client.scenarios.runs.scoreAndComplete(runId!, {
-        polling: { maxAttempts: 120, pollingIntervalMs: 5_000, timeoutMs: 20 * 60 * 1000 },
-      });
-      expect(['completed', 'scored', 'running', 'failed', 'timeout', 'canceled']).toContain(scored.state);
-      await client.devboxes.shutdown(scored.devbox_id);
+      let scored: ScenarioRunView | undefined;
+      try {
+        scored = await client.scenarios.runs.scoreAndComplete(runId!, {
+          polling: { maxAttempts: 120, pollingIntervalMs: 5_000, timeoutMs: 20 * 60 * 1000 },
+        });
+        expect(['completed', 'scored', 'running', 'failed', 'timeout', 'canceled']).toContain(scored.state);
+      } finally {
+        if (scored) {
+          await client.devboxes.shutdown(scored.devbox_id);
+        }
+      }
     },
     THIRTY_SECOND_TIMEOUT,
   );

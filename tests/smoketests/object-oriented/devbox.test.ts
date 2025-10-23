@@ -108,19 +108,24 @@ describe('smoketest: object-oriented devbox', () => {
     });
 
     test('get devbox by ID', async () => {
-      // First create a devbox
-      const devbox = await sdk.devbox.create({
-        name: uniqueName('sdk-devbox-retrieve'),
-        launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 }, // 5 minutes
-      });
-      expect(devbox.id).toBeTruthy();
+      let devbox: Devbox | undefined;
+      try {
+        devbox = await sdk.devbox.create({
+          name: uniqueName('sdk-devbox-retrieve'),
+          launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 }, // 5 minutes
+        });
+        expect(devbox.id).toBeTruthy();
 
-      // Retrieve it by ID
-      const retrieved = await sdk.devbox.fromId(devbox.id);
-      expect(retrieved.id).toBe(devbox.id);
+        // Retrieve it by ID
+        const retrieved = sdk.devbox.fromId(devbox.id);
+        expect(retrieved.id).toBe(devbox.id);
 
-      // Clean up
-      await devbox.shutdown();
+        // Clean up
+      } finally {
+        if (devbox) {
+          await devbox.shutdown();
+        }
+      }
     });
   });
 

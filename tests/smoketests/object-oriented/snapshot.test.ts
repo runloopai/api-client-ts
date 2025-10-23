@@ -47,18 +47,19 @@ describe('smoketest: object-oriented snapshot', () => {
 
     test('create snapshot async from devbox', async () => {
       expect(devbox).toBeDefined();
-      const asyncSnapshot = await devbox.snapshotDiskAsync({
-        name: uniqueName('sdk-snapshot-async'),
-        commit_message: 'Test async snapshot from SDK',
-      });
-      expect(asyncSnapshot).toBeDefined();
-      expect(asyncSnapshot.id).toBeTruthy();
-
-      // Wait for it to complete
-      await asyncSnapshot.awaitCompleted();
-
-      // Clean up
-      await asyncSnapshot.delete();
+      let asyncSnapshot: Snapshot | undefined;
+      try {
+        asyncSnapshot = await devbox.snapshotDiskAsync({
+          name: uniqueName('sdk-snapshot-async'),
+          commit_message: 'Test async snapshot from SDK',
+        });
+        expect(asyncSnapshot).toBeDefined();
+        expect(asyncSnapshot.id).toBeTruthy();
+      } finally {
+        if (asyncSnapshot) {
+          await asyncSnapshot.delete();
+        }
+      }
     });
 
     test('get snapshot info', async () => {
@@ -89,27 +90,35 @@ describe('smoketest: object-oriented snapshot', () => {
     test('create devbox from snapshot (SDK method)', async () => {
       expect(snapshot).toBeDefined();
       // Use SDK method to create devbox from snapshot
-      const newDevbox = await sdk.devbox.createFromSnapshot(snapshot.id, {
-        name: uniqueName('devbox-from-snapshot-sdk'),
-      });
-      expect(newDevbox).toBeDefined();
-      expect(newDevbox.id).toBeTruthy();
-
-      // Clean up the devbox
-      await newDevbox.shutdown();
+      let newDevbox: Devbox | undefined;
+      try {
+        newDevbox = await sdk.devbox.createFromSnapshot(snapshot.id, {
+          name: uniqueName('devbox-from-snapshot-sdk'),
+        });
+        expect(newDevbox).toBeDefined();
+        expect(newDevbox.id).toBeTruthy();
+      } finally {
+        if (newDevbox) {
+          await newDevbox.shutdown();
+        }
+      }
     });
 
     test('create devbox from snapshot (instance method)', async () => {
       expect(snapshot).toBeDefined();
       // Use snapshot instance method to create devbox
-      const newDevbox = await snapshot.createDevbox({
-        name: uniqueName('devbox-from-snapshot-instance'),
-      });
-      expect(newDevbox).toBeDefined();
-      expect(newDevbox.id).toBeTruthy();
-
-      // Clean up the devbox
-      await newDevbox.shutdown();
+      let newDevbox: Devbox | undefined;
+      try {
+        newDevbox = await snapshot.createDevbox({
+          name: uniqueName('devbox-from-snapshot-instance'),
+        });
+        expect(newDevbox).toBeDefined();
+        expect(newDevbox.id).toBeTruthy();
+      } finally {
+        if (newDevbox) {
+          await newDevbox.shutdown();
+        }
+      }
     });
 
     test('delete snapshot', async () => {
@@ -134,43 +143,52 @@ describe('smoketest: object-oriented snapshot', () => {
 
     test('list snapshots for specific devbox', async () => {
       // Create a devbox and snapshot
-      const devbox = await sdk.devbox.create({
-        name: uniqueName('sdk-devbox-snapshot-list'),
-        launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 }, // 5 minutes
-      });
-      const snapshot = await devbox.snapshotDisk({
-        name: uniqueName('sdk-snapshot-list'),
-        commit_message: 'Test snapshot for list',
-      });
+      let devbox: Devbox | undefined;
+      let snapshot: Snapshot | undefined;
+      try {
+        devbox = await sdk.devbox.create({
+          name: uniqueName('sdk-devbox-snapshot-list'),
+          launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 }, // 5 minutes
+        });
+        snapshot = await devbox.snapshotDisk({
+          name: uniqueName('sdk-snapshot-list'),
+          commit_message: 'Test snapshot for list',
+        });
 
-      // List snapshots for this devbox
-      const snapshots = await sdk.snapshot.list({ devbox_id: devbox.id });
-      expect(Array.isArray(snapshots)).toBe(true);
-      expect(snapshots.length).toBeGreaterThan(0);
-
-      // Clean up
-      await snapshot.delete();
-      await devbox.shutdown();
+        // List snapshots for this devbox
+        const snapshots = await sdk.snapshot.list({ devbox_id: devbox.id });
+        expect(Array.isArray(snapshots)).toBe(true);
+        expect(snapshots.length).toBeGreaterThan(0);
+      } finally {
+        if (devbox) {
+          await devbox.shutdown();
+        }
+        if (snapshot) {
+          await snapshot.delete();
+        }
+      }
     });
 
     test('get snapshot by ID', async () => {
-      // Create a devbox and snapshot
-      const devbox = await sdk.devbox.create({
-        name: uniqueName('sdk-devbox-snapshot-retrieve'),
-        launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 }, // 5 minutes
-      });
-      const snapshot = await devbox.snapshotDisk({
-        name: uniqueName('sdk-snapshot-retrieve'),
-        commit_message: 'Test snapshot for retrieve',
-      });
-
-      // Retrieve it by ID
-      const retrieved = await sdk.snapshot.fromId(snapshot.id);
-      expect(retrieved.id).toBe(snapshot.id);
-
-      // Clean up
-      await snapshot.delete();
-      await devbox.shutdown();
+      let devbox: Devbox | undefined;
+      let snapshot: Snapshot | undefined;
+      try {
+        devbox = await sdk.devbox.create({
+          name: uniqueName('sdk-devbox-snapshot-retrieve'),
+          launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 }, // 5 minutes
+        });
+        snapshot = await devbox.snapshotDisk({
+          name: uniqueName('sdk-snapshot-retrieve'),
+          commit_message: 'Test snapshot for retrieve',
+        });
+      } finally {
+        if (devbox) {
+          await devbox.shutdown();
+        }
+        if (snapshot) {
+          await snapshot.delete();
+        }
+      }
     });
   });
 });

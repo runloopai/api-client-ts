@@ -1,5 +1,6 @@
 import { RunloopSDK } from '@runloop/api-client';
 import { makeClient, THIRTY_SECOND_TIMEOUT, uniqueName } from '../utils';
+import { Devbox, StorageObject } from '@runloop/api-client/objects';
 
 const client = makeClient();
 const sdk = new RunloopSDK({
@@ -14,105 +15,129 @@ describe('smoketest: object-oriented storage object', () => {
     test(
       'create storage object',
       async () => {
-        const storageObject = await sdk.storageObject.create({
-          name: uniqueName('sdk-storage-object'),
-          content_type: 'text',
-          metadata: { test: 'sdk-smoketest' },
-        });
-        expect(storageObject).toBeDefined();
-        expect(storageObject.id).toBeTruthy();
-
-        // Clean up
-        await storageObject.delete();
+        let storageObject: StorageObject | undefined;
+        try {
+          storageObject = await sdk.storageObject.create({
+            name: uniqueName('sdk-storage-object'),
+            content_type: 'text',
+            metadata: { test: 'sdk-smoketest' },
+          });
+          expect(storageObject).toBeDefined();
+          expect(storageObject.id).toBeTruthy();
+        } finally {
+          if (storageObject) {
+            await storageObject.delete();
+          }
+        }
       },
       THIRTY_SECOND_TIMEOUT,
     );
 
     test('get storage object info', async () => {
-      const storageObject = await sdk.storageObject.create({
-        name: uniqueName('sdk-storage-object-info'),
-        content_type: 'text',
-        metadata: { test: 'sdk-smoketest' },
-      });
+      let storageObject: StorageObject | undefined;
+      try {
+        storageObject = await sdk.storageObject.create({
+          name: uniqueName('sdk-storage-object-info'),
+          content_type: 'text',
+          metadata: { test: 'sdk-smoketest' },
+        });
 
-      const info = await storageObject.getInfo();
-      expect(info.id).toBe(storageObject.id);
-      expect(info.name).toContain('sdk-storage-object-info');
-      expect(info.content_type).toBe('text');
-
-      // Clean up
-      await storageObject.delete();
+        const info = await storageObject.getInfo();
+        expect(info.id).toBe(storageObject.id);
+        expect(info.name).toContain('sdk-storage-object-info');
+        expect(info.content_type).toBe('text');
+      } finally {
+        if (storageObject) {
+          await storageObject.delete();
+        }
+      }
     });
 
     test('upload content to storage object', async () => {
-      const storageObject = await sdk.storageObject.create({
-        name: uniqueName('sdk-storage-object-upload'),
-        content_type: 'text',
-        metadata: { test: 'sdk-smoketest' },
-      });
+      let storageObject: StorageObject | undefined;
+      try {
+        storageObject = await sdk.storageObject.create({
+          name: uniqueName('sdk-storage-object-upload'),
+          content_type: 'text',
+          metadata: { test: 'sdk-smoketest' },
+        });
 
-      await storageObject.uploadContent('Hello from SDK storage object!');
-      await storageObject.complete();
+        await storageObject.uploadContent('Hello from SDK storage object!');
+        await storageObject.complete();
 
-      // Verify the content was uploaded
-      const info = await storageObject.getInfo();
-      expect(info.state).toBe('READ_ONLY');
-
-      // Clean up
-      await storageObject.delete();
+        // Verify the content was uploaded
+        const info = await storageObject.getInfo();
+        expect(info.state).toBe('READ_ONLY');
+      } finally {
+        if (storageObject) {
+          await storageObject.delete();
+        }
+      }
     });
 
     test('get download URL', async () => {
-      const storageObject = await sdk.storageObject.create({
-        name: uniqueName('sdk-storage-object-download'),
-        content_type: 'text',
-        metadata: { test: 'sdk-smoketest' },
-      });
+      let storageObject: StorageObject | undefined;
+      try {
+        storageObject = await sdk.storageObject.create({
+          name: uniqueName('sdk-storage-object-download'),
+          content_type: 'text',
+          metadata: { test: 'sdk-smoketest' },
+        });
 
-      await storageObject.uploadContent('Hello from SDK storage object!');
-      await storageObject.complete();
+        await storageObject.uploadContent('Hello from SDK storage object!');
+        await storageObject.complete();
 
-      const downloadUrl = await storageObject.getDownloadUrl(3600);
-      expect(downloadUrl.download_url).toBeTruthy();
-      expect(downloadUrl.download_url).toContain('http');
-
-      // Clean up
-      await storageObject.delete();
+        const downloadUrl = await storageObject.getDownloadUrl(3600);
+        expect(downloadUrl.download_url).toBeTruthy();
+        expect(downloadUrl.download_url).toContain('http');
+      } finally {
+        if (storageObject) {
+          await storageObject.delete();
+        }
+      }
     });
 
     test('download content as text', async () => {
-      const storageObject = await sdk.storageObject.create({
-        name: uniqueName('sdk-storage-object-download-text'),
-        content_type: 'text',
-        metadata: { test: 'sdk-smoketest' },
-      });
+      let storageObject: StorageObject | undefined;
+      try {
+        storageObject = await sdk.storageObject.create({
+          name: uniqueName('sdk-storage-object-download-text'),
+          content_type: 'text',
+          metadata: { test: 'sdk-smoketest' },
+        });
 
-      await storageObject.uploadContent('Hello from SDK storage object!');
-      await storageObject.complete();
+        await storageObject.uploadContent('Hello from SDK storage object!');
+        await storageObject.complete();
 
-      const content = await storageObject.downloadAsText();
-      expect(content).toBe('Hello from SDK storage object!');
-
-      // Clean up
-      await storageObject.delete();
+        const content = await storageObject.downloadAsText();
+        expect(content).toBe('Hello from SDK storage object!');
+      } finally {
+        if (storageObject) {
+          await storageObject.delete();
+        }
+      }
     });
 
     test('download content as buffer', async () => {
-      const storageObject = await sdk.storageObject.create({
-        name: uniqueName('sdk-storage-object-download-buffer'),
-        content_type: 'text',
-        metadata: { test: 'sdk-smoketest' },
-      });
+      let storageObject: StorageObject | undefined;
+      try {
+        storageObject = await sdk.storageObject.create({
+          name: uniqueName('sdk-storage-object-download-buffer'),
+          content_type: 'text',
+          metadata: { test: 'sdk-smoketest' },
+        });
 
-      await storageObject.uploadContent('Hello from SDK storage object!');
-      await storageObject.complete();
+        await storageObject.uploadContent('Hello from SDK storage object!');
+        await storageObject.complete();
 
-      const buffer = await storageObject.downloadAsBuffer();
-      expect(Buffer.isBuffer(buffer)).toBe(true);
-      expect(buffer.toString()).toBe('Hello from SDK storage object!');
-
-      // Clean up
-      await storageObject.delete();
+        const buffer = await storageObject.downloadAsBuffer();
+        expect(Buffer.isBuffer(buffer)).toBe(true);
+        expect(buffer.toString()).toBe('Hello from SDK storage object!');
+      } finally {
+        if (storageObject) {
+          await storageObject.delete();
+        }
+      }
     });
 
     test('delete storage object', async () => {
@@ -136,39 +161,44 @@ describe('smoketest: object-oriented storage object', () => {
 
   describe('static upload methods', () => {
     test('upload from text', async () => {
-      const uploaded = await sdk.storageObject.uploadFromText(
-        'Hello from uploadFromText!',
-        uniqueName('sdk-text-upload'),
-        { metadata: { source: 'uploadFromText' } },
-      );
-      expect(uploaded).toBeDefined();
-      expect(uploaded.id).toBeTruthy();
+      let uploaded: StorageObject | undefined;
+      try {
+        uploaded = await sdk.storageObject.uploadFromText(
+          'Hello from uploadFromText!',
+          uniqueName('sdk-text-upload'),
+          { metadata: { source: 'uploadFromText' } },
+        );
+        expect(uploaded).toBeDefined();
+        expect(uploaded.id).toBeTruthy();
 
-      // Verify content
-      const content = await uploaded.downloadAsText();
-      expect(content).toBe('Hello from uploadFromText!');
-
-      // Clean up
-      await uploaded.delete();
+        // Verify content
+        const content = await uploaded.downloadAsText();
+        expect(content).toBe('Hello from uploadFromText!');
+      } finally {
+        if (uploaded) {
+          await uploaded.delete();
+        }
+      }
     });
 
     test('upload from buffer', async () => {
-      const buffer = Buffer.from('Hello from uploadFromBuffer!');
-      const uploaded = await sdk.storageObject.uploadFromBuffer(
-        buffer,
-        uniqueName('sdk-buffer-upload'),
-        'text',
-        { metadata: { source: 'uploadFromBuffer' } },
-      );
-      expect(uploaded).toBeDefined();
-      expect(uploaded.id).toBeTruthy();
+      let uploaded: StorageObject | undefined;
+      try {
+        const buffer = Buffer.from('Hello from uploadFromBuffer!');
+        uploaded = await sdk.storageObject.uploadFromBuffer(buffer, uniqueName('sdk-buffer-upload'), 'text', {
+          metadata: { source: 'uploadFromBuffer' },
+        });
+        expect(uploaded).toBeDefined();
+        expect(uploaded.id).toBeTruthy();
 
-      // Verify content
-      const content = await uploaded.downloadAsText();
-      expect(content).toBe('Hello from uploadFromBuffer!');
-
-      // Clean up
-      await uploaded.delete();
+        // Verify content
+        const content = await uploaded.downloadAsText();
+        expect(content).toBe('Hello from uploadFromBuffer!');
+      } finally {
+        if (uploaded) {
+          await uploaded.delete();
+        }
+      }
     });
 
     test('upload from file', async () => {
@@ -215,85 +245,101 @@ describe('smoketest: object-oriented storage object', () => {
     });
 
     test('get storage object by ID', async () => {
-      // First create a storage object
-      const storageObject = await sdk.storageObject.create({
-        name: uniqueName('sdk-storage-object-retrieve'),
-        content_type: 'text',
-      });
-      expect(storageObject.id).toBeTruthy();
+      let storageObject: StorageObject | undefined;
+      try {
+        storageObject = await sdk.storageObject.create({
+          name: uniqueName('sdk-storage-object-retrieve'),
+          content_type: 'text',
+        });
+        expect(storageObject.id).toBeTruthy();
 
-      // Retrieve it by ID
-      const retrieved = await sdk.storageObject.fromId(storageObject.id);
-      expect(retrieved.id).toBe(storageObject.id);
-
-      // Clean up
-      await storageObject.delete();
+        // Retrieve it by ID
+        const retrieved = await sdk.storageObject.fromId(storageObject.id);
+        expect(retrieved.id).toBe(storageObject.id);
+      } finally {
+        if (storageObject) {
+          await storageObject.delete();
+        }
+      }
     });
   });
 
   describe('storage object mounting to devbox', () => {
     test('mount storage object to devbox', async () => {
-      // Create a storage object with content
-      const storageObject = await sdk.storageObject.create({
-        name: uniqueName('sdk-mount-object'),
-        content_type: 'text',
-      });
-      await storageObject.uploadContent('Hello from mounted storage object!');
-      await storageObject.complete();
+      let storageObject: StorageObject | undefined;
+      let devbox: Devbox | undefined;
+      try {
+        storageObject = await sdk.storageObject.create({
+          name: uniqueName('sdk-mount-object'),
+          content_type: 'text',
+        });
+        await storageObject.uploadContent('Hello from mounted storage object!');
+        await storageObject.complete();
 
-      // Create devbox with mounted storage object
-      const devbox = await sdk.devbox.create({
-        name: uniqueName('sdk-devbox-mount'),
-        launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 }, // 5 minutes
-        mounts: [
-          {
-            type: 'object_mount',
-            object_id: storageObject.id,
-            object_path: '/home/user/mounted-data',
-          },
-        ],
-      });
-      expect(devbox).toBeDefined();
-      expect(devbox.id).toBeTruthy();
-
-      // Clean up
-      await devbox.shutdown();
-      await storageObject.delete();
+        // Create devbox with mounted storage object
+        devbox = await sdk.devbox.create({
+          name: uniqueName('sdk-devbox-mount'),
+          launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 }, // 5 minutes
+          mounts: [
+            {
+              type: 'object_mount',
+              object_id: storageObject.id,
+              object_path: '/home/user/mounted-data',
+            },
+          ],
+        });
+        expect(devbox).toBeDefined();
+        expect(devbox.id).toBeTruthy();
+      } finally {
+        if (devbox) {
+          await devbox.shutdown();
+        }
+        if (storageObject) {
+          await storageObject.delete();
+        }
+      }
     });
 
     test('access mounted storage object in devbox', async () => {
       // Create a storage object with content
-      const storageObject = await sdk.storageObject.create({
-        name: uniqueName('sdk-mount-object-access'),
-        content_type: 'text',
-      });
-      await storageObject.uploadContent('Hello from mounted storage object!');
-      await storageObject.complete();
+      let storageObject: StorageObject | undefined;
+      let devbox: Devbox | undefined;
+      try {
+        storageObject = await sdk.storageObject.create({
+          name: uniqueName('sdk-mount-object-access'),
+          content_type: 'text',
+        });
+        await storageObject.uploadContent('Hello from mounted storage object!');
+        await storageObject.complete();
 
-      // Create devbox with mounted storage object
-      const devbox = await sdk.devbox.create({
-        name: uniqueName('sdk-devbox-mount-access'),
-        launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 }, // 5 minutes
-        mounts: [
-          {
-            type: 'object_mount',
-            object_id: storageObject.id,
-            object_path: '/home/user/mounted-data',
-          },
-        ],
-      });
+        // Create devbox with mounted storage object
+        devbox = await sdk.devbox.create({
+          name: uniqueName('sdk-devbox-mount-access'),
+          launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 }, // 5 minutes
+          mounts: [
+            {
+              type: 'object_mount',
+              object_id: storageObject.id,
+              object_path: '/home/user/mounted-data',
+            },
+          ],
+        });
 
-      // List the mounted directory
-      const result = await devbox.cmd.exec({ command: 'ls -la /home/user/mounted-data' });
-      expect(result.exitCode).toBe(0);
+        // List the mounted directory
+        const result = await devbox.cmd.exec({ command: 'ls -la /home/user/mounted-data' });
+        expect(result.exitCode).toBe(0);
 
-      // Read the mounted file
-      const content = await devbox.file.read({ file_path: '/home/user/mounted-data' });
-      expect(content).toBe('Hello from mounted storage object!');
-
-      // Clean up
-      await devbox.shutdown();
-      await storageObject.delete();
+        // Read the mounted file
+        const content = await devbox.file.read({ file_path: '/home/user/mounted-data' });
+        expect(content).toBe('Hello from mounted storage object!');
+      } finally {
+        if (devbox) {
+          await devbox.shutdown();
+        }
+        if (storageObject) {
+          await storageObject.delete();
+        }
+      }
     });
   });
 });
