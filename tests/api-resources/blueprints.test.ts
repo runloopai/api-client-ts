@@ -50,6 +50,7 @@ describe('resource blueprints', () => {
         user_parameters: { uid: 0, username: 'username' },
       },
       metadata: { foo: 'string' },
+      secrets: { foo: 'string' },
       services: [
         {
           image: 'image',
@@ -161,6 +162,7 @@ describe('resource blueprints', () => {
         user_parameters: { uid: 0, username: 'username' },
       },
       metadata: { foo: 'string' },
+      secrets: { foo: 'string' },
       system_setup_commands: ['string'],
     });
   });
@@ -251,6 +253,7 @@ describe('resource blueprints', () => {
         user_parameters: { uid: 0, username: 'username' },
       },
       metadata: { foo: 'string' },
+      secrets: { foo: 'string' },
       services: [
         {
           image: 'image',

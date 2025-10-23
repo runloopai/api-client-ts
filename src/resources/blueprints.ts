@@ -177,6 +177,13 @@ export interface BlueprintBuildFromInspectionParameters {
   metadata?: { [key: string]: string } | null;
 
   /**
+   * (Optional) Map of mount IDs/environment variable names to secret names. Secrets
+   * can be used as environment variables in system_setup_commands. Example:
+   * {"GITHUB_TOKEN": "gh_secret"} makes 'gh_secret' available as GITHUB_TOKEN.
+   */
+  secrets?: { [key: string]: string } | null;
+
+  /**
    * A list of commands to run to set up your system.
    */
   system_setup_commands?: Array<string> | null;
@@ -260,6 +267,14 @@ export interface BlueprintBuildParameters {
    * (Optional) User defined metadata for the Blueprint.
    */
   metadata?: { [key: string]: string } | null;
+
+  /**
+   * (Optional) Map of mount IDs/environment variable names to secret names. Secrets
+   * will be available to commands during the build. Secrets are NOT stored in the
+   * blueprint image. Example: {"DB_PASS": "DATABASE_PASSWORD"} makes the secret
+   * 'DATABASE_PASSWORD' available as environment variable 'DB_PASS'.
+   */
+  secrets?: { [key: string]: string } | null;
 
   /**
    * (Optional) List of containerized services to include in the Blueprint. These
@@ -539,6 +554,14 @@ export interface BlueprintCreateParams {
   metadata?: { [key: string]: string } | null;
 
   /**
+   * (Optional) Map of mount IDs/environment variable names to secret names. Secrets
+   * will be available to commands during the build. Secrets are NOT stored in the
+   * blueprint image. Example: {"DB_PASS": "DATABASE_PASSWORD"} makes the secret
+   * 'DATABASE_PASSWORD' available as environment variable 'DB_PASS'.
+   */
+  secrets?: { [key: string]: string } | null;
+
+  /**
    * (Optional) List of containerized services to include in the Blueprint. These
    * services will be pre-pulled during the build phase for optimized startup
    * performance.
@@ -639,6 +662,13 @@ export interface BlueprintCreateFromInspectionParams {
   metadata?: { [key: string]: string } | null;
 
   /**
+   * (Optional) Map of mount IDs/environment variable names to secret names. Secrets
+   * can be used as environment variables in system_setup_commands. Example:
+   * {"GITHUB_TOKEN": "gh_secret"} makes 'gh_secret' available as GITHUB_TOKEN.
+   */
+  secrets?: { [key: string]: string } | null;
+
+  /**
    * A list of commands to run to set up your system.
    */
   system_setup_commands?: Array<string> | null;
@@ -700,6 +730,14 @@ export interface BlueprintPreviewParams {
    * (Optional) User defined metadata for the Blueprint.
    */
   metadata?: { [key: string]: string } | null;
+
+  /**
+   * (Optional) Map of mount IDs/environment variable names to secret names. Secrets
+   * will be available to commands during the build. Secrets are NOT stored in the
+   * blueprint image. Example: {"DB_PASS": "DATABASE_PASSWORD"} makes the secret
+   * 'DATABASE_PASSWORD' available as environment variable 'DB_PASS'.
+   */
+  secrets?: { [key: string]: string } | null;
 
   /**
    * (Optional) List of containerized services to include in the Blueprint. These
