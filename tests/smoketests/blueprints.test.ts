@@ -67,4 +67,38 @@ describe('smoketest: blueprints', () => {
       THIRTY_SECOND_TIMEOUT,
     );
   });
+
+  describe('blueprint secrets', () => {
+    let secretsBlueprintId: string | undefined;
+    const secretsBlueprintName = uniqueName('bp-secrets');
+
+    afterAll(async () => {
+      if (secretsBlueprintId) {
+        await client.blueprints.delete(secretsBlueprintId);
+      }
+    });
+
+    test(
+      'create blueprint with secret in Dockerfile and await build',
+      async () => {
+        const created = await client.blueprints.createAndAwaitBuildCompleted(
+          {
+            name: secretsBlueprintName,
+            dockerfile:
+              'FROM runloop:runloop/starter-arm64\nARG GITHUB_TOKEN\nRUN git config --global credential.helper \'!f() { echo "username=x-access-token"; echo "password=$GITHUB_TOKEN"; }; f\' && git clone https://github.com/runloopai/runloop-fe.git /workspace/runloop-fe && git config --global --unset credential.helper\nWORKDIR /workspace/runloop-fe',
+            secrets: {
+              GITHUB_TOKEN: 'GITHUB_TOKEN_FOR_SMOKETESTS',
+            },
+          },
+          {
+            polling: { maxAttempts: 180, pollingIntervalMs: 5_000, timeoutMs: 30 * 60 * 1000 },
+          },
+        );
+        expect(created.status).toBe('build_complete');
+        expect(created.parameters.secrets?.['GITHUB_TOKEN']).toBe('GITHUB_TOKEN_FOR_SMOKETESTS');
+        secretsBlueprintId = created.id;
+      },
+      THIRTY_SECOND_TIMEOUT,
+    );
+  });
 });
