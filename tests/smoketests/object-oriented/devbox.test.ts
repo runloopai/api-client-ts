@@ -284,4 +284,202 @@ describe('smoketest: object-oriented devbox', () => {
       await snapshot.delete();
     });
   });
+
+  describe('command execution with streaming callbacks', () => {
+    let devbox: Devbox;
+
+    beforeAll(
+      async () => {
+        devbox = await sdk.devbox.create({
+          name: uniqueName('sdk-devbox-streaming'),
+          launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 },
+        });
+      },
+      THIRTY_SECOND_TIMEOUT,
+    );
+
+    afterAll(async () => {
+      if (devbox) {
+        await devbox.shutdown();
+      }
+    });
+
+    test('exec with stdout callback', async () => {
+      const stdoutLines: string[] = [];
+
+      const result = await devbox.cmd.exec({
+        command: 'echo "line1" && echo "line2" && echo "line3"',
+        stdout: (line) => {
+          stdoutLines.push(line);
+        },
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.exitCode).toBe(0);
+      expect(stdoutLines.length).toBeGreaterThan(0);
+      expect(stdoutLines.join('')).toContain('line1');
+      expect(stdoutLines.join('')).toContain('line2');
+      expect(stdoutLines.join('')).toContain('line3');
+    });
+
+    test('exec with stderr callback', async () => {
+      const stderrLines: string[] = [];
+
+      const result = await devbox.cmd.exec({
+        command: 'echo "error1" >&2 && echo "error2" >&2',
+        stderr: (line) => {
+          stderrLines.push(line);
+        },
+      });
+
+      expect(result.success).toBe(true);
+      expect(stderrLines.length).toBeGreaterThan(0);
+      expect(stderrLines.join('')).toContain('error1');
+      expect(stderrLines.join('')).toContain('error2');
+    });
+
+    test('exec with output callback (both stdout and stderr)', async () => {
+      const allLines: string[] = [];
+
+      const result = await devbox.cmd.exec({
+        command: 'echo "stdout1" && echo "stderr1" >&2 && echo "stdout2"',
+        output: (line) => {
+          allLines.push(line);
+        },
+      });
+
+      expect(result.success).toBe(true);
+      expect(allLines.length).toBeGreaterThan(0);
+      const combined = allLines.join('');
+      expect(combined).toContain('stdout1');
+      expect(combined).toContain('stderr1');
+      expect(combined).toContain('stdout2');
+    });
+
+    test('exec with all three callbacks (stdout, stderr, output)', async () => {
+      const stdoutLines: string[] = [];
+      const stderrLines: string[] = [];
+      const outputLines: string[] = [];
+
+      const result = await devbox.cmd.exec({
+        command: 'echo "out1" && echo "err1" >&2 && echo "out2"',
+        stdout: (line) => stdoutLines.push(line),
+        stderr: (line) => stderrLines.push(line),
+        output: (line) => outputLines.push(line),
+      });
+
+      expect(result.success).toBe(true);
+
+      // Verify stdout callback received stdout
+      expect(stdoutLines.join('')).toContain('out1');
+      expect(stdoutLines.join('')).toContain('out2');
+
+      // Verify stderr callback received stderr
+      expect(stderrLines.join('')).toContain('err1');
+
+      // Verify output callback received both
+      expect(outputLines.length).toBeGreaterThan(0);
+      const combined = outputLines.join('');
+      expect(combined).toContain('out');
+      expect(combined).toContain('err1');
+    });
+
+    test('exec WITHOUT callbacks (preserve existing behavior)', async () => {
+      const result = await devbox.cmd.exec({
+        command: 'echo "test output"',
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.exitCode).toBe(0);
+      const stdout = await result.stdout();
+      expect(stdout).toContain('test output');
+    });
+
+    test('execAsync with callbacks - real-time streaming', async () => {
+      const stdoutLines: string[] = [];
+      let receivedBeforeCompletion = false;
+
+      // Start async execution with streaming
+      const execution = await devbox.cmd.execAsync({
+        command: 'echo "immediate" && sleep 2 && echo "delayed"',
+        stdout: (line) => {
+          stdoutLines.push(line);
+          if (line.includes('immediate')) {
+            receivedBeforeCompletion = true;
+          }
+        },
+      });
+
+      // Give time for first line to stream
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      // Verify we received logs before command completion
+      expect(receivedBeforeCompletion).toBe(true);
+
+      // Now wait for completion
+      const result = await execution.result();
+      expect(result.success).toBe(true);
+
+      // Verify all lines received
+      expect(stdoutLines.join('')).toContain('immediate');
+      expect(stdoutLines.join('')).toContain('delayed');
+    });
+
+    test('execAsync with stderr callback', async () => {
+      const stderrLines: string[] = [];
+
+      const execution = await devbox.cmd.execAsync({
+        command: 'echo "error output" >&2',
+        stderr: (line) => {
+          stderrLines.push(line);
+        },
+      });
+
+      const result = await execution.result();
+      expect(result.success).toBe(true);
+      expect(stderrLines.length).toBeGreaterThan(0);
+      expect(stderrLines.join('')).toContain('error output');
+    });
+
+    test('exec with command producing both stdout and stderr', async () => {
+      const stdoutLines: string[] = [];
+      const stderrLines: string[] = [];
+
+      const result = await devbox.cmd.exec({
+        command: 'echo "to stdout" && echo "to stderr" >&2 && echo "more stdout"',
+        stdout: (line) => stdoutLines.push(line),
+        stderr: (line) => stderrLines.push(line),
+      });
+
+      expect(result.success).toBe(true);
+
+      // Verify correct separation
+      const stdoutCombined = stdoutLines.join('');
+      const stderrCombined = stderrLines.join('');
+
+      expect(stdoutCombined).toContain('to stdout');
+      expect(stdoutCombined).toContain('more stdout');
+      expect(stderrCombined).toContain('to stderr');
+    });
+
+    test('exec with long output - verify all lines received', async () => {
+      const stdoutLines: string[] = [];
+
+      const result = await devbox.cmd.exec({
+        command: 'for i in {1..20}; do echo "line $i"; done',
+        stdout: (line) => stdoutLines.push(line),
+      });
+
+      expect(result.success).toBe(true);
+
+      // Verify we received multiple lines
+      expect(stdoutLines.length).toBeGreaterThan(10);
+
+      // Verify some specific lines
+      const combined = stdoutLines.join('');
+      expect(combined).toContain('line 1');
+      expect(combined).toContain('line 10');
+      expect(combined).toContain('line 20');
+    });
+  });
 });
