@@ -183,11 +183,7 @@ export class Devbox {
     if (callbacks.stdout || callbacks.output) {
       const stdoutPromise = (async () => {
         try {
-          const stream = await this.client.devboxes.executions.streamStdoutUpdates(
-            this._id,
-            executionId,
-            {},
-          );
+          const stream = await this.client.devboxes.executions.streamStdoutUpdates(this._id, executionId, {});
           for await (const chunk of stream) {
             if (callbacks.stdout) callbacks.stdout(chunk.output);
             if (callbacks.output) callbacks.output(chunk.output);
@@ -204,11 +200,7 @@ export class Devbox {
     if (callbacks.stderr || callbacks.output) {
       const stderrPromise = (async () => {
         try {
-          const stream = await this.client.devboxes.executions.streamStderrUpdates(
-            this._id,
-            executionId,
-            {},
-          );
+          const stream = await this.client.devboxes.executions.streamStderrUpdates(this._id, executionId, {});
           for await (const chunk of stream) {
             if (callbacks.stderr) callbacks.stderr(chunk.output);
             if (callbacks.output) callbacks.output(chunk.output);
@@ -266,7 +258,7 @@ export class Devbox {
       /**
        * Execute a command on the devbox and wait for it to complete.
        * Optionally provide callbacks to stream logs in real-time.
-       * 
+       *
        * When callbacks are provided, this method waits for both the command to complete
        * AND all streaming data to be processed before returning.
        *
@@ -284,20 +276,24 @@ export class Devbox {
           // With callbacks: use async execution workflow to enable streaming
           const { stdout, stderr, output, ...executeParams } = params;
           const execution = await this.client.devboxes.executeAsync(this._id, executeParams, options);
-          
+
           // Start streaming and await both completion and streaming
-          const callbacks: { stdout?: (line: string) => void; stderr?: (line: string) => void; output?: (line: string) => void } = {};
+          const callbacks: {
+            stdout?: (line: string) => void;
+            stderr?: (line: string) => void;
+            output?: (line: string) => void;
+          } = {};
           if (stdout) callbacks.stdout = stdout;
           if (stderr) callbacks.stderr = stderr;
           if (output) callbacks.output = output;
           const streamingPromise = this.startStreamingWithCallbacks(execution.execution_id, callbacks);
-          
+
           // Wait for both command completion and streaming to finish
           const [result] = await Promise.all([
             this.client.devboxes.executions.awaitCompleted(this._id, execution.execution_id, options),
             streamingPromise,
           ]);
-          
+
           return new ExecutionResult(this.client, this._id, execution.execution_id, result);
         } else {
           // Without callbacks: use existing optimized workflow
@@ -309,7 +305,7 @@ export class Devbox {
       /**
        * Execute a command asynchronously without waiting for completion.
        * Optionally provide callbacks to stream logs in real-time as they are produced.
-       * 
+       *
        * Note: Streaming runs independently in the background. Callbacks will continue
        * firing even after calling execution.result(). This allows you to see live logs
        * while the command runs and after it completes.
@@ -324,10 +320,14 @@ export class Devbox {
       ): Promise<Execution> => {
         const { stdout, stderr, output, ...executeParams } = params;
         const execution = await this.client.devboxes.executeAsync(this._id, executeParams, options);
-        
+
         // Start streaming in background if callbacks provided (fire and forget)
         if (stdout || stderr || output) {
-          const callbacks: { stdout?: (line: string) => void; stderr?: (line: string) => void; output?: (line: string) => void } = {};
+          const callbacks: {
+            stdout?: (line: string) => void;
+            stderr?: (line: string) => void;
+            output?: (line: string) => void;
+          } = {};
           if (stdout) callbacks.stdout = stdout;
           if (stderr) callbacks.stderr = stderr;
           if (output) callbacks.output = output;
@@ -336,7 +336,7 @@ export class Devbox {
             console.error('Error in background streaming:', error);
           });
         }
-        
+
         return new Execution(this.client, this._id, execution.execution_id, execution);
       },
     };

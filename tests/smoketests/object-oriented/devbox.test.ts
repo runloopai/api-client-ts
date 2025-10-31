@@ -288,15 +288,12 @@ describe('smoketest: object-oriented devbox', () => {
   describe('command execution with streaming callbacks', () => {
     let devbox: Devbox;
 
-    beforeAll(
-      async () => {
-        devbox = await sdk.devbox.create({
-          name: uniqueName('sdk-devbox-streaming'),
-          launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 },
-        });
-      },
-      THIRTY_SECOND_TIMEOUT,
-    );
+    beforeAll(async () => {
+      devbox = await sdk.devbox.create({
+        name: uniqueName('sdk-devbox-streaming'),
+        launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 },
+      });
+    }, THIRTY_SECOND_TIMEOUT);
 
     afterAll(async () => {
       if (devbox) {
@@ -440,10 +437,10 @@ describe('smoketest: object-oriented devbox', () => {
 
       const result = await execution.result();
       expect(result.success).toBe(true);
-      
+
       // Give streaming a moment to catch up after command completion
       await new Promise((resolve) => setTimeout(resolve, 500));
-      
+
       expect(stderrLines.length).toBeGreaterThan(0);
       expect(stderrLines.join('')).toContain('error output');
     });
