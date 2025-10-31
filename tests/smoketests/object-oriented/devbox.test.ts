@@ -416,9 +416,12 @@ describe('smoketest: object-oriented devbox', () => {
       // Verify we received logs before command completion
       expect(receivedBeforeCompletion).toBe(true);
 
-      // Now wait for completion
+      // Now wait for completion (streaming continues independently)
       const result = await execution.result();
       expect(result.success).toBe(true);
+
+      // Give streaming a moment to catch up after command completion
+      await new Promise((resolve) => setTimeout(resolve, 500));
 
       // Verify all lines received
       expect(stdoutLines.join('')).toContain('immediate');
@@ -437,6 +440,10 @@ describe('smoketest: object-oriented devbox', () => {
 
       const result = await execution.result();
       expect(result.success).toBe(true);
+      
+      // Give streaming a moment to catch up after command completion
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      
       expect(stderrLines.length).toBeGreaterThan(0);
       expect(stderrLines.join('')).toContain('error output');
     });
@@ -480,6 +487,64 @@ describe('smoketest: object-oriented devbox', () => {
       expect(combined).toContain('line 1');
       expect(combined).toContain('line 10');
       expect(combined).toContain('line 20');
+    });
+
+    test('concurrent execAsync - multiple executions streaming simultaneously', async () => {
+      const taskALogs: string[] = [];
+      const taskBLogs: string[] = [];
+      let taskACount = 0;
+      let taskBCount = 0;
+
+      // Start both executions at the same time (don't await)
+      const executionA = devbox.cmd.execAsync({
+        command: 'echo "A1" && sleep 0.5 && echo "A2" && sleep 0.5 && echo "A3"',
+        stdout: (line) => {
+          taskALogs.push(line);
+          taskACount++;
+        },
+      });
+
+      const executionB = devbox.cmd.execAsync({
+        command: 'sleep 0.3 && echo "B1" && sleep 0.5 && echo "B2" && sleep 0.5 && echo "B3"',
+        stdout: (line) => {
+          taskBLogs.push(line);
+          taskBCount++;
+        },
+      });
+
+      // Wait for both to start
+      const [execA, execB] = await Promise.all([executionA, executionB]);
+
+      // Verify both are receiving logs concurrently
+      // Wait a bit for some logs to arrive
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      // At this point, both should have received at least some logs
+      expect(taskACount).toBeGreaterThan(0);
+      expect(taskBCount).toBeGreaterThan(0);
+
+      // Wait for both to complete
+      const [resultA, resultB] = await Promise.all([execA.result(), execB.result()]);
+
+      // Give streaming time to finish
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
+      // Verify both completed successfully
+      expect(resultA.success).toBe(true);
+      expect(resultB.success).toBe(true);
+
+      // Verify all logs were received from both streams
+      expect(taskALogs.join('')).toContain('A1');
+      expect(taskALogs.join('')).toContain('A2');
+      expect(taskALogs.join('')).toContain('A3');
+
+      expect(taskBLogs.join('')).toContain('B1');
+      expect(taskBLogs.join('')).toContain('B2');
+      expect(taskBLogs.join('')).toContain('B3');
+
+      // Verify we received logs from both (proving concurrent streaming)
+      expect(taskACount).toBeGreaterThanOrEqual(3);
+      expect(taskBCount).toBeGreaterThanOrEqual(3);
     });
   });
 });
