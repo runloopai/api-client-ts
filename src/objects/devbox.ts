@@ -306,9 +306,8 @@ export class Devbox {
        * Execute a command asynchronously without waiting for completion.
        * Optionally provide callbacks to stream logs in real-time as they are produced.
        *
-       * Note: Streaming runs independently in the background. Callbacks will continue
-       * firing even after calling execution.result(). This allows you to see live logs
-       * while the command runs and after it completes.
+       * Callbacks fire in real-time as logs arrive. When you call execution.result(),
+       * it will wait for both the command to complete and all streaming to finish.
        *
        * @param params - Parameters containing the command, optional shell name, and optional callbacks
        * @param options - Request options
@@ -321,7 +320,8 @@ export class Devbox {
         const { stdout, stderr, output, ...executeParams } = params;
         const execution = await this.client.devboxes.executeAsync(this._id, executeParams, options);
 
-        // Start streaming in background if callbacks provided (fire and forget)
+        // Start streaming in background if callbacks provided
+        let streamingPromise: Promise<void> | undefined;
         if (stdout || stderr || output) {
           const callbacks: {
             stdout?: (line: string) => void;
@@ -331,13 +331,11 @@ export class Devbox {
           if (stdout) callbacks.stdout = stdout;
           if (stderr) callbacks.stderr = stderr;
           if (output) callbacks.output = output;
-          // Start streaming - it runs independently in the background
-          this.startStreamingWithCallbacks(execution.execution_id, callbacks).catch((error) => {
-            console.error('Error in background streaming:', error);
-          });
+          // Start streaming - will be awaited when result() is called
+          streamingPromise = this.startStreamingWithCallbacks(execution.execution_id, callbacks);
         }
 
-        return new Execution(this.client, this._id, execution.execution_id, execution);
+        return new Execution(this.client, this._id, execution.execution_id, execution, streamingPromise);
       },
     };
   }

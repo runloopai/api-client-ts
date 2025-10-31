@@ -413,12 +413,9 @@ describe('smoketest: object-oriented devbox', () => {
       // Verify we received logs before command completion
       expect(receivedBeforeCompletion).toBe(true);
 
-      // Now wait for completion (streaming continues independently)
+      // Now wait for completion (also waits for streaming)
       const result = await execution.result();
       expect(result.success).toBe(true);
-
-      // Give streaming a moment to catch up after command completion
-      await new Promise((resolve) => setTimeout(resolve, 500));
 
       // Verify all lines received
       expect(stdoutLines.join('')).toContain('immediate');
@@ -437,10 +434,6 @@ describe('smoketest: object-oriented devbox', () => {
 
       const result = await execution.result();
       expect(result.success).toBe(true);
-
-      // Give streaming a moment to catch up after command completion
-      await new Promise((resolve) => setTimeout(resolve, 500));
-
       expect(stderrLines.length).toBeGreaterThan(0);
       expect(stderrLines.join('')).toContain('error output');
     });

@@ -12,17 +12,22 @@ export class Execution {
   private _devboxId: string;
   private _executionId: string;
   private _initialResult: DevboxAsyncExecutionDetailView;
+  private _streamingPromise?: Promise<void>;
 
   constructor(
     client: Runloop,
     devboxId: string,
     executionId: string,
     initialResult: DevboxAsyncExecutionDetailView,
+    streamingPromise?: Promise<void>,
   ) {
     this.client = client;
     this._devboxId = devboxId;
     this._executionId = executionId;
     this._initialResult = initialResult;
+    if (streamingPromise) {
+      this._streamingPromise = streamingPromise;
+    }
   }
 
   // Doesn't work as expected, the execution is killed when the stdin is sent.
@@ -43,6 +48,7 @@ export class Execution {
 
   /**
    * Wait for the execution to complete and return the result.
+   * If streaming callbacks were provided, also waits for all streams to finish.
    *
    * @param options - Request options with optional polling configuration
    * @returns ExecutionResult with stdout, stderr, and exit code
@@ -52,13 +58,16 @@ export class Execution {
       polling?: Partial<PollingOptions<DevboxAsyncExecutionDetailView>>;
     },
   ): Promise<ExecutionResult> {
-    // Use the existing waitForCommand method to poll for completion
-    const finalResult = await this.client.devboxes.waitForCommand(
-      this._devboxId,
-      this._executionId,
-      { statuses: ['completed'] },
-      options,
-    );
+    // Wait for both command completion and streaming to finish
+    const [finalResult] = await Promise.all([
+      this.client.devboxes.waitForCommand(
+        this._devboxId,
+        this._executionId,
+        { statuses: ['completed'] },
+        options,
+      ),
+      this._streamingPromise || Promise.resolve(),
+    ]);
 
     return new ExecutionResult(this.client, this._devboxId, this._executionId, finalResult);
   }
