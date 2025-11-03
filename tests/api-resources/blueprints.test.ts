@@ -65,29 +65,29 @@ describe('resource blueprints', () => {
     });
   });
 
-  test('create rejects large file_mount', async () => {
+  test('create rejects large file_mount', () => {
     const tooLargeContent = 'a'.repeat(786_000 + 1);
-    await expect(
+    expect(() =>
       client.blueprints.create({
         name: 'name',
         file_mounts: { '/tmp/large.txt': tooLargeContent },
       }),
-    ).rejects.toThrow(/over the limit/);
+    ).toThrow(/over the limit/);
   });
 
-  test('create rejects total file_mount size', async () => {
+  test('create rejects total file_mount size', () => {
     const perFileMax = 786_000;
     const file_mounts: Record<string, string> = {};
     for (let i = 0; i < 10; i++) {
       file_mounts[`/tmp/${i}.txt`] = 'a'.repeat(perFileMax);
     }
     file_mounts['/tmp/extra.txt'] = 'x';
-    await expect(
+    expect(() =>
       client.blueprints.create({
         name: 'name',
         file_mounts,
       }),
-    ).rejects.toThrow(/total file_mounts size .* over the limit/);
+    ).toThrow(/total file_mounts size .* over the limit/);
   });
 
   test('retrieve', async () => {
