@@ -26,15 +26,32 @@ function formatBytes(numBytes: number): string {
   return `${numBytes} bytes`;
 }
 
-function validateFileMounts(
-  fileMounts?: { [key: string]: string } | null,
-): Array<string> {
+function getUtf8ByteLength(input: string): number {
+  let byteLength = 0;
+  for (let i = 0; i < input.length; i++) {
+    const codeUnit = input.charCodeAt(i);
+    if (codeUnit < 0x80) {
+      byteLength += 1;
+    } else if (codeUnit < 0x800) {
+      byteLength += 2;
+    } else if (codeUnit >= 0xd800 && codeUnit <= 0xdbff) {
+      // Surrogate pair (4 bytes in UTF-8)
+      i += 1;
+      byteLength += 4;
+    } else {
+      byteLength += 3;
+    }
+  }
+  return byteLength;
+}
+
+function validateFileMounts(fileMounts?: { [key: string]: string } | null): Array<string> {
   const errors: Array<string> = [];
   if (!fileMounts) return errors;
 
   let totalSizeBytes = 0;
   for (const [mountPath, content] of Object.entries(fileMounts)) {
-    const sizeBytes = Buffer.byteLength(content ?? '', 'utf8');
+    const sizeBytes = getUtf8ByteLength(content ?? '');
     if (sizeBytes > FILE_MOUNT_MAX_SIZE_BYTES) {
       const over = sizeBytes - FILE_MOUNT_MAX_SIZE_BYTES;
       errors.push(

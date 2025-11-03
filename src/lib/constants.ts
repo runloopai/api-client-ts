@@ -9,4 +9,3 @@ export const FILE_MOUNT_MAX_SIZE_BYTES = 786_000;
 // Maximum allowed total size (in bytes) across all `file_mounts` when creating Blueprints
 export const FILE_MOUNT_TOTAL_MAX_SIZE_BYTES = 786_000 * 10; // ~10 mb
 
-
