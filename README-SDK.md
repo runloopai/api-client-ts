@@ -80,22 +80,17 @@ Object-oriented interface for working with devboxes. Created via `sdk.devbox.cre
 const devbox = await sdk.devbox.create({ name: 'my-devbox' });
 
 // Create a devbox from a blueprint ID
-const devboxFromBlueprint = await sdk.devbox.createFromBlueprintId(
-  'bpt-',
-  { name: 'my-devbox-from-blueprint' }
-);
+const devboxFromBlueprint = await sdk.devbox.createFromBlueprintId('bpt-', {
+  name: 'my-devbox-from-blueprint',
+});
 
 // Create a devbox from a blueprint name
-const devboxFromBlueprintName = await sdk.devbox.createFromBlueprintName(
-  'my-blueprint-name',
-  { name: 'my-devbox-from-blueprint' }
-);
+const devboxFromBlueprintName = await sdk.devbox.createFromBlueprintName('my-blueprint-name', {
+  name: 'my-devbox-from-blueprint',
+});
 
 // Create a devbox from a snapshot
-const devboxFromSnapshot = await sdk.devbox.createFromSnapshot(
-  'snp-',
-  { name: 'my-devbox-from-snapshot' }
-);
+const devboxFromSnapshot = await sdk.devbox.createFromSnapshot('snp-', { name: 'my-devbox-from-snapshot' });
 
 // Or get an existing one
 const existingDevbox = sdk.devbox.fromId('devbox-id');
@@ -260,10 +255,7 @@ const newDevbox = await snapshot.createDevbox({
 });
 
 // Or create new devbox from snapshot (using SDK method)
-const anotherDevbox = await sdk.devbox.createFromSnapshot(
-  snapshot.id,
-  { name: 'another-devbox' }
-);
+const anotherDevbox = await sdk.devbox.createFromSnapshot(snapshot.id, { name: 'another-devbox' });
 ```
 
 #### Devbox Management
@@ -327,16 +319,12 @@ const devbox = await blueprint.createDevbox({
 });
 
 // Or create devbox from blueprint (using SDK method with ID)
-const anotherDevbox = await sdk.devbox.createFromBlueprintId(
-  blueprint.id,
-  { name: 'another-devbox' }
-);
+const anotherDevbox = await sdk.devbox.createFromBlueprintId(blueprint.id, { name: 'another-devbox' });
 
 // Or create devbox from blueprint (using SDK method with name)
-const yetAnotherDevbox = await sdk.devbox.createFromBlueprintName(
-  'my-blueprint-name',
-  { name: 'yet-another-devbox' }
-);
+const yetAnotherDevbox = await sdk.devbox.createFromBlueprintName('my-blueprint-name', {
+  name: 'yet-another-devbox',
+});
 
 // Delete the blueprint when done
 await blueprint.delete();
