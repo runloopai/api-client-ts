@@ -58,8 +58,8 @@ export class Execution {
       polling?: Partial<PollingOptions<DevboxAsyncExecutionDetailView>>;
     },
   ): Promise<ExecutionResult> {
-    // Wait for both command completion and streaming to finish
-    const [finalResult] = await Promise.all([
+    // Wait for both command completion and streaming to finish (using allSettled for robustness)
+    const results = await Promise.allSettled([
       this.client.devboxes.waitForCommand(
         this._devboxId,
         this._executionId,
@@ -68,6 +68,12 @@ export class Execution {
       ),
       this._streamingPromise || Promise.resolve(),
     ]);
+
+    // Extract command result (throw if it failed, ignore streaming errors)
+    if (results[0].status === 'rejected') {
+      throw results[0].reason;
+    }
+    const finalResult = results[0].value;
 
     return new ExecutionResult(this.client, this._devboxId, this._executionId, finalResult);
   }
