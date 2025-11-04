@@ -36,6 +36,7 @@ export class ExecutionResult {
    * @returns The stdout content
    */
   async stdout(numLines?: number): Promise<string> {
+    //if(this._result.)
     // For now, just return the stdout from the result
     // In the future, this will support pagination when output is truncated
     return this._result.stdout ?? '';
