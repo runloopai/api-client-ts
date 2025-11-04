@@ -21,23 +21,9 @@ import { Execution } from './execution';
 import { ExecutionResult } from './execution-result';
 
 /**
- * Extended execution parameters with optional streaming callbacks.
- * Callbacks are invoked in real-time as logs are produced.
+ * Streaming callbacks for real-time log processing.
  */
-export interface DevboxExecuteParamsWithCallbacks extends DevboxExecuteParams {
-  /** Callback invoked for each stdout log line */
-  stdout?: (line: string) => void;
-  /** Callback invoked for each stderr log line */
-  stderr?: (line: string) => void;
-  /** Callback invoked for all log lines (both stdout and stderr) */
-  output?: (line: string) => void;
-}
-
-/**
- * Extended async execution parameters with optional streaming callbacks.
- * Callbacks are invoked in real-time as logs are produced.
- */
-export interface DevboxExecuteAsyncParamsWithCallbacks extends DevboxExecuteAsyncParams {
+export interface ExecuteStreamingCallbacks {
   /** Callback invoked for each stdout log line */
   stdout?: (line: string) => void;
   /** Callback invoked for each stderr log line */
@@ -171,22 +157,20 @@ export class Devbox {
    */
   private startStreamingWithCallbacks(
     executionId: string,
-    callbacks: {
-      stdout?: (line: string) => void;
-      stderr?: (line: string) => void;
-      output?: (line: string) => void;
-    },
+    stdout?: (line: string) => void,
+    stderr?: (line: string) => void,
+    output?: (line: string) => void,
   ): Promise<void> {
     const streamingPromises: Promise<void>[] = [];
 
     // Stream stdout if stdout or output callback provided
-    if (callbacks.stdout || callbacks.output) {
+    if (stdout || output) {
       const stdoutPromise = (async () => {
         try {
           const stream = await this.client.devboxes.executions.streamStdoutUpdates(this._id, executionId, {});
           for await (const chunk of stream) {
-            if (callbacks.stdout) callbacks.stdout(chunk.output);
-            if (callbacks.output) callbacks.output(chunk.output);
+            if (stdout) stdout(chunk.output);
+            if (output) output(chunk.output);
           }
         } catch (error) {
           // Silently handle streaming errors - don't block execution completion
@@ -197,13 +181,13 @@ export class Devbox {
     }
 
     // Stream stderr if stderr or output callback provided
-    if (callbacks.stderr || callbacks.output) {
+    if (stderr || output) {
       const stderrPromise = (async () => {
         try {
           const stream = await this.client.devboxes.executions.streamStderrUpdates(this._id, executionId, {});
           for await (const chunk of stream) {
-            if (callbacks.stderr) callbacks.stderr(chunk.output);
-            if (callbacks.output) callbacks.output(chunk.output);
+            if (stderr) stderr(chunk.output);
+            if (output) output(chunk.output);
           }
         } catch (error) {
           // Silently handle streaming errors - don't block execution completion
@@ -267,7 +251,7 @@ export class Devbox {
        * @returns ExecutionResult with stdout, stderr, and exit status
        */
       exec: async (
-        params: DevboxExecuteParamsWithCallbacks,
+        params: DevboxExecuteParams & ExecuteStreamingCallbacks,
         options?: Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxAsyncExecutionDetailView>> },
       ): Promise<ExecutionResult> => {
         const hasCallbacks = params.stdout || params.stderr || params.output;
@@ -278,21 +262,24 @@ export class Devbox {
           const execution = await this.client.devboxes.executeAsync(this._id, executeParams, options);
 
           // Start streaming and await both completion and streaming
-          const callbacks: {
-            stdout?: (line: string) => void;
-            stderr?: (line: string) => void;
-            output?: (line: string) => void;
-          } = {};
-          if (stdout) callbacks.stdout = stdout;
-          if (stderr) callbacks.stderr = stderr;
-          if (output) callbacks.output = output;
-          const streamingPromise = this.startStreamingWithCallbacks(execution.execution_id, callbacks);
+          const streamingPromise = this.startStreamingWithCallbacks(
+            execution.execution_id,
+            stdout,
+            stderr,
+            output,
+          );
 
-          // Wait for both command completion and streaming to finish
-          const [result] = await Promise.all([
+          // Wait for both command completion and streaming to finish (using allSettled for robustness)
+          const results = await Promise.allSettled([
             this.client.devboxes.executions.awaitCompleted(this._id, execution.execution_id, options),
             streamingPromise,
           ]);
+
+          // Extract command result (throw if it failed, ignore streaming errors)
+          if (results[0].status === 'rejected') {
+            throw results[0].reason;
+          }
+          const result = results[0].value;
 
           return new ExecutionResult(this.client, this._id, execution.execution_id, result);
         } else {
@@ -314,7 +301,7 @@ export class Devbox {
        * @returns Execution object for tracking and controlling the command
        */
       execAsync: async (
-        params: DevboxExecuteAsyncParamsWithCallbacks,
+        params: DevboxExecuteAsyncParams & ExecuteStreamingCallbacks,
         options?: Core.RequestOptions,
       ): Promise<Execution> => {
         const { stdout, stderr, output, ...executeParams } = params;
@@ -323,16 +310,8 @@ export class Devbox {
         // Start streaming in background if callbacks provided
         let streamingPromise: Promise<void> | undefined;
         if (stdout || stderr || output) {
-          const callbacks: {
-            stdout?: (line: string) => void;
-            stderr?: (line: string) => void;
-            output?: (line: string) => void;
-          } = {};
-          if (stdout) callbacks.stdout = stdout;
-          if (stderr) callbacks.stderr = stderr;
-          if (output) callbacks.output = output;
           // Start streaming - will be awaited when result() is called
-          streamingPromise = this.startStreamingWithCallbacks(execution.execution_id, callbacks);
+          streamingPromise = this.startStreamingWithCallbacks(execution.execution_id, stdout, stderr, output);
         }
 
         return new Execution(this.client, this._id, execution.execution_id, execution, streamingPromise);
