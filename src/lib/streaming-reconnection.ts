@@ -22,7 +22,7 @@ export async function withStreamAutoReconnect<Item>(
         }
         return; // Stream completed normally
       } catch (error) {
-        if (error instanceof APIError && error.status === 408) {
+        if ((error as any)?.status === 408) {
           // Reconnect with the last known offset
           currentStream = await streamCreator(lastOffset);
           continue;
