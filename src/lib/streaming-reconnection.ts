@@ -1,5 +1,4 @@
 import { Stream } from '../streaming';
-import { APIError } from '../error';
 
 /**
  * Wraps a stream with automatic reconnection on timeout.
