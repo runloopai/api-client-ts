@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.67.0 (2025-11-04)
+
+Full Changelog: [v0.66.1...v0.67.0](https://github.com/runloopai/api-client-ts/compare/v0.66.1...v0.67.0)
+
+### ⚠ BREAKING CHANGES
+
+* add realtime stdout/stderr/output callbacks to devbox exec + execAsync for SSE log streaming completion ([#638](https://github.com/runloopai/api-client-ts/issues/638))
+
+### Features
+
+* add realtime stdout/stderr/output callbacks to devbox exec + execAsync for SSE log streaming completion ([#638](https://github.com/runloopai/api-client-ts/issues/638)) ([c1fb163](https://github.com/runloopai/api-client-ts/commit/c1fb1639b1b43d292f832edd8b7602590ac23caf))
+
 ## 0.66.1 (2025-10-23)
 
 Full Changelog: [v0.60.0...v0.66.1](https://github.com/runloopai/api-client-ts/compare/v0.60.0...v0.66.1)
