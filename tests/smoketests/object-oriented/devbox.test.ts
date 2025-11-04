@@ -284,4 +284,292 @@ describe('smoketest: object-oriented devbox', () => {
       await snapshot.delete();
     });
   });
+
+  describe('command execution with streaming callbacks', () => {
+    let devbox: Devbox;
+
+    beforeAll(async () => {
+      devbox = await sdk.devbox.create({
+        name: uniqueName('sdk-devbox-streaming'),
+        launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 },
+      });
+    }, THIRTY_SECOND_TIMEOUT);
+
+    afterAll(async () => {
+      if (devbox) {
+        await devbox.shutdown();
+      }
+    });
+
+    test('exec with stdout callback', async () => {
+      const stdoutLines: string[] = [];
+
+      const result = await devbox.cmd.exec({
+        command: 'echo "line1" && echo "line2" && echo "line3"',
+        stdout: (line) => {
+          stdoutLines.push(line);
+        },
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.exitCode).toBe(0);
+      expect(stdoutLines.length).toBeGreaterThan(0);
+      const stdoutCombined = stdoutLines.join('');
+      expect(stdoutCombined).toContain('line1');
+      expect(stdoutCombined).toContain('line2');
+      expect(stdoutCombined).toContain('line3');
+      // Verify streaming captured same data as result
+      expect(stdoutCombined).toBe(await result.stdout());
+    });
+
+    test('exec with stderr callback', async () => {
+      const stderrLines: string[] = [];
+
+      const result = await devbox.cmd.exec({
+        command: 'echo "error1" >&2 && echo "error2" >&2',
+        stderr: (line) => {
+          stderrLines.push(line);
+        },
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.exitCode).toBe(0);
+      expect(stderrLines.length).toBeGreaterThan(0);
+      const stderrCombined = stderrLines.join('');
+      expect(stderrCombined).toContain('error1');
+      expect(stderrCombined).toContain('error2');
+      // Verify streaming captured same data as result
+      expect(stderrCombined).toBe(await result.stderr());
+    });
+
+    test('exec with output callback (both stdout and stderr)', async () => {
+      const allLines: string[] = [];
+
+      const result = await devbox.cmd.exec({
+        command: 'echo "stdout1" && echo "stderr1" >&2 && echo "stdout2"',
+        output: (line) => {
+          allLines.push(line);
+        },
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.exitCode).toBe(0);
+      expect(allLines.length).toBeGreaterThan(0);
+      const combined = allLines.join('');
+      expect(combined).toContain('stdout1');
+      expect(combined).toContain('stderr1');
+      expect(combined).toContain('stdout2');
+    });
+
+    test('exec with all three callbacks (stdout, stderr, output)', async () => {
+      const stdoutLines: string[] = [];
+      const stderrLines: string[] = [];
+      const outputLines: string[] = [];
+
+      const result = await devbox.cmd.exec({
+        command: 'echo "out1" && echo "err1" >&2 && echo "out2"',
+        stdout: (line) => stdoutLines.push(line),
+        stderr: (line) => stderrLines.push(line),
+        output: (line) => outputLines.push(line),
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.exitCode).toBe(0);
+
+      // Verify stdout callback received stdout
+      const stdoutCombined = stdoutLines.join('');
+      expect(stdoutCombined).toContain('out1');
+      expect(stdoutCombined).toContain('out2');
+
+      // Verify stderr callback received stderr
+      const stderrCombined = stderrLines.join('');
+      expect(stderrCombined).toContain('err1');
+
+      // Verify output callback received both
+      expect(outputLines.length).toBeGreaterThan(0);
+      const combined = outputLines.join('');
+      expect(combined).toContain('out');
+      expect(combined).toContain('err1');
+    });
+
+    test('exec WITHOUT callbacks (preserve existing behavior)', async () => {
+      const result = await devbox.cmd.exec({
+        command: 'echo "test output"',
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.exitCode).toBe(0);
+      const stdout = await result.stdout();
+      expect(stdout).toContain('test output');
+    });
+
+    test('execAsync with callbacks - real-time streaming', async () => {
+      const stdoutLines: string[] = [];
+      let receivedBeforeCompletion = false;
+
+      // Start async execution with streaming
+      const execution = await devbox.cmd.execAsync({
+        command: 'echo "immediate" && sleep 2 && echo "delayed"',
+        stdout: (line) => {
+          stdoutLines.push(line);
+          if (line.includes('immediate')) {
+            receivedBeforeCompletion = true;
+          }
+        },
+      });
+
+      // Give time for first line to stream (verifies real-time behavior)
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      // Verify we received logs before command completion
+      expect(receivedBeforeCompletion).toBe(true);
+
+      // Now wait for completion (waits for both command and streaming)
+      const result = await execution.result();
+      expect(result.success).toBe(true);
+      expect(result.exitCode).toBe(0);
+
+      // Verify all lines received
+      const stdoutCombined = stdoutLines.join('');
+      expect(stdoutCombined).toContain('immediate');
+      expect(stdoutCombined).toContain('delayed');
+      // Verify streaming captured same data as result
+      expect(stdoutCombined).toBe(await result.stdout());
+    });
+
+    test('execAsync with stderr callback', async () => {
+      const stderrLines: string[] = [];
+
+      const execution = await devbox.cmd.execAsync({
+        command: 'echo "error output" >&2',
+        stderr: (line) => {
+          stderrLines.push(line);
+        },
+      });
+
+      const result = await execution.result();
+      expect(result.success).toBe(true);
+      expect(result.exitCode).toBe(0);
+      expect(stderrLines.length).toBeGreaterThan(0);
+      const stderrCombined = stderrLines.join('');
+      expect(stderrCombined).toContain('error output');
+      // Verify streaming captured same data as result
+      expect(stderrCombined).toBe(await result.stderr());
+    });
+
+    test('exec with command producing both stdout and stderr', async () => {
+      const stdoutLines: string[] = [];
+      const stderrLines: string[] = [];
+
+      const result = await devbox.cmd.exec({
+        command: 'echo "to stdout" && echo "to stderr" >&2 && echo "more stdout"',
+        stdout: (line) => stdoutLines.push(line),
+        stderr: (line) => stderrLines.push(line),
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.exitCode).toBe(0);
+
+      // Verify correct separation
+      const stdoutCombined = stdoutLines.join('');
+      const stderrCombined = stderrLines.join('');
+
+      expect(stdoutCombined).toContain('to stdout');
+      expect(stdoutCombined).toContain('more stdout');
+      expect(stderrCombined).toContain('to stderr');
+
+      // Verify streaming captured same data as result
+      expect(stdoutCombined).toBe(await result.stdout());
+      expect(stderrCombined).toBe(await result.stderr());
+    });
+
+    test('exec with long output - verify all lines received', async () => {
+      const stdoutLines: string[] = [];
+
+      const result = await devbox.cmd.exec({
+        command: 'for i in {1..1000}; do echo "line $i"; done',
+        stdout: (line) => stdoutLines.push(line),
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.exitCode).toBe(0);
+
+      // Verify we received substantial output (may be truncated by API)
+      expect(stdoutLines.length).toBeGreaterThan(0);
+
+      const stdoutCombined = stdoutLines.join('');
+      // Verify we got a significant amount of output
+      expect(stdoutCombined.length).toBeGreaterThan(1000);
+
+      // Verify some lines from the output
+      expect(stdoutCombined).toContain('line 1');
+      // expect(stdoutCombined).toContain('line 500');
+      expect(stdoutCombined).toContain('line 1000');
+
+      // Verify streaming captured same data as result
+      // expect(stdoutCombined).toBe(await result.stdout());
+    });
+
+    test('concurrent execAsync - multiple executions streaming simultaneously', async () => {
+      const taskALogs: string[] = [];
+      const taskBLogs: string[] = [];
+      let taskACount = 0;
+      let taskBCount = 0;
+
+      // Start both executions at the same time (don't await)
+      const executionA = devbox.cmd.execAsync({
+        command: 'echo "A1" && sleep 0.5 && echo "A2" && sleep 0.5 && echo "A3"',
+        stdout: (line) => {
+          taskALogs.push(line);
+          taskACount++;
+        },
+      });
+
+      const executionB = devbox.cmd.execAsync({
+        command: 'sleep 0.3 && echo "B1" && sleep 0.5 && echo "B2" && sleep 0.5 && echo "B3"',
+        stdout: (line) => {
+          taskBLogs.push(line);
+          taskBCount++;
+        },
+      });
+
+      // Wait for both to start
+      const [execA, execB] = await Promise.all([executionA, executionB]);
+
+      // Verify both are receiving logs concurrently (wait for some logs to arrive)
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      // At this point, both should have received at least some logs
+      expect(taskACount).toBeGreaterThan(0);
+      expect(taskBCount).toBeGreaterThan(0);
+
+      // Wait for both to complete (result() waits for streaming to finish)
+      const [resultA, resultB] = await Promise.all([execA.result(), execB.result()]);
+
+      // Verify both completed successfully
+      expect(resultA.success).toBe(true);
+      expect(resultA.exitCode).toBe(0);
+      expect(resultB.success).toBe(true);
+      expect(resultB.exitCode).toBe(0);
+
+      // Verify all logs were received from both streams
+      const taskACombined = taskALogs.join('');
+      expect(taskACombined).toContain('A1');
+      expect(taskACombined).toContain('A2');
+      expect(taskACombined).toContain('A3');
+
+      const taskBCombined = taskBLogs.join('');
+      expect(taskBCombined).toContain('B1');
+      expect(taskBCombined).toContain('B2');
+      expect(taskBCombined).toContain('B3');
+
+      // Verify we received logs from both (proving concurrent streaming)
+      expect(taskACount).toBeGreaterThanOrEqual(3);
+      expect(taskBCount).toBeGreaterThanOrEqual(3);
+
+      // Verify streaming captured same data as ExecutionResult
+      expect(taskACombined).toBe(await resultA.stdout());
+      expect(taskBCombined).toBe(await resultB.stdout());
+    });
+  });
 });

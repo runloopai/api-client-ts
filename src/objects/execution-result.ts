@@ -6,8 +6,8 @@ import type { DevboxAsyncExecutionDetailView } from '../resources/devboxes/devbo
  */
 export class ExecutionResult {
   private client: Runloop;
-  private _executionId: string;
   private _devboxId: string;
+  private _executionId: string;
   private _result: DevboxAsyncExecutionDetailView;
 
   constructor(
