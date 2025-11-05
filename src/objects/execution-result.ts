@@ -30,6 +30,71 @@ export class ExecutionResult {
   }
 
   /**
+   * Helper to get last N lines, filtering out trailing empty strings
+   */
+  private getLastNLines(text: string, n: number): string {
+    const lines = text.split('\n');
+    // Remove trailing empty strings (from trailing newlines)
+    while (lines.length > 0 && lines[lines.length - 1] === '') {
+      lines.pop();
+    }
+    return lines.slice(-n).join('\n');
+  }
+
+  /**
+   * Helper to count non-empty lines (excluding trailing empty strings)
+   */
+  private countNonEmptyLines(text: string): number {
+    const lines = text.split('\n');
+    // Remove trailing empty strings first
+    const trimmedLines = [...lines];
+    while (trimmedLines.length > 0 && trimmedLines[trimmedLines.length - 1] === '') {
+      trimmedLines.pop();
+    }
+    return trimmedLines.length;
+  }
+
+  /**
+   * Common logic for getting output (stdout or stderr) with optional line limiting
+   */
+  private async getOutput(
+    currentOutput: string,
+    isOutputTruncated: boolean,
+    numLines: number | undefined,
+    streamFn: () => Promise<AsyncIterable<{ output: string }>>,
+  ): Promise<string> {
+    // If numLines is specified, check if we have enough lines already
+    if (numLines !== undefined) {
+      const nonEmptyCount = this.countNonEmptyLines(currentOutput);
+      if (!isOutputTruncated || nonEmptyCount >= numLines) {
+        // We have enough lines, return the last N lines
+        return this.getLastNLines(currentOutput, numLines);
+      }
+    }
+
+    // If output is truncated and we need all lines (or more than available), stream all logs
+    if (isOutputTruncated) {
+      const stream = await streamFn();
+      let output = '';
+      for await (const chunk of stream) {
+        output += chunk.output;
+      }
+
+      // If numLines was specified, return only the last N lines
+      if (numLines !== undefined) {
+        return this.getLastNLines(output, numLines);
+      }
+      return output;
+    }
+
+    // Output is not truncated, return what we have
+    if (numLines !== undefined) {
+      return this.getLastNLines(currentOutput, numLines);
+    }
+    return currentOutput;
+  }
+
+  /**
    * Get the stdout output from the execution. If numLines is specified, it will return the last N lines. If numLines is not specified, it will return the entire stdout output.
    * Note after the execution is completed, the stdout is not available anymore.
    *
@@ -38,57 +103,11 @@ export class ExecutionResult {
    */
   async stdout(numLines?: number): Promise<string> {
     const currentStdout = this._result.stdout ?? '';
-    const isOutputTruncated = (this._result as any).stdout_truncated === true;
+    const isOutputTruncated = this._result.stdout_truncated === true;
 
-    // Helper to get last N lines, filtering out trailing empty strings
-    const getLastNLines = (text: string, n: number): string => {
-      const lines = text.split('\n');
-      // Remove trailing empty strings (from trailing newlines)
-      while (lines.length > 0 && lines[lines.length - 1] === '') {
-        lines.pop();
-      }
-      return lines.slice(-n).join('\n');
-    };
-
-    // If numLines is specified, check if we have enough lines already
-    if (numLines !== undefined) {
-      const currentLines = currentStdout.split('\n');
-      // Count non-empty lines (excluding trailing empty strings)
-      // Remove trailing empty strings first
-      const trimmedLines = [...currentLines];
-      while (trimmedLines.length > 0 && trimmedLines[trimmedLines.length - 1] === '') {
-        trimmedLines.pop();
-      }
-      const nonEmptyCount = trimmedLines.length;
-      if (!isOutputTruncated || nonEmptyCount >= numLines) {
-        // We have enough lines, return the last N lines
-        return getLastNLines(currentStdout, numLines);
-      }
-    }
-
-    // If output is truncated and we need all lines (or more than available), stream all logs
-    if (isOutputTruncated) {
-      const stream = await this.client.devboxes.executions.streamStdoutUpdates(
-        this._devboxId,
-        this._executionId,
-      );
-      let stdout = '';
-      for await (const chunk of stream) {
-        stdout += chunk.output;
-      }
-
-      // If numLines was specified, return only the last N lines
-      if (numLines !== undefined) {
-        return getLastNLines(stdout, numLines);
-      }
-      return stdout;
-    }
-
-    // Output is not truncated, return what we have
-    if (numLines !== undefined) {
-      return getLastNLines(currentStdout, numLines);
-    }
-    return currentStdout;
+    return this.getOutput(currentStdout, isOutputTruncated, numLines, () =>
+      this.client.devboxes.executions.streamStdoutUpdates(this._devboxId, this._executionId),
+    );
   }
 
   /**
@@ -100,57 +119,11 @@ export class ExecutionResult {
    */
   async stderr(numLines?: number): Promise<string> {
     const currentStderr = this._result.stderr ?? '';
-    const isOutputTruncated = (this._result as any).stderr_truncated === true;
+    const isOutputTruncated = this._result.stderr_truncated === true;
 
-    // Helper to get last N lines, filtering out trailing empty strings
-    const getLastNLines = (text: string, n: number): string => {
-      const lines = text.split('\n');
-      // Remove trailing empty strings (from trailing newlines)
-      while (lines.length > 0 && lines[lines.length - 1] === '') {
-        lines.pop();
-      }
-      return lines.slice(-n).join('\n');
-    };
-
-    // If numLines is specified, check if we have enough lines already
-    if (numLines !== undefined) {
-      const currentLines = currentStderr.split('\n');
-      // Count non-empty lines (excluding trailing empty strings)
-      // Remove trailing empty strings first
-      const trimmedLines = [...currentLines];
-      while (trimmedLines.length > 0 && trimmedLines[trimmedLines.length - 1] === '') {
-        trimmedLines.pop();
-      }
-      const nonEmptyCount = trimmedLines.length;
-      if (!isOutputTruncated || nonEmptyCount >= numLines) {
-        // We have enough lines, return the last N lines
-        return getLastNLines(currentStderr, numLines);
-      }
-    }
-
-    // If output is truncated and we need all lines (or more than available), stream all logs
-    if (isOutputTruncated) {
-      const stream = await this.client.devboxes.executions.streamStderrUpdates(
-        this._devboxId,
-        this._executionId,
-      );
-      let stderr = '';
-      for await (const chunk of stream) {
-        stderr += chunk.output;
-      }
-
-      // If numLines was specified, return only the last N lines
-      if (numLines !== undefined) {
-        return getLastNLines(stderr, numLines);
-      }
-      return stderr;
-    }
-
-    // Output is not truncated, return what we have
-    if (numLines !== undefined) {
-      return getLastNLines(currentStderr, numLines);
-    }
-    return currentStderr;
+    return this.getOutput(currentStderr, isOutputTruncated, numLines, () =>
+      this.client.devboxes.executions.streamStderrUpdates(this._devboxId, this._executionId),
+    );
   }
 
   /**
