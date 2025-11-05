@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.67.1 (2025-11-05)
+
+Full Changelog: [v0.67.0...v0.67.1](https://github.com/runloopai/api-client-ts/compare/v0.67.0...v0.67.1)
+
+### Features
+
+* **api:** api update ([d3eff9f](https://github.com/runloopai/api-client-ts/commit/d3eff9feb7ddda605394bf0195d37881d3cb26e1))
+
+
+### Documentation
+
+* Updating PR templates for the repo ([#641](https://github.com/runloopai/api-client-ts/issues/641)) ([2deb187](https://github.com/runloopai/api-client-ts/commit/2deb187ae9d2bdf7be89b938e3f70763bbc01a18))
+
 ## 0.67.0 (2025-11-04)
 
 Full Changelog: [v0.66.1...v0.67.0](https://github.com/runloopai/api-client-ts/compare/v0.66.1...v0.67.0)
