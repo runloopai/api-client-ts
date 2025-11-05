@@ -57,6 +57,7 @@ describe('smoketest: object-oriented snapshot', () => {
         expect(asyncSnapshot.id).toBeTruthy();
       } finally {
         if (asyncSnapshot) {
+          await asyncSnapshot.awaitCompleted();
           await asyncSnapshot.delete();
         }
       }
