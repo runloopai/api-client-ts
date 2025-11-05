@@ -501,8 +501,7 @@ describe('smoketest: object-oriented devbox', () => {
       }
 
       // Verify streaming captured same data as result
-      // TODO(alex): Run this test after we've enabled pagination for ExecutionResult.stdout()
-      // expect(stdoutCombined).toBe(await result.stdout());
+      expect(stdoutCombined).toBe(await result.stdout());
     });
 
     test('concurrent execAsync - multiple executions streaming simultaneously', async () => {
