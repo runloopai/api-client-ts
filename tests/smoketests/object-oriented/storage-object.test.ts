@@ -1,14 +1,7 @@
-import { RunloopSDK } from '@runloop/api-client';
-import { makeClient, THIRTY_SECOND_TIMEOUT, uniqueName } from '../utils';
+import { THIRTY_SECOND_TIMEOUT, uniqueName, makeClientSDK } from '../utils';
 import { Devbox, StorageObject } from '@runloop/api-client/objects';
 
-const client = makeClient();
-const sdk = new RunloopSDK({
-  bearerToken: process.env['RUNLOOP_API_KEY'],
-  baseURL: process.env['RUNLOOP_BASE_URL'],
-  timeout: 120_000,
-  maxRetries: 1,
-});
+const sdk = makeClientSDK();
 
 describe('smoketest: object-oriented storage object', () => {
   describe('storage object lifecycle', () => {
@@ -240,7 +233,7 @@ describe('smoketest: object-oriented storage object', () => {
 
     test('list storage objects via static method', async () => {
       const { StorageObject } = await import('@runloop/api-client/objects');
-      const objects = await StorageObject.list(client, { limit: 5 });
+      const objects = await StorageObject.list(sdk.api, { limit: 5 });
       expect(Array.isArray(objects)).toBe(true);
     });
 

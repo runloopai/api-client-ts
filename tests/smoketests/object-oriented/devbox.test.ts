@@ -1,14 +1,8 @@
-import { RunloopSDK, toFile } from '@runloop/api-client';
+import { toFile } from '@runloop/api-client';
 import { Devbox } from '@runloop/api-client/objects';
-import { makeClient, THIRTY_SECOND_TIMEOUT, uniqueName } from '../utils';
+import { makeClientSDK, THIRTY_SECOND_TIMEOUT, uniqueName } from '../utils';
 
-const client = makeClient();
-const sdk = new RunloopSDK({
-  bearerToken: process.env['RUNLOOP_API_KEY'],
-  baseURL: process.env['RUNLOOP_BASE_URL'],
-  timeout: 120_000,
-  maxRetries: 1,
-});
+const sdk = makeClientSDK();
 
 describe('smoketest: object-oriented devbox', () => {
   describe('devbox lifecycle', () => {

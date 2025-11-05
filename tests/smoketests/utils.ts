@@ -1,4 +1,4 @@
-import { Runloop } from '@runloop/api-client';
+import { Runloop, RunloopSDK } from '@runloop/api-client';
 
 export function makeClient(overrides: Partial<ConstructorParameters<typeof Runloop>[0]> = {}) {
   const baseURL = process.env['RUNLOOP_BASE_URL'];
@@ -10,6 +10,15 @@ export function makeClient(overrides: Partial<ConstructorParameters<typeof Runlo
     timeout: 120_000,
     maxRetries: 1,
     ...overrides,
+  });
+}
+
+export function makeClientSDK() {
+  return new RunloopSDK({
+    bearerToken: process.env['RUNLOOP_API_KEY'],
+    baseURL: process.env['RUNLOOP_BASE_URL'],
+    timeout: 120_000,
+    maxRetries: 1,
   });
 }
 

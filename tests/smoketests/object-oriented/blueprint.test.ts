@@ -1,14 +1,7 @@
-import { RunloopSDK } from '@runloop/api-client';
-import { makeClient, THIRTY_SECOND_TIMEOUT, uniqueName } from '../utils';
+import { THIRTY_SECOND_TIMEOUT, uniqueName, makeClientSDK } from '../utils';
 import { Blueprint, Devbox } from '@runloop/api-client/objects';
 
-const client = makeClient();
-const sdk = new RunloopSDK({
-  bearerToken: process.env['RUNLOOP_API_KEY'],
-  baseURL: process.env['RUNLOOP_BASE_URL'],
-  timeout: 120_000,
-  maxRetries: 1,
-});
+const sdk = makeClientSDK();
 
 describe('smoketest: object-oriented blueprint', () => {
   describe('blueprint lifecycle', () => {

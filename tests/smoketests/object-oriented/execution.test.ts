@@ -1,14 +1,7 @@
-import { RunloopSDK } from '@runloop/api-client';
 import { Devbox, Execution } from '@runloop/api-client/objects';
-import { makeClient, uniqueName } from '../utils';
+import { makeClientSDK, uniqueName } from '../utils';
 
-const client = makeClient();
-const sdk = new RunloopSDK({
-  bearerToken: process.env['RUNLOOP_API_KEY'],
-  baseURL: process.env['RUNLOOP_BASE_URL'],
-  timeout: 120_000,
-  maxRetries: 1,
-});
+const sdk = makeClientSDK();
 
 describe('smoketest: object-oriented execution', () => {
   describe('execution lifecycle', () => {
@@ -166,14 +159,40 @@ describe('smoketest: object-oriented execution', () => {
 
     test('handle execution with stderr output', async () => {
       expect(devbox).toBeDefined();
+      // Generate 1000 lines to stderr to test large output handling
       const result = await devbox.cmd.exec({
-        command: 'echo "Error message" >&2',
+        command: 'for i in {1..1000}; do echo "Error message $i" >&2; done',
       });
       expect(result).toBeDefined();
       expect(result.exitCode).toBe(0);
 
-      const stderr = await result.stderr();
-      expect(stderr).toContain('Error message');
+      // Get all stderr output
+      const allStderr = await result.stderr();
+      expect(allStderr).toBeDefined();
+      expect(typeof allStderr).toBe('string');
+
+      // Verify it contains expected error messages
+      expect(allStderr).toContain('Error message 1');
+      expect(allStderr).toContain('Error message 1000');
+
+      // Get last 10 lines to test numLines parameter
+      const last10Lines = await result.stderr(10);
+      const last10LinesArray = last10Lines.split('\n').filter((line) => line.trim().length > 0);
+
+      // Should contain the last error messages
+      expect(last10Lines).toContain('Error message 1000');
+      expect(last10LinesArray.length).toBeGreaterThanOrEqual(1);
+
+      // Verify it's the last lines, not the first (check actual error numbers)
+      const errorNumbers = last10LinesArray
+        .map((line) => {
+          const match = line.match(/Error message (\d+)/);
+          return match && match[1] ? parseInt(match[1], 10) : null;
+        })
+        .filter((num): num is number => num !== null);
+      expect(errorNumbers.length).toBeGreaterThan(0);
+      expect(Math.min(...errorNumbers)).toBeGreaterThanOrEqual(991);
+      expect(Math.max(...errorNumbers)).toBeLessThanOrEqual(1000);
     });
 
     test('handle execution with no output', async () => {
