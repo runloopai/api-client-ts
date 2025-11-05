@@ -93,7 +93,7 @@ export interface LaunchParameters {
 
   /**
    * Time in seconds after which Devbox will automatically shutdown. Default is 1
-   * hour.
+   * hour. Maximum is 48 hours (172800 seconds).
    */
   keep_alive_time_seconds?: number | null;
 
