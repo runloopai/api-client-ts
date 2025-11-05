@@ -501,12 +501,13 @@ describe('smoketest: object-oriented devbox', () => {
       // Verify we got a significant amount of output
       expect(stdoutCombined.length).toBeGreaterThan(1000);
 
-      // Verify some lines from the output
-      expect(stdoutCombined).toContain('line 1');
-      // expect(stdoutCombined).toContain('line 500');
-      expect(stdoutCombined).toContain('line 1000');
+      // Verify all 1000 lines are present in the output
+      for (let i = 1; i <= 1000; i++) {
+        expect(stdoutCombined).toContain(`line ${i}`);
+      }
 
       // Verify streaming captured same data as result
+      // TODO(alex): Run this test after we've enabled pagination for ExecutionResult.stdout()
       // expect(stdoutCombined).toBe(await result.stdout());
     });
 
