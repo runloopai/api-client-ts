@@ -370,8 +370,8 @@ describe('ExecutionResult', () => {
 
       const stdout = await result.stdout(2);
 
-      // Split by \n creates an empty string at the end, so last 2 items are ['line3', '']
-      expect(stdout).toBe('line3\n');
+      // Should return the last 2 actual lines (trailing empty strings are removed)
+      expect(stdout).toBe('line2\nline3');
     });
 
     it('should handle numLines = 0', async () => {
