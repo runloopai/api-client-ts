@@ -379,8 +379,8 @@ describe('ExecutionResult', () => {
 
       const stdout = await result.stdout(0);
 
-      // slice(0) returns empty array when 0 is passed as negative index
-      expect(stdout).toBe('line1\nline2\nline3');
+      // When numLines is 0, it should return an empty string
+      expect(stdout).toBe('');
     });
 
     it('should handle numLines = 1 (last line only)', async () => {
