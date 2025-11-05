@@ -33,6 +33,9 @@ export class ExecutionResult {
    * Helper to get last N lines, filtering out trailing empty strings
    */
   private getLastNLines(text: string, n: number): string {
+    if (n <= 0) {
+      return '';
+    }
     const lines = text.split('\n');
     // Remove trailing empty strings (from trailing newlines)
     while (lines.length > 0 && lines[lines.length - 1] === '') {
@@ -45,13 +48,14 @@ export class ExecutionResult {
    * Helper to count non-empty lines (excluding trailing empty strings)
    */
   private countNonEmptyLines(text: string): number {
-    const lines = text.split('\n');
+    const countLines = text.split('\n');
     // Remove trailing empty strings first
-    const trimmedLines = [...lines];
+    const trimmedLines = [...countLines];
     while (trimmedLines.length > 0 && trimmedLines[trimmedLines.length - 1] === '') {
       trimmedLines.pop();
     }
-    return trimmedLines.length;
+    // Filter out all empty strings (including those in the middle)
+    return trimmedLines.filter((line) => line !== '').length;
   }
 
   /**
