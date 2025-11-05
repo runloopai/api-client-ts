@@ -7,6 +7,71 @@ import * as Shared from './shared';
 import { BlueprintsCursorIDPage, type BlueprintsCursorIDPageParams } from '../pagination';
 import { RunloopError } from '../error';
 import { PollingOptions, poll } from '../lib/polling';
+import { FILE_MOUNT_MAX_SIZE_BYTES, FILE_MOUNT_TOTAL_MAX_SIZE_BYTES } from '../lib/constants';
+
+function formatBytes(numBytes: number): string {
+  if (numBytes < 1024) return `${numBytes} bytes`;
+  const units: Array<[number, string]> = [
+    [1 << 30, 'GB'],
+    [1 << 20, 'MB'],
+    [1 << 10, 'KB'],
+  ];
+  for (const [factor, unit] of units) {
+    if (numBytes >= factor) {
+      const value = numBytes / factor;
+      if (Number.isInteger(value)) return `${value} ${unit}`;
+      return `${value.toFixed(1)} ${unit}`;
+    }
+  }
+  return `${numBytes} bytes`;
+}
+
+function getUtf8ByteLength(input: string): number {
+  let byteLength = 0;
+  for (let i = 0; i < input.length; i++) {
+    const codeUnit = input.charCodeAt(i);
+    if (codeUnit < 0x80) {
+      byteLength += 1;
+    } else if (codeUnit < 0x800) {
+      byteLength += 2;
+    } else if (codeUnit >= 0xd800 && codeUnit <= 0xdbff) {
+      // Surrogate pair (4 bytes in UTF-8)
+      i += 1;
+      byteLength += 4;
+    } else {
+      byteLength += 3;
+    }
+  }
+  return byteLength;
+}
+
+function validateFileMounts(fileMounts?: { [key: string]: string } | null): Array<string> {
+  const errors: Array<string> = [];
+  if (!fileMounts) return errors;
+
+  let totalSizeBytes = 0;
+  for (const [mountPath, content] of Object.entries(fileMounts)) {
+    const sizeBytes = getUtf8ByteLength(content ?? '');
+    if (sizeBytes > FILE_MOUNT_MAX_SIZE_BYTES) {
+      const over = sizeBytes - FILE_MOUNT_MAX_SIZE_BYTES;
+      errors.push(
+        `file_mount '${mountPath}' is ${formatBytes(over)} over the limit (` +
+          `${formatBytes(sizeBytes)} / ${formatBytes(FILE_MOUNT_MAX_SIZE_BYTES)}). Use object_mounts instead.`,
+      );
+    }
+    totalSizeBytes += sizeBytes;
+  }
+
+  if (totalSizeBytes > FILE_MOUNT_TOTAL_MAX_SIZE_BYTES) {
+    const totalOver = totalSizeBytes - FILE_MOUNT_TOTAL_MAX_SIZE_BYTES;
+    errors.push(
+      `total file_mounts size is ${formatBytes(totalOver)} over the limit (` +
+        `${formatBytes(totalSizeBytes)} / ${formatBytes(FILE_MOUNT_TOTAL_MAX_SIZE_BYTES)}). Use object_mounts instead.`,
+    );
+  }
+
+  return errors;
+}
 
 export class Blueprints extends APIResource {
   /**
@@ -16,6 +81,10 @@ export class Blueprints extends APIResource {
    * 'building_complete' if the build is successful.
    */
   create(body: BlueprintCreateParams, options?: Core.RequestOptions): Core.APIPromise<BlueprintView> {
+    const errors = validateFileMounts(body?.file_mounts);
+    if (errors.length > 0) {
+      throw new Error(errors.join('; '));
+    }
     return this._client.post('/v1/blueprints', { body, ...options });
   }
 
@@ -101,6 +170,10 @@ export class Blueprints extends APIResource {
     body: BlueprintCreateFromInspectionParams,
     options?: Core.RequestOptions,
   ): Core.APIPromise<BlueprintView> {
+    const errors = validateFileMounts(body?.file_mounts);
+    if (errors.length > 0) {
+      throw new Error(errors.join('; '));
+    }
     return this._client.post('/v1/blueprints/create_from_inspection', { body, ...options });
   }
 

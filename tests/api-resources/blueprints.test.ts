@@ -65,6 +65,31 @@ describe('resource blueprints', () => {
     });
   });
 
+  test('create rejects large file_mount', () => {
+    const tooLargeContent = 'a'.repeat(131_000 + 1);
+    expect(() =>
+      client.blueprints.create({
+        name: 'name',
+        file_mounts: { '/tmp/large.txt': tooLargeContent },
+      }),
+    ).toThrow(/over the limit/);
+  });
+
+  test('create rejects total file_mount size', () => {
+    const perFileMax = 131_000;
+    const file_mounts: Record<string, string> = {};
+    for (let i = 0; i < 10; i++) {
+      file_mounts[`/tmp/${i}.txt`] = 'a'.repeat(perFileMax);
+    }
+    file_mounts['/tmp/extra.txt'] = 'x';
+    expect(() =>
+      client.blueprints.create({
+        name: 'name',
+        file_mounts,
+      }),
+    ).toThrow(/total file_mounts size .* over the limit/);
+  });
+
   test('retrieve', async () => {
     const responsePromise = client.blueprints.retrieve('id');
     const rawResponse = await responsePromise.asResponse();
