@@ -312,14 +312,16 @@ export interface ExecutionSendStdInParams {
 
 export interface ExecutionStreamStderrUpdatesParams {
   /**
-   * The byte offset to start the stream from
+   * The byte offset to start the stream from (if unspecified, starts from the
+   * beginning of the stream)
    */
   offset?: string;
 }
 
 export interface ExecutionStreamStdoutUpdatesParams {
   /**
-   * The byte offset to start the stream from
+   * The byte offset to start the stream from (if unspecified, starts from the
+   * beginning of the stream)
    */
   offset?: string;
 }
