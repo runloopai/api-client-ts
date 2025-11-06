@@ -30,27 +30,104 @@ export class ExecutionResult {
   }
 
   /**
-   * Get the stdout output from the execution.
-   *
-   * @param numLines - Optional number of lines to return (for future pagination support)
-   * @returns The stdout content
+   * Helper to get last N lines, filtering out trailing empty strings
    */
-  async stdout(numLines?: number): Promise<string> {
-    // For now, just return the stdout from the result
-    // In the future, this will support pagination when output is truncated
-    return this._result.stdout ?? '';
+  private getLastNLines(text: string, n: number): string {
+    if (n <= 0) {
+      return '';
+    }
+    const lines = text.split('\n');
+    // Remove trailing empty strings (from trailing newlines)
+    while (lines.length > 0 && lines[lines.length - 1] === '') {
+      lines.pop();
+    }
+    return lines.slice(-n).join('\n');
   }
 
   /**
-   * Get the stderr output from the execution.
+   * Helper to count non-empty lines (excluding trailing empty strings)
+   */
+  private countNonEmptyLines(text: string): number {
+    const countLines = text.split('\n');
+    // Remove trailing empty strings first
+    const trimmedLines = [...countLines];
+    while (trimmedLines.length > 0 && trimmedLines[trimmedLines.length - 1] === '') {
+      trimmedLines.pop();
+    }
+    // Filter out all empty strings (including those in the middle)
+    return trimmedLines.filter((line) => line !== '').length;
+  }
+
+  /**
+   * Common logic for getting output (stdout or stderr) with optional line limiting
+   */
+  private async getOutput(
+    currentOutput: string,
+    isOutputTruncated: boolean,
+    numLines: number | undefined,
+    streamFn: () => Promise<AsyncIterable<{ output: string }>>,
+  ): Promise<string> {
+    // If numLines is specified, check if we have enough lines already
+    if (numLines !== undefined) {
+      const nonEmptyCount = this.countNonEmptyLines(currentOutput);
+      if (!isOutputTruncated || nonEmptyCount >= numLines) {
+        // We have enough lines, return the last N lines
+        return this.getLastNLines(currentOutput, numLines);
+      }
+    }
+
+    // If output is truncated and we need all lines (or more than available), stream all logs
+    if (isOutputTruncated) {
+      const stream = await streamFn();
+      let output = '';
+      for await (const chunk of stream) {
+        output += chunk.output;
+      }
+
+      // If numLines was specified, return only the last N lines
+      if (numLines !== undefined) {
+        return this.getLastNLines(output, numLines);
+      }
+      return output;
+    }
+
+    // Output is not truncated, return what we have
+    if (numLines !== undefined) {
+      return this.getLastNLines(currentOutput, numLines);
+    }
+    return currentOutput;
+  }
+
+  /**
+   * Get the stdout output from the execution. If numLines is specified, it will return the last N lines. If numLines is not specified, it will return the entire stdout output.
+   * Note after the execution is completed, the stdout is not available anymore.
    *
-   * @param numLines - Optional number of lines to return (for future pagination support)
+   * @param numLines - Optional number of lines to return from the end (most recent logs)
+   * @returns The stdout content
+   */
+  async stdout(numLines?: number): Promise<string> {
+    const currentStdout = this._result.stdout ?? '';
+    const isOutputTruncated = this._result.stdout_truncated === true;
+
+    return this.getOutput(currentStdout, isOutputTruncated, numLines, () =>
+      this.client.devboxes.executions.streamStdoutUpdates(this._devboxId, this._executionId),
+    );
+  }
+
+  /**
+   * Get the stderr output from the execution. If numLines is specified, it will return the last N lines. If numLines is not specified, it will return the entire stderr output.
+   * Note after the execution is completed, the stderr is not available anymore.
+   *
+   * @param numLines - Optional number of lines to guarantee from the end (most recent logs)
    * @returns The stderr content
    */
   async stderr(numLines?: number): Promise<string> {
-    // For now, just return the stderr from the result
-    // In the future, this will collecting all of the stderr output until the execution completes. If output is truncated, it will return the truncated output.
-    return this._result.stderr ?? '';
+    const currentStderr = this._result.stderr ?? '';
+    const isOutputTruncated = this._result.stderr_truncated === true;
+
+    return this.getOutput(currentStderr, isOutputTruncated, numLines, () =>
+      this.client.devboxes.executions.streamStderrUpdates(this._devboxId, this._executionId),
+    );
   }
 
   /**

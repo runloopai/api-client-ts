@@ -50,6 +50,26 @@ describe('smoketest: executions', () => {
     expect(typeof received).toBe('string');
   });
 
+  test('tail stderr logs', async () => {
+    // Create a new execution that produces stderr output
+    const stderrExec = await client.devboxes.executions.executeAsync(devboxId!, {
+      command: 'echo "error output" >&2 && sleep 1',
+    });
+    const stderrExecId = stderrExec.execution_id;
+    await client.devboxes.executions.awaitCompleted(devboxId!, stderrExecId, {
+      polling: { maxAttempts: 120, pollingIntervalMs: 2_000, timeoutMs: 10 * 60 * 1000 },
+    });
+
+    const stream = await client.devboxes.executions.streamStderrUpdates(devboxId!, stderrExecId, {});
+    let received = '';
+    for await (const chunk of stream) {
+      received += chunk.output;
+      if (received.length > 0) break; // stop early to avoid long loops in CI
+    }
+    expect(typeof received).toBe('string');
+    expect(received).toContain('error output');
+  });
+
   test('executeAndAwaitCompletion', async () => {
     const completed = await client.devboxes.executeAndAwaitCompletion(devboxId!, {
       command: 'echo hello && sleep 1',
@@ -138,5 +158,48 @@ describe('smoketest: executions', () => {
     expect(outputLines[2]).toBe('line 3');
     expect(outputLines[3]).toBe('line 4');
     expect(outputLines[4]).toBe('line 5');
+  });
+
+  test('executeAndAwaitCompletion with stderr output', async () => {
+    // This test verifies that stderr output is captured
+    const completed = await client.devboxes.executeAndAwaitCompletion(devboxId!, {
+      command: 'echo "Error message" >&2',
+    });
+
+    expect(completed.status).toBe('completed');
+    expect(completed.stderr).toBeDefined();
+    expect(completed.stderr).toContain('Error message');
+  });
+
+  test('executeAndAwaitCompletion with multiple stderr lines', async () => {
+    // This test verifies that multiple lines of stderr are captured
+    const completed = await client.devboxes.executeAndAwaitCompletion(devboxId!, {
+      command: 'echo "error 1" >&2 && echo "error 2" >&2 && echo "error 3" >&2',
+    });
+
+    expect(completed.status).toBe('completed');
+    expect(completed.stderr).toBeDefined();
+
+    const errorLines = completed.stderr?.trim().split('\n') || [];
+    expect(errorLines.length).toBeGreaterThanOrEqual(3);
+    expect(completed.stderr).toContain('error 1');
+    expect(completed.stderr).toContain('error 2');
+    expect(completed.stderr).toContain('error 3');
+  });
+
+  test('executeAndAwaitCompletion with both stdout and stderr', async () => {
+    // This test verifies that both stdout and stderr are captured separately
+    const completed = await client.devboxes.executeAndAwaitCompletion(devboxId!, {
+      command: 'echo "stdout message" && echo "stderr message" >&2',
+    });
+
+    expect(completed.status).toBe('completed');
+    expect(completed.stdout).toBeDefined();
+    expect(completed.stderr).toBeDefined();
+    expect(completed.stdout).toContain('stdout message');
+    expect(completed.stderr).toContain('stderr message');
+    // Verify they are separate
+    expect(completed.stdout).not.toContain('stderr message');
+    expect(completed.stderr).not.toContain('stdout message');
   });
 });
