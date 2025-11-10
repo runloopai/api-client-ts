@@ -30,21 +30,20 @@ export class Execution {
     }
   }
 
-  // Doesn't work as expected, the execution is killed when the stdin is sent.
-  // /**
-  //  * Send input to the execution's stdin.
-  //  *
-  //  * @param input - The input to send
-  //  * @param options - Request options
-  //  */
-  // async sendStdIn(input: string, options?: Core.RequestOptions): Promise<void> {
-  //   await this.client.devboxes.executions.sendStdIn(
-  //     this._devboxId,
-  //     this._executionId,
-  //     { text: input },
-  //     options,
-  //   );
-  // }
+  /**
+   * Send input to the execution's stdin.
+   *
+   * @param input - The input to send
+   * @param options - Request options
+   */
+  async sendStdIn(input: string, options?: Core.RequestOptions): Promise<void> {
+    await this.client.devboxes.executions.sendStdIn(
+      this._devboxId,
+      this._executionId,
+      { text: input },
+      options,
+    );
+  }
 
   /**
    * Wait for the execution to complete and return the result.
