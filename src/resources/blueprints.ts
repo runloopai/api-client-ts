@@ -468,7 +468,7 @@ export interface BlueprintView {
   /**
    * The status of the Blueprint build.
    */
-  status: 'provisioning' | 'building' | 'failed' | 'build_complete';
+  status: 'queued' | 'provisioning' | 'building' | 'failed' | 'build_complete';
 
   /**
    * The ID of the base Blueprint.
