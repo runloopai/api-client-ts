@@ -54,3 +54,6 @@ if [ -e ./scripts/build-deno ]
 then
   ./scripts/build-deno
 fi
+
+# Generate SDK documentation
+yarn docs:sdk

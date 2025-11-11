@@ -1,18 +1,99 @@
 import { Runloop, type ClientOptions } from './index';
-import { Devbox } from './objects/devbox';
-import { Blueprint } from './objects/blueprint';
-import { Snapshot } from './objects/snapshot';
-import { StorageObject } from './objects/storage-object';
+import { Devbox } from './sdk/devbox';
+import { Blueprint } from './sdk/blueprint';
+import { Snapshot } from './sdk/snapshot';
+import { StorageObject } from './sdk/storage-object';
+import { Execution } from './sdk/execution';
+import { ExecutionResult } from './sdk/execution-result';
+
+// Re-export SDK classes for documentation
+export { Devbox, Blueprint, Snapshot, StorageObject, Execution, ExecutionResult };
+
+// Re-export types from core
 import type * as Core from './core';
+export type { RequestOptions } from './core';
+
+// Re-export types from lib
+import { PollingOptions } from './lib/polling';
+export { PollingOptions };
+
+// Re-export types from resources/devboxes
 import type {
   DevboxCreateParams,
   DevboxListDiskSnapshotsParams,
   DevboxListParams,
   DevboxView,
+  DevboxAsyncExecutionDetailView,
+  DevboxExecutionDetailView,
+  DevboxSnapshotDiskParams,
+  DevboxCreateTunnelParams,
+  DevboxRemoveTunnelParams,
+  DevboxReadFileContentsParams,
+  DevboxWriteFileContentsParams,
+  DevboxDownloadFileParams,
+  DevboxUploadFileParams,
+  DevboxExecuteParams,
+  DevboxExecuteAsyncParams,
+  DevboxSnapshotView,
+  DevboxCreateSSHKeyResponse,
+  DevboxTunnelView,
 } from './resources/devboxes/devboxes';
-import type { BlueprintCreateParams, BlueprintListParams } from './resources/blueprints';
-import type { ObjectCreateParams, ObjectListParams } from './resources/objects';
-import { PollingOptions } from './lib/polling';
+
+export type {
+  DevboxCreateParams,
+  DevboxListDiskSnapshotsParams,
+  DevboxListParams,
+  DevboxView,
+  DevboxAsyncExecutionDetailView,
+  DevboxExecutionDetailView,
+  DevboxSnapshotDiskParams,
+  DevboxCreateTunnelParams,
+  DevboxRemoveTunnelParams,
+  DevboxReadFileContentsParams,
+  DevboxWriteFileContentsParams,
+  DevboxDownloadFileParams,
+  DevboxUploadFileParams,
+  DevboxExecuteParams,
+  DevboxExecuteAsyncParams,
+  DevboxSnapshotView,
+  DevboxCreateSSHKeyResponse,
+  DevboxTunnelView,
+};
+
+// Re-export types from resources/devboxes/disk-snapshots
+import type {
+  DevboxSnapshotAsyncStatusView,
+  DiskSnapshotUpdateParams,
+} from './resources/devboxes/disk-snapshots';
+
+export type { DevboxSnapshotAsyncStatusView, DiskSnapshotUpdateParams };
+
+// Re-export types from resources/blueprints
+import type {
+  BlueprintCreateParams,
+  BlueprintListParams,
+  BlueprintView,
+  BlueprintBuildLogsListView,
+} from './resources/blueprints';
+
+export type { BlueprintCreateParams, BlueprintListParams, BlueprintView, BlueprintBuildLogsListView };
+
+// Re-export types from resources/objects
+import type {
+  ObjectCreateParams,
+  ObjectListParams,
+  ObjectView,
+  ObjectDownloadURLView,
+} from './resources/objects';
+
+export type { ObjectCreateParams, ObjectListParams, ObjectView, ObjectDownloadURLView };
+
+// Re-export ExecuteStreamingCallbacks from devbox
+export type { ExecuteStreamingCallbacks } from './sdk/devbox';
+
+// Re-export Runloop and ClientOptions
+export { Runloop };
+export type { ClientOptions };
 
 // Extract the content type from the API types
 type ContentType = ObjectCreateParams['content_type'];

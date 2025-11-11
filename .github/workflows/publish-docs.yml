@@ -1,0 +1,130 @@
+name: Publish Docs
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'src/**'
+      - 'typedoc.json'
+      - 'tsconfig.typedoc.json'
+      - 'package.json'
+      - 'README-SDK.md'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  publish-docs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Build project
+        run: yarn build
+
+      - name: Build documentation
+        run: yarn docs:sdk
+
+      - name: Get version from package.json
+        id: package-version
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Built docs for version: $VERSION"
+
+      - name: Check if gh-pages branch exists
+        id: check-branch
+        run: |
+          if git ls-remote --heads origin gh-pages | grep -q gh-pages; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create gh-pages branch if it doesn't exist
+        if: steps.check-branch.outputs.exists == 'false'
+        run: |
+          git checkout --orphan gh-pages
+          git rm -rf . || true
+          mkdir -p docs
+          touch docs/.gitkeep
+          git add docs/.gitkeep
+          git commit -m "Initial commit for gh-pages branch"
+          git push origin gh-pages
+
+      - name: Checkout gh-pages branch
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          path: gh-pages
+          fetch-depth: 0
+
+      - name: Copy documentation to gh-pages
+        run: |
+          # Create docs directory if it doesn't exist
+          mkdir -p gh-pages/docs
+          
+          # The plugin creates versioned directories and symlinks automatically
+          # Copy the entire docs directory structure to preserve all versions
+          # Use -a to preserve symlinks and directory structure
+          if [ -d "docs" ]; then
+            # Copy all contents from docs to gh-pages/docs
+            # This preserves version directories and symlinks created by the plugin
+            cp -a docs/* gh-pages/docs/ 2>/dev/null || cp -r docs/* gh-pages/docs/
+            echo "Copied documentation to gh-pages/docs/"
+          else
+            echo "Warning: docs directory not found"
+            exit 1
+          fi
+          
+          # List what was copied for debugging
+          echo "Contents of gh-pages/docs:"
+          ls -la gh-pages/docs/ || true
+
+      - name: Create index.html redirect
+        run: |
+          # Create an index.html in gh-pages root that redirects to docs
+          # This allows GitHub Pages to serve the docs when configured to deploy from gh-pages branch
+          VERSION="${{ steps.package-version.outputs.version }}"
+          cat > gh-pages/index.html <<EOF
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <meta http-equiv="refresh" content="0; url=./docs/$VERSION/">
+            <link rel="canonical" href="./docs/$VERSION/">
+          </head>
+          <body>
+            <p>Redirecting to <a href="./docs/$VERSION/">documentation</a>...</p>
+          </body>
+          </html>
+          EOF
+
+      - name: Commit and push to gh-pages
+        run: |
+          cd gh-pages
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          
+          # Check if there are changes to commit
+          if [ -n "$(git status --porcelain)" ]; then
+            git add -A
+            git commit -m "docs: Update documentation for version ${{ steps.package-version.outputs.version }} [skip ci]"
+            git push origin gh-pages
+          else
+            echo "No changes to commit"
+          fi
+

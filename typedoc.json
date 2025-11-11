@@ -1,0 +1,62 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "entryPoints": [
+    "src/sdk.ts"
+  ],
+  "entryPointStrategy": "expand",
+  "out": "docs",
+  "tsconfig": "tsconfig.typedoc.json",
+  "includeVersion": true,
+  "readme": "README-SDK.md",
+  "name": "Runloop SDK API Reference",
+  "excludePrivate": true,
+  "excludeProtected": false,
+  "excludeInternal": false,
+  "excludeExternals": false,
+  "plugin": [
+    "typedoc-material-theme",
+    "typedoc-plugin-pages",
+    "typedoc-plugin-include-example",
+    "typedoc-plugin-mdn-links",
+    "@shipgirl/typedoc-plugin-versions"
+  ],
+  "versions": {
+    "makeRelativeLinks": true
+  },
+  "themeColor": "#1976d2",
+  "navigation": {
+    "includeCategories": true,
+    "includeGroups": true
+  },
+  "categorizeByGroup": true,
+  "searchInComments": true,
+  "sort": [
+    "source-order"
+  ],
+  "kindSortOrder": [
+    "Project",
+    "Module",
+    "Namespace",
+    "Enum",
+    "Class",
+    "Interface",
+    "TypeAlias",
+    "Constructor",
+    "Property",
+    "Method",
+    "Accessor",
+    "Function",
+    "Variable"
+  ],
+  "visibilityFilters": {
+    "protected": false,
+    "private": false,
+    "inherited": true,
+    "external": true
+  },
+  "validation": {
+    "invalidLink": true,
+    "notDocumented": false
+  }
+}
+

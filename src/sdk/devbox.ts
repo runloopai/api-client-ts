@@ -34,6 +34,161 @@ export interface ExecuteStreamingCallbacks {
 
 /**
  * Object-oriented interface for working with Devboxes.
+ *
+ * ## Overview
+ *
+ * The `Devbox` class provides a high-level, object-oriented API for managing devboxes.
+ * It wraps the low-level API client and provides convenient methods for common operations.
+ *
+ * ## Creating Devboxes
+ *
+ * ### Basic Creation
+ * ```typescript
+ * import { RunloopSDK } from '@runloop/api-client-ts';
+ *
+ * const runloop = new RunloopSDK();
+ * const devbox = await runloop.devbox.create({ name: 'my-devbox' });
+ * console.log(`Created devbox: ${devbox.id}`);
+ * ```
+ *
+ * ### Create from Blueprint
+ * ```typescript
+ * const runloop = new RunloopSDK();
+ * // Using blueprint ID
+ * const devbox = await runloop.devbox.createFromBlueprintId('blueprint-123', {
+ *   name: 'my-devbox',
+ * });
+ *
+ * // Using blueprint name
+ * const devbox = await runloop.devbox.createFromBlueprintName('my-blueprint', {
+ *   name: 'my-devbox',
+ * });
+ * ```
+ *
+ * ### Create from Snapshot
+ * ```typescript
+ * const runloop = new RunloopSDK();
+ * const devbox = await runloop.devbox.createFromSnapshot('snapshot-123', {
+ *   name: 'restored-devbox',
+ * });
+ * ```
+ *
+ * ## Command Execution
+ *
+ * ### Synchronous Execution
+ * ```typescript
+ * const result = await devbox.cmd.exec({ command: 'echo "Hello, World!"' });
+ * console.log(`Exit code: ${result.exitCode}`);
+ * console.log(`Output: ${await result.stdout()}`);
+ * ```
+ *
+ * ### Execution with Streaming Logs
+ * ```typescript
+ * const result = await devbox.cmd.exec({
+ *   command: 'npm install',
+ *   stdout: (line) => console.log(`[stdout] ${line}`),
+ *   stderr: (line) => console.error(`[stderr] ${line}`),
+ * });
+ * ```
+ *
+ * ### Asynchronous Execution
+ * ```typescript
+ * const execution = await devbox.cmd.execAsync({
+ *   command: 'long-running-task',
+ *   stdout: (line) => console.log(line),
+ * });
+ *
+ * // Do other work...
+ *
+ * const result = await execution.result();
+ * console.log(`Completed with exit code: ${result.exitCode}`);
+ * ```
+ *
+ * ## File Operations
+ *
+ * ### Read File
+ * ```typescript
+ * const content = await devbox.file.read({ path: '/app/config.json' });
+ * console.log(content);
+ * ```
+ *
+ * ### Write File
+ * ```typescript
+ * await devbox.file.write({
+ *   path: '/app/config.json',
+ *   contents: JSON.stringify({ key: 'value' }),
+ * });
+ * ```
+ *
+ * ### Upload File
+ * ```typescript
+ * await devbox.file.upload({
+ *   path: '/app/data.txt',
+ *   file: new File(['content'], 'data.txt'),
+ * });
+ * ```
+ *
+ * ### Download File
+ * ```typescript
+ * const response = await devbox.file.download({ path: '/app/output.txt' });
+ * const blob = await response.blob();
+ * ```
+ *
+ * ## Lifecycle Management
+ *
+ * ### Suspend and Resume
+ * ```typescript
+ * // Suspend devbox (creates snapshot)
+ * await devbox.suspend();
+ *
+ * // Resume later
+ * await devbox.resume();
+ * ```
+ *
+ * ### Create Snapshot
+ * ```typescript
+ * // Create snapshot and wait for completion
+ * const snapshot = await devbox.snapshotDisk({ name: 'backup' });
+ * console.log(`Snapshot created: ${snapshot.id}`);
+ *
+ * // Create snapshot asynchronously
+ * const snapshot = await devbox.snapshotDiskAsync({ name: 'backup' });
+ * await snapshot.awaitCompleted();
+ * ```
+ *
+ * ### Shutdown
+ * ```typescript
+ * await devbox.shutdown();
+ * ```
+ *
+ * ## Network Operations
+ *
+ * ### Create SSH Key
+ * ```typescript
+ * const sshKey = await devbox.net.createSSHKey();
+ * console.log(`SSH Key: ${sshKey.public_key}`);
+ * ```
+ *
+ * ### Create Tunnel
+ * ```typescript
+ * const tunnel = await devbox.net.createTunnel({ port: 8080 });
+ * console.log(`Tunnel URL: ${tunnel.url}`);
+ * ```
+ *
+ * ## Working with Existing Devboxes
+ *
+ * ```typescript
+ * const runloop = new RunloopSDK();
+ * // Get devbox by ID
+ * const devbox = runloop.devbox.fromId('devbox-123');
+ *
+ * // Get current info
+ * const info = await devbox.getInfo();
+ * console.log(`Status: ${info.status}`);
+ *
+ * // Wait for running state
+ * await devbox.awaitRunning();
+ * ```
  */
 export class Devbox {
   private client: Runloop;
@@ -47,6 +202,13 @@ export class Devbox {
   /**
    * Create a new Devbox and wait for it to reach the running state.
    * This is the recommended way to create a devbox as it ensures it's ready to use.
+   *
+   * @example
+   * ```typescript
+   * const runloop = new RunloopSDK();
+   * const devbox = await runloop.devbox.create({ name: 'my-devbox' });
+   * console.log(`Devbox ${devbox.id} is ready!`);
+   * ```
    *
    * @param client - The Runloop client instance
    * @param params - Parameters for creating the devbox
@@ -246,6 +408,20 @@ export class Devbox {
        * When callbacks are provided, this method waits for both the command to complete
        * AND all streaming data to be processed before returning.
        *
+       * @example
+       * ```typescript
+       * // Simple execution
+       * const result = await devbox.cmd.exec({ command: 'ls -la' });
+       * console.log(await result.stdout());
+       *
+       * // With streaming callbacks
+       * const result = await devbox.cmd.exec({
+       *   command: 'npm install',
+       *   stdout: (line) => process.stdout.write(line),
+       *   stderr: (line) => process.stderr.write(line),
+       * });
+       * ```
+       *
        * @param params - Parameters containing the command, optional shell name, and optional callbacks
        * @param options - Request options with optional polling configuration
        * @returns ExecutionResult with stdout, stderr, and exit status
@@ -296,6 +472,21 @@ export class Devbox {
        * Callbacks fire in real-time as logs arrive. When you call execution.result(),
        * it will wait for both the command to complete and all streaming to finish.
        *
+       * @example
+       * ```typescript
+       * const execution = await devbox.cmd.execAsync({
+       *   command: 'long-running-task.sh',
+       *   stdout: (line) => console.log(`[LOG] ${line}`),
+       * });
+       *
+       * // Do other work while command runs...
+       *
+       * const result = await execution.result();
+       * if (result.success) {
+       *   console.log('Task completed successfully!');
+       * }
+       * ```
+       *
        * @param params - Parameters containing the command, optional shell name, and optional callbacks
        * @param options - Request options
        * @returns Execution object for tracking and controlling the command
@@ -327,6 +518,12 @@ export class Devbox {
       /**
        * Read file contents from the devbox as a UTF-8 string.
        *
+       * @example
+       * ```typescript
+       * const content = await devbox.file.read({ path: '/app/config.json' });
+       * const config = JSON.parse(content);
+       * ```
+       *
        * @param params - Parameters containing the file path
        * @param options - Request options
        * @returns File contents as a string
@@ -337,6 +534,14 @@ export class Devbox {
 
       /**
        * Write UTF-8 string contents to a file on the devbox.
+       *
+       * @example
+       * ```typescript
+       * await devbox.file.write({
+       *   path: '/app/config.json',
+       *   contents: JSON.stringify({ key: 'value' }, null, 2),
+       * });
+       * ```
        *
        * @param params - Parameters containing the file path and contents
        * @param options - Request options
@@ -399,6 +604,12 @@ export class Devbox {
 
   /**
    * Create a disk snapshot of the devbox. Returns a snapshot that is completed. If you don't want to block on completion, use snapshotDiskAsync().
+   *
+   * @example
+   * ```typescript
+   * const snapshot = await devbox.snapshotDisk({ name: 'pre-deployment' });
+   * console.log(`Snapshot ${snapshot.id} created successfully`);
+   * ```
    */
   async snapshotDisk(
     params?: DevboxSnapshotDiskParams,
@@ -412,6 +623,13 @@ export class Devbox {
 
   /**
    * Create a disk snapshot of the devbox asynchronously. Returns a snapshot that is not yet completed but has started. You can await completion using snapshot.awaitCompleted().
+   *
+   * @example
+   * ```typescript
+   * const snapshot = await devbox.snapshotDiskAsync({ name: 'backup' });
+   * // Do other work...
+   * await snapshot.awaitCompleted();
+   * ```
    */
   async snapshotDiskAsync(
     params?: DevboxSnapshotDiskParams,
