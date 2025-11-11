@@ -18,9 +18,9 @@ module.exports = {
   ],
   testMatch: ['**/tests/smoketests/object-oriented/**/*.test.ts'],
   collectCoverageFrom: [
-    'src/objects/**/*.ts',
+    'src/sdk/**/*.ts',
     'src/sdk.ts',
-    '!src/objects/index.ts',
+    '!src/sdk/index.ts',
     '!**/*.d.ts',
     '!**/node_modules/**',
   ],
