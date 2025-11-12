@@ -21,10 +21,117 @@ export interface AgentMountParameters {
   type: 'agent_mount';
 
   /**
-   * Optional path to mount the agent on the Devbox. Required for git and object
-   * agents. Use absolute path (e.g., /home/user/agent)
+   * Path to mount the agent on the Devbox. Required for git and object agents. Use
+   * absolute path (e.g., /home/user/agent)
    */
   agent_path?: string | null;
+
+  /**
+   * Optional auth token for private repositories. Only used for git agents.
+   */
+  auth_token?: string | null;
+}
+
+/**
+ * Agent source configuration.
+ */
+export interface AgentSource {
+  /**
+   * Source type: npm, pip, object, or git
+   */
+  type: string;
+
+  /**
+   * Git source configuration
+   */
+  git?: AgentSource.Git | null;
+
+  /**
+   * NPM source configuration
+   */
+  npm?: AgentSource.Npm | null;
+
+  /**
+   * Object store source configuration
+   */
+  object?: AgentSource.Object | null;
+
+  /**
+   * Pip source configuration
+   */
+  pip?: AgentSource.Pip | null;
+}
+
+export namespace AgentSource {
+  /**
+   * Git source configuration
+   */
+  export interface Git {
+    /**
+     * Git repository URL
+     */
+    repository: string;
+
+    /**
+     * Optional Git ref (branch/tag/commit), defaults to main/HEAD
+     */
+    ref?: string | null;
+
+    /**
+     * Setup commands to run after cloning
+     */
+    setup?: Array<string> | null;
+  }
+
+  /**
+   * NPM source configuration
+   */
+  export interface Npm {
+    /**
+     * NPM package name
+     */
+    package_name: string;
+
+    /**
+     * NPM version constraint
+     */
+    npm_version?: string | null;
+
+    /**
+     * NPM registry URL
+     */
+    registry_url?: string | null;
+  }
+
+  /**
+   * Object store source configuration
+   */
+  export interface Object {
+    /**
+     * Object ID
+     */
+    object_id: string;
+  }
+
+  /**
+   * Pip source configuration
+   */
+  export interface Pip {
+    /**
+     * Pip package name
+     */
+    package_name: string;
+
+    /**
+     * Pip version constraint
+     */
+    pip_version?: string | null;
+
+    /**
+     * Pip registry URL
+     */
+    registry_url?: string | null;
+  }
 }
 
 export interface CodeMountParameters {

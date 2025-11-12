@@ -342,8 +342,8 @@ export class Devboxes extends APIResource {
   }
 
   /**
-   * List all snapshots of a Devbox while optionally filtering by Devbox ID and
-   * metadata.
+   * List all snapshots of a Devbox while optionally filtering by Devbox ID, source
+   * Blueprint ID, and metadata.
    */
   listDiskSnapshots(
     query?: DevboxListDiskSnapshotsParams,
@@ -703,6 +703,11 @@ export interface DevboxSnapshotView {
    * (Optional) The custom name of the snapshot.
    */
   name?: string | null;
+
+  /**
+   * (Optional) The source Blueprint ID this snapshot was created from.
+   */
+  source_blueprint_id?: string | null;
 }
 
 export interface DevboxTunnelView {
@@ -1088,6 +1093,11 @@ export interface DevboxListDiskSnapshotsParams extends DiskSnapshotsCursorIDPage
    * Filter snapshots by metadata key with multiple possible values (OR condition).
    */
   'metadata[key][in]'?: string;
+
+  /**
+   * Source Blueprint ID to filter snapshots by.
+   */
+  source_blueprint_id?: string;
 }
 
 export interface DevboxReadFileContentsParams {

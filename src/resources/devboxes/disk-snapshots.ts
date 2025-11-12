@@ -31,8 +31,8 @@ export class DiskSnapshots extends APIResource {
   }
 
   /**
-   * List all snapshots of a Devbox while optionally filtering by Devbox ID and
-   * metadata.
+   * List all snapshots of a Devbox while optionally filtering by Devbox ID, source
+   * Blueprint ID, and metadata.
    */
   list(
     query?: DiskSnapshotListParams,
@@ -157,6 +157,11 @@ export interface DiskSnapshotListParams extends DiskSnapshotsCursorIDPageParams 
    * Filter snapshots by metadata key with multiple possible values (OR condition).
    */
   'metadata[key][in]'?: string;
+
+  /**
+   * Source Blueprint ID to filter snapshots by.
+   */
+  source_blueprint_id?: string;
 }
 
 export declare namespace DiskSnapshots {
