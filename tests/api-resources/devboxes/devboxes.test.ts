@@ -305,6 +305,7 @@ describe('resource devboxes', () => {
           limit: 0,
           'metadata[key]': 'metadata[key]',
           'metadata[key][in]': 'metadata[key][in]',
+          source_blueprint_id: 'source_blueprint_id',
           starting_after: 'starting_after',
         },
         { path: '/_stainless_unknown_path' },

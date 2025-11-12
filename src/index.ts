@@ -5,6 +5,8 @@ import * as Core from './core';
 import * as Errors from './error';
 import * as Pagination from './pagination';
 import {
+  type AgentsCursorIDPageParams,
+  AgentsCursorIDPageResponse,
   type BenchmarkRunsCursorIDPageParams,
   BenchmarkRunsCursorIDPageResponse,
   type BenchmarksCursorIDPageParams,
@@ -28,6 +30,15 @@ import {
 } from './pagination';
 import * as Uploads from './uploads';
 import * as API from './resources/index';
+import {
+  AgentCreateParameters,
+  AgentCreateParams,
+  AgentListParams,
+  AgentListView,
+  AgentView,
+  AgentViewsAgentsCursorIDPage,
+  Agents,
+} from './resources/agents';
 import {
   BlueprintBuildFromInspectionParameters,
   BlueprintBuildLog,
@@ -282,6 +293,7 @@ export class Runloop extends Core.APIClient {
   }
 
   benchmarks: API.Benchmarks = new API.Benchmarks(this);
+  agents: API.Agents = new API.Agents(this);
   blueprints: API.Blueprints = new API.Blueprints(this);
   devboxes: API.Devboxes = new API.Devboxes(this);
   scenarios: API.Scenarios = new API.Scenarios(this);
@@ -334,6 +346,8 @@ export class Runloop extends Core.APIClient {
 
 Runloop.Benchmarks = Benchmarks;
 Runloop.BenchmarkViewsBenchmarksCursorIDPage = BenchmarkViewsBenchmarksCursorIDPage;
+Runloop.Agents = Agents;
+Runloop.AgentViewsAgentsCursorIDPage = AgentViewsAgentsCursorIDPage;
 Runloop.Blueprints = Blueprints;
 Runloop.BlueprintViewsBlueprintsCursorIDPage = BlueprintViewsBlueprintsCursorIDPage;
 Runloop.Devboxes = Devboxes;
@@ -378,6 +392,12 @@ export declare namespace Runloop {
   export {
     type BenchmarksCursorIDPageParams as BenchmarksCursorIDPageParams,
     type BenchmarksCursorIDPageResponse as BenchmarksCursorIDPageResponse,
+  };
+
+  export import AgentsCursorIDPage = Pagination.AgentsCursorIDPage;
+  export {
+    type AgentsCursorIDPageParams as AgentsCursorIDPageParams,
+    type AgentsCursorIDPageResponse as AgentsCursorIDPageResponse,
   };
 
   export import BenchmarkRunsCursorIDPage = Pagination.BenchmarkRunsCursorIDPage;
@@ -425,6 +445,16 @@ export declare namespace Runloop {
     type BenchmarkDefinitionsParams as BenchmarkDefinitionsParams,
     type BenchmarkListPublicParams as BenchmarkListPublicParams,
     type BenchmarkStartRunParams as BenchmarkStartRunParams,
+  };
+
+  export {
+    Agents as Agents,
+    type AgentCreateParameters as AgentCreateParameters,
+    type AgentListView as AgentListView,
+    type AgentView as AgentView,
+    AgentViewsAgentsCursorIDPage as AgentViewsAgentsCursorIDPage,
+    type AgentCreateParams as AgentCreateParams,
+    type AgentListParams as AgentListParams,
   };
 
   export {
@@ -554,6 +584,7 @@ export declare namespace Runloop {
 
   export type AfterIdle = API.AfterIdle;
   export type AgentMountParameters = API.AgentMountParameters;
+  export type AgentSource = API.AgentSource;
   export type CodeMountParameters = API.CodeMountParameters;
   export type LaunchParameters = API.LaunchParameters;
   export type Mount = API.Mount;

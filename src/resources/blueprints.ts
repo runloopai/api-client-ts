@@ -46,7 +46,9 @@ export class Blueprints extends APIResource {
   }
 
   /**
-   * Delete a previously created Blueprint.
+   * Delete a previously created Blueprint. If a blueprint has dependent snapshots,
+   * it cannot be deleted. You can find them by querying: GET
+   * /v1/devboxes/disk_snapshots?source_blueprint_id={blueprint_id}.
    */
   delete(id: string, options?: Core.RequestOptions): Core.APIPromise<unknown> {
     return this._client.post(`/v1/blueprints/${id}/delete`, options);
