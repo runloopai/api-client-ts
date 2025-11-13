@@ -121,7 +121,8 @@ describe('smoketest: object-oriented snapshot', () => {
 
       // Verify it's deleted by trying to get info (should fail)
       try {
-        await snapshot.getInfo();
+        const status = await snapshot.getInfo();
+        status.
         fail('Expected snapshot to be deleted');
       } catch (error) {
         expect(error).toBeDefined();

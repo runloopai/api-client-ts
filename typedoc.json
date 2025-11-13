@@ -4,7 +4,7 @@
     "src/sdk.ts"
   ],
   "entryPointStrategy": "expand",
-  "out": "docs",
+  "out": "../docs/reference/ts",
   "tsconfig": "tsconfig.typedoc.json",
   "includeVersion": true,
   "readme": "README-SDK.md",
@@ -14,16 +14,17 @@
   "excludeInternal": false,
   "excludeExternals": false,
   "plugin": [
-    "typedoc-material-theme",
-    "typedoc-plugin-pages",
-    "typedoc-plugin-include-example",
-    "typedoc-plugin-mdn-links",
-    "@shipgirl/typedoc-plugin-versions"
+    "typedoc-plugin-markdown",
+    "typedoc-mintlify"
   ],
-  "versions": {
-    "makeRelativeLinks": true
-  },
-  "themeColor": "#1976d2",
+  "theme": "mintlify",
+  "mintlifyComponents": true,
+  "generateMintlifyNav": false,
+  "fileExtension": ".mdx",
+  "entryFileName": "index",
+  "flattenOutputFiles": false,
+  "outputFileStrategy": "members",
+  "membersWithOwnFile": ["Class", "Interface", "Function", "Enum", "TypeAlias"],
   "navigation": {
     "includeCategories": true,
     "includeGroups": true
@@ -57,6 +58,11 @@
   "validation": {
     "invalidLink": true,
     "notDocumented": false
+  },
+  "externalSymbolLinkMappings": {
+    "@runloop/api-client": {
+      "BlobLikePart": "#"
+    }
   }
 }
 
