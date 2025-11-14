@@ -49,6 +49,10 @@
     "@runloop/api-client": {
       "BlobLikePart": "#"
     }
+  },
+  "navigationLinks": {
+    "GitHub": "https://github.com/runloopai/api-client-ts",
+    "Documentation": "https://docs.runloop.ai"
   }
 }
 
