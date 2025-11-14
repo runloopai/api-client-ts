@@ -109,7 +109,7 @@ export interface DevboxSnapshotAsyncStatusView {
   /**
    * The current status of the snapshot operation.
    */
-  status: 'in_progress' | 'error' | 'complete';
+  status: 'in_progress' | 'error' | 'complete' | 'deleted';
 
   /**
    * Error message if the operation failed.
