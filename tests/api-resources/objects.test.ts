@@ -25,6 +25,7 @@ describe('resource objects', () => {
       content_type: 'unspecified',
       name: 'name',
       metadata: { foo: 'string' },
+      ttl_ms: 0,
     });
   });
 
@@ -69,12 +70,12 @@ describe('resource objects', () => {
     await expect(
       client.objects.list(
         {
-          content_type: 'content_type',
+          content_type: 'unspecified',
           limit: 0,
           name: 'name',
           search: 'search',
           starting_after: 'starting_after',
-          state: 'state',
+          state: 'UPLOADING',
         },
         { path: '/_stainless_unknown_path' },
       ),
@@ -165,12 +166,12 @@ describe('resource objects', () => {
     await expect(
       client.objects.listPublic(
         {
-          content_type: 'content_type',
+          content_type: 'unspecified',
           limit: 0,
           name: 'name',
           search: 'search',
           starting_after: 'starting_after',
-          state: 'state',
+          state: 'UPLOADING',
         },
         { path: '/_stainless_unknown_path' },
       ),
