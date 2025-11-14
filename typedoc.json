@@ -39,8 +39,7 @@
     "protected": false,
     "private": false,
     "inherited": true,
-    "external": true,
-    "internal": false
+    "external": true
   },
   "validation": {
     "invalidLink": true,

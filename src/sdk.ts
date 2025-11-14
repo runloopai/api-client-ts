@@ -133,6 +133,7 @@ export namespace RunloopSDK {
   export class DevboxInterface {
     /**
      * @internal
+     * @private
      */
     constructor(private client: Runloop) {}
 
@@ -189,6 +190,7 @@ export namespace RunloopSDK {
   export class BlueprintInterface {
     /**
      * @internal
+     * @private
      */
     constructor(private client: Runloop) {}
 
@@ -221,6 +223,7 @@ export namespace RunloopSDK {
   export class SnapshotInterface {
     /**
      * @internal
+     * @private
      */
     constructor(private client: Runloop) {}
 
@@ -234,11 +237,23 @@ export namespace RunloopSDK {
   }
 
   /**
-   * Storage object management interface
+   *
+   * ## Overview
+   *
+   * The `StorageObjectInterface` class provides a high-level API for managing storage objects,
+   * which are files stored in Runloop's object storage. Storage objects can be uploaded,
+   * downloaded, and managed with metadata.
+   *
+   * runloop.storageObject.create({
+   *   name: 'my-file.txt',
+   *   content_type: 'text',
+   *   metadata: { project: 'demo' },
+   * });
    */
   export class StorageObjectInterface {
     /**
      * @internal
+     * @private
      */
     constructor(private client: Runloop) {}
 
