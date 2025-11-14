@@ -34,8 +34,8 @@
     "docs:sdk:markdown": "typedoc --options typedoc.markdown.json",
     "docs": "typedoc --options typedoc.json",
     "docs:watch": "typedoc --options typedoc.json --watch",
-    "preDeploy": "yarn docs:sdk",
-    "deploy": "gh-pages -d typedoc"
+    "predeploy-gh-pages": "yarn docs:sdk",
+    "deploy-gh-pages": "gh-pages -d typedoc"
   },
   "dependencies": {
     "@types/node": "^18.11.18",
