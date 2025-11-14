@@ -4,27 +4,13 @@
     "src/sdk.ts"
   ],
   "entryPointStrategy": "expand",
-  "out": "../docs/reference/ts",
+  "out": "typedoc/",
   "tsconfig": "tsconfig.typedoc.json",
   "includeVersion": true,
   "readme": "README-SDK.md",
-  "name": "Runloop SDK API Reference",
-  "excludePrivate": true,
-  "excludeProtected": false,
-  "excludeInternal": false,
-  "excludeExternals": false,
   "plugin": [
-    "typedoc-plugin-markdown",
-    "typedoc-mintlify"
+    "typedoc-github-theme"
   ],
-  "theme": "mintlify",
-  "mintlifyComponents": true,
-  "generateMintlifyNav": false,
-  "fileExtension": ".mdx",
-  "entryFileName": "index",
-  "flattenOutputFiles": false,
-  "outputFileStrategy": "members",
-  "membersWithOwnFile": ["Class", "Interface", "Function", "Enum", "TypeAlias"],
   "navigation": {
     "includeCategories": true,
     "includeGroups": true
