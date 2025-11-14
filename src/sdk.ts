@@ -131,6 +131,9 @@ export namespace RunloopSDK {
    * Devbox management interface
    */
   export class DevboxInterface {
+    /**
+     * @internal
+     */
     constructor(private client: Runloop) {}
 
     async create(
@@ -184,6 +187,9 @@ export namespace RunloopSDK {
    * Blueprint management interface
    */
   export class BlueprintInterface {
+    /**
+     * @internal
+     */
     constructor(private client: Runloop) {}
 
     async create(
@@ -213,6 +219,9 @@ export namespace RunloopSDK {
    * Snapshot management interface
    */
   export class SnapshotInterface {
+    /**
+     * @internal
+     */
     constructor(private client: Runloop) {}
 
     fromId(id: string): Snapshot {
@@ -228,6 +237,9 @@ export namespace RunloopSDK {
    * Storage object management interface
    */
   export class StorageObjectInterface {
+    /**
+     * @internal
+     */
     constructor(private client: Runloop) {}
 
     async create(
