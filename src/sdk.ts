@@ -129,10 +129,28 @@ export class RunloopSDK {
 export namespace RunloopSDK {
   /**
    * Devbox management interface
+   *
+   * ## Overview
+   *
+   * The `DevboxInterface` class provides a high-level API for managing devboxes,
+   * which are isolated development environments running in Runloop's cloud infrastructure.
+   * Devboxes can be created from blueprints or snapshots, and support command execution,
+   * file operations, and lifecycle management.
+   *
+   * ## Usage
+   *
+   * This interface is accessed via {@link RunloopSDK.devbox}. You should construct
+   * a {@link RunloopSDK} instance and use it from there:
+   *
+   * @example
+   * ```typescript
+   * const sdk = new RunloopSDK();
+   * const devbox = await sdk.devbox.create({ name: 'my-devbox' });
+   * const result = await devbox.cmd.exec({ command: 'echo "Hello, World!"' });
+   * ```
    */
   export class DevboxInterface {
     /**
-     * @internal
      * @private
      */
     constructor(private client: Runloop) {}
@@ -186,10 +204,31 @@ export namespace RunloopSDK {
 
   /**
    * Blueprint management interface
+   *
+   * ## Overview
+   *
+   * The `BlueprintInterface` class provides a high-level API for managing blueprints,
+   * which define the base configuration for devboxes. Blueprints are built from Dockerfiles
+   * and can be used to create multiple devboxes with consistent environments.
+   *
+   * ## Usage
+   *
+   * This interface is accessed via {@link RunloopSDK.blueprint}. You should construct
+   * a {@link RunloopSDK} instance and use it from there:
+   *
+   * @example
+   * ```typescript
+   * const sdk = new RunloopSDK();
+   * const blueprint = await sdk.blueprint.create({
+   *   name: 'my-blueprint',
+   *   dockerfile: `FROM ubuntu:22.04
+   *                RUN apt-get update`,
+   * });
+   * const devbox = await sdk.devbox.createFromBlueprintId(blueprint.id, { name: 'my-devbox' });
+   * ```
    */
   export class BlueprintInterface {
     /**
-     * @internal
      * @private
      */
     constructor(private client: Runloop) {}
@@ -219,10 +258,26 @@ export namespace RunloopSDK {
 
   /**
    * Snapshot management interface
+   *
+   * ## Overview
+   *
+   * The `SnapshotInterface` class provides a high-level API for managing disk snapshots,
+   * which capture the complete state of a devbox's disk. Snapshots can be used to restore
+   * devboxes to a previous state or create new devboxes from saved states.
+   *
+   * ## Usage
+   *
+   * This interface is accessed via {@link RunloopSDK.snapshot}. You should construct
+   * a {@link RunloopSDK} instance and use it from there:
+   *
+   * @example
+   * ```typescript
+   * const sdk = new RunloopSDK();
+   * const snapshots = await sdk.snapshot.list(...);
+   * ```
    */
   export class SnapshotInterface {
     /**
-     * @internal
      * @private
      */
     constructor(private client: Runloop) {}
@@ -237,6 +292,7 @@ export namespace RunloopSDK {
   }
 
   /**
+   * Storage object management interface
    *
    * ## Overview
    *
@@ -244,15 +300,20 @@ export namespace RunloopSDK {
    * which are files stored in Runloop's object storage. Storage objects can be uploaded,
    * downloaded, and managed with metadata.
    *
-   * runloop.storageObject.create({
-   *   name: 'my-file.txt',
-   *   content_type: 'text',
-   *   metadata: { project: 'demo' },
-   * });
+   * ## Usage
+   *
+   * This interface is accessed via {@link RunloopSDK.storageObject}. You should construct
+   * a {@link RunloopSDK} instance and use it from there:
+   *
+   * @example
+   * ```typescript
+   * const sdk = new RunloopSDK();
+   * const storageObject = await sdk.storageObject.uploadFromFile("./my-file.txt", "my-file.txt");
+   * const objects = await sdk.storageObject.list();
+   * ```
    */
   export class StorageObjectInterface {
     /**
-     * @internal
      * @private
      */
     constructor(private client: Runloop) {}
