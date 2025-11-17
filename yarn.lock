@@ -692,7 +692,7 @@
 
 "@shipgirl/typedoc-plugin-versions@^0.3.2":
   version "0.3.2"
-  resolved "https://registry.npmjs.org/@shipgirl/typedoc-plugin-versions/-/typedoc-plugin-versions-0.3.2.tgz"
+  resolved "https://registry.yarnpkg.com/@shipgirl/typedoc-plugin-versions/-/typedoc-plugin-versions-0.3.2.tgz#a365db2df9a2792261dabff2fb94bb302ead4f4f"
   integrity sha512-mFs79lmSQm05ec/Dn2jUdMivt3sB5x+fxDaaIOuDAxpXcrEtqlbKYpe/b1Bo6M8EbsJSHxoppWeon2evJIMBCQ==
   dependencies:
     fs-extra "^11.2.0"

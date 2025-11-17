@@ -4,12 +4,13 @@
     "src/sdk.ts"
   ],
   "entryPointStrategy": "expand",
-  "out": "typedoc/",
+  "out": "docs/",
   "tsconfig": "tsconfig.typedoc.json",
   "includeVersion": true,
   "readme": "README-SDK.md",
   "plugin": [
-    "typedoc-github-theme"
+    "typedoc-github-theme",
+    "@shipgirl/typedoc-plugin-versions"
   ],
   "navigation": {
     "includeCategories": true,

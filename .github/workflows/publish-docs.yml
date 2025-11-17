@@ -1,130 +1,86 @@
-name: Publish Docs
-
+name: PUBLISH DOCS
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - 'src/**'
-      - 'typedoc.json'
-      - 'tsconfig.typedoc.json'
-      - 'package.json'
-      - 'README-SDK.md'
-  workflow_dispatch:
-
+    workflow_dispatch:
+    workflow_call:
+    release:
+        types: [published]
 permissions:
-  contents: write
+    contents: write # allows the 'Commit' step without tokens
 
 jobs:
-  publish-docs:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+    get_history: # create an artifact from the existing documentation builds
+        runs-on: ubuntu-latest
+        steps:
+            - name: get the gh-pages repo
+              uses: actions/checkout@v3
+              with:
+                  ref: gh-pages
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-          cache: 'yarn'
+            - name: tar the existing docs
+              run: |
+                  mkdir -p ./docs
+                  tar -cvf documentation.tar ./docs
 
-      - name: Install dependencies
-        run: yarn install --frozen-lockfile
+            - name: create a document artifact
+              uses: actions/upload-artifact@v3
+              with:
+                  name: documentation
+                  path: documentation.tar
 
-      - name: Build project
-        run: yarn build
+    build: # builds the distribution and then the documentation
+        needs: get_history
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout src
+              uses: actions/checkout@v3
 
-      - name: Build documentation
-        run: yarn docs:sdk
+            - run: mkdir -p ./docs
+            - name: Download the existing documents artifact
+              uses: actions/download-artifact@v3
+              with:
+                  name: documentation
+            - run: tar -xf documentation.tar ./docs -C ./docs
 
-      - name: Get version from package.json
-        id: package-version
-        run: |
-          VERSION=$(node -p "require('./package.json').version")
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
-          echo "Built docs for version: $VERSION"
+            - name: Build
+              uses: actions/setup-node@v3
+              with:
+                  node-version: 16.x
+                  cache: 'npm'
+            - run: npm ci
+            - run: npm run build # set up 'build' script in your package.json
 
-      - name: Check if gh-pages branch exists
-        id: check-branch
-        run: |
-          if git ls-remote --heads origin gh-pages | grep -q gh-pages; then
-            echo "exists=true" >> $GITHUB_OUTPUT
-          else
-            echo "exists=false" >> $GITHUB_OUTPUT
-          fi
+            - name: Build documents
+              run: npm run docs #set up 'docs' build script in your package.json
 
-      - name: Create gh-pages branch if it doesn't exist
-        if: steps.check-branch.outputs.exists == 'false'
-        run: |
-          git checkout --orphan gh-pages
-          git rm -rf . || true
-          mkdir -p docs
-          touch docs/.gitkeep
-          git add docs/.gitkeep
-          git commit -m "Initial commit for gh-pages branch"
-          git push origin gh-pages
+            - name: tar the new docs
+              run: tar -cvf newdocumentation.tar ./docs
 
-      - name: Checkout gh-pages branch
-        uses: actions/checkout@v4
-        with:
-          ref: gh-pages
-          path: gh-pages
-          fetch-depth: 0
+            - name: create a new document artifact
+              uses: actions/upload-artifact@v3
+              with:
+                  name: newdocumentation
+                  path: newdocumentation.tar
 
-      - name: Copy documentation to gh-pages
-        run: |
-          # Create docs directory if it doesn't exist
-          mkdir -p gh-pages/docs
-          
-          # The plugin creates versioned directories and symlinks automatically
-          # Copy the entire docs directory structure to preserve all versions
-          # Use -a to preserve symlinks and directory structure
-          if [ -d "docs" ]; then
-            # Copy all contents from docs to gh-pages/docs
-            # This preserves version directories and symlinks created by the plugin
-            cp -a docs/* gh-pages/docs/ 2>/dev/null || cp -r docs/* gh-pages/docs/
-            echo "Copied documentation to gh-pages/docs/"
-          else
-            echo "Warning: docs directory not found"
-            exit 1
-          fi
-          
-          # List what was copied for debugging
-          echo "Contents of gh-pages/docs:"
-          ls -la gh-pages/docs/ || true
+    commit: # commit the old and new merged documents to gh-pages/docs
+        needs: build
+        runs-on: ubuntu-latest
+        steps:
+            - name: checkout the gh-pages repo
+              uses: actions/checkout@v3
+              with:
+                  ref: gh-pages
 
-      - name: Create index.html redirect
-        run: |
-          # Create an index.html in gh-pages root that redirects to docs
-          # This allows GitHub Pages to serve the docs when configured to deploy from gh-pages branch
-          VERSION="${{ steps.package-version.outputs.version }}"
-          cat > gh-pages/index.html <<EOF
-          <!DOCTYPE html>
-          <html>
-          <head>
-            <meta http-equiv="refresh" content="0; url=./docs/$VERSION/">
-            <link rel="canonical" href="./docs/$VERSION/">
-          </head>
-          <body>
-            <p>Redirecting to <a href="./docs/$VERSION/">documentation</a>...</p>
-          </body>
-          </html>
-          EOF
+            - run: mkdir -p ./docs
+            - name: Download the new documents artifact
+              uses: actions/download-artifact@v3
+              with:
+                  name: newdocumentation
+            - run: tar -xf newdocumentation.tar ./docs -C ./docs
 
-      - name: Commit and push to gh-pages
-        run: |
-          cd gh-pages
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          
-          # Check if there are changes to commit
-          if [ -n "$(git status --porcelain)" ]; then
-            git add -A
-            git commit -m "docs: Update documentation for version ${{ steps.package-version.outputs.version }} [skip ci]"
-            git push origin gh-pages
-          else
-            echo "No changes to commit"
-          fi
-
+            - name: commit
+              run: |
+                  git config --global user.email "username@users.noreply.github.com"
+                  git config --global user.name "Continuous Integration"
+                  git add .
+                  git commit -m "CI updated the documentation"
+                  git push

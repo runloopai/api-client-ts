@@ -1,5 +1,5 @@
 .vscode
-typedoc
+docs
 .prism.log
 node_modules
 yarn-error.log
