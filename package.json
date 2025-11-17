@@ -31,7 +31,6 @@
     "lint": "./scripts/lint",
     "fix": "./scripts/format",
     "docs:sdk": "typedoc --options typedoc.json",
-    "docs:sdk:markdown": "typedoc --options typedoc.markdown.json",
     "docs": "typedoc --options typedoc.json",
     "docs:watch": "typedoc --options typedoc.json --watch",
     "predeploy-gh-pages": "yarn docs:sdk",

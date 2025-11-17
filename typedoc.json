@@ -24,9 +24,9 @@
   "kindSortOrder": [
     "Project",
     "Module",
-    "Namespace",
     "Enum",
     "Class",
+    "Namespace",
     "Interface",
     "TypeAlias",
     "Constructor",
