@@ -33,6 +33,248 @@ export interface ExecuteStreamingCallbacks {
 }
 
 /**
+ * Network operations for a devbox.
+ * Provides methods for managing SSH keys and network tunnels.
+ */
+export class DevboxNetOps {
+  /**
+   * @private
+   */
+  constructor(
+    private client: Runloop,
+    private devboxId: string,
+  ) {}
+
+  /**
+   * Create an SSH key for remote access to the devbox.
+   * @param {Core.RequestOptions} [options] - Request options
+   * @returns {Promise<unknown>} SSH key creation result
+   */
+  async createSSHKey(options?: Core.RequestOptions) {
+    return this.client.devboxes.createSSHKey(this.devboxId, options);
+  }
+
+  /**
+   * Create a tunnel to a port on the devbox.
+   * @param {DevboxCreateTunnelParams} params - Tunnel creation parameters
+   * @param {Core.RequestOptions} [options] - Request options
+   * @returns {Promise<unknown>} Tunnel creation result
+   */
+  async createTunnel(params: DevboxCreateTunnelParams, options?: Core.RequestOptions) {
+    return this.client.devboxes.createTunnel(this.devboxId, params, options);
+  }
+
+  /**
+   * Remove a tunnel from the devbox.
+   * @param {DevboxRemoveTunnelParams} params - Tunnel removal parameters
+   * @param {Core.RequestOptions} [options] - Request options
+   * @returns {Promise<unknown>} Tunnel removal result
+   */
+  async removeTunnel(params: DevboxRemoveTunnelParams, options?: Core.RequestOptions) {
+    return this.client.devboxes.removeTunnel(this.devboxId, params, options);
+  }
+}
+
+/**
+ * Command execution operations for a devbox.
+ * Provides methods for executing commands synchronously and asynchronously.
+ */
+export class DevboxCmdOps {
+  /**
+   * @private
+   */
+  constructor(
+    private client: Runloop,
+    private devboxId: string,
+    private startStreamingWithCallbacks: (
+      executionId: string,
+      stdout?: (line: string) => void,
+      stderr?: (line: string) => void,
+      output?: (line: string) => void,
+    ) => Promise<void>,
+  ) {}
+
+  /**
+   * Execute a command on the devbox and wait for it to complete.
+   * Optionally provide callbacks to stream logs in real-time.
+   *
+   * When callbacks are provided, this method waits for both the command to complete
+   * AND all streaming data to be processed before returning.
+   *
+   * @example
+   * ```typescript
+   * // Simple execution
+   * const result = await devbox.cmd.exec({ command: 'ls -la' });
+   * console.log(await result.stdout());
+   *
+   * // With streaming callbacks
+   * const result = await devbox.cmd.exec({
+   *   command: 'npm install',
+   *   stdout: (line) => process.stdout.write(line),
+   *   stderr: (line) => process.stderr.write(line),
+   * });
+   * ```
+   *
+   * @param {DevboxExecuteParams & ExecuteStreamingCallbacks} params - Parameters containing the command, optional shell name, and optional callbacks
+   * @param {Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxAsyncExecutionDetailView>> }} [options] - Request options with optional polling configuration
+   * @returns {Promise<ExecutionResult>} {@link ExecutionResult} with stdout, stderr, and exit status
+   */
+  async exec(
+    params: DevboxExecuteParams & ExecuteStreamingCallbacks,
+    options?: Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxAsyncExecutionDetailView>> },
+  ): Promise<ExecutionResult> {
+    const hasCallbacks = params.stdout || params.stderr || params.output;
+
+    if (hasCallbacks) {
+      // With callbacks: use async execution workflow to enable streaming
+      const { stdout, stderr, output, ...executeParams } = params;
+      const execution = await this.client.devboxes.executeAsync(this.devboxId, executeParams, options);
+
+      // Start streaming and await both completion and streaming
+      const streamingPromise = this.startStreamingWithCallbacks(
+        execution.execution_id,
+        stdout,
+        stderr,
+        output,
+      );
+
+      // Wait for both command completion and streaming to finish (using allSettled for robustness)
+      const results = await Promise.allSettled([
+        this.client.devboxes.executions.awaitCompleted(this.devboxId, execution.execution_id, options),
+        streamingPromise,
+      ]);
+
+      // Extract command result (throw if it failed, ignore streaming errors)
+      if (results[0].status === 'rejected') {
+        throw results[0].reason;
+      }
+      const result = results[0].value;
+
+      return new ExecutionResult(this.client, this.devboxId, execution.execution_id, result);
+    } else {
+      // Without callbacks: use existing optimized workflow
+      const result = await this.client.devboxes.executeAndAwaitCompletion(this.devboxId, params, options);
+      return new ExecutionResult(this.client, this.devboxId, result.execution_id, result);
+    }
+  }
+
+  /**
+   * Execute a command asynchronously without waiting for completion.
+   * Optionally provide callbacks to stream logs in real-time as they are produced.
+   *
+   * Callbacks fire in real-time as logs arrive. When you call execution.result(),
+   * it will wait for both the command to complete and all streaming to finish.
+   *
+   * @example
+   * ```typescript
+   * const execution = await devbox.cmd.execAsync({
+   *   command: 'long-running-task.sh',
+   *   stdout: (line) => console.log(`[LOG] ${line}`),
+   * });
+   *
+   * // Do other work while command runs...
+   *
+   * const result = await execution.result();
+   * if (result.success) {
+   *   console.log('Task completed successfully!');
+   * }
+   * ```
+   *
+   * @param {DevboxExecuteAsyncParams & ExecuteStreamingCallbacks} params - Parameters containing the command, optional shell name, and optional callbacks
+   * @param {Core.RequestOptions} [options] - Request options
+   * @returns {Promise<Execution>} {@link Execution} object for tracking and controlling the command
+   */
+  async execAsync(
+    params: DevboxExecuteAsyncParams & ExecuteStreamingCallbacks,
+    options?: Core.RequestOptions,
+  ): Promise<Execution> {
+    const { stdout, stderr, output, ...executeParams } = params;
+    const execution = await this.client.devboxes.executeAsync(this.devboxId, executeParams, options);
+
+    // Start streaming in background if callbacks provided
+    let streamingPromise: Promise<void> | undefined;
+    if (stdout || stderr || output) {
+      // Start streaming - will be awaited when result() is called
+      streamingPromise = this.startStreamingWithCallbacks(execution.execution_id, stdout, stderr, output);
+    }
+
+    return new Execution(this.client, this.devboxId, execution.execution_id, execution, streamingPromise);
+  }
+}
+
+/**
+ * File operations for a devbox.
+ * Provides methods for reading, writing, uploading, and downloading files.
+ */
+export class DevboxFileOps {
+  /**
+   * @private
+   */
+  constructor(
+    private client: Runloop,
+    private devboxId: string,
+  ) {}
+
+  /**
+   * Read file contents from the devbox as a UTF-8 string.
+   *
+   * @example
+   * ```typescript
+   * const content = await devbox.file.read({ path: '/app/config.json' });
+   * const config = JSON.parse(content);
+   * ```
+   *
+   * @param {DevboxReadFileContentsParams} params - Parameters containing the file path
+   * @param {Core.RequestOptions} [options] - Request options
+   * @returns {Promise<string>} File contents as a string
+   */
+  async read(params: DevboxReadFileContentsParams, options?: Core.RequestOptions): Promise<string> {
+    return this.client.devboxes.readFileContents(this.devboxId, params, options);
+  }
+
+  /**
+   * Write UTF-8 string contents to a file on the devbox.
+   *
+   * @example
+   * ```typescript
+   * await devbox.file.write({
+   *   path: '/app/config.json',
+   *   contents: JSON.stringify({ key: 'value' }, null, 2),
+   * });
+   * ```
+   *
+   * @param {DevboxWriteFileContentsParams} params - Parameters containing the file path and contents
+   * @param {Core.RequestOptions} [options] - Request options
+   * @returns {Promise<unknown>} Execution result
+   */
+  async write(params: DevboxWriteFileContentsParams, options?: Core.RequestOptions) {
+    return this.client.devboxes.writeFileContents(this.devboxId, params, options);
+  }
+
+  /**
+   * Download file contents (supports binary files).
+   *
+   * @param {DevboxDownloadFileParams} params - Parameters containing the file path
+   * @param {Core.RequestOptions} [options] - Request options
+   * @returns {Promise<Response>} Response with file contents
+   */
+  async download(params: DevboxDownloadFileParams, options?: Core.RequestOptions) {
+    return this.client.devboxes.downloadFile(this.devboxId, params, options);
+  }
+
+  /**
+   * Upload a file to the devbox.
+   *
+   * @param {DevboxUploadFileParams} params - Parameters containing the file path and file to upload
+   * @param {Core.RequestOptions} [options] - Request options
+   * @returns {Promise<unknown>} Upload result
+   */
+  async upload(params: DevboxUploadFileParams, options?: Core.RequestOptions) {
+    return this.client.devboxes.uploadFile(this.devboxId, params, options);
+  }
+}
+
+/**
  * Object-oriented interface for working with Devboxes.
  *
  * ## Overview
@@ -48,155 +290,36 @@ export interface ExecuteStreamingCallbacks {
  *
  * const runloop = new RunloopSDK();
  * const devbox = await runloop.devbox.create({ name: 'my-devbox' });
+ * devbox.cmd.exec({ command: 'echo "Hello, World!"' });
  * console.log(`Created devbox: ${devbox.id}`);
  * ```
  *
- * ### Create from Blueprint
- * ```typescript
- * const runloop = new RunloopSDK();
- * // Using blueprint ID
- * const devbox = await runloop.devbox.createFromBlueprintId('blueprint-123', {
- *   name: 'my-devbox',
- * });
- *
- * // Using blueprint name
- * const devbox = await runloop.devbox.createFromBlueprintName('my-blueprint', {
- *   name: 'my-devbox',
- * });
- * ```
- *
- * ### Create from Snapshot
- * ```typescript
- * const runloop = new RunloopSDK();
- * const devbox = await runloop.devbox.createFromSnapshot('snapshot-123', {
- *   name: 'restored-devbox',
- * });
- * ```
- *
- * ## Command Execution
- *
- * ### Synchronous Execution
- * ```typescript
- * const result = await devbox.cmd.exec({ command: 'echo "Hello, World!"' });
- * console.log(`Exit code: ${result.exitCode}`);
- * console.log(`Output: ${await result.stdout()}`);
- * ```
- *
- * ### Execution with Streaming Logs
- * ```typescript
- * const result = await devbox.cmd.exec({
- *   command: 'npm install',
- *   stdout: (line) => console.log(`[stdout] ${line}`),
- *   stderr: (line) => console.error(`[stderr] ${line}`),
- * });
- * ```
- *
- * ### Asynchronous Execution
- * ```typescript
- * const execution = await devbox.cmd.execAsync({
- *   command: 'long-running-task',
- *   stdout: (line) => console.log(line),
- * });
- *
- * // Do other work...
- *
- * const result = await execution.result();
- * console.log(`Completed with exit code: ${result.exitCode}`);
- * ```
- *
- * ## File Operations
- *
- * ### Read File
- * ```typescript
- * const content = await devbox.file.read({ path: '/app/config.json' });
- * console.log(content);
- * ```
- *
- * ### Write File
- * ```typescript
- * await devbox.file.write({
- *   path: '/app/config.json',
- *   contents: JSON.stringify({ key: 'value' }),
- * });
- * ```
- *
- * ### Upload File
- * ```typescript
- * await devbox.file.upload({
- *   path: '/app/data.txt',
- *   file: new File(['content'], 'data.txt'),
- * });
- * ```
- *
- * ### Download File
- * ```typescript
- * const response = await devbox.file.download({ path: '/app/output.txt' });
- * const blob = await response.blob();
- * ```
- *
- * ## Lifecycle Management
- *
- * ### Suspend and Resume
- * ```typescript
- * // Suspend devbox (creates snapshot)
- * await devbox.suspend();
- *
- * // Resume later
- * await devbox.resume();
- * ```
- *
- * ### Create Snapshot
- * ```typescript
- * // Create snapshot and wait for completion
- * const snapshot = await devbox.snapshotDisk({ name: 'backup' });
- * console.log(`Snapshot created: ${snapshot.id}`);
- *
- * // Create snapshot asynchronously
- * const snapshot = await devbox.snapshotDiskAsync({ name: 'backup' });
- * await snapshot.awaitCompleted();
- * ```
- *
- * ### Shutdown
- * ```typescript
- * await devbox.shutdown();
- * ```
- *
- * ## Network Operations
- *
- * ### Create SSH Key
- * ```typescript
- * const sshKey = await devbox.net.createSSHKey();
- * console.log(`SSH Key: ${sshKey.public_key}`);
- * ```
- *
- * ### Create Tunnel
- * ```typescript
- * const tunnel = await devbox.net.createTunnel({ port: 8080 });
- * console.log(`Tunnel URL: ${tunnel.url}`);
- * ```
- *
- * ## Working with Existing Devboxes
- *
- * ```typescript
- * const runloop = new RunloopSDK();
- * // Get devbox by ID
- * const devbox = runloop.devbox.fromId('devbox-123');
- *
- * // Get current info
- * const info = await devbox.getInfo();
- * console.log(`Status: ${info.status}`);
- *
- * // Wait for running state
- * await devbox.awaitRunning();
- * ```
  */
 export class Devbox {
   private client: Runloop;
   private _id: string;
 
+  /**
+   * Network operations on the devbox.
+   */
+  public readonly net: DevboxNetOps;
+
+  /**
+   * Command execution operations on the devbox.
+   */
+  public readonly cmd: DevboxCmdOps;
+
+  /**
+   * File operations on the devbox.
+   */
+  public readonly file: DevboxFileOps;
+
   private constructor(client: Runloop, id: string) {
     this.client = client;
     this._id = id;
+    this.net = new DevboxNetOps(this.client, this._id);
+    this.cmd = new DevboxCmdOps(this.client, this._id, this.startStreamingWithCallbacks.bind(this));
+    this.file = new DevboxFileOps(this.client, this._id);
   }
 
   /**
@@ -399,221 +522,6 @@ export class Devbox {
   }
 
   /**
-   * Command execution operations on the devbox.
-   */
-  get cmd() {
-    return {
-      /**
-       * Execute a command on the devbox and wait for it to complete.
-       * Optionally provide callbacks to stream logs in real-time.
-       *
-       * When callbacks are provided, this method waits for both the command to complete
-       * AND all streaming data to be processed before returning.
-       *
-       * @example
-       * ```typescript
-       * // Simple execution
-       * const result = await devbox.cmd.exec({ command: 'ls -la' });
-       * console.log(await result.stdout());
-       *
-       * // With streaming callbacks
-       * const result = await devbox.cmd.exec({
-       *   command: 'npm install',
-       *   stdout: (line) => process.stdout.write(line),
-       *   stderr: (line) => process.stderr.write(line),
-       * });
-       * ```
-       *
-       * @param {DevboxExecuteParams & ExecuteStreamingCallbacks} params - Parameters containing the command, optional shell name, and optional callbacks
-       * @param {Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxAsyncExecutionDetailView>> }} [options] - Request options with optional polling configuration
-       * @returns {Promise<ExecutionResult>} {@link ExecutionResult} with stdout, stderr, and exit status
-       */
-      exec: async (
-        params: DevboxExecuteParams & ExecuteStreamingCallbacks,
-        options?: Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxAsyncExecutionDetailView>> },
-      ): Promise<ExecutionResult> => {
-        const hasCallbacks = params.stdout || params.stderr || params.output;
-
-        if (hasCallbacks) {
-          // With callbacks: use async execution workflow to enable streaming
-          const { stdout, stderr, output, ...executeParams } = params;
-          const execution = await this.client.devboxes.executeAsync(this._id, executeParams, options);
-
-          // Start streaming and await both completion and streaming
-          const streamingPromise = this.startStreamingWithCallbacks(
-            execution.execution_id,
-            stdout,
-            stderr,
-            output,
-          );
-
-          // Wait for both command completion and streaming to finish (using allSettled for robustness)
-          const results = await Promise.allSettled([
-            this.client.devboxes.executions.awaitCompleted(this._id, execution.execution_id, options),
-            streamingPromise,
-          ]);
-
-          // Extract command result (throw if it failed, ignore streaming errors)
-          if (results[0].status === 'rejected') {
-            throw results[0].reason;
-          }
-          const result = results[0].value;
-
-          return new ExecutionResult(this.client, this._id, execution.execution_id, result);
-        } else {
-          // Without callbacks: use existing optimized workflow
-          const result = await this.client.devboxes.executeAndAwaitCompletion(this._id, params, options);
-          return new ExecutionResult(this.client, this._id, result.execution_id, result);
-        }
-      },
-
-      /**
-       * Execute a command asynchronously without waiting for completion.
-       * Optionally provide callbacks to stream logs in real-time as they are produced.
-       *
-       * Callbacks fire in real-time as logs arrive. When you call execution.result(),
-       * it will wait for both the command to complete and all streaming to finish.
-       *
-       * @example
-       * ```typescript
-       * const execution = await devbox.cmd.execAsync({
-       *   command: 'long-running-task.sh',
-       *   stdout: (line) => console.log(`[LOG] ${line}`),
-       * });
-       *
-       * // Do other work while command runs...
-       *
-       * const result = await execution.result();
-       * if (result.success) {
-       *   console.log('Task completed successfully!');
-       * }
-       * ```
-       *
-       * @param {DevboxExecuteAsyncParams & ExecuteStreamingCallbacks} params - Parameters containing the command, optional shell name, and optional callbacks
-       * @param {Core.RequestOptions} [options] - Request options
-       * @returns {Promise<Execution>} {@link Execution} object for tracking and controlling the command
-       */
-      execAsync: async (
-        params: DevboxExecuteAsyncParams & ExecuteStreamingCallbacks,
-        options?: Core.RequestOptions,
-      ): Promise<Execution> => {
-        const { stdout, stderr, output, ...executeParams } = params;
-        const execution = await this.client.devboxes.executeAsync(this._id, executeParams, options);
-
-        // Start streaming in background if callbacks provided
-        let streamingPromise: Promise<void> | undefined;
-        if (stdout || stderr || output) {
-          // Start streaming - will be awaited when result() is called
-          streamingPromise = this.startStreamingWithCallbacks(execution.execution_id, stdout, stderr, output);
-        }
-
-        return new Execution(this.client, this._id, execution.execution_id, execution, streamingPromise);
-      },
-    };
-  }
-
-  /**
-   * File operations on the devbox.
-   */
-  get file() {
-    return {
-      /**
-       * Read file contents from the devbox as a UTF-8 string.
-       *
-       * @example
-       * ```typescript
-       * const content = await devbox.file.read({ path: '/app/config.json' });
-       * const config = JSON.parse(content);
-       * ```
-       *
-       * @param {DevboxReadFileContentsParams} params - Parameters containing the file path
-       * @param {Core.RequestOptions} [options] - Request options
-       * @returns {Promise<string>} File contents as a string
-       */
-      read: async (params: DevboxReadFileContentsParams, options?: Core.RequestOptions): Promise<string> => {
-        return this.client.devboxes.readFileContents(this._id, params, options);
-      },
-
-      /**
-       * Write UTF-8 string contents to a file on the devbox.
-       *
-       * @example
-       * ```typescript
-       * await devbox.file.write({
-       *   path: '/app/config.json',
-       *   contents: JSON.stringify({ key: 'value' }, null, 2),
-       * });
-       * ```
-       *
-       * @param {DevboxWriteFileContentsParams} params - Parameters containing the file path and contents
-       * @param {Core.RequestOptions} [options] - Request options
-       * @returns {Promise<unknown>} Execution result
-       */
-      write: async (params: DevboxWriteFileContentsParams, options?: Core.RequestOptions) => {
-        return this.client.devboxes.writeFileContents(this._id, params, options);
-      },
-
-      /**
-       * Download file contents (supports binary files).
-       *
-       * @param {DevboxDownloadFileParams} params - Parameters containing the file path
-       * @param {Core.RequestOptions} [options] - Request options
-       * @returns {Promise<Response>} Response with file contents
-       */
-      download: async (params: DevboxDownloadFileParams, options?: Core.RequestOptions) => {
-        return this.client.devboxes.downloadFile(this._id, params, options);
-      },
-
-      /**
-       * Upload a file to the devbox.
-       *
-       * @param {DevboxUploadFileParams} params - Parameters containing the file path and file to upload
-       * @param {Core.RequestOptions} [options] - Request options
-       * @returns {Promise<unknown>} Upload result
-       */
-      upload: async (params: DevboxUploadFileParams, options?: Core.RequestOptions) => {
-        return this.client.devboxes.uploadFile(this._id, params, options);
-      },
-    };
-  }
-
-  /**
-   * Shutdown the devbox.
-   * @param {Core.RequestOptions} [options] - Request options
-   * @returns {Promise<unknown>} Shutdown result
-   */
-  async shutdown(options?: Core.RequestOptions) {
-    return await this.client.devboxes.shutdown(this._id, options);
-  }
-
-  /**
-   * Suspend the devbox and create a disk snapshot.
-   * @param {Core.RequestOptions} [options] - Request options
-   * @returns {Promise<unknown>} Suspend result
-   */
-  async suspend(options?: Core.RequestOptions) {
-    return this.client.devboxes.suspend(this._id, options);
-  }
-
-  /**
-   * Resume a suspended devbox.
-   * @param {Core.RequestOptions} [options] - Request options
-   * @returns {Promise<unknown>} Resume result
-   */
-  async resume(options?: Core.RequestOptions) {
-    return this.client.devboxes.resume(this._id, options);
-  }
-
-  /**
-   * Send a keep-alive signal to prevent idle shutdown.
-   * @param {Core.RequestOptions} [options] - Request options
-   * @returns {Promise<unknown>} Keep-alive result
-   */
-  async keepAlive(options?: Core.RequestOptions): Promise<unknown> {
-    return this.client.devboxes.keepAlive(this._id, options);
-  }
-
-  /**
    * Create a disk snapshot of the devbox. Returns a snapshot that is completed. If you don't want to block on completion, use snapshotDiskAsync().
    *
    * @example
@@ -657,38 +565,38 @@ export class Devbox {
   }
 
   /**
-   * Network operations on the devbox.
+   * Shutdown the devbox.
+   * @param {Core.RequestOptions} [options] - Request options
+   * @returns {Promise<unknown>} Shutdown result
    */
-  get net() {
-    return {
-      /**
-       * Create an SSH key for remote access to the devbox.
-       * @param {Core.RequestOptions} [options] - Request options
-       * @returns {Promise<unknown>} SSH key creation result
-       */
-      createSSHKey: async (options?: Core.RequestOptions) => {
-        return this.client.devboxes.createSSHKey(this._id, options);
-      },
+  async shutdown(options?: Core.RequestOptions) {
+    return await this.client.devboxes.shutdown(this._id, options);
+  }
 
-      /**
-       * Create a tunnel to a port on the devbox.
-       * @param {DevboxCreateTunnelParams} params - Tunnel creation parameters
-       * @param {Core.RequestOptions} [options] - Request options
-       * @returns {Promise<unknown>} Tunnel creation result
-       */
-      createTunnel: async (params: DevboxCreateTunnelParams, options?: Core.RequestOptions) => {
-        return this.client.devboxes.createTunnel(this._id, params, options);
-      },
+  /**
+   * Suspend the devbox and create a disk snapshot.
+   * @param {Core.RequestOptions} [options] - Request options
+   * @returns {Promise<unknown>} Suspend result
+   */
+  async suspend(options?: Core.RequestOptions) {
+    return this.client.devboxes.suspend(this._id, options);
+  }
 
-      /**
-       * Remove a tunnel from the devbox.
-       * @param {DevboxRemoveTunnelParams} params - Tunnel removal parameters
-       * @param {Core.RequestOptions} [options] - Request options
-       * @returns {Promise<unknown>} Tunnel removal result
-       */
-      removeTunnel: async (params: DevboxRemoveTunnelParams, options?: Core.RequestOptions) => {
-        return this.client.devboxes.removeTunnel(this._id, params, options);
-      },
-    };
+  /**
+   * Resume a suspended devbox.
+   * @param {Core.RequestOptions} [options] - Request options
+   * @returns {Promise<unknown>} Resume result
+   */
+  async resume(options?: Core.RequestOptions) {
+    return this.client.devboxes.resume(this._id, options);
+  }
+
+  /**
+   * Send a keep-alive signal to prevent idle shutdown.
+   * @param {Core.RequestOptions} [options] - Request options
+   * @returns {Promise<unknown>} Keep-alive result
+   */
+  async keepAlive(options?: Core.RequestOptions): Promise<unknown> {
+    return this.client.devboxes.keepAlive(this._id, options);
   }
 }

@@ -111,11 +111,46 @@ type ContentType = ObjectCreateParams['content_type'];
  * ```
  */
 export class RunloopSDK {
+  /**
+   * Low-level API client providing direct access to all Runloop API endpoints.
+   * Use this when you need fine-grained control or access to features not yet exposed
+   * through the high-level interfaces. Most users should prefer the specialized interfaces
+   * (devbox, blueprint, etc.) for a more convenient API.
+   */
   public readonly api: Runloop;
-  public readonly devbox: RunloopSDK.DevboxInterface;
-  public readonly blueprint: RunloopSDK.BlueprintInterface;
-  public readonly snapshot: RunloopSDK.SnapshotInterface;
-  public readonly storageObject: RunloopSDK.StorageObjectInterface;
+
+  /**
+   * Interface for creating and accessing {@link Devbox} class instances.
+   * Devboxes are isolated development environments running in Runloop's cloud - the core resource
+   * that provides you with a fully configured development environment. Use this interface to create
+   * new devboxes or get existing ones by ID.
+   */
+  public readonly devbox: RunloopSDK.DevboxOps;
+
+  /**
+   * Interface for creating and accessing {@link Blueprint} class instances.
+   * Blueprints are reusable templates that define the base configuration for devboxes, built from
+   * Dockerfiles. They can be used to create multiple devboxes with consistent environments. Use this
+   * interface to create new blueprints or get existing ones by ID.
+   */
+  public readonly blueprint: RunloopSDK.BlueprintOps;
+
+  /**
+   * Interface for creating and accessing {@link Snapshot} class instances.
+   * Snapshots are point-in-time copies of a devbox's disk state, allowing you to save the complete
+   * state of a devbox and restore it later or create new devboxes from saved states. Use this
+   * interface to list snapshots or get existing ones by ID.
+   */
+  public readonly snapshot: RunloopSDK.SnapshotOps;
+
+  /**
+   * Interface for creating and accessing {@link StorageObject} class instances.
+   * Storage objects are files stored in Runloop's object storage system. They can be uploaded,
+   * downloaded, and managed with metadata, useful for storing configuration files, data files, or
+   * any other content you need to persist or share between devboxes. Use this interface to create
+   * new storage objects or get existing ones by ID.
+   */
+  public readonly storageObject: RunloopSDK.StorageObjectOps;
 
   /**
    * Creates a new RunloopSDK instance.
@@ -123,10 +158,10 @@ export class RunloopSDK {
    */
   constructor(options?: ClientOptions) {
     this.api = new Runloop(options);
-    this.devbox = new RunloopSDK.DevboxInterface(this.api);
-    this.blueprint = new RunloopSDK.BlueprintInterface(this.api);
-    this.snapshot = new RunloopSDK.SnapshotInterface(this.api);
-    this.storageObject = new RunloopSDK.StorageObjectInterface(this.api);
+    this.devbox = new RunloopSDK.DevboxOps(this.api);
+    this.blueprint = new RunloopSDK.BlueprintOps(this.api);
+    this.snapshot = new RunloopSDK.SnapshotOps(this.api);
+    this.storageObject = new RunloopSDK.StorageObjectOps(this.api);
   }
 }
 
@@ -136,7 +171,7 @@ export namespace RunloopSDK {
    *
    * ## Overview
    *
-   * The `DevboxInterface` class provides a high-level API for managing devboxes,
+   * The `DevboxInterface` class provides a high-level abstraction for managing devboxes,
    * which are isolated development environments running in Runloop's cloud infrastructure.
    * Devboxes can be created from blueprints or snapshots, and support command execution,
    * file operations, and lifecycle management.
@@ -153,7 +188,7 @@ export namespace RunloopSDK {
    * const result = await devbox.cmd.exec({ command: 'echo "Hello, World!"' });
    * ```
    */
-  export class DevboxInterface {
+  export class DevboxOps {
     /**
      * @private
      */
@@ -249,7 +284,7 @@ export namespace RunloopSDK {
    *
    * ## Overview
    *
-   * The `BlueprintInterface` class provides a high-level API for managing blueprints,
+   * The `BlueprintInterface` class provides a high-level abstraction for managing blueprints,
    * which define the base configuration for devboxes. Blueprints are built from Dockerfiles
    * and can be used to create multiple devboxes with consistent environments.
    *
@@ -269,7 +304,7 @@ export namespace RunloopSDK {
    * const devbox = await sdk.devbox.createFromBlueprintId(blueprint.id, { name: 'my-devbox' });
    * ```
    */
-  export class BlueprintInterface {
+  export class BlueprintOps {
     /**
      * @private
      */
@@ -320,7 +355,7 @@ export namespace RunloopSDK {
    *
    * ## Overview
    *
-   * The `SnapshotInterface` class provides a high-level API for managing disk snapshots,
+   * The `SnapshotInterface` class provides a high-level abstraction for managing disk snapshots,
    * which capture the complete state of a devbox's disk. Snapshots can be used to restore
    * devboxes to a previous state or create new devboxes from saved states.
    *
@@ -337,7 +372,7 @@ export namespace RunloopSDK {
    * const devbox = await snapshot.createDevbox();
    * ```
    */
-  export class SnapshotInterface {
+  export class SnapshotOps {
     /**
      * @private
      */
@@ -368,7 +403,7 @@ export namespace RunloopSDK {
    *
    * ## Overview
    *
-   * The `StorageObjectInterface` class provides a high-level API for managing storage objects,
+   * The `StorageObjectInterface` class provides a high-level abstraction for managing storage objects,
    * which are files stored in Runloop's object storage. Storage objects can be uploaded,
    * downloaded, and managed with metadata.
    *
@@ -384,14 +419,14 @@ export namespace RunloopSDK {
    * const objects = await sdk.storageObject.list();
    * ```
    */
-  export class StorageObjectInterface {
+  export class StorageObjectOps {
     /**
      * @private
      */
     constructor(private client: Runloop) {}
 
     /**
-     * Create a new storage object. This is for advanced users and for basic operations you should use the {@link StorageObjectInterface.uploadFromFile uploadFromFile()}, {@link StorageObjectInterface.uploadFromText uploadFromText()}, or {@link StorageObjectInterface.uploadFromBuffer uploadFromBuffer()} methods instead.
+     * Create a new storage object. This is for advanced users and for basic operations you should use the {@link StorageObjectOps.uploadFromFile uploadFromFile()}, {@link StorageObjectOps.uploadFromText uploadFromText()}, or {@link StorageObjectOps.uploadFromBuffer uploadFromBuffer()} methods instead.
      *
      * @example
      * ```typescript
@@ -400,11 +435,13 @@ export namespace RunloopSDK {
      *   content_type: 'text',
      *   metadata: { project: 'demo' },
      * });
-     * console.log(storageObject.id);
+     * storageObject.uploadContent('Hello, World!');
+     * // this will mark the object as complete and make it read-only
+     * storageObject.complete();
      * ```
-     * @param {ObjectCreateParams} params - Parameters for creating the object.
-     * @param {Core.RequestOptions & { polling?: Partial<PollingOptions<Runloop.Objects.ObjectView>> }} [options] - Request options.
-     * @returns {Promise<StorageObject>} A {@link StorageObject} instance.
+     * @param params - Parameters for creating the object.
+     * @param options - Request options.
+     * @returns A {@link StorageObject} instance.
      */
     async create(
       params: ObjectCreateParams,
