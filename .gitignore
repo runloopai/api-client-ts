@@ -1,5 +1,4 @@
 .vscode
-docs
 .prism.log
 node_modules
 yarn-error.log
@@ -14,4 +13,3 @@ dist-deno
 coverage-objects
 object-coverage-report.json
 docs
-docs-markdown
