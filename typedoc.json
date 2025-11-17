@@ -18,8 +18,6 @@
   },
   "categorizeByGroup": true,
   "versions": ["stable", "v0.67.1"],
-  "stable": "v0.67.1",
-  
   "searchInComments": true,
   "sort": [
     "source-order"
