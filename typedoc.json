@@ -17,9 +17,6 @@
     "includeGroups": true
   },
   "categorizeByGroup": true,
-  "metadata": {
-    "versions": ["stable", "v0.67.1"]
-  },
   "searchInComments": true,
   "sort": [
     "source-order"
