@@ -162,8 +162,8 @@ export class ExecutionResult {
    * const lastLines = await result.stdout(10);
    * ```
    *
-   * @param numLines - Optional number of lines to return from the end (most recent logs)
-   * @returns The stdout content
+   * @param {number} [numLines] - Optional number of lines to return from the end (most recent logs)
+   * @returns {Promise<string>} The stdout content
    */
   async stdout(numLines?: number): Promise<string> {
     const currentStdout = this._result.stdout ?? '';
@@ -187,8 +187,8 @@ export class ExecutionResult {
    * const recentErrors = await result.stderr(5);
    * ```
    *
-   * @param numLines - Optional number of lines to guarantee from the end (most recent logs)
-   * @returns The stderr content
+   * @param {number} [numLines] - Optional number of lines to guarantee from the end (most recent logs)
+   * @returns {Promise<string>} The stderr content
    */
   async stderr(numLines?: number): Promise<string> {
     const currentStderr = this._result.stderr ?? '';

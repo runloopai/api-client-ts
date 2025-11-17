@@ -117,8 +117,8 @@ export class Execution {
    * }
    * ```
    *
-   * @param options - Request options with optional polling configuration
-   * @returns ExecutionResult with stdout, stderr, and exit code
+   * @param {Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxAsyncExecutionDetailView>> }} [options] - Request options with optional polling configuration
+   * @returns {Promise<ExecutionResult>} {@link ExecutionResult} with stdout, stderr, and exit code
    */
   async result(
     options?: Core.RequestOptions & {
@@ -147,6 +147,8 @@ export class Execution {
 
   /**
    * Get the current state of the execution.
+   * @param {Core.RequestOptions} [options] - Request options
+   * @returns {Promise<DevboxAsyncExecutionDetailView>} The current execution state
    */
   async getState(options?: Core.RequestOptions): Promise<DevboxAsyncExecutionDetailView> {
     return this.client.devboxes.executions.retrieve(this._devboxId, this._executionId, options);
@@ -155,7 +157,8 @@ export class Execution {
   /**
    * Kill the execution if it's still running.
    *
-   * @param options - Request options
+   * @param {Core.RequestOptions} [options] - Request options
+   * @returns {Promise<void>} Promise that resolves when the execution is killed
    */
   async kill(options?: Core.RequestOptions): Promise<void> {
     await this.client.devboxes.executions.kill(this._devboxId, this._executionId, options);

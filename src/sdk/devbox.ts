@@ -210,10 +210,10 @@ export class Devbox {
    * console.log(`Devbox ${devbox.id} is ready!`);
    * ```
    *
-   * @param client - The Runloop client instance
-   * @param params - Parameters for creating the devbox
-   * @param options - Request options with optional polling configuration
-   * @returns A Devbox instance in the running state
+   * @param {Runloop} client - The Runloop client instance
+   * @param {DevboxCreateParams} [params] - Parameters for creating the devbox
+   * @param {Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxView>> }} [options] - Request options with optional polling configuration
+   * @returns {Promise<Devbox>} A {@link Devbox} instance in the running state
    */
   static async create(
     client: Runloop,
@@ -227,11 +227,11 @@ export class Devbox {
   /**
    * Create a new Devbox from a Blueprint and wait for it to reach the running state.
    *
-   * @param client - The Runloop client instance
-   * @param blueprintId - The blueprint ID to create from
-   * @param params - Additional devbox creation parameters
-   * @param options - Request options with optional polling configuration
-   * @returns A Devbox instance in the running state
+   * @param {Runloop} client - The Runloop client instance
+   * @param {string} blueprintId - The blueprint ID to create from
+   * @param {Omit<DevboxCreateParams, 'blueprint_id' | 'snapshot_id' | 'blueprint_name'>} [params] - Additional devbox creation parameters
+   * @param {Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxView>> }} [options] - Request options with optional polling configuration
+   * @returns {Promise<Devbox>} A {@link Devbox} instance in the running state
    */
   static async createFromBlueprintId(
     client: Runloop,
@@ -250,11 +250,11 @@ export class Devbox {
   /**
    * Create a new Devbox from a Blueprint name and wait for it to reach the running state.
    *
-   * @param client - The Runloop client instance
-   * @param blueprintName - The blueprint name to create from
-   * @param params - Additional devbox creation parameters
-   * @param options - Request options with optional polling configuration
-   * @returns A Devbox instance in the running state
+   * @param {Runloop} client - The Runloop client instance
+   * @param {string} blueprintName - The blueprint name to create from
+   * @param {Omit<DevboxCreateParams, 'blueprint_id' | 'snapshot_id' | 'blueprint_name'>} [params] - Additional devbox creation parameters
+   * @param {Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxView>> }} [options] - Request options with optional polling configuration
+   * @returns {Promise<Devbox>} A {@link Devbox} instance in the running state
    */
   static async createFromBlueprintName(
     client: Runloop,
@@ -273,11 +273,11 @@ export class Devbox {
   /**
    * Create a new Devbox from a Snapshot and wait for it to reach the running state.
    *
-   * @param client - The Runloop client instance
-   * @param snapshotId - The snapshot ID to create from
-   * @param params - Additional devbox creation parameters
-   * @param options - Request options with optional polling configuration
-   * @returns A Devbox instance in the running state
+   * @param {Runloop} client - The Runloop client instance
+   * @param {string} snapshotId - The snapshot ID to create from
+   * @param {Omit<DevboxCreateParams, 'snapshot_id' | 'blueprint_id' | 'blueprint_name'>} [params] - Additional devbox creation parameters
+   * @param {Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxView>> }} [options] - Request options with optional polling configuration
+   * @returns {Promise<Devbox>} A {@link Devbox} instance in the running state
    */
   static async createFromSnapshot(
     client: Runloop,
@@ -297,9 +297,9 @@ export class Devbox {
    * Create a Devbox instance by ID without retrieving from API.
    * Use getInfo() to fetch the actual data when needed.
    *
-   * @param client - The Runloop client instance
-   * @param id - The devbox ID
-   * @returns A Devbox instance
+   * @param {Runloop} client - The Runloop client instance
+   * @param {string} id - The devbox ID
+   * @returns {Devbox} A {@link Devbox} instance
    */
   static fromId(client: Runloop, id: string): Devbox {
     return new Devbox(client, id);
@@ -365,6 +365,8 @@ export class Devbox {
 
   /**
    * Get the complete devbox data from the API.
+   * @param {Core.RequestOptions} [options] - Request options
+   * @returns {Promise<DevboxView>} The devbox data
    */
   async getInfo(options?: Core.RequestOptions): Promise<DevboxView> {
     return this.client.devboxes.retrieve(this._id, options);
@@ -374,8 +376,8 @@ export class Devbox {
    * Wait for the devbox to reach the running state.
    * Uses optimized server-side polling for better performance.
    *
-   * @param options - Request options with optional polling configuration
-   * @returns The devbox data when running state is reached
+   * @param {Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxView>> }} [options] - Request options with optional polling configuration
+   * @returns {Promise<DevboxView>} The devbox data when running state is reached
    */
   async awaitRunning(
     options?: Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxView>> },
@@ -387,8 +389,8 @@ export class Devbox {
    * Wait for the devbox to reach the suspended state.
    * Uses optimized server-side polling for better performance.
    *
-   * @param options - Request options with optional polling configuration
-   * @returns The devbox data when suspended state is reached
+   * @param {Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxView>> }} [options] - Request options with optional polling configuration
+   * @returns {Promise<DevboxView>} The devbox data when suspended state is reached
    */
   async awaitSuspended(
     options?: Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxView>> },
@@ -422,9 +424,9 @@ export class Devbox {
        * });
        * ```
        *
-       * @param params - Parameters containing the command, optional shell name, and optional callbacks
-       * @param options - Request options with optional polling configuration
-       * @returns ExecutionResult with stdout, stderr, and exit status
+       * @param {DevboxExecuteParams & ExecuteStreamingCallbacks} params - Parameters containing the command, optional shell name, and optional callbacks
+       * @param {Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxAsyncExecutionDetailView>> }} [options] - Request options with optional polling configuration
+       * @returns {Promise<ExecutionResult>} {@link ExecutionResult} with stdout, stderr, and exit status
        */
       exec: async (
         params: DevboxExecuteParams & ExecuteStreamingCallbacks,
@@ -487,9 +489,9 @@ export class Devbox {
        * }
        * ```
        *
-       * @param params - Parameters containing the command, optional shell name, and optional callbacks
-       * @param options - Request options
-       * @returns Execution object for tracking and controlling the command
+       * @param {DevboxExecuteAsyncParams & ExecuteStreamingCallbacks} params - Parameters containing the command, optional shell name, and optional callbacks
+       * @param {Core.RequestOptions} [options] - Request options
+       * @returns {Promise<Execution>} {@link Execution} object for tracking and controlling the command
        */
       execAsync: async (
         params: DevboxExecuteAsyncParams & ExecuteStreamingCallbacks,
@@ -524,9 +526,9 @@ export class Devbox {
        * const config = JSON.parse(content);
        * ```
        *
-       * @param params - Parameters containing the file path
-       * @param options - Request options
-       * @returns File contents as a string
+       * @param {DevboxReadFileContentsParams} params - Parameters containing the file path
+       * @param {Core.RequestOptions} [options] - Request options
+       * @returns {Promise<string>} File contents as a string
        */
       read: async (params: DevboxReadFileContentsParams, options?: Core.RequestOptions): Promise<string> => {
         return this.client.devboxes.readFileContents(this._id, params, options);
@@ -543,9 +545,9 @@ export class Devbox {
        * });
        * ```
        *
-       * @param params - Parameters containing the file path and contents
-       * @param options - Request options
-       * @returns Execution result
+       * @param {DevboxWriteFileContentsParams} params - Parameters containing the file path and contents
+       * @param {Core.RequestOptions} [options] - Request options
+       * @returns {Promise<unknown>} Execution result
        */
       write: async (params: DevboxWriteFileContentsParams, options?: Core.RequestOptions) => {
         return this.client.devboxes.writeFileContents(this._id, params, options);
@@ -554,9 +556,9 @@ export class Devbox {
       /**
        * Download file contents (supports binary files).
        *
-       * @param params - Parameters containing the file path
-       * @param options - Request options
-       * @returns Response with file contents
+       * @param {DevboxDownloadFileParams} params - Parameters containing the file path
+       * @param {Core.RequestOptions} [options] - Request options
+       * @returns {Promise<Response>} Response with file contents
        */
       download: async (params: DevboxDownloadFileParams, options?: Core.RequestOptions) => {
         return this.client.devboxes.downloadFile(this._id, params, options);
@@ -565,8 +567,9 @@ export class Devbox {
       /**
        * Upload a file to the devbox.
        *
-       * @param params - Parameters containing the file path and file to upload
-       * @param options - Request options
+       * @param {DevboxUploadFileParams} params - Parameters containing the file path and file to upload
+       * @param {Core.RequestOptions} [options] - Request options
+       * @returns {Promise<unknown>} Upload result
        */
       upload: async (params: DevboxUploadFileParams, options?: Core.RequestOptions) => {
         return this.client.devboxes.uploadFile(this._id, params, options);
@@ -576,6 +579,8 @@ export class Devbox {
 
   /**
    * Shutdown the devbox.
+   * @param {Core.RequestOptions} [options] - Request options
+   * @returns {Promise<unknown>} Shutdown result
    */
   async shutdown(options?: Core.RequestOptions) {
     return await this.client.devboxes.shutdown(this._id, options);
@@ -583,6 +588,8 @@ export class Devbox {
 
   /**
    * Suspend the devbox and create a disk snapshot.
+   * @param {Core.RequestOptions} [options] - Request options
+   * @returns {Promise<unknown>} Suspend result
    */
   async suspend(options?: Core.RequestOptions) {
     return this.client.devboxes.suspend(this._id, options);
@@ -590,6 +597,8 @@ export class Devbox {
 
   /**
    * Resume a suspended devbox.
+   * @param {Core.RequestOptions} [options] - Request options
+   * @returns {Promise<unknown>} Resume result
    */
   async resume(options?: Core.RequestOptions) {
     return this.client.devboxes.resume(this._id, options);
@@ -597,6 +606,8 @@ export class Devbox {
 
   /**
    * Send a keep-alive signal to prevent idle shutdown.
+   * @param {Core.RequestOptions} [options] - Request options
+   * @returns {Promise<unknown>} Keep-alive result
    */
   async keepAlive(options?: Core.RequestOptions): Promise<unknown> {
     return this.client.devboxes.keepAlive(this._id, options);
@@ -610,6 +621,9 @@ export class Devbox {
    * const snapshot = await devbox.snapshotDisk({ name: 'pre-deployment' });
    * console.log(`Snapshot ${snapshot.id} created successfully`);
    * ```
+   * @param {DevboxSnapshotDiskParams} [params] - Snapshot creation parameters
+   * @param {Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxSnapshotView>> }} [options] - Request options with optional polling configuration
+   * @returns {Promise<Snapshot>} A completed {@link Snapshot} instance
    */
   async snapshotDisk(
     params?: DevboxSnapshotDiskParams,
@@ -630,6 +644,9 @@ export class Devbox {
    * // Do other work...
    * await snapshot.awaitCompleted();
    * ```
+   * @param {DevboxSnapshotDiskParams} [params] - Snapshot creation parameters
+   * @param {Core.RequestOptions} [options] - Request options
+   * @returns {Promise<Snapshot>} A {@link Snapshot} instance that has started but may not be completed
    */
   async snapshotDiskAsync(
     params?: DevboxSnapshotDiskParams,
@@ -646,6 +663,8 @@ export class Devbox {
     return {
       /**
        * Create an SSH key for remote access to the devbox.
+       * @param {Core.RequestOptions} [options] - Request options
+       * @returns {Promise<unknown>} SSH key creation result
        */
       createSSHKey: async (options?: Core.RequestOptions) => {
         return this.client.devboxes.createSSHKey(this._id, options);
@@ -653,6 +672,9 @@ export class Devbox {
 
       /**
        * Create a tunnel to a port on the devbox.
+       * @param {DevboxCreateTunnelParams} params - Tunnel creation parameters
+       * @param {Core.RequestOptions} [options] - Request options
+       * @returns {Promise<unknown>} Tunnel creation result
        */
       createTunnel: async (params: DevboxCreateTunnelParams, options?: Core.RequestOptions) => {
         return this.client.devboxes.createTunnel(this._id, params, options);
@@ -660,6 +682,9 @@ export class Devbox {
 
       /**
        * Remove a tunnel from the devbox.
+       * @param {DevboxRemoveTunnelParams} params - Tunnel removal parameters
+       * @param {Core.RequestOptions} [options] - Request options
+       * @returns {Promise<unknown>} Tunnel removal result
        */
       removeTunnel: async (params: DevboxRemoveTunnelParams, options?: Core.RequestOptions) => {
         return this.client.devboxes.removeTunnel(this._id, params, options);

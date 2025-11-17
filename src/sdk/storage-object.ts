@@ -204,10 +204,10 @@ export class StorageObject {
    * console.log(storageObject.id);
    * ```
    *
-   * @param client - The Runloop client instance
-   * @param params - Parameters for creating the object
-   * @param options - Request options
-   * @returns An Object instance with upload URL
+   * @param {Runloop} client - The Runloop client instance
+   * @param {ObjectCreateParams} params - Parameters for creating the object
+   * @param {Core.RequestOptions} [options] - Request options
+   * @returns {Promise<StorageObject>} A {@link StorageObject} instance with upload URL
    */
   static async create(
     client: Runloop,
@@ -222,9 +222,9 @@ export class StorageObject {
    * Create a StorageObject instance by ID without retrieving from API.
    * Use getInfo() to fetch the actual data when needed.
    *
-   * @param client - The Runloop client instance
-   * @param id - The object ID
-   * @returns An Object instance
+   * @param {Runloop} client - The Runloop client instance
+   * @param {string} id - The object ID
+   * @returns {StorageObject} A {@link StorageObject} instance
    */
   static fromId(client: Runloop, id: string): StorageObject {
     return new StorageObject(client, id, null);
@@ -233,10 +233,10 @@ export class StorageObject {
   /**
    * List all storage objects with optional filters.
    *
-   * @param client - The Runloop client instance
-   * @param params - Optional filter parameters
-   * @param options - Request options
-   * @returns Array of Object instances
+   * @param {Runloop} client - The Runloop client instance
+   * @param {ObjectListParams} [params] - Optional filter parameters
+   * @param {Core.RequestOptions} [options] - Request options
+   * @returns {Promise<StorageObject[]>} Array of {@link StorageObject} instances
    */
   static async list(
     client: Runloop,
@@ -274,10 +274,11 @@ export class StorageObject {
    * console.log(`Uploaded: ${object.id}`);
    * ```
    *
-   * @param filePath - Path to the file to upload
-   * @param name - Name for the uploaded object
-   * @param options - Request options with optional client, content type, and metadata
-   * @returns A completed StorageObject instance
+   * @param {Runloop} client - The Runloop client instance
+   * @param {string} filePath - Path to the file to upload
+   * @param {string} name - Name for the uploaded object
+   * @param {Core.RequestOptions & { contentType?: ContentType; metadata?: Record<string, string> }} [options] - Request options with optional client, content type, and metadata
+   * @returns {Promise<StorageObject>} A completed {@link StorageObject} instance
    */
   static async uploadFromFile(
     client: Runloop,
@@ -367,10 +368,11 @@ export class StorageObject {
    * );
    * ```
    *
-   * @param text - The text content to upload
-   * @param name - Name for the object
-   * @param options - Request options with optional metadata
-   * @returns A completed StorageObject instance
+   * @param {Runloop} client - The Runloop client instance
+   * @param {string} text - The text content to upload
+   * @param {string} name - Name for the object
+   * @param {Core.RequestOptions & { metadata?: Record<string, string> }} [options] - Request options with optional metadata
+   * @returns {Promise<StorageObject>} A completed {@link StorageObject} instance
    */
   static async uploadFromText(
     client: Runloop,
@@ -433,11 +435,12 @@ export class StorageObject {
    * );
    * ```
    *
-   * @param buffer - The buffer content to upload
-   * @param name - Name for the object
-   * @param contentType - Content type for the object
-   * @param options - Request options with optional client and metadata
-   * @returns A completed StorageObject instance
+   * @param {Runloop} client - The Runloop client instance
+   * @param {Buffer} buffer - The buffer content to upload
+   * @param {string} name - Name for the object
+   * @param {ContentType} contentType - Content type for the object
+   * @param {Core.RequestOptions & { metadata?: Record<string, string> }} [options] - Request options with optional client and metadata
+   * @returns {Promise<StorageObject>} A completed {@link StorageObject} instance
    */
   static async uploadFromBuffer(
     client: Runloop,
@@ -494,6 +497,8 @@ export class StorageObject {
 
   /**
    * Get the complete object data from the API.
+   * @param {Core.RequestOptions} [options] - Request options
+   * @returns {Promise<ObjectView>} The object data
    */
   async getInfo(options?: Core.RequestOptions): Promise<ObjectView> {
     return this.client.objects.retrieve(this._id, options);
@@ -519,8 +524,8 @@ export class StorageObject {
    * await object.complete();
    * ```
    *
-   * @param content - The content to upload (string or Buffer)
-   * @returns Promise that resolves when upload is complete
+   * @param {string | Buffer} content - The content to upload (string or Buffer)
+   * @returns {Promise<void>} Promise that resolves when upload is complete
    */
   async uploadContent(content: string | Buffer): Promise<void> {
     if (!this._uploadUrl) {
@@ -553,7 +558,8 @@ export class StorageObject {
    * Mark the object's upload as complete, transitioning it from UPLOADING to READ_ONLY state.
    * Call this after you've finished uploading content via the upload URL.
    *
-   * @param options - Request options
+   * @param {Core.RequestOptions} [options] - Request options
+   * @returns {Promise<void>} Promise that resolves when the upload is marked as complete
    */
   async complete(options?: Core.RequestOptions): Promise<void> {
     await this.client.objects.complete(this._id, {}, options);
@@ -563,9 +569,9 @@ export class StorageObject {
    * Get a presigned download URL for this object.
    * The URL will be valid for the specified duration (default: 1 hour).
    *
-   * @param durationSeconds - How long the URL should be valid (default: 3600)
-   * @param options - Request options
-   * @returns Download URL information
+   * @param {number} [durationSeconds] - How long the URL should be valid (default: 3600)
+   * @param {Core.RequestOptions} [options] - Request options
+   * @returns {Promise<ObjectDownloadURLView>} Download URL information
    */
   async getDownloadUrl(
     durationSeconds?: number,
@@ -590,8 +596,8 @@ export class StorageObject {
    * console.log(content);
    * ```
    *
-   * @param options - Request options
-   * @returns The object content as a string
+   * @param {Core.RequestOptions} [options] - Request options
+   * @returns {Promise<string>} The object content as a string
    */
   async downloadAsText(options?: Core.RequestOptions): Promise<string> {
     const { download_url } = await this.getDownloadUrl(undefined, options);
@@ -616,8 +622,8 @@ export class StorageObject {
    * fs.writeFileSync('downloaded.bin', buffer);
    * ```
    *
-   * @param options - Request options
-   * @returns The object content as a Buffer
+   * @param {Core.RequestOptions} [options] - Request options
+   * @returns {Promise<Buffer>} The object content as a Buffer
    */
   async downloadAsBuffer(options?: Core.RequestOptions): Promise<Buffer> {
     const { download_url } = await this.getDownloadUrl(undefined, options);
@@ -634,7 +640,8 @@ export class StorageObject {
   /**
    * Delete this object. This action is irreversible.
    *
-   * @param options - Request options
+   * @param {Core.RequestOptions} [options] - Request options
+   * @returns {Promise<void>} Promise that resolves when the object is deleted
    */
   async delete(options?: Core.RequestOptions): Promise<void> {
     await this.client.objects.delete(this._id, {}, options);

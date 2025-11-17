@@ -104,8 +104,8 @@ type ContentType = ObjectCreateParams['content_type'];
  *
  * @example
  * ```typescript
- * const sdk = new RunloopSDK(); // export RUNLOOP_API_KEY will automatically be used.
- * const devbox = await sdk.devbox.create({ name: 'my-devbox' });
+ * const runloop = new RunloopSDK(); // export RUNLOOP_API_KEY will automatically be used.
+ * const devbox = await runloop.devbox.create({ name: 'my-devbox' });
  * const result = await devbox.cmd.exec({ command: 'echo "Hello, World!"' });
  * console.log(result.exitCode);
  * ```
@@ -117,6 +117,10 @@ export class RunloopSDK {
   public readonly snapshot: RunloopSDK.SnapshotInterface;
   public readonly storageObject: RunloopSDK.StorageObjectInterface;
 
+  /**
+   * Creates a new RunloopSDK instance.
+   * @param {ClientOptions} [options] - Optional client configuration options.
+   */
   constructor(options?: ClientOptions) {
     this.api = new Runloop(options);
     this.devbox = new RunloopSDK.DevboxInterface(this.api);
@@ -128,7 +132,7 @@ export class RunloopSDK {
 
 export namespace RunloopSDK {
   /**
-   * Devbox management interface
+   * Devbox SDK interface for managing devboxes.
    *
    * ## Overview
    *
@@ -144,8 +148,8 @@ export namespace RunloopSDK {
    *
    * @example
    * ```typescript
-   * const sdk = new RunloopSDK();
-   * const devbox = await sdk.devbox.create({ name: 'my-devbox' });
+   * const runloop = new RunloopSDK();
+   * const devbox = await runloop.devbox.create({ name: 'my-devbox' });
    * const result = await devbox.cmd.exec({ command: 'echo "Hello, World!"' });
    * ```
    */
@@ -155,6 +159,12 @@ export namespace RunloopSDK {
      */
     constructor(private client: Runloop) {}
 
+    /**
+     * Create a new devbox.
+     * @param {DevboxCreateParams} [params] - Parameters for creating the devbox.
+     * @param {Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxView>> }} [options] - Request options including polling configuration.
+     * @returns {Promise<Devbox>} A {@link Devbox} instance.
+     */
     async create(
       params?: DevboxCreateParams,
       options?: Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxView>> },
@@ -162,6 +172,13 @@ export namespace RunloopSDK {
       return Devbox.create(this.client, params, options);
     }
 
+    /**
+     * Create a new devbox from a blueprint ID.
+     * @param {string} blueprintId - The ID of the blueprint to use.
+     * @param {Omit<DevboxCreateParams, 'blueprint_id' | 'snapshot_id' | 'blueprint_name'>} [params] - Additional parameters for creating the devbox (excluding blueprint_id, snapshot_id, and blueprint_name).
+     * @param {Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxView>> }} [options] - Request options including polling configuration.
+     * @returns {Promise<Devbox>} A {@link Devbox} instance.
+     */
     async createFromBlueprintId(
       blueprintId: string,
       params?: Omit<DevboxCreateParams, 'blueprint_id' | 'snapshot_id' | 'blueprint_name'>,
@@ -170,6 +187,13 @@ export namespace RunloopSDK {
       return Devbox.createFromBlueprintId(this.client, blueprintId, params, options);
     }
 
+    /**
+     * Create a new devbox from a blueprint name.
+     * @param {string} blueprintName - The name of the blueprint to use.
+     * @param {Omit<DevboxCreateParams, 'blueprint_id' | 'snapshot_id' | 'blueprint_name'>} [params] - Additional parameters for creating the devbox (excluding blueprint_id, snapshot_id, and blueprint_name).
+     * @param {Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxView>> }} [options] - Request options including polling configuration.
+     * @returns {Promise<Devbox>} A {@link Devbox} instance.
+     */
     async createFromBlueprintName(
       blueprintName: string,
       params?: Omit<DevboxCreateParams, 'blueprint_id' | 'snapshot_id' | 'blueprint_name'>,
@@ -178,6 +202,13 @@ export namespace RunloopSDK {
       return Devbox.createFromBlueprintName(this.client, blueprintName, params, options);
     }
 
+    /**
+     * Create a new devbox from a snapshot.
+     * @param {string} snapshotId - The ID of the snapshot to use.
+     * @param {Omit<DevboxCreateParams, 'snapshot_id' | 'blueprint_id' | 'blueprint_name'>} [params] - Additional parameters for creating the devbox (excluding snapshot_id, blueprint_id, and blueprint_name).
+     * @param {Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxView>> }} [options] - Request options including polling configuration.
+     * @returns {Promise<Devbox>} A {@link Devbox} instance.
+     */
     async createFromSnapshot(
       snapshotId: string,
       params?: Omit<DevboxCreateParams, 'snapshot_id' | 'blueprint_id' | 'blueprint_name'>,
@@ -186,10 +217,21 @@ export namespace RunloopSDK {
       return Devbox.createFromSnapshot(this.client, snapshotId, params, options);
     }
 
+    /**
+     * Get a devbox object by its ID.
+     * @param {string} id - The ID of the devbox.
+     * @returns {Devbox} A {@link Devbox} instance.
+     */
     fromId(id: string): Devbox {
       return Devbox.fromId(this.client, id);
     }
 
+    /**
+     * List all devboxes with optional filters.
+     * @param {DevboxListParams} [params] - Optional filter parameters.
+     * @param {Core.RequestOptions} [options] - Request options.
+     * @returns {Promise<Devbox[]>} An array of {@link Devbox} instances.
+     */
     async list(params?: DevboxListParams, options?: Core.RequestOptions): Promise<Devbox[]> {
       const result = await this.client.devboxes.list(params, options);
       const devboxes: Devbox[] = [];
@@ -203,7 +245,7 @@ export namespace RunloopSDK {
   }
 
   /**
-   * Blueprint management interface
+   * Blueprint SDK interface for managing blueprints.
    *
    * ## Overview
    *
@@ -233,6 +275,12 @@ export namespace RunloopSDK {
      */
     constructor(private client: Runloop) {}
 
+    /**
+     * Create a new blueprint.
+     * @param {BlueprintCreateParams} params - Parameters for creating the blueprint.
+     * @param {Core.RequestOptions & { polling?: Partial<PollingOptions<Runloop.Blueprints.BlueprintView>> }} [options] - Request options including polling configuration.
+     * @returns {Promise<Blueprint>} A {@link Blueprint} instance.
+     */
     async create(
       params: BlueprintCreateParams,
       options?: Core.RequestOptions & { polling?: Partial<PollingOptions<Runloop.Blueprints.BlueprintView>> },
@@ -240,10 +288,21 @@ export namespace RunloopSDK {
       return Blueprint.create(this.client, params, options);
     }
 
+    /**
+     * Get a blueprint object by its ID.
+     * @param {string} id - The ID of the blueprint.
+     * @returns {Blueprint} A {@link Blueprint} instance.
+     */
     fromId(id: string): Blueprint {
       return Blueprint.fromId(this.client, id);
     }
 
+    /**
+     * List all blueprints with optional filters.
+     * @param {BlueprintListParams} [params] - Optional filter parameters.
+     * @param {Core.RequestOptions} [options] - Request options.
+     * @returns {Promise<Blueprint[]>} An array of {@link Blueprint} instances.
+     */
     async list(params?: BlueprintListParams, options?: Core.RequestOptions): Promise<Blueprint[]> {
       const result = await this.client.blueprints.list(params, options);
       const blueprints: Blueprint[] = [];
@@ -257,7 +316,7 @@ export namespace RunloopSDK {
   }
 
   /**
-   * Snapshot management interface
+   * Snapshot SDK interface for managing disk snapshots.
    *
    * ## Overview
    *
@@ -273,7 +332,9 @@ export namespace RunloopSDK {
    * @example
    * ```typescript
    * const sdk = new RunloopSDK();
-   * const snapshots = await sdk.snapshot.list(...);
+   * const snapshot = await devbox.snapshotDisk({ name: 'backup' });
+   * ...
+   * const devbox = await snapshot.createDevbox();
    * ```
    */
   export class SnapshotInterface {
@@ -282,10 +343,21 @@ export namespace RunloopSDK {
      */
     constructor(private client: Runloop) {}
 
+    /**
+     * Get a snapshot object by its ID.
+     * @param {string} id - The ID of the snapshot.
+     * @returns {Snapshot} A {@link Snapshot} instance.
+     */
     fromId(id: string): Snapshot {
       return Snapshot.fromId(this.client, id);
     }
 
+    /**
+     * List all snapshots.
+     * @param {DevboxListDiskSnapshotsParams} [params] - Optional filter parameters.
+     * @param {Core.RequestOptions} [options] - Request options.
+     * @returns {Promise<Snapshot[]>} An array of {@link Snapshot} instances.
+     */
     async list(params?: DevboxListDiskSnapshotsParams, options?: Core.RequestOptions): Promise<Snapshot[]> {
       return Snapshot.list(this.client, params, options);
     }
@@ -318,6 +390,22 @@ export namespace RunloopSDK {
      */
     constructor(private client: Runloop) {}
 
+    /**
+     * Create a new storage object. This is for advanced users and for basic operations you should use the {@link StorageObjectInterface.uploadFromFile uploadFromFile()}, {@link StorageObjectInterface.uploadFromText uploadFromText()}, or {@link StorageObjectInterface.uploadFromBuffer uploadFromBuffer()} methods instead.
+     *
+     * @example
+     * ```typescript
+     * const storageObject = await runloop.storageObject.create({
+     *   name: 'my-file.txt',
+     *   content_type: 'text',
+     *   metadata: { project: 'demo' },
+     * });
+     * console.log(storageObject.id);
+     * ```
+     * @param {ObjectCreateParams} params - Parameters for creating the object.
+     * @param {Core.RequestOptions & { polling?: Partial<PollingOptions<Runloop.Objects.ObjectView>> }} [options] - Request options.
+     * @returns {Promise<StorageObject>} A {@link StorageObject} instance.
+     */
     async create(
       params: ObjectCreateParams,
       options?: Core.RequestOptions & { polling?: Partial<PollingOptions<Runloop.Objects.ObjectView>> },
@@ -325,10 +413,21 @@ export namespace RunloopSDK {
       return StorageObject.create(this.client, params, options);
     }
 
+    /**
+     * Get a storage object by its ID.
+     * @param {string} id - The ID of the storage object.
+     * @returns {StorageObject} A {@link StorageObject} instance.
+     */
     fromId(id: string): StorageObject {
       return StorageObject.fromId(this.client, id);
     }
 
+    /**
+     * List all storage objects with optional filters.
+     * @param {ObjectListParams} [params] - Optional filter parameters.
+     * @param {Core.RequestOptions} [options] - Request options.
+     * @returns {Promise<StorageObject[]>} An array of {@link StorageObject} instances.
+     */
     async list(params?: ObjectListParams, options?: Core.RequestOptions): Promise<StorageObject[]> {
       const result = await this.client.objects.list(params, options);
       const storageObjects: StorageObject[] = [];
@@ -341,6 +440,10 @@ export namespace RunloopSDK {
     /**
      * Upload a file directly from the filesystem (Node.js only).
      * This method handles the complete three-step upload process.
+     * @param {string} filePath - The path to the file to upload.
+     * @param {string} name - The name to use for the storage object.
+     * @param {Core.RequestOptions & { contentType?: ContentType; metadata?: Record<string, string> }} [options] - Request options including content type and metadata.
+     * @returns {Promise<StorageObject>} A {@link StorageObject} instance.
      */
     async uploadFromFile(
       filePath: string,
@@ -356,6 +459,10 @@ export namespace RunloopSDK {
     /**
      * Upload text content directly.
      * This method handles the complete three-step upload process.
+     * @param {string} text - The text content to upload.
+     * @param {string} name - The name to use for the storage object.
+     * @param {Core.RequestOptions & { metadata?: Record<string, string> }} [options] - Request options including metadata.
+     * @returns {Promise<StorageObject>} A {@link StorageObject} instance.
      */
     async uploadFromText(
       text: string,
@@ -370,6 +477,11 @@ export namespace RunloopSDK {
     /**
      * Upload content from a Buffer (Node.js only).
      * This method handles the complete three-step upload process.
+     * @param {Buffer} buffer - The buffer containing the content to upload.
+     * @param {string} name - The name to use for the storage object.
+     * @param {ContentType} contentType - The content type of the buffer.
+     * @param {Core.RequestOptions & { metadata?: Record<string, string> }} [options] - Request options including metadata.
+     * @returns {Promise<StorageObject>} A {@link StorageObject} instance.
      */
     async uploadFromBuffer(
       buffer: Buffer,

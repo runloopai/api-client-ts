@@ -115,9 +115,9 @@ export class Snapshot {
    * Create a Snapshot instance by ID without retrieving from API.
    * Use getInfo() to fetch the actual data when needed.
    *
-   * @param client - The Runloop client instance
-   * @param id - The snapshot ID
-   * @returns A Snapshot instance
+   * @param {Runloop} client - The Runloop client instance
+   * @param {string} id - The snapshot ID
+   * @returns {Snapshot} A {@link Snapshot} instance
    */
   static fromId(client: Runloop, id: string): Snapshot {
     return new Snapshot(client, id);
@@ -136,10 +136,10 @@ export class Snapshot {
    * const snapshots = await runloop.snapshot.list({ devbox_id: 'devbox-123' });
    * ```
    *
-   * @param client - The Runloop client instance
-   * @param params - Optional filter parameters
-   * @param options - Request options
-   * @returns Array of Snapshot instances
+   * @param {Runloop} client - The Runloop client instance
+   * @param {DevboxListDiskSnapshotsParams} [params] - Optional filter parameters
+   * @param {Core.RequestOptions} [options] - Request options
+   * @returns {Promise<Snapshot[]>} Array of {@link Snapshot} instances
    */
   static async list(
     client: Runloop,
@@ -165,6 +165,8 @@ export class Snapshot {
 
   /**
    * Get the complete snapshot data from the API.
+   * @param {Core.RequestOptions} [options] - Request options
+   * @returns {Promise<DevboxSnapshotAsyncStatusView>} The snapshot data
    */
   async getInfo(options?: Core.RequestOptions) {
     return await this.client.devboxes.diskSnapshots.queryStatus(this._id, options);
@@ -174,8 +176,9 @@ export class Snapshot {
    * Update the snapshot's name and/or metadata.
    * This performs a complete replacement, not a patch.
    *
-   * @param params - New name and/or metadata
-   * @param options - Request options
+   * @param {DiskSnapshotUpdateParams} [params] - New name and/or metadata
+   * @param {Core.RequestOptions} [options] - Request options
+   * @returns {Promise<void>} Promise that resolves when the update is complete
    */
   async update(params?: DiskSnapshotUpdateParams, options?: Core.RequestOptions): Promise<void> {
     await this.client.devboxes.diskSnapshots.update(this._id, params, options);
@@ -184,7 +187,8 @@ export class Snapshot {
   /**
    * Delete this snapshot.
    *
-   * @param options - Request options
+   * @param {Core.RequestOptions} [options] - Request options
+   * @returns {Promise<unknown>} The deletion result
    */
   async delete(options?: Core.RequestOptions): Promise<unknown> {
     return this.client.devboxes.diskSnapshots.delete(this._id, options);
@@ -194,8 +198,8 @@ export class Snapshot {
    * Query the status of an asynchronous snapshot operation.
    * Useful when the snapshot was created with snapshotDiskAsync().
    *
-   * @param options - Request options
-   * @returns Async status information
+   * @param {Core.RequestOptions} [options] - Request options
+   * @returns {Promise<DevboxSnapshotAsyncStatusView>} Async status information
    */
   async queryStatus(options?: Core.RequestOptions): Promise<DevboxSnapshotAsyncStatusView> {
     return this.client.devboxes.diskSnapshots.queryStatus(this._id, options);
@@ -204,8 +208,8 @@ export class Snapshot {
   /**
    * Wait for the snapshot to be completed.
    *
-   * @param options - Request options with optional polling configuration
-   * @returns Snapshot data
+   * @param {Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxSnapshotAsyncStatusView>> }} [options] - Request options with optional polling configuration
+   * @returns {Promise<DevboxSnapshotAsyncStatusView>} Snapshot data
    */
   async awaitCompleted(
     options?: Core.RequestOptions & {
@@ -230,9 +234,9 @@ export class Snapshot {
    * });
    * ```
    *
-   * @param params - Additional devbox creation parameters (optional)
-   * @param options - Request options with optional polling configuration
-   * @returns A new Devbox instance created from this snapshot
+   * @param {Omit<DevboxCreateParams, 'snapshot_id' | 'blueprint_id' | 'blueprint_name'>} [params] - Additional devbox creation parameters (optional)
+   * @param {Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxView>> }} [options] - Request options with optional polling configuration
+   * @returns {Promise<Devbox>} A new {@link Devbox} instance created from this snapshot
    */
   async createDevbox(
     params?: Omit<DevboxCreateParams, 'snapshot_id' | 'blueprint_id' | 'blueprint_name'>,
