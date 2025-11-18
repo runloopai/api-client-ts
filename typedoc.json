@@ -1,26 +1,19 @@
 {
   "$schema": "https://typedoc.org/schema.json",
-  "entryPoints": [
-    "src/sdk.ts"
-  ],
+  "entryPoints": ["src/sdk.ts"],
   "entryPointStrategy": "expand",
   "out": "docs/",
   "tsconfig": "tsconfig.typedoc.json",
   "includeVersion": true,
   "readme": "README-SDK.md",
-  "plugin": [
-    "typedoc-github-theme",
-    "@shipgirl/typedoc-plugin-versions"
-  ],
+  "plugin": ["typedoc-github-theme", "@shipgirl/typedoc-plugin-versions"],
   "navigation": {
     "includeCategories": true,
     "includeGroups": true
   },
   "categorizeByGroup": true,
   "searchInComments": true,
-  "sort": [
-    "source-order"
-  ],
+  "sort": ["source-order"],
   "kindSortOrder": [
     "Project",
     "Module",
@@ -56,4 +49,3 @@
     "Documentation": "https://docs.runloop.ai"
   }
 }
-

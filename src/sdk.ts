@@ -1,95 +1,39 @@
+// Export everything from sdk/index.ts
+export * from './sdk/index';
+
 import { Runloop, type ClientOptions } from './index';
 import { Devbox } from './sdk/devbox';
 import { Blueprint } from './sdk/blueprint';
 import { Snapshot } from './sdk/snapshot';
 import { StorageObject } from './sdk/storage-object';
-import { Execution } from './sdk/execution';
-import { ExecutionResult } from './sdk/execution-result';
-
-// Re-export SDK classes for documentation
-export { Devbox, Blueprint, Snapshot, StorageObject, Execution, ExecutionResult };
 
 // Re-export types from core
 import type * as Core from './core';
 export type { RequestOptions } from './core';
 
-// Re-export types from lib
-import { PollingOptions } from './lib/polling';
-export { PollingOptions };
-
-// Re-export types from resources/devboxes
+// Import types used in this file
 import type {
   DevboxCreateParams,
-  DevboxListDiskSnapshotsParams,
   DevboxListParams,
   DevboxView,
-  DevboxAsyncExecutionDetailView,
-  DevboxExecutionDetailView,
-  DevboxSnapshotDiskParams,
-  DevboxCreateTunnelParams,
-  DevboxRemoveTunnelParams,
-  DevboxReadFileContentsParams,
-  DevboxWriteFileContentsParams,
-  DevboxDownloadFileParams,
-  DevboxUploadFileParams,
-  DevboxExecuteParams,
-  DevboxExecuteAsyncParams,
-  DevboxSnapshotView,
-  DevboxCreateSSHKeyResponse,
-  DevboxTunnelView,
+  DevboxListDiskSnapshotsParams,
 } from './resources/devboxes/devboxes';
+import type { BlueprintCreateParams, BlueprintListParams } from './resources/blueprints';
+import type { ObjectCreateParams, ObjectListParams } from './resources/objects';
+import { PollingOptions } from './lib/polling';
 
+// Note: We don't export resource classes (Benchmarks, Blueprints, Devboxes, etc.) from the SDK
+// Those are low-level API classes and should be accessed via runloop.api.*
+// Users can import types directly from '@runloop/api-client/resources' if needed
+
+// Re-export types from resources/devboxes/disk-snapshots (not in resources/index.ts)
 export type {
-  DevboxCreateParams,
-  DevboxListDiskSnapshotsParams,
-  DevboxListParams,
-  DevboxView,
-  DevboxAsyncExecutionDetailView,
-  DevboxExecutionDetailView,
-  DevboxSnapshotDiskParams,
-  DevboxCreateTunnelParams,
-  DevboxRemoveTunnelParams,
-  DevboxReadFileContentsParams,
-  DevboxWriteFileContentsParams,
-  DevboxDownloadFileParams,
-  DevboxUploadFileParams,
-  DevboxExecuteParams,
-  DevboxExecuteAsyncParams,
-  DevboxSnapshotView,
-  DevboxCreateSSHKeyResponse,
-  DevboxTunnelView,
-};
-
-// Re-export types from resources/devboxes/disk-snapshots
-import type {
   DevboxSnapshotAsyncStatusView,
   DiskSnapshotUpdateParams,
 } from './resources/devboxes/disk-snapshots';
 
-export type { DevboxSnapshotAsyncStatusView, DiskSnapshotUpdateParams };
-
-// Re-export types from resources/blueprints
-import type {
-  BlueprintCreateParams,
-  BlueprintListParams,
-  BlueprintView,
-  BlueprintBuildLogsListView,
-} from './resources/blueprints';
-
-export type { BlueprintCreateParams, BlueprintListParams, BlueprintView, BlueprintBuildLogsListView };
-
-// Re-export types from resources/objects
-import type {
-  ObjectCreateParams,
-  ObjectListParams,
-  ObjectView,
-  ObjectDownloadURLView,
-} from './resources/objects';
-
-export type { ObjectCreateParams, ObjectListParams, ObjectView, ObjectDownloadURLView };
-
-// Re-export ExecuteStreamingCallbacks from devbox
-export type { ExecuteStreamingCallbacks } from './sdk/devbox';
+// Re-export types from lib
+export { PollingOptions };
 
 // Re-export Runloop and ClientOptions
 export { Runloop };
@@ -125,7 +69,7 @@ export class RunloopSDK {
    * that provides you with a fully configured development environment. Use this interface to create
    * new devboxes or get existing ones by ID.
    */
-  public readonly devbox: RunloopSDK.DevboxOps;
+  public readonly devbox: DevboxOps;
 
   /**
    * Interface for creating and accessing {@link Blueprint} class instances.
@@ -133,7 +77,7 @@ export class RunloopSDK {
    * Dockerfiles. They can be used to create multiple devboxes with consistent environments. Use this
    * interface to create new blueprints or get existing ones by ID.
    */
-  public readonly blueprint: RunloopSDK.BlueprintOps;
+  public readonly blueprint: BlueprintOps;
 
   /**
    * Interface for creating and accessing {@link Snapshot} class instances.
@@ -141,7 +85,7 @@ export class RunloopSDK {
    * state of a devbox and restore it later or create new devboxes from saved states. Use this
    * interface to list snapshots or get existing ones by ID.
    */
-  public readonly snapshot: RunloopSDK.SnapshotOps;
+  public readonly snapshot: SnapshotOps;
 
   /**
    * Interface for creating and accessing {@link StorageObject} class instances.
@@ -150,7 +94,7 @@ export class RunloopSDK {
    * any other content you need to persist or share between devboxes. Use this interface to create
    * new storage objects or get existing ones by ID.
    */
-  public readonly storageObject: RunloopSDK.StorageObjectOps;
+  public readonly storageObject: StorageObjectOps;
 
   /**
    * Creates a new RunloopSDK instance.
@@ -158,379 +102,391 @@ export class RunloopSDK {
    */
   constructor(options?: ClientOptions) {
     this.api = new Runloop(options);
-    this.devbox = new RunloopSDK.DevboxOps(this.api);
-    this.blueprint = new RunloopSDK.BlueprintOps(this.api);
-    this.snapshot = new RunloopSDK.SnapshotOps(this.api);
-    this.storageObject = new RunloopSDK.StorageObjectOps(this.api);
+    this.devbox = new DevboxOps(this.api);
+    this.blueprint = new BlueprintOps(this.api);
+    this.snapshot = new SnapshotOps(this.api);
+    this.storageObject = new StorageObjectOps(this.api);
   }
 }
 
-export namespace RunloopSDK {
+/**
+ * Devbox SDK interface for managing devboxes.
+ *
+ * ## Overview
+ *
+ * The `DevboxOps` class provides a high-level abstraction for managing devboxes,
+ * which are isolated development environments running in Runloop's cloud infrastructure.
+ * Devboxes can be created from blueprints or snapshots, and support command execution,
+ * file operations, and lifecycle management.
+ *
+ * ## Usage
+ *
+ * This interface is accessed via {@link RunloopSDK.devbox}. You should construct
+ * a {@link RunloopSDK} instance and use it from there:
+ *
+ * @example
+ * ```typescript
+ * const runloop = new RunloopSDK();
+ * const devbox = await runloop.devbox.create({ name: 'my-devbox' });
+ * const result = await devbox.cmd.exec({ command: 'echo "Hello, World!"' });
+ * ```
+ */
+export class DevboxOps {
   /**
-   * Devbox SDK interface for managing devboxes.
-   *
-   * ## Overview
-   *
-   * The `DevboxInterface` class provides a high-level abstraction for managing devboxes,
-   * which are isolated development environments running in Runloop's cloud infrastructure.
-   * Devboxes can be created from blueprints or snapshots, and support command execution,
-   * file operations, and lifecycle management.
-   *
-   * ## Usage
-   *
-   * This interface is accessed via {@link RunloopSDK.devbox}. You should construct
-   * a {@link RunloopSDK} instance and use it from there:
-   *
-   * @example
-   * ```typescript
-   * const runloop = new RunloopSDK();
-   * const devbox = await runloop.devbox.create({ name: 'my-devbox' });
-   * const result = await devbox.cmd.exec({ command: 'echo "Hello, World!"' });
-   * ```
+   * @private
    */
-  export class DevboxOps {
-    /**
-     * @private
-     */
-    constructor(private client: Runloop) {}
+  constructor(private client: Runloop) {}
 
-    /**
-     * Create a new devbox.
-     * @param {DevboxCreateParams} [params] - Parameters for creating the devbox.
-     * @param {Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxView>> }} [options] - Request options including polling configuration.
-     * @returns {Promise<Devbox>} A {@link Devbox} instance.
-     */
-    async create(
-      params?: DevboxCreateParams,
-      options?: Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxView>> },
-    ): Promise<Devbox> {
-      return Devbox.create(this.client, params, options);
-    }
-
-    /**
-     * Create a new devbox from a blueprint ID.
-     * @param {string} blueprintId - The ID of the blueprint to use.
-     * @param {Omit<DevboxCreateParams, 'blueprint_id' | 'snapshot_id' | 'blueprint_name'>} [params] - Additional parameters for creating the devbox (excluding blueprint_id, snapshot_id, and blueprint_name).
-     * @param {Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxView>> }} [options] - Request options including polling configuration.
-     * @returns {Promise<Devbox>} A {@link Devbox} instance.
-     */
-    async createFromBlueprintId(
-      blueprintId: string,
-      params?: Omit<DevboxCreateParams, 'blueprint_id' | 'snapshot_id' | 'blueprint_name'>,
-      options?: Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxView>> },
-    ): Promise<Devbox> {
-      return Devbox.createFromBlueprintId(this.client, blueprintId, params, options);
-    }
-
-    /**
-     * Create a new devbox from a blueprint name.
-     * @param {string} blueprintName - The name of the blueprint to use.
-     * @param {Omit<DevboxCreateParams, 'blueprint_id' | 'snapshot_id' | 'blueprint_name'>} [params] - Additional parameters for creating the devbox (excluding blueprint_id, snapshot_id, and blueprint_name).
-     * @param {Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxView>> }} [options] - Request options including polling configuration.
-     * @returns {Promise<Devbox>} A {@link Devbox} instance.
-     */
-    async createFromBlueprintName(
-      blueprintName: string,
-      params?: Omit<DevboxCreateParams, 'blueprint_id' | 'snapshot_id' | 'blueprint_name'>,
-      options?: Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxView>> },
-    ): Promise<Devbox> {
-      return Devbox.createFromBlueprintName(this.client, blueprintName, params, options);
-    }
-
-    /**
-     * Create a new devbox from a snapshot.
-     * @param {string} snapshotId - The ID of the snapshot to use.
-     * @param {Omit<DevboxCreateParams, 'snapshot_id' | 'blueprint_id' | 'blueprint_name'>} [params] - Additional parameters for creating the devbox (excluding snapshot_id, blueprint_id, and blueprint_name).
-     * @param {Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxView>> }} [options] - Request options including polling configuration.
-     * @returns {Promise<Devbox>} A {@link Devbox} instance.
-     */
-    async createFromSnapshot(
-      snapshotId: string,
-      params?: Omit<DevboxCreateParams, 'snapshot_id' | 'blueprint_id' | 'blueprint_name'>,
-      options?: Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxView>> },
-    ): Promise<Devbox> {
-      return Devbox.createFromSnapshot(this.client, snapshotId, params, options);
-    }
-
-    /**
-     * Get a devbox object by its ID.
-     * @param {string} id - The ID of the devbox.
-     * @returns {Devbox} A {@link Devbox} instance.
-     */
-    fromId(id: string): Devbox {
-      return Devbox.fromId(this.client, id);
-    }
-
-    /**
-     * List all devboxes with optional filters.
-     * @param {DevboxListParams} [params] - Optional filter parameters.
-     * @param {Core.RequestOptions} [options] - Request options.
-     * @returns {Promise<Devbox[]>} An array of {@link Devbox} instances.
-     */
-    async list(params?: DevboxListParams, options?: Core.RequestOptions): Promise<Devbox[]> {
-      const result = await this.client.devboxes.list(params, options);
-      const devboxes: Devbox[] = [];
-
-      for (const devbox of result.devboxes) {
-        devboxes.push(Devbox.fromId(this.client, devbox.id));
-      }
-
-      return devboxes;
-    }
+  /**
+   * Create a new devbox.
+   * @param {DevboxCreateParams} [params] - Parameters for creating the devbox.
+   * @param {Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxView>> }} [options] - Request options including polling configuration.
+   * @returns {Promise<Devbox>} A {@link Devbox} instance.
+   */
+  async create(
+    params?: DevboxCreateParams,
+    options?: Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxView>> },
+  ): Promise<Devbox> {
+    return Devbox.create(this.client, params, options);
   }
 
   /**
-   * Blueprint SDK interface for managing blueprints.
-   *
-   * ## Overview
-   *
-   * The `BlueprintInterface` class provides a high-level abstraction for managing blueprints,
-   * which define the base configuration for devboxes. Blueprints are built from Dockerfiles
-   * and can be used to create multiple devboxes with consistent environments.
-   *
-   * ## Usage
-   *
-   * This interface is accessed via {@link RunloopSDK.blueprint}. You should construct
-   * a {@link RunloopSDK} instance and use it from there:
+   * Create a new devbox from a blueprint ID.
+   * @param {string} blueprintId - The ID of the blueprint to use.
+   * @param {Omit<DevboxCreateParams, 'blueprint_id' | 'snapshot_id' | 'blueprint_name'>} [params] - Additional parameters for creating the devbox (excluding blueprint_id, snapshot_id, and blueprint_name).
+   * @param {Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxView>> }} [options] - Request options including polling configuration.
+   * @returns {Promise<Devbox>} A {@link Devbox} instance.
+   */
+  async createFromBlueprintId(
+    blueprintId: string,
+    params?: Omit<DevboxCreateParams, 'blueprint_id' | 'snapshot_id' | 'blueprint_name'>,
+    options?: Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxView>> },
+  ): Promise<Devbox> {
+    return Devbox.createFromBlueprintId(this.client, blueprintId, params, options);
+  }
+
+  /**
+   * Create a new devbox from a blueprint name.
+   * @param {string} blueprintName - The name of the blueprint to use.
+   * @param {Omit<DevboxCreateParams, 'blueprint_id' | 'snapshot_id' | 'blueprint_name'>} [params] - Additional parameters for creating the devbox (excluding blueprint_id, snapshot_id, and blueprint_name).
+   * @param {Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxView>> }} [options] - Request options including polling configuration.
+   * @returns {Promise<Devbox>} A {@link Devbox} instance.
+   */
+  async createFromBlueprintName(
+    blueprintName: string,
+    params?: Omit<DevboxCreateParams, 'blueprint_id' | 'snapshot_id' | 'blueprint_name'>,
+    options?: Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxView>> },
+  ): Promise<Devbox> {
+    return Devbox.createFromBlueprintName(this.client, blueprintName, params, options);
+  }
+
+  /**
+   * Create a new devbox from a snapshot.
+   * @param {string} snapshotId - The ID of the snapshot to use.
+   * @param {Omit<DevboxCreateParams, 'snapshot_id' | 'blueprint_id' | 'blueprint_name'>} [params] - Additional parameters for creating the devbox (excluding snapshot_id, blueprint_id, and blueprint_name).
+   * @param {Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxView>> }} [options] - Request options including polling configuration.
+   * @returns {Promise<Devbox>} A {@link Devbox} instance.
+   */
+  async createFromSnapshot(
+    snapshotId: string,
+    params?: Omit<DevboxCreateParams, 'snapshot_id' | 'blueprint_id' | 'blueprint_name'>,
+    options?: Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxView>> },
+  ): Promise<Devbox> {
+    return Devbox.createFromSnapshot(this.client, snapshotId, params, options);
+  }
+
+  /**
+   * Get a devbox object by its ID.
+   * @param {string} id - The ID of the devbox.
+   * @returns {Devbox} A {@link Devbox} instance.
+   */
+  fromId(id: string): Devbox {
+    return Devbox.fromId(this.client, id);
+  }
+
+  /**
+   * List all devboxes with optional filters.
+   * @param {DevboxListParams} [params] - Optional filter parameters.
+   * @param {Core.RequestOptions} [options] - Request options.
+   * @returns {Promise<Devbox[]>} An array of {@link Devbox} instances.
+   */
+  async list(params?: DevboxListParams, options?: Core.RequestOptions): Promise<Devbox[]> {
+    const result = await this.client.devboxes.list(params, options);
+    const devboxes: Devbox[] = [];
+
+    for (const devbox of result.devboxes) {
+      devboxes.push(Devbox.fromId(this.client, devbox.id));
+    }
+
+    return devboxes;
+  }
+}
+
+/**
+ * Blueprint SDK interface for managing blueprints.
+ *
+ * ## Overview
+ *
+ * The `BlueprintOps` class provides a high-level abstraction for managing blueprints,
+ * which define the base configuration for devboxes. Blueprints are built from Dockerfiles
+ * and can be used to create multiple devboxes with consistent environments.
+ *
+ * ## Usage
+ *
+ * This interface is accessed via {@link RunloopSDK.blueprint}. You should construct
+ * a {@link RunloopSDK} instance and use it from there:
+ *
+ * @example
+ * ```typescript
+ * const sdk = new RunloopSDK();
+ * const blueprint = await sdk.blueprint.create({
+ *   name: 'my-blueprint',
+ *   dockerfile: `FROM ubuntu:22.04
+ *                RUN apt-get update`,
+ * });
+ * const devbox = await sdk.devbox.createFromBlueprintId(blueprint.id, { name: 'my-devbox' });
+ * ```
+ */
+export class BlueprintOps {
+  /**
+   * @private
+   */
+  constructor(private client: Runloop) {}
+
+  /**
+   * Create a new blueprint.
+   * @param {BlueprintCreateParams} params - Parameters for creating the blueprint.
+   * @param {Core.RequestOptions & { polling?: Partial<PollingOptions<Runloop.Blueprints.BlueprintView>> }} [options] - Request options including polling configuration.
+   * @returns {Promise<Blueprint>} A {@link Blueprint} instance.
+   */
+  async create(
+    params: BlueprintCreateParams,
+    options?: Core.RequestOptions & { polling?: Partial<PollingOptions<Runloop.Blueprints.BlueprintView>> },
+  ): Promise<Blueprint> {
+    return Blueprint.create(this.client, params, options);
+  }
+
+  /**
+   * Get a blueprint object by its ID.
+   * @param {string} id - The ID of the blueprint.
+   * @returns {Blueprint} A {@link Blueprint} instance.
+   */
+  fromId(id: string): Blueprint {
+    return Blueprint.fromId(this.client, id);
+  }
+
+  /**
+   * List all blueprints with optional filters.
+   * @param {BlueprintListParams} [params] - Optional filter parameters.
+   * @param {Core.RequestOptions} [options] - Request options.
+   * @returns {Promise<Blueprint[]>} An array of {@link Blueprint} instances.
+   */
+  async list(params?: BlueprintListParams, options?: Core.RequestOptions): Promise<Blueprint[]> {
+    const result = await this.client.blueprints.list(params, options);
+    const blueprints: Blueprint[] = [];
+
+    for (const blueprint of result.blueprints) {
+      blueprints.push(Blueprint.fromId(this.client, blueprint.id));
+    }
+
+    return blueprints;
+  }
+}
+
+/**
+ * Snapshot SDK interface for managing disk snapshots.
+ *
+ * ## Overview
+ *
+ * The `SnapshotOps` class provides a high-level abstraction for managing disk snapshots,
+ * which capture the complete state of a devbox's disk. Snapshots can be used to restore
+ * devboxes to a previous state or create new devboxes from saved states.
+ *
+ * ## Usage
+ *
+ * This interface is accessed via {@link RunloopSDK.snapshot}. You should construct
+ * a {@link RunloopSDK} instance and use it from there:
+ *
+ * @example
+ * ```typescript
+ * const sdk = new RunloopSDK();
+ * const snapshot = await devbox.snapshotDisk({ name: 'backup' });
+ * ...
+ * const devbox = await snapshot.createDevbox();
+ * ```
+ */
+export class SnapshotOps {
+  /**
+   * @private
+   */
+  constructor(private client: Runloop) {}
+
+  /**
+   * Get a snapshot object by its ID.
+   * @param {string} id - The ID of the snapshot.
+   * @returns {Snapshot} A {@link Snapshot} instance.
+   */
+  fromId(id: string): Snapshot {
+    return Snapshot.fromId(this.client, id);
+  }
+
+  /**
+   * List all snapshots.
+   * @param {DevboxListDiskSnapshotsParams} [params] - Optional filter parameters.
+   * @param {Core.RequestOptions} [options] - Request options.
+   * @returns {Promise<Snapshot[]>} An array of {@link Snapshot} instances.
+   */
+  async list(params?: DevboxListDiskSnapshotsParams, options?: Core.RequestOptions): Promise<Snapshot[]> {
+    return Snapshot.list(this.client, params, options);
+  }
+}
+
+/**
+ * Storage object management interface
+ *
+ * ## Overview
+ *
+ * The `StorageObjectOps` class provides a high-level abstraction for managing storage objects,
+ * which are files stored in Runloop's object storage. Storage objects can be uploaded,
+ * downloaded, and managed with metadata.
+ *
+ * ## Usage
+ *
+ * This interface is accessed via {@link RunloopSDK.storageObject}. You should construct
+ * a {@link RunloopSDK} instance and use it from there:
+ *
+ * @example
+ * ```typescript
+ * const sdk = new RunloopSDK();
+ * const storageObject = await sdk.storageObject.uploadFromFile("./my-file.txt", "my-file.txt");
+ * const objects = await sdk.storageObject.list();
+ * ```
+ */
+export class StorageObjectOps {
+  /**
+   * @private
+   */
+  constructor(private client: Runloop) {}
+
+  /**
+   * Create a new storage object. This is for advanced users and for basic operations you should use the {@link StorageObjectOps.uploadFromFile uploadFromFile()}, {@link StorageObjectOps.uploadFromText uploadFromText()}, or {@link StorageObjectOps.uploadFromBuffer uploadFromBuffer()} methods instead.
    *
    * @example
    * ```typescript
-   * const sdk = new RunloopSDK();
-   * const blueprint = await sdk.blueprint.create({
-   *   name: 'my-blueprint',
-   *   dockerfile: `FROM ubuntu:22.04
-   *                RUN apt-get update`,
+   * const storageObject = await runloop.storageObject.create({
+   *   name: 'my-file.txt',
+   *   content_type: 'text',
+   *   metadata: { project: 'demo' },
    * });
-   * const devbox = await sdk.devbox.createFromBlueprintId(blueprint.id, { name: 'my-devbox' });
+   * storageObject.uploadContent('Hello, World!');
+   * // this will mark the object as complete and make it read-only
+   * storageObject.complete();
    * ```
+   * @param params - Parameters for creating the object.
+   * @param options - Request options.
+   * @returns A {@link StorageObject} instance.
    */
-  export class BlueprintOps {
-    /**
-     * @private
-     */
-    constructor(private client: Runloop) {}
-
-    /**
-     * Create a new blueprint.
-     * @param {BlueprintCreateParams} params - Parameters for creating the blueprint.
-     * @param {Core.RequestOptions & { polling?: Partial<PollingOptions<Runloop.Blueprints.BlueprintView>> }} [options] - Request options including polling configuration.
-     * @returns {Promise<Blueprint>} A {@link Blueprint} instance.
-     */
-    async create(
-      params: BlueprintCreateParams,
-      options?: Core.RequestOptions & { polling?: Partial<PollingOptions<Runloop.Blueprints.BlueprintView>> },
-    ): Promise<Blueprint> {
-      return Blueprint.create(this.client, params, options);
-    }
-
-    /**
-     * Get a blueprint object by its ID.
-     * @param {string} id - The ID of the blueprint.
-     * @returns {Blueprint} A {@link Blueprint} instance.
-     */
-    fromId(id: string): Blueprint {
-      return Blueprint.fromId(this.client, id);
-    }
-
-    /**
-     * List all blueprints with optional filters.
-     * @param {BlueprintListParams} [params] - Optional filter parameters.
-     * @param {Core.RequestOptions} [options] - Request options.
-     * @returns {Promise<Blueprint[]>} An array of {@link Blueprint} instances.
-     */
-    async list(params?: BlueprintListParams, options?: Core.RequestOptions): Promise<Blueprint[]> {
-      const result = await this.client.blueprints.list(params, options);
-      const blueprints: Blueprint[] = [];
-
-      for (const blueprint of result.blueprints) {
-        blueprints.push(Blueprint.fromId(this.client, blueprint.id));
-      }
-
-      return blueprints;
-    }
+  async create(
+    params: ObjectCreateParams,
+    options?: Core.RequestOptions & { polling?: Partial<PollingOptions<Runloop.Objects.ObjectView>> },
+  ): Promise<StorageObject> {
+    return StorageObject.create(this.client, params, options);
   }
 
   /**
-   * Snapshot SDK interface for managing disk snapshots.
-   *
-   * ## Overview
-   *
-   * The `SnapshotInterface` class provides a high-level abstraction for managing disk snapshots,
-   * which capture the complete state of a devbox's disk. Snapshots can be used to restore
-   * devboxes to a previous state or create new devboxes from saved states.
-   *
-   * ## Usage
-   *
-   * This interface is accessed via {@link RunloopSDK.snapshot}. You should construct
-   * a {@link RunloopSDK} instance and use it from there:
-   *
-   * @example
-   * ```typescript
-   * const sdk = new RunloopSDK();
-   * const snapshot = await devbox.snapshotDisk({ name: 'backup' });
-   * ...
-   * const devbox = await snapshot.createDevbox();
-   * ```
+   * Get a storage object by its ID.
+   * @param {string} id - The ID of the storage object.
+   * @returns {StorageObject} A {@link StorageObject} instance.
    */
-  export class SnapshotOps {
-    /**
-     * @private
-     */
-    constructor(private client: Runloop) {}
-
-    /**
-     * Get a snapshot object by its ID.
-     * @param {string} id - The ID of the snapshot.
-     * @returns {Snapshot} A {@link Snapshot} instance.
-     */
-    fromId(id: string): Snapshot {
-      return Snapshot.fromId(this.client, id);
-    }
-
-    /**
-     * List all snapshots.
-     * @param {DevboxListDiskSnapshotsParams} [params] - Optional filter parameters.
-     * @param {Core.RequestOptions} [options] - Request options.
-     * @returns {Promise<Snapshot[]>} An array of {@link Snapshot} instances.
-     */
-    async list(params?: DevboxListDiskSnapshotsParams, options?: Core.RequestOptions): Promise<Snapshot[]> {
-      return Snapshot.list(this.client, params, options);
-    }
+  fromId(id: string): StorageObject {
+    return StorageObject.fromId(this.client, id);
   }
 
   /**
-   * Storage object management interface
-   *
-   * ## Overview
-   *
-   * The `StorageObjectInterface` class provides a high-level abstraction for managing storage objects,
-   * which are files stored in Runloop's object storage. Storage objects can be uploaded,
-   * downloaded, and managed with metadata.
-   *
-   * ## Usage
-   *
-   * This interface is accessed via {@link RunloopSDK.storageObject}. You should construct
-   * a {@link RunloopSDK} instance and use it from there:
-   *
-   * @example
-   * ```typescript
-   * const sdk = new RunloopSDK();
-   * const storageObject = await sdk.storageObject.uploadFromFile("./my-file.txt", "my-file.txt");
-   * const objects = await sdk.storageObject.list();
-   * ```
+   * List all storage objects with optional filters.
+   * @param {ObjectListParams} [params] - Optional filter parameters.
+   * @param {Core.RequestOptions} [options] - Request options.
+   * @returns {Promise<StorageObject[]>} An array of {@link StorageObject} instances.
    */
-  export class StorageObjectOps {
-    /**
-     * @private
-     */
-    constructor(private client: Runloop) {}
-
-    /**
-     * Create a new storage object. This is for advanced users and for basic operations you should use the {@link StorageObjectOps.uploadFromFile uploadFromFile()}, {@link StorageObjectOps.uploadFromText uploadFromText()}, or {@link StorageObjectOps.uploadFromBuffer uploadFromBuffer()} methods instead.
-     *
-     * @example
-     * ```typescript
-     * const storageObject = await runloop.storageObject.create({
-     *   name: 'my-file.txt',
-     *   content_type: 'text',
-     *   metadata: { project: 'demo' },
-     * });
-     * storageObject.uploadContent('Hello, World!');
-     * // this will mark the object as complete and make it read-only
-     * storageObject.complete();
-     * ```
-     * @param params - Parameters for creating the object.
-     * @param options - Request options.
-     * @returns A {@link StorageObject} instance.
-     */
-    async create(
-      params: ObjectCreateParams,
-      options?: Core.RequestOptions & { polling?: Partial<PollingOptions<Runloop.Objects.ObjectView>> },
-    ): Promise<StorageObject> {
-      return StorageObject.create(this.client, params, options);
+  async list(params?: ObjectListParams, options?: Core.RequestOptions): Promise<StorageObject[]> {
+    const result = await this.client.objects.list(params, options);
+    const storageObjects: StorageObject[] = [];
+    for (const storageObject of result.objects) {
+      storageObjects.push(StorageObject.fromId(this.client, storageObject.id));
     }
+    return storageObjects;
+  }
 
-    /**
-     * Get a storage object by its ID.
-     * @param {string} id - The ID of the storage object.
-     * @returns {StorageObject} A {@link StorageObject} instance.
-     */
-    fromId(id: string): StorageObject {
-      return StorageObject.fromId(this.client, id);
-    }
+  /**
+   * Upload a file directly from the filesystem (Node.js only).
+   * This method handles the complete three-step upload process.
+   * @param {string} filePath - The path to the file to upload.
+   * @param {string} name - The name to use for the storage object.
+   * @param {Core.RequestOptions & { contentType?: ContentType; metadata?: Record<string, string> }} [options] - Request options including content type and metadata.
+   * @returns {Promise<StorageObject>} A {@link StorageObject} instance.
+   */
+  async uploadFromFile(
+    filePath: string,
+    name: string,
+    options?: Core.RequestOptions & {
+      contentType?: ContentType;
+      metadata?: Record<string, string>;
+    },
+  ): Promise<StorageObject> {
+    return StorageObject.uploadFromFile(this.client, filePath, name, options);
+  }
 
-    /**
-     * List all storage objects with optional filters.
-     * @param {ObjectListParams} [params] - Optional filter parameters.
-     * @param {Core.RequestOptions} [options] - Request options.
-     * @returns {Promise<StorageObject[]>} An array of {@link StorageObject} instances.
-     */
-    async list(params?: ObjectListParams, options?: Core.RequestOptions): Promise<StorageObject[]> {
-      const result = await this.client.objects.list(params, options);
-      const storageObjects: StorageObject[] = [];
-      for (const storageObject of result.objects) {
-        storageObjects.push(StorageObject.fromId(this.client, storageObject.id));
-      }
-      return storageObjects;
-    }
+  /**
+   * Upload text content directly.
+   * This method handles the complete three-step upload process.
+   * @param {string} text - The text content to upload.
+   * @param {string} name - The name to use for the storage object.
+   * @param {Core.RequestOptions & { metadata?: Record<string, string> }} [options] - Request options including metadata.
+   * @returns {Promise<StorageObject>} A {@link StorageObject} instance.
+   */
+  async uploadFromText(
+    text: string,
+    name: string,
+    options?: Core.RequestOptions & {
+      metadata?: Record<string, string>;
+    },
+  ): Promise<StorageObject> {
+    return StorageObject.uploadFromText(this.client, text, name, options);
+  }
 
-    /**
-     * Upload a file directly from the filesystem (Node.js only).
-     * This method handles the complete three-step upload process.
-     * @param {string} filePath - The path to the file to upload.
-     * @param {string} name - The name to use for the storage object.
-     * @param {Core.RequestOptions & { contentType?: ContentType; metadata?: Record<string, string> }} [options] - Request options including content type and metadata.
-     * @returns {Promise<StorageObject>} A {@link StorageObject} instance.
-     */
-    async uploadFromFile(
-      filePath: string,
-      name: string,
-      options?: Core.RequestOptions & {
-        contentType?: ContentType;
-        metadata?: Record<string, string>;
-      },
-    ): Promise<StorageObject> {
-      return StorageObject.uploadFromFile(this.client, filePath, name, options);
-    }
-
-    /**
-     * Upload text content directly.
-     * This method handles the complete three-step upload process.
-     * @param {string} text - The text content to upload.
-     * @param {string} name - The name to use for the storage object.
-     * @param {Core.RequestOptions & { metadata?: Record<string, string> }} [options] - Request options including metadata.
-     * @returns {Promise<StorageObject>} A {@link StorageObject} instance.
-     */
-    async uploadFromText(
-      text: string,
-      name: string,
-      options?: Core.RequestOptions & {
-        metadata?: Record<string, string>;
-      },
-    ): Promise<StorageObject> {
-      return StorageObject.uploadFromText(this.client, text, name, options);
-    }
-
-    /**
-     * Upload content from a Buffer (Node.js only).
-     * This method handles the complete three-step upload process.
-     * @param {Buffer} buffer - The buffer containing the content to upload.
-     * @param {string} name - The name to use for the storage object.
-     * @param {ContentType} contentType - The content type of the buffer.
-     * @param {Core.RequestOptions & { metadata?: Record<string, string> }} [options] - Request options including metadata.
-     * @returns {Promise<StorageObject>} A {@link StorageObject} instance.
-     */
-    async uploadFromBuffer(
-      buffer: Buffer,
-      name: string,
-      contentType: ContentType,
-      options?: Core.RequestOptions & {
-        metadata?: Record<string, string>;
-      },
-    ): Promise<StorageObject> {
-      return StorageObject.uploadFromBuffer(this.client, buffer, name, contentType, options);
-    }
+  /**
+   * Upload content from a Buffer (Node.js only).
+   * This method handles the complete three-step upload process.
+   * @param {Buffer} buffer - The buffer containing the content to upload.
+   * @param {string} name - The name to use for the storage object.
+   * @param {ContentType} contentType - The content type of the buffer.
+   * @param {Core.RequestOptions & { metadata?: Record<string, string> }} [options] - Request options including metadata.
+   * @returns {Promise<StorageObject>} A {@link StorageObject} instance.
+   */
+  async uploadFromBuffer(
+    buffer: Buffer,
+    name: string,
+    contentType: ContentType,
+    options?: Core.RequestOptions & {
+      metadata?: Record<string, string>;
+    },
+  ): Promise<StorageObject> {
+    return StorageObject.uploadFromBuffer(this.client, buffer, name, contentType, options);
   }
 }
 
 export default RunloopSDK;
+
+export declare namespace RunloopSDK {
+  export {
+    RunloopSDK as Client,
+    DevboxOps as DevboxOps,
+    BlueprintOps as BlueprintOps,
+    SnapshotOps as SnapshotOps,
+    StorageObjectOps as StorageObjectOps,
+    Devbox as Devbox,
+    Blueprint as Blueprint,
+    Snapshot as Snapshot,
+    StorageObject as StorageObject,
+  };
+}

@@ -1,20 +1,5 @@
 {
   "extends": "./tsconfig.json",
-  "exclude": [
-    "**/*.test.ts",
-    "**/tests/**",
-    "**/node_modules/**",
-    "src/_shims/**/*-deno.ts"
-  ],
-  "include": [
-    "src/sdk.ts",
-    "src/sdk/**/*.ts",
-    "src/core.ts",
-    "src/resources/**/*.ts",
-    "src/lib/**/*.ts"
-  ]
+  "exclude": ["**/*.test.ts", "**/tests/**", "**/node_modules/**", "src/_shims/**/*-deno.ts"],
+  "include": ["src/sdk.ts", "src/sdk/**/*.ts", "src/core.ts", "src/resources/**/*.ts", "src/lib/**/*.ts"]
 }
-
-
-
-

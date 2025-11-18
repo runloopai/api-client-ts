@@ -20,6 +20,10 @@ import { Snapshot } from './snapshot';
 import { Execution } from './execution';
 import { ExecutionResult } from './execution-result';
 
+// Re-export Execution and ExecutionResult for Devbox namespace
+export { Execution } from './execution';
+export { ExecutionResult } from './execution-result';
+
 /**
  * Streaming callbacks for real-time log processing.
  */
@@ -599,4 +603,15 @@ export class Devbox {
   async keepAlive(options?: Core.RequestOptions): Promise<unknown> {
     return this.client.devboxes.keepAlive(this._id, options);
   }
+}
+
+export declare namespace Devbox {
+  export {
+    DevboxNetOps as NetOps,
+    DevboxCmdOps as CmdOps,
+    DevboxFileOps as FileOps,
+    Execution as Execution,
+    ExecutionResult as ExecutionResult,
+    type ExecuteStreamingCallbacks as ExecuteStreamingCallbacks,
+  };
 }
