@@ -23,6 +23,7 @@
     "test:objects-coverage": "RUN_SMOKETESTS=1 jest --verbose --config jest.config.objects.js --coverage --coverageReporters=text --coverageReporters=json-summary",
     "test:objects-coverage:html": "RUN_SMOKETESTS=1 jest --verbose --config jest.config.objects.js --coverage --coverageReporters=html --coverageReporters=text && open coverage-objects/index.html",
     "build": "./scripts/build",
+    "prepublishOnly": "echo 'to publish, run yarn build && (cd dist; yarn publish)' && exit 1",
     "format": "prettier --write --cache --cache-strategy metadata . !dist",
     "prepare": "if ./scripts/utils/check-is-in-git-install.sh; then ./scripts/build && ./scripts/utils/git-swap.sh; fi",
     "tsn": "ts-node -r tsconfig-paths/register",
