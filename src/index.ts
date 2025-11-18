@@ -184,7 +184,6 @@ export interface ClientOptions {
    * Note that request timeouts are retried by default, so in a worst-case scenario you may wait
    * much longer than this timeout before the promise succeeds or fails.
    *
-   * @unit milliseconds
    */
   timeout?: number | undefined;
 
@@ -231,6 +230,8 @@ export interface ClientOptions {
 
 /**
  * API Client for interfacing with the Runloop API.
+ * @hidden
+ * @private
  */
 export class Runloop extends Core.APIClient {
   bearerToken: string;
@@ -349,6 +350,7 @@ Runloop.Secrets = Secrets;
 
 /**
  * @hidden
+ * @private
  */
 export declare namespace Runloop {
   export type RequestOptions = Core.RequestOptions;
@@ -582,6 +584,8 @@ export {
 } from './error';
 
 /**
+ * @hidden
+ * @private
  * @deprecated Use named imports instead of default import. This is the old api client. Use the new SDK instead.
  * @example
  * ```typescript

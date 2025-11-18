@@ -1,12 +1,10 @@
 export * from './sdk/index';
+import type * as Core from './core';
 import { Runloop, type ClientOptions } from './index';
 import { Devbox } from './sdk/devbox';
 import { Blueprint } from './sdk/blueprint';
 import { Snapshot } from './sdk/snapshot';
 import { StorageObject } from './sdk/storage-object';
-
-// Re-export types from core
-import type * as Core from './core';
 
 // Import types used in this file
 import type {
@@ -19,10 +17,14 @@ import type { BlueprintCreateParams, BlueprintListParams } from './resources/blu
 import type { ObjectCreateParams, ObjectListParams } from './resources/objects';
 import { PollingOptions } from './lib/polling';
 
+export * from './index';
+
 /**
- * Alias for the Runloop API namespace.
- * Provides access to low-level API types and classes.
- * Use this instead of the Runloop namespace for better clarity.
+ * Primary Runloop API namespace used by the SDK.
+ *
+ * Prefer this over the legacy `Runloop` export so that generated docs highlight
+ * the new name, while still preserving backwards compatibility for existing
+ * customers that import `Runloop` directly.
  */
 export import RunloopAPI = Runloop;
 
@@ -68,7 +70,7 @@ export class RunloopSDK {
    * through the high-level interfaces. Most users should prefer the specialized interfaces
    * (devbox, blueprint, etc.) for a more convenient API.
    */
-  public readonly api: Runloop;
+  public readonly api: RunloopAPI;
 
   /**
    * **Devbox Operations** - {@link DevboxOps} for creating and accessing {@link Devbox} class instances.
@@ -112,7 +114,7 @@ export class RunloopSDK {
    * @param {ClientOptions} [options] - Optional client configuration options.
    */
   constructor(options?: ClientOptions) {
-    this.api = new Runloop(options);
+    this.api = new RunloopAPI(options);
     this.devbox = new DevboxOps(this.api);
     this.blueprint = new BlueprintOps(this.api);
     this.snapshot = new SnapshotOps(this.api);
@@ -146,7 +148,7 @@ export class DevboxOps {
   /**
    * @private
    */
-  constructor(private client: Runloop) {}
+  constructor(private client: RunloopAPI) {}
 
   /**
    * Create a new devbox.
@@ -262,7 +264,7 @@ export class BlueprintOps {
   /**
    * @private
    */
-  constructor(private client: Runloop) {}
+  constructor(private client: RunloopAPI) {}
 
   /**
    * Create a new blueprint.
@@ -332,7 +334,7 @@ export class SnapshotOps {
   /**
    * @private
    */
-  constructor(private client: Runloop) {}
+  constructor(private client: RunloopAPI) {}
 
   /**
    * Get a snapshot object by its ID.
@@ -379,7 +381,7 @@ export class StorageObjectOps {
   /**
    * @private
    */
-  constructor(private client: Runloop) {}
+  constructor(private client: RunloopAPI) {}
 
   /**
    * Create a new storage object. This is for advanced users and for basic operations you should use the {@link StorageObjectOps.uploadFromFile uploadFromFile()}, {@link StorageObjectOps.uploadFromText uploadFromText()}, or {@link StorageObjectOps.uploadFromBuffer uploadFromBuffer()} methods instead.
