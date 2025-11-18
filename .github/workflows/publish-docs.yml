@@ -4,6 +4,9 @@ on:
   workflow_call:
   release:
     types: [published]
+  push:
+    branches:
+      - main
 permissions:
   contents: write # allows the 'Commit' step without tokens
 
