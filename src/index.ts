@@ -229,9 +229,15 @@ export interface ClientOptions {
 }
 
 /**
- * API Client for interfacing with the Runloop API.
- * @hidden
- * @private
+ * API Client for interfacing with the Runloop API. This is the old api client. Use the new {@link RunloopSDK} instead.
+ * @example
+ * ```typescript
+ * import { RunloopSDK } from '@runloop/api-client';
+ * const runloop = new RunloopSDK();
+ * const devbox = await runloop.devbox.create();
+ * const result = await devbox.cmd.exec({ command: 'echo "Hello, World!"' });
+ * console.log(result.exitCode);
+ * ```
  */
 export class Runloop extends Core.APIClient {
   bearerToken: string;
@@ -348,10 +354,6 @@ Runloop.Repositories = Repositories;
 Runloop.RepositoryConnectionViewsRepositoriesCursorIDPage = RepositoryConnectionViewsRepositoriesCursorIDPage;
 Runloop.Secrets = Secrets;
 
-/**
- * @hidden
- * @private
- */
 export declare namespace Runloop {
   export type RequestOptions = Core.RequestOptions;
 
@@ -584,9 +586,6 @@ export {
 } from './error';
 
 /**
- * @hidden
- * @private
- * @deprecated Use named imports instead of default import. This is the old api client. Use the new SDK instead.
  * @example
  * ```typescript
  * // Instead of: import Runloop from '@runloop/api-client'
