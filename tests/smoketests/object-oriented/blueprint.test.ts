@@ -1,5 +1,5 @@
 import { THIRTY_SECOND_TIMEOUT, uniqueName, makeClientSDK } from '../utils';
-import { Blueprint, Devbox } from '@runloop/api-client/objects';
+import { Blueprint, Devbox } from '@runloop/api-client/sdk';
 
 const sdk = makeClientSDK();
 

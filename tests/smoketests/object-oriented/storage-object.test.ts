@@ -1,5 +1,5 @@
 import { THIRTY_SECOND_TIMEOUT, uniqueName, makeClientSDK } from '../utils';
-import { Devbox, StorageObject } from '@runloop/api-client/objects';
+import { Devbox, StorageObject } from '@runloop/api-client/sdk';
 
 const sdk = makeClientSDK();
 
@@ -232,7 +232,7 @@ describe('smoketest: object-oriented storage object', () => {
     });
 
     test('list storage objects via static method', async () => {
-      const { StorageObject } = await import('@runloop/api-client/objects');
+      const { StorageObject } = await import('@runloop/api-client/sdk');
       const objects = await StorageObject.list(sdk.api, { limit: 5 });
       expect(Array.isArray(objects)).toBe(true);
     });

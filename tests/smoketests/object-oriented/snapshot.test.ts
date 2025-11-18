@@ -1,4 +1,4 @@
-import { Devbox, Snapshot } from '@runloop/api-client/objects';
+import { Devbox, Snapshot } from '@runloop/api-client/sdk';
 import { makeClientSDK, uniqueName } from '../utils';
 
 const sdk = makeClientSDK();
