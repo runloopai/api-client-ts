@@ -50,6 +50,25 @@ type ContentType = ObjectCreateParams['content_type'];
  * const result = await devbox.cmd.exec({ command: 'echo "Hello, World!"' });
  * console.log(result.exitCode);
  * ```
+ *
+ * ## To access the high-level interfaces, you can use the `devbox`, `blueprint`, `snapshot`, `storageObject` properties:
+ * See the documentation for each interface for more details.
+ * - {@link DevboxOps}
+ * - {@link BlueprintOps}
+ * - {@link SnapshotOps}
+ * - {@link StorageObjectOps}
+ *
+ * ## To access the low-level API, you can use the api property:
+ * This is useful when you need to access features not yet exposed through the high-level interfaces.
+ *
+ * See the {@link RunloopAPI} for the Runloop class for more details.
+ *
+ * ```typescript
+ * const runloop = new RunloopSDK();
+ * const createResult = await runloop.api.secrets.create({ name: 'my-secret', value: 'my-secret-value' });
+ * console.log(createResult.name);
+ * ```
+ *
  */
 export class RunloopSDK {
   /**
@@ -61,34 +80,38 @@ export class RunloopSDK {
   public readonly api: Runloop;
 
   /**
-   * Interface for creating and accessing {@link Devbox} class instances.
+   * **Devbox Operations** - {@link DevboxOps} for creating and accessing {@link Devbox} class instances.
+   *
    * Devboxes are isolated development environments running in Runloop's cloud - the core resource
-   * that provides you with a fully configured development environment. Use this interface to create
+   * that provides you with a fully configured development environment. Use these operations to create
    * new devboxes or get existing ones by ID.
    */
   public readonly devbox: DevboxOps;
 
   /**
-   * Interface for creating and accessing {@link Blueprint} class instances.
+   * **Blueprint Operations** - {@link BlueprintOps} for creating and accessing {@link Blueprint} class instances.
+   *
    * Blueprints are reusable templates that define the base configuration for devboxes, built from
-   * Dockerfiles. They can be used to create multiple devboxes with consistent environments. Use this
-   * interface to create new blueprints or get existing ones by ID.
+   * Dockerfiles. They can be used to create multiple devboxes with consistent environments. Use these
+   * operations to create new blueprints or get existing ones by ID.
    */
   public readonly blueprint: BlueprintOps;
 
   /**
-   * Interface for creating and accessing {@link Snapshot} class instances.
+   * **Snapshot Operations** - {@link SnapshotOps} for creating and accessing {@link Snapshot} class instances.
+   *
    * Snapshots are point-in-time copies of a devbox's disk state, allowing you to save the complete
-   * state of a devbox and restore it later or create new devboxes from saved states. Use this
-   * interface to list snapshots or get existing ones by ID.
+   * state of a devbox and restore it later or create new devboxes from saved states. Use these
+   * operations to list snapshots or get existing ones by ID.
    */
   public readonly snapshot: SnapshotOps;
 
   /**
-   * Interface for creating and accessing {@link StorageObject} class instances.
+   * **Storage Object Operations** - {@link StorageObjectOps} for creating and accessing {@link StorageObject} class instances.
+   *
    * Storage objects are files stored in Runloop's object storage system. They can be uploaded,
    * downloaded, and managed with metadata, useful for storing configuration files, data files, or
-   * any other content you need to persist or share between devboxes. Use this interface to create
+   * any other content you need to persist or share between devboxes. Use these operations to create
    * new storage objects or get existing ones by ID.
    */
   public readonly storageObject: StorageObjectOps;
