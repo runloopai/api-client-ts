@@ -28,6 +28,7 @@ import { PollingOptions } from './lib/polling';
 
 // Re-export types from lib
 export type { PollingOptions };
+export type { ClientOptions };
 
 /**
  * Alias for the Runloop API namespace.
