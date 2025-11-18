@@ -10,7 +10,7 @@ const config: JestConfigWithTsJest = {
     '^.+\\.(t|j)sx?$': ['@swc/jest', { sourceMaps: 'inline' }],
   },
   moduleNameMapper: {
-    '^@runloop/api-client$': '<rootDir>/src/index.ts',
+    '^@runloop/api-client$': '<rootDir>/src/sdk.ts',
     '^@runloop/api-client/_shims/auto/(.*)$': '<rootDir>/src/_shims/auto/$1-node',
     '^@runloop/api-client/(.*)$': '<rootDir>/src/$1',
   },

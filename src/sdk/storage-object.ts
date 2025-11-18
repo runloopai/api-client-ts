@@ -48,6 +48,116 @@ function assertNodeEnvironment(): void {
 
 /**
  * Object-oriented interface for working with Storage Objects.
+ *
+ * ## Overview
+ *
+ * The `StorageObject` class provides a high-level API for managing storage objects,
+ * which are files stored in Runloop's object storage. Storage objects can be uploaded,
+ * downloaded, and managed with metadata.
+ *
+ * ## Uploading Objects
+ *
+ * ### Upload from File (Node.js)
+ * ```typescript
+ * import { RunloopSDK } from '@runloop/api-client-ts';
+ *
+ * const runloop = new RunloopSDK();
+ * const object = await runloop.storageObject.uploadFromFile(
+ *   './my-file.txt',
+ *   'my-file.txt',
+ *   { metadata: { project: 'demo' } }
+ * );
+ * console.log(`Uploaded object: ${object.id}`);
+ * ```
+ *
+ * ### Upload from Text
+ * ```typescript
+ * const runloop = new RunloopSDK();
+ * const object = await runloop.storageObject.uploadFromText(
+ *   'Hello, World!',
+ *   'greeting.txt',
+ *   { metadata: { type: 'greeting' } }
+ * );
+ * ```
+ *
+ * ### Upload from Buffer (Node.js)
+ * ```typescript
+ * const runloop = new RunloopSDK();
+ * const buffer = Buffer.from('Binary data');
+ * const object = await runloop.storageObject.uploadFromBuffer(
+ *   buffer,
+ *   'data.bin',
+ *   'unspecified',
+ *   { metadata: { format: 'binary' } }
+ * );
+ * ```
+ *
+ * ### Manual Upload Process
+ * ```typescript
+ * const runloop = new RunloopSDK();
+ * // Step 1: Create object
+ * const object = await runloop.storageObject.create({
+ *   name: 'my-file.txt',
+ *   content_type: 'text',
+ * });
+ *
+ * // Step 2: Upload content
+ * await object.uploadContent('File contents');
+ *
+ * // Step 3: Mark as complete
+ * await object.complete();
+ * ```
+ *
+ * ## Downloading Objects
+ *
+ * ### Download as Text
+ * ```typescript
+ * const runloop = new RunloopSDK();
+ * const object = runloop.storageObject.fromId('object-123');
+ * const content = await object.downloadAsText();
+ * console.log(content);
+ * ```
+ *
+ * ### Download as Buffer
+ * ```typescript
+ * const runloop = new RunloopSDK();
+ * const object = runloop.storageObject.fromId('object-123');
+ * const buffer = await object.downloadAsBuffer();
+ * fs.writeFileSync('downloaded.bin', buffer);
+ * ```
+ *
+ * ### Get Download URL
+ * ```typescript
+ * const runloop = new RunloopSDK();
+ * const object = runloop.storageObject.fromId('object-123');
+ * const { download_url } = await object.getDownloadUrl(3600); // Valid for 1 hour
+ * console.log(`Download URL: ${download_url}`);
+ * ```
+ *
+ * ## Managing Objects
+ *
+ * ### List Objects
+ * ```typescript
+ * const runloop = new RunloopSDK();
+ * const objects = await runloop.storageObject.list();
+ * for (const object of objects) {
+ *   const info = await object.getInfo();
+ *   console.log(`${info.name}: ${info.size} bytes`);
+ * }
+ * ```
+ *
+ * ### Get Object Info
+ * ```typescript
+ * const runloop = new RunloopSDK();
+ * const object = runloop.storageObject.fromId('object-123');
+ * const info = await object.getInfo();
+ * console.log(`Name: ${info.name}, Size: ${info.size}, Type: ${info.content_type}`);
+ * ```
+ *
+ * ### Delete Object
+ * ```typescript
+ * await object.delete();
+ * ```
  */
 export class StorageObject {
   private client: Runloop;
@@ -70,26 +180,34 @@ export class StorageObject {
    * 1. To upload you call uploadContent() or use the getDownloadUrl() method to get the upload URL and upload the content manually.
    * 2. You must call complete() to mark the upload as complete.
    *
-   * Example:
+   * @example
    * ```typescript
-   * const storageObject = await StorageObject.create(client, {
+   * const runloop = new RunloopSDK();
+   * // Manual upload process
+   * const storageObject = await runloop.storageObject.create({
    *   name: 'my-upload.txt',
    *   content_type: 'text',
    *   metadata: { project: 'demo' },
    * });
    * await storageObject.uploadContent('Hello, World!');
    * await storageObject.complete();
+   * ```
    *
-   * Upload from file example:
+   * @example
    * ```typescript
-   * const storageObject = await StorageObject.uploadFromFile(client, './my-file.txt', 'my-upload.txt');
+   * const runloop = new RunloopSDK();
+   * // Or use the convenience method
+   * const storageObject = await runloop.storageObject.uploadFromFile(
+   *   './my-file.txt',
+   *   'my-upload.txt'
+   * );
    * console.log(storageObject.id);
    * ```
    *
-   * @param client - The Runloop client instance
-   * @param params - Parameters for creating the object
-   * @param options - Request options
-   * @returns An Object instance with upload URL
+   * @param {Runloop} client - The Runloop client instance
+   * @param {ObjectCreateParams} params - Parameters for creating the object
+   * @param {Core.RequestOptions} [options] - Request options
+   * @returns {Promise<StorageObject>} A {@link StorageObject} instance with upload URL
    */
   static async create(
     client: Runloop,
@@ -104,9 +222,9 @@ export class StorageObject {
    * Create a StorageObject instance by ID without retrieving from API.
    * Use getInfo() to fetch the actual data when needed.
    *
-   * @param client - The Runloop client instance
-   * @param id - The object ID
-   * @returns An Object instance
+   * @param {Runloop} client - The Runloop client instance
+   * @param {string} id - The object ID
+   * @returns {StorageObject} A {@link StorageObject} instance
    */
   static fromId(client: Runloop, id: string): StorageObject {
     return new StorageObject(client, id, null);
@@ -115,10 +233,10 @@ export class StorageObject {
   /**
    * List all storage objects with optional filters.
    *
-   * @param client - The Runloop client instance
-   * @param params - Optional filter parameters
-   * @param options - Request options
-   * @returns Array of Object instances
+   * @param {Runloop} client - The Runloop client instance
+   * @param {ObjectListParams} [params] - Optional filter parameters
+   * @param {Core.RequestOptions} [options] - Request options
+   * @returns {Promise<StorageObject[]>} Array of {@link StorageObject} instances
    */
   static async list(
     client: Runloop,
@@ -142,10 +260,25 @@ export class StorageObject {
    * 2. Upload file content to the provided URL
    * 3. Mark upload as complete
    *
-   * @param filePath - Path to the file to upload
-   * @param name - Name for the uploaded object
-   * @param options - Request options with optional client, content type, and metadata
-   * @returns A completed StorageObject instance
+   * @example
+   * ```typescript
+   * const runloop = new RunloopSDK();
+   * const object = await runloop.storageObject.uploadFromFile(
+   *   './package.json',
+   *   'package.json',
+   *   {
+   *     contentType: 'text',
+   *     metadata: { project: 'my-app' },
+   *   }
+   * );
+   * console.log(`Uploaded: ${object.id}`);
+   * ```
+   *
+   * @param {Runloop} client - The Runloop client instance
+   * @param {string} filePath - Path to the file to upload
+   * @param {string} name - Name for the uploaded object
+   * @param {Core.RequestOptions & { contentType?: ContentType; metadata?: Record<string, string> }} [options] - Request options with optional client, content type, and metadata
+   * @returns {Promise<StorageObject>} A completed {@link StorageObject} instance
    */
   static async uploadFromFile(
     client: Runloop,
@@ -225,10 +358,21 @@ export class StorageObject {
    * 2. Upload text content to the provided URL
    * 3. Mark upload as complete
    *
-   * @param text - The text content to upload
-   * @param name - Name for the object
-   * @param options - Request options with optional metadata
-   * @returns A completed StorageObject instance
+   * @example
+   * ```typescript
+   * const runloop = new RunloopSDK();
+   * const object = await runloop.storageObject.uploadFromText(
+   *   JSON.stringify({ key: 'value' }, null, 2),
+   *   'config.json',
+   *   { metadata: { type: 'config' } }
+   * );
+   * ```
+   *
+   * @param {Runloop} client - The Runloop client instance
+   * @param {string} text - The text content to upload
+   * @param {string} name - Name for the object
+   * @param {Core.RequestOptions & { metadata?: Record<string, string> }} [options] - Request options with optional metadata
+   * @returns {Promise<StorageObject>} A completed {@link StorageObject} instance
    */
   static async uploadFromText(
     client: Runloop,
@@ -279,11 +423,24 @@ export class StorageObject {
    * 2. Upload buffer content to the provided URL
    * 3. Mark upload as complete
    *
-   * @param buffer - The buffer content to upload
-   * @param name - Name for the object
-   * @param contentType - Content type for the object
-   * @param options - Request options with optional client and metadata
-   * @returns A completed StorageObject instance
+   * @example
+   * ```typescript
+   * const runloop = new RunloopSDK();
+   * const buffer = Buffer.from('Binary data');
+   * const object = await runloop.storageObject.uploadFromBuffer(
+   *   buffer,
+   *   'data.bin',
+   *   'unspecified',
+   *   { metadata: { format: 'binary' } }
+   * );
+   * ```
+   *
+   * @param {Runloop} client - The Runloop client instance
+   * @param {Buffer} buffer - The buffer content to upload
+   * @param {string} name - Name for the object
+   * @param {ContentType} contentType - Content type for the object
+   * @param {Core.RequestOptions & { metadata?: Record<string, string> }} [options] - Request options with optional client and metadata
+   * @returns {Promise<StorageObject>} A completed {@link StorageObject} instance
    */
   static async uploadFromBuffer(
     client: Runloop,
@@ -340,6 +497,8 @@ export class StorageObject {
 
   /**
    * Get the complete object data from the API.
+   * @param {Core.RequestOptions} [options] - Request options
+   * @returns {Promise<ObjectView>} The object data
    */
   async getInfo(options?: Core.RequestOptions): Promise<ObjectView> {
     return this.client.objects.retrieve(this._id, options);
@@ -354,8 +513,19 @@ export class StorageObject {
    *
    * When this is done call complete() to mark the upload as complete.
    *
-   * @param content - The content to upload (string or Buffer)
-   * @returns Promise that resolves when upload is complete
+   * @example
+   * ```typescript
+   * const runloop = new RunloopSDK();
+   * const object = await runloop.storageObject.create({
+   *   name: 'data.txt',
+   *   content_type: 'text',
+   * });
+   * await object.uploadContent('Hello, World!');
+   * await object.complete();
+   * ```
+   *
+   * @param {string | Buffer} content - The content to upload (string or Buffer)
+   * @returns {Promise<void>} Promise that resolves when upload is complete
    */
   async uploadContent(content: string | Buffer): Promise<void> {
     if (!this._uploadUrl) {
@@ -388,7 +558,8 @@ export class StorageObject {
    * Mark the object's upload as complete, transitioning it from UPLOADING to READ_ONLY state.
    * Call this after you've finished uploading content via the upload URL.
    *
-   * @param options - Request options
+   * @param {Core.RequestOptions} [options] - Request options
+   * @returns {Promise<void>} Promise that resolves when the upload is marked as complete
    */
   async complete(options?: Core.RequestOptions): Promise<void> {
     await this.client.objects.complete(this._id, {}, options);
@@ -398,9 +569,9 @@ export class StorageObject {
    * Get a presigned download URL for this object.
    * The URL will be valid for the specified duration (default: 1 hour).
    *
-   * @param durationSeconds - How long the URL should be valid (default: 3600)
-   * @param options - Request options
-   * @returns Download URL information
+   * @param {number} [durationSeconds] - How long the URL should be valid (default: 3600)
+   * @param {Core.RequestOptions} [options] - Request options
+   * @returns {Promise<ObjectDownloadURLView>} Download URL information
    */
   async getDownloadUrl(
     durationSeconds?: number,
@@ -417,8 +588,16 @@ export class StorageObject {
    * Download the content of this object as text.
    * This is a convenience method that fetches the download URL and retrieves the content.
    *
-   * @param options - Request options
-   * @returns The object content as a string
+   * @example
+   * ```typescript
+   * const runloop = new RunloopSDK();
+   * const object = runloop.storageObject.fromId('object-123');
+   * const content = await object.downloadAsText();
+   * console.log(content);
+   * ```
+   *
+   * @param {Core.RequestOptions} [options] - Request options
+   * @returns {Promise<string>} The object content as a string
    */
   async downloadAsText(options?: Core.RequestOptions): Promise<string> {
     const { download_url } = await this.getDownloadUrl(undefined, options);
@@ -435,8 +614,16 @@ export class StorageObject {
    * Download the content of this object as a Buffer.
    * This is a convenience method that fetches the download URL and retrieves the content.
    *
-   * @param options - Request options
-   * @returns The object content as a Buffer
+   * @example
+   * ```typescript
+   * const runloop = new RunloopSDK();
+   * const object = runloop.storageObject.fromId('object-123');
+   * const buffer = await object.downloadAsBuffer();
+   * fs.writeFileSync('downloaded.bin', buffer);
+   * ```
+   *
+   * @param {Core.RequestOptions} [options] - Request options
+   * @returns {Promise<Buffer>} The object content as a Buffer
    */
   async downloadAsBuffer(options?: Core.RequestOptions): Promise<Buffer> {
     const { download_url } = await this.getDownloadUrl(undefined, options);
@@ -453,7 +640,8 @@ export class StorageObject {
   /**
    * Delete this object. This action is irreversible.
    *
-   * @param options - Request options
+   * @param {Core.RequestOptions} [options] - Request options
+   * @returns {Promise<void>} Promise that resolves when the object is deleted
    */
   async delete(options?: Core.RequestOptions): Promise<void> {
     await this.client.objects.delete(this._id, {}, options);

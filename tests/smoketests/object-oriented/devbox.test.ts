@@ -1,5 +1,5 @@
 import { toFile } from '@runloop/api-client';
-import { Devbox } from '@runloop/api-client/objects';
+import { Devbox } from '@runloop/api-client/sdk';
 import { makeClientSDK, THIRTY_SECOND_TIMEOUT, uniqueName } from '../utils';
 
 const sdk = makeClientSDK();

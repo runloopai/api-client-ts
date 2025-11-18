@@ -184,7 +184,6 @@ export interface ClientOptions {
    * Note that request timeouts are retried by default, so in a worst-case scenario you may wait
    * much longer than this timeout before the promise succeeds or fails.
    *
-   * @unit milliseconds
    */
   timeout?: number | undefined;
 
@@ -230,7 +229,15 @@ export interface ClientOptions {
 }
 
 /**
- * API Client for interfacing with the Runloop API.
+ * API Client for interfacing with the Runloop API. This is the old api client. Use the new {@link RunloopSDK} instead.
+ * @example
+ * ```typescript
+ * import { RunloopSDK } from '@runloop/api-client';
+ * const runloop = new RunloopSDK();
+ * const devbox = await runloop.devbox.create();
+ * const result = await devbox.cmd.exec({ command: 'echo "Hello, World!"' });
+ * console.log(result.exitCode);
+ * ```
  */
 export class Runloop extends Core.APIClient {
   bearerToken: string;
@@ -578,20 +585,15 @@ export {
   UnprocessableEntityError,
 } from './error';
 
-export { RunloopSDK } from './sdk';
-
-// /**
-//  * @deprecated Use named imports instead of default import. This is the old api client. Use the new SDK instead.
-//  * @example
-//  * ```typescript
-//  * // Instead of: import Runloop from '@runloop/api-client'
-//  * import { RunloopSDK } from '@runloop/api-client'
-//  * const sdk = new RunloopSDK();
-//  * //For existing api client, use the api property
-//  * const client = new RunloopSDK();
-//  * const devbox = await client.api.devboxes.create({ name: 'my-devbox' });
-//  * ```
-//  */
-// This WILL be deprecated soon.. not yet though.
-
+/**
+ * @example
+ * ```typescript
+ * // Instead of: import Runloop from '@runloop/api-client'
+ * import { RunloopSDK } from '@runloop/api-client'
+ * const sdk = new RunloopSDK();
+ * //For existing api client, use the api property
+ * const client = new RunloopSDK();
+ * const devbox = await client.api.devboxes.create({ name: 'my-devbox' });
+ * ```
+ */
 export default Runloop;

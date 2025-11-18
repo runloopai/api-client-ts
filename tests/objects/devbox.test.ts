@@ -1,6 +1,5 @@
-import { Devbox } from '../../src/objects/devbox';
+import { Devbox } from '../../src/sdk/devbox';
 import type { DevboxView, DevboxAsyncExecutionDetailView } from '../../src/resources/devboxes/devboxes';
-
 // Mock the Runloop client
 jest.mock('../../src/index');
 
@@ -128,7 +127,7 @@ describe('Devbox (New API)', () => {
           { command: 'echo "Hello World"' },
           undefined,
         );
-        expect(result).toBeInstanceOf(require('../../src/objects/execution-result').ExecutionResult);
+        expect(result).toBeInstanceOf(require('../../src/sdk/execution-result').ExecutionResult);
         expect(result.exitCode).toBe(0);
       });
     });
@@ -150,7 +149,7 @@ describe('Devbox (New API)', () => {
           { command: 'sleep 10' },
           undefined,
         );
-        expect(result).toBeInstanceOf(require('../../src/objects/execution').Execution);
+        expect(result).toBeInstanceOf(require('../../src/sdk/execution').Execution);
         expect(result.executionId).toBe('exec-456');
       });
     });
@@ -251,7 +250,7 @@ describe('Devbox (New API)', () => {
           { name: 'test-snapshot' },
           undefined,
         );
-        expect(snapshot).toBeInstanceOf(require('../../src/objects/snapshot').Snapshot);
+        expect(snapshot).toBeInstanceOf(require('../../src/sdk/snapshot').Snapshot);
         expect(snapshot.id).toBe('snapshot-456');
       });
 
@@ -268,7 +267,7 @@ describe('Devbox (New API)', () => {
           undefined,
           undefined,
         );
-        expect(snapshot).toBeInstanceOf(require('../../src/objects/snapshot').Snapshot);
+        expect(snapshot).toBeInstanceOf(require('../../src/sdk/snapshot').Snapshot);
         expect(snapshot.id).toBe('snapshot-789');
       });
     });

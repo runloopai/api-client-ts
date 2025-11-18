@@ -1,4 +1,4 @@
-import { ExecutionResult } from '../../src/objects/execution-result';
+import { ExecutionResult } from '../../src/sdk/execution-result';
 import type { DevboxAsyncExecutionDetailView } from '../../src/resources/devboxes/devboxes';
 
 // Mock the Runloop client

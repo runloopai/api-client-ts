@@ -12,3 +12,4 @@ dist-deno
 .DS_Store
 coverage-objects
 object-coverage-report.json
+docs

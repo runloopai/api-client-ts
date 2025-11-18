@@ -1,9 +1,9 @@
-name: Object Smoke Test & Coverage Check
+name: SDK Smoke Tests & Coverage Check
 
 on:
   pull_request:
     paths:
-      - 'src/objects/**'
+      - 'src/sdk/**'
       - 'tests/smoketests/object-oriented/**'
   workflow_dispatch:
     inputs:

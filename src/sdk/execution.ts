@@ -6,6 +6,58 @@ import { ExecutionResult } from './execution-result';
 
 /**
  * Execution object for tracking async command execution with streaming support.
+ *
+ * ## Overview
+ *
+ * The `Execution` class represents an asynchronous command execution on a devbox.
+ * It provides methods to track the execution state, wait for completion, and control
+ * the execution (e.g., kill it if needed).
+ *
+ * ## Usage
+ *
+ * Executions are typically created via `devbox.cmd.execAsync()`:
+ * ```typescript
+ * import { RunloopSDK } from '@runloop/api-client-ts';
+ *
+ * const runloop = new RunloopSDK();
+ * const devbox = runloop.devbox.fromId('devbox-123');
+ *
+ * // Start async execution with streaming
+ * const execution = await devbox.cmd.execAsync({
+ *   command: 'long-running-task.sh',
+ *   stdout: (line) => console.log(`[LOG] ${line}`),
+ *   stderr: (line) => console.error(`[ERROR] ${line}`),
+ * });
+ *
+ * // Do other work while command runs...
+ *
+ * // Wait for completion and get result
+ * const result = await execution.result();
+ * if (result.success) {
+ *   console.log('Task completed successfully!');
+ * } else {
+ *   console.error(`Task failed with exit code: ${result.exitCode}`);
+ * }
+ * ```
+ *
+ * ## Monitoring Execution
+ *
+ * ### Get Current State
+ * ```typescript
+ * const state = await execution.getState();
+ * console.log(`Status: ${state.status}`);
+ * ```
+ *
+ * ### Kill Execution
+ * ```typescript
+ * // Kill a running execution
+ * await execution.kill();
+ * ```
+ *
+ * ## Properties
+ *
+ * - `executionId`: The unique execution ID
+ * - `devboxId`: The devbox ID this execution belongs to
  */
 export class Execution {
   private client: Runloop;
@@ -50,8 +102,23 @@ export class Execution {
    * Wait for the execution to complete and return the result.
    * If streaming callbacks were provided, also waits for all streams to finish.
    *
-   * @param options - Request options with optional polling configuration
-   * @returns ExecutionResult with stdout, stderr, and exit code
+   * @example
+   * ```typescript
+   * const runloop = new RunloopSDK();
+   * const devbox = runloop.devbox.fromId('devbox-123');
+   * const execution = await devbox.cmd.execAsync({ command: 'npm install' });
+   * const result = await execution.result();
+   *
+   * if (result.success) {
+   *   console.log('Installation successful!');
+   *   console.log(await result.stdout());
+   * } else {
+   *   console.error('Installation failed:', await result.stderr());
+   * }
+   * ```
+   *
+   * @param {Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxAsyncExecutionDetailView>> }} [options] - Request options with optional polling configuration
+   * @returns {Promise<ExecutionResult>} {@link ExecutionResult} with stdout, stderr, and exit code
    */
   async result(
     options?: Core.RequestOptions & {
@@ -80,6 +147,8 @@ export class Execution {
 
   /**
    * Get the current state of the execution.
+   * @param {Core.RequestOptions} [options] - Request options
+   * @returns {Promise<DevboxAsyncExecutionDetailView>} The current execution state
    */
   async getState(options?: Core.RequestOptions): Promise<DevboxAsyncExecutionDetailView> {
     return this.client.devboxes.executions.retrieve(this._devboxId, this._executionId, options);
@@ -88,7 +157,8 @@ export class Execution {
   /**
    * Kill the execution if it's still running.
    *
-   * @param options - Request options
+   * @param {Core.RequestOptions} [options] - Request options
+   * @returns {Promise<void>} Promise that resolves when the execution is killed
    */
   async kill(options?: Core.RequestOptions): Promise<void> {
     await this.client.devboxes.executions.kill(this._devboxId, this._executionId, options);

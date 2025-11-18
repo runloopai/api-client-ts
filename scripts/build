@@ -13,7 +13,7 @@ node scripts/utils/check-version.cjs
 
 rm -rf dist; mkdir dist
 # Copy src to dist/src and build from dist/src into dist, so that
-# the source map for index.js.map will refer to ./src/index.ts etc
+# the source map for sdk.js.map will refer to ./src/sdk.ts etc
 cp -rp src README.md dist
 rm dist/src/_shims/*-deno.ts dist/src/_shims/auto/*-deno.ts
 for file in LICENSE CHANGELOG.md; do
@@ -32,15 +32,15 @@ node scripts/utils/make-dist-package-json.cjs > dist/package.json
 # copy over handwritten .js/.mjs/.d.ts files
 cp src/_shims/*.{d.ts,js,mjs,md} dist/_shims
 cp src/_shims/auto/*.{d.ts,js,mjs} dist/_shims/auto
-# we need to add exports = module.exports = Runloop to index.js;
-# No way to get that from index.ts because it would cause compile errors
+# we need to add exports = module.exports = Runloop to sdk.js;
+# No way to get that from sdk.ts because it would cause compile errors
 # when building .mjs
 node scripts/utils/fix-index-exports.cjs
-# with "moduleResolution": "nodenext", if ESM resolves to index.d.ts,
+# with "moduleResolution": "nodenext", if ESM resolves to sdk.d.ts,
 # it'll have TS errors on the default import.  But if it resolves to
-# index.d.mts the default import will work (even though both files have
+# sdk.d.mts the default import will work (even though both files have
 # the same export default statement)
-cp dist/index.d.ts dist/index.d.mts
+cp dist/sdk.d.ts dist/sdk.d.mts
 cp tsconfig.dist-src.json dist/src/tsconfig.json
 
 node scripts/utils/postprocess-files.cjs

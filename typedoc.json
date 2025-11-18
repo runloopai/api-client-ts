@@ -1,0 +1,52 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "entryPoints": ["src/sdk.ts"],
+  "entryPointStrategy": "expand",
+  "out": "docs/",
+  "tsconfig": "tsconfig.typedoc.json",
+  "includeVersion": true,
+  "readme": "README-SDK.md",
+  "plugin": ["typedoc-github-theme", "@shipgirl/typedoc-plugin-versions"],
+  "navigation": {
+    "includeCategories": true,
+    "includeGroups": true
+  },
+  "categorizeByGroup": true,
+  "searchInComments": true,
+  "sort": ["source-order"],
+  "kindSortOrder": [
+    "Project",
+    "Module",
+    "Enum",
+    "Class",
+    "Namespace",
+    "Interface",
+    "TypeAlias",
+    "Constructor",
+    "Property",
+    "Method",
+    "Accessor",
+    "Function",
+    "Variable"
+  ],
+  "visibilityFilters": {
+    "protected": false,
+    "private": false,
+    "inherited": true,
+    "external": true
+  },
+  "excludeTags": ["@hidden"],
+  "validation": {
+    "invalidLink": true,
+    "notDocumented": false
+  },
+  "externalSymbolLinkMappings": {
+    "@runloop/api-client": {
+      "BlobLikePart": "#"
+    }
+  },
+  "navigationLinks": {
+    "GitHub": "https://github.com/runloopai/api-client-ts",
+    "Documentation": "https://docs.runloop.ai"
+  }
+}

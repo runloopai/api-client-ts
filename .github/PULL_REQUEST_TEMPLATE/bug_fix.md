@@ -16,8 +16,8 @@ Examples: `fix: resolve memory leak` · `fix(api): handle null response` · `fix
 
 ## Changes
 
-- 
-- 
+-
+-
 
 ## Testing
 
@@ -32,4 +32,3 @@ Examples: `fix: resolve memory leak` · `fix(api): handle null response` · `fix
 - [ ] PR title follows Conventional Commits format (`fix:` or `fix(scope):`)
 - [ ] Root cause identified and documented
 - [ ] Tests added to prevent regression
-

@@ -16,8 +16,8 @@ Examples: `feat: add new SDK method` · `feat(storage): support file uploads` ·
 
 ## Changes
 
-- 
-- 
+-
+-
 
 ## Testing
 
@@ -37,4 +37,3 @@ Examples: `feat: add new SDK method` · `feat(storage): support file uploads` ·
 - [ ] PR title follows Conventional Commits format (`feat:` or `feat(scope):`)
 - [ ] Documentation updated (if needed)
 - [ ] Breaking changes documented (if applicable)
-

@@ -6,7 +6,7 @@ module.exports = {
     '^.+\\.(t|j)sx?$': ['@swc/jest', { sourceMaps: 'inline' }],
   },
   moduleNameMapper: {
-    '^@runloop/api-client$': '<rootDir>/src/index.ts',
+    '^@runloop/api-client$': '<rootDir>/src/sdk.ts',
     '^@runloop/api-client/_shims/auto/(.*)$': '<rootDir>/src/_shims/auto/$1-node',
     '^@runloop/api-client/(.*)$': '<rootDir>/src/$1',
   },
@@ -18,9 +18,9 @@ module.exports = {
   ],
   testMatch: ['**/tests/smoketests/object-oriented/**/*.test.ts'],
   collectCoverageFrom: [
-    'src/objects/**/*.ts',
+    'src/sdk/**/*.ts',
     'src/sdk.ts',
-    '!src/objects/index.ts',
+    '!src/sdk/index.ts',
     '!**/*.d.ts',
     '!**/node_modules/**',
   ],

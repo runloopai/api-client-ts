@@ -3,6 +3,57 @@ import type { DevboxAsyncExecutionDetailView } from '../resources/devboxes/devbo
 
 /**
  * Result object for a completed execution with streaming stdout/stderr support.
+ *
+ * ## Overview
+ *
+ * The `ExecutionResult` class provides access to the results of a completed command execution.
+ * It includes the exit code, stdout/stderr output, and convenient methods for checking success/failure.
+ *
+ * ## Usage
+ *
+ * Execution results are typically obtained from `devbox.cmd.exec()` or `execution.result()`:
+ * ```typescript
+ * import { RunloopSDK } from '@runloop/api-client-ts';
+ *
+ * const runloop = new RunloopSDK();
+ * const devbox = runloop.devbox.fromId('devbox-123');
+ *
+ * // Get result from synchronous execution
+ * const result = await devbox.cmd.exec({ command: 'ls -la' });
+ *
+ * // Check success
+ * if (result.success) {
+ *   console.log('Command succeeded!');
+ *   console.log(await result.stdout());
+ * } else {
+ *   console.error(`Command failed with exit code: ${result.exitCode}`);
+ *   console.error(await result.stderr());
+ * }
+ * ```
+ *
+ * ## Accessing Output
+ *
+ * ### Get Full Output
+ * ```typescript
+ * const stdout = await result.stdout();
+ * const stderr = await result.stderr();
+ * ```
+ *
+ * ### Get Last N Lines
+ * ```typescript
+ * // Get last 10 lines of stdout
+ * const lastLines = await result.stdout(10);
+ *
+ * // Get last 5 lines of stderr
+ * const errors = await result.stderr(5);
+ * ```
+ *
+ * ## Properties
+ *
+ * - `exitCode`: The exit code of the command (null if not available)
+ * - `success`: Boolean indicating if exit code is 0
+ * - `failed`: Boolean indicating if exit code is non-zero
+ * - `result`: Raw execution result data
  */
 export class ExecutionResult {
   private client: Runloop;
@@ -102,8 +153,17 @@ export class ExecutionResult {
    * Get the stdout output from the execution. If numLines is specified, it will return the last N lines. If numLines is not specified, it will return the entire stdout output.
    * Note after the execution is completed, the stdout is not available anymore.
    *
-   * @param numLines - Optional number of lines to return from the end (most recent logs)
-   * @returns The stdout content
+   * @example
+   * ```typescript
+   * // Get full stdout
+   * const fullOutput = await result.stdout();
+   *
+   * // Get last 10 lines
+   * const lastLines = await result.stdout(10);
+   * ```
+   *
+   * @param {number} [numLines] - Optional number of lines to return from the end (most recent logs)
+   * @returns {Promise<string>} The stdout content
    */
   async stdout(numLines?: number): Promise<string> {
     const currentStdout = this._result.stdout ?? '';
@@ -118,8 +178,17 @@ export class ExecutionResult {
    * Get the stderr output from the execution. If numLines is specified, it will return the last N lines. If numLines is not specified, it will return the entire stderr output.
    * Note after the execution is completed, the stderr is not available anymore.
    *
-   * @param numLines - Optional number of lines to guarantee from the end (most recent logs)
-   * @returns The stderr content
+   * @example
+   * ```typescript
+   * // Get full stderr
+   * const fullErrors = await result.stderr();
+   *
+   * // Get last 5 lines
+   * const recentErrors = await result.stderr(5);
+   * ```
+   *
+   * @param {number} [numLines] - Optional number of lines to guarantee from the end (most recent logs)
+   * @returns {Promise<string>} The stderr content
    */
   async stderr(numLines?: number): Promise<string> {
     const currentStderr = this._result.stderr ?? '';
