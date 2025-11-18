@@ -32,7 +32,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout src
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - run: mkdir -p ./docs
       - name: Download the existing documents artifact
@@ -42,15 +42,15 @@ jobs:
       - run: tar -xf documentation.tar ./docs -C ./docs
 
       - name: Build
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: 16.x
-          cache: 'npm'
-      - run: npm ci
-      - run: npm run build # set up 'build' script in your package.json
+          node-version: 22.x
+          cache: 'yarn'
+      - run: yarn install --frozen-lockfile
+      - run: yarn build # set up 'build' script in your package.json
 
       - name: Build documents
-        run: npm run docs #set up 'docs' build script in your package.json
+        run: yarn docs #set up 'docs' build script in your package.json
 
       - name: tar the new docs
         run: tar -cvf newdocumentation.tar ./docs
