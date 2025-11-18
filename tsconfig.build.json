@@ -6,7 +6,7 @@
     "rootDir": "./dist/src",
     "paths": {
       "@runloop/api-client/*": ["./dist/src/*"],
-      "@runloop/api-client": ["./dist/src/index.ts"]
+      "@runloop/api-client": ["./dist/src/sdk.ts"]
     },
     "noEmit": false,
     "declaration": true,

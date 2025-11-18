@@ -3,8 +3,8 @@
   "version": "0.67.1",
   "description": "The official TypeScript library for the Runloop API",
   "author": "Runloop <support@runloop.ai>",
-  "types": "dist/index.d.ts",
-  "main": "dist/index.js",
+  "types": "dist/sdk.d.ts",
+  "main": "dist/sdk.js",
   "type": "commonjs",
   "repository": "github:runloopai/api-client-ts",
   "license": "MIT",
@@ -76,8 +76,8 @@
     "typescript": "^5.9.0"
   },
   "sideEffects": [
-    "./_shims/index.js",
-    "./_shims/index.mjs",
+    "./_shims/sdk.js",
+    "./_shims/sdk.mjs",
     "./shims/node.js",
     "./shims/node.mjs",
     "./shims/web.js",
@@ -121,11 +121,11 @@
     },
     ".": {
       "require": {
-        "types": "./dist/index.d.ts",
-        "default": "./dist/index.js"
+        "types": "./dist/sdk.d.ts",
+        "default": "./dist/sdk.js"
       },
-      "types": "./dist/index.d.mts",
-      "default": "./dist/index.mjs"
+      "types": "./dist/sdk.d.mts",
+      "default": "./dist/sdk.mjs"
     },
     "./*.mjs": {
       "types": "./dist/*.d.ts",

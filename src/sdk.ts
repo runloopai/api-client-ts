@@ -7,7 +7,6 @@ import { StorageObject } from './sdk/storage-object';
 
 // Re-export types from core
 import type * as Core from './core';
-//export type { RequestOptions } from './core';
 
 // Import types used in this file
 import type {
@@ -19,10 +18,6 @@ import type {
 import type { BlueprintCreateParams, BlueprintListParams } from './resources/blueprints';
 import type { ObjectCreateParams, ObjectListParams } from './resources/objects';
 import { PollingOptions } from './lib/polling';
-
-// Re-export types from lib
-//export type { PollingOptions };
-//export type { ClientOptions };
 
 /**
  * Alias for the Runloop API namespace.
@@ -508,7 +503,7 @@ export declare namespace RunloopSDK {
     StorageObject as StorageObject,
   };
 }
-// Export SDK classes from sdk/index.ts - these are separate from RunloopSDK to avoid circular dependencies
+// Export SDK classes from sdk/sdk.ts - these are separate from RunloopSDK to avoid circular dependencies
 export {
   Devbox,
   DevboxCmdOps,
