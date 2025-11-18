@@ -1,4 +1,4 @@
-name: PUBLISH DOCS
+name: Publish Typedoc to GitHub Pages
 on:
   workflow_dispatch:
   workflow_call:
