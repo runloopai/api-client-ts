@@ -205,6 +205,14 @@ export interface BlueprintBuildParameters {
   build_args?: { [key: string]: string } | null;
 
   /**
+   * (Optional) Map of named Docker build contexts. Keys are context names, values
+   * are typed context definitions (object or http). See Docker buildx additional
+   * contexts for details:
+   * https://docs.docker.com/reference/cli/docker/buildx/build/#build-context
+   */
+  build_contexts?: { [key: string]: BlueprintBuildParameters.BuildContexts } | null;
+
+  /**
    * A list of code mounts to be included in the Blueprint.
    */
   code_mounts?: Array<Shared.CodeMountParameters> | null;
@@ -223,6 +231,11 @@ export interface BlueprintBuildParameters {
    * Parameters to configure your Devbox at launch time.
    */
   launch_parameters?: Shared.LaunchParameters | null;
+
+  /**
+   * (Optional) Local build context stored in object-storage.
+   */
+  local_build_context?: BlueprintBuildParameters.LocalBuildContext | null;
 
   /**
    * (Optional) User defined metadata for the Blueprint.
@@ -251,6 +264,87 @@ export interface BlueprintBuildParameters {
 }
 
 export namespace BlueprintBuildParameters {
+  export interface BuildContexts {
+    /**
+     * Type of the context. Supported values: object, http
+     */
+    type: 'OBJECT' | 'HTTP';
+
+    /**
+     * HTTP(S) context parameters.
+     */
+    http?: BuildContexts.HTTP | null;
+
+    /**
+     * Object context parameters (named build context).
+     */
+    object?: BuildContexts.Object | null;
+  }
+
+  export namespace BuildContexts {
+    /**
+     * HTTP(S) context parameters.
+     */
+    export interface HTTP {
+      /**
+       * HTTP(S) URL to a tarball or directory to use as context.
+       */
+      url: string;
+    }
+
+    /**
+     * Object context parameters (named build context).
+     */
+    export interface Object {
+      /**
+       * Handle for a Runloop stored object to use as context.
+       */
+      object_id: string;
+    }
+  }
+
+  /**
+   * (Optional) Local build context stored in object-storage.
+   */
+  export interface LocalBuildContext {
+    /**
+     * Type of the context. Supported values: object, http
+     */
+    type: 'OBJECT' | 'HTTP';
+
+    /**
+     * HTTP(S) context parameters.
+     */
+    http?: LocalBuildContext.HTTP | null;
+
+    /**
+     * Object context parameters (named build context).
+     */
+    object?: LocalBuildContext.Object | null;
+  }
+
+  export namespace LocalBuildContext {
+    /**
+     * HTTP(S) context parameters.
+     */
+    export interface HTTP {
+      /**
+       * HTTP(S) URL to a tarball or directory to use as context.
+       */
+      url: string;
+    }
+
+    /**
+     * Object context parameters (named build context).
+     */
+    export interface Object {
+      /**
+       * Handle for a Runloop stored object to use as context.
+       */
+      object_id: string;
+    }
+  }
+
   export interface Service {
     /**
      * The image of the container service.
@@ -490,6 +584,14 @@ export interface BlueprintCreateParams {
   build_args?: { [key: string]: string } | null;
 
   /**
+   * (Optional) Map of named Docker build contexts. Keys are context names, values
+   * are typed context definitions (object or http). See Docker buildx additional
+   * contexts for details:
+   * https://docs.docker.com/reference/cli/docker/buildx/build/#build-context
+   */
+  build_contexts?: { [key: string]: BlueprintCreateParams.BuildContexts } | null;
+
+  /**
    * A list of code mounts to be included in the Blueprint.
    */
   code_mounts?: Array<Shared.CodeMountParameters> | null;
@@ -508,6 +610,11 @@ export interface BlueprintCreateParams {
    * Parameters to configure your Devbox at launch time.
    */
   launch_parameters?: Shared.LaunchParameters | null;
+
+  /**
+   * (Optional) Local build context stored in object-storage.
+   */
+  local_build_context?: BlueprintCreateParams.LocalBuildContext | null;
 
   /**
    * (Optional) User defined metadata for the Blueprint.
@@ -536,6 +643,87 @@ export interface BlueprintCreateParams {
 }
 
 export namespace BlueprintCreateParams {
+  export interface BuildContexts {
+    /**
+     * Type of the context. Supported values: object, http
+     */
+    type: 'OBJECT' | 'HTTP';
+
+    /**
+     * HTTP(S) context parameters.
+     */
+    http?: BuildContexts.HTTP | null;
+
+    /**
+     * Object context parameters (named build context).
+     */
+    object?: BuildContexts.Object | null;
+  }
+
+  export namespace BuildContexts {
+    /**
+     * HTTP(S) context parameters.
+     */
+    export interface HTTP {
+      /**
+       * HTTP(S) URL to a tarball or directory to use as context.
+       */
+      url: string;
+    }
+
+    /**
+     * Object context parameters (named build context).
+     */
+    export interface Object {
+      /**
+       * Handle for a Runloop stored object to use as context.
+       */
+      object_id: string;
+    }
+  }
+
+  /**
+   * (Optional) Local build context stored in object-storage.
+   */
+  export interface LocalBuildContext {
+    /**
+     * Type of the context. Supported values: object, http
+     */
+    type: 'OBJECT' | 'HTTP';
+
+    /**
+     * HTTP(S) context parameters.
+     */
+    http?: LocalBuildContext.HTTP | null;
+
+    /**
+     * Object context parameters (named build context).
+     */
+    object?: LocalBuildContext.Object | null;
+  }
+
+  export namespace LocalBuildContext {
+    /**
+     * HTTP(S) context parameters.
+     */
+    export interface HTTP {
+      /**
+       * HTTP(S) URL to a tarball or directory to use as context.
+       */
+      url: string;
+    }
+
+    /**
+     * Object context parameters (named build context).
+     */
+    export interface Object {
+      /**
+       * Handle for a Runloop stored object to use as context.
+       */
+      object_id: string;
+    }
+  }
+
   export interface Service {
     /**
      * The image of the container service.
@@ -668,6 +856,14 @@ export interface BlueprintPreviewParams {
   build_args?: { [key: string]: string } | null;
 
   /**
+   * (Optional) Map of named Docker build contexts. Keys are context names, values
+   * are typed context definitions (object or http). See Docker buildx additional
+   * contexts for details:
+   * https://docs.docker.com/reference/cli/docker/buildx/build/#build-context
+   */
+  build_contexts?: { [key: string]: BlueprintPreviewParams.BuildContexts } | null;
+
+  /**
    * A list of code mounts to be included in the Blueprint.
    */
   code_mounts?: Array<Shared.CodeMountParameters> | null;
@@ -686,6 +882,11 @@ export interface BlueprintPreviewParams {
    * Parameters to configure your Devbox at launch time.
    */
   launch_parameters?: Shared.LaunchParameters | null;
+
+  /**
+   * (Optional) Local build context stored in object-storage.
+   */
+  local_build_context?: BlueprintPreviewParams.LocalBuildContext | null;
 
   /**
    * (Optional) User defined metadata for the Blueprint.
@@ -714,6 +915,87 @@ export interface BlueprintPreviewParams {
 }
 
 export namespace BlueprintPreviewParams {
+  export interface BuildContexts {
+    /**
+     * Type of the context. Supported values: object, http
+     */
+    type: 'OBJECT' | 'HTTP';
+
+    /**
+     * HTTP(S) context parameters.
+     */
+    http?: BuildContexts.HTTP | null;
+
+    /**
+     * Object context parameters (named build context).
+     */
+    object?: BuildContexts.Object | null;
+  }
+
+  export namespace BuildContexts {
+    /**
+     * HTTP(S) context parameters.
+     */
+    export interface HTTP {
+      /**
+       * HTTP(S) URL to a tarball or directory to use as context.
+       */
+      url: string;
+    }
+
+    /**
+     * Object context parameters (named build context).
+     */
+    export interface Object {
+      /**
+       * Handle for a Runloop stored object to use as context.
+       */
+      object_id: string;
+    }
+  }
+
+  /**
+   * (Optional) Local build context stored in object-storage.
+   */
+  export interface LocalBuildContext {
+    /**
+     * Type of the context. Supported values: object, http
+     */
+    type: 'OBJECT' | 'HTTP';
+
+    /**
+     * HTTP(S) context parameters.
+     */
+    http?: LocalBuildContext.HTTP | null;
+
+    /**
+     * Object context parameters (named build context).
+     */
+    object?: LocalBuildContext.Object | null;
+  }
+
+  export namespace LocalBuildContext {
+    /**
+     * HTTP(S) context parameters.
+     */
+    export interface HTTP {
+      /**
+       * HTTP(S) URL to a tarball or directory to use as context.
+       */
+      url: string;
+    }
+
+    /**
+     * Object context parameters (named build context).
+     */
+    export interface Object {
+      /**
+       * Handle for a Runloop stored object to use as context.
+       */
+      object_id: string;
+    }
+  }
+
   export interface Service {
     /**
      * The image of the container service.

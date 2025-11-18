@@ -73,14 +73,14 @@ export namespace AgentSource {
     repository: string;
 
     /**
+     * Setup commands to run after cloning
+     */
+    agent_setup?: Array<string> | null;
+
+    /**
      * Optional Git ref (branch/tag/commit), defaults to main/HEAD
      */
     ref?: string | null;
-
-    /**
-     * Setup commands to run after cloning
-     */
-    setup?: Array<string> | null;
   }
 
   /**
@@ -91,6 +91,11 @@ export namespace AgentSource {
      * NPM package name
      */
     package_name: string;
+
+    /**
+     * Setup commands to run after installation
+     */
+    agent_setup?: Array<string> | null;
 
     /**
      * NPM version constraint
@@ -111,6 +116,11 @@ export namespace AgentSource {
      * Object ID
      */
     object_id: string;
+
+    /**
+     * Setup commands to run after unpacking
+     */
+    agent_setup?: Array<string> | null;
   }
 
   /**
@@ -121,6 +131,11 @@ export namespace AgentSource {
      * Pip package name
      */
     package_name: string;
+
+    /**
+     * Setup commands to run after installation
+     */
+    agent_setup?: Array<string> | null;
 
     /**
      * Pip version constraint

@@ -25,10 +25,20 @@ describe('resource agents', () => {
       name: 'name',
       source: {
         type: 'type',
-        git: { repository: 'repository', ref: 'ref', setup: ['string'] },
-        npm: { package_name: 'package_name', npm_version: 'npm_version', registry_url: 'registry_url' },
-        object: { object_id: 'object_id' },
-        pip: { package_name: 'package_name', pip_version: 'pip_version', registry_url: 'registry_url' },
+        git: { repository: 'repository', agent_setup: ['string'], ref: 'ref' },
+        npm: {
+          package_name: 'package_name',
+          agent_setup: ['string'],
+          npm_version: 'npm_version',
+          registry_url: 'registry_url',
+        },
+        object: { object_id: 'object_id', agent_setup: ['string'] },
+        pip: {
+          package_name: 'package_name',
+          agent_setup: ['string'],
+          pip_version: 'pip_version',
+          registry_url: 'registry_url',
+        },
       },
     });
   });
