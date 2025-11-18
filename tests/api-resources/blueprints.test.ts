@@ -26,6 +26,7 @@ describe('resource blueprints', () => {
       base_blueprint_id: 'base_blueprint_id',
       base_blueprint_name: 'base_blueprint_name',
       build_args: { foo: 'string' },
+      build_contexts: { foo: { type: 'OBJECT', http: { url: 'url' }, object: { object_id: 'object_id' } } },
       code_mounts: [
         {
           repo_name: 'repo_name',
@@ -49,6 +50,7 @@ describe('resource blueprints', () => {
         resource_size_request: 'X_SMALL',
         user_parameters: { uid: 0, username: 'username' },
       },
+      local_build_context: { type: 'OBJECT', http: { url: 'url' }, object: { object_id: 'object_id' } },
       metadata: { foo: 'string' },
       secrets: { foo: 'string' },
       services: [
@@ -254,6 +256,7 @@ describe('resource blueprints', () => {
       name: 'name',
       base_blueprint_name: 'base_blueprint_name',
       build_args: { foo: 'string' },
+      build_contexts: { foo: { type: 'OBJECT', http: { url: 'url' }, object: { object_id: 'object_id' } } },
       code_mounts: [
         {
           repo_name: 'repo_name',
@@ -277,6 +280,7 @@ describe('resource blueprints', () => {
         resource_size_request: 'X_SMALL',
         user_parameters: { uid: 0, username: 'username' },
       },
+      local_build_context: { type: 'OBJECT', http: { url: 'url' }, object: { object_id: 'object_id' } },
       metadata: { foo: 'string' },
       secrets: { foo: 'string' },
       services: [
