@@ -1,6 +1,4 @@
-// Export everything from sdk/index.ts
 export * from './sdk/index';
-
 import { Runloop, type ClientOptions } from './index';
 import { Devbox } from './sdk/devbox';
 import { Blueprint } from './sdk/blueprint';
@@ -9,7 +7,7 @@ import { StorageObject } from './sdk/storage-object';
 
 // Re-export types from core
 import type * as Core from './core';
-export type { RequestOptions } from './core';
+//export type { RequestOptions } from './core';
 
 // Import types used in this file
 import type {
@@ -22,13 +20,9 @@ import type { BlueprintCreateParams, BlueprintListParams } from './resources/blu
 import type { ObjectCreateParams, ObjectListParams } from './resources/objects';
 import { PollingOptions } from './lib/polling';
 
-// Note: We don't export resource classes (Benchmarks, Blueprints, Devboxes, etc.) from the SDK
-// Those are low-level API classes and should be accessed via runloop.api.*
-// Users can import types directly from '@runloop/api-client/resources' if needed
-
 // Re-export types from lib
-export type { PollingOptions };
-export type { ClientOptions };
+//export type { PollingOptions };
+//export type { ClientOptions };
 
 /**
  * Alias for the Runloop API namespace.
@@ -514,3 +508,16 @@ export declare namespace RunloopSDK {
     StorageObject as StorageObject,
   };
 }
+// Export SDK classes from sdk/index.ts - these are separate from RunloopSDK to avoid circular dependencies
+export {
+  Devbox,
+  DevboxCmdOps,
+  DevboxFileOps,
+  DevboxNetOps,
+  type ExecuteStreamingCallbacks,
+  Blueprint,
+  Snapshot,
+  StorageObject,
+  Execution,
+  ExecutionResult,
+} from './sdk/index';

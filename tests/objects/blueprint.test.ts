@@ -1,5 +1,5 @@
-import { Blueprint } from '../../src/objects/blueprint';
-import { Devbox } from '../../src/objects/devbox';
+import { Blueprint } from '../../src/sdk/blueprint';
+import { Devbox } from '../../src/sdk/devbox';
 import type { BlueprintView, BlueprintBuildLogsListView } from '../../src/resources/blueprints';
 
 // Mock the Runloop client

@@ -1,5 +1,5 @@
-import { Snapshot } from '../../src/objects/snapshot';
-import { Devbox } from '../../src/objects/devbox';
+import { Snapshot } from '../../src/sdk/snapshot';
+import { Devbox } from '../../src/sdk/devbox';
 import type { DevboxSnapshotView } from '../../src/resources/devboxes/devboxes';
 import type { DevboxSnapshotAsyncStatusView } from '../../src/resources/devboxes/disk-snapshots';
 

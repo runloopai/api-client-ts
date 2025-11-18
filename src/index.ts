@@ -581,7 +581,7 @@ export {
   UnprocessableEntityError,
 } from './error';
 
-export { RunloopSDK } from './sdk';
+export * from './sdk';
 
 /**
  * @deprecated Use named imports instead of default import. This is the old api client. Use the new SDK instead.

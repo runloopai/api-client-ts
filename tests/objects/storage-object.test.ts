@@ -1,4 +1,4 @@
-import { StorageObject } from '../../src/objects/storage-object';
+import { StorageObject } from '../../src/sdk/storage-object';
 import type { ObjectView, ObjectDownloadURLView } from '../../src/resources/objects';
 
 // Mock the Runloop client
