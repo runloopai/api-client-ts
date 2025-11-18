@@ -7,5 +7,5 @@ module.exports = {
     'unused-imports/no-unused-imports': 'error',
   },
   root: true,
-  ignorePatterns: ['dist/**/*', 'docs/**/*'],
+  ignorePatterns: ['dist/**/*', 'docs/**/*', 'tests/**/*'],
 };
