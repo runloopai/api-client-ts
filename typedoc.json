@@ -35,6 +35,7 @@
     "inherited": true,
     "external": true
   },
+  "excludeTags": ["@hidden"],
   "validation": {
     "invalidLink": true,
     "notDocumented": false

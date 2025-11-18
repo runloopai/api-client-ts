@@ -26,18 +26,15 @@ import { PollingOptions } from './lib/polling';
 // Those are low-level API classes and should be accessed via runloop.api.*
 // Users can import types directly from '@runloop/api-client/resources' if needed
 
-// Re-export types from resources/devboxes/disk-snapshots (not in resources/index.ts)
-export type {
-  DevboxSnapshotAsyncStatusView,
-  DiskSnapshotUpdateParams,
-} from './resources/devboxes/disk-snapshots';
-
 // Re-export types from lib
-export { PollingOptions };
+export type { PollingOptions };
 
-// Re-export Runloop and ClientOptions
-export { Runloop };
-export type { ClientOptions };
+/**
+ * Alias for the Runloop API namespace.
+ * Provides access to low-level API types and classes.
+ * Use this instead of the Runloop namespace for better clarity.
+ */
+export import RunloopAPI = Runloop;
 
 // Extract the content type from the API types
 type ContentType = ObjectCreateParams['content_type'];
@@ -256,12 +253,14 @@ export class BlueprintOps {
   /**
    * Create a new blueprint.
    * @param {BlueprintCreateParams} params - Parameters for creating the blueprint.
-   * @param {Core.RequestOptions & { polling?: Partial<PollingOptions<Runloop.Blueprints.BlueprintView>> }} [options] - Request options including polling configuration.
+   * @param {Core.RequestOptions & { polling?: Partial<PollingOptions<RunloopAPI.Blueprints.BlueprintView>> }} [options] - Request options including polling configuration.
    * @returns {Promise<Blueprint>} A {@link Blueprint} instance.
    */
   async create(
     params: BlueprintCreateParams,
-    options?: Core.RequestOptions & { polling?: Partial<PollingOptions<Runloop.Blueprints.BlueprintView>> },
+    options?: Core.RequestOptions & {
+      polling?: Partial<PollingOptions<RunloopAPI.Blueprints.BlueprintView>>;
+    },
   ): Promise<Blueprint> {
     return Blueprint.create(this.client, params, options);
   }
@@ -388,7 +387,7 @@ export class StorageObjectOps {
    */
   async create(
     params: ObjectCreateParams,
-    options?: Core.RequestOptions & { polling?: Partial<PollingOptions<Runloop.Objects.ObjectView>> },
+    options?: Core.RequestOptions & { polling?: Partial<PollingOptions<RunloopAPI.Objects.ObjectView>> },
   ): Promise<StorageObject> {
     return StorageObject.create(this.client, params, options);
   }

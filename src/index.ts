@@ -347,6 +347,9 @@ Runloop.Repositories = Repositories;
 Runloop.RepositoryConnectionViewsRepositoriesCursorIDPage = RepositoryConnectionViewsRepositoriesCursorIDPage;
 Runloop.Secrets = Secrets;
 
+/**
+ * @hidden
+ */
 export declare namespace Runloop {
   export type RequestOptions = Core.RequestOptions;
 
