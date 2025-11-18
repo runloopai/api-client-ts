@@ -52,14 +52,15 @@ type ContentType = ObjectCreateParams['content_type'];
  * console.log(result.exitCode);
  * ```
  *
- * ## To access the high-level interfaces, you can use the `devbox`, `blueprint`, `snapshot`, `storageObject` properties:
- * See the documentation for each interface for more details.
- * - {@link DevboxOps}
- * - {@link BlueprintOps}
- * - {@link SnapshotOps}
- * - {@link StorageObjectOps}
+ * ## Operations
+ * - `devbox` - {@link DevboxOps}
+ * - `blueprint` - {@link BlueprintOps}
+ * - `snapshot` - {@link SnapshotOps}
+ * - `storageObject` - {@link StorageObjectOps}
  *
- * ## To access the low-level API, you can use the api property:
+ * See the documentation for each Operations class for more details.
+ *
+ * ## Use the HTTP API directly
  * This is useful when you need to access features not yet exposed through the high-level interfaces.
  *
  * See the {@link RunloopAPI} for the Runloop class for more details.
