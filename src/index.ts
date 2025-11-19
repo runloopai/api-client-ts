@@ -240,7 +240,7 @@ export interface ClientOptions {
 }
 
 /**
- * API Client for interfacing with the Runloop API. This is the old api client. Use the new {@link RunloopSDK} instead.
+ * API Client for interfacing with the Runloop API. This is the runloop api client. Use the new {@link RunloopSDK} instead like this:
  * @example
  * ```typescript
  * import { RunloopSDK } from '@runloop/api-client';
