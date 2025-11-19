@@ -8,9 +8,9 @@ jest.mock('../../src/index');
 (global as any).fetch = jest.fn();
 
 // Mock fs and path modules
-jest.mock('node:fs', () => ({
-  statSync: jest.fn(),
-  readFileSync: jest.fn(),
+jest.mock('node:fs/promises', () => ({
+  stat: jest.fn(),
+  readFile: jest.fn(),
 }));
 
 jest.mock('node:path', () => ({
@@ -29,7 +29,7 @@ describe('StorageObject (New API)', () => {
 
   beforeEach(() => {
     // Get mocked modules
-    mockFs = require('node:fs');
+    mockFs = require('node:fs/promises');
     mockPath = require('node:path');
 
     // Create mock client instance with proper structure
@@ -462,8 +462,8 @@ describe('StorageObject (New API)', () => {
 
     it('should upload a text file with auto-detected content-type', async () => {
       const mockFileBuffer = Buffer.from('test content');
-      mockFs.statSync.mockReturnValue({ isFile: () => true });
-      mockFs.readFileSync.mockReturnValue(mockFileBuffer);
+      mockFs.stat.mockResolvedValue({ isFile: () => true });
+      mockFs.readFile.mockResolvedValue(mockFileBuffer);
 
       const mockObjectData = { id: 'file-123', upload_url: 'https://upload.example.com/file' };
       const mockObjectInfo = { ...mockObjectData, name: 'test.txt', state: 'UPLOADING' };
@@ -485,15 +485,15 @@ describe('StorageObject (New API)', () => {
         { name: 'test.txt', content_type: 'text', metadata: null },
         undefined,
       );
-      expect(mockFs.readFileSync).toHaveBeenCalledWith('./test.txt');
+      expect(mockFs.readFile).toHaveBeenCalledWith('./test.txt');
       expect(result).toBeInstanceOf(StorageObject);
       expect(result.id).toBe('file-123');
     });
 
     it('should upload a file with explicit content-type and custom name', async () => {
       const mockFileBuffer = Buffer.from('binary content');
-      mockFs.statSync.mockReturnValue({ isFile: () => true });
-      mockFs.readFileSync.mockReturnValue(mockFileBuffer);
+      mockFs.stat.mockResolvedValue({ isFile: () => true });
+      mockFs.readFile.mockResolvedValue(mockFileBuffer);
 
       const mockObjectData = { id: 'file-456', upload_url: 'https://upload.example.com/file' };
       const mockObjectInfo = { ...mockObjectData, name: 'custom.bin', state: 'UPLOADING' };
@@ -535,9 +535,7 @@ describe('StorageObject (New API)', () => {
     });
 
     it('should handle file read errors gracefully', async () => {
-      mockFs.statSync.mockImplementation(() => {
-        throw new Error('File not found');
-      });
+      mockFs.stat.mockRejectedValue(new Error('File not found'));
 
       await expect(
         StorageObject.uploadFromFile(mockClient, './nonexistent.txt', 'nonexistent.txt', {}),
@@ -546,8 +544,8 @@ describe('StorageObject (New API)', () => {
 
     it('should handle upload failures gracefully', async () => {
       const mockFileBuffer = Buffer.from('test content');
-      mockFs.statSync.mockReturnValue({ isFile: () => true });
-      mockFs.readFileSync.mockReturnValue(mockFileBuffer);
+      mockFs.stat.mockResolvedValue({ isFile: () => true });
+      mockFs.readFile.mockResolvedValue(mockFileBuffer);
 
       const mockObjectData = { id: 'file-789', upload_url: 'https://upload.example.com/file' };
       const mockObjectInfo = { ...mockObjectData, name: 'test.txt', state: 'UPLOADING' };
@@ -568,8 +566,8 @@ describe('StorageObject (New API)', () => {
 
     it('should upload an archive file with auto-detected content-type', async () => {
       const mockArchiveBuffer = Buffer.from('compressed archive content');
-      mockFs.statSync.mockReturnValue({ isFile: () => true });
-      mockFs.readFileSync.mockReturnValue(mockArchiveBuffer);
+      mockFs.stat.mockResolvedValue({ isFile: () => true });
+      mockFs.readFile.mockResolvedValue(mockArchiveBuffer);
 
       const mockObjectData = { id: 'archive-123', upload_url: 'https://upload.example.com/archive' };
       const mockObjectInfo = { ...mockObjectData, name: 'project.tar.gz', state: 'UPLOADING' };
@@ -595,7 +593,7 @@ describe('StorageObject (New API)', () => {
         { name: 'test-archive.tar.gz', content_type: 'tgz', metadata: null },
         undefined,
       );
-      expect(mockFs.readFileSync).toHaveBeenCalledWith('./files/test-archive.tar.gz');
+      expect(mockFs.readFile).toHaveBeenCalledWith('./files/test-archive.tar.gz');
       expect(result).toBeInstanceOf(StorageObject);
       expect(result.id).toBe('archive-123');
     });
