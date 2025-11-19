@@ -51,18 +51,9 @@ await devbox.shutdown();
 
 ## Core Concepts
 
-### [RunloopSDK](https://runloopai.github.io/api-client-ts/stable/classes/RunloopSDK.html)
+### Runloop ADK
 
-The main SDK class that provides access to all Runloop functionality:
-
-```typescript
-import { RunloopSDK } from '@runloop/api-client';
-
-const sdk = new RunloopSDK({
-  bearerToken: 'your-api-key',
-  // ... other options
-});
-```
+The main SDK class that provides access to all Runloop functionality construct view the [RunloopSDK documentation](https://runloopai.github.io/api-client-ts/stable/classes/RunloopSDK.html) to see specific capabilities.
 
 ### Available Resources
 
@@ -72,27 +63,17 @@ The SDK provides object-oriented interfaces for all major Runloop resources:
 - **[`sdk.blueprint`](https://runloopai.github.io/api-client-ts/stable/classes/RunloopSDK.Blueprint.html)** - Blueprint management (create, list, build blueprints)
 - **[`sdk.snapshot`](https://runloopai.github.io/api-client-ts/stable/classes/RunloopSDK.Snapshot.html)** - Snapshot management (list disk snapshots)
 - **[`sdk.storageObject`](https://runloopai.github.io/api-client-ts/stable/classes/RunloopSDK.StorageObject.html)** - Storage object management (upload, download, list objects)
-- **[`sdk.api`](https://runloopai.github.io/api-client-ts/stable/classes/Runloop.html)** - Direct access to the legacy REST API client
-
-## Installation
-
-```sh
-npm install @runloop/api-client
-```
-
-## Usage
-
-The full API of this library can be found in [api.md](api.md).
+- **[`sdk.api`](https://runloopai.github.io/api-client-ts/stable/classes/Runloop.html)** - Direct access to the REST API client
 
 <!-- prettier-ignore -->
 ```js
-import Runloop from '@runloop/api-client';
+import { RunloopSDK } from '@runloop/api-client';
 
-const client = new Runloop({
+const client = new RunloopSDK({
   bearerToken: process.env['RUNLOOP_API_KEY'], // This is the default and can be omitted
 });
 
-const devboxView = await client.devboxes.create();
+const devboxView = await client.api.devboxes.create();
 
 console.log(devboxView.id);
 ```
@@ -189,7 +170,7 @@ only 429 errors will be retried.
 You can use the `maxRetries` option to configure or disable this:
 
 <!-- prettier-ignore -->
-```js
+```ts
 // Configure the default for all requests:
 const client = new Runloop({
   maxRetries: 0, // default is 5
