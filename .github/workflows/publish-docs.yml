@@ -1,15 +1,21 @@
-name: PUBLISH DOCS
+name: Publish Docs to GitHub Pages
 on:
   workflow_dispatch:
   workflow_call:
   release:
     types: [published]
+  workflow_run:
+    workflows: ['Set Stable Tag']
+    types:
+      - completed
 permissions:
   contents: write # allows the 'Commit' step without tokens
 
 jobs:
   get_history: # create an artifact from the existing documentation builds
     runs-on: ubuntu-latest
+    # Only run if set-stable-tag succeeded (for workflow_run events), or for other trigger types
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
     steps:
       - name: get the gh-pages repo
         uses: actions/checkout@v3
@@ -33,6 +39,9 @@ jobs:
     steps:
       - name: Checkout src
         uses: actions/checkout@v4
+        with:
+          # When triggered by workflow_run, checkout the commit that was used in set-stable-tag
+          ref: ${{ github.event.workflow_run.head_sha || github.ref }}
 
       - run: mkdir -p ./docs
       - name: Download the existing documents artifact

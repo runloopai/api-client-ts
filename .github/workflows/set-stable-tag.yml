@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: 'Version to tag as stable (e.g., 0.67.1). Leave empty to use the version from the latest publish.'
+        description: 'Version to tag as stable (e.g., 0.67.1)'
         required: true
         type: string
   workflow_run:
@@ -15,11 +15,49 @@ on:
       - completed
 
 jobs:
-  set-stable-tag:
-    name: Set stable tag
+  check_version:
+    name: Check version
     runs-on: ubuntu-latest
     # Only run if the publish workflow succeeded, or if manually triggered
     if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
+    outputs:
+      is_prerelease: ${{ steps.check.outputs.is_prerelease }}
+      version: ${{ steps.check.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # When triggered by workflow_run, checkout the commit that was published
+          ref: ${{ github.event.workflow_run.head_sha || github.ref }}
+
+      - name: Check if version is prerelease
+        id: check
+        run: |
+          # Determine version: use input if provided (manual), otherwise get from package.json (automatic)
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            VERSION="${{ inputs.version }}"
+            echo "Using provided version: $VERSION"
+          else
+            VERSION="$(jq -r -e '.version' ./package.json)"
+            echo "Using version from package.json: $VERSION"
+          fi
+
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+          # Check if version contains a hyphen followed by letters (prerelease pattern like 1.0.0-alpha)
+          if [[ "$VERSION" =~ -([a-zA-Z]+) ]]; then
+            echo "is_prerelease=true" >> $GITHUB_OUTPUT
+            echo "Detected prerelease version: $VERSION"
+          else
+            echo "is_prerelease=false" >> $GITHUB_OUTPUT
+            echo "Detected stable version: $VERSION"
+          fi
+
+  set-stable-tag:
+    name: Set stable tag
+    needs: check_version
+    runs-on: ubuntu-latest
+    # Skip this job if it's a prerelease version
+    if: needs.check_version.outputs.is_prerelease != 'true'
 
     steps:
       - uses: actions/checkout@v4
@@ -36,23 +74,10 @@ jobs:
         run: |
           npm config set '//registry.npmjs.org/:_authToken' "$NPM_TOKEN"
           PACKAGE_NAME="@runloop/api-client"
+          VERSION="${{ needs.check_version.outputs.version }}"
 
-          # Determine version: use input if provided (manual), otherwise get from package.json (automatic)
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            VERSION="${{ inputs.version }}"
-            echo "Using provided version: $VERSION"
-          else
-            VERSION="$(jq -r -e '.version' ./package.json)"
-            echo "Using version from package.json: $VERSION"
-          fi
-
-          # Only add stable tag if this is not a prerelease version
-          if [[ ! "$VERSION" =~ -([a-zA-Z]+) ]]; then
-            echo "Setting stable tag to version $VERSION for package $PACKAGE_NAME"
-            npm dist-tag add "$PACKAGE_NAME@$VERSION" stable
-            echo "Successfully set stable tag to $VERSION"
-          else
-            echo "Skipping stable tag for prerelease version $VERSION"
-          fi
+          echo "Setting stable tag to version $VERSION for package $PACKAGE_NAME"
+          npm dist-tag add "$PACKAGE_NAME@$VERSION" stable
+          echo "Successfully set stable tag to $VERSION"
         env:
           NPM_TOKEN: ${{ secrets.RUNLOOP_NPM_TOKEN || secrets.NPM_TOKEN }}
