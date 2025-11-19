@@ -7,7 +7,7 @@ on:
     inputs:
       version:
         description: 'Version to tag as stable (e.g., 0.67.1). Leave empty to use the version from the latest publish.'
-        required: false
+        required: true
         type: string
   workflow_run:
     workflows: ['Publish NPM']
@@ -23,35 +23,27 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          # When triggered by workflow_run, checkout the commit that was published
+          ref: ${{ github.event.workflow_run.head_sha || github.ref }}
 
       - name: Set up Node
         uses: actions/setup-node@v3
         with:
           node-version: '20'
 
-      - name: Install dependencies
-        run: |
-          yarn install
-
-      - name: Build package
-        # Build when triggered by workflow_run, or when manually triggered without a version
-        if: ${{ github.event_name == 'workflow_run' || (github.event_name == 'workflow_dispatch' && !inputs.version) }}
-        run: |
-          yarn build
-
       - name: Set stable tag on NPM
         run: |
           npm config set '//registry.npmjs.org/:_authToken' "$NPM_TOKEN"
           PACKAGE_NAME="@runloop/api-client"
 
-          # Determine version: use input if provided, otherwise get from dist/package.json
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ -n "${{ inputs.version }}" ]; then
+          # Determine version: use input if provided (manual), otherwise get from package.json (automatic)
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             VERSION="${{ inputs.version }}"
             echo "Using provided version: $VERSION"
           else
-            cd dist
             VERSION="$(jq -r -e '.version' ./package.json)"
-            echo "Using version from published package: $VERSION"
+            echo "Using version from package.json: $VERSION"
           fi
 
           # Only add stable tag if this is not a prerelease version
