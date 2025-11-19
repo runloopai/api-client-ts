@@ -2,11 +2,92 @@
 
 [![NPM version](https://img.shields.io/npm/v/@runloop/api-client.svg)](https://npmjs.org/package/@runloop/api-client) ![npm bundle size](https://img.shields.io/bundlephobia/minzip/@runloop/api-client)
 
-This library provides convenient access to the Runloop REST API from server-side TypeScript or JavaScript.
+This library provides convenient access to the Runloop SDK & REST API from server-side TypeScript or JavaScript.
 
-The REST API documentation can be found on [runloop.ai](https://runloop.ai). The full API of this library can be found in [api.md](api.md).
+The additional documentation guides can be found at [docs.runloop.ai](https://docs.runloop.ai). The full API of this library can be found in [api.md](api.md).
 
-It is generated with [Stainless](https://www.stainless.com/).
+The **RunloopSDK** is the recommended, modern way to interact with the Runloop API. It provides high-level object-oriented interfaces for common operations while maintaining full access to the underlying REST API through the `.api` property.
+
+## Installation
+
+```sh
+npm install @runloop/api-client
+```
+
+## Quickstart
+
+Here's a complete example that demonstrates the core SDK functionality:
+
+```typescript
+import { RunloopSDK } from '@runloop/api-client';
+
+const sdk = new RunloopSDK({
+  bearerToken: process.env.RUNLOOP_API_KEY, // This is the default and can be omitted
+});
+
+// Create a new devbox and wait for it to be ready
+const devbox = await sdk.devbox.create();
+
+// Execute a synchronous command
+const result = await devbox.cmd.exec({ command: 'echo "Hello, World!"' });
+console.log('Output:', await result.stdout()); // "Hello, World!"
+console.log('Exit code:', result.exitCode); // 0
+
+// Start a long-running HTTP server asynchronously
+const serverExec = await devbox.cmd.execAsync({
+  command: 'npx http-server -p 8080',
+});
+console.log(`Started server with execution ID: ${serverExec.executionId}`);
+
+// Check server status
+const state = await serverExec.getState();
+console.log('Server status:', state.status); // "running"
+
+// Later... kill the server when done
+await serverExec.kill();
+
+await devbox.shutdown();
+```
+
+## Core Concepts
+
+### RunloopSDK
+
+The main SDK class that provides access to all Runloop functionality:
+
+```typescript
+import { RunloopSDK } from '@runloop/api-client';
+
+const sdk = new RunloopSDK({
+  bearerToken: 'your-api-key',
+  // ... other options
+});
+```
+
+### Available Resources
+
+The SDK provides object-oriented interfaces for all major Runloop resources:
+
+- **`sdk.devbox`** - Devbox management (create, list, execute commands, file operations)
+- **`sdk.blueprint`** - Blueprint management (create, list, build blueprints)
+- **`sdk.snapshot`** - Snapshot management (list disk snapshots)
+- **`sdk.storageObject`** - Storage object management (upload, download, list objects)
+- **`sdk.api`** - Direct access to the legacy REST API client
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ## Installation
 
