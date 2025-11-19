@@ -31,8 +31,8 @@ export class DiskSnapshots extends APIResource {
   }
 
   /**
-   * List all snapshots of a Devbox while optionally filtering by Devbox ID and
-   * metadata.
+   * List all snapshots of a Devbox while optionally filtering by Devbox ID, source
+   * Blueprint ID, and metadata.
    */
   list(
     query?: DiskSnapshotListParams,
@@ -109,7 +109,7 @@ export interface DevboxSnapshotAsyncStatusView {
   /**
    * The current status of the snapshot operation.
    */
-  status: 'in_progress' | 'error' | 'complete';
+  status: 'in_progress' | 'error' | 'complete' | 'deleted';
 
   /**
    * Error message if the operation failed.
@@ -157,6 +157,11 @@ export interface DiskSnapshotListParams extends DiskSnapshotsCursorIDPageParams 
    * Filter snapshots by metadata key with multiple possible values (OR condition).
    */
   'metadata[key][in]'?: string;
+
+  /**
+   * Source Blueprint ID to filter snapshots by.
+   */
+  source_blueprint_id?: string;
 }
 
 export declare namespace DiskSnapshots {
