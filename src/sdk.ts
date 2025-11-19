@@ -490,7 +490,17 @@ export class StorageObjectOps {
   }
 }
 
-export default RunloopSDK;
+// @deprecated Use {@link RunloopSDK} instead.
+/**
+ * @deprecated Use {@link RunloopSDK} instead.
+ * @example
+ * ```typescript
+ * import { RunloopSDK } from '@runloop/api-client';
+ * const sdk = new RunloopSDK();
+ * const devbox = await sdk.devbox.create({ name: 'my-devbox' });
+ * ```
+ */
+export default Runloop;
 
 export declare namespace RunloopSDK {
   export {
