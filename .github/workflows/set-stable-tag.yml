@@ -1,0 +1,37 @@
+# This workflow allows manually setting the "stable" dist-tag to a specific version on NPM.
+# You can run this workflow by navigating to https://www.github.com/runloopai/api-client-ts/actions/workflows/set-stable-tag.yml
+name: Set Stable Tag
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to tag as stable (e.g., 0.67.1)'
+        required: true
+        type: string
+
+jobs:
+  set-stable-tag:
+    name: Set stable tag
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+
+      - name: Set stable tag on NPM
+        run: |
+          npm config set '//registry.npmjs.org/:_authToken' "$NPM_TOKEN"
+          PACKAGE_NAME="@runloop/api-client"
+          VERSION="${{ inputs.version }}"
+
+          echo "Setting stable tag to version $VERSION for package $PACKAGE_NAME"
+          npm dist-tag add "$PACKAGE_NAME@$VERSION" stable
+
+          echo "Successfully set stable tag to $VERSION"
+          echo "You can verify with: npm dist-tag ls $PACKAGE_NAME"
+        env:
+          NPM_TOKEN: ${{ secrets.RUNLOOP_NPM_TOKEN || secrets.NPM_TOKEN }}
