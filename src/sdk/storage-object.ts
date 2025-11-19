@@ -8,6 +8,7 @@ import type {
 } from '../resources/objects';
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
+import * as tar from 'tar';
 
 // Extract the content type from the API types
 type ContentType = ObjectCreateParams['content_type'];
@@ -483,6 +484,75 @@ export class StorageObject {
     }
 
     // Step 3: Mark upload as complete
+    await storageObject.complete();
+
+    return storageObject;
+  }
+
+  /**
+   * @hidden
+   */
+  static async uploadFromDir(
+    client: Runloop,
+    dirPath: string,
+    params: Omit<ObjectCreateParams, 'content_type'>,
+    options?: Core.RequestOptions,
+  ): Promise<StorageObject> {
+    assertNodeEnvironment();
+
+    // Verify directory exists and is actually a directory
+    try {
+      const stats = await fs.stat(dirPath);
+      if (!stats.isDirectory()) {
+        throw new Error(`Path is not a directory: ${dirPath}`);
+      }
+    } catch (error) {
+      throw new Error(
+        `Failed to access directory ${dirPath}: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      );
+    }
+
+    // Create the tarball in-memory.
+    let buffer;
+    try {
+      const tarStream = tar.create({ gzip: true, cwd: dirPath }, ['.']);
+      const chunks = [];
+      for await (const chunk of tarStream) {
+        chunks.push(chunk);
+      }
+      buffer = Buffer.concat(chunks);
+    } catch (error) {
+      throw new Error(
+        `Failed to create tarball from directory ${dirPath}: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      );
+    }
+
+    // Create the object.
+    const createParams: ObjectCreateParams = { ...params, content_type: 'tgz' };
+    const objectData = await client.objects.create(createParams, options);
+    const storageObject = new StorageObject(client, objectData.id, objectData.upload_url);
+
+    const uploadUrl = objectData.upload_url;
+    if (!uploadUrl) {
+      throw new Error('No upload URL available. Object may already be completed or deleted.');
+    }
+
+    // Write the tarball to the upload URL.
+    try {
+      const response = await fetch(uploadUrl, {
+        method: 'PUT',
+        body: buffer,
+      });
+
+      if (!response.ok) {
+        throw new Error(`Upload failed: ${response.status} ${response.statusText}`);
+      }
+    } catch (error) {
+      throw new Error(
+        `Failed to upload tarball: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      );
+    }
+
     await storageObject.complete();
 
     return storageObject;
