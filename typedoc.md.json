@@ -2,11 +2,10 @@
   "$schema": "https://typedoc.org/schema.json",
   "entryPoints": ["src/sdk.ts"],
   "entryPointStrategy": "expand",
-  "out": "docs/",
+  "out": "docs-md/",
   "tsconfig": "tsconfig.typedoc.json",
   "includeVersion": true,
-  "readme": "README-SDK.md",
-  "plugin": ["typedoc-github-theme", "@shipgirl/typedoc-plugin-versions", "typedoc-plugin-dt-links"],
+  "plugin": ["typedoc-plugin-markdown"],
   "navigation": {
     "includeCategories": true,
     "includeGroups": true

@@ -13,3 +13,4 @@ dist-deno
 coverage-objects
 object-coverage-report.json
 docs
+docs-md
