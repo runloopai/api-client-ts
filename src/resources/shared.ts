@@ -14,9 +14,15 @@ export interface AfterIdle {
 
 export interface AgentMountParameters {
   /**
-   * The ID of the agent to mount.
+   * The ID of the agent to mount. Either agent_id or name must be set.
    */
-  agent_id: string;
+  agent_id: string | null;
+
+  /**
+   * The name of the agent to mount. Returns the most recent agent with a matching
+   * name if no agent id string provided. Either agent id or name must be set
+   */
+  agent_name: string | null;
 
   type: 'agent_mount';
 

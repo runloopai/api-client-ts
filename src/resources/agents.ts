@@ -93,6 +93,11 @@ export interface AgentView {
   id: string;
 
   /**
+   * The creation time of the Agent (Unix timestamp milliseconds).
+   */
+  create_time_ms: number;
+
+  /**
    * Whether the Agent is publicly accessible.
    */
   is_public: boolean;
