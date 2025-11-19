@@ -11,6 +11,8 @@
     "includeCategories": true,
     "includeGroups": true
   },
+  "favicon": "./favicon.png",
+  "githubPages": true,
   "categorizeByGroup": true,
   "searchInComments": true,
   "sort": ["source-order"],
@@ -35,6 +37,7 @@
     "inherited": true,
     "external": true
   },
+
   "excludeTags": ["@hidden"],
   "validation": {
     "invalidLink": true,
