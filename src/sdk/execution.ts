@@ -138,6 +138,10 @@ export class Execution {
    * console.log(`Status: ${state.status}`);
    * ```
    */
+  async getState(options?: Core.RequestOptions): Promise<DevboxAsyncExecutionDetailView> {
+    return this.client.devboxes.executions.retrieve(this._devboxId, this._executionId, options);
+  }
+
   /**
    * Kill the execution if it's still running.
    *
