@@ -30,3 +30,20 @@ jobs:
           bash ./bin/publish-npm
         env:
           NPM_TOKEN: ${{ secrets.RUNLOOP_NPM_TOKEN || secrets.NPM_TOKEN }}
+
+      - name: Add stable tag to NPM release
+        run: |
+          npm config set '//registry.npmjs.org/:_authToken' "$NPM_TOKEN"
+          cd dist
+          PACKAGE_NAME="$(jq -r -e '.name' ./package.json)"
+          VERSION="$(jq -r -e '.version' ./package.json)"
+
+          # Only add stable tag if this is not a prerelease version
+          if [[ ! "$VERSION" =~ -([a-zA-Z]+) ]]; then
+            echo "Adding stable tag to version $VERSION"
+            npm dist-tag add "$PACKAGE_NAME@$VERSION" stable
+          else
+            echo "Skipping stable tag for prerelease version $VERSION"
+          fi
+        env:
+          NPM_TOKEN: ${{ secrets.RUNLOOP_NPM_TOKEN || secrets.NPM_TOKEN }}

@@ -4,6 +4,7 @@ Types:
 
 - <code><a href="./src/resources/shared.ts">AfterIdle</a></code>
 - <code><a href="./src/resources/shared.ts">AgentMountParameters</a></code>
+- <code><a href="./src/resources/shared.ts">AgentSource</a></code>
 - <code><a href="./src/resources/shared.ts">CodeMountParameters</a></code>
 - <code><a href="./src/resources/shared.ts">LaunchParameters</a></code>
 - <code><a href="./src/resources/shared.ts">Mount</a></code>
@@ -40,6 +41,20 @@ Methods:
 - <code title="post /v1/benchmarks/runs/{id}/cancel">client.benchmarks.runs.<a href="./src/resources/benchmarks/runs.ts">cancel</a>(id) -> BenchmarkRunView</code>
 - <code title="post /v1/benchmarks/runs/{id}/complete">client.benchmarks.runs.<a href="./src/resources/benchmarks/runs.ts">complete</a>(id) -> BenchmarkRunView</code>
 - <code title="get /v1/benchmarks/runs/{id}/scenario_runs">client.benchmarks.runs.<a href="./src/resources/benchmarks/runs.ts">listScenarioRuns</a>(id, { ...params }) -> ScenarioRunViewsBenchmarkRunsCursorIDPage</code>
+
+# Agents
+
+Types:
+
+- <code><a href="./src/resources/agents.ts">AgentCreateParameters</a></code>
+- <code><a href="./src/resources/agents.ts">AgentListView</a></code>
+- <code><a href="./src/resources/agents.ts">AgentView</a></code>
+
+Methods:
+
+- <code title="post /v1/agents">client.agents.<a href="./src/resources/agents.ts">create</a>({ ...params }) -> AgentView</code>
+- <code title="get /v1/agents/{id}">client.agents.<a href="./src/resources/agents.ts">retrieve</a>(id) -> AgentView</code>
+- <code title="get /v1/agents">client.agents.<a href="./src/resources/agents.ts">list</a>({ ...params }) -> AgentViewsAgentsCursorIDPage</code>
 
 # Blueprints
 

@@ -2,6 +2,15 @@
 
 export * from './shared';
 export {
+  AgentViewsAgentsCursorIDPage,
+  Agents,
+  type AgentCreateParameters,
+  type AgentListView,
+  type AgentView,
+  type AgentCreateParams,
+  type AgentListParams,
+} from './agents';
+export {
   BenchmarkRunViewsBenchmarkRunsCursorIDPage,
   BenchmarkViewsBenchmarksCursorIDPage,
   Benchmarks,

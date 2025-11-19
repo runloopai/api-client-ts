@@ -1,5 +1,24 @@
 # Changelog
 
+## 0.68.0 (2025-11-19)
+
+Full Changelog: [v0.67.1...v0.68.0](https://github.com/runloopai/api-client-ts/compare/v0.67.1...v0.68.0)
+
+### Features
+
+* **blueprint:** adds queued state ([c8f5e0b](https://github.com/runloopai/api-client-ts/commit/c8f5e0b01cbd2fd573403b7d9b61816efce03b1f))
+* **blueprints:** Cleanup the BuildContext API ([#6407](https://github.com/runloopai/api-client-ts/issues/6407))\n\nTest ([8bd1c44](https://github.com/runloopai/api-client-ts/commit/8bd1c4468565effadc66b8524594daa5761938a4))
+* **blueprints:** prevent deletion of blueprints with dependent snapshots ([f52eb9a](https://github.com/runloopai/api-client-ts/commit/f52eb9aedc5d9317a2ab27952c13b0f2b2172339))
+* **devbox:** adding devbox execution std out / err last n lines ([#643](https://github.com/runloopai/api-client-ts/issues/643)) ([71de54c](https://github.com/runloopai/api-client-ts/commit/71de54c13bca60f3057e8c8ed2b8e5e531fffc9f))
+* **object:** Added ability to give objects a Time To Live, after which they are automatically deleted.\nfeat(blueprints): Added the ability to attach objects as build contexts that can be referenced in your Dockerfile. ([0ee5067](https://github.com/runloopai/api-client-ts/commit/0ee50676c734c536a8d1b5c25ef19d154da1f121))
+* **streaming:** harden SSE timeout recovery ([#645](https://github.com/runloopai/api-client-ts/issues/645)) ([cb249a7](https://github.com/runloopai/api-client-ts/commit/cb249a7d2c854a28e3932f35b2ad98dd30c8737b))
+
+
+### Bug Fixes
+
+* **file-mount:** client side validation for file_mount size checks ([#639](https://github.com/runloopai/api-client-ts/issues/639)) ([30e7123](https://github.com/runloopai/api-client-ts/commit/30e712315740c393c21dbfe34e4d2611dca0d0dc))
+* **snapshot:** added "deleted" status to DevboxSnapshotStatus enum \n fix(storage-object): added ObjectState enum, fixed createObject() to appropriately type content_type and state as the respective enums ([5f8b203](https://github.com/runloopai/api-client-ts/commit/5f8b2031aa38ff9a87e3554c9e5100189ea448e2))
+
 ## 0.67.1 (2025-11-05)
 
 Full Changelog: [v0.67.0...v0.67.1](https://github.com/runloopai/api-client-ts/compare/v0.67.0...v0.67.1)
