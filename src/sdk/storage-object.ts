@@ -6,7 +6,7 @@ import type {
   ObjectDownloadURLView,
   ObjectListParams,
 } from '../resources/objects';
-import * as fs from 'node:fs';
+import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 
 // Extract the content type from the API types
@@ -293,7 +293,7 @@ export class StorageObject {
 
     // Check if file exists and get stats
     try {
-      const stats = fs.statSync(filePath);
+      const stats = await fs.stat(filePath);
       if (!stats.isFile()) {
         throw new Error(`Path is not a file: ${filePath}`);
       }
@@ -306,7 +306,7 @@ export class StorageObject {
     // Read file content immediately to fail fast if file doesn't exist
     let fileBuffer: Buffer;
     try {
-      fileBuffer = fs.readFileSync(filePath);
+      fileBuffer = await fs.readFile(filePath);
     } catch (error) {
       throw new Error(
         `Failed to read file ${filePath}: ${error instanceof Error ? error.message : 'Unknown error'}`,
