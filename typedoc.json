@@ -5,7 +5,7 @@
   "out": "docs/",
   "tsconfig": "tsconfig.typedoc.json",
   "includeVersion": true,
-  "readme": "README-SDK.md",
+  "readme": "README.md",
   "plugin": ["typedoc-github-theme", "@shipgirl/typedoc-plugin-versions", "typedoc-plugin-dt-links"],
   "navigation": {
     "includeCategories": true,
