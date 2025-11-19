@@ -21,86 +21,20 @@ import { Devbox } from './devbox';
  * Snapshots capture the complete state of a devbox's disk and can be used to restore
  * devboxes to a previous state or create new devboxes from saved states.
  *
- * ## Creating Snapshots
+ * ## Quickstart
  *
  * Snapshots are typically created from devboxes:
  * ```typescript
  * import { RunloopSDK } from '@runloop/api-client-ts';
  *
  * const runloop = new RunloopSDK();
- * const devbox = runloop.devbox.fromId('devbox-123');
- *
- * // Create snapshot and wait for completion
+ * const devbox = runloop.devbox.create({ name: 'my-devbox' });
+ * devbox.file.write('my-file.txt', 'Hello, World!');
  * const snapshot = await devbox.snapshotDisk({ name: 'backup' });
- * console.log(`Snapshot ${snapshot.id} created`);
- *
- * // Or create asynchronously
- * const snapshot = await devbox.snapshotDiskAsync({ name: 'backup' });
- * await snapshot.awaitCompleted();
+ * const devboxFromSnapshot = await snapshot.createDevbox({ name: 'my-devbox-from-snapshot' });
+ * ...
  * ```
  *
- * ## Working with Existing Snapshots
- *
- * ### Get Snapshot by ID
- * ```typescript
- * const runloop = new RunloopSDK();
- * const snapshot = runloop.snapshot.fromId('snapshot-123');
- * const info = await snapshot.getInfo();
- * console.log(`Snapshot status: ${info.status}`);
- * ```
- *
- * ### List Snapshots
- * ```typescript
- * const runloop = new RunloopSDK();
- * // List all snapshots
- * const snapshots = await runloop.snapshot.list();
- *
- * // Filter by devbox ID
- * const snapshots = await runloop.snapshot.list({ devbox_id: 'devbox-123' });
- *
- * for (const snapshot of snapshots) {
- *   console.log(`Snapshot: ${snapshot.id}`);
- * }
- * ```
- *
- * ## Creating Devboxes from Snapshots
- *
- * ### Using the Snapshot Instance
- * ```typescript
- * const runloop = new RunloopSDK();
- * const snapshot = runloop.snapshot.fromId('snapshot-123');
- * const devbox = await snapshot.createDevbox({ name: 'restored-devbox' });
- * ```
- *
- * ### Using the SDK Interface
- * ```typescript
- * const runloop = new RunloopSDK();
- * const devbox = await runloop.devbox.createFromSnapshot('snapshot-123', {
- *   name: 'restored-devbox',
- * });
- * ```
- *
- * ## Managing Snapshots
- *
- * ### Update Snapshot Metadata
- * ```typescript
- * await snapshot.update({
- *   name: 'updated-name',
- *   metadata: { environment: 'production' },
- * });
- * ```
- *
- * ### Wait for Completion
- * ```typescript
- * const snapshot = await devbox.snapshotDiskAsync({ name: 'backup' });
- * await snapshot.awaitCompleted();
- * console.log('Snapshot is ready!');
- * ```
- *
- * ### Delete Snapshot
- * ```typescript
- * await snapshot.delete();
- * ```
  */
 export class Snapshot {
   private client: Runloop;

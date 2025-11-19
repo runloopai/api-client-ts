@@ -55,108 +55,18 @@ function assertNodeEnvironment(): void {
  * which are files stored in Runloop's object storage. Storage objects can be uploaded,
  * downloaded, and managed with metadata.
  *
- * ## Uploading Objects
+ * ## Quickstart
  *
- * ### Upload from File (Node.js)
  * ```typescript
  * import { RunloopSDK } from '@runloop/api-client-ts';
  *
  * const runloop = new RunloopSDK();
- * const object = await runloop.storageObject.uploadFromFile(
+ * const storageObject = await runloop.storageObject.uploadFromFile(
  *   './my-file.txt',
  *   'my-file.txt',
- *   { metadata: { project: 'demo' } }
+ *   { metadata: { project: 'demo' } },
  * );
- * console.log(`Uploaded object: ${object.id}`);
- * ```
- *
- * ### Upload from Text
- * ```typescript
- * const runloop = new RunloopSDK();
- * const object = await runloop.storageObject.uploadFromText(
- *   'Hello, World!',
- *   'greeting.txt',
- *   { metadata: { type: 'greeting' } }
- * );
- * ```
- *
- * ### Upload from Buffer (Node.js)
- * ```typescript
- * const runloop = new RunloopSDK();
- * const buffer = Buffer.from('Binary data');
- * const object = await runloop.storageObject.uploadFromBuffer(
- *   buffer,
- *   'data.bin',
- *   'unspecified',
- *   { metadata: { format: 'binary' } }
- * );
- * ```
- *
- * ### Manual Upload Process
- * ```typescript
- * const runloop = new RunloopSDK();
- * // Step 1: Create object
- * const object = await runloop.storageObject.create({
- *   name: 'my-file.txt',
- *   content_type: 'text',
- * });
- *
- * // Step 2: Upload content
- * await object.uploadContent('File contents');
- *
- * // Step 3: Mark as complete
- * await object.complete();
- * ```
- *
- * ## Downloading Objects
- *
- * ### Download as Text
- * ```typescript
- * const runloop = new RunloopSDK();
- * const object = runloop.storageObject.fromId('object-123');
- * const content = await object.downloadAsText();
- * console.log(content);
- * ```
- *
- * ### Download as Buffer
- * ```typescript
- * const runloop = new RunloopSDK();
- * const object = runloop.storageObject.fromId('object-123');
- * const buffer = await object.downloadAsBuffer();
- * fs.writeFileSync('downloaded.bin', buffer);
- * ```
- *
- * ### Get Download URL
- * ```typescript
- * const runloop = new RunloopSDK();
- * const object = runloop.storageObject.fromId('object-123');
- * const { download_url } = await object.getDownloadUrl(3600); // Valid for 1 hour
- * console.log(`Download URL: ${download_url}`);
- * ```
- *
- * ## Managing Objects
- *
- * ### List Objects
- * ```typescript
- * const runloop = new RunloopSDK();
- * const objects = await runloop.storageObject.list();
- * for (const object of objects) {
- *   const info = await object.getInfo();
- *   console.log(`${info.name}: ${info.size} bytes`);
- * }
- * ```
- *
- * ### Get Object Info
- * ```typescript
- * const runloop = new RunloopSDK();
- * const object = runloop.storageObject.fromId('object-123');
- * const info = await object.getInfo();
- * console.log(`Name: ${info.name}, Size: ${info.size}, Type: ${info.content_type}`);
- * ```
- *
- * ### Delete Object
- * ```typescript
- * await object.delete();
+ * const text = await storageObject.downloadAsText();
  * ```
  */
 export class StorageObject {
@@ -183,25 +93,17 @@ export class StorageObject {
    * @example
    * ```typescript
    * const runloop = new RunloopSDK();
-   * // Manual upload process
-   * const storageObject = await runloop.storageObject.create({
-   *   name: 'my-upload.txt',
+   * // Step 1: Create object
+   * const object = await runloop.storageObject.create({
+   *   name: 'my-file.txt',
    *   content_type: 'text',
-   *   metadata: { project: 'demo' },
    * });
-   * await storageObject.uploadContent('Hello, World!');
-   * await storageObject.complete();
-   * ```
    *
-   * @example
-   * ```typescript
-   * const runloop = new RunloopSDK();
-   * // Or use the convenience method
-   * const storageObject = await runloop.storageObject.uploadFromFile(
-   *   './my-file.txt',
-   *   'my-upload.txt'
-   * );
-   * console.log(storageObject.id);
+   * // Step 2: Upload content
+   * await object.uploadContent('File contents');
+   *
+   * // Step 3: Mark as complete
+   * await object.complete();
    * ```
    *
    * @param {Runloop} client - The Runloop client instance
@@ -362,9 +264,9 @@ export class StorageObject {
    * ```typescript
    * const runloop = new RunloopSDK();
    * const object = await runloop.storageObject.uploadFromText(
-   *   JSON.stringify({ key: 'value' }, null, 2),
-   *   'config.json',
-   *   { metadata: { type: 'config' } }
+   *   'Hello, World!',
+   *   'greeting.txt',
+   *   { metadata: { type: 'greeting' } }
    * );
    * ```
    *
@@ -497,6 +399,15 @@ export class StorageObject {
 
   /**
    * Get the complete object data from the API.
+   *
+   * @example
+   * ```typescript
+   * const runloop = new RunloopSDK();
+   * const object = runloop.storageObject.fromId('object-123');
+   * const info = await object.getInfo();
+   * console.log(`Name: ${info.name}, Size: ${info.size}, Type: ${info.content_type}`);
+   * ```
+   *
    * @param {Core.RequestOptions} [options] - Request options
    * @returns {Promise<ObjectView>} The object data
    */
@@ -568,6 +479,14 @@ export class StorageObject {
   /**
    * Get a presigned download URL for this object.
    * The URL will be valid for the specified duration (default: 1 hour).
+   *
+   * @example
+   * ```typescript
+   * const runloop = new RunloopSDK();
+   * const object = runloop.storageObject.fromId('object-123');
+   * const { download_url } = await object.getDownloadUrl(3600); // Valid for 1 hour
+   * console.log(`Download URL: ${download_url}`);
+   * ```
    *
    * @param {number} [durationSeconds] - How long the URL should be valid (default: 3600)
    * @param {Core.RequestOptions} [options] - Request options

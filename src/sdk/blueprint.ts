@@ -11,12 +11,43 @@ import { Devbox } from './devbox';
 
 /**
  * Object-oriented interface for working with Blueprints.
+ *
+ * ## Overview
+ *
+ * The `Blueprint` class provides a high-level, object-oriented API for managing blueprints.
+ * Blueprints are ways to create customized starting points for Devboxes.
+ * They allow you to define custom starting points for Devboxes such that environment set up can be cached to improve Devbox boot times.
+ *
+ * ## Quickstart
+ *
+ * ### Basic Creation
+ * ```typescript
+ * import { RunloopSDK } from '@runloop/api-client-ts';
+ *
+ * const runloop = new RunloopSDK();
+ * const blueprint = await runloop.blueprint.create({
+ *   name: 'my-blueprint',
+ *   dockerfile: 'FROM ubuntu:22.04
+ *                RUN apt-get update',
+ * });
+ * console.log(`Created blueprint: ${blueprint.id}`);
+ *
+ * // Create a devbox from the blueprint
+ * const devbox = await blueprint.createDevbox({ name: 'my-devbox' });
  * ```
+ *
  */
 export class Blueprint {
   private client: Runloop;
   private _id: string;
 
+  /**
+   * Creates a new Blueprint instance.
+   *
+   * @private
+   * @param {Runloop} client - The Runloop client instance
+   * @param {string} id - The blueprint ID
+   */
   private constructor(client: Runloop, id: string) {
     this.client = client;
     this._id = id;

@@ -2,14 +2,14 @@ import { Runloop } from '../index';
 import type { DevboxAsyncExecutionDetailView } from '../resources/devboxes/devboxes';
 
 /**
- * Result object for a completed execution with streaming stdout/stderr support.
+ * Execution Result object for a completed command execution.
  *
  * ## Overview
  *
  * The `ExecutionResult` class provides access to the results of a completed command execution.
  * It includes the exit code, stdout/stderr output, and convenient methods for checking success/failure.
  *
- * ## Usage
+ * ## Quickstart
  *
  * Execution results are typically obtained from `devbox.cmd.exec()` or `execution.result()`:
  * ```typescript
@@ -48,12 +48,6 @@ import type { DevboxAsyncExecutionDetailView } from '../resources/devboxes/devbo
  * const errors = await result.stderr(5);
  * ```
  *
- * ## Properties
- *
- * - `exitCode`: The exit code of the command (null if not available)
- * - `success`: Boolean indicating if exit code is 0
- * - `failed`: Boolean indicating if exit code is non-zero
- * - `result`: Raw execution result data
  */
 export class ExecutionResult {
   private client: Runloop;
@@ -61,6 +55,15 @@ export class ExecutionResult {
   private _executionId: string;
   private _result: DevboxAsyncExecutionDetailView;
 
+  /**
+   * Creates a new ExecutionResult instance.
+   *
+   * @private
+   * @param {Runloop} client - The Runloop client instance
+   * @param {string} devboxId - The devbox ID
+   * @param {string} executionId - The execution ID
+   * @param {DevboxAsyncExecutionDetailView} result - The raw execution result data
+   */
   constructor(
     client: Runloop,
     devboxId: string,
@@ -75,13 +78,20 @@ export class ExecutionResult {
 
   /**
    * Get the exit code of the execution.
+   *
+   * @returns {number | null} The exit code, or null if not available
    */
   get exitCode(): number | null {
     return this._result.exit_status ?? null;
   }
 
   /**
-   * Helper to get last N lines, filtering out trailing empty strings
+   * Helper to get last N lines, filtering out trailing empty strings.
+   *
+   * @private
+   * @param {string} text - The text to extract lines from
+   * @param {number} n - The number of lines to return from the end
+   * @returns {string} The last N lines of text, with trailing empty lines removed
    */
   private getLastNLines(text: string, n: number): string {
     if (n <= 0) {
@@ -96,7 +106,11 @@ export class ExecutionResult {
   }
 
   /**
-   * Helper to count non-empty lines (excluding trailing empty strings)
+   * Helper to count non-empty lines (excluding trailing empty strings).
+   *
+   * @private
+   * @param {string} text - The text to count lines in
+   * @returns {number} The number of non-empty lines in the text
    */
   private countNonEmptyLines(text: string): number {
     const countLines = text.split('\n');
@@ -110,7 +124,14 @@ export class ExecutionResult {
   }
 
   /**
-   * Common logic for getting output (stdout or stderr) with optional line limiting
+   * Common logic for getting output (stdout or stderr) with optional line limiting.
+   *
+   * @private
+   * @param {string} currentOutput - The current output string
+   * @param {boolean} isOutputTruncated - Whether the output has been truncated
+   * @param {number | undefined} numLines - Optional number of lines to return from the end
+   * @param {() => Promise<AsyncIterable<{ output: string }>>} streamFn - Function to stream additional output if truncated
+   * @returns {Promise<string>} The output content, optionally limited to the last N lines
    */
   private async getOutput(
     currentOutput: string,
@@ -153,6 +174,8 @@ export class ExecutionResult {
    * Get the stdout output from the execution. If numLines is specified, it will return the last N lines. If numLines is not specified, it will return the entire stdout output.
    * Note after the execution is completed, the stdout is not available anymore.
    *
+   * This method has to retrieve more logs from the server if you specify numLines. It will resolve faster if you specify how many lines you need. Defaults to all lines.
+   *
    * @example
    * ```typescript
    * // Get full stdout
@@ -162,7 +185,7 @@ export class ExecutionResult {
    * const lastLines = await result.stdout(10);
    * ```
    *
-   * @param {number} [numLines] - Optional number of lines to return from the end (most recent logs)
+   * @param {number} [numLines] - Optional number of lines to return from the end (most recent logs) Defaults to all lines.
    * @returns {Promise<string>} The stdout content
    */
   async stdout(numLines?: number): Promise<string> {
@@ -178,6 +201,8 @@ export class ExecutionResult {
    * Get the stderr output from the execution. If numLines is specified, it will return the last N lines. If numLines is not specified, it will return the entire stderr output.
    * Note after the execution is completed, the stderr is not available anymore.
    *
+   * This method has to retrieve more logs from the server if you specify numLines. It will resolve faster if you specify how many lines you need. Defaults to all lines.
+   *
    * @example
    * ```typescript
    * // Get full stderr
@@ -187,7 +212,7 @@ export class ExecutionResult {
    * const recentErrors = await result.stderr(5);
    * ```
    *
-   * @param {number} [numLines] - Optional number of lines to guarantee from the end (most recent logs)
+   * @param {number} [numLines] - Optional number of lines to guarantee from the end (most recent logs) Defaults to all lines.
    * @returns {Promise<string>} The stderr content
    */
   async stderr(numLines?: number): Promise<string> {
@@ -201,6 +226,8 @@ export class ExecutionResult {
 
   /**
    * Get the raw execution result.
+   *
+   * @returns {DevboxAsyncExecutionDetailView} The raw execution result data
    */
   get result(): DevboxAsyncExecutionDetailView {
     return this._result;
@@ -208,6 +235,8 @@ export class ExecutionResult {
 
   /**
    * Check if the execution completed successfully (exit code 0).
+   *
+   * @returns {boolean} True if the execution succeeded (exit code 0), false otherwise
    */
   get success(): boolean {
     return this.exitCode === 0;
@@ -215,6 +244,8 @@ export class ExecutionResult {
 
   /**
    * Check if the execution failed (non-zero exit code).
+   *
+   * @returns {boolean} True if the execution failed (non-zero exit code), false otherwise
    */
   get failed(): boolean {
     return this.exitCode !== null && this.exitCode !== 0;
