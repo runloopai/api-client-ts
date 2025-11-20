@@ -14,10 +14,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: runloopai/checkout@main
 
       - name: Set up Node
-        uses: actions/setup-node@v3
+        uses: runloopai/setup-node@main
         with:
           node-version: '20'
 

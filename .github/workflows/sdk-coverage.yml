@@ -21,10 +21,10 @@ jobs:
     timeout-minutes: 120
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: runloopai/checkout@main
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: runloopai/setup-node@main
         with:
           node-version: '20'
           cache: 'yarn'
@@ -56,7 +56,7 @@ jobs:
         run: yarn test:objects-coverage 2>&1 | tee test-output.log
 
       - name: Upload coverage report
-        uses: actions/upload-artifact@v4
+        uses: runloopai/upload-artifact@main
         if: always()
         with:
           name: coverage-report
@@ -65,7 +65,7 @@ jobs:
 
       - name: Comment results on PR
         if: always() && github.event_name == 'pull_request'
-        uses: actions/github-script@v7
+        uses: runloopai/github-script@main
         with:
           script: |
             const fs = require('fs');
