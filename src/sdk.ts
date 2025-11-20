@@ -151,7 +151,21 @@ export class DevboxOps {
   constructor(private client: RunloopAPI) {}
 
   /**
-   * Create a new devbox.
+   * Create a new Devbox and wait for it to reach the running state.
+   * This is the recommended way to create a devbox as it ensures it's ready to use.
+   *
+   * See the {@link DevboxOps.create} method for calling this
+   * @private
+   *
+   * @example
+   * ```typescript
+   * const runloop = new RunloopSDK();
+   * const devbox = await runloop.devbox.create({ name: 'my-devbox' });
+   *
+   * devbox.cmd.exec({ command: 'echo "Hello, World!"' });
+   * ...
+   * ```
+   *
    * @param {DevboxCreateParams} [params] - Parameters for creating the devbox.
    * @param {Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxView>> }} [options] - Request options including polling configuration.
    * @returns {Promise<Devbox>} A {@link Devbox} instance.
@@ -195,6 +209,16 @@ export class DevboxOps {
 
   /**
    * Create a new devbox from a snapshot.
+   *
+   * @example
+   * ```typescript
+   * const devbox = await Devbox.createFromSnapshot(
+   *   runloop,
+   *   snapshot.id,
+   *   { name: 'restored-devbox' }
+   * );
+   * ```
+   *
    * @param {string} snapshotId - The ID of the snapshot to use.
    * @param {Omit<DevboxCreateParams, 'snapshot_id' | 'blueprint_id' | 'blueprint_name'>} [params] - Additional parameters for creating the devbox (excluding snapshot_id, blueprint_id, and blueprint_name).
    * @param {Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxView>> }} [options] - Request options including polling configuration.
@@ -410,6 +434,7 @@ export class StorageObjectOps {
 
   /**
    * Get a storage object by its ID.
+   *
    * @param {string} id - The ID of the storage object.
    * @returns {StorageObject} A {@link StorageObject} instance.
    */
@@ -434,7 +459,27 @@ export class StorageObjectOps {
 
   /**
    * Upload a file directly from the filesystem (Node.js only).
-   * This method handles the complete three-step upload process.
+   * This method handles the complete three-step upload process:
+   * 1. Create object and get upload URL
+   * 2. Upload file content to the provided URL
+   * 3. Mark upload as complete
+   *
+   * See the {@link StorageObjectOps.uploadFromFile} method for calling this
+   * @private
+   *
+   * @example
+   * ```typescript
+   * const runloop = new RunloopSDK();
+   * const object = await runloop.storageObject.uploadFromFile(
+   *   './package.json',
+   *   'package.json',
+   *   {
+   *     contentType: 'text',
+   *     metadata: { project: 'my-app' },
+   *   }
+   * );
+   * console.log(`Uploaded: ${object.id}`);
+   * ```
    * @param {string} filePath - The path to the file to upload.
    * @param {string} name - The name to use for the storage object.
    * @param {Core.RequestOptions & { contentType?: ContentType; metadata?: Record<string, string> }} [options] - Request options including content type and metadata.
@@ -453,7 +498,20 @@ export class StorageObjectOps {
 
   /**
    * Upload text content directly.
-   * This method handles the complete three-step upload process.
+   * This method handles the complete three-step upload process:
+   * 1. Create object and get upload URL
+   * 2. Upload text content to the provided URL
+   * 3. Mark upload as complete
+   *
+   * @example
+   * ```typescript
+   * const runloop = new RunloopSDK();
+   * const object = await runloop.storageObject.uploadFromText(
+   *   'Hello, World!',
+   *   'greeting.txt',
+   *   { metadata: { type: 'greeting' } }
+   * );
+   * ```
    * @param {string} text - The text content to upload.
    * @param {string} name - The name to use for the storage object.
    * @param {Core.RequestOptions & { metadata?: Record<string, string> }} [options] - Request options including metadata.
@@ -471,7 +529,22 @@ export class StorageObjectOps {
 
   /**
    * Upload content from a Buffer (Node.js only).
-   * This method handles the complete three-step upload process.
+   * This method handles the complete three-step upload process:
+   * 1. Create object and get upload URL
+   * 2. Upload buffer content to the provided URL
+   * 3. Mark upload as complete
+   *
+   * @example
+   * ```typescript
+   * const runloop = new RunloopSDK();
+   * const buffer = Buffer.from('Binary data');
+   * const object = await runloop.storageObject.uploadFromBuffer(
+   *   buffer,
+   *   'data.bin',
+   *   'unspecified',
+   *   { metadata: { format: 'binary' } }
+   * );
+   * ```
    * @param {Buffer} buffer - The buffer containing the content to upload.
    * @param {string} name - The name to use for the storage object.
    * @param {ContentType} contentType - The content type of the buffer.

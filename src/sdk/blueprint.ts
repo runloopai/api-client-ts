@@ -11,43 +11,12 @@ import { Devbox } from './devbox';
 
 /**
  * Object-oriented interface for working with Blueprints.
- *
- * ## Overview
- *
- * The `Blueprint` class provides a high-level, object-oriented API for managing blueprints.
- * Blueprints are ways to create customized starting points for Devboxes.
- * They allow you to define custom starting points for Devboxes such that environment set up can be cached to improve Devbox boot times.
- *
- * ## Quickstart
- *
- * ### Basic Creation
- * ```typescript
- * import { RunloopSDK } from '@runloop/api-client-ts';
- *
- * const runloop = new RunloopSDK();
- * const blueprint = await runloop.blueprint.create({
- *   name: 'my-blueprint',
- *   dockerfile: 'FROM ubuntu:22.04
- *                RUN apt-get update',
- * });
- * console.log(`Created blueprint: ${blueprint.id}`);
- *
- * // Create a devbox from the blueprint
- * const devbox = await blueprint.createDevbox({ name: 'my-devbox' });
  * ```
- *
  */
 export class Blueprint {
   private client: Runloop;
   private _id: string;
 
-  /**
-   * Creates a new Blueprint instance.
-   *
-   * @private
-   * @param {Runloop} client - The Runloop client instance
-   * @param {string} id - The blueprint ID
-   */
   private constructor(client: Runloop, id: string) {
     this.client = client;
     this._id = id;
@@ -56,6 +25,9 @@ export class Blueprint {
   /**
    * Create a new Blueprint and wait for it to complete building.
    * This is the recommended way to create a blueprint as it ensures it's ready to use.
+   *
+   * See the {@link BlueprintOps.create} method for calling this
+   * @private
    *
    * @param {Runloop} client - The Runloop client instance
    * @param {BlueprintCreateParams} params - Parameters for creating the blueprint
@@ -76,6 +48,9 @@ export class Blueprint {
   /**
    * Create a Blueprint instance by ID without retrieving from API.
    * Use getInfo() to fetch the actual data when needed.
+   *
+   * See the {@link BlueprintOps.fromId} method for calling this
+   * @private
    *
    * @param {Runloop} client - The Runloop client instance
    * @param {string} id - The blueprint ID
@@ -132,6 +107,9 @@ export class Blueprint {
   /**
    * Delete this blueprint.
    *
+   * @private
+   * See the {@link BlueprintOps.delete} method for calling this
+   *
    * @param {Core.RequestOptions} [options] - Request options
    * @returns {Promise<unknown>} The deletion result
    */
@@ -143,6 +121,9 @@ export class Blueprint {
    * Create a new devbox from this blueprint.
    * This is a convenience method that calls Devbox.create() with the blueprint ID
    * and any additional parameters you want to layer on top.
+   *
+   * See the {@link BlueprintOps.createDevbox} method for calling this
+   * @private
    *
    * @param {Omit<DevboxCreateParams, 'blueprint_id' | 'snapshot_id' | 'blueprint_name'>} [params] - Additional devbox creation parameters (optional)
    * @param {Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxView>> }} [options] - Request options with optional polling configuration

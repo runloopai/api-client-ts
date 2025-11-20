@@ -49,6 +49,9 @@ export class Snapshot {
    * Create a Snapshot instance by ID without retrieving from API.
    * Use getInfo() to fetch the actual data when needed.
    *
+   * See the {@link SnapshotOps.fromId} method for calling this
+   * @private
+   *
    * @param {Runloop} client - The Runloop client instance
    * @param {string} id - The snapshot ID
    * @returns {Snapshot} A {@link Snapshot} instance

@@ -124,6 +124,9 @@ export class StorageObject {
    * Create a StorageObject instance by ID without retrieving from API.
    * Use getInfo() to fetch the actual data when needed.
    *
+   * See the {@link StorageObjectOps.fromId} method for calling this
+   * @private
+   *
    * @param {Runloop} client - The Runloop client instance
    * @param {string} id - The object ID
    * @returns {StorageObject} A {@link StorageObject} instance
@@ -161,6 +164,9 @@ export class StorageObject {
    * 1. Create object and get upload URL
    * 2. Upload file content to the provided URL
    * 3. Mark upload as complete
+   *
+   * See the {@link StorageObjectOps.uploadFromFile} method for calling this
+   * @private
    *
    * @example
    * ```typescript
@@ -260,6 +266,9 @@ export class StorageObject {
    * 2. Upload text content to the provided URL
    * 3. Mark upload as complete
    *
+   * See the {@link StorageObjectOps.uploadFromText} method for calling this
+   * @private
+   *
    * @example
    * ```typescript
    * const runloop = new RunloopSDK();
@@ -326,6 +335,9 @@ export class StorageObject {
    * 3. Mark upload as complete
    *
    * @example
+   * See the {@link StorageObjectOps.uploadFromBuffer} method for calling this
+   * @private
+   *
    * ```typescript
    * const runloop = new RunloopSDK();
    * const buffer = Buffer.from('Binary data');

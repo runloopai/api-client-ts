@@ -366,6 +366,9 @@ export class Devbox {
    * Create a new Devbox and wait for it to reach the running state.
    * This is the recommended way to create a devbox as it ensures it's ready to use.
    *
+   * See the {@link DevboxOps.create} method for calling this
+   * @private
+   *
    * @example
    * ```typescript
    * const runloop = new RunloopSDK();
@@ -392,14 +395,8 @@ export class Devbox {
   /**
    * Create a new Devbox from a Blueprint and wait for it to reach the running state.
    *
-   * @example
-   * ```typescript
-   * const devbox = await Devbox.createFromBlueprintId(
-   *   runloop,
-   *   blueprint.id,
-   *   { name: 'my-devbox' }
-   * );
-   * ```
+   * See the {@link DevboxOps.createFromBlueprintId} method for calling this
+   * @private
    *
    * @param {Runloop} client - The Runloop client instance
    * @param {string} blueprintId - The blueprint ID to create from
@@ -424,6 +421,9 @@ export class Devbox {
   /**
    * Create a new Devbox from a Blueprint name and wait for it to reach the running state.
    *
+   * See the {@link DevboxOps.createFromBlueprintName} method for calling this
+   * @private
+   *
    * @param {Runloop} client - The Runloop client instance
    * @param {string} blueprintName - The blueprint name to create from
    * @param {Omit<DevboxCreateParams, 'blueprint_id' | 'snapshot_id' | 'blueprint_name'>} [params] - Additional devbox creation parameters
@@ -446,6 +446,9 @@ export class Devbox {
 
   /**
    * Create a new Devbox from a Snapshot and wait for it to reach the running state.
+   *
+   * See the {@link DevboxOps.createFromSnapshot} method for calling this
+   * @private
    *
    * @example
    * ```typescript
@@ -479,6 +482,9 @@ export class Devbox {
   /**
    * Create a Devbox instance by ID without retrieving from API.
    * Use getInfo() to fetch the actual data when needed.
+   *
+   * See the {@link DevboxOps.fromId} method for calling this
+   * @private
    *
    * @example
    * ```typescript
