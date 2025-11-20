@@ -51,11 +51,39 @@ export class DevboxNetOps {
   ) {}
 
   /**
-   * Create an SSH key for remote access to the devbox.
+   * Create an SSH key for remote access to the devbox. The public key is installed on the devbox and the private key is returned.
+   * The key can be used to SSH into the devbox. To use this you must add the private key to your SSH agent and configure it like this:
+   *
+   * The ssh user is the same user as defined in the {@link DevboxCreateParams.launch_parameters.user_parameters user parameters} of the {@link DevboxCreateParams  devbox creation parameters}.
+   *
+   * A special proxy command is required to allow SSH through the proxy. This is because the devbox is behind a proxy and the SSH client needs to be able to connect to the devbox through the proxy.
+   * The proxy command is:
+   * ```
+   * openssl s_client -quiet -servername %h -connect {sshUrl} 2>/dev/null
+   * ```
+   * This command uses the OpenSSL library to connect to the devbox through the proxy.
+   * The `-quiet` flag is used to suppress the output of the OpenSSL library.
+   * The `-servername %h` flag is used to specify the server name to connect to.
+   * The `-connect {sshUrl}` flag is used to specify the URL to connect to.
+   * The `2>/dev/null` flag is used to suppress the output of the OpenSSL library.
    *
    * @example
    * ```typescript
-   * const sshKey = await devbox.net.createSSHKey();
+   * const sshKeyResponse = await devbox.net.createSSHKey();
+   * const sshUrl = sshKeyResponse.url;
+   * const sshKey = sshKeyResponse.ssh_private_key;
+   * ```
+   *
+   * **NOTE:** The ssh user is the same user defined in the {@link DevboxCreateParams.launch_parameters} launch parameters.
+   *
+   * ssh-config example:
+   * ```
+   *
+   * Host {devbox-id}
+   *   Hostname {sshKeyResponse.url}
+   *   User {user} # the user defined in the devbox params
+   *   IdentityFile {keyfile_path} # the path to the `sshKeyResponse.sshKey` private key
+   *   ProxyCommand openssl s_client -quiet -servername %h -connect ssh.runloop.pro:443 2>/dev/null # required to allow SSH through the proxy
    * ```
    *
    * @param {Core.RequestOptions} [options] - Request options
