@@ -1,3 +1,4 @@
+import { ReadEntry } from 'tar';
 import { THIRTY_SECOND_TIMEOUT, uniqueName, makeClientSDK } from '../utils';
 import { Devbox, StorageObject } from '@runloop/api-client/sdk';
 
@@ -195,13 +196,13 @@ describe('smoketest: object-oriented storage object', () => {
     });
 
     test('upload from file', async () => {
-      const fs = require('fs');
+      const fs = require('fs/promises');
       const path = require('path');
       const os = require('os');
 
       // Create a temporary file
       const tmpFile = path.join(os.tmpdir(), `test-upload-${Date.now()}.txt`);
-      fs.writeFileSync(tmpFile, 'Hello from uploadFromFile!');
+      await fs.writeFile(tmpFile, 'Hello from uploadFromFile!');
 
       try {
         const uploaded = await sdk.storageObject.uploadFromFile(tmpFile, uniqueName('sdk-file-upload'), {
@@ -218,11 +219,50 @@ describe('smoketest: object-oriented storage object', () => {
         await uploaded.delete();
       } finally {
         // Clean up temp file
-        if (fs.existsSync(tmpFile)) {
-          fs.unlinkSync(tmpFile);
-        }
+        await fs.unlink(tmpFile).catch(() => {});
       }
     });
+  });
+
+  test('upload from dir', async () => {
+    const fs = require('fs/promises');
+    const path = require('path');
+    const os = require('os');
+    const tar = require('tar');
+
+    // Create a temporary directory with a file in it.
+    const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), 'dir-to-tar-'));
+    const contentPath = path.join(tmpDir, 'content');
+    await fs.writeFile(contentPath, 'Hello from uploadFromDir!');
+    try {
+      const uploaded = await sdk.storageObject.uploadFromDir(tmpDir, { name: uniqueName('sdk-dir-upload') });
+      expect(uploaded).toBeDefined();
+      expect(uploaded.id).toBeTruthy();
+
+      // Verify content type.
+      const info = await uploaded.getInfo();
+      expect(info.content_type).toBe('tgz');
+
+      // Untar the downloaded object and check for the original
+      // file.
+      const data = await uploaded.downloadAsBuffer();
+      const contentChunks: Buffer[] = [];
+      const tarStream = tar.list({
+        onReadEntry: async (entry: ReadEntry) => {
+          if (entry.path == './content') {
+            for await (const chunk of entry) {
+              contentChunks.push(chunk);
+            }
+          }
+        },
+      });
+      await tarStream.write(data);
+      const content = Buffer.concat(contentChunks);
+      expect(content.toString('utf-8')).toBe('Hello from uploadFromDir!');
+    } finally {
+      await fs.unlink(contentPath).catch(() => {});
+      await fs.unlink(tmpDir).catch(() => {});
+    }
   });
 
   describe('storage object list and retrieval', () => {

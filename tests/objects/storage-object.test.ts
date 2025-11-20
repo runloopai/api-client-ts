@@ -19,6 +19,12 @@ jest.mock('node:path', () => ({
     const ext = path.split('.').pop();
     return ext ? `.${ext}` : '';
   }),
+  join: jest.fn((...paths) => paths.join('/')),
+}));
+
+// Mock tar module
+jest.mock('tar', () => ({
+  create: jest.fn(),
 }));
 
 describe('StorageObject (New API)', () => {
@@ -807,6 +813,146 @@ describe('StorageObject (New API)', () => {
       expect((global as any).fetch).toHaveBeenCalledTimes(1);
       expect(mockClient.objects.complete).toHaveBeenCalledTimes(1);
       expect(result).toBeInstanceOf(StorageObject);
+    });
+  });
+
+  describe('uploadFromDir', () => {
+    let mockTar: any;
+
+    beforeEach(() => {
+      // Clear all mocks
+      jest.clearAllMocks();
+      // Reset global fetch mock
+      ((global as any).fetch as jest.Mock).mockClear();
+      // Get tar mock
+      mockTar = require('tar');
+    });
+
+    it('should upload a directory as gzipped tarball', async () => {
+      // Mock directory exists
+      mockFs.stat.mockResolvedValue({ isDirectory: () => true });
+
+      // Mock tar stream
+      const mockTarballBuffer = Buffer.from('compressed tarball content');
+      mockTar.create.mockReturnValue({
+        [Symbol.asyncIterator]: async function* () {
+          yield mockTarballBuffer;
+        },
+      });
+
+      const mockObjectData = { id: 'dir-123', upload_url: 'https://upload.example.com/dir' };
+      const mockObjectInfo = { ...mockObjectData, name: 'project.tar.gz', state: 'UPLOADING' };
+      const mockCompletedData = { ...mockObjectInfo, state: 'READ_ONLY' };
+
+      mockClient.objects.create.mockResolvedValue(mockObjectData);
+      mockClient.objects.retrieve.mockResolvedValue(mockObjectInfo);
+      mockClient.objects.complete.mockResolvedValue(mockCompletedData);
+
+      ((global as any).fetch as jest.Mock).mockResolvedValue({
+        ok: true,
+        status: 200,
+        statusText: 'OK',
+      });
+
+      const result = await StorageObject.uploadFromDir(mockClient, './my-project', {
+        name: 'project.tar.gz',
+      });
+
+      expect(mockClient.objects.create).toHaveBeenCalledWith(
+        { name: 'project.tar.gz', content_type: 'tgz' },
+        undefined,
+      );
+      expect(mockTar.create).toHaveBeenCalled();
+      expect(result).toBeInstanceOf(StorageObject);
+      expect(result.id).toBe('dir-123');
+    });
+
+    it('should upload directory with TTL and metadata', async () => {
+      // Mock directory exists
+      mockFs.stat.mockResolvedValue({ isDirectory: () => true });
+
+      // Mock tar stream
+      const mockTarballBuffer = Buffer.from('compressed tarball');
+      mockTar.create.mockReturnValue({
+        [Symbol.asyncIterator]: async function* () {
+          yield mockTarballBuffer;
+        },
+      });
+
+      const mockObjectData = { id: 'dir-456', upload_url: 'https://upload.example.com/dir' };
+      const mockCompletedData = { ...mockObjectData, state: 'READ_ONLY' };
+
+      mockClient.objects.create.mockResolvedValue(mockObjectData);
+      mockClient.objects.complete.mockResolvedValue(mockCompletedData);
+
+      ((global as any).fetch as jest.Mock).mockResolvedValue({
+        ok: true,
+        status: 200,
+        statusText: 'OK',
+      });
+
+      const result = await StorageObject.uploadFromDir(mockClient, './my-project', {
+        name: 'project.tar.gz',
+        ttl_ms: 3600000,
+        metadata: { project: 'demo' },
+      });
+
+      expect(mockClient.objects.create).toHaveBeenCalledWith(
+        { name: 'project.tar.gz', content_type: 'tgz', metadata: { project: 'demo' }, ttl_ms: 3600000 },
+        undefined,
+      );
+      expect(result.id).toBe('dir-456');
+    });
+
+    it('should throw error if path is not a directory', async () => {
+      mockFs.stat.mockResolvedValue({ isDirectory: () => false });
+
+      await expect(
+        StorageObject.uploadFromDir(mockClient, './file.txt', { name: 'archive.tar.gz' }),
+      ).rejects.toThrow('Path is not a directory: ./file.txt');
+    });
+
+    it('should throw error if directory does not exist', async () => {
+      mockFs.stat.mockRejectedValue(new Error('ENOENT: no such file or directory'));
+
+      await expect(
+        StorageObject.uploadFromDir(mockClient, './nonexistent', { name: 'archive.tar.gz' }),
+      ).rejects.toThrow('Failed to access directory ./nonexistent');
+    });
+
+    it('should throw error in browser environment', async () => {
+      const originalProcess = global.process;
+      delete (global as any).process;
+
+      await expect(
+        StorageObject.uploadFromDir(mockClient, './project', { name: 'project.tar.gz' }),
+      ).rejects.toThrow('File upload methods are only available in Node.js environment');
+
+      global.process = originalProcess;
+    });
+
+    it('should handle upload failures gracefully', async () => {
+      mockFs.stat.mockResolvedValue({ isDirectory: () => true });
+
+      const mockTarballBuffer = Buffer.from('tarball');
+      mockTar.create.mockReturnValue({
+        [Symbol.asyncIterator]: async function* () {
+          yield mockTarballBuffer;
+        },
+      });
+
+      const mockObjectData = { id: 'dir-999', upload_url: 'https://upload.example.com/dir' };
+      mockClient.objects.create.mockResolvedValue(mockObjectData);
+
+      ((global as any).fetch as jest.Mock).mockResolvedValue({
+        ok: false,
+        status: 500,
+        statusText: 'Internal Server Error',
+      });
+
+      await expect(
+        StorageObject.uploadFromDir(mockClient, './project', { name: 'project.tar.gz' }),
+      ).rejects.toThrow('Failed to upload tarball: Upload failed: 500 Internal Server Error');
     });
   });
 

@@ -561,6 +561,38 @@ export class StorageObjectOps {
   ): Promise<StorageObject> {
     return StorageObject.uploadFromBuffer(this.client, buffer, name, contentType, options);
   }
+
+  /**
+   * Upload a local directory as a gzipped tarball (Node.js only).
+   * This method creates a tar archive of the directory contents, gzips it, and uploads it.
+   *
+   * @example
+   * ```typescript
+   * const runloop = new RunloopSDK();
+   *
+   * const object = await runloop.storageObject.uploadFromDir(
+   *   './my-project',
+   *   {
+   *     name: 'my-project.tar.gz',
+   *     ttl_ms: 3600000, // 1 hour
+   *     metadata: { project: 'demo' }
+   *   }
+   * );
+   * console.log(`Uploaded directory as ${object.id}`);
+   * ```
+   *
+   * @param {string} dirPath - The path to the directory to upload.
+   * @param {Omit<ObjectCreateParams, 'content_type'} params - Parameters for creating the object.
+   * @param {Core.RequestOptions} options - Request options.
+   * @returns {Promise<StorageObject>} A {@link StorageObject} instance.
+   */
+  async uploadFromDir(
+    dirPath: string,
+    params: Omit<ObjectCreateParams, 'content_type'>,
+    options?: Core.RequestOptions,
+  ): Promise<StorageObject> {
+    return StorageObject.uploadFromDir(this.client, dirPath, params, options);
+  }
 }
 
 // @deprecated Use {@link RunloopSDK} instead.
