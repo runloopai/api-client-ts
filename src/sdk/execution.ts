@@ -13,7 +13,7 @@ import { ExecutionResult } from './execution-result';
  * It provides methods to track the execution state, wait for completion, and control
  * the execution (e.g., kill it if needed).
  *
- * ## Usage
+ * ## Quickstart
  *
  * Executions are typically created via `devbox.cmd.execAsync()`:
  * ```typescript
@@ -24,40 +24,17 @@ import { ExecutionResult } from './execution-result';
  *
  * // Start async execution with streaming
  * const execution = await devbox.cmd.execAsync({
- *   command: 'long-running-task.sh',
+ *   command: 'npx http-server -p 8080',
  *   stdout: (line) => console.log(`[LOG] ${line}`),
  *   stderr: (line) => console.error(`[ERROR] ${line}`),
  * });
  *
  * // Do other work while command runs...
  *
- * // Wait for completion and get result
- * const result = await execution.result();
- * if (result.success) {
- *   console.log('Task completed successfully!');
- * } else {
- *   console.error(`Task failed with exit code: ${result.exitCode}`);
- * }
+ * // End the process early
+ * const excution.kill();
  * ```
  *
- * ## Monitoring Execution
- *
- * ### Get Current State
- * ```typescript
- * const state = await execution.getState();
- * console.log(`Status: ${state.status}`);
- * ```
- *
- * ### Kill Execution
- * ```typescript
- * // Kill a running execution
- * await execution.kill();
- * ```
- *
- * ## Properties
- *
- * - `executionId`: The unique execution ID
- * - `devboxId`: The devbox ID this execution belongs to
  */
 export class Execution {
   private client: Runloop;
@@ -66,6 +43,9 @@ export class Execution {
   private _initialResult: DevboxAsyncExecutionDetailView;
   private _streamingPromise?: Promise<void>;
 
+  /**
+   * @private
+   */
   constructor(
     client: Runloop,
     devboxId: string,
@@ -107,6 +87,9 @@ export class Execution {
    * const runloop = new RunloopSDK();
    * const devbox = runloop.devbox.fromId('devbox-123');
    * const execution = await devbox.cmd.execAsync({ command: 'npm install' });
+   *
+   * // Other work while command runs...
+   *
    * const result = await execution.result();
    *
    * if (result.success) {
@@ -147,8 +130,13 @@ export class Execution {
 
   /**
    * Get the current state of the execution.
-   * @param {Core.RequestOptions} [options] - Request options
-   * @returns {Promise<DevboxAsyncExecutionDetailView>} The current execution state
+   *
+   * @example
+   * ```typescript
+   * const execution = await devbox.cmd.execAsync({ command: 'npx http-server -p 8080' });
+   * const state = await execution.getState();
+   * console.log(`Status: ${state.status}`);
+   * ```
    */
   async getState(options?: Core.RequestOptions): Promise<DevboxAsyncExecutionDetailView> {
     return this.client.devboxes.executions.retrieve(this._devboxId, this._executionId, options);

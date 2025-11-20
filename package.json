@@ -30,6 +30,7 @@
     "lint": "./scripts/lint",
     "fix": "./scripts/format",
     "docs": "typedoc --options typedoc.json",
+    "docs:md": "typedoc --options typedoc.md.json",
     "docs:watch": "typedoc --options typedoc.json --watch",
     "predeploy-gh-pages": "yarn docs:sdk",
     "deploy-gh-pages": "gh-pages -d typedoc"
@@ -71,8 +72,10 @@
     "typedoc": "^0.28.14",
     "typedoc-github-theme": "^0.3.1",
     "typedoc-material-theme": "^1.4.1",
+    "typedoc-plugin-dt-links": "^2.0.29",
     "typedoc-plugin-include-example": "^3.0.2",
     "typedoc-plugin-markdown": "^4.9.0",
+    "typedoc-plugin-md": "^0.7.1",
     "typedoc-plugin-pages": "^1.1.0",
     "typescript": "^5.9.0"
   },

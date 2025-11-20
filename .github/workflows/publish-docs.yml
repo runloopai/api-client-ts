@@ -1,9 +1,12 @@
-name: PUBLISH DOCS
+name: Publish Typedoc to GitHub Pages
 on:
   workflow_dispatch:
   workflow_call:
   release:
     types: [published]
+  push:
+    branches:
+      - main
 permissions:
   contents: write # allows the 'Commit' step without tokens
 

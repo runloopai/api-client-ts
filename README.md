@@ -2,11 +2,11 @@
 
 [![NPM version](https://img.shields.io/npm/v/@runloop/api-client.svg)](https://npmjs.org/package/@runloop/api-client) ![npm bundle size](https://img.shields.io/bundlephobia/minzip/@runloop/api-client)
 
-This library provides convenient access to the Runloop REST API from server-side TypeScript or JavaScript.
+This library provides convenient access to the Runloop SDK & REST API from server-side TypeScript or JavaScript.
 
-The REST API documentation can be found on [runloop.ai](https://runloop.ai). The full API of this library can be found in [api.md](api.md).
+The additional documentation guides can be found at [docs.runloop.ai](https://docs.runloop.ai). The full API of this library can be found in [api.md](api.md).
 
-It is generated with [Stainless](https://www.stainless.com/).
+The **RunloopSDK** is the recommended, modern way to interact with the Runloop API. It provides high-level object-oriented interfaces for common operations while maintaining full access to the underlying REST API through the `.api` property.
 
 ## Installation
 
@@ -14,261 +14,147 @@ It is generated with [Stainless](https://www.stainless.com/).
 npm install @runloop/api-client
 ```
 
-## Usage
+## Quickstart
 
-The full API of this library can be found in [api.md](api.md).
+Here's a complete example that demonstrates the core SDK functionality:
 
-<!-- prettier-ignore -->
-```js
+```typescript
+import { RunloopSDK } from '@runloop/api-client';
+
+const sdk = new RunloopSDK({
+  bearerToken: process.env.RUNLOOP_API_KEY, // This is the default and can be omitted
+});
+
+// Create a new devbox and wait for it to be ready
+const devbox = await sdk.devbox.create();
+
+// Execute a synchronous command
+const result = await devbox.cmd.exec({ command: 'echo "Hello, World!"' });
+console.log('Output:', await result.stdout()); // "Hello, World!"
+console.log('Exit code:', result.exitCode); // 0
+
+// Start a long-running HTTP server asynchronously
+const serverExec = await devbox.cmd.execAsync({
+  command: 'npx http-server -p 8080',
+});
+console.log(`Started server with execution ID: ${serverExec.executionId}`);
+
+// Check server status
+const state = await serverExec.getState();
+console.log('Server status:', state.status); // "running"
+
+// Later... kill the server when done
+await serverExec.kill();
+
+await devbox.shutdown();
+```
+
+## Core Concepts
+
+### Runloop SDK
+
+The main SDK class that provides access to all Runloop functionality construct view the [RunloopSDK documentation](https://runloopai.github.io/api-client-ts/stable/classes/RunloopSDK.html) to see specific capabilities.
+
+### Available Resources
+
+The SDK provides object-oriented interfaces for all major Runloop resources:
+
+- **[`runloop.devbox`](https://runloopai.github.io/api-client-ts/stable/classes/DevboxOps.html)** - Devbox management (create, list, execute commands, file operations)
+- **[`runloop.blueprint`](https://runloopai.github.io/api-client-ts/stable/classes/BlueprintOps.html)** - Blueprint management (create, list, build blueprints)
+- **[`runloop.snapshot`](https://runloopai.github.io/api-client-ts/stable/classes/SnapshotOps.html)** - Snapshot management (list disk snapshots)
+- **[`runloop.storageObject`](https://runloopai.github.io/api-client-ts/stable/classes/StorageObjectOps.html)** - Storage object management (upload, download, list objects)
+- **[`runloop.api`](https://runloopai.github.io/api-client-ts/stable/classes/Runloop.html)** - Direct access to the REST API client
+
+## TypeScript Support
+
+The SDK is fully typed with comprehensive TypeScript definitions:
+
+```typescript
+import { RunloopSDK, type DevboxView } from '@runloop/api-client';
+
+const runloop = new RunloopSDK();
+const devbox: DevboxView = await runloop.devbox.create();
+```
+
+## Migration from API Client
+
+If you're currently using the legacy API, migration is straightforward:
+
+All of the runloop client methods `runloop.secrets` has moved to `runloopSDK.api.secrets`. Updating all references to this will move to the new sdk client.
+
+```typescript
+// Before (Legacy api client)
 import Runloop from '@runloop/api-client';
+const runloop = new Runloop();
+const secretResult = await runloop.secrets.create({ ... });
 
-const client = new Runloop({
-  bearerToken: process.env['RUNLOOP_API_KEY'], // This is the default and can be omitted
-});
 
-const devboxView = await client.devboxes.create();
-
-console.log(devboxView.id);
+// After (SDK)
+import { RunloopSDK } from '@runloop/api-client';
+const runloop  = new RunloopSDK();
+const secretResult = await runloop.api.secrets.create({ ... });
 ```
 
-### Request & Response types
+Once you've migrated your existing code to the new SDK client you can optionally go through and move from the API paradime to the object oriented SDK.
 
-This library includes TypeScript definitions for all request params and response fields. You may import and use them like so:
-
-<!-- prettier-ignore -->
 ```ts
+// Before (Legacy api client)
 import Runloop from '@runloop/api-client';
+const runloop = new Runloop()
 
-const client = new Runloop({
-  bearerToken: process.env['RUNLOOP_API_KEY'], // This is the default and can be omitted
-});
+const devboxResult = await runloop.devboxes.createAndAwaitRunning()
 
-const devboxView: Runloop.DevboxView = await client.devboxes.create();
+await runloop.devboxes.executeAndAwaitCompletion(devboxResult.id, {"command": "touch example.txt"})
+
+const snapshotResult = await runloop.devbox.snapshotDisk()
+await runloop.devboxes.snapshotDisk(devboxResult.id)
+await runloop.snapshots.awaitCompleted(snapshotResult.id)
+runloop.devbox.create({ snapshot_id: snapshotResult.id})
+...
+await runloop.devbox.shutdown(devboxResult.id)
+
+// After (SDK)
+import { RunloopSDK } from '@runloop/api-client';
+const runloop  = new RunloopSDK();
+
+const devbox = await runloop.devbox.create();
+await devbox.cmd.exec({ command: "touch example.txt" });
+const snapshot = await devbox.snapshotDisk();
+await snapshot.createDevbox();
+...
+await devbox.shutdown();
 ```
 
-Documentation for each method, request param, and response field are available in docstrings and will appear on hover in most modern editors.
+## Advanced Configuration
 
-## File uploads
+Customize the SDK with your API token, endpoint, timeout, and retry settings:
 
-Request parameters that correspond to file uploads can be passed in many different forms:
-
-- `File` (or an object with the same structure)
-- a `fetch` `Response` (or an object with the same structure)
-- an `fs.ReadStream`
-- the return value of our `toFile` helper
-
-```ts
-import fs from 'fs';
-import fetch from 'node-fetch';
-import Runloop, { toFile } from '@runloop/api-client';
-
-const client = new Runloop();
-
-// If you have access to Node `fs` we recommend using `fs.createReadStream()`:
-await client.devboxes.uploadFile('id', { path: 'path', file: fs.createReadStream('/path/to/file') });
-
-// Or if you have the web `File` API you can pass a `File` instance:
-await client.devboxes.uploadFile('id', { path: 'path', file: new File(['my bytes'], 'file') });
-
-// You can also pass a `fetch` `Response`:
-await client.devboxes.uploadFile('id', { path: 'path', file: await fetch('https://somesite/file') });
-
-// Finally, if none of the above are convenient, you can use our `toFile` helper:
-await client.devboxes.uploadFile('id', { path: 'path', file: await toFile(Buffer.from('my bytes'), 'file') });
-await client.devboxes.uploadFile('id', {
-  path: 'path',
-  file: await toFile(new Uint8Array([0, 1, 2]), 'file'),
+```typescript
+const runloop = new RunloopSDK({
+  bearerToken: process.env.RUNLOOP_API_KEY,
+  timeout: 60000, // 60 second timeout
+  maxRetries: 3, // Retry failed requests
 });
 ```
 
-## Handling errors
+## Error Handling
 
-When the library is unable to connect to the API,
-or if the API returns a non-success status code (i.e., 4xx or 5xx response),
-a subclass of `APIError` will be thrown:
+The SDK provides comprehensive error handling with typed exceptions:
 
-<!-- prettier-ignore -->
-```ts
-const devboxView = await client.devboxes.create().catch(async (err) => {
-  if (err instanceof Runloop.APIError) {
-    console.log(err.status); // 400
-    console.log(err.name); // BadRequestError
-    console.log(err.headers); // {server: 'nginx', ...}
+```typescript
+try {
+  const devbox = await runloop.devbox.create();
+  const result = await devbox.cmd.exec({ command: 'invalid-command' });
+} catch (error) {
+  if (error instanceof RunloopSDK.APIError) {
+    console.log('API Error:', error.status, error.message);
+  } else if (error instanceof RunloopSDK.APIConnectionError) {
+    console.log('Connection Error:', error.message);
   } else {
-    throw err;
+    console.log('Unexpected Error:', error);
   }
-});
-```
-
-Error codes are as follows:
-
-| Status Code | Error Type                 |
-| ----------- | -------------------------- |
-| 400         | `BadRequestError`          |
-| 401         | `AuthenticationError`      |
-| 403         | `PermissionDeniedError`    |
-| 404         | `NotFoundError`            |
-| 422         | `UnprocessableEntityError` |
-| 429         | `RateLimitError`           |
-| >=500       | `InternalServerError`      |
-| N/A         | `APIConnectionError`       |
-
-### Retries
-
-Certain errors will be automatically retried 5 times by default, with a short exponential backoff.
-Connection errors (for example, due to a network connectivity problem), 408 Request Timeout, 409 Conflict,
-429 Rate Limit, and >=500 Internal errors will all be retried by default for GET requests. For POST requests,
-only 429 errors will be retried.
-
-You can use the `maxRetries` option to configure or disable this:
-
-<!-- prettier-ignore -->
-```js
-// Configure the default for all requests:
-const client = new Runloop({
-  maxRetries: 0, // default is 5
-});
-
-// Or, configure per-request:
-await client.devboxes.create({
-  maxRetries: 10,
-});
-```
-
-### Timeouts
-
-Requests time out after 30 seconds by default. You can configure this with a `timeout` option:
-
-<!-- prettier-ignore -->
-```ts
-// Configure the default for all requests:
-const client = new Runloop({
-  timeout: 20 * 1000, // 20 seconds (default is 30 seconds)
-});
-
-// Override per-request:
-await client.devboxes.create({
-  timeout: 5 * 1000,
-});
-```
-
-On timeout, an `APIConnectionTimeoutError` is thrown.
-
-Note that requests which time out will be [retried twice by default](#retries).
-
-## Auto-pagination
-
-List methods in the Runloop API are paginated.
-You can use the `for await … of` syntax to iterate through items across all pages:
-
-```ts
-async function fetchAllDevboxViews(params) {
-  const allDevboxViews = [];
-  // Automatically fetches more pages as needed.
-  for await (const devboxView of client.devboxes.list()) {
-    allDevboxViews.push(devboxView);
-  }
-  return allDevboxViews;
 }
 ```
-
-Alternatively, you can request a single page at a time:
-
-```ts
-let page = await client.devboxes.list();
-for (const devboxView of page.devboxes) {
-  console.log(devboxView);
-}
-
-// Convenience methods are provided for manually paginating:
-while (page.hasNextPage()) {
-  page = await page.getNextPage();
-  // ...
-}
-```
-
-## Advanced Usage
-
-### Accessing raw Response data (e.g., headers)
-
-The "raw" `Response` returned by `fetch()` can be accessed through the `.asResponse()` method on the `APIPromise` type that all methods return.
-
-You can also use the `.withResponse()` method to get the raw `Response` along with the parsed data.
-
-<!-- prettier-ignore -->
-```ts
-const client = new Runloop();
-
-const response = await client.devboxes.create().asResponse();
-console.log(response.headers.get('X-My-Header'));
-console.log(response.statusText); // access the underlying Response object
-
-const { data: devboxView, response: raw } = await client.devboxes.create().withResponse();
-console.log(raw.headers.get('X-My-Header'));
-console.log(devboxView.id);
-```
-
-### Making custom/undocumented requests
-
-This library is typed for convenient access to the documented API. If you need to access undocumented
-endpoints, params, or response properties, the library can still be used.
-
-#### Undocumented endpoints
-
-To make requests to undocumented endpoints, you can use `client.get`, `client.post`, and other HTTP verbs.
-Options on the client, such as retries, will be respected when making these requests.
-
-```ts
-await client.post('/some/path', {
-  body: { some_prop: 'foo' },
-  query: { some_query_arg: 'bar' },
-});
-```
-
-#### Undocumented request params
-
-To make requests using undocumented parameters, you may use `// @ts-expect-error` on the undocumented
-parameter. This library doesn't validate at runtime that the request matches the type, so any extra values you
-send will be sent as-is.
-
-```ts
-client.foo.create({
-  foo: 'my_param',
-  bar: 12,
-  // @ts-expect-error baz is not yet public
-  baz: 'undocumented option',
-});
-```
-
-For requests with the `GET` verb, any extra params will be in the query, all other requests will send the
-extra param in the body.
-
-If you want to explicitly send an extra argument, you can do so with the `query`, `body`, and `headers` request
-options.
-
-#### Undocumented response properties
-
-To access undocumented response properties, you may access the response object with `// @ts-expect-error` on
-the response object, or cast the response object to the requisite type. Like the request params, we do not
-validate or strip extra properties from the response from the API.
-
-### Customizing the fetch client
-
-By default, this library uses `node-fetch` in Node, and expects a global `fetch` function in other environments.
-
-If you would prefer to use a global, web-standards-compliant `fetch` function even in a Node environment,
-(for example, if you are running Node with `--experimental-fetch` or using NextJS which polyfills with `undici`),
-add the following import before your first import `from "Runloop"`:
-
-```ts
-// Tell TypeScript and the package to use the global web fetch instead of node-fetch.
-// Note, despite the name, this does not add any polyfills, but expects them to be provided if needed.
-import '@runloop/api-client/shims/web';
-import Runloop from '@runloop/api-client';
-```
-
-To do the inverse, add `import "@runloop/api-client/shims/node"` (which does import polyfills).
-This can also be useful if you are getting the wrong TypeScript types for `Response` ([more details](https://github.com/runloopai/api-client-ts/tree/main/src/_shims#readme)).
 
 ### Logging and middleware
 
@@ -277,9 +163,9 @@ which can be used to inspect or alter the `Request` or `Response` before/after e
 
 ```ts
 import { fetch } from 'undici'; // as one example
-import Runloop from '@runloop/api-client';
+import { RunloopSDK } from '@runloop/api-client';
 
-const client = new Runloop({
+const runloop = new RunloopSDK({
   fetch: async (url: RequestInfo, init?: RequestInit): Promise<Response> => {
     console.log('About to make a request', url, init);
     const response = await fetch(url, init);
@@ -300,16 +186,13 @@ If you would like to disable or customize this behavior, for example to use the 
 
 <!-- prettier-ignore -->
 ```ts
-import http from 'http';
-import { HttpsProxyAgent } from 'https-proxy-agent';
-
 // Configure the default for all requests:
-const client = new Runloop({
+const runloop = new RunloopSDK({
   httpAgent: new HttpsProxyAgent(process.env.PROXY_URL),
 });
 
 // Override per-request:
-await client.devboxes.create({
+await runloop.devboxes.create({...}, {
   httpAgent: new http.Agent({ keepAlive: false }),
 });
 ```

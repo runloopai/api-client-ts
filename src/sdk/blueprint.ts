@@ -26,6 +26,9 @@ export class Blueprint {
    * Create a new Blueprint and wait for it to complete building.
    * This is the recommended way to create a blueprint as it ensures it's ready to use.
    *
+   * See the {@link BlueprintOps.create} method for calling this
+   * @private
+   *
    * @param {Runloop} client - The Runloop client instance
    * @param {BlueprintCreateParams} params - Parameters for creating the blueprint
    * @param {Core.RequestOptions & { polling?: Partial<PollingOptions<BlueprintView>> }} [options] - Request options with optional polling configuration
@@ -45,6 +48,9 @@ export class Blueprint {
   /**
    * Create a Blueprint instance by ID without retrieving from API.
    * Use getInfo() to fetch the actual data when needed.
+   *
+   * See the {@link BlueprintOps.fromId} method for calling this
+   * @private
    *
    * @param {Runloop} client - The Runloop client instance
    * @param {string} id - The blueprint ID
@@ -101,6 +107,9 @@ export class Blueprint {
   /**
    * Delete this blueprint.
    *
+   * @private
+   * See the {@link BlueprintOps.delete} method for calling this
+   *
    * @param {Core.RequestOptions} [options] - Request options
    * @returns {Promise<unknown>} The deletion result
    */
@@ -112,6 +121,9 @@ export class Blueprint {
    * Create a new devbox from this blueprint.
    * This is a convenience method that calls Devbox.create() with the blueprint ID
    * and any additional parameters you want to layer on top.
+   *
+   * See the {@link BlueprintOps.createDevbox} method for calling this
+   * @private
    *
    * @param {Omit<DevboxCreateParams, 'blueprint_id' | 'snapshot_id' | 'blueprint_name'>} [params] - Additional devbox creation parameters (optional)
    * @param {Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxView>> }} [options] - Request options with optional polling configuration
