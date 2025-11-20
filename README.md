@@ -161,7 +161,7 @@ const runloop = new RunloopSDK({
 });
 
 // Override per-request:
-await runloop.devboxes.create({
+await runloop.devboxes.create({...}, {
   httpAgent: new http.Agent({ keepAlive: false }),
 });
 ```
