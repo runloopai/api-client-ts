@@ -51,7 +51,7 @@ await devbox.shutdown();
 
 ## Core Concepts
 
-### Runloop ADK
+### Runloop SDK
 
 The main SDK class that provides access to all Runloop functionality construct view the [RunloopSDK documentation](https://runloopai.github.io/api-client-ts/stable/classes/RunloopSDK.html) to see specific capabilities.
 
@@ -76,7 +76,7 @@ const runloop = new RunloopSDK();
 const devbox: DevboxView = await runloop.devbox.create();
 ```
 
-## Migration from Legacy API
+## Migration from API Client
 
 If you're currently using the legacy API, migration is straightforward:
 
@@ -92,6 +92,7 @@ import { RunloopSDK } from '@runloop/api-client';
 const runloop  = new RunloopSDK();
 const secretResult = await runloop.api.secrets.create({ ... });
 ```
+
 
 ## Advanced Configuration
 
@@ -132,7 +133,7 @@ which can be used to inspect or alter the `Request` or `Response` before/after e
 
 ```ts
 import { fetch } from 'undici'; // as one example
-import Runloop from '@runloop/api-client';
+import { RunloopSDK } from '@runloop/api-client';
 
 const runloop = new RunloopSDK({
   fetch: async (url: RequestInfo, init?: RequestInit): Promise<Response> => {
