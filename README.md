@@ -80,10 +80,12 @@ const devbox: DevboxView = await runloop.devbox.create();
 
 If you're currently using the legacy API, migration is straightforward:
 
+All of the runloop client methods `runloop.secrets` has moved to `runloopSDK.api.secrets`. Updating all references to this will move to the new sdk client.
+
 ```typescript
-// Before (Legacy API)
+// Before (Legacy api client)
 import Runloop from '@runloop/api-client';
-const runloop = new RunloopSDK();
+const runloop = new Runloop();
 const secretResult = await runloop.secrets.create({ ... });
 
 
@@ -91,6 +93,36 @@ const secretResult = await runloop.secrets.create({ ... });
 import { RunloopSDK } from '@runloop/api-client';
 const runloop  = new RunloopSDK();
 const secretResult = await runloop.api.secrets.create({ ... });
+```
+
+Once you've migrated your existing code to the new SDK client you can optionally go through and move from the API paradime to the object oriented SDK.
+
+```ts
+// Before (Legacy api client)
+import Runloop from '@runloop/api-client';
+const runloop = new Runloop()
+
+const devboxResult = await runloop.devboxes.createAndAwaitRunning()
+
+await runloop.devboxes.executeAndAwaitCompletion(devboxResult.id, {"command": "touch example.txt"})
+
+const snapshotResult = await runloop.devbox.snapshotDisk()
+await runloop.devboxes.snapshotDisk(devboxResult.id)
+await runloop.snapshots.awaitCompleted(snapshotResult.id)
+runloop.devbox.create({ snapshot_id: snapshotResult.id})
+...
+await runloop.devbox.shutdown(devboxResult.id)
+
+// After (SDK)
+import { RunloopSDK } from '@runloop/api-client';
+const runloop  = new RunloopSDK();
+
+const devbox = await runloop.devbox.create();
+await devbox.cmd.exec({ command: "touch example.txt" });
+const snapshot = await devbox.snapshotDisk();
+await snapshot.createDevbox();
+...
+await devbox.shutdown();
 ```
 
 ## Advanced Configuration
