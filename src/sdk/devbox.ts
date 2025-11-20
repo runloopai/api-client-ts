@@ -65,7 +65,7 @@ export class DevboxNetOps {
   }
 
   /**
-   * Create a tunnel to a port on the devbox.
+   * Open a port on the devbox to be accessible from the internet.
    *
    * @example
    * ```typescript
