@@ -318,7 +318,7 @@ export class DevboxFileOps {
  * ## Overview
  *
  * The `Devbox` class provides a high-level, object-oriented API for managing devboxes.
- * Devboxes are containers that run your code in a consistent environment. They have the the following operations:
+ * Devboxes are containers that run your code in a consistent environment. They have the the following categories of operations:
  * - {@link DevboxNetOps net} - Network operations
  * - {@link DevboxCmdOps cmd} - Command execution operations
  * - {@link DevboxFileOps file} - File operations
@@ -331,7 +331,7 @@ export class DevboxFileOps {
  * const runloop = new RunloopSDK();
  * const devbox = await runloop.devbox.create({ name: 'my-devbox' });
  * devbox.cmd.exec({ command: 'echo "Hello, World!"' });
- * console.log(`Created devbox: ${devbox.id}`);
+ * ...
  * ```
  *
  */
