@@ -100,7 +100,6 @@ Customize the SDK with your API token, endpoint, timeout, and retry settings:
 ```typescript
 const runloop = new RunloopSDK({
   bearerToken: process.env.RUNLOOP_API_KEY,
-  baseURL: 'https://api.runloop.ai',
   timeout: 60000, // 60 second timeout
   maxRetries: 3, // Retry failed requests
 });
