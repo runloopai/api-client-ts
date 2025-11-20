@@ -11,7 +11,7 @@ import type { DevboxAsyncExecutionDetailView } from '../resources/devboxes/devbo
  *
  * ## Quickstart
  *
- * Execution results are typically obtained from `devbox.cmd.exec()` or `execution.result()`:
+ * Execution results are typically obtained from `devbox.cmd.exec()` or `asyncExecution.result()`:
  * ```typescript
  * import { RunloopSDK } from '@runloop/api-client-ts';
  *
@@ -113,14 +113,8 @@ export class ExecutionResult {
    * @returns {number} The number of non-empty lines in the text
    */
   private countNonEmptyLines(text: string): number {
-    const countLines = text.split('\n');
-    // Remove trailing empty strings first
-    const trimmedLines = [...countLines];
-    while (trimmedLines.length > 0 && trimmedLines[trimmedLines.length - 1] === '') {
-      trimmedLines.pop();
-    }
-    // Filter out all empty strings (including those in the middle)
-    return trimmedLines.filter((line) => line !== '').length;
+    const lines = text.split('\n');
+    return lines.filter((line) => line !== '').length;
   }
 
   /**
@@ -174,7 +168,7 @@ export class ExecutionResult {
    * Get the stdout output from the execution. If numLines is specified, it will return the last N lines. If numLines is not specified, it will return the entire stdout output.
    * Note after the execution is completed, the stdout is not available anymore.
    *
-   * This method has to retrieve more logs from the server if you specify numLines. It will resolve faster if you specify how many lines you need. Defaults to all lines.
+   * This method will retreive more logs from the server if necessary, an execution returns a subset of the logs. If you don't require all lines, it will resolve faster if you specify how many lines you need. Defaults to all lines.
    *
    * @example
    * ```typescript
@@ -201,7 +195,7 @@ export class ExecutionResult {
    * Get the stderr output from the execution. If numLines is specified, it will return the last N lines. If numLines is not specified, it will return the entire stderr output.
    * Note after the execution is completed, the stderr is not available anymore.
    *
-   * This method has to retrieve more logs from the server if you specify numLines. It will resolve faster if you specify how many lines you need. Defaults to all lines.
+   * This method will retreive more logs from the server if necessary, an execution returns a subset of the logs. If you don't require all lines, it will resolve faster if you specify how many lines you need. Defaults to all lines.
    *
    * @example
    * ```typescript

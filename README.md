@@ -93,7 +93,6 @@ const runloop  = new RunloopSDK();
 const secretResult = await runloop.api.secrets.create({ ... });
 ```
 
-
 ## Advanced Configuration
 
 Customize the SDK with your API token, endpoint, timeout, and retry settings:

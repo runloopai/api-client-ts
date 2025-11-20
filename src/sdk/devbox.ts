@@ -565,7 +565,6 @@ export class Devbox {
    *
    * @example
    * ```typescript
-   * const devbox = Devbox.fromId(runloop, 'devbox-123');
    * const info = await devbox.getInfo();
    * console.log(`Devbox name: ${info.name}, status: ${info.status}`);
    * ```
