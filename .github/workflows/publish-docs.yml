@@ -75,7 +75,7 @@ jobs:
 
       - run: mkdir -p ./docs
       - name: Download the new documents artifact
-        uses: runloopai/download-artifact@main
+        uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53
         with:
           name: newdocumentation
       - run: tar -xf newdocumentation.tar ./docs -C ./docs
