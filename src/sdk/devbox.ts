@@ -14,6 +14,7 @@ import type {
   DevboxExecuteParams,
   DevboxExecuteAsyncParams,
   DevboxSnapshotView,
+  DevboxKeepAliveResponse,
 } from '../resources/devboxes/devboxes';
 import { PollingOptions } from '../lib/polling';
 import { Snapshot } from './snapshot';
@@ -58,7 +59,7 @@ export class DevboxNetOps {
    * ```
    *
    * @param {Core.RequestOptions} [options] - Request options
-   * @returns {Promise<unknown>} SSH key creation result
+   * @returns {Promise<DevboxCreateSSHKeyResponse>} SSH key creation result
    */
   async createSSHKey(options?: Core.RequestOptions) {
     return this.client.devboxes.createSSHKey(this.devboxId, options);
@@ -74,7 +75,7 @@ export class DevboxNetOps {
    *
    * @param {DevboxCreateTunnelParams} params - Tunnel creation parameters
    * @param {Core.RequestOptions} [options] - Request options
-   * @returns {Promise<unknown>} Tunnel creation result
+   * @returns {Promise<DevboxTunnelView>} Tunnel creation result
    */
   async createTunnel(params: DevboxCreateTunnelParams, options?: Core.RequestOptions) {
     return this.client.devboxes.createTunnel(this.devboxId, params, options);
@@ -90,7 +91,7 @@ export class DevboxNetOps {
    *
    * @param {DevboxRemoveTunnelParams} params - Tunnel removal parameters
    * @param {Core.RequestOptions} [options] - Request options
-   * @returns {Promise<unknown>} Tunnel removal result
+   * @returns {Promise<DevboxRemoveTunnelResponse>} Tunnel removal result
    */
   async removeTunnel(params: DevboxRemoveTunnelParams, options?: Core.RequestOptions) {
     return this.client.devboxes.removeTunnel(this.devboxId, params, options);
@@ -267,7 +268,7 @@ export class DevboxFileOps {
    *
    * @param {DevboxWriteFileContentsParams} params - Parameters containing the file path and contents
    * @param {Core.RequestOptions} [options] - Request options
-   * @returns {Promise<unknown>} Execution result
+   * @returns {Promise<DevboxWriteFileContentsResponse>} Execution result
    */
   async write(params: DevboxWriteFileContentsParams, options?: Core.RequestOptions) {
     return this.client.devboxes.writeFileContents(this.devboxId, params, options);
@@ -285,7 +286,7 @@ export class DevboxFileOps {
    *
    * @param {DevboxDownloadFileParams} params - Parameters containing the file path
    * @param {Core.RequestOptions} [options] - Request options
-   * @returns {Promise<Response>} Response with file contents
+   * @returns {Promise<DevboxDownloadFileResponse>} Download file response
    */
   async download(params: DevboxDownloadFileParams, options?: Core.RequestOptions) {
     return this.client.devboxes.downloadFile(this.devboxId, params, options);
@@ -305,7 +306,7 @@ export class DevboxFileOps {
    *
    * @param {DevboxUploadFileParams} params - Parameters containing the file path and file to upload
    * @param {Core.RequestOptions} [options] - Request options
-   * @returns {Promise<unknown>} Upload result
+   * @returns {Promise<DevboxUploadFileResponse>} Upload result
    */
   async upload(params: DevboxUploadFileParams, options?: Core.RequestOptions) {
     return this.client.devboxes.uploadFile(this.devboxId, params, options);
@@ -674,7 +675,7 @@ export class Devbox {
    * ```
    *
    * @param {Core.RequestOptions} [options] - Request options
-   * @returns {Promise<unknown>} Shutdown result
+   * @returns {Promise<DevboxShutdownResponse>} Shutdown result
    */
   async shutdown(options?: Core.RequestOptions) {
     return await this.client.devboxes.shutdown(this._id, options);
@@ -690,7 +691,7 @@ export class Devbox {
    * ```
    *
    * @param {Core.RequestOptions} [options] - Request options
-   * @returns {Promise<unknown>} Suspend result
+   * @returns {Promise<DevboxSuspendResponse>} Suspend result
    */
   async suspend(options?: Core.RequestOptions) {
     return this.client.devboxes.suspend(this._id, options);
@@ -706,7 +707,7 @@ export class Devbox {
    * ```
    *
    * @param {Core.RequestOptions} [options] - Request options
-   * @returns {Promise<unknown>} Resume result
+   * @returns {Promise<DevboxResumeResponse>} Resume result
    */
   async resume(options?: Core.RequestOptions) {
     return this.client.devboxes.resume(this._id, options);
@@ -722,9 +723,9 @@ export class Devbox {
    * ```
    *
    * @param {Core.RequestOptions} [options] - Request options
-   * @returns {Promise<unknown>} Keep-alive result
+   * @returns {Promise<DevboxKeepAliveResponse>} Keep-alive result
    */
-  async keepAlive(options?: Core.RequestOptions): Promise<unknown> {
+  async keepAlive(options?: Core.RequestOptions): Promise<DevboxKeepAliveResponse> {
     return this.client.devboxes.keepAlive(this._id, options);
   }
 }

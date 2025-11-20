@@ -337,7 +337,7 @@ export class Devboxes extends APIResource {
    * Send a 'Keep Alive' signal to a running Devbox that is configured to shutdown on
    * idle so the idle time resets.
    */
-  keepAlive(id: string, options?: Core.RequestOptions): Core.APIPromise<unknown> {
+  keepAlive(id: string, options?: Core.RequestOptions): Core.APIPromise<DevboxKeepAliveResponse> {
     return this._client.post(`/v1/devboxes/${id}/keep_alive`, options);
   }
 
