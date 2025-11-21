@@ -802,7 +802,7 @@ export interface DevboxCreateParams {
   metadata?: { [key: string]: string } | null;
 
   /**
-   * A list of file system mounts to be included in the Devbox.
+   * A list of mounts to be included in the Devbox.
    */
   mounts?: Array<Shared.Mount> | null;
 
