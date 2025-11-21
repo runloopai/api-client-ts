@@ -19,10 +19,10 @@ jobs:
     runs-on: ${{ github.repository == 'stainless-sdks/runloop-node' && 'depot-ubuntu-24.04' || 'ubuntu-latest' }}
     if: github.event_name == 'push' || github.event.pull_request.head.repo.fork
     steps:
-      - uses: actions/checkout@v4
+      - uses: runloopai/checkout@main
 
       - name: Set up Node
-        uses: actions/setup-node@v4
+        uses: runloopai/setup-node@main
         with:
           node-version: '18'
 
@@ -41,10 +41,10 @@ jobs:
       contents: read
       id-token: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: runloopai/checkout@main
 
       - name: Set up Node
-        uses: actions/setup-node@v4
+        uses: runloopai/setup-node@main
         with:
           node-version: '18'
 
@@ -57,7 +57,7 @@ jobs:
       - name: Get GitHub OIDC Token
         if: github.repository == 'stainless-sdks/runloop-node'
         id: github-oidc
-        uses: actions/github-script@v6
+        uses: runloopai/github-script@main
         with:
           script: core.setOutput('github_token', await core.getIDToken());
 
@@ -74,10 +74,10 @@ jobs:
     runs-on: ${{ github.repository == 'stainless-sdks/runloop-node' && 'depot-ubuntu-24.04' || 'ubuntu-latest' }}
     if: github.event_name == 'push' || github.event.pull_request.head.repo.fork
     steps:
-      - uses: actions/checkout@v4
+      - uses: runloopai/checkout@main
 
       - name: Set up Node
-        uses: actions/setup-node@v4
+        uses: runloopai/setup-node@main
         with:
           node-version: '20'
 

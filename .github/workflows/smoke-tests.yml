@@ -17,10 +17,10 @@ jobs:
     timeout-minutes: 60
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: runloopai/checkout@main
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: runloopai/setup-node@main
         with:
           node-version: '20'
           cache: 'yarn'
@@ -52,7 +52,7 @@ jobs:
 
       - name: Comment results on PR
         if: failure() && github.event_name == 'pull_request'
-        uses: actions/github-script@v7
+        uses: runloopai/github-script@main
         with:
           script: |
             const runUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
@@ -72,7 +72,7 @@ jobs:
 
       - name: Comment success on PR
         if: success() && github.event_name == 'pull_request'
-        uses: actions/github-script@v7
+        uses: runloopai/github-script@main
         with:
           script: |
             const comment = `## ✅ Smoke Tests Passed
