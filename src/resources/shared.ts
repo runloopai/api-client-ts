@@ -167,6 +167,8 @@ export interface CodeMountParameters {
    */
   repo_owner: string;
 
+  type: 'code_mount';
+
   /**
    * The authentication token necessary to pull repo.
    */
@@ -274,7 +276,23 @@ export namespace LaunchParameters {
   }
 }
 
-export type Mount = ObjectMountParameters | AgentMountParameters;
+export type Mount =
+  | ObjectMountParameters
+  | AgentMountParameters
+  | CodeMountParameters
+  | Mount.FileMountParameters;
+
+export namespace Mount {
+  export interface FileMountParameters {
+    /**
+     * Map of file paths to file contents to be written before setup. Keys are absolute
+     * paths where files should be created, values are the file contents.
+     */
+    files: { [key: string]: string };
+
+    type: 'file_mount';
+  }
+}
 
 export interface ObjectMountParameters {
   /**

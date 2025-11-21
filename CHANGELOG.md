@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.69.0 (2025-11-21)
+
+Full Changelog: [v0.68.0...v0.69.0](https://github.com/runloopai/api-client-ts/compare/v0.68.0...v0.69.0)
+
+### Features
+
+* **devbox:** unify api for devbox mounts ([546c5f6](https://github.com/runloopai/api-client-ts/commit/546c5f6ad80ffa79388545b03fb94a13a0b17144))
+* **storage-objects:** Adds a helper method to create an Object from a local directory ([#656](https://github.com/runloopai/api-client-ts/issues/656)) ([b87ac39](https://github.com/runloopai/api-client-ts/commit/b87ac396696b02ef99bdf700b2abff2c7de68c9d))
+
 ## 0.68.0 (2025-11-19)
 
 Full Changelog: [v0.67.1...v0.68.0](https://github.com/runloopai/api-client-ts/compare/v0.67.1...v0.68.0)
