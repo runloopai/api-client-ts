@@ -212,14 +212,6 @@ export class Devboxes extends APIResource {
   }
 
   /**
-   * Send a 'Keep Alive' signal to a running Devbox that is configured to shutdown on
-   * idle so the idle time resets.
-   */
-  keepAlive(id: string, options?: Core.RequestOptions): Core.APIPromise<unknown> {
-    return this._client.post(`/v1/devboxes/${id}/keep_alive`, options);
-  }
-
-  /**
    * List all snapshots of a Devbox while optionally filtering by Devbox ID, source
    * Blueprint ID, and metadata.
    */
@@ -271,15 +263,6 @@ export class Devboxes extends APIResource {
     options?: Core.RequestOptions,
   ): Core.APIPromise<unknown> {
     return this._client.post(`/v1/devboxes/${id}/remove_tunnel`, { body, ...options });
-  }
-
-  /**
-   * Resume a suspended Devbox with the disk state captured as suspend time. Note
-   * that any previously running processes or daemons will need to be restarted using
-   * the Devbox shell tools.
-   */
-  resume(id: string, options?: Core.RequestOptions): Core.APIPromise<DevboxView> {
-    return this._client.post(`/v1/devboxes/${id}/resume`, options);
   }
 
   /**
@@ -336,15 +319,6 @@ export class Devboxes extends APIResource {
       return this.snapshotDiskAsync(id, {}, body);
     }
     return this._client.post(`/v1/devboxes/${id}/snapshot_disk_async`, { body, ...options });
-  }
-
-  /**
-   * Suspend a running Devbox and create a disk snapshot to enable resuming the
-   * Devbox later with the same disk. Note this will not snapshot memory state such
-   * as running processes.
-   */
-  suspend(id: string, options?: Core.RequestOptions): Core.APIPromise<DevboxView> {
-    return this._client.post(`/v1/devboxes/${id}/suspend`, options);
   }
 
   /**
@@ -746,8 +720,6 @@ export interface DevboxCreateSSHKeyResponse {
 
 export type DevboxDeleteDiskSnapshotResponse = unknown;
 
-export type DevboxKeepAliveResponse = unknown;
-
 export type DevboxReadFileContentsResponse = string;
 
 export type DevboxRemoveTunnelResponse = unknown;
@@ -1091,7 +1063,6 @@ export declare namespace Devboxes {
     type DevboxView as DevboxView,
     type DevboxCreateSSHKeyResponse as DevboxCreateSSHKeyResponse,
     type DevboxDeleteDiskSnapshotResponse as DevboxDeleteDiskSnapshotResponse,
-    type DevboxKeepAliveResponse as DevboxKeepAliveResponse,
     type DevboxReadFileContentsResponse as DevboxReadFileContentsResponse,
     type DevboxRemoveTunnelResponse as DevboxRemoveTunnelResponse,
     type DevboxUploadFileResponse as DevboxUploadFileResponse,

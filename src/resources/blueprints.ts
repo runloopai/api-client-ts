@@ -205,11 +205,6 @@ export interface BlueprintBuildParameters {
   build_args?: { [key: string]: string } | null;
 
   /**
-   * A build context backed by an Object.
-   */
-  build_context?: BlueprintBuildParameters.BuildContext | null;
-
-  /**
    * A list of code mounts to be included in the Blueprint.
    */
   code_mounts?: Array<Shared.CodeMountParameters> | null;
@@ -235,14 +230,6 @@ export interface BlueprintBuildParameters {
   metadata?: { [key: string]: string } | null;
 
   /**
-   * (Optional) Map of named build contexts to attach to the Blueprint build, where
-   * the keys are the name used when referencing the contexts in a Dockerfile. See
-   * Docker buildx additional contexts for details:
-   * https://docs.docker.com/reference/cli/docker/buildx/build/#build-context
-   */
-  named_build_contexts?: { [key: string]: BlueprintBuildParameters.NamedBuildContexts } | null;
-
-  /**
    * (Optional) Map of mount IDs/environment variable names to secret names. Secrets
    * will be available to commands during the build. Secrets are NOT stored in the
    * blueprint image. Example: {"DB_PASS": "DATABASE_PASSWORD"} makes the secret
@@ -264,30 +251,6 @@ export interface BlueprintBuildParameters {
 }
 
 export namespace BlueprintBuildParameters {
-  /**
-   * A build context backed by an Object.
-   */
-  export interface BuildContext {
-    /**
-     * The ID of an object, whose contents are to be used as a build context.
-     */
-    object_id: string;
-
-    type: 'object';
-  }
-
-  /**
-   * A build context backed by an Object.
-   */
-  export interface NamedBuildContexts {
-    /**
-     * The ID of an object, whose contents are to be used as a build context.
-     */
-    object_id: string;
-
-    type: 'object';
-  }
-
   export interface Service {
     /**
      * The image of the container service.
@@ -527,11 +490,6 @@ export interface BlueprintCreateParams {
   build_args?: { [key: string]: string } | null;
 
   /**
-   * A build context backed by an Object.
-   */
-  build_context?: BlueprintCreateParams.BuildContext | null;
-
-  /**
    * A list of code mounts to be included in the Blueprint.
    */
   code_mounts?: Array<Shared.CodeMountParameters> | null;
@@ -557,14 +515,6 @@ export interface BlueprintCreateParams {
   metadata?: { [key: string]: string } | null;
 
   /**
-   * (Optional) Map of named build contexts to attach to the Blueprint build, where
-   * the keys are the name used when referencing the contexts in a Dockerfile. See
-   * Docker buildx additional contexts for details:
-   * https://docs.docker.com/reference/cli/docker/buildx/build/#build-context
-   */
-  named_build_contexts?: { [key: string]: BlueprintCreateParams.NamedBuildContexts } | null;
-
-  /**
    * (Optional) Map of mount IDs/environment variable names to secret names. Secrets
    * will be available to commands during the build. Secrets are NOT stored in the
    * blueprint image. Example: {"DB_PASS": "DATABASE_PASSWORD"} makes the secret
@@ -586,30 +536,6 @@ export interface BlueprintCreateParams {
 }
 
 export namespace BlueprintCreateParams {
-  /**
-   * A build context backed by an Object.
-   */
-  export interface BuildContext {
-    /**
-     * The ID of an object, whose contents are to be used as a build context.
-     */
-    object_id: string;
-
-    type: 'object';
-  }
-
-  /**
-   * A build context backed by an Object.
-   */
-  export interface NamedBuildContexts {
-    /**
-     * The ID of an object, whose contents are to be used as a build context.
-     */
-    object_id: string;
-
-    type: 'object';
-  }
-
   export interface Service {
     /**
      * The image of the container service.
@@ -742,11 +668,6 @@ export interface BlueprintPreviewParams {
   build_args?: { [key: string]: string } | null;
 
   /**
-   * A build context backed by an Object.
-   */
-  build_context?: BlueprintPreviewParams.BuildContext | null;
-
-  /**
    * A list of code mounts to be included in the Blueprint.
    */
   code_mounts?: Array<Shared.CodeMountParameters> | null;
@@ -772,14 +693,6 @@ export interface BlueprintPreviewParams {
   metadata?: { [key: string]: string } | null;
 
   /**
-   * (Optional) Map of named build contexts to attach to the Blueprint build, where
-   * the keys are the name used when referencing the contexts in a Dockerfile. See
-   * Docker buildx additional contexts for details:
-   * https://docs.docker.com/reference/cli/docker/buildx/build/#build-context
-   */
-  named_build_contexts?: { [key: string]: BlueprintPreviewParams.NamedBuildContexts } | null;
-
-  /**
    * (Optional) Map of mount IDs/environment variable names to secret names. Secrets
    * will be available to commands during the build. Secrets are NOT stored in the
    * blueprint image. Example: {"DB_PASS": "DATABASE_PASSWORD"} makes the secret
@@ -801,30 +714,6 @@ export interface BlueprintPreviewParams {
 }
 
 export namespace BlueprintPreviewParams {
-  /**
-   * A build context backed by an Object.
-   */
-  export interface BuildContext {
-    /**
-     * The ID of an object, whose contents are to be used as a build context.
-     */
-    object_id: string;
-
-    type: 'object';
-  }
-
-  /**
-   * A build context backed by an Object.
-   */
-  export interface NamedBuildContexts {
-    /**
-     * The ID of an object, whose contents are to be used as a build context.
-     */
-    object_id: string;
-
-    type: 'object';
-  }
-
   export interface Service {
     /**
      * The image of the container service.
