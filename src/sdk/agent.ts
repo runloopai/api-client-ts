@@ -1,10 +1,6 @@
 import { Runloop } from '../index';
 import type * as Core from '../core';
 import type { AgentCreateParams, AgentListParams, AgentView } from '../resources/agents';
-import type { DevboxCreateParams } from '../resources/devboxes/devboxes';
-import type { PollingOptions } from '../lib/polling';
-import type { DevboxView } from '../resources/devboxes/devboxes';
-import { Devbox } from './devbox';
 
 /**
  * Object-oriented interface for working with Agents.
@@ -17,7 +13,7 @@ import { Devbox } from './devbox';
  *
  * ## Quickstart
  *
- * Agents are created and then mounted into devboxes:
+ * Agents are created and then mounted into devboxes via the mounts parameter:
  * ```typescript
  * import { RunloopSDK } from '@runloop/api-client-ts';
  *
@@ -36,9 +32,13 @@ import { Devbox } from './devbox';
  * });
  *
  * // Mount agent into a devbox
- * const devbox = await agent.createDevbox({
+ * const devbox = await runloop.devbox.create({
  *   name: 'devbox-with-agent',
- *   agent_path: '/home/user/agent'
+ *   mounts: [{
+ *     type: 'agent_mount',
+ *     agent_id: agent.id,
+ *     agent_path: '/home/user/agent'
+ *   }]
  * });
  * ```
  *
@@ -138,50 +138,5 @@ export class Agent {
    */
   async getInfo(options?: Core.RequestOptions): Promise<AgentView> {
     return await this.client.agents.retrieve(this._id, options);
-  }
-
-  /**
-   * Create a new devbox with this agent mounted.
-   * This is a convenience method that creates a devbox with the agent pre-configured.
-   *
-   * @example
-   * ```typescript
-   * const runloop = new RunloopSDK();
-   * const agent = runloop.agent.fromId('agent-123');
-   * const devbox = await agent.createDevbox({
-   *   name: 'my-devbox',
-   *   agent_path: '/home/user/my-agent',
-   * });
-   * ```
-   *
-   * @param {Omit<DevboxCreateParams, 'blueprint_id' | 'snapshot_id' | 'blueprint_name'> & { agent_path?: string; auth_token?: string }} [params] - Devbox creation parameters plus agent mount options
-   * @param {Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxView>> }} [options] - Request options with optional polling configuration
-   * @returns {Promise<Devbox>} A new {@link Devbox} instance with this agent mounted
-   */
-  async createDevbox(
-    params?: Omit<DevboxCreateParams, 'blueprint_id' | 'snapshot_id' | 'blueprint_name'> & {
-      agent_path?: string;
-      auth_token?: string;
-    },
-    options?: Core.RequestOptions & {
-      polling?: Partial<PollingOptions<DevboxView>>;
-    },
-  ): Promise<Devbox> {
-    const { agent_path, auth_token, mounts, ...devboxParams } = params || {};
-
-    const agentMount = {
-      type: 'agent_mount' as const,
-      agent_id: this._id,
-      agent_name: null,
-      agent_path: agent_path || null,
-      auth_token: auth_token || null,
-    };
-
-    const createParams: DevboxCreateParams = {
-      ...devboxParams,
-      mounts: mounts ? [...mounts, agentMount] : [agentMount],
-    };
-
-    return Devbox.create(this.client, createParams, options);
   }
 }
