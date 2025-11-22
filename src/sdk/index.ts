@@ -2,5 +2,6 @@ export { Devbox, DevboxCmdOps, DevboxFileOps, DevboxNetOps, type ExecuteStreamin
 export { Blueprint } from './blueprint';
 export { Snapshot } from './snapshot';
 export { StorageObject } from './storage-object';
+export { Agent } from './agent';
 export { Execution } from './execution';
 export { ExecutionResult } from './execution-result';
