@@ -265,7 +265,7 @@ export namespace LaunchParameters {
    */
   export interface UserParameters {
     /**
-     * User ID (UID) for the Linux user. Must be a positive integer.
+     * User ID (UID) for the Linux user. Must be a non-negative integer.
      */
     uid: number;
 
