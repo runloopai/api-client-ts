@@ -9,6 +9,7 @@ import type {
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import * as tar from 'tar';
+import fetch from 'node-fetch';
 
 // Extract the content type from the API types
 type ContentType = ObjectCreateParams['content_type'];
@@ -312,7 +313,7 @@ export class StorageObject {
     try {
       const response = await fetch(uploadUrl, {
         method: 'PUT',
-        body: new Blob([text]),
+        body: text,
       });
 
       if (!response.ok) {
@@ -387,7 +388,7 @@ export class StorageObject {
     try {
       const response = await fetch(uploadUrl, {
         method: 'PUT',
-        body: new Blob([buffer]),
+        body: buffer,
       });
 
       if (!response.ok) {
@@ -430,14 +431,16 @@ export class StorageObject {
     let buffer;
     try {
       const tarStream = tar.create({ gzip: true, cwd: dirPath }, ['.']);
-      const chunks = [];
+      const chunks: Buffer[] = [];
       for await (const chunk of tarStream) {
         chunks.push(chunk);
       }
-      buffer = Buffer.concat(chunks);
+      buffer = Buffer.concat(chunks as readonly Uint8Array[]);
     } catch (error) {
       throw new Error(
-        `Failed to create tarball from directory ${dirPath}: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        `Failed to create tarball from directory ${dirPath}: ${
+          error instanceof Error ? error.message : 'Unknown error'
+        }`,
       );
     }
 

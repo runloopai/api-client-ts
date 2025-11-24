@@ -595,19 +595,6 @@ export class StorageObjectOps {
   }
 }
 
-export declare namespace RunloopSDK {
-  export {
-    RunloopSDK as Client,
-    DevboxOps as DevboxOps,
-    BlueprintOps as BlueprintOps,
-    SnapshotOps as SnapshotOps,
-    StorageObjectOps as StorageObjectOps,
-    Devbox as Devbox,
-    Blueprint as Blueprint,
-    Snapshot as Snapshot,
-    StorageObject as StorageObject,
-  };
-}
 // Export SDK classes from sdk/sdk.ts - these are separate from RunloopSDK to avoid circular dependencies
 export {
   Devbox,

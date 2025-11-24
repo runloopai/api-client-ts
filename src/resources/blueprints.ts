@@ -56,7 +56,9 @@ function validateFileMounts(fileMounts?: { [key: string]: string } | null): Arra
       const over = sizeBytes - FILE_MOUNT_MAX_SIZE_BYTES;
       errors.push(
         `file_mount '${mountPath}' is ${formatBytes(over)} over the limit (` +
-          `${formatBytes(sizeBytes)} / ${formatBytes(FILE_MOUNT_MAX_SIZE_BYTES)}). Use object_mounts instead.`,
+          `${formatBytes(sizeBytes)} / ${formatBytes(
+            FILE_MOUNT_MAX_SIZE_BYTES,
+          )}). Use object_mounts instead.`,
       );
     }
     totalSizeBytes += sizeBytes;
@@ -66,7 +68,9 @@ function validateFileMounts(fileMounts?: { [key: string]: string } | null): Arra
     const totalOver = totalSizeBytes - FILE_MOUNT_TOTAL_MAX_SIZE_BYTES;
     errors.push(
       `total file_mounts size is ${formatBytes(totalOver)} over the limit (` +
-        `${formatBytes(totalSizeBytes)} / ${formatBytes(FILE_MOUNT_TOTAL_MAX_SIZE_BYTES)}). Use object_mounts instead.`,
+        `${formatBytes(totalSizeBytes)} / ${formatBytes(
+          FILE_MOUNT_TOTAL_MAX_SIZE_BYTES,
+        )}). Use object_mounts instead.`,
     );
   }
 
