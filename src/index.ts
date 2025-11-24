@@ -616,9 +616,6 @@ export {
   UnprocessableEntityError,
 } from './error';
 
-// Re-export RunloopSDK from sdk.ts
-export { RunloopSDK } from './sdk';
-
 /**
  * @example
  * ```typescript
