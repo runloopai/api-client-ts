@@ -39,7 +39,7 @@ type ContentType = ObjectCreateParams['content_type'];
  * ```typescript
  * const runloop = new RunloopSDK(); // export RUNLOOP_API_KEY will automatically be used.
  * const devbox = await runloop.devbox.create({ name: 'my-devbox' });
- * const result = await devbox.cmd.exec({ command: 'echo "Hello, World!"' });
+ * const result = await devbox.cmd.exec('echo "Hello, World!"');
  * console.log(result.exitCode);
  * ```
  *
@@ -141,7 +141,7 @@ export class RunloopSDK {
  * ```typescript
  * const runloop = new RunloopSDK();
  * const devbox = await runloop.devbox.create({ name: 'my-devbox' });
- * const result = await devbox.cmd.exec({ command: 'echo "Hello, World!"' });
+ * const result = await devbox.cmd.exec('echo "Hello, World!"');
  * ```
  */
 export class DevboxOps {
@@ -162,7 +162,7 @@ export class DevboxOps {
    * const runloop = new RunloopSDK();
    * const devbox = await runloop.devbox.create({ name: 'my-devbox' });
    *
-   * devbox.cmd.exec({ command: 'echo "Hello, World!"' });
+   * devbox.cmd.exec('echo "Hello, World!"');
    * ...
    * ```
    *

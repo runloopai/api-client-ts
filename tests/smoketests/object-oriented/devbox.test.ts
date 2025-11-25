@@ -38,7 +38,7 @@ describe('smoketest: object-oriented devbox', () => {
 
     test('execute synchronous command', async () => {
       expect(devbox).toBeDefined();
-      const result = await devbox.cmd.exec({ command: 'echo "Hello from SDK!"' });
+      const result = await devbox.cmd.exec('echo "Hello from SDK!"');
       expect(result).toBeDefined();
       expect(result.exitCode).toBe(0);
       const output = await result.stdout();
@@ -47,7 +47,7 @@ describe('smoketest: object-oriented devbox', () => {
 
     test('execute asynchronous command', async () => {
       expect(devbox).toBeDefined();
-      const execution = await devbox.cmd.execAsync({ command: 'sleep 2 && echo "Async command completed"' });
+      const execution = await devbox.cmd.execAsync('sleep 2 && echo "Async command completed"');
       expect(execution).toBeDefined();
       expect(execution.executionId).toBeTruthy();
 
@@ -298,8 +298,7 @@ describe('smoketest: object-oriented devbox', () => {
     test('exec with stdout callback', async () => {
       const stdoutLines: string[] = [];
 
-      const result = await devbox.cmd.exec({
-        command: 'echo "line1" && echo "line2" && echo "line3"',
+      const result = await devbox.cmd.exec('echo "line1" && echo "line2" && echo "line3"', {
         stdout: (line) => {
           stdoutLines.push(line);
         },
@@ -319,8 +318,7 @@ describe('smoketest: object-oriented devbox', () => {
     test('exec with stderr callback', async () => {
       const stderrLines: string[] = [];
 
-      const result = await devbox.cmd.exec({
-        command: 'echo "error1" >&2 && echo "error2" >&2',
+      const result = await devbox.cmd.exec('echo "error1" >&2 && echo "error2" >&2', {
         stderr: (line) => {
           stderrLines.push(line);
         },
@@ -339,8 +337,7 @@ describe('smoketest: object-oriented devbox', () => {
     test('exec with output callback (both stdout and stderr)', async () => {
       const allLines: string[] = [];
 
-      const result = await devbox.cmd.exec({
-        command: 'echo "stdout1" && echo "stderr1" >&2 && echo "stdout2"',
+      const result = await devbox.cmd.exec('echo "stdout1" && echo "stderr1" >&2 && echo "stdout2"', {
         output: (line) => {
           allLines.push(line);
         },
@@ -360,8 +357,7 @@ describe('smoketest: object-oriented devbox', () => {
       const stderrLines: string[] = [];
       const outputLines: string[] = [];
 
-      const result = await devbox.cmd.exec({
-        command: 'echo "out1" && echo "err1" >&2 && echo "out2"',
+      const result = await devbox.cmd.exec('echo "out1" && echo "err1" >&2 && echo "out2"', {
         stdout: (line) => stdoutLines.push(line),
         stderr: (line) => stderrLines.push(line),
         output: (line) => outputLines.push(line),
@@ -387,9 +383,7 @@ describe('smoketest: object-oriented devbox', () => {
     });
 
     test('exec WITHOUT callbacks (preserve existing behavior)', async () => {
-      const result = await devbox.cmd.exec({
-        command: 'echo "test output"',
-      });
+      const result = await devbox.cmd.exec('echo "test output"');
 
       expect(result.success).toBe(true);
       expect(result.exitCode).toBe(0);
@@ -402,8 +396,7 @@ describe('smoketest: object-oriented devbox', () => {
       let receivedBeforeCompletion = false;
 
       // Start async execution with streaming
-      const execution = await devbox.cmd.execAsync({
-        command: 'echo "immediate" && sleep 2 && echo "delayed"',
+      const execution = await devbox.cmd.execAsync('echo "immediate" && sleep 2 && echo "delayed"', {
         stdout: (line) => {
           stdoutLines.push(line);
           if (line.includes('immediate')) {
@@ -434,8 +427,7 @@ describe('smoketest: object-oriented devbox', () => {
     test('execAsync with stderr callback', async () => {
       const stderrLines: string[] = [];
 
-      const execution = await devbox.cmd.execAsync({
-        command: 'echo "error output" >&2',
+      const execution = await devbox.cmd.execAsync('echo "error output" >&2', {
         stderr: (line) => {
           stderrLines.push(line);
         },
@@ -455,8 +447,7 @@ describe('smoketest: object-oriented devbox', () => {
       const stdoutLines: string[] = [];
       const stderrLines: string[] = [];
 
-      const result = await devbox.cmd.exec({
-        command: 'echo "to stdout" && echo "to stderr" >&2 && echo "more stdout"',
+      const result = await devbox.cmd.exec('echo "to stdout" && echo "to stderr" >&2 && echo "more stdout"', {
         stdout: (line) => stdoutLines.push(line),
         stderr: (line) => stderrLines.push(line),
       });
@@ -480,8 +471,7 @@ describe('smoketest: object-oriented devbox', () => {
     test('exec with long output - verify all lines received', async () => {
       const stdoutLines: string[] = [];
 
-      const result = await devbox.cmd.exec({
-        command: 'for i in {1..1000}; do echo "line $i"; done',
+      const result = await devbox.cmd.exec('for i in {1..1000}; do echo "line $i"; done', {
         stdout: (line) => stdoutLines.push(line),
       });
 
@@ -511,16 +501,14 @@ describe('smoketest: object-oriented devbox', () => {
       let taskBCount = 0;
 
       // Start both executions at the same time (don't await)
-      const executionA = devbox.cmd.execAsync({
-        command: 'echo "A1" && sleep 0.5 && echo "A2" && sleep 0.5 && echo "A3"',
+      const executionA = devbox.cmd.execAsync('echo "A1" && sleep 0.5 && echo "A2" && sleep 0.5 && echo "A3"', {
         stdout: (line) => {
           taskALogs.push(line);
           taskACount++;
         },
       });
 
-      const executionB = devbox.cmd.execAsync({
-        command: 'sleep 0.3 && echo "B1" && sleep 0.5 && echo "B2" && sleep 0.5 && echo "B3"',
+      const executionB = devbox.cmd.execAsync('sleep 0.3 && echo "B1" && sleep 0.5 && echo "B2" && sleep 0.5 && echo "B3"', {
         stdout: (line) => {
           taskBLogs.push(line);
           taskBCount++;

@@ -29,14 +29,12 @@ const sdk = new RunloopSDK({
 const devbox = await sdk.devbox.create();
 
 // Execute a synchronous command
-const result = await devbox.cmd.exec({ command: 'echo "Hello, World!"' });
+const result = await devbox.cmd.exec('echo "Hello, World!"');
 console.log('Output:', await result.stdout()); // "Hello, World!"
 console.log('Exit code:', result.exitCode); // 0
 
 // Start a long-running HTTP server asynchronously
-const serverExec = await devbox.cmd.execAsync({
-  command: 'npx http-server -p 8080',
-});
+const serverExec = await devbox.cmd.execAsync('npx http-server -p 8080');
 console.log(`Started server with execution ID: ${serverExec.executionId}`);
 
 // Check server status
@@ -104,7 +102,7 @@ const runloop = new Runloop()
 
 const devboxResult = await runloop.devboxes.createAndAwaitRunning()
 
-await runloop.devboxes.executeAndAwaitCompletion(devboxResult.id, {"command": "touch example.txt"})
+await runloop.devboxes.executeAndAwaitCompletion(devboxResult.id, { command: "touch example.txt" })
 
 const snapshotResult = await runloop.devbox.snapshotDisk()
 await runloop.devboxes.snapshotDisk(devboxResult.id)
@@ -118,7 +116,7 @@ import { RunloopSDK } from '@runloop/api-client';
 const runloop  = new RunloopSDK();
 
 const devbox = await runloop.devbox.create();
-await devbox.cmd.exec({ command: "touch example.txt" });
+await devbox.cmd.exec("touch example.txt");
 const snapshot = await devbox.snapshotDisk();
 await snapshot.createDevbox();
 ...
@@ -144,7 +142,7 @@ The SDK provides comprehensive error handling with typed exceptions:
 ```typescript
 try {
   const devbox = await runloop.devbox.create();
-  const result = await devbox.cmd.exec({ command: 'invalid-command' });
+  const result = await devbox.cmd.exec('invalid-command');
 } catch (error) {
   if (error instanceof RunloopSDK.APIError) {
     console.log('API Error:', error.status, error.message);

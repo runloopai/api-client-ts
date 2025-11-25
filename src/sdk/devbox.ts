@@ -155,30 +155,32 @@ export class DevboxCmdOps {
    * @example
    * ```typescript
    * // Simple execution
-   * const result = await devbox.cmd.exec({ command: 'ls -la' });
+   * const result = await devbox.cmd.exec('ls -la');
    * console.log(await result.stdout());
    *
    * // With streaming callbacks
-   * const result = await devbox.cmd.exec({
-   *   command: 'npm install',
+   * const result = await devbox.cmd.exec('npm install', {
    *   stdout: (line) => process.stdout.write(line),
    *   stderr: (line) => process.stderr.write(line),
    * });
    * ```
    *
-   * @param {DevboxExecuteParams & ExecuteStreamingCallbacks} params - Parameters containing the command, optional shell name, and optional callbacks
+   * @param {string} command - The command to execute
+   * @param {Omit<DevboxExecuteParams, 'command'> & ExecuteStreamingCallbacks} [params] - Optional parameters including shell name and callbacks
    * @param {Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxAsyncExecutionDetailView>> }} [options] - Request options with optional polling configuration
    * @returns {Promise<ExecutionResult>} {@link ExecutionResult} with stdout, stderr, and exit status
    */
   async exec(
-    params: DevboxExecuteParams & ExecuteStreamingCallbacks,
+    command: string,
+    params?: Omit<DevboxExecuteParams, 'command'> & ExecuteStreamingCallbacks,
     options?: Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxAsyncExecutionDetailView>> },
   ): Promise<ExecutionResult> {
-    const hasCallbacks = params.stdout || params.stderr || params.output;
+    const fullParams = { ...params, command };
+    const hasCallbacks = fullParams.stdout || fullParams.stderr || fullParams.output;
 
     if (hasCallbacks) {
       // With callbacks: use async execution workflow to enable streaming
-      const { stdout, stderr, output, ...executeParams } = params;
+      const { stdout, stderr, output, ...executeParams } = fullParams;
       const execution = await this.client.devboxes.executeAsync(this.devboxId, executeParams, options);
 
       // Start streaming and await both completion and streaming
@@ -204,7 +206,7 @@ export class DevboxCmdOps {
       return new ExecutionResult(this.client, this.devboxId, execution.execution_id, result);
     } else {
       // Without callbacks: use existing optimized workflow
-      const result = await this.client.devboxes.executeAndAwaitCompletion(this.devboxId, params, options);
+      const result = await this.client.devboxes.executeAndAwaitCompletion(this.devboxId, fullParams, options);
       return new ExecutionResult(this.client, this.devboxId, result.execution_id, result);
     }
   }
@@ -218,8 +220,7 @@ export class DevboxCmdOps {
    *
    * @example
    * ```typescript
-   * const execution = await devbox.cmd.execAsync({
-   *   command: 'long-running-task.sh',
+   * const execution = await devbox.cmd.execAsync('long-running-task.sh', {
    *   stdout: (line) => console.log(`[LOG] ${line}`),
    * });
    *
@@ -231,15 +232,18 @@ export class DevboxCmdOps {
    * }
    * ```
    *
-   * @param {DevboxExecuteAsyncParams & ExecuteStreamingCallbacks} params - Parameters containing the command, optional shell name, and optional callbacks
+   * @param {string} command - The command to execute
+   * @param {Omit<DevboxExecuteAsyncParams, 'command'> & ExecuteStreamingCallbacks} [params] - Optional parameters including shell name and callbacks
    * @param {Core.RequestOptions} [options] - Request options
    * @returns {Promise<Execution>} {@link Execution} object for tracking and controlling the command
    */
   async execAsync(
-    params: DevboxExecuteAsyncParams & ExecuteStreamingCallbacks,
+    command: string,
+    params?: Omit<DevboxExecuteAsyncParams, 'command'> & ExecuteStreamingCallbacks,
     options?: Core.RequestOptions,
   ): Promise<Execution> {
-    const { stdout, stderr, output, ...executeParams } = params;
+    const fullParams = { ...params, command };
+    const { stdout, stderr, output, ...executeParams } = fullParams;
     const execution = await this.client.devboxes.executeAsync(this.devboxId, executeParams, options);
 
     // Start streaming in background if callbacks provided
@@ -359,7 +363,7 @@ export class DevboxFileOps {
  *
  * const runloop = new RunloopSDK();
  * const devbox = await runloop.devbox.create({ name: 'my-devbox' });
- * devbox.cmd.exec({ command: 'echo "Hello, World!"' });
+ * devbox.cmd.exec('echo "Hello, World!"');
  * ...
  * ```
  *
@@ -403,7 +407,7 @@ export class Devbox {
    * const runloop = new RunloopSDK();
    * const devbox = await runloop.devbox.create({ name: 'my-devbox' });
    *
-   * devbox.cmd.exec({ command: 'echo "Hello, World!"' });
+   * devbox.cmd.exec('echo "Hello, World!"');
    * ...
    * ```
    *
@@ -715,6 +719,7 @@ export class Devbox {
    * @example
    * ```typescript
    * await devbox.suspend();
+   * // Optionally, wait for the devbox to reach the suspended state
    * await devbox.awaitSuspended();
    * ```
    *

@@ -120,7 +120,7 @@ describe('Devbox (New API)', () => {
 
         mockClient.devboxes.executeAndAwaitCompletion.mockResolvedValue(mockExecution);
 
-        const result = await devbox.cmd.exec({ command: 'echo "Hello World"' });
+        const result = await devbox.cmd.exec('echo "Hello World"');
 
         expect(mockClient.devboxes.executeAndAwaitCompletion).toHaveBeenCalledWith(
           'devbox-123',
@@ -142,7 +142,7 @@ describe('Devbox (New API)', () => {
 
         mockClient.devboxes.executeAsync.mockResolvedValue(mockExecution);
 
-        const result = await devbox.cmd.execAsync({ command: 'sleep 10' });
+        const result = await devbox.cmd.execAsync('sleep 10');
 
         expect(mockClient.devboxes.executeAsync).toHaveBeenCalledWith(
           'devbox-123',
@@ -288,7 +288,7 @@ describe('Devbox (New API)', () => {
       const error = new Error('Command failed');
       mockClient.devboxes.executeAndAwaitCompletion.mockRejectedValue(error);
 
-      await expect(devbox.cmd.exec({ command: 'failing-command' })).rejects.toThrow('Command failed');
+      await expect(devbox.cmd.exec('failing-command')).rejects.toThrow('Command failed');
     });
   });
 });

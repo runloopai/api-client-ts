@@ -19,7 +19,7 @@ import type { DevboxAsyncExecutionDetailView } from '../resources/devboxes/devbo
  * const devbox = runloop.devbox.fromId('devbox-123');
  *
  * // Get result from synchronous execution
- * const result = await devbox.cmd.exec({ command: 'ls -la' });
+ * const result = await devbox.cmd.exec('ls -la');
  *
  * // Check success
  * if (result.success) {

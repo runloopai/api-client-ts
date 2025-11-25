@@ -359,7 +359,7 @@ describe('smoketest: object-oriented storage object', () => {
         });
 
         // List the mounted directory
-        const result = await devbox.cmd.exec({ command: 'ls -la /home/user/mounted-data' });
+        const result = await devbox.cmd.exec('ls -la /home/user/mounted-data');
         expect(result.exitCode).toBe(0);
 
         // Read the mounted file
