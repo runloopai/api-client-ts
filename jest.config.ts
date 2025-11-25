@@ -6,7 +6,7 @@ const runBuiltPackageTest = process.env['RUN_BUILT_PACKAGE_TEST'] === '1';
 const config: JestConfigWithTsJest = {
   preset: 'ts-jest/presets/default-esm',
   testEnvironment: 'node',
-  testTimeout: (runSmoketests || runBuiltPackageTest) ? 300000 : 120000, // 5 minutes for smoke tests, 2 minutes for regular tests
+  testTimeout: runSmoketests || runBuiltPackageTest ? 300000 : 120000, // 5 minutes for smoke tests, 2 minutes for regular tests
   transform: {
     '^.+\\.(t|j)sx?$': ['@swc/jest', { sourceMaps: 'inline' }],
   },
@@ -29,7 +29,8 @@ const config: JestConfigWithTsJest = {
         '<rootDir>/tests/(?!smoketests).*', // Ignore all test files except those in smoketests/
         '<rootDir>/tests/smoketests/build-package.test.ts', // Exclude build-package test from regular smoke test runs
       ]
-    : runBuiltPackageTest ? [] // Don't ignore anything when running built-package test
+    : runBuiltPackageTest ?
+      [] // Don't ignore anything when running built-package test
     : ['<rootDir>/tests/smoketests/']), // Ignore smoke tests when running regular tests
   ],
   // Add display name for smoke tests to make it clearer in output
