@@ -285,10 +285,14 @@ export type Mount =
 export namespace Mount {
   export interface FileMountParameters {
     /**
-     * Map of file paths to file contents to be written before setup. Keys are absolute
-     * paths where files should be created, values are the file contents.
+     * Content of the file to mount.
      */
-    files: { [key: string]: string };
+    content: string;
+
+    /**
+     * Target path where the file should be mounted.
+     */
+    target: string;
 
     type: 'file_mount';
   }
@@ -321,6 +325,11 @@ export interface RunProfile {
    * Additional runtime LaunchParameters to apply after the devbox starts.
    */
   launchParameters?: LaunchParameters | null;
+
+  /**
+   * A list of mounts to be included in the scenario run.
+   */
+  mounts?: Array<Mount> | null;
 
   /**
    * Purpose of the run.

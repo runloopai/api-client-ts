@@ -26,6 +26,7 @@ describe('resource blueprints', () => {
       base_blueprint_id: 'base_blueprint_id',
       base_blueprint_name: 'base_blueprint_name',
       build_args: { foo: 'string' },
+      build_context: { object_id: 'object_id', type: 'object' },
       code_mounts: [
         {
           repo_name: 'repo_name',
@@ -255,6 +256,7 @@ describe('resource blueprints', () => {
       name: 'name',
       base_blueprint_name: 'base_blueprint_name',
       build_args: { foo: 'string' },
+      build_context: { object_id: 'object_id', type: 'object' },
       code_mounts: [
         {
           repo_name: 'repo_name',

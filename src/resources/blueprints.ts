@@ -319,6 +319,11 @@ export interface BlueprintBuildParameters {
   build_args?: { [key: string]: string } | null;
 
   /**
+   * A build context backed by an Object.
+   */
+  build_context?: BlueprintBuildParameters.BuildContext | null;
+
+  /**
    * A list of code mounts to be included in the Blueprint.
    */
   code_mounts?: Array<Shared.CodeMountParameters> | null;
@@ -365,6 +370,18 @@ export interface BlueprintBuildParameters {
 }
 
 export namespace BlueprintBuildParameters {
+  /**
+   * A build context backed by an Object.
+   */
+  export interface BuildContext {
+    /**
+     * The ID of an object, whose contents are to be used as a build context.
+     */
+    object_id: string;
+
+    type: 'object';
+  }
+
   export interface Service {
     /**
      * The image of the container service.
@@ -604,6 +621,11 @@ export interface BlueprintCreateParams {
   build_args?: { [key: string]: string } | null;
 
   /**
+   * A build context backed by an Object.
+   */
+  build_context?: BlueprintCreateParams.BuildContext | null;
+
+  /**
    * A list of code mounts to be included in the Blueprint.
    */
   code_mounts?: Array<Shared.CodeMountParameters> | null;
@@ -650,6 +672,18 @@ export interface BlueprintCreateParams {
 }
 
 export namespace BlueprintCreateParams {
+  /**
+   * A build context backed by an Object.
+   */
+  export interface BuildContext {
+    /**
+     * The ID of an object, whose contents are to be used as a build context.
+     */
+    object_id: string;
+
+    type: 'object';
+  }
+
   export interface Service {
     /**
      * The image of the container service.
@@ -782,6 +816,11 @@ export interface BlueprintPreviewParams {
   build_args?: { [key: string]: string } | null;
 
   /**
+   * A build context backed by an Object.
+   */
+  build_context?: BlueprintPreviewParams.BuildContext | null;
+
+  /**
    * A list of code mounts to be included in the Blueprint.
    */
   code_mounts?: Array<Shared.CodeMountParameters> | null;
@@ -828,6 +867,18 @@ export interface BlueprintPreviewParams {
 }
 
 export namespace BlueprintPreviewParams {
+  /**
+   * A build context backed by an Object.
+   */
+  export interface BuildContext {
+    /**
+     * The ID of an object, whose contents are to be used as a build context.
+     */
+    object_id: string;
+
+    type: 'object';
+  }
+
   export interface Service {
     /**
      * The image of the container service.
