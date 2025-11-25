@@ -1,6 +1,6 @@
 {
   "name": "@runloop/api-client",
-  "version": "0.68.0",
+  "version": "0.69.0",
   "description": "The official TypeScript library for the Runloop API",
   "author": "Runloop <support@runloop.ai>",
   "types": "dist/index.d.ts",
