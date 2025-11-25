@@ -6,10 +6,10 @@ import type {
   ObjectDownloadURLView,
   ObjectListParams,
 } from '../resources/objects';
+import { fetch } from '../_shims/index';
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import * as tar from 'tar';
-import fetch from 'node-fetch';
 
 // Extract the content type from the API types
 type ContentType = ObjectCreateParams['content_type'];

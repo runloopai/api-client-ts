@@ -597,6 +597,7 @@ export class StorageObjectOps {
 
 export declare namespace RunloopSDK {
   export {
+    RunloopSDK as Client,
     DevboxOps as DevboxOps,
     BlueprintOps as BlueprintOps,
     SnapshotOps as SnapshotOps,
