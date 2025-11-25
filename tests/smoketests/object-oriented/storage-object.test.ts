@@ -257,7 +257,7 @@ describe('smoketest: object-oriented storage object', () => {
         },
       });
       await tarStream.write(data);
-      const content = Buffer.concat(contentChunks);
+      const content = Buffer.concat(contentChunks as readonly Uint8Array[]);
       expect(content.toString('utf-8')).toBe('Hello from uploadFromDir!');
     } finally {
       await fs.unlink(contentPath).catch(() => {});

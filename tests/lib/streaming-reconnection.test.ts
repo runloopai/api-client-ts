@@ -1,3 +1,4 @@
+import { ReadableStream, ReadableStreamDefaultController } from 'stream/web';
 import { APIError } from '../../src/error';
 import { withStreamAutoReconnect } from '../../src/lib/streaming-reconnection';
 import { Stream } from '../../src/streaming';
@@ -37,7 +38,7 @@ function createStreamFactory(
     let lastDeliveredOffset = offset ?? 0;
 
     const readable = new ReadableStream<Uint8Array>({
-      async pull(controller) {
+      async pull(controller: ReadableStreamDefaultController<Uint8Array>) {
         const trigger = takeTrigger(lastDeliveredOffset);
         if (trigger) {
           controller.error(trigger.error ?? new Error('Synthetic failure'));
@@ -220,7 +221,7 @@ describe('withStreamAutoReconnect', () => {
         creatorCalls += 1;
         const abortController = new AbortController();
         const readable = new ReadableStream<Uint8Array>({
-          pull(controller) {
+          pull(controller: ReadableStreamDefaultController<Uint8Array>) {
             controller.error(error);
           },
           cancel() {
