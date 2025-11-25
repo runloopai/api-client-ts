@@ -1,0 +1,154 @@
+import {
+  RunloopSDK,
+  RunloopAPI,
+  Devbox,
+  Blueprint,
+  Snapshot,
+  StorageObject,
+  DevboxOps,
+  BlueprintOps,
+  SnapshotOps,
+  StorageObjectOps,
+  DevboxCmdOps,
+  DevboxFileOps,
+  DevboxNetOps,
+  Execution,
+  ExecutionResult,
+  type ExecuteStreamingCallbacks,
+} from '../../dist/sdk';
+import { THIRTY_SECOND_TIMEOUT } from './utils';
+
+describe('smoketest: built package import', () => {
+  let sdk: RunloopSDK;
+
+  beforeAll(() => {
+    // Initialize SDK from built package with environment variables
+    sdk = new RunloopSDK({
+      bearerToken: process.env['RUNLOOP_API_KEY'],
+      baseURL: process.env['RUNLOOP_BASE_URL'],
+      timeout: 120_000,
+      maxRetries: 1,
+    });
+  });
+
+  describe('RunloopSDK from built package', () => {
+    test('should create SDK instance from built package', () => {
+      expect(sdk).toBeDefined();
+      expect(sdk.devbox).toBeDefined();
+      expect(sdk.blueprint).toBeDefined();
+      expect(sdk.snapshot).toBeDefined();
+      expect(sdk.storageObject).toBeDefined();
+      expect(sdk.api).toBeDefined();
+    });
+
+    test('should provide access to legacy API', () => {
+      expect(sdk.api).toBeDefined();
+      expect(sdk.api.devboxes).toBeDefined();
+      expect(sdk.api.blueprints).toBeDefined();
+      expect(sdk.api.objects).toBeDefined();
+    });
+
+    test('should verify RunloopSDK namespace exports are available', () => {
+      // Test that namespace exports are accessible
+      // These are exported from the RunloopSDK namespace
+      expect(DevboxOps).toBeDefined();
+      expect(BlueprintOps).toBeDefined();
+      expect(SnapshotOps).toBeDefined();
+      expect(StorageObjectOps).toBeDefined();
+      expect(Devbox).toBeDefined();
+      expect(Blueprint).toBeDefined();
+      expect(Snapshot).toBeDefined();
+      expect(StorageObject).toBeDefined();
+    });
+
+    test('should verify additional SDK classes are available', () => {
+      expect(DevboxCmdOps).toBeDefined();
+      expect(DevboxFileOps).toBeDefined();
+      expect(DevboxNetOps).toBeDefined();
+      expect(Execution).toBeDefined();
+      expect(ExecutionResult).toBeDefined();
+    });
+
+    test('should verify types are available', () => {
+      // Type check - if this compiles, the type is available
+      const callback: ExecuteStreamingCallbacks = {
+        stdout: () => {},
+        stderr: () => {},
+        output: () => {},
+      };
+      expect(callback).toBeDefined();
+      expect(typeof callback.stdout).toBe('function');
+      expect(typeof callback.stderr).toBe('function');
+      expect(typeof callback.output).toBe('function');
+    });
+
+    test('should verify RunloopAPI namespace and nested resources', () => {
+      expect(RunloopAPI).toBeDefined();
+      expect(RunloopAPI.Devboxes).toBeDefined();
+      expect(RunloopAPI.Blueprints).toBeDefined();
+      expect(RunloopAPI.Objects).toBeDefined();
+      expect(RunloopAPI.Secrets).toBeDefined();
+      expect(RunloopAPI.Agents).toBeDefined();
+      expect(RunloopAPI.Benchmarks).toBeDefined();
+      expect(RunloopAPI.Scenarios).toBeDefined();
+      expect(RunloopAPI.Repositories).toBeDefined();
+    });
+
+    test(
+      'should list devboxes via API',
+      async () => {
+        const result = await sdk.api.devboxes.list({ limit: 10 });
+        expect(result).toBeDefined();
+        expect(Array.isArray(result.devboxes)).toBe(true);
+      },
+      THIRTY_SECOND_TIMEOUT,
+    );
+
+    test(
+      'should list blueprints via API',
+      async () => {
+        const result = await sdk.api.blueprints.list({ limit: 10 });
+        expect(result).toBeDefined();
+        expect(Array.isArray(result.blueprints)).toBe(true);
+      },
+      THIRTY_SECOND_TIMEOUT,
+    );
+
+    test(
+      'should list devboxes via SDK interface',
+      async () => {
+        const devboxes = await sdk.devbox.list({ limit: 10 });
+        expect(Array.isArray(devboxes)).toBe(true);
+      },
+      THIRTY_SECOND_TIMEOUT,
+    );
+
+    test(
+      'should list blueprints via SDK interface',
+      async () => {
+        const blueprints = await sdk.blueprint.list({ limit: 10 });
+        expect(Array.isArray(blueprints)).toBe(true);
+      },
+      THIRTY_SECOND_TIMEOUT,
+    );
+
+    test(
+      'should list snapshots via SDK interface',
+      async () => {
+        const snapshots = await sdk.snapshot.list({ limit: 10 });
+        expect(Array.isArray(snapshots)).toBe(true);
+      },
+      THIRTY_SECOND_TIMEOUT,
+    );
+
+    test(
+      'should list storage objects via SDK interface',
+      async () => {
+        const objects = await sdk.storageObject.list({ limit: 10 });
+        expect(Array.isArray(objects)).toBe(true);
+      },
+      THIRTY_SECOND_TIMEOUT,
+    );
+  });
+});
+
