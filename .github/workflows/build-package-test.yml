@@ -1,0 +1,29 @@
+name: Build Package Test
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build-package-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: runloopai/checkout@main
+
+      - name: Setup Node
+        uses: runloopai/setup-node@main
+        with:
+          node-version: '20'
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: yarn --frozen-lockfile
+
+      - name: Run build package test
+        run: yarn test:built-package
+
