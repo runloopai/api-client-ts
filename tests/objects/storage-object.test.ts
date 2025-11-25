@@ -4,8 +4,17 @@ import type { ObjectView, ObjectDownloadURLView } from '../../src/resources/obje
 // Mock the Runloop client
 jest.mock('../../src/index');
 
-// Mock fetch globally
-(global as any).fetch = jest.fn();
+// Mock node-fetch (used by shims in Node.js environment)
+// We'll get a reference to the mock in beforeEach
+jest.mock('node-fetch', () => {
+  const mockFn = jest.fn();
+  // Store on global so we can access it
+  (global as any).__nodeFetchMock = mockFn;
+  return {
+    default: mockFn,
+    __esModule: true,
+  };
+});
 
 // Mock fs and path modules
 jest.mock('node:fs/promises', () => ({
@@ -32,11 +41,17 @@ describe('StorageObject (New API)', () => {
   let mockObjectData: ObjectView;
   let mockFs: any;
   let mockPath: any;
+  let mockFetch: jest.Mock;
 
   beforeEach(() => {
     // Get mocked modules
     mockFs = require('node:fs/promises');
     mockPath = require('node:path');
+    
+    // Get the mocked fetch function from node-fetch
+    const nodeFetch = require('node-fetch');
+    mockFetch = nodeFetch.default;
+    (global as any).fetch = mockFetch;
 
     // Create mock client instance with proper structure
     mockClient = {
@@ -93,7 +108,7 @@ describe('StorageObject (New API)', () => {
     };
 
     // Reset fetch mock
-    ((global as any).fetch as jest.Mock).mockReset();
+    mockFetch.mockReset();
   });
 
   describe('create', () => {
@@ -234,11 +249,11 @@ describe('StorageObject (New API)', () => {
           statusText: 'OK',
         };
 
-        ((global as any).fetch as jest.Mock).mockResolvedValue(mockFetchResponse);
+        mockFetch.mockResolvedValue(mockFetchResponse);
 
         await storageObject.uploadContent('Hello, World!');
 
-        expect((global as any).fetch).toHaveBeenCalledWith(mockObjectData.upload_url, {
+        expect(mockFetch).toHaveBeenCalledWith(mockObjectData.upload_url, {
           method: 'PUT',
           body: Buffer.from('Hello, World!', 'utf-8'),
         });
@@ -254,12 +269,12 @@ describe('StorageObject (New API)', () => {
           statusText: 'OK',
         };
 
-        ((global as any).fetch as jest.Mock).mockResolvedValue(mockFetchResponse);
+        mockFetch.mockResolvedValue(mockFetchResponse);
 
         const buffer = Buffer.from([0x89, 0x50, 0x4e, 0x47]);
         await storageObject.uploadContent(buffer);
 
-        expect((global as any).fetch).toHaveBeenCalledWith(mockObjectData.upload_url, {
+        expect(mockFetch).toHaveBeenCalledWith(mockObjectData.upload_url, {
           method: 'PUT',
           body: buffer,
         });
@@ -284,7 +299,7 @@ describe('StorageObject (New API)', () => {
           text: jest.fn().mockResolvedValue('Forbidden'),
         };
 
-        ((global as any).fetch as jest.Mock).mockResolvedValue(mockFetchResponse);
+        mockFetch.mockResolvedValue(mockFetchResponse);
 
         await expect(storageObject.uploadContent('test')).rejects.toThrow('Upload failed: 403');
       });
@@ -355,11 +370,11 @@ describe('StorageObject (New API)', () => {
           text: jest.fn().mockResolvedValue('File contents'),
         };
 
-        ((global as any).fetch as jest.Mock).mockResolvedValue(mockFetchResponse);
+        mockFetch.mockResolvedValue(mockFetchResponse);
 
         const content = await storageObject.downloadAsText();
 
-        expect((global as any).fetch).toHaveBeenCalledWith(mockDownloadUrl.download_url);
+        expect(mockFetch).toHaveBeenCalledWith(mockDownloadUrl.download_url);
         expect(content).toBe('File contents');
       });
 
@@ -376,7 +391,7 @@ describe('StorageObject (New API)', () => {
           statusText: 'Not Found',
         };
 
-        ((global as any).fetch as jest.Mock).mockResolvedValue(mockFetchResponse);
+        mockFetch.mockResolvedValue(mockFetchResponse);
 
         await expect(storageObject.downloadAsText()).rejects.toThrow('Download failed: 404 Not Found');
       });
@@ -396,11 +411,11 @@ describe('StorageObject (New API)', () => {
           arrayBuffer: jest.fn().mockResolvedValue(mockArrayBuffer),
         };
 
-        ((global as any).fetch as jest.Mock).mockResolvedValue(mockFetchResponse);
+        mockFetch.mockResolvedValue(mockFetchResponse);
 
         const buffer = await storageObject.downloadAsBuffer();
 
-        expect((global as any).fetch).toHaveBeenCalledWith(mockDownloadUrl.download_url);
+        expect(mockFetch).toHaveBeenCalledWith(mockDownloadUrl.download_url);
         expect(Buffer.isBuffer(buffer)).toBe(true);
         expect(buffer.length).toBe(4);
       });
@@ -435,7 +450,7 @@ describe('StorageObject (New API)', () => {
 
       // Upload - mock getInfo for uploadContent
       mockClient.objects.retrieve.mockResolvedValue(mockObjectData);
-      ((global as any).fetch as jest.Mock).mockResolvedValue({ ok: true });
+      mockFetch.mockResolvedValue({ ok: true });
       await obj.uploadContent('Test content');
 
       // Complete
@@ -448,7 +463,7 @@ describe('StorageObject (New API)', () => {
         download_url: 'https://s3.example.com/download/workflow-test.txt',
       };
       mockClient.objects.download.mockResolvedValue(mockDownloadUrl);
-      ((global as any).fetch as jest.Mock).mockResolvedValue({
+      mockFetch.mockResolvedValue({
         ok: true,
         text: jest.fn().mockResolvedValue('Test content'),
       });
@@ -463,7 +478,7 @@ describe('StorageObject (New API)', () => {
       // Clear all mocks
       jest.clearAllMocks();
       // Reset global fetch mock
-      ((global as any).fetch as jest.Mock).mockClear();
+      mockFetch.mockClear();
     });
 
     it('should upload a text file with auto-detected content-type', async () => {
@@ -479,7 +494,7 @@ describe('StorageObject (New API)', () => {
       mockClient.objects.retrieve.mockResolvedValue(mockObjectInfo);
       mockClient.objects.complete.mockResolvedValue(mockCompletedData);
 
-      ((global as any).fetch as jest.Mock).mockResolvedValue({
+      mockFetch.mockResolvedValue({
         ok: true,
         status: 200,
         statusText: 'OK',
@@ -509,7 +524,7 @@ describe('StorageObject (New API)', () => {
       mockClient.objects.retrieve.mockResolvedValue(mockObjectInfo);
       mockClient.objects.complete.mockResolvedValue(mockCompletedData);
 
-      ((global as any).fetch as jest.Mock).mockResolvedValue({
+      mockFetch.mockResolvedValue({
         ok: true,
         status: 200,
         statusText: 'OK',
@@ -559,7 +574,7 @@ describe('StorageObject (New API)', () => {
       mockClient.objects.create.mockResolvedValue(mockObjectData);
       mockClient.objects.retrieve.mockResolvedValue(mockObjectInfo);
 
-      ((global as any).fetch as jest.Mock).mockResolvedValue({
+      mockFetch.mockResolvedValue({
         ok: false,
         status: 500,
         statusText: 'Internal Server Error',
@@ -583,7 +598,7 @@ describe('StorageObject (New API)', () => {
       mockClient.objects.retrieve.mockResolvedValue(mockObjectInfo);
       mockClient.objects.complete.mockResolvedValue(mockCompletedData);
 
-      ((global as any).fetch as jest.Mock).mockResolvedValue({
+      mockFetch.mockResolvedValue({
         ok: true,
         status: 200,
         statusText: 'OK',
@@ -610,7 +625,7 @@ describe('StorageObject (New API)', () => {
       // Clear all mocks
       jest.clearAllMocks();
       // Reset global fetch mock
-      ((global as any).fetch as jest.Mock).mockClear();
+      mockFetch.mockClear();
     });
 
     it('should upload text content with text content-type', async () => {
@@ -623,7 +638,7 @@ describe('StorageObject (New API)', () => {
       mockClient.objects.retrieve.mockResolvedValue(mockObjectInfo);
       mockClient.objects.complete.mockResolvedValue(mockCompletedData);
 
-      ((global as any).fetch as jest.Mock).mockResolvedValue({
+      mockFetch.mockResolvedValue({
         ok: true,
         status: 200,
         statusText: 'OK',
@@ -636,7 +651,7 @@ describe('StorageObject (New API)', () => {
         undefined,
       );
       // uploadFromText uses Blob for fetch body
-      const fetchCalls = ((global as any).fetch as jest.Mock).mock.calls;
+      const fetchCalls = mockFetch.mock.calls;
       expect(fetchCalls[0][0]).toBe('https://upload.example.com/text');
       expect(fetchCalls[0][1].method).toBe('PUT');
       expect(fetchCalls[0][1].body).toBeInstanceOf(Blob);
@@ -654,7 +669,7 @@ describe('StorageObject (New API)', () => {
       mockClient.objects.retrieve.mockResolvedValue(mockObjectInfo);
       mockClient.objects.complete.mockResolvedValue(mockCompletedData);
 
-      ((global as any).fetch as jest.Mock).mockResolvedValue({
+      mockFetch.mockResolvedValue({
         ok: true,
         status: 200,
         statusText: 'OK',
@@ -679,7 +694,7 @@ describe('StorageObject (New API)', () => {
       mockClient.objects.create.mockResolvedValue(mockObjectData);
       mockClient.objects.retrieve.mockResolvedValue(mockObjectInfo);
 
-      ((global as any).fetch as jest.Mock).mockResolvedValue({
+      mockFetch.mockResolvedValue({
         ok: false,
         status: 403,
         statusText: 'Forbidden',
@@ -700,7 +715,7 @@ describe('StorageObject (New API)', () => {
       mockClient.objects.retrieve.mockResolvedValue(mockObjectInfo);
       mockClient.objects.complete.mockResolvedValue(mockCompletedData);
 
-      ((global as any).fetch as jest.Mock).mockResolvedValue({
+      mockFetch.mockResolvedValue({
         ok: true,
         status: 200,
         statusText: 'OK',
@@ -721,7 +736,7 @@ describe('StorageObject (New API)', () => {
       // Clear all mocks
       jest.clearAllMocks();
       // Reset global fetch mock
-      ((global as any).fetch as jest.Mock).mockClear();
+      mockFetch.mockClear();
     });
 
     it('should upload buffer with specified content-type and name', async () => {
@@ -734,7 +749,7 @@ describe('StorageObject (New API)', () => {
       mockClient.objects.retrieve.mockResolvedValue(mockObjectInfo);
       mockClient.objects.complete.mockResolvedValue(mockCompletedData);
 
-      ((global as any).fetch as jest.Mock).mockResolvedValue({
+      mockFetch.mockResolvedValue({
         ok: true,
         status: 200,
         statusText: 'OK',
@@ -749,7 +764,7 @@ describe('StorageObject (New API)', () => {
         { metadata: { source: 'buffer' } },
       );
       // uploadFromBuffer uses Blob for fetch body
-      const fetchCalls = ((global as any).fetch as jest.Mock).mock.calls;
+      const fetchCalls = mockFetch.mock.calls;
       expect(fetchCalls[0][0]).toBe('https://upload.example.com/buffer');
       expect(fetchCalls[0][1].method).toBe('PUT');
       expect(fetchCalls[0][1].body).toBeInstanceOf(Blob);
@@ -779,7 +794,7 @@ describe('StorageObject (New API)', () => {
       mockClient.objects.create.mockResolvedValue(mockObjectData);
       mockClient.objects.retrieve.mockResolvedValue(mockObjectInfo);
 
-      ((global as any).fetch as jest.Mock).mockResolvedValue({
+      mockFetch.mockResolvedValue({
         ok: false,
         status: 403,
         statusText: 'Forbidden',
@@ -800,7 +815,7 @@ describe('StorageObject (New API)', () => {
       mockClient.objects.retrieve.mockResolvedValue(mockObjectInfo);
       mockClient.objects.complete.mockResolvedValue(mockCompletedData);
 
-      ((global as any).fetch as jest.Mock).mockResolvedValue({
+      mockFetch.mockResolvedValue({
         ok: true,
         status: 200,
         statusText: 'OK',
@@ -823,7 +838,7 @@ describe('StorageObject (New API)', () => {
       // Clear all mocks
       jest.clearAllMocks();
       // Reset global fetch mock
-      ((global as any).fetch as jest.Mock).mockClear();
+      mockFetch.mockClear();
       // Get tar mock
       mockTar = require('tar');
     });
@@ -848,7 +863,7 @@ describe('StorageObject (New API)', () => {
       mockClient.objects.retrieve.mockResolvedValue(mockObjectInfo);
       mockClient.objects.complete.mockResolvedValue(mockCompletedData);
 
-      ((global as any).fetch as jest.Mock).mockResolvedValue({
+      mockFetch.mockResolvedValue({
         ok: true,
         status: 200,
         statusText: 'OK',
@@ -885,7 +900,7 @@ describe('StorageObject (New API)', () => {
       mockClient.objects.create.mockResolvedValue(mockObjectData);
       mockClient.objects.complete.mockResolvedValue(mockCompletedData);
 
-      ((global as any).fetch as jest.Mock).mockResolvedValue({
+      mockFetch.mockResolvedValue({
         ok: true,
         status: 200,
         statusText: 'OK',
@@ -944,7 +959,7 @@ describe('StorageObject (New API)', () => {
       const mockObjectData = { id: 'dir-999', upload_url: 'https://upload.example.com/dir' };
       mockClient.objects.create.mockResolvedValue(mockObjectData);
 
-      ((global as any).fetch as jest.Mock).mockResolvedValue({
+      mockFetch.mockResolvedValue({
         ok: false,
         status: 500,
         statusText: 'Internal Server Error',
