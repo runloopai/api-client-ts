@@ -162,9 +162,9 @@ export class DevboxOps {
    * const runloop = new RunloopSDK();
    * const devbox = await runloop.devbox.create({ name: 'my-devbox' });
    *
- * devbox.cmd.exec('echo "Hello, World!"');
- * ...
- * ```
+   * devbox.cmd.exec('echo "Hello, World!"');
+   * ...
+   * ```
    *
    * @param {DevboxCreateParams} [params] - Parameters for creating the devbox.
    * @param {Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxView>> }} [options] - Request options including polling configuration.
