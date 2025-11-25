@@ -246,7 +246,7 @@ export interface ClientOptions {
  * import { RunloopSDK } from '@runloop/api-client';
  * const runloop = new RunloopSDK();
  * const devbox = await runloop.devbox.create();
- * const result = await devbox.cmd.exec({ command: 'echo "Hello, World!"' });
+ * const result = await devbox.cmd.exec('echo "Hello, World!"');
  * console.log(result.exitCode);
  * ```
  */

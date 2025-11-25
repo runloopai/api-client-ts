@@ -23,8 +23,7 @@ import { ExecutionResult } from './execution-result';
  * const devbox = runloop.devbox.fromId('devbox-123');
  *
  * // Start async execution with streaming
- * const execution = await devbox.cmd.execAsync({
- *   command: 'npx http-server -p 8080',
+ * const execution = await devbox.cmd.execAsync('npx http-server -p 8080', {
  *   stdout: (line) => console.log(`[LOG] ${line}`),
  *   stderr: (line) => console.error(`[ERROR] ${line}`),
  * });
@@ -86,7 +85,7 @@ export class Execution {
    * ```typescript
    * const runloop = new RunloopSDK();
    * const devbox = runloop.devbox.fromId('devbox-123');
-   * const execution = await devbox.cmd.execAsync({ command: 'npm install' });
+   * const execution = await devbox.cmd.execAsync('npm install');
    *
    * // Other work while command runs...
    *
@@ -133,7 +132,7 @@ export class Execution {
    *
    * @example
    * ```typescript
-   * const execution = await devbox.cmd.execAsync({ command: 'npx http-server -p 8080' });
+   * const execution = await devbox.cmd.execAsync('npx http-server -p 8080');
    * const state = await execution.getState();
    * console.log(`Status: ${state.status}`);
    * ```
