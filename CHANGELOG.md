@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.69.1 (2025-11-25)
+
+Full Changelog: [v0.69.0...v0.69.1](https://github.com/runloopai/api-client-ts/compare/v0.69.0...v0.69.1)
+
 ## 0.69.0 (2025-11-25)
 
 Full Changelog: [v0.68.0...v0.69.0](https://github.com/runloopai/api-client-ts/compare/v0.68.0...v0.69.0)
