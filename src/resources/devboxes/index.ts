@@ -28,6 +28,7 @@ export {
   type DevboxView,
   type DevboxCreateSSHKeyResponse,
   type DevboxDeleteDiskSnapshotResponse,
+  type DevboxKeepAliveResponse,
   type DevboxReadFileContentsResponse,
   type DevboxRemoveTunnelResponse,
   type DevboxUploadFileResponse,
