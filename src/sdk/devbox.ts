@@ -20,6 +20,7 @@ import { PollingOptions } from '../lib/polling';
 import { Snapshot } from './snapshot';
 import { Execution } from './execution';
 import { ExecutionResult } from './execution-result';
+import { uuidv7 } from 'uuidv7';
 
 // Re-export Execution and ExecutionResult for Devbox namespace
 export { Execution } from './execution';
@@ -261,10 +262,12 @@ export class DevboxCmdOps {
  * Named shell operations for a devbox.
  * Provides methods for executing commands in a persistent, stateful shell session.
  *
- * Use {@link Devbox.shell} to create a named shell instance.
+ * Use {@link Devbox.shell} to create a named shell instance. If you use the same shell name,
+ * it will re-attach to the existing named shell, preserving its state (environment variables,
+ * current working directory, etc.).
  *
  * Named shells are stateful and maintain environment variables and the current working directory (CWD)
- * across commands, just like a real shell on your local computer. Commands executed through the same
+ * across commands. Commands executed through the same
  * named shell instance will execute sequentially - the shell can only run one command at a time with
  * automatic queuing. This ensures that environment changes and directory changes from one command
  * are preserved for the next command.
@@ -286,15 +289,8 @@ export class DevboxNamedShell {
    * @private
    */
   constructor(
-    private client: Runloop,
-    private devboxId: string,
+    private devbox: Devbox,
     private shellName: string,
-    private startStreamingWithCallbacks: (
-      executionId: string,
-      stdout?: (line: string) => void,
-      stderr?: (line: string) => void,
-      output?: (line: string) => void,
-    ) => Promise<void>,
   ) {}
 
   /**
@@ -338,40 +334,7 @@ export class DevboxNamedShell {
     params?: Omit<Omit<DevboxExecuteParams, 'command'>, 'shell_name'> & ExecuteStreamingCallbacks,
     options?: Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxAsyncExecutionDetailView>> },
   ): Promise<ExecutionResult> {
-    const fullParams = { ...params, command, shell_name: this.shellName };
-    const hasCallbacks = fullParams.stdout || fullParams.stderr || fullParams.output;
-
-    if (hasCallbacks) {
-      // With callbacks: use async execution workflow to enable streaming
-      const { stdout, stderr, output, ...executeParams } = fullParams;
-      const execution = await this.client.devboxes.executeAsync(this.devboxId, executeParams, options);
-
-      // Start streaming and await both completion and streaming
-      const streamingPromise = this.startStreamingWithCallbacks(
-        execution.execution_id,
-        stdout,
-        stderr,
-        output,
-      );
-
-      // Wait for both command completion and streaming to finish (using allSettled for robustness)
-      const results = await Promise.allSettled([
-        this.client.devboxes.executions.awaitCompleted(this.devboxId, execution.execution_id, options),
-        streamingPromise,
-      ]);
-
-      // Extract command result (throw if it failed, ignore streaming errors)
-      if (results[0].status === 'rejected') {
-        throw results[0].reason;
-      }
-      const result = results[0].value;
-
-      return new ExecutionResult(this.client, this.devboxId, execution.execution_id, result);
-    } else {
-      // Without callbacks: use existing optimized workflow
-      const result = await this.client.devboxes.executeAndAwaitCompletion(this.devboxId, fullParams, options);
-      return new ExecutionResult(this.client, this.devboxId, result.execution_id, result);
-    }
+    return this.devbox.cmd.exec(command, { ...params, shell_name: this.shellName }, options);
   }
 
   /**
@@ -413,18 +376,7 @@ export class DevboxNamedShell {
     params?: Omit<Omit<DevboxExecuteAsyncParams, 'command'>, 'shell_name'> & ExecuteStreamingCallbacks,
     options?: Core.RequestOptions,
   ): Promise<Execution> {
-    const fullParams = { ...params, command, shell_name: this.shellName };
-    const { stdout, stderr, output, ...executeParams } = fullParams;
-    const execution = await this.client.devboxes.executeAsync(this.devboxId, executeParams, options);
-
-    // Start streaming in background if callbacks provided
-    let streamingPromise: Promise<void> | undefined;
-    if (stdout || stderr || output) {
-      // Start streaming - will be awaited when result() is called
-      streamingPromise = this.startStreamingWithCallbacks(execution.execution_id, stdout, stderr, output);
-    }
-
-    return new Execution(this.client, this.devboxId, execution.execution_id, execution, streamingPromise);
+    return this.devbox.cmd.execAsync(command, { ...params, shell_name: this.shellName }, options);
   }
 }
 
@@ -723,8 +675,11 @@ export class Devbox {
    *
    * @example
    * ```typescript
-   * // Create a named shell
+   * // Create a named shell with a custom name
    * const shell = devbox.shell('my-session');
+   *
+   * // Create a named shell with an auto-generated UUID name
+   * const shell2 = devbox.shell();
    *
    * // Commands execute sequentially and share state
    * await shell.exec('cd /app');
@@ -733,16 +688,11 @@ export class Devbox {
    * await shell.exec('pwd'); // Will output '/app' because CWD is preserved
    * ```
    *
-   * @param {string} shellName - The name of the persistent shell session
+   * @param {string} [shellName] - The name of the persistent shell session. If not provided, a UUID will be generated automatically.
    * @returns {DevboxNamedShell} A {@link DevboxNamedShell} instance for executing commands in the named shell
    */
-  shell(shellName: string): DevboxNamedShell {
-    return new DevboxNamedShell(
-      this.client,
-      this._id,
-      shellName,
-      this.startStreamingWithCallbacks.bind(this),
-    );
+  shell(shellName: string = uuidv7()): DevboxNamedShell {
+    return new DevboxNamedShell(this, shellName);
   }
 
   /**
