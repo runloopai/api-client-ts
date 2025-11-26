@@ -797,5 +797,95 @@ describe('smoketest: object-oriented devbox', () => {
       expect(output2).toContain('shell2-value');
       expect(output2).toContain('/home');
     });
+
+    test('shell.exec - with additional params passed through', async () => {
+      expect(devbox).toBeDefined();
+      const shell = devbox.shell('test-shell-params');
+
+      // Test that additional params (like working_dir) are passed through correctly
+      // Note: shell_name should override any shell_name in params
+      const result = await shell.exec('pwd', {
+        working_dir: '/tmp',
+      });
+
+      expect(result.exitCode).toBe(0);
+      const output = (await result.stdout()).trim();
+      // Should be in /tmp due to working_dir param
+      expect(output).toBe('/tmp');
+    });
+
+    test('shell.execAsync - with additional params passed through', async () => {
+      expect(devbox).toBeDefined();
+      const shell = devbox.shell('test-shell-async-params');
+
+      // Test that additional params are passed through correctly
+      const execution = await shell.execAsync('pwd', {
+        working_dir: '/home',
+      });
+
+      const result = await execution.result();
+      expect(result.exitCode).toBe(0);
+      const output = (await result.stdout()).trim();
+      // Should be in /home due to working_dir param
+      expect(output).toBe('/home');
+    });
+
+    test('shell.exec - with stderr streaming callback', async () => {
+      expect(devbox).toBeDefined();
+      const shell = devbox.shell('test-shell-stderr');
+      const stderrLines: string[] = [];
+
+      const result = await shell.exec('echo "error output" >&2', {
+        stderr: (line) => {
+          stderrLines.push(line);
+        },
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.exitCode).toBe(0);
+      expect(stderrLines.length).toBeGreaterThan(0);
+      const stderrCombined = stderrLines.join('');
+      expect(stderrCombined).toContain('error output');
+      // Verify streaming captured same data as result
+      expect(stderrCombined).toBe(await result.stderr());
+    });
+
+    test('shell.execAsync - with both stdout and stderr streaming callbacks', async () => {
+      expect(devbox).toBeDefined();
+      const shell = devbox.shell('test-shell-both-streams');
+      const stdoutLines: string[] = [];
+      const stderrLines: string[] = [];
+
+      const execution = await shell.execAsync('echo "to stdout" && echo "to stderr" >&2', {
+        stdout: (line) => stdoutLines.push(line),
+        stderr: (line) => stderrLines.push(line),
+      });
+
+      const result = await execution.result();
+      expect(result.success).toBe(true);
+      expect(result.exitCode).toBe(0);
+
+      const stdoutCombined = stdoutLines.join('');
+      const stderrCombined = stderrLines.join('');
+
+      expect(stdoutCombined).toContain('to stdout');
+      expect(stderrCombined).toContain('to stderr');
+
+      // Verify streaming captured same data as result
+      expect(stdoutCombined).toBe(await result.stdout());
+      expect(stderrCombined).toBe(await result.stderr());
+    });
+
+    test('shell - auto-generated shell name', async () => {
+      expect(devbox).toBeDefined();
+      // Create shell without providing a name - should auto-generate UUID
+      const shell = devbox.shell();
+      expect(shell).toBeDefined();
+
+      const result = await shell.exec('echo "test"');
+      expect(result.exitCode).toBe(0);
+      const output = await result.stdout();
+      expect(output).toContain('test');
+    });
   });
 });
