@@ -86,6 +86,15 @@ export class ExecutionResult {
   }
 
   /**
+   * Get the unique ID identifying this execution.
+   *
+   * @returns string A UUIDv7 execution ID
+   */
+  get executionId(): string {
+    return this._executionId;
+  }
+
+  /**
    * Helper to get last N lines, filtering out trailing empty strings.
    *
    * @private

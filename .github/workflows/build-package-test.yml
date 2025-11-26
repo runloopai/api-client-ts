@@ -26,4 +26,3 @@ jobs:
 
       - name: Run build package test
         run: yarn test:built-package
-

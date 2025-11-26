@@ -167,13 +167,13 @@ export class DevboxCmdOps {
    * ```
    *
    * @param {string} command - The command to execute
-   * @param {Omit<DevboxExecuteParams, 'command'> & ExecuteStreamingCallbacks} [params] - Optional parameters including shell name and callbacks
+   * @param {Omit<DevboxExecuteParams, 'command' | 'command_id'> & ExecuteStreamingCallbacks} [params] - Optional parameters including shell name and callbacks
    * @param {Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxAsyncExecutionDetailView>> }} [options] - Request options with optional polling configuration
    * @returns {Promise<ExecutionResult>} {@link ExecutionResult} with stdout, stderr, and exit status
    */
   async exec(
     command: string,
-    params?: Omit<DevboxExecuteParams, 'command'> & ExecuteStreamingCallbacks,
+    params?: Omit<DevboxExecuteParams, 'command' | 'command_id'> & ExecuteStreamingCallbacks,
     options?: Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxAsyncExecutionDetailView>> },
   ): Promise<ExecutionResult> {
     const fullParams = { ...params, command };
@@ -325,13 +325,13 @@ export class DevboxNamedShell {
    * ```
    *
    * @param {string} command - The command to execute
-   * @param {Omit<Omit<DevboxExecuteParams, 'command'>, 'shell_name'> & ExecuteStreamingCallbacks} [params] - Optional parameters (shell_name is automatically set)
+   * @param {Omit<DevboxExecuteParams, 'command' | 'command_id' | 'shell_name'> & ExecuteStreamingCallbacks} [params] - Optional parameters (shell_name is automatically set)
    * @param {Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxAsyncExecutionDetailView>> }} [options] - Request options with optional polling configuration
    * @returns {Promise<ExecutionResult>} {@link ExecutionResult} with stdout, stderr, and exit status
    */
   async exec(
     command: string,
-    params?: Omit<Omit<DevboxExecuteParams, 'command'>, 'shell_name'> & ExecuteStreamingCallbacks,
+    params?: Omit<DevboxExecuteParams, 'command' | 'command_id' | 'shell_name'> & ExecuteStreamingCallbacks,
     options?: Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxAsyncExecutionDetailView>> },
   ): Promise<ExecutionResult> {
     return this.devbox.cmd.exec(command, { ...params, shell_name: this.shellName }, options);
@@ -367,13 +367,13 @@ export class DevboxNamedShell {
    * ```
    *
    * @param {string} command - The command to execute
-   * @param {Omit<Omit<DevboxExecuteAsyncParams, 'command'>, 'shell_name'> & ExecuteStreamingCallbacks} [params] - Optional parameters (shell_name is automatically set)
+   * @param {Omit<DevboxExecuteAsyncParams, 'command' | 'shell_name'> & ExecuteStreamingCallbacks} [params] - Optional parameters (shell_name is automatically set)
    * @param {Core.RequestOptions} [options] - Request options
    * @returns {Promise<Execution>} {@link Execution} object for tracking and controlling the command
    */
   async execAsync(
     command: string,
-    params?: Omit<Omit<DevboxExecuteAsyncParams, 'command'>, 'shell_name'> & ExecuteStreamingCallbacks,
+    params?: Omit<DevboxExecuteAsyncParams, 'command' | 'shell_name'> & ExecuteStreamingCallbacks,
     options?: Core.RequestOptions,
   ): Promise<Execution> {
     return this.devbox.cmd.execAsync(command, { ...params, shell_name: this.shellName }, options);
