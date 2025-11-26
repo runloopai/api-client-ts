@@ -1,6 +1,7 @@
 import { Blueprint } from '../../src/sdk/blueprint';
 import { Devbox } from '../../src/sdk/devbox';
 import type { BlueprintView, BlueprintBuildLogsListView } from '../../src/resources/blueprints';
+import { StorageObject } from '@runloop/api-client/sdk';
 
 // Mock the Runloop client
 jest.mock('../../src/index');
@@ -120,6 +121,29 @@ describe('Blueprint (New API)', () => {
           name: 'complex-blueprint',
           dockerfile: 'FROM ubuntu:22.04\nRUN apt-get update',
           system_setup_commands: ['npm install'],
+          metadata: { version: '1.0' },
+        },
+        undefined,
+      );
+    });
+
+    it('should support convenience object build_context blueprint configuration', async () => {
+      mockClient.blueprints.createAndAwaitBuildCompleted.mockResolvedValue(mockBlueprintData);
+
+      const obj = StorageObject.fromId(mockClient, 'obj_foo');
+
+      await Blueprint.create(mockClient, {
+        name: 'build-context-object-blueprint',
+        dockerfile: 'FROM ubuntu:22.04',
+        build_context: obj,
+        metadata: { version: '1.0' },
+      });
+
+      expect(mockClient.blueprints.createAndAwaitBuildCompleted).toHaveBeenCalledWith(
+        {
+          name: 'build-context-object-blueprint',
+          dockerfile: 'FROM ubuntu:22.04',
+          build_context: { type: 'object', object_id: 'obj_foo' },
           metadata: { version: '1.0' },
         },
         undefined,

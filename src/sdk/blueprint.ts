@@ -8,10 +8,18 @@ import type {
 import type { DevboxCreateParams, DevboxView } from '../resources/devboxes/devboxes';
 import type { PollingOptions } from '../lib/polling';
 import { Devbox } from './devbox';
+import { StorageObject } from './storage-object';
+
+export type CreateParams = Omit<BlueprintCreateParams, 'build_context'> & {
+  /**
+   * A build context to attach to the Blueprint build.
+   * Enables the use of `COPY` Dockerfile directives.
+   */
+  build_context?: StorageObject | BlueprintCreateParams.BuildContext | null;
+};
 
 /**
  * Object-oriented interface for working with Blueprints.
- * ```
  */
 export class Blueprint {
   private client: Runloop;
@@ -30,18 +38,25 @@ export class Blueprint {
    * @private
    *
    * @param {Runloop} client - The Runloop client instance
-   * @param {BlueprintCreateParams} params - Parameters for creating the blueprint
+   * @param {CreateParams} params - Parameters for creating the blueprint
    * @param {Core.RequestOptions & { polling?: Partial<PollingOptions<BlueprintView>> }} [options] - Request options with optional polling configuration
    * @returns {Promise<Blueprint>} A {@link Blueprint} instance with completed build
    */
   static async create(
     client: Runloop,
-    params: BlueprintCreateParams,
+    params: CreateParams,
     options?: Core.RequestOptions & {
       polling?: Partial<PollingOptions<BlueprintView>>;
     },
   ): Promise<Blueprint> {
-    const blueprintData = await client.blueprints.createAndAwaitBuildCompleted(params, options);
+    let rawParams = { ...params };
+    if (params.build_context instanceof StorageObject) {
+      rawParams.build_context = { type: 'object', object_id: params.build_context.id };
+    }
+    const blueprintData = await client.blueprints.createAndAwaitBuildCompleted(
+      rawParams as BlueprintCreateParams,
+      options,
+    );
     return new Blueprint(client, blueprintData.id);
   }
 
