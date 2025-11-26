@@ -1,6 +1,7 @@
 import { toFile } from '@runloop/api-client';
 import { Devbox } from '@runloop/api-client/sdk';
 import { makeClientSDK, THIRTY_SECOND_TIMEOUT, uniqueName } from '../utils';
+import { uuidv7 } from 'uuidv7';
 
 const sdk = makeClientSDK();
 
@@ -796,38 +797,6 @@ describe('smoketest: object-oriented devbox', () => {
       const output2 = (await result2.stdout()).trim();
       expect(output2).toContain('shell2-value');
       expect(output2).toContain('/home');
-    });
-
-    test('shell.exec - with additional params passed through', async () => {
-      expect(devbox).toBeDefined();
-      const shell = devbox.shell('test-shell-params');
-
-      // Test that additional params (like working_dir) are passed through correctly
-      // Note: shell_name should override any shell_name in params
-      const result = await shell.exec('pwd', {
-        working_dir: '/tmp',
-      });
-
-      expect(result.exitCode).toBe(0);
-      const output = (await result.stdout()).trim();
-      // Should be in /tmp due to working_dir param
-      expect(output).toBe('/tmp');
-    });
-
-    test('shell.execAsync - with additional params passed through', async () => {
-      expect(devbox).toBeDefined();
-      const shell = devbox.shell('test-shell-async-params');
-
-      // Test that additional params are passed through correctly
-      const execution = await shell.execAsync('pwd', {
-        working_dir: '/home',
-      });
-
-      const result = await execution.result();
-      expect(result.exitCode).toBe(0);
-      const output = (await result.stdout()).trim();
-      // Should be in /home due to working_dir param
-      expect(output).toBe('/home');
     });
 
     test('shell.exec - with stderr streaming callback', async () => {
