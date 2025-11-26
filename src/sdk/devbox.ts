@@ -20,6 +20,7 @@ import { PollingOptions } from '../lib/polling';
 import { Snapshot } from './snapshot';
 import { Execution } from './execution';
 import { ExecutionResult } from './execution-result';
+import { uuidv7 } from 'uuidv7';
 
 // Re-export Execution and ExecutionResult for Devbox namespace
 export { Execution } from './execution';
@@ -254,6 +255,128 @@ export class DevboxCmdOps {
     }
 
     return new Execution(this.client, this.devboxId, execution.execution_id, execution, streamingPromise);
+  }
+}
+
+/**
+ * Named shell operations for a devbox.
+ * Provides methods for executing commands in a persistent, stateful shell session.
+ *
+ * Use {@link Devbox.shell} to create a named shell instance. If you use the same shell name,
+ * it will re-attach to the existing named shell, preserving its state (environment variables,
+ * current working directory, etc.).
+ *
+ * Named shells are stateful and maintain environment variables and the current working directory (CWD)
+ * across commands. Commands executed through the same
+ * named shell instance will execute sequentially - the shell can only run one command at a time with
+ * automatic queuing. This ensures that environment changes and directory changes from one command
+ * are preserved for the next command.
+ *
+ * @example
+ * ```typescript
+ * // Create a named shell
+ * const shell = devbox.shell('my-session');
+ *
+ * // Commands execute sequentially and share state
+ * await shell.exec('cd /app');
+ * await shell.exec('export MY_VAR=value');
+ * await shell.exec('echo $MY_VAR'); // Will output 'value' because env is preserved
+ * await shell.exec('pwd'); // Will output '/app' because CWD is preserved
+ * ```
+ */
+export class DevboxNamedShell {
+  /**
+   * @private
+   */
+  constructor(
+    private devbox: Devbox,
+    private shellName: string,
+  ) {}
+
+  /**
+   * Execute a command in the named shell and wait for it to complete.
+   * Optionally provide callbacks to stream logs in real-time.
+   *
+   * The command will execute in the persistent shell session, maintaining environment variables
+   * and the current working directory from previous commands. Commands are queued and execute
+   * sequentially - only one command runs at a time in the named shell.
+   *
+   * When callbacks are provided, this method waits for both the command to complete
+   * AND all streaming data to be processed before returning.
+   *
+   * @example
+   * ```typescript
+   * const shell = devbox.shell('my-session');
+   *
+   * // Simple execution
+   * const result = await shell.exec('ls -la');
+   * console.log(await result.stdout());
+   *
+   * // With streaming callbacks
+   * const result = await shell.exec('npm install', {
+   *   stdout: (line) => process.stdout.write(line),
+   *   stderr: (line) => process.stderr.write(line),
+   * });
+   *
+   * // Stateful execution - environment and CWD are preserved
+   * await shell.exec('cd /app');
+   * await shell.exec('export NODE_ENV=production');
+   * const result = await shell.exec('npm start'); // Runs in /app with NODE_ENV=production
+   * ```
+   *
+   * @param {string} command - The command to execute
+   * @param {Omit<Omit<DevboxExecuteParams, 'command'>, 'shell_name'> & ExecuteStreamingCallbacks} [params] - Optional parameters (shell_name is automatically set)
+   * @param {Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxAsyncExecutionDetailView>> }} [options] - Request options with optional polling configuration
+   * @returns {Promise<ExecutionResult>} {@link ExecutionResult} with stdout, stderr, and exit status
+   */
+  async exec(
+    command: string,
+    params?: Omit<Omit<DevboxExecuteParams, 'command'>, 'shell_name'> & ExecuteStreamingCallbacks,
+    options?: Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxAsyncExecutionDetailView>> },
+  ): Promise<ExecutionResult> {
+    return this.devbox.cmd.exec(command, { ...params, shell_name: this.shellName }, options);
+  }
+
+  /**
+   * Execute a command in the named shell asynchronously without waiting for completion.
+   * Optionally provide callbacks to stream logs in real-time as they are produced.
+   *
+   * The command will execute in the persistent shell session, maintaining environment variables
+   * and the current working directory from previous commands. Commands are queued and execute
+   * sequentially - only one command runs at a time in the named shell.
+   *
+   * Callbacks fire in real-time as logs arrive. When you call execution.result(),
+   * it will wait for both the command to complete and all streaming to finish.
+   *
+   * @example
+   * ```typescript
+   * const shell = devbox.shell('my-session');
+   *
+   * const execution = await shell.execAsync('long-running-task.sh', {
+   *   stdout: (line) => console.log(`[LOG] ${line}`),
+   * });
+   *
+   * // Do other work while command runs...
+   * // Note: if you call shell.exec() or shell.execAsync() again, it will queue
+   * // and wait for this command to complete first
+   *
+   * const result = await execution.result();
+   * if (result.success) {
+   *   console.log('Task completed successfully!');
+   * }
+   * ```
+   *
+   * @param {string} command - The command to execute
+   * @param {Omit<Omit<DevboxExecuteAsyncParams, 'command'>, 'shell_name'> & ExecuteStreamingCallbacks} [params] - Optional parameters (shell_name is automatically set)
+   * @param {Core.RequestOptions} [options] - Request options
+   * @returns {Promise<Execution>} {@link Execution} object for tracking and controlling the command
+   */
+  async execAsync(
+    command: string,
+    params?: Omit<Omit<DevboxExecuteAsyncParams, 'command'>, 'shell_name'> & ExecuteStreamingCallbacks,
+    options?: Core.RequestOptions,
+  ): Promise<Execution> {
+    return this.devbox.cmd.execAsync(command, { ...params, shell_name: this.shellName }, options);
   }
 }
 
@@ -542,6 +665,37 @@ export class Devbox {
   }
 
   /**
+   * Create a named shell instance for stateful command execution.
+   *
+   * Named shells are stateful and maintain environment variables and the current working directory (CWD)
+   * across commands, just like a real shell on your local computer. Commands executed through the same
+   * named shell instance will execute sequentially - the shell can only run one command at a time with
+   * automatic queuing. This ensures that environment changes and directory changes from one command
+   * are preserved for the next command.
+   *
+   * @example
+   * ```typescript
+   * // Create a named shell with a custom name
+   * const shell = devbox.shell('my-session');
+   *
+   * // Create a named shell with an auto-generated UUID name
+   * const shell2 = devbox.shell();
+   *
+   * // Commands execute sequentially and share state
+   * await shell.exec('cd /app');
+   * await shell.exec('export MY_VAR=value');
+   * await shell.exec('echo $MY_VAR'); // Will output 'value' because env is preserved
+   * await shell.exec('pwd'); // Will output '/app' because CWD is preserved
+   * ```
+   *
+   * @param {string} [shellName] - The name of the persistent shell session. If not provided, a UUID will be generated automatically.
+   * @returns {DevboxNamedShell} A {@link DevboxNamedShell} instance for executing commands in the named shell
+   */
+  shell(shellName: string = uuidv7()): DevboxNamedShell {
+    return new DevboxNamedShell(this, shellName);
+  }
+
+  /**
    * Start streaming logs with callbacks.
    * Returns a promise that resolves when all streams complete.
    * Uses SSE streams from the old SDK with auto-reconnect.
@@ -799,5 +953,10 @@ export declare namespace Devbox {
      * @see {@link ExecuteStreamingCallbacks}
      */
     type ExecuteStreamingCallbacks as ExecuteStreamingCallbacks,
+    /**
+     * Named shell operations class for stateful command execution.
+     * @see {@link DevboxNamedShell}
+     */
+    DevboxNamedShell as NamedShell,
   };
 }

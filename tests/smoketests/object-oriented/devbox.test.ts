@@ -501,19 +501,25 @@ describe('smoketest: object-oriented devbox', () => {
       let taskBCount = 0;
 
       // Start both executions at the same time (don't await)
-      const executionA = devbox.cmd.execAsync('echo "A1" && sleep 0.5 && echo "A2" && sleep 0.5 && echo "A3"', {
-        stdout: (line) => {
-          taskALogs.push(line);
-          taskACount++;
+      const executionA = devbox.cmd.execAsync(
+        'echo "A1" && sleep 0.5 && echo "A2" && sleep 0.5 && echo "A3"',
+        {
+          stdout: (line) => {
+            taskALogs.push(line);
+            taskACount++;
+          },
         },
-      });
+      );
 
-      const executionB = devbox.cmd.execAsync('sleep 0.3 && echo "B1" && sleep 0.5 && echo "B2" && sleep 0.5 && echo "B3"', {
-        stdout: (line) => {
-          taskBLogs.push(line);
-          taskBCount++;
+      const executionB = devbox.cmd.execAsync(
+        'sleep 0.3 && echo "B1" && sleep 0.5 && echo "B2" && sleep 0.5 && echo "B3"',
+        {
+          stdout: (line) => {
+            taskBLogs.push(line);
+            taskBCount++;
+          },
         },
-      });
+      );
 
       // Wait for both to start
       const [execA, execB] = await Promise.all([executionA, executionB]);
@@ -552,6 +558,334 @@ describe('smoketest: object-oriented devbox', () => {
       // Verify streaming captured same data as ExecutionResult
       expect(taskACombined).toBe(await resultA.stdout());
       expect(taskBCombined).toBe(await resultB.stdout());
+    });
+  });
+
+  describe('named shell - stateful command execution', () => {
+    let devbox: Devbox;
+
+    beforeAll(async () => {
+      devbox = await sdk.devbox.create({
+        name: uniqueName('sdk-devbox-named-shell'),
+        launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 },
+      });
+    }, THIRTY_SECOND_TIMEOUT);
+
+    afterAll(async () => {
+      if (devbox) {
+        await devbox.shutdown();
+      }
+    });
+
+    test('shell.exec - basic execution', async () => {
+      expect(devbox).toBeDefined();
+      const shell = devbox.shell('test-shell-1');
+      const result = await shell.exec('echo "Hello from named shell!"');
+      expect(result).toBeDefined();
+      expect(result.exitCode).toBe(0);
+      const output = await result.stdout();
+      expect(output).toContain('Hello from named shell!');
+    });
+
+    test('shell.exec - CWD persistence across commands', async () => {
+      expect(devbox).toBeDefined();
+      const shell = devbox.shell('test-shell-2');
+
+      // Create a directory and change to it
+      await shell.exec('mkdir -p /tmp/test-shell-dir');
+      await shell.exec('cd /tmp/test-shell-dir');
+
+      // Verify we're in the new directory
+      const pwdResult = await shell.exec('pwd');
+      const pwd = (await pwdResult.stdout()).trim();
+      expect(pwd).toBe('/tmp/test-shell-dir');
+
+      // Create a file in the current directory
+      await shell.exec('echo "test content" > testfile.txt');
+
+      // Verify the file exists in the current directory
+      const lsResult = await shell.exec('ls testfile.txt');
+      expect(lsResult.exitCode).toBe(0);
+      const lsOutput = await lsResult.stdout();
+      expect(lsOutput).toContain('testfile.txt');
+    });
+
+    test('shell.exec - environment variable persistence', async () => {
+      expect(devbox).toBeDefined();
+      const shell = devbox.shell('test-shell-3');
+
+      // Set an environment variable
+      await shell.exec('export TEST_VAR="test-value-123"');
+
+      // Verify the variable persists in the next command
+      const echoResult = await shell.exec('echo $TEST_VAR');
+      const output = (await echoResult.stdout()).trim();
+      expect(output).toBe('test-value-123');
+
+      // Set another variable and verify both persist
+      await shell.exec('export ANOTHER_VAR="another-value"');
+      const bothResult = await shell.exec('echo "$TEST_VAR:$ANOTHER_VAR"');
+      const bothOutput = (await bothResult.stdout()).trim();
+      expect(bothOutput).toBe('test-value-123:another-value');
+    });
+
+    test('shell.exec - combined CWD and environment persistence', async () => {
+      expect(devbox).toBeDefined();
+      const shell = devbox.shell('test-shell-4');
+
+      // Set environment and change directory
+      await shell.exec('export PROJECT_DIR="/tmp/my-project"');
+      await shell.exec('mkdir -p $PROJECT_DIR');
+      await shell.exec('cd $PROJECT_DIR');
+
+      // Verify both persist
+      const pwdResult = await shell.exec('pwd');
+      const pwd = (await pwdResult.stdout()).trim();
+      expect(pwd).toBe('/tmp/my-project');
+
+      // Create a file using the environment variable
+      await shell.exec('echo "project file" > $PROJECT_DIR/file.txt');
+
+      // Verify file exists
+      const lsResult = await shell.exec('ls file.txt');
+      expect(lsResult.exitCode).toBe(0);
+    });
+
+    test('shell.execAsync - basic async execution', async () => {
+      expect(devbox).toBeDefined();
+      const shell = devbox.shell('test-shell-5');
+      const execution = await shell.execAsync('sleep 1 && echo "Async command completed"');
+      expect(execution).toBeDefined();
+      expect(execution.executionId).toBeTruthy();
+
+      // Wait for completion
+      const result = await execution.result();
+      expect(result.exitCode).toBe(0);
+      const output = await result.stdout();
+      expect(output).toContain('Async command completed');
+    });
+
+    test('shell.execAsync - stateful async execution', async () => {
+      expect(devbox).toBeDefined();
+      const shell = devbox.shell('test-shell-6');
+
+      // Set state in first command
+      await shell.exec('export ASYNC_VAR="async-value"');
+      await shell.exec('cd /tmp');
+
+      // Start async command that uses the state
+      const execution = await shell.execAsync('echo "CWD: $(pwd), VAR: $ASYNC_VAR"');
+      const result = await execution.result();
+
+      expect(result.exitCode).toBe(0);
+      const output = await result.stdout();
+      expect(output).toContain('CWD: /tmp');
+      expect(output).toContain('VAR: async-value');
+    });
+
+    test('shell.exec - sequential execution (queuing)', async () => {
+      expect(devbox).toBeDefined();
+      const shell = devbox.shell('test-shell-7');
+
+      // Start multiple commands - they should execute sequentially
+      const startTime = Date.now();
+      await shell.exec('sleep 1 && echo "first"');
+      await shell.exec('sleep 1 && echo "second"');
+      await shell.exec('sleep 1 && echo "third"');
+      const endTime = Date.now();
+
+      // Verify they took at least 3 seconds (sequential execution)
+      const duration = endTime - startTime;
+      expect(duration).toBeGreaterThanOrEqual(2900); // Allow some margin for overhead
+
+      // Verify all commands executed in order
+      const finalResult = await shell.exec('echo "done"');
+      const output = await finalResult.stdout();
+      expect(output).toContain('done');
+    });
+
+    test('shell.execAsync - sequential execution with queuing', async () => {
+      expect(devbox).toBeDefined();
+      const shell = devbox.shell('test-shell-8');
+
+      // Start multiple async commands - they should queue and execute sequentially
+      const exec1 = shell.execAsync('sleep 1 && echo "async-first"');
+      const exec2 = shell.execAsync('sleep 1 && echo "async-second"');
+      const exec3 = shell.execAsync('sleep 1 && echo "async-third"');
+
+      // Wait for all to complete
+      const [result1, result2, result3] = await Promise.all([
+        (await exec1).result(),
+        (await exec2).result(),
+        (await exec3).result(),
+      ]);
+
+      // Verify all completed successfully
+      expect(result1.exitCode).toBe(0);
+      expect(result2.exitCode).toBe(0);
+      expect(result3.exitCode).toBe(0);
+
+      // Verify outputs
+      expect(await result1.stdout()).toContain('async-first');
+      expect(await result2.stdout()).toContain('async-second');
+      expect(await result3.stdout()).toContain('async-third');
+    });
+
+    test('shell.exec - with streaming callbacks', async () => {
+      expect(devbox).toBeDefined();
+      const shell = devbox.shell('test-shell-9');
+      const stdoutLines: string[] = [];
+
+      const result = await shell.exec('echo "line1" && echo "line2" && echo "line3"', {
+        stdout: (line) => {
+          stdoutLines.push(line);
+        },
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.exitCode).toBe(0);
+      expect(stdoutLines.length).toBeGreaterThan(0);
+      const stdoutCombined = stdoutLines.join('');
+      expect(stdoutCombined).toContain('line1');
+      expect(stdoutCombined).toContain('line2');
+      expect(stdoutCombined).toContain('line3');
+      // Verify streaming captured same data as result
+      expect(stdoutCombined).toBe(await result.stdout());
+    });
+
+    test('shell.execAsync - with streaming callbacks', async () => {
+      expect(devbox).toBeDefined();
+      const shell = devbox.shell('test-shell-10');
+      const stdoutLines: string[] = [];
+
+      const execution = await shell.execAsync('echo "async-line1" && sleep 0.5 && echo "async-line2"', {
+        stdout: (line) => {
+          stdoutLines.push(line);
+        },
+      });
+
+      const result = await execution.result();
+      expect(result.success).toBe(true);
+      expect(result.exitCode).toBe(0);
+
+      const stdoutCombined = stdoutLines.join('');
+      expect(stdoutCombined).toContain('async-line1');
+      expect(stdoutCombined).toContain('async-line2');
+      // Verify streaming captured same data as result
+      expect(stdoutCombined).toBe(await result.stdout());
+    });
+
+    test('multiple named shells - independent state', async () => {
+      expect(devbox).toBeDefined();
+      const shell1 = devbox.shell('independent-shell-1');
+      const shell2 = devbox.shell('independent-shell-2');
+
+      // Set different state in each shell
+      await shell1.exec('export VAR="shell1-value"');
+      await shell1.exec('cd /tmp');
+      await shell2.exec('export VAR="shell2-value"');
+      await shell2.exec('cd /home');
+
+      // Verify each shell maintains its own state
+      const result1 = await shell1.exec('echo "$VAR:$(pwd)"');
+      const output1 = (await result1.stdout()).trim();
+      expect(output1).toContain('shell1-value');
+      expect(output1).toContain('/tmp');
+
+      const result2 = await shell2.exec('echo "$VAR:$(pwd)"');
+      const output2 = (await result2.stdout()).trim();
+      expect(output2).toContain('shell2-value');
+      expect(output2).toContain('/home');
+    });
+
+    test('shell.exec - with additional params passed through', async () => {
+      expect(devbox).toBeDefined();
+      const shell = devbox.shell('test-shell-params');
+
+      // Test that additional params (like working_dir) are passed through correctly
+      // Note: shell_name should override any shell_name in params
+      const result = await shell.exec('pwd', {
+        working_dir: '/tmp',
+      });
+
+      expect(result.exitCode).toBe(0);
+      const output = (await result.stdout()).trim();
+      // Should be in /tmp due to working_dir param
+      expect(output).toBe('/tmp');
+    });
+
+    test('shell.execAsync - with additional params passed through', async () => {
+      expect(devbox).toBeDefined();
+      const shell = devbox.shell('test-shell-async-params');
+
+      // Test that additional params are passed through correctly
+      const execution = await shell.execAsync('pwd', {
+        working_dir: '/home',
+      });
+
+      const result = await execution.result();
+      expect(result.exitCode).toBe(0);
+      const output = (await result.stdout()).trim();
+      // Should be in /home due to working_dir param
+      expect(output).toBe('/home');
+    });
+
+    test('shell.exec - with stderr streaming callback', async () => {
+      expect(devbox).toBeDefined();
+      const shell = devbox.shell('test-shell-stderr');
+      const stderrLines: string[] = [];
+
+      const result = await shell.exec('echo "error output" >&2', {
+        stderr: (line) => {
+          stderrLines.push(line);
+        },
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.exitCode).toBe(0);
+      expect(stderrLines.length).toBeGreaterThan(0);
+      const stderrCombined = stderrLines.join('');
+      expect(stderrCombined).toContain('error output');
+      // Verify streaming captured same data as result
+      expect(stderrCombined).toBe(await result.stderr());
+    });
+
+    test('shell.execAsync - with both stdout and stderr streaming callbacks', async () => {
+      expect(devbox).toBeDefined();
+      const shell = devbox.shell('test-shell-both-streams');
+      const stdoutLines: string[] = [];
+      const stderrLines: string[] = [];
+
+      const execution = await shell.execAsync('echo "to stdout" && echo "to stderr" >&2', {
+        stdout: (line) => stdoutLines.push(line),
+        stderr: (line) => stderrLines.push(line),
+      });
+
+      const result = await execution.result();
+      expect(result.success).toBe(true);
+      expect(result.exitCode).toBe(0);
+
+      const stdoutCombined = stdoutLines.join('');
+      const stderrCombined = stderrLines.join('');
+
+      expect(stdoutCombined).toContain('to stdout');
+      expect(stderrCombined).toContain('to stderr');
+
+      // Verify streaming captured same data as result
+      expect(stdoutCombined).toBe(await result.stdout());
+      expect(stderrCombined).toBe(await result.stderr());
+    });
+
+    test('shell - auto-generated shell name', async () => {
+      expect(devbox).toBeDefined();
+      // Create shell without providing a name - should auto-generate UUID
+      const shell = devbox.shell();
+      expect(shell).toBeDefined();
+
+      const result = await shell.exec('echo "test"');
+      expect(result.exitCode).toBe(0);
+      const output = await result.stdout();
+      expect(output).toContain('test');
     });
   });
 });
