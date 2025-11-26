@@ -2,7 +2,7 @@ export * from './sdk/index';
 import type * as Core from './core';
 import { Runloop, type ClientOptions } from './index';
 import { Devbox } from './sdk/devbox';
-import { Blueprint } from './sdk/blueprint';
+import { Blueprint, type CreateParams as BlueprintCreateParams } from './sdk/blueprint';
 import { Snapshot } from './sdk/snapshot';
 import { StorageObject } from './sdk/storage-object';
 
@@ -13,7 +13,7 @@ import type {
   DevboxView,
   DevboxListDiskSnapshotsParams,
 } from './resources/devboxes/devboxes';
-import type { BlueprintCreateParams, BlueprintListParams } from './resources/blueprints';
+import type { BlueprintListParams } from './resources/blueprints';
 import type { ObjectCreateParams, ObjectListParams } from './resources/objects';
 import { PollingOptions } from './lib/polling';
 
@@ -282,6 +282,26 @@ export class DevboxOps {
  *                RUN apt-get update`,
  * });
  * const devbox = await sdk.devbox.createFromBlueprintId(blueprint.id, { name: 'my-devbox' });
+ * ```
+ *
+ * To use a local directory as a build context, use an object.
+ *
+ * @example
+ * ```typescript
+ * const sdk = new RunloopSDK();
+ * const obj = await sdk.storageObject.uploadFromDir(
+ *   './',
+ *   {
+ *     name: 'build-context',
+ *     ttl_ms: 3600000, // 1 hour
+ *   }
+ * );
+ * const blueprint = await sdk.blueprint.create({
+ *   name: 'my-blueprint-with-context',
+ *   dockerfile: `FROM ubuntu:22.04
+ *                COPY . .`,
+ *   build_context: obj,
+ * });
  * ```
  */
 export class BlueprintOps {
