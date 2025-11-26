@@ -261,6 +261,8 @@ export class DevboxCmdOps {
  * Named shell operations for a devbox.
  * Provides methods for executing commands in a persistent, stateful shell session.
  *
+ * Use {@link Devbox.shell} to create a named shell instance.
+ *
  * Named shells are stateful and maintain environment variables and the current working directory (CWD)
  * across commands, just like a real shell on your local computer. Commands executed through the same
  * named shell instance will execute sequentially - the shell can only run one command at a time with
