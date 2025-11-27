@@ -23,6 +23,8 @@ describe('Devbox (New API)', () => {
         shutdown: jest.fn(),
         suspend: jest.fn(),
         resume: jest.fn(),
+        awaitRunning: jest.fn(),
+        awaitSuspended: jest.fn(),
         keepAlive: jest.fn(),
         snapshotDisk: jest.fn(),
         snapshotDiskAsync: jest.fn(),
@@ -208,12 +210,15 @@ describe('Devbox (New API)', () => {
       });
 
       it('should resume the devbox', async () => {
+        const mockRunningData = { ...mockDevboxData, status: 'running' as const };
         mockClient.devboxes.resume.mockResolvedValue(undefined);
+        mockClient.devboxes.awaitRunning.mockResolvedValue(mockRunningData);
 
         const result = await devbox.resume();
 
         expect(mockClient.devboxes.resume).toHaveBeenCalledWith('devbox-123', undefined);
-        expect(result).toBeUndefined(); // Should return API response
+        expect(mockClient.devboxes.awaitRunning).toHaveBeenCalledWith('devbox-123', undefined);
+        expect(result).toEqual(mockRunningData); // Should return devbox data when running
       });
     });
 
