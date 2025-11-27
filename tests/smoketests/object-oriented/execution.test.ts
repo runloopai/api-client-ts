@@ -49,6 +49,7 @@ describe('smoketest: object-oriented execution', () => {
       expect(result.exitCode).toBe(0);
       expect(result.success).toBe(true);
       expect(result.failed).toBe(false);
+      expect(result.executionId).toBeTruthy();
       expect(result.result).toBeDefined();
 
       const output = await result.stdout();
