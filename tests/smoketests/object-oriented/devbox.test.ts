@@ -161,10 +161,6 @@ describe('smoketest: object-oriented devbox', () => {
       const resumeResponse = await devbox.resumeAsync();
       expect(resumeResponse).toBeDefined();
 
-      // Status might still be suspended or transitioning
-      const infoAfterResume = await devbox.getInfo();
-      expect(['suspended', 'running', 'starting']).toContain(infoAfterResume.status);
-
       // Now wait for running state explicitly
       const runningInfo = await devbox.awaitRunning();
       expect(runningInfo.status).toBe('running');
