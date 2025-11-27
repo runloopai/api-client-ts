@@ -40,6 +40,13 @@ This directory contains comprehensive smoke tests for the object-oriented Runloo
 - Mounting storage objects to devboxes
 - Accessing mounted content in devboxes
 
+### `agent.test.ts`
+
+- Agent lifecycle (create, get info)
+- Agent listing and retrieval by ID
+- Creating agents from different sources (npm, git)
+- NOTE: Agents currently lack a delete method, so cleanup is pending API implementation
+
 ### `execution.test.ts`
 
 - Asynchronous command execution

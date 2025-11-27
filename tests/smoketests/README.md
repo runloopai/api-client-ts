@@ -1,6 +1,6 @@
 # Smoke tests
 
-End-to-end smoke tests run against the real API to validate critical flows (devboxes, snapshots, blueprints, executions/log tailing, scenarios/benchmarks) and verify custom helpers like `poll()` are importable.
+End-to-end smoke tests run against the real API to validate critical flows (devboxes, snapshots, blueprints, agents, executions/log tailing, scenarios/benchmarks) and verify custom helpers like `poll()` are importable.
 
 - Local run (requires `RUNLOOP_API_KEY`):
 
