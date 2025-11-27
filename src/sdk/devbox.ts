@@ -885,18 +885,38 @@ export class Devbox {
   }
 
   /**
-   * Resume a suspended devbox.
+   * Resume a suspended devbox and wait for it to reach the running state.
    *
    * @example
    * ```typescript
    * await devbox.resume();
+   * // Devbox is now running
+   * ```
+   *
+   * @param {Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxView>> }} [options] - Request options with optional polling configuration
+   * @returns {Promise<DevboxView>} The devbox data when running state is reached
+   */
+  async resume(
+    options?: Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxView>> },
+  ): Promise<DevboxView> {
+    await this.resumeAsync(options);
+    return this.awaitRunning(options);
+  }
+
+  /**
+   * Resume a suspended devbox without waiting for it to reach the running state.
+   *
+   * @example
+   * ```typescript
+   * await devbox.resumeAsync();
+   * // Optionally wait for running state
    * await devbox.awaitRunning();
    * ```
    *
    * @param {Core.RequestOptions} [options] - Request options
    * @returns {Promise<DevboxResumeResponse>} Resume result
    */
-  async resume(options?: Core.RequestOptions) {
+  async resumeAsync(options?: Core.RequestOptions) {
     return this.client.devboxes.resume(this._id, options);
   }
 
