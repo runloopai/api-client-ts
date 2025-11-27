@@ -5,6 +5,7 @@ import { Devbox } from './sdk/devbox';
 import { Blueprint, type CreateParams as BlueprintCreateParams } from './sdk/blueprint';
 import { Snapshot } from './sdk/snapshot';
 import { StorageObject } from './sdk/storage-object';
+import { Agent } from './sdk/agent';
 
 // Import types used in this file
 import type {
@@ -15,6 +16,7 @@ import type {
 } from './resources/devboxes/devboxes';
 import type { BlueprintListParams } from './resources/blueprints';
 import type { ObjectCreateParams, ObjectListParams } from './resources/objects';
+import type { AgentCreateParams, AgentListParams } from './resources/agents';
 import { PollingOptions } from './lib/polling';
 
 export * from './index';
@@ -48,6 +50,7 @@ type ContentType = ObjectCreateParams['content_type'];
  * - `blueprint` - {@link BlueprintOps}
  * - `snapshot` - {@link SnapshotOps}
  * - `storageObject` - {@link StorageObjectOps}
+ * - `agent` - {@link AgentOps}
  *
  * See the documentation for each Operations class for more details.
  *
@@ -110,6 +113,15 @@ export class RunloopSDK {
   public readonly storageObject: StorageObjectOps;
 
   /**
+   * **Agent Operations** - {@link AgentOps} for creating and accessing {@link Agent} class instances.
+   *
+   * Agents are registered AI agent entities that can be mounted into devboxes. Agents can be sourced
+   * from npm, pip, git repositories, or object storage, and provide reusable agent code that can be
+   * shared across multiple devboxes. Use these operations to create new agents or get existing ones by ID.
+   */
+  public readonly agent: AgentOps;
+
+  /**
    * Creates a new RunloopSDK instance.
    * @param {ClientOptions} [options] - Optional client configuration options.
    */
@@ -119,6 +131,7 @@ export class RunloopSDK {
     this.blueprint = new BlueprintOps(this.api);
     this.snapshot = new SnapshotOps(this.api);
     this.storageObject = new StorageObjectOps(this.api);
+    this.agent = new AgentOps(this.api);
   }
 }
 
@@ -615,6 +628,75 @@ export class StorageObjectOps {
   }
 }
 
+/**
+ * Agent SDK interface for managing agents.
+ *
+ * ## Overview
+ *
+ * The `AgentOps` class provides a high-level abstraction for managing AI agent entities.
+ * Agents can be sourced from npm, pip, git repositories, or object storage, and mounted
+ * into devboxes for execution.
+ *
+ * ## Usage
+ *
+ * This interface is accessed via {@link RunloopSDK.agent}. You should construct
+ * a {@link RunloopSDK} instance and use it from there:
+ *
+ * @example
+ * ```typescript
+ * const sdk = new RunloopSDK();
+ * const agent = await sdk.agent.create({
+ *   name: 'my-npm-agent',
+ *   source: {
+ *     type: 'npm',
+ *     npm: { package_name: '@my-org/agent' }
+ *   }
+ * });
+ * const devbox = await agent.createDevbox({
+ *   name: 'devbox-with-agent',
+ *   agent_path: '/home/user/agent'
+ * });
+ * ```
+ */
+export class AgentOps {
+  /**
+   * @private
+   */
+  constructor(private client: RunloopAPI) {}
+
+  /**
+   * Create a new agent.
+   *
+   * @param {AgentCreateParams} params - Parameters for creating the agent.
+   * @param {Core.RequestOptions} [options] - Request options.
+   * @returns {Promise<Agent>} An {@link Agent} instance.
+   */
+  async create(params: AgentCreateParams, options?: Core.RequestOptions): Promise<Agent> {
+    return Agent.create(this.client, params, options);
+  }
+
+  /**
+   * Get an agent object by its ID.
+   *
+   * @param {string} id - The ID of the agent.
+   * @returns {Agent} An {@link Agent} instance.
+   */
+  fromId(id: string): Agent {
+    return Agent.fromId(this.client, id);
+  }
+
+  /**
+   * List all agents with optional filters.
+   *
+   * @param {AgentListParams} [params] - Optional filter parameters.
+   * @param {Core.RequestOptions} [options] - Request options.
+   * @returns {Promise<Agent[]>} An array of {@link Agent} instances.
+   */
+  async list(params?: AgentListParams, options?: Core.RequestOptions): Promise<Agent[]> {
+    return Agent.list(this.client, params, options);
+  }
+}
+
 // @deprecated Use {@link RunloopSDK} instead.
 /**
  * @deprecated Use {@link RunloopSDK} instead.
@@ -634,10 +716,12 @@ export declare namespace RunloopSDK {
     BlueprintOps as BlueprintOps,
     SnapshotOps as SnapshotOps,
     StorageObjectOps as StorageObjectOps,
+    AgentOps as AgentOps,
     Devbox as Devbox,
     Blueprint as Blueprint,
     Snapshot as Snapshot,
     StorageObject as StorageObject,
+    Agent as Agent,
   };
 }
 // Export SDK classes from sdk/sdk.ts - these are separate from RunloopSDK to avoid circular dependencies
@@ -650,6 +734,7 @@ export {
   Blueprint,
   Snapshot,
   StorageObject,
+  Agent,
   Execution,
   ExecutionResult,
 } from './sdk/index';
