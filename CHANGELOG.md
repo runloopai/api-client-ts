@@ -1,5 +1,19 @@
 # Changelog
 
+## 1.0.0 (2025-12-01)
+
+Full Changelog: [v0.69.0...v1.0.0](https://github.com/runloopai/api-client-ts/compare/v0.69.0...v1.0.0)
+
+### Features
+
+* **devbox:** added devbox.shell(shellName) command and stateful shell class to SDK ([#665](https://github.com/runloopai/api-client-ts/issues/665)) ([ad9474f](https://github.com/runloopai/api-client-ts/commit/ad9474f9a8a25c331be7d51bebc5d6934db9ec6d))
+
+
+### Chores
+
+* **blueprints:** Add convenience build_context API that takes a StorageObject directly. ([#666](https://github.com/runloopai/api-client-ts/issues/666)) ([ec2beaf](https://github.com/runloopai/api-client-ts/commit/ec2beafd9d8091b1b679921ed9a871d57fa8dbdf))
+* Remove broken tests and command_id for exec ([#668](https://github.com/runloopai/api-client-ts/issues/668)) ([0ca3940](https://github.com/runloopai/api-client-ts/commit/0ca394035f746cce5492ac86ce9e5ce21c3ec592))
+
 ## 0.69.0 (2025-11-25)
 
 Full Changelog: [v0.68.0...v0.69.0](https://github.com/runloopai/api-client-ts/compare/v0.68.0...v0.69.0)
