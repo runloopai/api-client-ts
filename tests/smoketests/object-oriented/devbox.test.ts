@@ -137,11 +137,33 @@ describe('smoketest: object-oriented devbox', () => {
       const suspendedInfo = await devbox.getInfo();
       expect(suspendedInfo.status).toBe('suspended');
 
-      // Resume the devbox
-      await devbox.resume();
-      await devbox.awaitRunning();
-      const resumedInfo = await devbox.getInfo();
+      // Resume the devbox - resume() automatically waits for running state
+      const resumedInfo = await devbox.resume();
       expect(resumedInfo.status).toBe('running');
+
+      // Clean up
+      await devbox.shutdown();
+    });
+
+    test('resumeAsync - resume without waiting', async () => {
+      const devbox = await sdk.devbox.create({
+        name: uniqueName('sdk-devbox-resume-async'),
+        launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 }, // 5 minutes
+      });
+
+      // Suspend the devbox
+      await devbox.suspend();
+      await devbox.awaitSuspended();
+      const suspendedInfo = await devbox.getInfo();
+      expect(suspendedInfo.status).toBe('suspended');
+
+      // Resume the devbox asynchronously - doesn't wait automatically
+      const resumeResponse = await devbox.resumeAsync();
+      expect(resumeResponse).toBeDefined();
+
+      // Now wait for running state explicitly
+      const runningInfo = await devbox.awaitRunning();
+      expect(runningInfo.status).toBe('running');
 
       // Clean up
       await devbox.shutdown();
