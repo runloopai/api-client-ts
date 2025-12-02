@@ -396,6 +396,15 @@ export class Devboxes extends APIResource {
   }
 
   /**
+   * Resume a suspended Devbox with the disk state captured as suspend time. Note
+   * that any previously running processes or daemons will need to be restarted using
+   * the Devbox shell tools.
+   */
+  resume(id: string, options?: Core.RequestOptions): Core.APIPromise<DevboxView> {
+    return this._client.post(`/v1/devboxes/${id}/resume`, options);
+  }
+
+  /**
    * Shutdown a running Devbox. This will permanently stop the Devbox. If you want to
    * save the state of the Devbox, you should take a snapshot before shutting down or
    * should suspend the Devbox instead of shutting down.
@@ -449,6 +458,15 @@ export class Devboxes extends APIResource {
       return this.snapshotDiskAsync(id, {}, body);
     }
     return this._client.post(`/v1/devboxes/${id}/snapshot_disk_async`, { body, ...options });
+  }
+
+  /**
+   * Suspend a running Devbox and create a disk snapshot to enable resuming the
+   * Devbox later with the same disk. Note this will not snapshot memory state such
+   * as running processes.
+   */
+  suspend(id: string, options?: Core.RequestOptions): Core.APIPromise<DevboxView> {
+    return this._client.post(`/v1/devboxes/${id}/suspend`, options);
   }
 
   /**
