@@ -12,6 +12,7 @@ describe('AgentOps', () => {
 
   beforeEach(() => {
     // Create mock client
+    jest.clearAllMocks();
     mockClient = {
       agents: {
         create: jest.fn(),
@@ -37,7 +38,8 @@ describe('AgentOps', () => {
     };
 
     // Mock Agent.create to return a mock Agent instance
-    (Agent.create as jest.Mock).mockResolvedValue(new Agent(mockClient, 'agent-123'));
+    const mockAgentInstance = { id: 'agent-123', getInfo: jest.fn() } as unknown as Agent;
+    jest.spyOn(Agent as any, 'create').mockResolvedValue(mockAgentInstance);
   });
 
   describe('createFromNpm', () => {
