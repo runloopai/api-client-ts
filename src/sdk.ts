@@ -676,6 +676,141 @@ export class AgentOps {
   }
 
   /**
+   * Create an agent from an NPM package.
+   *
+   * @param {object} params - Parameters for creating the agent.
+   * @param {string} params.package_name - NPM package name.
+   * @param {string} [params.npm_version] - NPM version constraint.
+   * @param {string} [params.registry_url] - NPM registry URL.
+   * @param {string[]} [params.agent_setup] - Setup commands to run after installation.
+   * @param {Core.RequestOptions} [options] - Request options.
+   * @returns {Promise<Agent>} An {@link Agent} instance.
+   */
+  async createFromNpm(
+    params: Omit<AgentCreateParams, 'source'> & {
+      package_name: string;
+      npm_version?: string;
+      registry_url?: string;
+      agent_setup?: string[];
+    },
+    options?: Core.RequestOptions,
+  ): Promise<Agent> {
+    const { package_name, npm_version, registry_url, agent_setup, ...restParams } = params;
+
+    const npmConfig: any = { package_name };
+    if (npm_version !== undefined) npmConfig.npm_version = npm_version;
+    if (registry_url !== undefined) npmConfig.registry_url = registry_url;
+    if (agent_setup !== undefined) npmConfig.agent_setup = agent_setup;
+
+    return this.create(
+      {
+        ...restParams,
+        source: { type: 'npm', npm: npmConfig },
+      },
+      options,
+    );
+  }
+
+  /**
+   * Create an agent from a Pip package.
+   *
+   * @param {object} params - Parameters for creating the agent.
+   * @param {string} params.package_name - Pip package name.
+   * @param {string} [params.pip_version] - Pip version constraint.
+   * @param {string} [params.registry_url] - Pip registry URL.
+   * @param {string[]} [params.agent_setup] - Setup commands to run after installation.
+   * @param {Core.RequestOptions} [options] - Request options.
+   * @returns {Promise<Agent>} An {@link Agent} instance.
+   */
+  async createFromPip(
+    params: Omit<AgentCreateParams, 'source'> & {
+      package_name: string;
+      pip_version?: string;
+      registry_url?: string;
+      agent_setup?: string[];
+    },
+    options?: Core.RequestOptions,
+  ): Promise<Agent> {
+    const { package_name, pip_version, registry_url, agent_setup, ...restParams } = params;
+
+    const pipConfig: any = { package_name };
+    if (pip_version !== undefined) pipConfig.pip_version = pip_version;
+    if (registry_url !== undefined) pipConfig.registry_url = registry_url;
+    if (agent_setup !== undefined) pipConfig.agent_setup = agent_setup;
+
+    return this.create(
+      {
+        ...restParams,
+        source: { type: 'pip', pip: pipConfig },
+      },
+      options,
+    );
+  }
+
+  /**
+   * Create an agent from a Git repository.
+   *
+   * @param {object} params - Parameters for creating the agent.
+   * @param {string} params.repository - Git repository URL.
+   * @param {string} [params.ref] - Optional Git ref (branch/tag/commit), defaults to main/HEAD.
+   * @param {string[]} [params.agent_setup] - Setup commands to run after cloning.
+   * @param {Core.RequestOptions} [options] - Request options.
+   * @returns {Promise<Agent>} An {@link Agent} instance.
+   */
+  async createFromGit(
+    params: Omit<AgentCreateParams, 'source'> & {
+      repository: string;
+      ref?: string;
+      agent_setup?: string[];
+    },
+    options?: Core.RequestOptions,
+  ): Promise<Agent> {
+    const { repository, ref, agent_setup, ...restParams } = params;
+
+    const gitConfig: any = { repository };
+    if (ref !== undefined) gitConfig.ref = ref;
+    if (agent_setup !== undefined) gitConfig.agent_setup = agent_setup;
+
+    return this.create(
+      {
+        ...restParams,
+        source: { type: 'git', git: gitConfig },
+      },
+      options,
+    );
+  }
+
+  /**
+   * Create an agent from a storage object.
+   *
+   * @param {object} params - Parameters for creating the agent.
+   * @param {string} params.object_id - Storage object ID.
+   * @param {string[]} [params.agent_setup] - Setup commands to run after unpacking.
+   * @param {Core.RequestOptions} [options] - Request options.
+   * @returns {Promise<Agent>} An {@link Agent} instance.
+   */
+  async createFromObject(
+    params: Omit<AgentCreateParams, 'source'> & {
+      object_id: string;
+      agent_setup?: string[];
+    },
+    options?: Core.RequestOptions,
+  ): Promise<Agent> {
+    const { object_id, agent_setup, ...restParams } = params;
+
+    const objectConfig: any = { object_id };
+    if (agent_setup !== undefined) objectConfig.agent_setup = agent_setup;
+
+    return this.create(
+      {
+        ...restParams,
+        source: { type: 'object', object: objectConfig },
+      },
+      options,
+    );
+  }
+
+  /**
    * Get an agent object by its ID.
    *
    * @param {string} id - The ID of the agent.
