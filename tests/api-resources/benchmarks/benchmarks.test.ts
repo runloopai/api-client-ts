@@ -189,6 +189,7 @@ describe('resource benchmarks', () => {
           resource_size_request: 'X_SMALL',
           user_parameters: { uid: 0, username: 'username' },
         },
+        mounts: [{ object_id: 'object_id', object_path: 'object_path', type: 'object_mount' }],
         purpose: 'purpose',
         secrets: { foo: 'string' },
       },
