@@ -866,6 +866,11 @@ export interface DevboxCreateSSHKeyResponse {
   ssh_private_key: string;
 
   /**
+   * The Linux user to use for SSH connections to this Devbox.
+   */
+  ssh_user: string;
+
+  /**
    * The host url of the Devbox that can be used for SSH.
    */
   url: string;

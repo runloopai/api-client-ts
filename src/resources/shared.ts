@@ -12,32 +12,6 @@ export interface AfterIdle {
   on_idle: 'shutdown' | 'suspend';
 }
 
-export interface AgentMountParameters {
-  /**
-   * The ID of the agent to mount. Either agent_id or name must be set.
-   */
-  agent_id: string | null;
-
-  /**
-   * The name of the agent to mount. Returns the most recent agent with a matching
-   * name if no agent id string provided. Either agent id or name must be set
-   */
-  agent_name: string | null;
-
-  type: 'agent_mount';
-
-  /**
-   * Path to mount the agent on the Devbox. Required for git and object agents. Use
-   * absolute path (e.g., /home/user/agent)
-   */
-  agent_path?: string | null;
-
-  /**
-   * Optional auth token for private repositories. Only used for git agents.
-   */
-  auth_token?: string | null;
-}
-
 /**
  * Agent source configuration.
  */
@@ -167,8 +141,6 @@ export interface CodeMountParameters {
    */
   repo_owner: string;
 
-  type: 'code_mount';
-
   /**
    * The authentication token necessary to pull repo.
    */
@@ -276,14 +248,76 @@ export namespace LaunchParameters {
   }
 }
 
-export type Mount =
-  | ObjectMountParameters
-  | AgentMountParameters
-  | CodeMountParameters
-  | Mount.FileMountParameters;
+export type Mount = Mount.ObjectMount | Mount.AgentMount | Mount.CodeMount | Mount.FileMount;
 
 export namespace Mount {
-  export interface FileMountParameters {
+  export interface ObjectMount {
+    /**
+     * The ID of the object to write.
+     */
+    object_id: string;
+
+    /**
+     * The path to write the object on the Devbox. Use absolute path of object (ie
+     * /home/user/object.txt, or directory if archive /home/user/archive_dir)
+     */
+    object_path: string;
+
+    type: 'object_mount';
+  }
+
+  export interface AgentMount {
+    /**
+     * The ID of the agent to mount. Either agent_id or name must be set.
+     */
+    agent_id: string | null;
+
+    /**
+     * The name of the agent to mount. Returns the most recent agent with a matching
+     * name if no agent id string provided. Either agent id or name must be set
+     */
+    agent_name: string | null;
+
+    type: 'agent_mount';
+
+    /**
+     * Path to mount the agent on the Devbox. Required for git and object agents. Use
+     * absolute path (e.g., /home/user/agent)
+     */
+    agent_path?: string | null;
+
+    /**
+     * Optional auth token for private repositories. Only used for git agents.
+     */
+    auth_token?: string | null;
+  }
+
+  export interface CodeMount {
+    /**
+     * The name of the repo to mount. By default, code will be mounted at
+     * /home/user/{repo_name}s.
+     */
+    repo_name: string;
+
+    /**
+     * The owner of the repo.
+     */
+    repo_owner: string;
+
+    type: 'code_mount';
+
+    /**
+     * The authentication token necessary to pull repo.
+     */
+    token?: string | null;
+
+    /**
+     * Installation command to install and setup repository.
+     */
+    install_command?: string | null;
+  }
+
+  export interface FileMount {
     /**
      * Content of the file to mount.
      */
@@ -296,21 +330,6 @@ export namespace Mount {
 
     type: 'file_mount';
   }
-}
-
-export interface ObjectMountParameters {
-  /**
-   * The ID of the object to write.
-   */
-  object_id: string;
-
-  /**
-   * The path to write the object on the Devbox. Use absolute path of object (ie
-   * /home/user/object.txt, or directory if archive /home/user/archive_dir)
-   */
-  object_path: string;
-
-  type: 'object_mount';
 }
 
 export interface RunProfile {
