@@ -121,14 +121,26 @@ export class DockerIgnoreMatcher implements IgnoreMatcher {
   private patterns: CompiledPattern[];
 
   constructor(patterns: string[]) {
-    this.patterns = patterns.map((raw) => new CompiledPattern(raw));
+    this.patterns = patterns.map((raw) => {
+      // Normalize pattern immediately upon construction
+      let cleaned = raw;
+      if (cleaned.startsWith('/')) cleaned = cleaned.slice(1);
+      if (cleaned.startsWith('./')) cleaned = cleaned.slice(2);
+      if (cleaned.endsWith('/') && cleaned !== '/') cleaned = cleaned.slice(0, -1);
+      return new CompiledPattern(cleaned, raw);
+    });
   }
 
   matches(filePath: string): boolean {
     // Expect paths relative to context root, forward-slash separated
     let normalized = filePath.replace(/\\/g, '/');
 
+    // Strip leading ./ if present
     if (normalized.startsWith('./')) normalized = normalized.slice(2);
+
+    // Strip trailing slash if present (unless it's just root)
+    if (normalized.endsWith('/') && normalized !== '/') normalized = normalized.slice(0, -1);
+
     if (!normalized) normalized = '.';
 
     const parts = normalized.split('/');
@@ -172,14 +184,13 @@ class CompiledPattern {
   private readonly cleaned: string;
   private readonly regexp: RegExp;
 
-  constructor(pattern: string) {
+  constructor(pattern: string, raw?: string) {
+    this.raw = raw || pattern;
     if (pattern.startsWith('!')) {
       this.exclusion = true;
-      this.raw = pattern;
       this.cleaned = pattern.slice(1);
     } else {
       this.exclusion = false;
-      this.raw = pattern;
       this.cleaned = pattern;
     }
 
