@@ -1,7 +1,7 @@
-import { Agent } from '@runloop/api-client/sdk';
+import { Agent, Devbox, StorageObject } from '@runloop/api-client/sdk';
 import { makeClientSDK, THIRTY_SECOND_TIMEOUT, uniqueName } from '../utils';
 
-const sdk = makeClientSDK();
+const runloop = makeClientSDK();
 
 describe('smoketest: object-oriented agent', () => {
   describe('agent lifecycle', () => {
@@ -9,7 +9,7 @@ describe('smoketest: object-oriented agent', () => {
       'create agent basic',
       async () => {
         const name = uniqueName('sdk-agent-test-basic');
-        const agent = await sdk.agent.create({
+        const agent = await runloop.agent.create({
           name: name,
           source: {
             type: 'npm',
@@ -40,7 +40,7 @@ describe('smoketest: object-oriented agent', () => {
       'get agent info',
       async () => {
         const name = uniqueName('sdk-agent-test-info');
-        const agent = await sdk.agent.create({
+        const agent = await runloop.agent.create({
           name: name,
           source: {
             type: 'npm',
@@ -69,7 +69,7 @@ describe('smoketest: object-oriented agent', () => {
     test(
       'list agents',
       async () => {
-        const agents = await sdk.agent.list({ limit: 10 });
+        const agents = await runloop.agent.list({ limit: 10 });
 
         expect(Array.isArray(agents)).toBe(true);
         // List might be empty, that's okay
@@ -82,7 +82,7 @@ describe('smoketest: object-oriented agent', () => {
       'get agent by ID',
       async () => {
         // Create an agent
-        const created = await sdk.agent.create({
+        const created = await runloop.agent.create({
           name: uniqueName('sdk-agent-test-retrieve'),
           source: {
             type: 'npm',
@@ -94,7 +94,7 @@ describe('smoketest: object-oriented agent', () => {
 
         try {
           // Retrieve it by ID
-          const retrieved = sdk.agent.fromId(created.id);
+          const retrieved = runloop.agent.fromId(created.id);
           expect(retrieved.id).toBe(created.id);
 
           // Verify it's the same agent
@@ -118,13 +118,13 @@ describe('smoketest: object-oriented agent', () => {
         };
 
         // Create multiple agents
-        const agent1 = await sdk.agent.create({ name: uniqueName('sdk-agent-test-list-1'), source: sourceConfig });
-        const agent2 = await sdk.agent.create({ name: uniqueName('sdk-agent-test-list-2'), source: sourceConfig });
-        const agent3 = await sdk.agent.create({ name: uniqueName('sdk-agent-test-list-3'), source: sourceConfig });
+        const agent1 = await runloop.agent.create({ name: uniqueName('sdk-agent-test-list-1'), source: sourceConfig });
+        const agent2 = await runloop.agent.create({ name: uniqueName('sdk-agent-test-list-2'), source: sourceConfig });
+        const agent3 = await runloop.agent.create({ name: uniqueName('sdk-agent-test-list-3'), source: sourceConfig });
 
         try {
           // List agents
-          const agents = await sdk.agent.list({ limit: 100 });
+          const agents = await runloop.agent.list({ limit: 100 });
 
           expect(Array.isArray(agents)).toBe(true);
           expect(agents.length).toBeGreaterThanOrEqual(3);
@@ -149,7 +149,7 @@ describe('smoketest: object-oriented agent', () => {
       async () => {
         const name = uniqueName('sdk-agent-test-npm');
 
-        const agent = await sdk.agent.create({
+        const agent = await runloop.agent.create({
           name: name,
           source: {
             type: 'npm',
@@ -177,7 +177,7 @@ describe('smoketest: object-oriented agent', () => {
       async () => {
         const name = uniqueName('sdk-agent-test-git');
 
-        const agent = await sdk.agent.create({
+        const agent = await runloop.agent.create({
           name: name,
           source: {
             type: 'git',
@@ -199,6 +199,190 @@ describe('smoketest: object-oriented agent', () => {
         }
       },
       THIRTY_SECOND_TIMEOUT,
+    );
+  });
+
+  describe('agent convenience methods', () => {
+    test(
+      'createFromNpm',
+      async () => {
+        const name = uniqueName('sdk-agent-from-npm');
+        const agent = await runloop.agent.createFromNpm({
+          name: name,
+          package_name: '@runloop/hello-world-agent',
+        });
+
+        try {
+          expect(agent.id).toBeTruthy();
+          const info = await agent.getInfo();
+          expect(info.name).toBe(name);
+          expect(info.source?.type).toBe('npm');
+          expect(info.source?.npm?.package_name).toBe('@runloop/hello-world-agent');
+        } finally {
+          // TODO: Add agent cleanup once delete endpoint is implemented
+        }
+      },
+      THIRTY_SECOND_TIMEOUT,
+    );
+
+    test(
+      'createFromPip',
+      async () => {
+        const name = uniqueName('sdk-agent-from-pip');
+        const agent = await runloop.agent.createFromPip({
+          name: name,
+          package_name: 'runloop-example-agent',
+        });
+
+        try {
+          expect(agent.id).toBeTruthy();
+          const info = await agent.getInfo();
+          expect(info.name).toBe(name);
+          expect(info.source?.type).toBe('pip');
+          expect(info.source?.pip?.package_name).toBe('runloop-example-agent');
+        } finally {
+          // TODO: Add agent cleanup once delete endpoint is implemented
+        }
+      },
+      THIRTY_SECOND_TIMEOUT,
+    );
+
+    test(
+      'createFromGit',
+      async () => {
+        const name = uniqueName('sdk-agent-from-git');
+        const agent = await runloop.agent.createFromGit({
+          name: name,
+          repository: 'https://github.com/runloop/example-agent',
+          ref: 'main',
+        });
+
+        try {
+          expect(agent.id).toBeTruthy();
+          const info = await agent.getInfo();
+          expect(info.name).toBe(name);
+          expect(info.source?.type).toBe('git');
+          expect(info.source?.git?.repository).toBe('https://github.com/runloop/example-agent');
+        } finally {
+          // TODO: Add agent cleanup once delete endpoint is implemented
+        }
+      },
+      THIRTY_SECOND_TIMEOUT,
+    );
+
+    test(
+      'createFromObject with storage object',
+      async () => {
+        let storageObject: StorageObject | undefined;
+        let agent: Agent | undefined;
+
+        try {
+          // Create storage object with agent content
+          storageObject = await runloop.storageObject.create({
+            name: uniqueName('sdk-agent-storage-object'),
+            content_type: 'text',
+            metadata: { test: 'agent-smoketest' },
+          });
+
+          await storageObject.uploadContent('Agent content for testing');
+          await storageObject.complete();
+
+          // Create agent from storage object
+          const agentName = uniqueName('sdk-agent-from-object');
+          agent = await runloop.agent.createFromObject({
+            name: agentName,
+            object_id: storageObject.id,
+          });
+
+          expect(agent.id).toBeTruthy();
+          const info = await agent.getInfo();
+          expect(info.name).toBe(agentName);
+          expect(info.source?.type).toBe('object');
+          expect(info.source?.object?.object_id).toBe(storageObject.id);
+        } finally {
+          if (storageObject) {
+            await storageObject.delete();
+          }
+          // TODO: Add agent cleanup once delete endpoint is implemented
+        }
+      },
+      THIRTY_SECOND_TIMEOUT,
+    );
+  });
+
+  describe('agent with devbox mounting', () => {
+    test(
+      'mount agent from storage object into devbox',
+      async () => {
+        let storageObject: StorageObject | undefined;
+        let agent: Agent | undefined;
+        let devbox: Devbox | undefined;
+
+        try {
+          // Create storage object with agent content
+          storageObject = await runloop.storageObject.create({
+            name: uniqueName('sdk-agent-mount-storage'),
+            content_type: 'text',
+            metadata: { test: 'agent-mount-smoketest' },
+          });
+
+          await storageObject.uploadContent('Agent content for devbox mounting');
+          await storageObject.complete();
+
+          // Create agent from storage object
+          agent = await runloop.agent.createFromObject({
+            name: uniqueName('sdk-agent-for-mount'),
+            object_id: storageObject.id,
+          });
+
+          // Create devbox with agent mount
+          devbox = await runloop.devbox.create({
+            name: uniqueName('sdk-devbox-with-agent'),
+            launch_parameters: {
+              resource_size_request: 'X_SMALL',
+              keep_alive_time_seconds: 60 * 5, // 5 minutes
+            },
+            mounts: [
+              {
+                type: 'agent_mount',
+                agent_id: agent.id,
+                agent_name: null,
+                agent_path: '/home/user/test-agent',
+              },
+            ],
+          });
+
+          expect(devbox.id).toBeTruthy();
+
+          // Wait for devbox to be running
+          const info = await devbox.getInfo();
+          if (info.status !== 'running') {
+            // Poll until running (simplified approach)
+            let attempts = 0;
+            while (attempts < 60) {
+              const currentInfo = await devbox.getInfo();
+              if (currentInfo.status === 'running') {
+                break;
+              }
+              await new Promise((resolve) => setTimeout(resolve, 5000));
+              attempts++;
+            }
+          }
+
+          // Verify the agent was mounted
+          const result = await devbox.cmd.exec('ls -la /home/user/test-agent');
+          expect(result.exitCode).toBe(0);
+        } finally {
+          if (devbox) {
+            await devbox.shutdown();
+          }
+          if (storageObject) {
+            await storageObject.delete();
+          }
+          // TODO: Add agent cleanup once delete endpoint is implemented
+        }
+      },
+      THIRTY_SECOND_TIMEOUT * 8,
     );
   });
 });

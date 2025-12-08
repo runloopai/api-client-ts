@@ -288,28 +288,28 @@ export class DevboxOps {
  *
  * @example
  * ```typescript
- * const sdk = new RunloopSDK();
- * const blueprint = await sdk.blueprint.create({
+ * const runloop = new RunloopSDK();
+ * const blueprint = await runloop.blueprint.create({
  *   name: 'my-blueprint',
  *   dockerfile: `FROM ubuntu:22.04
  *                RUN apt-get update`,
  * });
- * const devbox = await sdk.devbox.createFromBlueprintId(blueprint.id, { name: 'my-devbox' });
+ * const devbox = await runloop.devbox.createFromBlueprintId(blueprint.id, { name: 'my-devbox' });
  * ```
  *
  * To use a local directory as a build context, use an object.
  *
  * @example
  * ```typescript
- * const sdk = new RunloopSDK();
- * const obj = await sdk.storageObject.uploadFromDir(
+ * const runloop = new RunloopSDK();
+ * const obj = await runloop.storageObject.uploadFromDir(
  *   './',
  *   {
  *     name: 'build-context',
  *     ttl_ms: 3600000, // 1 hour
  *   }
  * );
- * const blueprint = await sdk.blueprint.create({
+ * const blueprint = await runloop.blueprint.create({
  *   name: 'my-blueprint-with-context',
  *   dockerfile: `FROM ubuntu:22.04
  *                COPY . .`,
@@ -381,7 +381,7 @@ export class BlueprintOps {
  *
  * @example
  * ```typescript
- * const sdk = new RunloopSDK();
+ * const runloop = new RunloopSDK();
  * const snapshot = await devbox.snapshotDisk({ name: 'backup' });
  * ...
  * const devbox = await snapshot.createDevbox();
@@ -429,9 +429,9 @@ export class SnapshotOps {
  *
  * @example
  * ```typescript
- * const sdk = new RunloopSDK();
- * const storageObject = await sdk.storageObject.uploadFromFile("./my-file.txt", "my-file.txt");
- * const objects = await sdk.storageObject.list();
+ * const runloop = new RunloopSDK();
+ * const storageObject = await runloop.storageObject.uploadFromFile("./my-file.txt", "my-file.txt");
+ * const objects = await runloop.storageObject.list();
  * ```
  */
 export class StorageObjectOps {
@@ -644,8 +644,8 @@ export class StorageObjectOps {
  *
  * @example
  * ```typescript
- * const sdk = new RunloopSDK();
- * const agent = await sdk.agent.create({
+ * const runloop = new RunloopSDK();
+ * const agent = await runloop.agent.create({
  *   name: 'my-npm-agent',
  *   source: {
  *     type: 'npm',
@@ -667,6 +667,61 @@ export class AgentOps {
   /**
    * Create a new agent.
    *
+   * @example
+   * Create an agent from an NPM package:
+   * ```typescript
+   * const runloop = new RunloopSDK();
+   * const agent = await runloop.agent.create({
+   *   name: 'my-agent',
+   *   source: {
+   *     type: 'npm',
+   *     npm: {
+   *       package_name: '@my-org/agent',
+   *       npm_version: '1.0.0'
+   *     }
+   *   }
+   * });
+   * console.log(`Created agent: ${agent.id}`);
+   * ```
+   *
+   * @example
+   * Create an agent from a Git repository:
+   * ```typescript
+   * const runloop = new RunloopSDK();
+   * const agent = await runloop.agent.create({
+   *   name: 'my-git-agent',
+   *   source: {
+   *     type: 'git',
+   *     git: {
+   *       repository: 'https://github.com/my-org/agent-repo',
+   *       ref: 'main'
+   *     }
+   *   }
+   * });
+   * ```
+   *
+   * @example
+   * Create an agent from a storage object:
+   * ```typescript
+   * const runloop = new RunloopSDK();
+   * // First, upload your agent code as a storage object
+   * const storageObject = await runloop.storageObject.uploadFromDir(
+   *   './my-agent',
+   *   { name: 'agent-package' }
+   * );
+   *
+   * // Then create an agent from it
+   * const agent = await runloop.agent.create({
+   *   name: 'my-object-agent',
+   *   source: {
+   *     type: 'object',
+   *     object: {
+   *       object_id: storageObject.id
+   *     }
+   *   }
+   * });
+   * ```
+   *
    * @param {AgentCreateParams} params - Parameters for creating the agent.
    * @param {Core.RequestOptions} [options] - Request options.
    * @returns {Promise<Agent>} An {@link Agent} instance.
@@ -676,7 +731,322 @@ export class AgentOps {
   }
 
   /**
+   * Create an agent from an NPM package.
+   *
+   * @example
+   * Basic usage:
+   * ```typescript
+   * const runloop = new RunloopSDK();
+   * const agent = await runloop.agent.createFromNpm({
+   *   name: 'my-npm-agent',
+   *   package_name: '@my-org/agent'
+   * });
+   * ```
+   *
+   * @example
+   * With version and setup commands:
+   * ```typescript
+   * const runloop = new RunloopSDK();
+   * const agent = await runloop.agent.createFromNpm({
+   *   name: 'my-npm-agent',
+   *   package_name: '@my-org/agent',
+   *   npm_version: '^1.2.0',
+   *   agent_setup: ['npm run build', 'chmod +x ./run.sh']
+   * });
+   * ```
+   *
+   * @example
+   * Using a private registry:
+   * ```typescript
+   * const runloop = new RunloopSDK();
+   * const agent = await runloop.agent.createFromNpm({
+   *   name: 'private-agent',
+   *   package_name: '@my-org/private-agent',
+   *   registry_url: 'https://npm.mycompany.com'
+   * });
+   * ```
+   *
+   * @param {object} params - Parameters for creating the agent.
+   * @param {string} params.package_name - NPM package name.
+   * @param {string} [params.npm_version] - NPM version constraint.
+   * @param {string} [params.registry_url] - NPM registry URL.
+   * @param {string[]} [params.agent_setup] - Setup commands to run after installation.
+   * @param {Core.RequestOptions} [options] - Request options.
+   * @returns {Promise<Agent>} An {@link Agent} instance.
+   */
+  async createFromNpm(
+    params: Omit<AgentCreateParams, 'source'> & {
+      package_name: string;
+      npm_version?: string;
+      registry_url?: string;
+      agent_setup?: string[];
+    },
+    options?: Core.RequestOptions,
+  ): Promise<Agent> {
+    const { package_name, npm_version, registry_url, agent_setup, ...restParams } = params;
+
+    const npmConfig: any = { package_name };
+    if (npm_version !== undefined) npmConfig.npm_version = npm_version;
+    if (registry_url !== undefined) npmConfig.registry_url = registry_url;
+    if (agent_setup !== undefined) npmConfig.agent_setup = agent_setup;
+
+    return this.create(
+      {
+        ...restParams,
+        source: { type: 'npm', npm: npmConfig },
+      },
+      options,
+    );
+  }
+
+  /**
+   * Create an agent from a Pip package.
+   *
+   * @example
+   * Basic usage:
+   * ```typescript
+   * const runloop = new RunloopSDK();
+   * const agent = await runloop.agent.createFromPip({
+   *   name: 'my-python-agent',
+   *   package_name: 'my-agent-package'
+   * });
+   * ```
+   *
+   * @example
+   * With version constraint:
+   * ```typescript
+   * const runloop = new RunloopSDK();
+   * const agent = await runloop.agent.createFromPip({
+   *   name: 'my-python-agent',
+   *   package_name: 'my-agent-package',
+   *   pip_version: '>=1.0.0,<2.0.0'
+   * });
+   * ```
+   *
+   * @example
+   * Using a private PyPI registry:
+   * ```typescript
+   * const runloop = new RunloopSDK();
+   * const agent = await runloop.agent.createFromPip({
+   *   name: 'private-python-agent',
+   *   package_name: 'my-private-agent',
+   *   registry_url: 'https://pypi.mycompany.com/simple',
+   *   agent_setup: ['python setup.py install']
+   * });
+   * ```
+   *
+   * @param {object} params - Parameters for creating the agent.
+   * @param {string} params.package_name - Pip package name.
+   * @param {string} [params.pip_version] - Pip version constraint.
+   * @param {string} [params.registry_url] - Pip registry URL.
+   * @param {string[]} [params.agent_setup] - Setup commands to run after installation.
+   * @param {Core.RequestOptions} [options] - Request options.
+   * @returns {Promise<Agent>} An {@link Agent} instance.
+   */
+  async createFromPip(
+    params: Omit<AgentCreateParams, 'source'> & {
+      package_name: string;
+      pip_version?: string;
+      registry_url?: string;
+      agent_setup?: string[];
+    },
+    options?: Core.RequestOptions,
+  ): Promise<Agent> {
+    const { package_name, pip_version, registry_url, agent_setup, ...restParams } = params;
+
+    const pipConfig: any = { package_name };
+    if (pip_version !== undefined) pipConfig.pip_version = pip_version;
+    if (registry_url !== undefined) pipConfig.registry_url = registry_url;
+    if (agent_setup !== undefined) pipConfig.agent_setup = agent_setup;
+
+    return this.create(
+      {
+        ...restParams,
+        source: { type: 'pip', pip: pipConfig },
+      },
+      options,
+    );
+  }
+
+  /**
+   * Create an agent from a Git repository.
+   *
+   * @example
+   * Basic usage with public repository:
+   * ```typescript
+   * const runloop = new RunloopSDK();
+   * const agent = await runloop.agent.createFromGit({
+   *   name: 'my-git-agent',
+   *   repository: 'https://github.com/my-org/agent-repo'
+   * });
+   * ```
+   *
+   * @example
+   * With specific branch and setup commands:
+   * ```typescript
+   * const runloop = new RunloopSDK();
+   * const agent = await runloop.agent.createFromGit({
+   *   name: 'my-git-agent',
+   *   repository: 'https://github.com/my-org/agent-repo',
+   *   ref: 'develop',
+   *   agent_setup: [
+   *     'npm install',
+   *     'npm run build'
+   *   ]
+   * });
+   * ```
+   *
+   * @example
+   * Using a specific commit:
+   * ```typescript
+   * const runloop = new RunloopSDK();
+   * const agent = await runloop.agent.createFromGit({
+   *   name: 'my-git-agent',
+   *   repository: 'https://github.com/my-org/agent-repo',
+   *   ref: 'a1b2c3d4e5f6'
+   * });
+   * ```
+   *
+   * @param {object} params - Parameters for creating the agent.
+   * @param {string} params.repository - Git repository URL.
+   * @param {string} [params.ref] - Optional Git ref (branch/tag/commit), defaults to main/HEAD.
+   * @param {string[]} [params.agent_setup] - Setup commands to run after cloning.
+   * @param {Core.RequestOptions} [options] - Request options.
+   * @returns {Promise<Agent>} An {@link Agent} instance.
+   */
+  async createFromGit(
+    params: Omit<AgentCreateParams, 'source'> & {
+      repository: string;
+      ref?: string;
+      agent_setup?: string[];
+    },
+    options?: Core.RequestOptions,
+  ): Promise<Agent> {
+    const { repository, ref, agent_setup, ...restParams } = params;
+
+    const gitConfig: any = { repository };
+    if (ref !== undefined) gitConfig.ref = ref;
+    if (agent_setup !== undefined) gitConfig.agent_setup = agent_setup;
+
+    return this.create(
+      {
+        ...restParams,
+        source: { type: 'git', git: gitConfig },
+      },
+      options,
+    );
+  }
+
+  /**
+   * Create an agent from a storage object.
+   *
+   * @example
+   * Upload agent code and create agent:
+   * ```typescript
+   * const runloop = new RunloopSDK();
+   *
+   * // Upload agent directory as a storage object
+   * const storageObject = await runloop.storageObject.uploadFromDir(
+   *   './my-agent-code',
+   *   { name: 'agent-package' }
+   * );
+   *
+   * // Create agent from the storage object
+   * const agent = await runloop.agent.createFromObject({
+   *   name: 'my-object-agent',
+   *   object_id: storageObject.id
+   * });
+   * ```
+   *
+   * @example
+   * With setup commands:
+   * ```typescript
+   * const runloop = new RunloopSDK();
+   *
+   * const storageObject = await runloop.storageObject.uploadFromDir(
+   *   './my-agent-code',
+   *   { name: 'agent-package' }
+   * );
+   *
+   * const agent = await runloop.agent.createFromObject({
+   *   name: 'my-object-agent',
+   *   object_id: storageObject.id,
+   *   agent_setup: [
+   *     'chmod +x setup.sh',
+   *     './setup.sh',
+   *     'pip install -r requirements.txt'
+   *   ]
+   * });
+   * ```
+   *
+   * @example
+   * Complete workflow: storage object → agent → devbox:
+   * ```typescript
+   * const runloop = new RunloopSDK();
+   *
+   * // 1. Upload agent code
+   * const storageObject = await runloop.storageObject.uploadFromDir(
+   *   './my-agent',
+   *   { name: 'agent-v1' }
+   * );
+   *
+   * // 2. Create agent from storage object
+   * const agent = await runloop.agent.createFromObject({
+   *   name: 'my-agent',
+   *   object_id: storageObject.id
+   * });
+   *
+   * // 3. Create devbox with agent mounted
+   * const devbox = await runloop.devbox.create({
+   *   name: 'devbox-with-agent',
+   *   mounts: [{
+   *     type: 'agent_mount',
+   *     agent_id: agent.id,
+   *     agent_name: null,
+   *     agent_path: '/home/user/agent'
+   *   }]
+   * });
+   * ```
+   *
+   * @param {object} params - Parameters for creating the agent.
+   * @param {string} params.object_id - Storage object ID.
+   * @param {string[]} [params.agent_setup] - Setup commands to run after unpacking.
+   * @param {Core.RequestOptions} [options] - Request options.
+   * @returns {Promise<Agent>} An {@link Agent} instance.
+   */
+  async createFromObject(
+    params: Omit<AgentCreateParams, 'source'> & {
+      object_id: string;
+      agent_setup?: string[];
+    },
+    options?: Core.RequestOptions,
+  ): Promise<Agent> {
+    const { object_id, agent_setup, ...restParams } = params;
+
+    const objectConfig: any = { object_id };
+    if (agent_setup !== undefined) objectConfig.agent_setup = agent_setup;
+
+    return this.create(
+      {
+        ...restParams,
+        source: { type: 'object', object: objectConfig },
+      },
+      options,
+    );
+  }
+
+  /**
    * Get an agent object by its ID.
+   *
+   * @example
+   * ```typescript
+   * const runloop = new RunloopSDK();
+   * const agent = runloop.agent.fromId('agt_1234567890');
+   *
+   * // Get agent information
+   * const info = await agent.getInfo();
+   * console.log(`Agent name: ${info.name}`);
+   * ```
    *
    * @param {string} id - The ID of the agent.
    * @returns {Agent} An {@link Agent} instance.
@@ -687,6 +1057,28 @@ export class AgentOps {
 
   /**
    * List all agents with optional filters.
+   *
+   * @example
+   * List all agents:
+   * ```typescript
+   * const runloop = new RunloopSDK();
+   * const agents = await runloop.agent.list();
+   *
+   * for (const agent of agents) {
+   *   const info = await agent.getInfo();
+   *   console.log(`${info.name}: ${info.source?.type}`);
+   * }
+   * ```
+   *
+   * @example
+   * List with filters:
+   * ```typescript
+   * const runloop = new RunloopSDK();
+   * const agents = await runloop.agent.list({
+   *   name: 'my-agent',
+   *   limit: 10
+   * });
+   * ```
    *
    * @param {AgentListParams} [params] - Optional filter parameters.
    * @param {Core.RequestOptions} [options] - Request options.
@@ -703,8 +1095,8 @@ export class AgentOps {
  * @example
  * ```typescript
  * import { RunloopSDK } from '@runloop/api-client';
- * const sdk = new RunloopSDK();
- * const devbox = await sdk.devbox.create({ name: 'my-devbox' });
+ * const runloop = new RunloopSDK();
+ * const devbox = await runloop.devbox.create({ name: 'my-devbox' });
  * ```
  */
 export default Runloop;
