@@ -52,7 +52,6 @@ describe('resource blueprints', () => {
         user_parameters: { uid: 0, username: 'username' },
       },
       metadata: { foo: 'string' },
-      named_build_contexts: { foo: { object_id: 'object_id', type: 'object' } },
       secrets: { foo: 'string' },
       services: [
         {
@@ -283,7 +282,6 @@ describe('resource blueprints', () => {
         user_parameters: { uid: 0, username: 'username' },
       },
       metadata: { foo: 'string' },
-      named_build_contexts: { foo: { object_id: 'object_id', type: 'object' } },
       secrets: { foo: 'string' },
       services: [
         {
