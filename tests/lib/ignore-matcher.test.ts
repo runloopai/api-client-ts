@@ -1,4 +1,4 @@
-import { DockerIgnoreMatcher } from '../../src/lib/ignore-matcher';
+import { DockerIgnoreMatcher, createIgnoreMatcher } from '../../src/lib/ignore-matcher';
 
 describe('DockerIgnoreMatcher', () => {
   const check = (patterns: string[], path: string, expected: boolean) => {
@@ -35,6 +35,22 @@ describe('DockerIgnoreMatcher', () => {
     check(['*.log', '!keep.log'], 'keep.log', false);
     check(['*.log', '!keep.log'], 'other.log', true);
   });
+
+  it('handles exclusions with leading slash', () => {
+    // !/keep.log should behave like !keep.log relative to root
+    check(['*.log', '!/keep.log'], 'keep.log', false);
+  });
+
+  it('implicitly ignores .dockerignore', () => {
+    // this is an edge case in docker's behavior (.dockerignore is always implicitly ignored)
+    const matcher = new DockerIgnoreMatcher([]);
+    expect(matcher.matches('.dockerignore')).toBe(true);
+  });
+
+  it('normalizes patterns in constructor', () => {
+     // constructor should handle normalization just like createIgnoreMatcher might be expected to
+     // (though current createIgnoreMatcher implementation might also be flawed for exclusions)
+     const matcher = new DockerIgnoreMatcher(['/foo']);
+     expect(matcher.matches('foo')).toBe(true);
+  });
 });
-
-

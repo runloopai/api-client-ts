@@ -121,17 +121,37 @@ export class DockerIgnoreMatcher implements IgnoreMatcher {
   private patterns: CompiledPattern[];
 
   constructor(patterns: string[]) {
-    this.patterns = patterns.map((raw) => {
-      // Normalize pattern immediately upon construction
-      let cleaned = raw;
-      if (cleaned.startsWith('/')) cleaned = cleaned.slice(1);
-      if (cleaned.startsWith('./')) cleaned = cleaned.slice(2);
-      if (cleaned.endsWith('/') && cleaned !== '/') cleaned = cleaned.slice(0, -1);
-      return new CompiledPattern(cleaned, raw);
-    });
+    this.patterns = patterns
+      .map((raw) => {
+        const trimmed = raw.trim();
+        if (!trimmed || trimmed.startsWith('#')) return null;
+
+        // Handle exclusion prefix
+        let isExclusion = false;
+        let cleaned = trimmed;
+        if (cleaned.startsWith('!')) {
+          isExclusion = true;
+          cleaned = cleaned.slice(1);
+        }
+
+        // Normalize path separators
+        cleaned = cleaned.replace(/\\/g, '/');
+
+        // Remove leading/trailing formatting
+        if (cleaned.startsWith('/')) cleaned = cleaned.slice(1);
+        if (cleaned.startsWith('./')) cleaned = cleaned.slice(2);
+        if (cleaned.endsWith('/') && cleaned !== '/') cleaned = cleaned.slice(0, -1);
+
+        const pattern = isExclusion ? '!' + cleaned : cleaned;
+        return new CompiledPattern(pattern, raw);
+      })
+      .filter((p): p is CompiledPattern => p !== null);
   }
 
   matches(filePath: string): boolean {
+    // Always ignore the .dockerignore file itself
+    if (filePath === '.dockerignore') return true;
+
     // Expect paths relative to context root, forward-slash separated
     let normalized = filePath.replace(/\\/g, '/');
 
