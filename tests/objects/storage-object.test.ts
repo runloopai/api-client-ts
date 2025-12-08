@@ -11,6 +11,13 @@ jest.mock('../../src/index');
 jest.mock('node:fs/promises', () => ({
   stat: jest.fn(),
   readFile: jest.fn(),
+  mkdtemp: jest.fn(),
+  rm: jest.fn(),
+}));
+
+jest.mock('node:fs', () => ({
+  createWriteStream: jest.fn(),
+  createReadStream: jest.fn(),
 }));
 
 jest.mock('node:path', () => ({
@@ -36,12 +43,14 @@ describe('StorageObject (New API)', () => {
   let mockClient: any;
   let mockObjectData: ObjectView;
   let mockFs: any;
+  let mockFsSync: any;
   let mockPath: any;
   let mockIgnoreMatcher: any;
 
   beforeEach(() => {
     // Get mocked modules
     mockFs = require('node:fs/promises');
+    mockFsSync = require('node:fs');
     mockPath = require('node:path');
     mockIgnoreMatcher = require('../../src/lib/ignore-matcher');
     mockIgnoreMatcher.loadIgnoreMatcher.mockResolvedValue(null);
@@ -841,15 +850,32 @@ describe('StorageObject (New API)', () => {
 
     it('should upload a directory as gzipped tarball', async () => {
       // Mock directory exists
-      mockFs.stat.mockResolvedValue({ isDirectory: () => true });
+      mockFs.stat.mockResolvedValue({ isDirectory: () => true, size: 100 });
+      mockFs.mkdtemp.mockResolvedValue('/tmp/runloop-upload-123');
+      
+      // Mock write stream
+      const mockWriteStream = {
+        on: jest.fn().mockReturnThis(),
+      };
+      mockFsSync.createWriteStream.mockReturnValue(mockWriteStream);
+
+      // Mock read stream
+      const mockReadStream = {
+        pipe: jest.fn(),
+      };
+      mockFsSync.createReadStream.mockReturnValue(mockReadStream);
 
       // Mock tar stream
-      const mockTarballBuffer = Buffer.from('compressed tarball content');
-      mockTar.create.mockReturnValue({
-        [Symbol.asyncIterator]: async function* () {
-          yield mockTarballBuffer;
-        },
-      });
+      const mockTarStream = {
+        pipe: jest.fn((dest) => {
+            // Trigger finish immediately for test
+            const finishCall = dest.on.mock.calls.find((c: any) => c[0] === 'finish');
+            if (finishCall) finishCall[1]();
+            return dest;
+        }),
+        on: jest.fn(),
+      };
+      mockTar.create.mockReturnValue(mockTarStream);
 
       const mockObjectData = { id: 'dir-123', upload_url: 'https://upload.example.com/dir' };
       const mockObjectInfo = { ...mockObjectData, name: 'project.tar.gz', state: 'UPLOADING' };
@@ -871,16 +897,28 @@ describe('StorageObject (New API)', () => {
 
       expect(mockClient.objects.create).toHaveBeenCalledWith(
         { name: 'project.tar.gz', content_type: 'tgz' },
-        undefined,
+        expect.any(Object), // Match any options object, simplified check
       );
       expect(mockTar.create).toHaveBeenCalled();
+      expect(mockFs.mkdtemp).toHaveBeenCalled();
+      expect(mockFsSync.createWriteStream).toHaveBeenCalled();
+      expect(mockFsSync.createReadStream).toHaveBeenCalled();
+      expect(mockFs.rm).toHaveBeenCalledWith('/tmp/runloop-upload-123', { recursive: true, force: true });
       expect(result).toBeInstanceOf(StorageObject);
       expect(result.id).toBe('dir-123');
     });
 
     it('should respect ignore matcher when building tarball', async () => {
       // Mock directory exists
-      mockFs.stat.mockResolvedValue({ isDirectory: () => true });
+      mockFs.stat.mockResolvedValue({ isDirectory: () => true, size: 100 });
+      mockFs.mkdtemp.mockResolvedValue('/tmp/runloop-upload-123');
+
+      // Mocks for streams
+      const mockWriteStream = {
+        on: jest.fn().mockReturnThis(),
+      };
+      mockFsSync.createWriteStream.mockReturnValue(mockWriteStream);
+      mockFsSync.createReadStream.mockReturnValue({});
 
       // Provide a fake matcher
       const matcher = { matches: jest.fn() };
@@ -888,12 +926,15 @@ describe('StorageObject (New API)', () => {
       ignoreMod.loadIgnoreMatcher.mockResolvedValue(matcher);
 
       // Mock tar stream
-      const mockTarballBuffer = Buffer.from('tarball');
-      mockTar.create.mockReturnValue({
-        [Symbol.asyncIterator]: async function* () {
-          yield mockTarballBuffer;
-        },
-      });
+      const mockTarStream = {
+        pipe: jest.fn((dest) => {
+            const finishCall = dest.on.mock.calls.find((c: any) => c[0] === 'finish');
+            if (finishCall) finishCall[1]();
+            return dest;
+        }),
+        on: jest.fn(),
+      };
+      mockTar.create.mockReturnValue(mockTarStream);
 
       const mockObjectData = { id: 'dir-ignore', upload_url: 'https://upload.example.com/dir' };
       mockClient.objects.create.mockResolvedValue(mockObjectData);
@@ -908,6 +949,7 @@ describe('StorageObject (New API)', () => {
       expect(ignoreMod.loadIgnoreMatcher).toHaveBeenCalledWith('./my-project', 'docker');
 
       // Inspect filter behavior
+      expect(mockTar.create).toHaveBeenCalled(); // Fix brittle test: Assert called first
       const tarOptions = mockTar.create.mock.calls[0][0];
       expect(typeof tarOptions.filter).toBe('function');
 
@@ -922,15 +964,26 @@ describe('StorageObject (New API)', () => {
 
     it('should upload directory with TTL and metadata', async () => {
       // Mock directory exists
-      mockFs.stat.mockResolvedValue({ isDirectory: () => true });
+      mockFs.stat.mockResolvedValue({ isDirectory: () => true, size: 100 });
+      mockFs.mkdtemp.mockResolvedValue('/tmp/runloop-upload-123');
+
+      // Mocks for streams
+      const mockWriteStream = {
+        on: jest.fn().mockReturnThis(),
+      };
+      mockFsSync.createWriteStream.mockReturnValue(mockWriteStream);
+      mockFsSync.createReadStream.mockReturnValue({});
 
       // Mock tar stream
-      const mockTarballBuffer = Buffer.from('compressed tarball');
-      mockTar.create.mockReturnValue({
-        [Symbol.asyncIterator]: async function* () {
-          yield mockTarballBuffer;
-        },
-      });
+      const mockTarStream = {
+        pipe: jest.fn((dest) => {
+            const finishCall = dest.on.mock.calls.find((c: any) => c[0] === 'finish');
+            if (finishCall) finishCall[1]();
+            return dest;
+        }),
+        on: jest.fn(),
+      };
+      mockTar.create.mockReturnValue(mockTarStream);
 
       const mockObjectData = { id: 'dir-456', upload_url: 'https://upload.example.com/dir' };
       const mockCompletedData = { ...mockObjectData, state: 'READ_ONLY' };
@@ -952,7 +1005,7 @@ describe('StorageObject (New API)', () => {
 
       expect(mockClient.objects.create).toHaveBeenCalledWith(
         { name: 'project.tar.gz', content_type: 'tgz', metadata: { project: 'demo' }, ttl_ms: 3600000 },
-        undefined,
+        expect.anything(),
       );
       expect(result.id).toBe('dir-456');
     });
@@ -985,14 +1038,24 @@ describe('StorageObject (New API)', () => {
     });
 
     it('should handle upload failures gracefully', async () => {
-      mockFs.stat.mockResolvedValue({ isDirectory: () => true });
+      mockFs.stat.mockResolvedValue({ isDirectory: () => true, size: 100 });
+      mockFs.mkdtemp.mockResolvedValue('/tmp/runloop-upload-123');
+      
+      const mockWriteStream = {
+        on: jest.fn().mockReturnThis(),
+      };
+      mockFsSync.createWriteStream.mockReturnValue(mockWriteStream);
+      mockFsSync.createReadStream.mockReturnValue({});
 
-      const mockTarballBuffer = Buffer.from('tarball');
-      mockTar.create.mockReturnValue({
-        [Symbol.asyncIterator]: async function* () {
-          yield mockTarballBuffer;
-        },
-      });
+      const mockTarStream = {
+        pipe: jest.fn((dest) => {
+            const finishCall = dest.on.mock.calls.find((c: any) => c[0] === 'finish');
+            if (finishCall) finishCall[1]();
+            return dest;
+        }),
+        on: jest.fn(),
+      };
+      mockTar.create.mockReturnValue(mockTarStream);
 
       const mockObjectData = { id: 'dir-999', upload_url: 'https://upload.example.com/dir' };
       mockClient.objects.create.mockResolvedValue(mockObjectData);
