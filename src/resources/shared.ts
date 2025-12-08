@@ -165,7 +165,7 @@ export interface LaunchParameters {
   after_idle?: AfterIdle | null;
 
   /**
-   * The target architecture for the Devbox. If unset, defaults to arm64.
+   * The target architecture for the Devbox. If unset, defaults to x86_64.
    */
   architecture?: 'x86_64' | 'arm64' | null;
 
