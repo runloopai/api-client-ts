@@ -27,16 +27,24 @@ jest.mock('tar', () => ({
   create: jest.fn(),
 }));
 
+// Mock ignore matcher so uploadFromDir doesn't hit the real filesystem
+jest.mock('../../src/lib/ignore-matcher', () => ({
+  loadIgnoreMatcher: jest.fn(),
+}));
+
 describe('StorageObject (New API)', () => {
   let mockClient: any;
   let mockObjectData: ObjectView;
   let mockFs: any;
   let mockPath: any;
+  let mockIgnoreMatcher: any;
 
   beforeEach(() => {
     // Get mocked modules
     mockFs = require('node:fs/promises');
     mockPath = require('node:path');
+    mockIgnoreMatcher = require('../../src/lib/ignore-matcher');
+    mockIgnoreMatcher.loadIgnoreMatcher.mockResolvedValue(null);
 
     // Create mock client instance with proper structure
     mockClient = {
@@ -826,6 +834,9 @@ describe('StorageObject (New API)', () => {
       ((global as any).fetch as jest.Mock).mockClear();
       // Get tar mock
       mockTar = require('tar');
+      // Reset ignore matcher mock
+      const ignoreMod = require('../../src/lib/ignore-matcher');
+      ignoreMod.loadIgnoreMatcher.mockResolvedValue(null);
     });
 
     it('should upload a directory as gzipped tarball', async () => {
@@ -865,6 +876,48 @@ describe('StorageObject (New API)', () => {
       expect(mockTar.create).toHaveBeenCalled();
       expect(result).toBeInstanceOf(StorageObject);
       expect(result.id).toBe('dir-123');
+    });
+
+    it('should respect ignore matcher when building tarball', async () => {
+      // Mock directory exists
+      mockFs.stat.mockResolvedValue({ isDirectory: () => true });
+
+      // Provide a fake matcher
+      const matcher = { matches: jest.fn() };
+      const ignoreMod = require('../../src/lib/ignore-matcher');
+      ignoreMod.loadIgnoreMatcher.mockResolvedValue(matcher);
+
+      // Mock tar stream
+      const mockTarballBuffer = Buffer.from('tarball');
+      mockTar.create.mockReturnValue({
+        [Symbol.asyncIterator]: async function* () {
+          yield mockTarballBuffer;
+        },
+      });
+
+      const mockObjectData = { id: 'dir-ignore', upload_url: 'https://upload.example.com/dir' };
+      mockClient.objects.create.mockResolvedValue(mockObjectData);
+      mockClient.objects.complete.mockResolvedValue({ ...mockObjectData, state: 'READ_ONLY' });
+      ((global as any).fetch as jest.Mock).mockResolvedValue({ ok: true });
+
+      await StorageObject.uploadFromDir(mockClient, './my-project', {
+        name: 'project.tar.gz',
+      });
+
+      // Ensure we attempted to load a matcher for the directory
+      expect(ignoreMod.loadIgnoreMatcher).toHaveBeenCalledWith('./my-project', 'docker');
+
+      // Inspect filter behavior
+      const tarOptions = mockTar.create.mock.calls[0][0];
+      expect(typeof tarOptions.filter).toBe('function');
+
+      matcher.matches.mockReturnValue(true);
+      expect(tarOptions.filter('ignored.txt')).toBe(false);
+
+      matcher.matches.mockReturnValue(false);
+      expect(tarOptions.filter('kept.txt')).toBe(true);
+      // Normalization of ./ prefix
+      expect(tarOptions.filter('./kept.txt')).toBe(true);
     });
 
     it('should upload directory with TTL and metadata', async () => {

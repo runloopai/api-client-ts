@@ -9,6 +9,12 @@ import type {
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import * as tar from 'tar';
+import {
+  createIgnoreMatcher,
+  loadIgnoreMatcher,
+  loadIgnoreMatcherFromFile,
+  type IgnoreMatcher,
+} from '../lib/ignore-matcher';
 
 // Extract the content type from the API types
 type ContentType = ObjectCreateParams['content_type'];
@@ -410,7 +416,20 @@ export class StorageObject {
     client: Runloop,
     dirPath: string,
     params: Omit<ObjectCreateParams, 'content_type'>,
-    options?: Core.RequestOptions,
+    options?: Core.RequestOptions & {
+      /**
+       * Optional ignore configuration for the directory:
+       *  - an IgnoreMatcher instance, or
+       *  - an array of docker-style glob patterns (as in .dockerignore)
+       */
+      ignore?: IgnoreMatcher | string[];
+
+      /**
+       * Optional path to a specific .dockerignore-style file to use instead of
+       * the default `<dirPath>/.dockerignore`.
+       */
+      dockerignorePath?: string;
+    },
   ): Promise<StorageObject> {
     assertNodeEnvironment();
 
@@ -426,13 +445,45 @@ export class StorageObject {
       );
     }
 
-    // Create the tarball in-memory.
+    // Create the tarball in-memory, honoring .dockerignore / ignore options if present.
     let buffer;
     try {
-      const tarStream = tar.create({ gzip: true, cwd: dirPath }, ['.']);
-      const chunks = [];
+      let matcher: IgnoreMatcher | null = null;
+
+      if (options?.ignore && typeof (options.ignore as any).matches === 'function') {
+        matcher = options.ignore as IgnoreMatcher;
+      } else if (options?.ignore && Array.isArray(options.ignore)) {
+        matcher = createIgnoreMatcher(options.ignore, 'docker');
+      } else if (options?.dockerignorePath) {
+        matcher = await loadIgnoreMatcherFromFile(options.dockerignorePath, 'docker');
+      } else {
+        matcher = await loadIgnoreMatcher(dirPath, 'docker');
+      }
+
+      const tarStream = tar.create(
+        {
+          gzip: true,
+          cwd: dirPath,
+          filter: (entryPath: string) => {
+            if (!matcher) return true;
+
+            // Normalize to forward-slash relative paths
+            let rel = entryPath.replace(/\\/g, '/');
+
+            // tar may prefix entries with "./"
+            if (rel.startsWith('./')) rel = rel.slice(2);
+            if (!rel || rel === '.') return true;
+
+            // Return true to include; matcher.matches == "ignored"
+            return !matcher.matches(rel);
+          },
+        },
+        ['.'],
+      );
+
+      const chunks: Buffer[] = [];
       for await (const chunk of tarStream) {
-        chunks.push(chunk);
+        chunks.push(chunk as Buffer);
       }
       buffer = Buffer.concat(chunks);
     } catch (error) {
