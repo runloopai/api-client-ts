@@ -3,6 +3,7 @@ name: SDK Smoke Tests & Coverage Check
 on:
   pull_request:
     paths:
+      - 'src/sdk.ts'
       - 'src/sdk/**'
       - 'tests/smoketests/object-oriented/**'
   workflow_dispatch:
