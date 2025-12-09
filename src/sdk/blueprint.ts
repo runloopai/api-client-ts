@@ -7,8 +7,34 @@ import type {
 } from '../resources/blueprints';
 import type { DevboxCreateParams, DevboxView } from '../resources/devboxes/devboxes';
 import type { PollingOptions } from '../lib/polling';
+import type { IgnoreMatcher } from '../lib/ignore-matcher';
 import { Devbox } from './devbox';
 import { StorageObject } from './storage-object';
+
+export interface BuildContextDirOptions {
+  /**
+   * Path to the directory to use as build context (Node.js only).
+   */
+  path: string;
+
+  /**
+   * Optional ignore specification:
+   *  - an IgnoreMatcher instance, or
+   *  - an array of docker-style glob patterns (as in .dockerignore).
+   */
+  ignore?: IgnoreMatcher | string[];
+
+  /**
+   * Optional path to a specific .dockerignore-style file to use instead of the
+   * default `<path>/.dockerignore`.
+   */
+  dockerignorePath?: string;
+
+  /**
+   * TTL (ms) for the backing StorageObject. Defaults to 1 hour if omitted.
+   */
+  ttlMs?: number;
+}
 
 export type CreateParams = Omit<BlueprintCreateParams, 'build_context'> & {
   /**
@@ -16,6 +42,19 @@ export type CreateParams = Omit<BlueprintCreateParams, 'build_context'> & {
    * Enables the use of `COPY` Dockerfile directives.
    */
   build_context?: StorageObject | BlueprintCreateParams.BuildContext | null;
+
+  /**
+   * Configure a local directory build context.
+   *
+   * If provided, the SDK will:
+   *  1. Create and upload a gzipped tarball of `path` as a StorageObject
+   *     (honoring .dockerignore or provided ignore patterns),
+   *  2. Set `build_context` on the Blueprint to reference that object.
+   *
+   * If both build_context and build_context_dir are provided, build_context_dir
+   * takes precedence.
+   */
+  build_context_dir?: string | BuildContextDirOptions | null;
 };
 
 /**
@@ -49,14 +88,46 @@ export class Blueprint {
       polling?: Partial<PollingOptions<BlueprintView>>;
     },
   ): Promise<Blueprint> {
-    let rawParams = { ...params };
-    if (params.build_context instanceof StorageObject) {
-      rawParams.build_context = { type: 'object', object_id: params.build_context.id };
+    const { build_context, build_context_dir, ...other } = params as any;
+    let rawParams: BlueprintCreateParams;
+
+    if (build_context_dir) {
+      const dirConfig: BuildContextDirOptions =
+        typeof build_context_dir === 'string' ? { path: build_context_dir } : build_context_dir;
+
+      const ttlMs = dirConfig.ttlMs ?? 3600000;
+
+      const storageObject = await StorageObject.uploadFromDir(
+        client,
+        dirConfig.path,
+        {
+          name: `build-context-${params.name}`,
+          ttl_ms: ttlMs,
+        },
+        {
+          ...(options ?? {}),
+          ignore: dirConfig.ignore,
+          dockerignorePath: dirConfig.dockerignorePath,
+        } as any,
+      );
+
+      rawParams = {
+        ...other,
+        build_context: { type: 'object', object_id: storageObject.id },
+      } as BlueprintCreateParams;
+    } else if (build_context instanceof StorageObject) {
+      rawParams = {
+        ...other,
+        build_context: { type: 'object', object_id: build_context.id },
+      } as BlueprintCreateParams;
+    } else {
+      rawParams = {
+        ...other,
+        build_context,
+      } as BlueprintCreateParams;
     }
-    const blueprintData = await client.blueprints.createAndAwaitBuildCompleted(
-      rawParams as BlueprintCreateParams,
-      options,
-    );
+
+    const blueprintData = await client.blueprints.createAndAwaitBuildCompleted(rawParams, options);
     return new Blueprint(client, blueprintData.id);
   }
 

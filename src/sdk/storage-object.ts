@@ -7,8 +7,16 @@ import type {
   ObjectListParams,
 } from '../resources/objects';
 import * as fs from 'node:fs/promises';
+import * as fsSync from 'node:fs';
+import * as os from 'node:os';
 import * as path from 'node:path';
 import * as tar from 'tar';
+import {
+  createIgnoreMatcher,
+  loadIgnoreMatcher,
+  loadIgnoreMatcherFromFile,
+  type IgnoreMatcher,
+} from '../lib/ignore-matcher';
 
 // Extract the content type from the API types
 type ContentType = ObjectCreateParams['content_type'];
@@ -410,7 +418,20 @@ export class StorageObject {
     client: Runloop,
     dirPath: string,
     params: Omit<ObjectCreateParams, 'content_type'>,
-    options?: Core.RequestOptions,
+    options?: Core.RequestOptions & {
+      /**
+       * Optional ignore configuration for the directory:
+       *  - an IgnoreMatcher instance, or
+       *  - an array of docker-style glob patterns (as in .dockerignore)
+       */
+      ignore?: IgnoreMatcher | string[];
+
+      /**
+       * Optional path to a specific .dockerignore-style file to use instead of
+       * the default `<dirPath>/.dockerignore`.
+       */
+      dockerignorePath?: string;
+    },
   ): Promise<StorageObject> {
     assertNodeEnvironment();
 
@@ -426,50 +447,109 @@ export class StorageObject {
       );
     }
 
-    // Create the tarball in-memory.
-    let buffer;
+    // Extract SDK-specific options to avoid leaking them to the API client
+    const { ignore, dockerignorePath, ...requestOptions } = options || {};
+
+    // Create a temporary file for the tarball
+    const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), 'runloop-upload-'));
+    const tmpFilePath = path.join(tmpDir, 'upload.tar.gz');
+
     try {
-      const tarStream = tar.create({ gzip: true, cwd: dirPath }, ['.']);
-      const chunks = [];
-      for await (const chunk of tarStream) {
-        chunks.push(chunk);
+      let matcher: IgnoreMatcher | null = null;
+
+      if (ignore && typeof (ignore as any).matches === 'function') {
+        matcher = ignore as IgnoreMatcher;
+      } else if (ignore && Array.isArray(ignore)) {
+        matcher = createIgnoreMatcher(ignore, 'docker');
+      } else if (dockerignorePath) {
+        matcher = await loadIgnoreMatcherFromFile(dockerignorePath, 'docker');
+      } else {
+        matcher = await loadIgnoreMatcher(dirPath, 'docker');
       }
-      buffer = Buffer.concat(chunks);
+
+      const tarStream = tar.create(
+        {
+          gzip: true,
+          cwd: dirPath,
+          filter: (entryPath: string) => {
+            if (!matcher) return true;
+
+            // Normalize to forward-slash relative paths
+            let rel = entryPath.replace(/\\/g, '/');
+
+            // tar may prefix entries with "./"
+            if (rel.startsWith('./')) rel = rel.slice(2);
+            if (!rel || rel === '.') return true;
+
+            // Return true to include; matcher.matches == "ignored"
+            return !matcher.matches(rel);
+          },
+        },
+        ['.'],
+      );
+
+      // Pipe the tar stream to the temporary file
+      await new Promise<void>((resolve, reject) => {
+        const dest = fsSync.createWriteStream(tmpFilePath);
+        dest.on('finish', resolve);
+        dest.on('error', reject);
+        tarStream.on('error', reject);
+        tarStream.pipe(dest);
+      });
+
+      // Create the object.
+      const createParams: ObjectCreateParams = { ...params, content_type: 'tgz' };
+      // Cast requestOptions to Core.RequestOptions to satisfy the type checker,
+      // assuming the caller provided valid options minus our custom ones.
+      const objectData = await client.objects.create(createParams, requestOptions as Core.RequestOptions);
+      const storageObject = new StorageObject(client, objectData.id, objectData.upload_url);
+
+      const uploadUrl = objectData.upload_url;
+      if (!uploadUrl) {
+        throw new Error('No upload URL available. Object may already be completed or deleted.');
+      }
+
+      // Upload the file from disk
+      try {
+        const fileStream = fsSync.createReadStream(tmpFilePath);
+        const stats = await fs.stat(tmpFilePath);
+
+        const response = await fetch(uploadUrl, {
+          method: 'PUT',
+          body: fileStream as any,
+          headers: {
+            'Content-Length': stats.size.toString(),
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error(`Upload failed: ${response.status} ${response.statusText}`);
+        }
+      } catch (error) {
+        throw new Error(
+          `Failed to upload tarball: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        );
+      }
+
+      await storageObject.complete();
+
+      return storageObject;
     } catch (error) {
+      // Re-throw errors related to tar creation or other steps
+      if (error instanceof Error && error.message.startsWith('Failed to upload tarball')) {
+        throw error;
+      }
       throw new Error(
         `Failed to create tarball from directory ${dirPath}: ${error instanceof Error ? error.message : 'Unknown error'}`,
       );
-    }
-
-    // Create the object.
-    const createParams: ObjectCreateParams = { ...params, content_type: 'tgz' };
-    const objectData = await client.objects.create(createParams, options);
-    const storageObject = new StorageObject(client, objectData.id, objectData.upload_url);
-
-    const uploadUrl = objectData.upload_url;
-    if (!uploadUrl) {
-      throw new Error('No upload URL available. Object may already be completed or deleted.');
-    }
-
-    // Write the tarball to the upload URL.
-    try {
-      const response = await fetch(uploadUrl, {
-        method: 'PUT',
-        body: buffer,
-      });
-
-      if (!response.ok) {
-        throw new Error(`Upload failed: ${response.status} ${response.statusText}`);
+    } finally {
+      // Clean up temporary file and directory
+      try {
+        await fs.rm(tmpDir, { recursive: true, force: true });
+      } catch {
+        // Ignore cleanup errors
       }
-    } catch (error) {
-      throw new Error(
-        `Failed to upload tarball: ${error instanceof Error ? error.message : 'Unknown error'}`,
-      );
     }
-
-    await storageObject.complete();
-
-    return storageObject;
   }
 
   /**
