@@ -1,5 +1,35 @@
 # Changelog
 
+## 1.1.0 (2025-12-13)
+
+Full Changelog: [v1.0.0...v1.1.0](https://github.com/runloopai/api-client-ts/compare/v1.0.0...v1.1.0)
+
+### Features
+
+* **blueprints:** Add build context to the OpenAPI spec ([#6494](https://github.com/runloopai/api-client-ts/issues/6494)) ([e295c86](https://github.com/runloopai/api-client-ts/commit/e295c861c54be8320cf3a049023722159e1566d9))
+* **devbox:** added stdin streaming endpoint ([2610c5d](https://github.com/runloopai/api-client-ts/commit/2610c5d9207fab989f335633e9b8034d6905afd0))
+* **devbox:** added suspend async and promoted suspend to automatically await the devbox running ([#670](https://github.com/runloopai/api-client-ts/issues/670)) ([e814e00](https://github.com/runloopai/api-client-ts/commit/e814e000496e923023e525b038efcb39e34b4cdd))
+* **devbox:** default to x86 arch ([e040bc2](https://github.com/runloopai/api-client-ts/commit/e040bc2bd4411dd566fbe6e339055403eb52bfca))
+* **devbox:** return user for createSshKey ([3e8406b](https://github.com/runloopai/api-client-ts/commit/3e8406bb8b29a4e2cf87e89c22be7a8e5ecebf39))
+* **ignore matcher:** support for .dockerignore for build context ([#673](https://github.com/runloopai/api-client-ts/issues/673)) ([a843d54](https://github.com/runloopai/api-client-ts/commit/a843d54b93a69ea4cf8bf22475fd0cf6b04ba98b))
+
+
+### Bug Fixes
+
+* **api:** don't ignore devbox keep_alive, suspend and resume in api ([a5143ef](https://github.com/runloopai/api-client-ts/commit/a5143eff331d3404e1649ec57f01e67ea18b6613))
+* **devbox:** launch parameter typo ([2ef3ede](https://github.com/runloopai/api-client-ts/commit/2ef3ede2bbc71b79f111ab9c0326573f44dfab4c))
+* **mcp:** correct code tool API endpoint ([8932b2d](https://github.com/runloopai/api-client-ts/commit/8932b2d7b4bc2a5c50487db572286448d388e6ea))
+* **mcp:** return correct lines on typescript errors ([4ebe08c](https://github.com/runloopai/api-client-ts/commit/4ebe08c525a71cecb26e78a3a52602efb40fb968))
+* **scorer:** fixed RL_TEST_CONTEXT to RL_SCORER_CONTEXT ([e810958](https://github.com/runloopai/api-client-ts/commit/e810958cdab4b067d91f7a2e3cec481b44a5a7d9))
+
+
+### Chores
+
+* hide build context APIs ([8ea7bba](https://github.com/runloopai/api-client-ts/commit/8ea7bba5cd9cd9d047091386025965edeb316ab4))
+* **internal:** codegen related update ([09eb01d](https://github.com/runloopai/api-client-ts/commit/09eb01ddeb7496eb3badd068dba2fb9c1198fddf))
+* **internal:** codegen related update ([83d2d6c](https://github.com/runloopai/api-client-ts/commit/83d2d6cb029c72383fdece53d3850af5416447a1))
+* **mounts:** Update documentation for deprecated fields to direct the user to the replacement API ([1e68146](https://github.com/runloopai/api-client-ts/commit/1e6814677b20e12513da0faaa3cd4414a4d3df6e))
+
 ## 1.0.0 (2025-12-01)
 
 Full Changelog: [v0.69.0...v1.0.0](https://github.com/runloopai/api-client-ts/compare/v0.69.0...v1.0.0)
