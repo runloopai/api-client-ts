@@ -28,6 +28,7 @@ describe('AgentOps', () => {
       id: 'agent-123',
       create_time_ms: Date.now(),
       name: 'test-agent',
+      version: '1.0.0',
       is_public: false,
       source: {
         type: 'npm',
@@ -46,6 +47,7 @@ describe('AgentOps', () => {
     it('should create an agent from npm package', async () => {
       await agentOps.createFromNpm({
         name: 'test-agent',
+        version: '1.0.0',
         package_name: '@runloop/example-agent',
       });
 
@@ -53,6 +55,7 @@ describe('AgentOps', () => {
         mockClient,
         {
           name: 'test-agent',
+          version: '1.0.0',
           source: {
             type: 'npm',
             npm: {
@@ -67,6 +70,7 @@ describe('AgentOps', () => {
     it('should create an agent with all npm options', async () => {
       await agentOps.createFromNpm({
         name: 'test-agent',
+        version: '1.0.0',
         package_name: '@runloop/example-agent',
         npm_version: '1.2.3',
         registry_url: 'https://registry.example.com',
@@ -77,6 +81,7 @@ describe('AgentOps', () => {
         mockClient,
         {
           name: 'test-agent',
+          version: '1.0.0',
           source: {
             type: 'npm',
             npm: {
@@ -96,6 +101,7 @@ describe('AgentOps', () => {
     it('should create an agent from pip package', async () => {
       await agentOps.createFromPip({
         name: 'test-agent',
+        version: '1.0.0',
         package_name: 'runloop-example-agent',
       });
 
@@ -103,6 +109,7 @@ describe('AgentOps', () => {
         mockClient,
         {
           name: 'test-agent',
+          version: '1.0.0',
           source: {
             type: 'pip',
             pip: {
@@ -117,6 +124,7 @@ describe('AgentOps', () => {
     it('should create an agent with all pip options', async () => {
       await agentOps.createFromPip({
         name: 'test-agent',
+        version: '1.0.0',
         package_name: 'runloop-example-agent',
         pip_version: '1.2.3',
         registry_url: 'https://pypi.example.com',
@@ -127,6 +135,7 @@ describe('AgentOps', () => {
         mockClient,
         {
           name: 'test-agent',
+          version: '1.0.0',
           source: {
             type: 'pip',
             pip: {
@@ -146,6 +155,7 @@ describe('AgentOps', () => {
     it('should create an agent from git repository', async () => {
       await agentOps.createFromGit({
         name: 'test-agent',
+        version: '1.0.0',
         repository: 'https://github.com/example/agent-repo',
       });
 
@@ -153,6 +163,7 @@ describe('AgentOps', () => {
         mockClient,
         {
           name: 'test-agent',
+          version: '1.0.0',
           source: {
             type: 'git',
             git: {
@@ -167,6 +178,7 @@ describe('AgentOps', () => {
     it('should create an agent with all git options', async () => {
       await agentOps.createFromGit({
         name: 'test-agent',
+        version: '1.0.0',
         repository: 'https://github.com/example/agent-repo',
         ref: 'develop',
         agent_setup: ['npm install', 'npm run build'],
@@ -176,6 +188,7 @@ describe('AgentOps', () => {
         mockClient,
         {
           name: 'test-agent',
+          version: '1.0.0',
           source: {
             type: 'git',
             git: {
@@ -194,6 +207,7 @@ describe('AgentOps', () => {
     it('should create an agent from object', async () => {
       await agentOps.createFromObject({
         name: 'test-agent',
+        version: '1.0.0',
         object_id: 'obj_123',
       });
 
@@ -201,6 +215,7 @@ describe('AgentOps', () => {
         mockClient,
         {
           name: 'test-agent',
+          version: '1.0.0',
           source: {
             type: 'object',
             object: {
@@ -215,6 +230,7 @@ describe('AgentOps', () => {
     it('should create an agent with agent_setup', async () => {
       await agentOps.createFromObject({
         name: 'test-agent',
+        version: '1.0.0',
         object_id: 'obj_123',
         agent_setup: ['chmod +x setup.sh', './setup.sh'],
       });
@@ -223,6 +239,7 @@ describe('AgentOps', () => {
         mockClient,
         {
           name: 'test-agent',
+          version: '1.0.0',
           source: {
             type: 'object',
             object: {

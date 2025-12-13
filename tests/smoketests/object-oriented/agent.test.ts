@@ -11,6 +11,7 @@ describe('smoketest: object-oriented agent', () => {
         const name = uniqueName('sdk-agent-test-basic');
         const agent = await runloop.agent.create({
           name: name,
+          version: '1.0.0',
           source: {
             type: 'npm',
             npm: {
@@ -42,6 +43,7 @@ describe('smoketest: object-oriented agent', () => {
         const name = uniqueName('sdk-agent-test-info');
         const agent = await runloop.agent.create({
           name: name,
+          version: '1.0.0',
           source: {
             type: 'npm',
             npm: {
@@ -84,6 +86,7 @@ describe('smoketest: object-oriented agent', () => {
         // Create an agent
         const created = await runloop.agent.create({
           name: uniqueName('sdk-agent-test-retrieve'),
+          version: '1.0.0',
           source: {
             type: 'npm',
             npm: {
@@ -118,9 +121,9 @@ describe('smoketest: object-oriented agent', () => {
         };
 
         // Create multiple agents
-        const agent1 = await runloop.agent.create({ name: uniqueName('sdk-agent-test-list-1'), source: sourceConfig });
-        const agent2 = await runloop.agent.create({ name: uniqueName('sdk-agent-test-list-2'), source: sourceConfig });
-        const agent3 = await runloop.agent.create({ name: uniqueName('sdk-agent-test-list-3'), source: sourceConfig });
+        const agent1 = await runloop.agent.create({ name: uniqueName('sdk-agent-test-list-1'), version: '1.0.0', source: sourceConfig });
+        const agent2 = await runloop.agent.create({ name: uniqueName('sdk-agent-test-list-2'), version: '1.0.0', source: sourceConfig });
+        const agent3 = await runloop.agent.create({ name: uniqueName('sdk-agent-test-list-3'), version: '1.0.0', source: sourceConfig });
 
         try {
           // List agents
@@ -151,6 +154,7 @@ describe('smoketest: object-oriented agent', () => {
 
         const agent = await runloop.agent.create({
           name: name,
+          version: '1.0.0',
           source: {
             type: 'npm',
             npm: {
@@ -179,6 +183,7 @@ describe('smoketest: object-oriented agent', () => {
 
         const agent = await runloop.agent.create({
           name: name,
+          version: '1.0.0',
           source: {
             type: 'git',
             git: {
@@ -209,6 +214,7 @@ describe('smoketest: object-oriented agent', () => {
         const name = uniqueName('sdk-agent-from-npm');
         const agent = await runloop.agent.createFromNpm({
           name: name,
+          version: '1.0.0',
           package_name: '@runloop/hello-world-agent',
         });
 
@@ -231,6 +237,7 @@ describe('smoketest: object-oriented agent', () => {
         const name = uniqueName('sdk-agent-from-pip');
         const agent = await runloop.agent.createFromPip({
           name: name,
+          version: '1.0.0',
           package_name: 'runloop-example-agent',
         });
 
@@ -253,6 +260,7 @@ describe('smoketest: object-oriented agent', () => {
         const name = uniqueName('sdk-agent-from-git');
         const agent = await runloop.agent.createFromGit({
           name: name,
+          version: '1.0.0',
           repository: 'https://github.com/runloop/example-agent',
           ref: 'main',
         });
@@ -291,6 +299,7 @@ describe('smoketest: object-oriented agent', () => {
           const agentName = uniqueName('sdk-agent-from-object');
           agent = await runloop.agent.createFromObject({
             name: agentName,
+            version: '1.0.0',
             object_id: storageObject.id,
           });
 
@@ -332,6 +341,7 @@ describe('smoketest: object-oriented agent', () => {
           // Create agent from storage object
           agent = await runloop.agent.createFromObject({
             name: uniqueName('sdk-agent-for-mount'),
+            version: '1.0.0',
             object_id: storageObject.id,
           });
 
