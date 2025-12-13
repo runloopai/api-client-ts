@@ -87,6 +87,11 @@ export interface RunListParams extends BenchmarkRunsCursorIDPageParams {
    * The Benchmark ID to filter by.
    */
   benchmark_id?: string;
+
+  /**
+   * Filter by name
+   */
+  name?: string;
 }
 
 export interface RunListScenarioRunsParams extends BenchmarkRunsCursorIDPageParams {

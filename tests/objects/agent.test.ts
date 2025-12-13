@@ -23,6 +23,7 @@ describe('Agent (SDK)', () => {
       id: 'agent-123',
       create_time_ms: Date.now(),
       name: 'test-agent',
+      version: '1.0.0',
       is_public: false,
       source: {
         type: 'npm',
@@ -39,6 +40,7 @@ describe('Agent (SDK)', () => {
 
       const agent = await Agent.create(mockClient, {
         name: 'test-agent',
+        version: '1.0.0',
         source: {
           type: 'npm',
           npm: {
@@ -50,6 +52,7 @@ describe('Agent (SDK)', () => {
       expect(mockClient.agents.create).toHaveBeenCalledWith(
         {
           name: 'test-agent',
+          version: '1.0.0',
           source: {
             type: 'npm',
             npm: {
@@ -78,6 +81,7 @@ describe('Agent (SDK)', () => {
 
       const agent = await Agent.create(mockClient, {
         name: 'git-agent',
+        version: '1.0.0',
         source: {
           type: 'git',
           git: {
@@ -90,6 +94,7 @@ describe('Agent (SDK)', () => {
       expect(mockClient.agents.create).toHaveBeenCalledWith(
         {
           name: 'git-agent',
+          version: '1.0.0',
           source: {
             type: 'git',
             git: {
@@ -117,6 +122,7 @@ describe('Agent (SDK)', () => {
 
       await Agent.create(mockClient, {
         name: 'pip-agent',
+        version: '1.0.0',
         source: {
           type: 'pip',
           pip: {
@@ -128,6 +134,7 @@ describe('Agent (SDK)', () => {
       expect(mockClient.agents.create).toHaveBeenCalledWith(
         {
           name: 'pip-agent',
+          version: '1.0.0',
           source: {
             type: 'pip',
             pip: {
@@ -152,9 +159,9 @@ describe('Agent (SDK)', () => {
   describe('list', () => {
     it('should list agents and return Agent instances', async () => {
       const mockAgents = [
-        { id: 'agent-001', name: 'first-agent', create_time_ms: Date.now(), is_public: false },
-        { id: 'agent-002', name: 'second-agent', create_time_ms: Date.now(), is_public: true },
-        { id: 'agent-003', name: 'third-agent', create_time_ms: Date.now(), is_public: false },
+        { id: 'agent-001', name: 'first-agent', version: '1.0.0', create_time_ms: Date.now(), is_public: false },
+        { id: 'agent-002', name: 'second-agent', version: '1.0.0', create_time_ms: Date.now(), is_public: true },
+        { id: 'agent-003', name: 'third-agent', version: '1.0.0', create_time_ms: Date.now(), is_public: false },
       ];
 
       // Mock async iterator
@@ -181,7 +188,7 @@ describe('Agent (SDK)', () => {
     it('should pass filter parameters to list', async () => {
       const asyncIterator = {
         async *[Symbol.asyncIterator]() {
-          yield { id: 'agent-001', name: 'filtered-agent', create_time_ms: Date.now(), is_public: false };
+          yield { id: 'agent-001', name: 'filtered-agent', version: '1.0.0', create_time_ms: Date.now(), is_public: false };
         },
       };
 
@@ -214,6 +221,7 @@ describe('Agent (SDK)', () => {
       mockClient.agents.create.mockResolvedValue(mockAgentData);
       agent = await Agent.create(mockClient, {
         name: 'test-agent',
+        version: '1.0.0',
         source: {
           type: 'npm',
           npm: {
@@ -259,6 +267,7 @@ describe('Agent (SDK)', () => {
       await expect(
         Agent.create(mockClient, {
           name: 'failing-agent',
+          version: '1.0.0',
           source: {
             type: 'npm',
             npm: {
@@ -293,12 +302,14 @@ describe('Agent (SDK)', () => {
         id: 'agent-minimal',
         create_time_ms: Date.now(),
         name: 'minimal',
+        version: '1.0.0',
         is_public: false,
       };
       mockClient.agents.create.mockResolvedValue(minimalData);
 
       const agent = await Agent.create(mockClient, {
         name: 'minimal',
+        version: '1.0.0',
         source: {
           type: 'npm',
           npm: {
@@ -325,6 +336,7 @@ describe('Agent (SDK)', () => {
 
       const agent = await Agent.create(mockClient, {
         name: 'object-agent',
+        version: '1.0.0',
         source: {
           type: 'object',
           object: {

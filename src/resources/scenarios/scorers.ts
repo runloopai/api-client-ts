@@ -79,7 +79,7 @@ export interface ScorerCreateResponse {
   id: string;
 
   /**
-   * Bash script that takes in $RL_TEST_CONTEXT as env variable and runs scoring.
+   * Bash script that takes in $RL_SCORER_CONTEXT as env variable and runs scoring.
    */
   bash_script: string;
 
@@ -99,7 +99,7 @@ export interface ScorerRetrieveResponse {
   id: string;
 
   /**
-   * Bash script that takes in $RL_TEST_CONTEXT as env variable and runs scoring.
+   * Bash script that takes in $RL_SCORER_CONTEXT as env variable and runs scoring.
    */
   bash_script: string;
 
@@ -119,7 +119,7 @@ export interface ScorerUpdateResponse {
   id: string;
 
   /**
-   * Bash script that takes in $RL_TEST_CONTEXT as env variable and runs scoring.
+   * Bash script that takes in $RL_SCORER_CONTEXT as env variable and runs scoring.
    */
   bash_script: string;
 
@@ -139,7 +139,7 @@ export interface ScorerListResponse {
   id: string;
 
   /**
-   * Bash script that takes in $RL_TEST_CONTEXT as env variable and runs scoring.
+   * Bash script that takes in $RL_SCORER_CONTEXT as env variable and runs scoring.
    */
   bash_script: string;
 
