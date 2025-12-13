@@ -49,7 +49,14 @@ describe('resource runs', () => {
     // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
     await expect(
       client.scenarios.runs.list(
-        { limit: 0, scenario_id: 'scenario_id', starting_after: 'starting_after' },
+        {
+          benchmark_run_id: 'benchmark_run_id',
+          limit: 0,
+          name: 'name',
+          scenario_id: 'scenario_id',
+          starting_after: 'starting_after',
+          state: 'state',
+        },
         { path: '/_stainless_unknown_path' },
       ),
     ).rejects.toThrow(Runloop.NotFoundError);

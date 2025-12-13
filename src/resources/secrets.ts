@@ -154,7 +154,7 @@ export interface SecretUpdateParams {
 
 export interface SecretListParams {
   /**
-   * The limit of items to return. Default is 20.
+   * The limit of items to return. Default is 20. Max is 5000.
    */
   limit?: number;
 }
