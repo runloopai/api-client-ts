@@ -784,6 +784,11 @@ export interface ScenarioListParams extends ScenariosCursorIDPageParams {
    * Query for Scenarios with a given name.
    */
   name?: string;
+
+  /**
+   * Filter by validation type
+   */
+  validation_type?: string;
 }
 
 export interface ScenarioListPublicParams extends ScenariosCursorIDPageParams {

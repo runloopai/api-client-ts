@@ -77,9 +77,24 @@ export class Runs extends APIResource {
 
 export interface RunListParams extends BenchmarkRunsCursorIDPageParams {
   /**
+   * Filter by benchmark run ID
+   */
+  benchmark_run_id?: string;
+
+  /**
+   * Filter by name
+   */
+  name?: string;
+
+  /**
    * Filter runs associated to Scenario given ID
    */
   scenario_id?: string;
+
+  /**
+   * Filter by state
+   */
+  state?: string;
 }
 
 export declare namespace Runs {

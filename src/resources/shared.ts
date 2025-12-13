@@ -78,11 +78,6 @@ export namespace AgentSource {
     agent_setup?: Array<string> | null;
 
     /**
-     * NPM version constraint
-     */
-    npm_version?: string | null;
-
-    /**
      * NPM registry URL
      */
     registry_url?: string | null;
@@ -116,11 +111,6 @@ export namespace AgentSource {
      * Setup commands to run after installation
      */
     agent_setup?: Array<string> | null;
-
-    /**
-     * Pip version constraint
-     */
-    pip_version?: string | null;
 
     /**
      * Pip registry URL

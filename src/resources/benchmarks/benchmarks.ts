@@ -405,11 +405,16 @@ export interface BenchmarkUpdateParams {
   scenario_ids?: Array<string> | null;
 }
 
-export interface BenchmarkListParams extends BenchmarksCursorIDPageParams {}
+export interface BenchmarkListParams extends BenchmarksCursorIDPageParams {
+  /**
+   * Filter by name
+   */
+  name?: string;
+}
 
 export interface BenchmarkDefinitionsParams {
   /**
-   * The limit of items to return. Default is 20.
+   * The limit of items to return. Default is 20. Max is 5000.
    */
   limit?: number;
 

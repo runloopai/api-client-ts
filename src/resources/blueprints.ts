@@ -626,6 +626,11 @@ export interface BlueprintListParams extends BlueprintsCursorIDPageParams {
    * Filter by name
    */
   name?: string;
+
+  /**
+   * Filter by build status (queued, provisioning, building, failed, build_complete)
+   */
+  status?: string;
 }
 
 export interface BlueprintCreateFromInspectionParams {
@@ -674,6 +679,11 @@ export interface BlueprintListPublicParams extends BlueprintsCursorIDPageParams 
    * Filter by name
    */
   name?: string;
+
+  /**
+   * Filter by build status (queued, provisioning, building, failed, build_complete)
+   */
+  status?: string;
 }
 
 export interface BlueprintPreviewParams {
