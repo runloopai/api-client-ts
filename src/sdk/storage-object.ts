@@ -321,7 +321,7 @@ export class StorageObject {
     try {
       const response = await fetch(uploadUrl, {
         method: 'PUT',
-        body: new Blob([text]),
+        body: Buffer.from(text, 'utf-8'),
       });
 
       if (!response.ok) {
@@ -396,7 +396,7 @@ export class StorageObject {
     try {
       const response = await fetch(uploadUrl, {
         method: 'PUT',
-        body: new Blob([buffer]),
+        body: buffer,
       });
 
       if (!response.ok) {
