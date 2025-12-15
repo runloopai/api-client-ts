@@ -143,7 +143,7 @@ describe('DevboxOps', () => {
     describe('mixed mount types', () => {
       it('should handle mixed SDK and standard mount types', async () => {
         const mockStorageObject = { id: 'obj-123' } as StorageObject;
-        const standardMount: Shared.CodeMountParameters = {
+        const standardMount: Shared.Mount.CodeMount = {
           type: 'code_mount',
           repo_name: 'my-repo',
           repo_owner: 'owner',
@@ -176,7 +176,7 @@ describe('DevboxOps', () => {
       });
 
       it('should pass through standard ObjectMountParameters unchanged', async () => {
-        const standardObjectMount: Shared.ObjectMountParameters = {
+        const standardObjectMount: Shared.Mount.ObjectMount = {
           type: 'object_mount',
           object_id: 'obj-789',
           object_path: '/home/user/existing.txt',
@@ -198,11 +198,10 @@ describe('DevboxOps', () => {
       });
 
       it('should pass through file_mount unchanged', async () => {
-        const fileMount: Shared.Mount = {
+        const fileMount: Shared.Mount.FileMount = {
           type: 'file_mount',
-          files: {
-            '/home/user/config.json': '{"key": "value"}',
-          },
+          content: '{"key": "value"}',
+          target: '/home/user/config.json',
         };
 
         await devboxOps.create({
