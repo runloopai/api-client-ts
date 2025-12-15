@@ -1,4 +1,4 @@
-import { DevboxOps, SDKDevboxCreateParams, MountInstance, InlineObjectMount } from '../../src/sdk';
+import { DevboxOps, SDKDevboxCreateParams, MountInstance } from '../../src/sdk';
 import { Devbox } from '../../src/sdk/devbox';
 import { StorageObject } from '../../src/sdk/storage-object';
 import type { DevboxView } from '../../src/resources/devboxes/devboxes';
