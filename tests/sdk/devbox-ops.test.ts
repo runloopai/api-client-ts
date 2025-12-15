@@ -1,4 +1,4 @@
-import { DevboxOps, SDKDevboxCreateParams, SDKMountInput, SDKObjectMount } from '../../src/sdk';
+import { DevboxOps, SDKDevboxCreateParams, MountInstance, InlineObjectMount } from '../../src/sdk';
 import { Devbox } from '../../src/sdk/devbox';
 import { StorageObject } from '../../src/sdk/storage-object';
 import type { DevboxView } from '../../src/resources/devboxes/devboxes';
@@ -45,8 +45,8 @@ describe('DevboxOps', () => {
   });
 
   describe('create with SDK mount syntax', () => {
-    describe('SDKObjectMount transformation', () => {
-      it('should transform a single SDKObjectMount to ObjectMountParameters', async () => {
+    describe('InlineObjectMount transformation', () => {
+      it('should transform a single InlineObjectMount to ObjectMountParameters', async () => {
         // Create a mock StorageObject
         const mockStorageObject = { id: 'obj-123' } as StorageObject;
 
@@ -71,7 +71,7 @@ describe('DevboxOps', () => {
         );
       });
 
-      it('should transform multiple SDKObjectMounts in a single object', async () => {
+      it('should transform multiple InlineObjectMounts in a single object', async () => {
         const mockStorageObject1 = { id: 'obj-123' } as StorageObject;
         const mockStorageObject2 = { id: 'obj-456' } as StorageObject;
 
@@ -106,7 +106,7 @@ describe('DevboxOps', () => {
         );
       });
 
-      it('should transform multiple separate SDKObjectMount items', async () => {
+      it('should transform multiple separate InlineObjectMount items', async () => {
         const mockStorageObject1 = { id: 'obj-123' } as StorageObject;
         const mockStorageObject2 = { id: 'obj-456' } as StorageObject;
 
@@ -329,9 +329,9 @@ describe('DevboxOps', () => {
       expect(Devbox.create).toHaveBeenCalled();
     });
 
-    it('should accept SDKMountInput array', async () => {
+    it('should accept MountInstance array', async () => {
       const mockStorageObject = { id: 'obj-123' } as StorageObject;
-      const mounts: SDKMountInput[] = [
+      const mounts: MountInstance[] = [
         { '/path1': mockStorageObject },
         { type: 'object_mount', object_id: 'obj-456', object_path: '/path2' },
       ];

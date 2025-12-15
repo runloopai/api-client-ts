@@ -34,13 +34,13 @@ import * as Shared from './resources/shared';
  * { '/home/user/config.txt': storageObject }
  * ```
  */
-export type SDKObjectMount = { [path: string]: StorageObject };
+export type InlineObjectMount = { [path: string]: StorageObject };
 
 /**
  * Union type representing all valid mount inputs for the SDK.
- * Accepts both the standard API mount format and the convenient SDKObjectMount format.
+ * Accepts both the standard API mount format and the convenient InlineObjectMount format.
  */
-export type SDKMountInput = Shared.Mount | SDKObjectMount;
+export type MountInstance = Shared.Mount | InlineObjectMount;
 
 /**
  * Extended DevboxCreateParams that accepts the convenient SDK mount syntax.
@@ -59,17 +59,17 @@ export interface SDKDevboxCreateParams extends Omit<DevboxCreateParams, 'mounts'
    * ]
    * ```
    */
-  mounts?: Array<SDKMountInput> | null;
+  mounts?: Array<MountInstance> | null;
 }
 
 /**
- * Type guard to check if a mount input is an SDKObjectMount (path-to-StorageObject mapping).
- * Standard Shared.Mount types have a 'type' discriminator property, while SDKObjectMount does not.
+ * Type guard to check if a mount input is an InlineObjectMount (path-to-StorageObject mapping).
+ * Standard Shared.Mount types have a 'type' discriminator property, while InlineObjectMount does not.
  *
  * @param mount - The mount input to check
- * @returns true if the mount is an SDKObjectMount
+ * @returns true if the mount is an InlineObjectMount
  */
-function isSDKObjectMount(mount: SDKMountInput): mount is SDKObjectMount {
+function isInlineObjectMount(mount: MountInstance): mount is InlineObjectMount {
   return typeof mount === 'object' && mount !== null && !('type' in mount);
 }
 
@@ -80,9 +80,9 @@ function isSDKObjectMount(mount: SDKMountInput): mount is SDKObjectMount {
  * @param mounts - Array of SDK mount inputs
  * @returns Array of API-compatible mounts
  */
-function transformMounts(mounts: Array<SDKMountInput>): Array<Shared.Mount> {
+function transformMounts(mounts: Array<MountInstance>): Array<Shared.Mount> {
   return mounts.flatMap((mount) => {
-    if (isSDKObjectMount(mount)) {
+    if (isInlineObjectMount(mount)) {
       // Convert { "path": StorageObject } to ObjectMountParameters
       return Object.entries(mount).map(([path, obj]) => ({
         type: 'object_mount' as const,
