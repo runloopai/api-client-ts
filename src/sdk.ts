@@ -18,6 +18,136 @@ import type { BlueprintListParams } from './resources/blueprints';
 import type { ObjectCreateParams, ObjectListParams } from './resources/objects';
 import type { AgentCreateParams, AgentListParams } from './resources/agents';
 import { PollingOptions } from './lib/polling';
+import * as Shared from './resources/shared';
+
+// ============================================================================
+// SDK-specific mount types for convenient StorageObject mounting
+// ============================================================================
+
+/**
+ * A convenient mount format that maps a path to a StorageObject.
+ * The key is the path on the devbox where the object will be mounted,
+ * and the value is the StorageObject instance.
+ *
+ * @example
+ * ```typescript
+ * { '/home/user/config.txt': storageObject }
+ * ```
+ */
+export type InlineObjectMount = { [path: string]: StorageObject };
+
+/**
+ * Union type representing all valid mount inputs for the SDK.
+ * Accepts both the standard API mount format and the convenient InlineObjectMount format.
+ */
+export type MountInstance = Shared.Mount | InlineObjectMount;
+
+/**
+ * Extended DevboxCreateParams that accepts the convenient SDK mount syntax.
+ * Use this type when creating devboxes through the SDK's DevboxOps.create() method.
+ */
+export interface SDKDevboxCreateParams extends Omit<DevboxCreateParams, 'mounts'> {
+  /**
+   * A list of mounts to be included in the Devbox.
+   * Accepts both standard API mount format and the convenient `{ path: StorageObject }` syntax.
+   *
+   * @example
+   * ```typescript
+   * mounts: [
+   *   { '/home/user/file.txt': storageObject },
+   *   { type: 'code_mount', repo_name: 'my-repo', repo_owner: 'owner' }
+   * ]
+   * ```
+   */
+  mounts?: Array<MountInstance> | null;
+}
+
+/**
+ * Type guard to check if a mount input is an InlineObjectMount (path-to-StorageObject mapping).
+ * Standard Shared.Mount types have a 'type' discriminator property, while InlineObjectMount does not.
+ *
+ * @param mount - The mount input to check
+ * @returns true if the mount is an InlineObjectMount
+ */
+function isInlineObjectMount(mount: MountInstance): mount is InlineObjectMount {
+  if (typeof mount !== 'object' || mount === null || 'type' in mount) {
+    return false;
+  }
+  // Exclude arrays
+  if (Array.isArray(mount)) {
+    return false;
+  }
+  // Validate that all values have an 'id' property (StorageObject shape)
+  const values = Object.values(mount);
+  return (
+    values.length > 0 &&
+    values.every((v) => v && typeof v === 'object' && 'id' in v && typeof v.id === 'string')
+  );
+}
+
+/**
+ * Transforms SDK mount inputs to the API-compatible Shared.Mount format.
+ * Converts convenient `{ path: StorageObject }` syntax to `ObjectMountParameters`.
+ *
+ * @param mounts - Array of SDK mount inputs
+ * @returns Array of API-compatible mounts
+ */
+function transformMounts(mounts: Array<MountInstance>): Array<Shared.Mount> {
+  return mounts.flatMap((mount) => {
+    if (isInlineObjectMount(mount)) {
+      // Convert { "path": StorageObject } to ObjectMountParameters
+      return Object.entries(mount).map(([path, obj]) => {
+        if (!obj || typeof obj !== 'object' || typeof obj.id !== 'string') {
+          throw new Error(
+            `Invalid mount value for path "${path}": expected a StorageObject with an 'id' property, ` +
+              `got ${obj === null ? 'null' : typeof obj}`,
+          );
+        }
+        return {
+          type: 'object_mount' as const,
+          object_id: obj.id,
+          object_path: path,
+        };
+      });
+    }
+    // Already a standard mount
+    return mount;
+  });
+}
+
+/**
+ * Transforms SDKDevboxCreateParams to DevboxCreateParams by converting SDK mount syntax.
+ *
+ * @param params - SDK devbox creation parameters
+ * @returns API-compatible devbox creation parameters
+ */
+function transformSDKDevboxCreateParams(params?: SDKDevboxCreateParams): DevboxCreateParams | undefined {
+  if (!params) {
+    return undefined;
+  }
+
+  // Extract mounts and rest of params
+  const { mounts, ...rest } = params;
+
+  // If mounts is undefined, don't include it in the result (preserves the optional property)
+  if (mounts === undefined) {
+    return rest as DevboxCreateParams;
+  }
+
+  // If mounts is null or empty array, pass through as-is with correct type
+  if (mounts === null || mounts.length === 0) {
+    return {
+      ...rest,
+      mounts: mounts as Array<Shared.Mount> | null,
+    };
+  }
+
+  // Transform non-empty mounts array
+  return {
+    ...rest,
+    mounts: transformMounts(mounts),
+  };
+}
 
 export * from './index';
 
@@ -167,8 +297,10 @@ export class DevboxOps {
    * Create a new Devbox and wait for it to reach the running state.
    * This is the recommended way to create a devbox as it ensures it's ready to use.
    *
-   * See the {@link DevboxOps.create} method for calling this
-   * @private
+   * Supports the convenient SDK mount syntax for StorageObjects:
+   * ```typescript
+   * mounts: [{ '/path/on/devbox': storageObject }]
+   * ```
    *
    * @example
    * ```typescript
@@ -176,18 +308,28 @@ export class DevboxOps {
    * const devbox = await runloop.devbox.create({ name: 'my-devbox' });
    *
    * devbox.cmd.exec('echo "Hello, World!"');
-   * ...
    * ```
    *
-   * @param {DevboxCreateParams} [params] - Parameters for creating the devbox.
+   * @example
+   * ```typescript
+   * // Create devbox with mounted storage object
+   * const storageObject = await runloop.storageObject.uploadFromFile('./config.txt', 'config.txt');
+   * const devbox = await runloop.devbox.create({
+   *   name: 'devbox-with-file',
+   *   mounts: [{ '/home/user/config.txt': storageObject }]
+   * });
+   * ```
+   *
+   * @param {SDKDevboxCreateParams} [params] - Parameters for creating the devbox, with SDK mount syntax support.
    * @param {Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxView>> }} [options] - Request options including polling configuration.
    * @returns {Promise<Devbox>} A {@link Devbox} instance.
    */
   async create(
-    params?: DevboxCreateParams,
+    params?: SDKDevboxCreateParams,
     options?: Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxView>> },
   ): Promise<Devbox> {
-    return Devbox.create(this.client, params, options);
+    const transformedParams = transformSDKDevboxCreateParams(params);
+    return Devbox.create(this.client, transformedParams, options);
   }
 
   /**
