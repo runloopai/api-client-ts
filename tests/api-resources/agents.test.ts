@@ -10,7 +10,7 @@ const client = new Runloop({
 
 describe('resource agents', () => {
   test('create: only required params', async () => {
-    const responsePromise = client.agents.create({ name: 'name' });
+    const responsePromise = client.agents.create({ name: 'name', version: 'version' });
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
     const response = await responsePromise;
@@ -23,22 +23,13 @@ describe('resource agents', () => {
   test('create: required and optional params', async () => {
     const response = await client.agents.create({
       name: 'name',
+      version: 'version',
       source: {
         type: 'type',
         git: { repository: 'repository', agent_setup: ['string'], ref: 'ref' },
-        npm: {
-          package_name: 'package_name',
-          agent_setup: ['string'],
-          npm_version: 'npm_version',
-          registry_url: 'registry_url',
-        },
+        npm: { package_name: 'package_name', agent_setup: ['string'], registry_url: 'registry_url' },
         object: { object_id: 'object_id', agent_setup: ['string'] },
-        pip: {
-          package_name: 'package_name',
-          agent_setup: ['string'],
-          pip_version: 'pip_version',
-          registry_url: 'registry_url',
-        },
+        pip: { package_name: 'package_name', agent_setup: ['string'], registry_url: 'registry_url' },
       },
     });
   });
@@ -83,7 +74,14 @@ describe('resource agents', () => {
     // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
     await expect(
       client.agents.list(
-        { is_public: true, limit: 0, name: 'name', search: 'search', starting_after: 'starting_after' },
+        {
+          is_public: true,
+          limit: 0,
+          name: 'name',
+          search: 'search',
+          starting_after: 'starting_after',
+          version: 'version',
+        },
         { path: '/_stainless_unknown_path' },
       ),
     ).rejects.toThrow(Runloop.NotFoundError);

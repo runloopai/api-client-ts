@@ -6,6 +6,7 @@ import type {
   ObjectDownloadURLView,
   ObjectListParams,
 } from '../resources/objects';
+import { fetch } from '../_shims/index';
 import * as fs from 'node:fs/promises';
 import * as fsSync from 'node:fs';
 import * as os from 'node:os';
@@ -320,7 +321,7 @@ export class StorageObject {
     try {
       const response = await fetch(uploadUrl, {
         method: 'PUT',
-        body: new Blob([text]),
+        body: Buffer.from(text, 'utf-8'),
       });
 
       if (!response.ok) {
@@ -395,7 +396,7 @@ export class StorageObject {
     try {
       const response = await fetch(uploadUrl, {
         method: 'PUT',
-        body: new Blob([buffer]),
+        body: buffer,
       });
 
       if (!response.ok) {
@@ -509,17 +510,13 @@ export class StorageObject {
         throw new Error('No upload URL available. Object may already be completed or deleted.');
       }
 
-      // Upload the file from disk
+      // Upload the file from disk (read into buffer like uploadFromFile does)
       try {
-        const fileStream = fsSync.createReadStream(tmpFilePath);
-        const stats = await fs.stat(tmpFilePath);
+        const fileBuffer = await fs.readFile(tmpFilePath);
 
         const response = await fetch(uploadUrl, {
           method: 'PUT',
-          body: fileStream as any,
-          headers: {
-            'Content-Length': stats.size.toString(),
-          },
+          body: fileBuffer,
         });
 
         if (!response.ok) {

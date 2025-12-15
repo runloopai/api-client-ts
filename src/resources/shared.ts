@@ -12,32 +12,6 @@ export interface AfterIdle {
   on_idle: 'shutdown' | 'suspend';
 }
 
-export interface AgentMountParameters {
-  /**
-   * The ID of the agent to mount. Either agent_id or name must be set.
-   */
-  agent_id: string | null;
-
-  /**
-   * The name of the agent to mount. Returns the most recent agent with a matching
-   * name if no agent id string provided. Either agent id or name must be set
-   */
-  agent_name: string | null;
-
-  type: 'agent_mount';
-
-  /**
-   * Path to mount the agent on the Devbox. Required for git and object agents. Use
-   * absolute path (e.g., /home/user/agent)
-   */
-  agent_path?: string | null;
-
-  /**
-   * Optional auth token for private repositories. Only used for git agents.
-   */
-  auth_token?: string | null;
-}
-
 /**
  * Agent source configuration.
  */
@@ -104,11 +78,6 @@ export namespace AgentSource {
     agent_setup?: Array<string> | null;
 
     /**
-     * NPM version constraint
-     */
-    npm_version?: string | null;
-
-    /**
      * NPM registry URL
      */
     registry_url?: string | null;
@@ -144,11 +113,6 @@ export namespace AgentSource {
     agent_setup?: Array<string> | null;
 
     /**
-     * Pip version constraint
-     */
-    pip_version?: string | null;
-
-    /**
      * Pip registry URL
      */
     registry_url?: string | null;
@@ -166,8 +130,6 @@ export interface CodeMountParameters {
    * The owner of the repo.
    */
   repo_owner: string;
-
-  type: 'code_mount';
 
   /**
    * The authentication token necessary to pull repo.
@@ -193,7 +155,7 @@ export interface LaunchParameters {
   after_idle?: AfterIdle | null;
 
   /**
-   * The target architecture for the Devbox. If unset, defaults to arm64.
+   * The target architecture for the Devbox. If unset, defaults to x86_64.
    */
   architecture?: 'x86_64' | 'arm64' | null;
 
@@ -265,7 +227,7 @@ export namespace LaunchParameters {
    */
   export interface UserParameters {
     /**
-     * User ID (UID) for the Linux user. Must be a positive integer.
+     * User ID (UID) for the Linux user. Must be a non-negative integer.
      */
     uid: number;
 
@@ -276,37 +238,88 @@ export namespace LaunchParameters {
   }
 }
 
-export type Mount =
-  | ObjectMountParameters
-  | AgentMountParameters
-  | CodeMountParameters
-  | Mount.FileMountParameters;
+export type Mount = Mount.ObjectMount | Mount.AgentMount | Mount.CodeMount | Mount.FileMount;
 
 export namespace Mount {
-  export interface FileMountParameters {
+  export interface ObjectMount {
     /**
-     * Map of file paths to file contents to be written before setup. Keys are absolute
-     * paths where files should be created, values are the file contents.
+     * The ID of the object to write.
      */
-    files: { [key: string]: string };
+    object_id: string;
+
+    /**
+     * The path to write the object on the Devbox. Use absolute path of object (ie
+     * /home/user/object.txt, or directory if archive /home/user/archive_dir)
+     */
+    object_path: string;
+
+    type: 'object_mount';
+  }
+
+  export interface AgentMount {
+    /**
+     * The ID of the agent to mount. Either agent_id or name must be set.
+     */
+    agent_id: string | null;
+
+    /**
+     * The name of the agent to mount. Returns the most recent agent with a matching
+     * name if no agent id string provided. Either agent id or name must be set
+     */
+    agent_name: string | null;
+
+    type: 'agent_mount';
+
+    /**
+     * Path to mount the agent on the Devbox. Required for git and object agents. Use
+     * absolute path (e.g., /home/user/agent)
+     */
+    agent_path?: string | null;
+
+    /**
+     * Optional auth token for private repositories. Only used for git agents.
+     */
+    auth_token?: string | null;
+  }
+
+  export interface CodeMount {
+    /**
+     * The name of the repo to mount. By default, code will be mounted at
+     * /home/user/{repo_name}s.
+     */
+    repo_name: string;
+
+    /**
+     * The owner of the repo.
+     */
+    repo_owner: string;
+
+    type: 'code_mount';
+
+    /**
+     * The authentication token necessary to pull repo.
+     */
+    token?: string | null;
+
+    /**
+     * Installation command to install and setup repository.
+     */
+    install_command?: string | null;
+  }
+
+  export interface FileMount {
+    /**
+     * Content of the file to mount.
+     */
+    content: string;
+
+    /**
+     * Target path where the file should be mounted.
+     */
+    target: string;
 
     type: 'file_mount';
   }
-}
-
-export interface ObjectMountParameters {
-  /**
-   * The ID of the object to write.
-   */
-  object_id: string;
-
-  /**
-   * The path to write the object on the Devbox. Use absolute path of object (ie
-   * /home/user/object.txt, or directory if archive /home/user/archive_dir)
-   */
-  object_path: string;
-
-  type: 'object_mount';
 }
 
 export interface RunProfile {
@@ -321,6 +334,11 @@ export interface RunProfile {
    * Additional runtime LaunchParameters to apply after the devbox starts.
    */
   launchParameters?: LaunchParameters | null;
+
+  /**
+   * A list of mounts to be included in the scenario run.
+   */
+  mounts?: Array<Mount> | null;
 
   /**
    * Purpose of the run.

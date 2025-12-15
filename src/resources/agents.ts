@@ -53,6 +53,11 @@ export interface AgentCreateParameters {
   name: string;
 
   /**
+   * The version of the Agent. Must be a semver string (e.g., '2.0.65') or a SHA.
+   */
+  version: string;
+
+  /**
    * The source configuration for the Agent.
    */
   source?: Shared.AgentSource | null;
@@ -108,6 +113,11 @@ export interface AgentView {
   name: string;
 
   /**
+   * The version of the Agent. A semver string (e.g., '2.0.65') or a SHA.
+   */
+  version: string;
+
+  /**
    * The source configuration for the Agent.
    */
   source?: Shared.AgentSource | null;
@@ -118,6 +128,11 @@ export interface AgentCreateParams {
    * The name of the Agent.
    */
   name: string;
+
+  /**
+   * The version of the Agent. Must be a semver string (e.g., '2.0.65') or a SHA.
+   */
+  version: string;
 
   /**
    * The source configuration for the Agent.
@@ -140,6 +155,11 @@ export interface AgentListParams extends AgentsCursorIDPageParams {
    * Search by agent ID or name.
    */
   search?: string;
+
+  /**
+   * Filter by version. Use 'latest' to get the most recently created agent.
+   */
+  version?: string;
 }
 
 Agents.AgentViewsAgentsCursorIDPage = AgentViewsAgentsCursorIDPage;

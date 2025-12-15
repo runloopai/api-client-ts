@@ -866,6 +866,11 @@ export interface DevboxCreateSSHKeyResponse {
   ssh_private_key: string;
 
   /**
+   * The Linux user to use for SSH connections to this Devbox.
+   */
+  ssh_user: string;
+
+  /**
    * The host url of the Devbox that can be used for SSH.
    */
   url: string;
@@ -897,7 +902,7 @@ export interface DevboxCreateParams {
   blueprint_name?: string | null;
 
   /**
-   * A list of code mounts to be included in the Devbox.
+   * A list of code mounts to be included in the Devbox. Use mounts instead.
    */
   code_mounts?: Array<Shared.CodeMountParameters> | null;
 
@@ -914,7 +919,7 @@ export interface DevboxCreateParams {
   environment_variables?: { [key: string]: string } | null;
 
   /**
-   * (Optional) Map of paths and file contents to write before setup..
+   * Map of paths and file contents to write before setup. Use mounts instead.
    */
   file_mounts?: { [key: string]: string } | null;
 

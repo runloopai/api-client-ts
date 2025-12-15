@@ -349,14 +349,6 @@ export interface BlueprintBuildParameters {
   metadata?: { [key: string]: string } | null;
 
   /**
-   * (Optional) Map of named build contexts to attach to the Blueprint build, where
-   * the keys are the name used when referencing the contexts in a Dockerfile. See
-   * Docker buildx additional contexts for details:
-   * https://docs.docker.com/reference/cli/docker/buildx/build/#build-context
-   */
-  named_build_contexts?: { [key: string]: BlueprintBuildParameters.NamedBuildContexts } | null;
-
-  /**
    * (Optional) Map of mount IDs/environment variable names to secret names. Secrets
    * will be available to commands during the build. Secrets are NOT stored in the
    * blueprint image. Example: {"DB_PASS": "DATABASE_PASSWORD"} makes the secret
@@ -382,18 +374,6 @@ export namespace BlueprintBuildParameters {
    * A build context backed by an Object.
    */
   export interface BuildContext {
-    /**
-     * The ID of an object, whose contents are to be used as a build context.
-     */
-    object_id: string;
-
-    type: 'object';
-  }
-
-  /**
-   * A build context backed by an Object.
-   */
-  export interface NamedBuildContexts {
     /**
      * The ID of an object, whose contents are to be used as a build context.
      */
@@ -671,14 +651,6 @@ export interface BlueprintCreateParams {
   metadata?: { [key: string]: string } | null;
 
   /**
-   * (Optional) Map of named build contexts to attach to the Blueprint build, where
-   * the keys are the name used when referencing the contexts in a Dockerfile. See
-   * Docker buildx additional contexts for details:
-   * https://docs.docker.com/reference/cli/docker/buildx/build/#build-context
-   */
-  named_build_contexts?: { [key: string]: BlueprintCreateParams.NamedBuildContexts } | null;
-
-  /**
    * (Optional) Map of mount IDs/environment variable names to secret names. Secrets
    * will be available to commands during the build. Secrets are NOT stored in the
    * blueprint image. Example: {"DB_PASS": "DATABASE_PASSWORD"} makes the secret
@@ -704,18 +676,6 @@ export namespace BlueprintCreateParams {
    * A build context backed by an Object.
    */
   export interface BuildContext {
-    /**
-     * The ID of an object, whose contents are to be used as a build context.
-     */
-    object_id: string;
-
-    type: 'object';
-  }
-
-  /**
-   * A build context backed by an Object.
-   */
-  export interface NamedBuildContexts {
     /**
      * The ID of an object, whose contents are to be used as a build context.
      */
@@ -780,6 +740,11 @@ export interface BlueprintListParams extends BlueprintsCursorIDPageParams {
    * Filter by name
    */
   name?: string;
+
+  /**
+   * Filter by build status (queued, provisioning, building, failed, build_complete)
+   */
+  status?: string;
 }
 
 export interface BlueprintCreateFromInspectionParams {
@@ -828,6 +793,11 @@ export interface BlueprintListPublicParams extends BlueprintsCursorIDPageParams 
    * Filter by name
    */
   name?: string;
+
+  /**
+   * Filter by build status (queued, provisioning, building, failed, build_complete)
+   */
+  status?: string;
 }
 
 export interface BlueprintPreviewParams {
@@ -886,14 +856,6 @@ export interface BlueprintPreviewParams {
   metadata?: { [key: string]: string } | null;
 
   /**
-   * (Optional) Map of named build contexts to attach to the Blueprint build, where
-   * the keys are the name used when referencing the contexts in a Dockerfile. See
-   * Docker buildx additional contexts for details:
-   * https://docs.docker.com/reference/cli/docker/buildx/build/#build-context
-   */
-  named_build_contexts?: { [key: string]: BlueprintPreviewParams.NamedBuildContexts } | null;
-
-  /**
    * (Optional) Map of mount IDs/environment variable names to secret names. Secrets
    * will be available to commands during the build. Secrets are NOT stored in the
    * blueprint image. Example: {"DB_PASS": "DATABASE_PASSWORD"} makes the secret
@@ -919,18 +881,6 @@ export namespace BlueprintPreviewParams {
    * A build context backed by an Object.
    */
   export interface BuildContext {
-    /**
-     * The ID of an object, whose contents are to be used as a build context.
-     */
-    object_id: string;
-
-    type: 'object';
-  }
-
-  /**
-   * A build context backed by an Object.
-   */
-  export interface NamedBuildContexts {
     /**
      * The ID of an object, whose contents are to be used as a build context.
      */

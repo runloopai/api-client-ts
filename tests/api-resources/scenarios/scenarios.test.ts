@@ -185,7 +185,13 @@ describe('resource scenarios', () => {
     // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
     await expect(
       client.scenarios.list(
-        { benchmark_id: 'benchmark_id', limit: 0, name: 'name', starting_after: 'starting_after' },
+        {
+          benchmark_id: 'benchmark_id',
+          limit: 0,
+          name: 'name',
+          starting_after: 'starting_after',
+          validation_type: 'validation_type',
+        },
         { path: '/_stainless_unknown_path' },
       ),
     ).rejects.toThrow(Runloop.NotFoundError);
@@ -251,6 +257,7 @@ describe('resource scenarios', () => {
           resource_size_request: 'X_SMALL',
           user_parameters: { uid: 0, username: 'username' },
         },
+        mounts: [{ object_id: 'object_id', object_path: 'object_path', type: 'object_mount' }],
         purpose: 'purpose',
         secrets: { foo: 'string' },
       },
