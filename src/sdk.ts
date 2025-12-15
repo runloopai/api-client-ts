@@ -70,7 +70,19 @@ export interface SDKDevboxCreateParams extends Omit<DevboxCreateParams, 'mounts'
  * @returns true if the mount is an InlineObjectMount
  */
 function isInlineObjectMount(mount: MountInstance): mount is InlineObjectMount {
-  return typeof mount === 'object' && mount !== null && !('type' in mount);
+  if (typeof mount !== 'object' || mount === null || 'type' in mount) {
+    return false;
+  }
+  // Exclude arrays
+  if (Array.isArray(mount)) {
+    return false;
+  }
+  // Validate that all values have an 'id' property (StorageObject shape)
+  const values = Object.values(mount);
+  return (
+    values.length > 0 &&
+    values.every((v) => v && typeof v === 'object' && 'id' in v && typeof v.id === 'string')
+  );
 }
 
 /**
@@ -84,11 +96,19 @@ function transformMounts(mounts: Array<MountInstance>): Array<Shared.Mount> {
   return mounts.flatMap((mount) => {
     if (isInlineObjectMount(mount)) {
       // Convert { "path": StorageObject } to ObjectMountParameters
-      return Object.entries(mount).map(([path, obj]) => ({
-        type: 'object_mount' as const,
-        object_id: obj.id,
-        object_path: path,
-      }));
+      return Object.entries(mount).map(([path, obj]) => {
+        if (!obj || typeof obj !== 'object' || typeof obj.id !== 'string') {
+          throw new Error(
+            `Invalid mount value for path "${path}": expected a StorageObject with an 'id' property, ` +
+              `got ${obj === null ? 'null' : typeof obj}`,
+          );
+        }
+        return {
+          type: 'object_mount' as const,
+          object_id: obj.id,
+          object_path: path,
+        };
+      });
     }
     // Already a standard mount
     return mount;
@@ -106,13 +126,26 @@ function transformSDKDevboxCreateParams(params?: SDKDevboxCreateParams): DevboxC
     return undefined;
   }
 
-  if (!params.mounts || params.mounts.length === 0) {
-    return params as DevboxCreateParams;
+  // Extract mounts and rest of params
+  const { mounts, ...rest } = params;
+
+  // If mounts is undefined, don't include it in the result (preserves the optional property)
+  if (mounts === undefined) {
+    return rest as DevboxCreateParams;
   }
 
+  // If mounts is null or empty array, pass through as-is with correct type
+  if (mounts === null || mounts.length === 0) {
+    return {
+      ...rest,
+      mounts: mounts as Array<Shared.Mount> | null,
+    };
+  }
+
+  // Transform non-empty mounts array
   return {
-    ...params,
-    mounts: transformMounts(params.mounts),
+    ...rest,
+    mounts: transformMounts(mounts),
   };
 }
 

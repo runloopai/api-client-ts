@@ -4,9 +4,6 @@ import { StorageObject } from '../../src/sdk/storage-object';
 import type { DevboxView } from '../../src/resources/devboxes/devboxes';
 import * as Shared from '../../src/resources/shared';
 
-// Mock the Devbox class
-jest.mock('../../src/sdk/devbox');
-
 describe('DevboxOps', () => {
   let mockClient: any;
   let devboxOps: DevboxOps;
@@ -41,7 +38,11 @@ describe('DevboxOps', () => {
 
     // Mock Devbox.create to return a mock Devbox instance
     mockDevboxInstance = { id: 'devbox-123', getInfo: jest.fn() } as unknown as Devbox;
-    jest.spyOn(Devbox as any, 'create').mockResolvedValue(mockDevboxInstance);
+    jest.spyOn(Devbox, 'create').mockResolvedValue(mockDevboxInstance);
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
   });
 
   describe('create with SDK mount syntax', () => {
