@@ -29,6 +29,8 @@ import * as Shared from './resources/shared';
  * The key is the path on the devbox where the object will be mounted,
  * and the value is the StorageObject instance.
  *
+ * @category SDK Types
+ *
  * @example
  * ```typescript
  * { '/home/user/config.txt': storageObject }
@@ -39,12 +41,16 @@ export type InlineObjectMount = { [path: string]: StorageObject };
 /**
  * Union type representing all valid mount inputs for the SDK.
  * Accepts both the standard API mount format and the convenient InlineObjectMount format.
+ *
+ * @category SDK Types
  */
 export type MountInstance = Shared.Mount | InlineObjectMount;
 
 /**
  * Extended DevboxCreateParams that accepts the convenient SDK mount syntax.
  * Use this type when creating devboxes through the SDK's DevboxOps.create() method.
+ *
+ * @category SDK Types
  */
 export interface SDKDevboxCreateParams extends Omit<DevboxCreateParams, 'mounts'> {
   /**
@@ -167,6 +173,8 @@ type ContentType = ObjectCreateParams['content_type'];
  * Runloop SDK - The recommended way to interact with Runloop.
  * Provides both low-level API access and high-level object-oriented interfaces.
  *
+ * @category SDK Client
+ *
  * @example
  * ```typescript
  * const runloop = new RunloopSDK(); // export RUNLOOP_API_KEY will automatically be used.
@@ -175,6 +183,7 @@ type ContentType = ObjectCreateParams['content_type'];
  * console.log(result.exitCode);
  * ```
  *
+ * @remarks
  * ## Operations
  * - `devbox` - {@link DevboxOps}
  * - `blueprint` - {@link BlueprintOps}
@@ -268,6 +277,9 @@ export class RunloopSDK {
 /**
  * Devbox SDK interface for managing devboxes.
  *
+ * @category Devbox
+ *
+ * @remarks
  * ## Overview
  *
  * The `DevboxOps` class provides a high-level abstraction for managing devboxes,
@@ -417,6 +429,9 @@ export class DevboxOps {
 /**
  * Blueprint SDK interface for managing blueprints.
  *
+ * @category Blueprint
+ *
+ * @remarks
  * ## Overview
  *
  * The `BlueprintOps` class provides a high-level abstraction for managing blueprints,
@@ -510,6 +525,9 @@ export class BlueprintOps {
 /**
  * Snapshot SDK interface for managing disk snapshots.
  *
+ * @category Snapshot
+ *
+ * @remarks
  * ## Overview
  *
  * The `SnapshotOps` class provides a high-level abstraction for managing disk snapshots,
@@ -558,6 +576,9 @@ export class SnapshotOps {
 /**
  * Storage object management interface
  *
+ * @category Storage Object
+ *
+ * @remarks
  * ## Overview
  *
  * The `StorageObjectOps` class provides a high-level abstraction for managing storage objects,
@@ -773,6 +794,9 @@ export class StorageObjectOps {
 /**
  * Agent SDK interface for managing agents.
  *
+ * @category Agent
+ *
+ * @remarks
  * ## Overview
  *
  * The `AgentOps` class provides a high-level abstraction for managing AI agent entities.

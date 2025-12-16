@@ -7,6 +7,9 @@ import { ExecutionResult } from './execution-result';
 /**
  * Execution object for tracking async command execution with streaming support.
  *
+ * @category Execution Types
+ *
+ * @remarks
  * ## Overview
  *
  * The `Execution` class represents an asynchronous command execution on a devbox.

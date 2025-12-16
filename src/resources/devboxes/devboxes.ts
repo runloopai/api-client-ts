@@ -533,6 +533,11 @@ export class DevboxViewsDevboxesCursorIDPage extends DevboxesCursorIDPage<Devbox
 
 export class DevboxSnapshotViewsDiskSnapshotsCursorIDPage extends DiskSnapshotsCursorIDPage<DevboxSnapshotView> {}
 
+/**
+ * Details of an asynchronous command execution on a Devbox.
+ *
+ * @category Devbox Types
+ */
 export interface DevboxAsyncExecutionDetailView {
   /**
    * Devbox id where command was executed.
@@ -673,6 +678,11 @@ export interface DevboxSnapshotListView {
   total_count: number;
 }
 
+/**
+ * View of a Devbox disk snapshot.
+ *
+ * @category Snapshot Types
+ */
 export interface DevboxSnapshotView {
   /**
    * The unique identifier of the snapshot.
@@ -731,6 +741,8 @@ export interface DevboxTunnelView {
  * A Devbox represents a virtual development environment. It is an isolated sandbox
  * that can be given to agents and used to run arbitrary code such as AI generated
  * code.
+ *
+ * @category Devbox Types
  */
 export interface DevboxView {
   /**
@@ -886,6 +898,11 @@ export type DevboxRemoveTunnelResponse = unknown;
 
 export type DevboxUploadFileResponse = unknown;
 
+/**
+ * Parameters for creating a new Devbox.
+ *
+ * @category Devbox Types
+ */
 export interface DevboxCreateParams {
   /**
    * Blueprint ID to use for the Devbox. If none set, the Devbox will be created with
@@ -1005,6 +1022,11 @@ export interface DevboxDownloadFileParams {
   path: string;
 }
 
+/**
+ * Parameters for executing a command on a Devbox.
+ *
+ * @category Devbox Types
+ */
 export interface DevboxExecuteParams {
   /**
    * Body param: The command to execute via the Devbox shell. By default, commands

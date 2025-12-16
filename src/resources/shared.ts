@@ -1,5 +1,10 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
+/**
+ * Configuration for automatic Devbox behavior after idle time.
+ *
+ * @category Shared Types
+ */
 export interface AfterIdle {
   /**
    * After idle_time_seconds, on_idle action will be taken.
@@ -14,6 +19,8 @@ export interface AfterIdle {
 
 /**
  * Agent source configuration.
+ *
+ * @category Shared Types
  */
 export interface AgentSource {
   /**
@@ -119,6 +126,11 @@ export namespace AgentSource {
   }
 }
 
+/**
+ * Parameters for mounting code from a Git repository.
+ *
+ * @category Shared Types
+ */
 export interface CodeMountParameters {
   /**
    * The name of the repo to mount. By default, code will be mounted at
@@ -146,6 +158,8 @@ export interface CodeMountParameters {
  * LaunchParameters enable you to customize the resources available to your Devbox
  * as well as the environment set up that should be completed before the Devbox is
  * marked as 'running'.
+ *
+ * @category Shared Types
  */
 export interface LaunchParameters {
   /**
@@ -238,6 +252,11 @@ export namespace LaunchParameters {
   }
 }
 
+/**
+ * Mount configuration for attaching files, agents, or code to a Devbox.
+ *
+ * @category Shared Types
+ */
 export type Mount = Mount.ObjectMount | Mount.AgentMount | Mount.CodeMount | Mount.FileMount;
 
 export namespace Mount {
@@ -322,6 +341,11 @@ export namespace Mount {
   }
 }
 
+/**
+ * Configuration profile for scenario/benchmark runs.
+ *
+ * @category Shared Types
+ */
 export interface RunProfile {
   /**
    * Mapping of Environment Variable to Value. May be shown in devbox logging.

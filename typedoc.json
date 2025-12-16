@@ -1,6 +1,6 @@
 {
   "$schema": "https://typedoc.org/schema.json",
-  "entryPoints": ["src/sdk.ts"],
+  "entryPoints": ["src/sdk.ts", "src/types.ts"],
   "entryPointStrategy": "expand",
   "out": "docs/",
   "tsconfig": "tsconfig.typedoc.json",
@@ -30,6 +30,26 @@
     "Accessor",
     "Function",
     "Variable"
+  ],
+  "categoryOrder": [
+    "SDK Client",
+    "Devbox",
+    "Blueprint",
+    "Snapshot",
+    "Storage Object",
+    "Agent",
+    "Devbox Types",
+    "Blueprint Types",
+    "Snapshot Types",
+    "Storage Object Types",
+    "Agent Types",
+    "Execution Types",
+    "Shared Types",
+    "Browser Types",
+    "Computer Types",
+    "Log Types",
+    "SDK Types",
+    "*"
   ],
   "visibilityFilters": {
     "protected": false,

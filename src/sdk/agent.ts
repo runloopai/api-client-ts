@@ -5,6 +5,9 @@ import type { AgentCreateParams, AgentListParams, AgentView } from '../resources
 /**
  * Object-oriented interface for working with Agents.
  *
+ * @category Agent
+ *
+ * @remarks
  * ## Overview
  *
  * The `Agent` class provides a high-level API for managing AI agent entities.

@@ -90,6 +90,8 @@ export interface AgentListView {
 
 /**
  * An Agent represents a registered AI agent entity.
+ *
+ * @category Agent Types
  */
 export interface AgentView {
   /**
@@ -123,6 +125,11 @@ export interface AgentView {
   source?: Shared.AgentSource | null;
 }
 
+/**
+ * Parameters for creating a new Agent.
+ *
+ * @category Agent Types
+ */
 export interface AgentCreateParams {
   /**
    * The name of the Agent.

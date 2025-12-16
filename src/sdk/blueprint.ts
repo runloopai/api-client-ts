@@ -59,6 +59,8 @@ export type CreateParams = Omit<BlueprintCreateParams, 'build_context'> & {
 
 /**
  * Object-oriented interface for working with Blueprints.
+ *
+ * @category Blueprint
  */
 export class Blueprint {
   private client: Runloop;

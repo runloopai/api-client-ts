@@ -171,6 +171,8 @@ export interface ObjectListView {
 
 /**
  * An Object represents a stored data entity with metadata.
+ *
+ * @category Storage Object Types
  */
 export interface ObjectView {
   /**
@@ -214,6 +216,11 @@ export interface ObjectView {
   upload_url?: string | null;
 }
 
+/**
+ * Parameters for creating a new Storage Object.
+ *
+ * @category Storage Object Types
+ */
 export interface ObjectCreateParams {
   /**
    * The content type of the Object.
