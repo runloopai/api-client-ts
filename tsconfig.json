@@ -1,6 +1,6 @@
 {
   "include": ["src", "tests", "examples"],
-  "exclude": ["src/_shims/**/*-deno.ts", "tests/smoketests/build-package.test.ts"],
+  "exclude": ["src/_shims/**/*-deno.ts", "tests/smoketests/build-package.test.ts", "src/types.ts"],
   "compilerOptions": {
     "target": "es2020",
     "lib": ["es2020"],
