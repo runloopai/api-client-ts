@@ -59,6 +59,9 @@ function assertNodeEnvironment(): void {
 /**
  * Object-oriented interface for working with Storage Objects.
  *
+ * @category Storage Object
+ *
+ * @remarks
  * ## Overview
  *
  * The `StorageObject` class provides a high-level API for managing storage objects,

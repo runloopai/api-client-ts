@@ -28,6 +28,8 @@ export { ExecutionResult } from './execution-result';
 
 /**
  * Streaming callbacks for real-time log processing.
+ *
+ * @category Execution Types
  */
 export interface ExecuteStreamingCallbacks {
   /** Callback invoked for each stdout log line */
@@ -41,6 +43,8 @@ export interface ExecuteStreamingCallbacks {
 /**
  * Network operations for a devbox.
  * Provides methods for managing SSH keys and network tunnels.
+ *
+ * @category Devbox
  */
 export class DevboxNetOps {
   /**
@@ -130,6 +134,8 @@ export class DevboxNetOps {
 /**
  * Command execution operations for a devbox.
  * Provides methods for executing commands synchronously and asynchronously.
+ *
+ * @category Devbox
  */
 export class DevboxCmdOps {
   /**
@@ -262,6 +268,9 @@ export class DevboxCmdOps {
  * Named shell operations for a devbox.
  * Provides methods for executing commands in a persistent, stateful shell session.
  *
+ * @category Devbox
+ *
+ * @remarks
  * Use {@link Devbox.shell} to create a named shell instance. If you use the same shell name,
  * it will re-attach to the existing named shell, preserving its state (environment variables,
  * current working directory, etc.).
@@ -383,6 +392,8 @@ export class DevboxNamedShell {
 /**
  * File operations for a devbox.
  * Provides methods for reading, writing, uploading, and downloading files.
+ *
+ * @category Devbox
  */
 export class DevboxFileOps {
   /**
@@ -471,6 +482,9 @@ export class DevboxFileOps {
 /**
  * Object-oriented interface for working with Devboxes.
  *
+ * @category Devbox
+ *
+ * @remarks
  * ## Overview
  *
  * The `Devbox` class provides a high-level, object-oriented API for managing devboxes.

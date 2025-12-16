@@ -457,6 +457,8 @@ export interface BlueprintPreviewView {
  * Blueprints are ways to create customized starting points for Devboxes. They
  * allow you to define custom starting points for Devboxes such that environment
  * set up can be cached to improve Devbox boot times.
+ *
+ * @category Blueprint Types
  */
 export interface BlueprintView {
   /**
@@ -595,6 +597,11 @@ export interface InspectionSource {
 
 export type BlueprintDeleteResponse = unknown;
 
+/**
+ * Parameters for creating a new Blueprint.
+ *
+ * @category Blueprint Types
+ */
 export interface BlueprintCreateParams {
   /**
    * Name of the Blueprint.

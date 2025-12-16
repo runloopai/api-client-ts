@@ -15,6 +15,9 @@ import { Devbox } from './devbox';
 /**
  * Object-oriented interface for working with Disk Snapshots.
  *
+ * @category Snapshot
+ *
+ * @remarks
  * ## Overview
  *
  * The `Snapshot` class provides a high-level API for managing disk snapshots of devboxes.

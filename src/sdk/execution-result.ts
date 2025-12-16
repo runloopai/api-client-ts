@@ -4,6 +4,9 @@ import type { DevboxAsyncExecutionDetailView } from '../resources/devboxes/devbo
 /**
  * Execution Result object for a completed command execution.
  *
+ * @category Execution Types
+ *
+ * @remarks
  * ## Overview
  *
  * The `ExecutionResult` class provides access to the results of a completed command execution.
