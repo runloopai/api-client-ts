@@ -106,8 +106,10 @@ import {
   BenchmarkListPublicParams,
   BenchmarkRunListView,
   BenchmarkRunView,
+  BenchmarkScenarioUpdateParameters,
   BenchmarkStartRunParams,
   BenchmarkUpdateParams,
+  BenchmarkUpdateScenariosParams,
   BenchmarkView,
   BenchmarkViewsBenchmarksCursorIDPage,
   Benchmarks,
@@ -435,6 +437,7 @@ export declare namespace Runloop {
     type BenchmarkCreateParameters as BenchmarkCreateParameters,
     type BenchmarkRunListView as BenchmarkRunListView,
     type BenchmarkRunView as BenchmarkRunView,
+    type BenchmarkScenarioUpdateParameters as BenchmarkScenarioUpdateParameters,
     type BenchmarkView as BenchmarkView,
     type ScenarioDefinitionListView as ScenarioDefinitionListView,
     type StartBenchmarkRunParameters as StartBenchmarkRunParameters,
@@ -445,6 +448,7 @@ export declare namespace Runloop {
     type BenchmarkDefinitionsParams as BenchmarkDefinitionsParams,
     type BenchmarkListPublicParams as BenchmarkListPublicParams,
     type BenchmarkStartRunParams as BenchmarkStartRunParams,
+    type BenchmarkUpdateScenariosParams as BenchmarkUpdateScenariosParams,
   };
 
   export {
