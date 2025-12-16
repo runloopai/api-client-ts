@@ -111,6 +111,26 @@ export class Benchmarks extends APIResource {
   startRun(body: BenchmarkStartRunParams, options?: Core.RequestOptions): Core.APIPromise<BenchmarkRunView> {
     return this._client.post('/v1/benchmarks/start_run', { body, ...options });
   }
+
+  /**
+   * Add and/or remove Scenario IDs from an existing Benchmark.
+   */
+  updateScenarios(
+    id: string,
+    body?: BenchmarkUpdateScenariosParams,
+    options?: Core.RequestOptions,
+  ): Core.APIPromise<BenchmarkView>;
+  updateScenarios(id: string, options?: Core.RequestOptions): Core.APIPromise<BenchmarkView>;
+  updateScenarios(
+    id: string,
+    body: BenchmarkUpdateScenariosParams | Core.RequestOptions = {},
+    options?: Core.RequestOptions,
+  ): Core.APIPromise<BenchmarkView> {
+    if (isRequestOptions(body)) {
+      return this.updateScenarios(id, {}, body);
+    }
+    return this._client.post(`/v1/benchmarks/${id}/scenarios`, { body, ...options });
+  }
 }
 
 export class BenchmarkViewsBenchmarksCursorIDPage extends BenchmarksCursorIDPage<BenchmarkView> {}
@@ -235,6 +255,18 @@ export interface BenchmarkRunView {
    * scenario devboxes to the value of the secret 'DATABASE_PASSWORD'.
    */
   secrets_provided?: { [key: string]: string } | null;
+}
+
+export interface BenchmarkScenarioUpdateParameters {
+  /**
+   * Scenario IDs to add to the Benchmark.
+   */
+  scenarios_to_add?: Array<string> | null;
+
+  /**
+   * Scenario IDs to remove from the Benchmark.
+   */
+  scenarios_to_remove?: Array<string> | null;
 }
 
 /**
@@ -448,6 +480,18 @@ export interface BenchmarkStartRunParams {
   runProfile?: Shared.RunProfile | null;
 }
 
+export interface BenchmarkUpdateScenariosParams {
+  /**
+   * Scenario IDs to add to the Benchmark.
+   */
+  scenarios_to_add?: Array<string> | null;
+
+  /**
+   * Scenario IDs to remove from the Benchmark.
+   */
+  scenarios_to_remove?: Array<string> | null;
+}
+
 Benchmarks.BenchmarkViewsBenchmarksCursorIDPage = BenchmarkViewsBenchmarksCursorIDPage;
 Benchmarks.Runs = Runs;
 
@@ -456,6 +500,7 @@ export declare namespace Benchmarks {
     type BenchmarkCreateParameters as BenchmarkCreateParameters,
     type BenchmarkRunListView as BenchmarkRunListView,
     type BenchmarkRunView as BenchmarkRunView,
+    type BenchmarkScenarioUpdateParameters as BenchmarkScenarioUpdateParameters,
     type BenchmarkView as BenchmarkView,
     type ScenarioDefinitionListView as ScenarioDefinitionListView,
     type StartBenchmarkRunParameters as StartBenchmarkRunParameters,
@@ -466,6 +511,7 @@ export declare namespace Benchmarks {
     type BenchmarkDefinitionsParams as BenchmarkDefinitionsParams,
     type BenchmarkListPublicParams as BenchmarkListPublicParams,
     type BenchmarkStartRunParams as BenchmarkStartRunParams,
+    type BenchmarkUpdateScenariosParams as BenchmarkUpdateScenariosParams,
   };
 
   export {

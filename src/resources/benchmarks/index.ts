@@ -7,6 +7,7 @@ export {
   type BenchmarkCreateParameters,
   type BenchmarkRunListView,
   type BenchmarkRunView,
+  type BenchmarkScenarioUpdateParameters,
   type BenchmarkView,
   type ScenarioDefinitionListView,
   type StartBenchmarkRunParameters,
@@ -16,5 +17,6 @@ export {
   type BenchmarkDefinitionsParams,
   type BenchmarkListPublicParams,
   type BenchmarkStartRunParams,
+  type BenchmarkUpdateScenariosParams,
 } from './benchmarks';
 export { Runs, type RunListParams, type RunListScenarioRunsParams } from './runs';

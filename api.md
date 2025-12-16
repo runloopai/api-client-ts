@@ -16,6 +16,7 @@ Types:
 - <code><a href="./src/resources/benchmarks/benchmarks.ts">BenchmarkCreateParameters</a></code>
 - <code><a href="./src/resources/benchmarks/benchmarks.ts">BenchmarkRunListView</a></code>
 - <code><a href="./src/resources/benchmarks/benchmarks.ts">BenchmarkRunView</a></code>
+- <code><a href="./src/resources/benchmarks/benchmarks.ts">BenchmarkScenarioUpdateParameters</a></code>
 - <code><a href="./src/resources/benchmarks/benchmarks.ts">BenchmarkView</a></code>
 - <code><a href="./src/resources/benchmarks/benchmarks.ts">ScenarioDefinitionListView</a></code>
 - <code><a href="./src/resources/benchmarks/benchmarks.ts">StartBenchmarkRunParameters</a></code>
@@ -29,6 +30,7 @@ Methods:
 - <code title="get /v1/benchmarks/{id}/definitions">client.benchmarks.<a href="./src/resources/benchmarks/benchmarks.ts">definitions</a>(id, { ...params }) -> ScenarioDefinitionListView</code>
 - <code title="get /v1/benchmarks/list_public">client.benchmarks.<a href="./src/resources/benchmarks/benchmarks.ts">listPublic</a>({ ...params }) -> BenchmarkViewsBenchmarksCursorIDPage</code>
 - <code title="post /v1/benchmarks/start_run">client.benchmarks.<a href="./src/resources/benchmarks/benchmarks.ts">startRun</a>({ ...params }) -> BenchmarkRunView</code>
+- <code title="post /v1/benchmarks/{id}/scenarios">client.benchmarks.<a href="./src/resources/benchmarks/benchmarks.ts">updateScenarios</a>(id, { ...params }) -> BenchmarkView</code>
 
 ## Runs
 
