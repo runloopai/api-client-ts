@@ -18,6 +18,7 @@ export {
   type BenchmarkRunListView,
   type BenchmarkRunView,
   type BenchmarkScenarioUpdateParameters,
+  type BenchmarkUpdateParameters,
   type BenchmarkView,
   type ScenarioDefinitionListView,
   type StartBenchmarkRunParameters,

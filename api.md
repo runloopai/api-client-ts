@@ -17,6 +17,7 @@ Types:
 - <code><a href="./src/resources/benchmarks/benchmarks.ts">BenchmarkRunListView</a></code>
 - <code><a href="./src/resources/benchmarks/benchmarks.ts">BenchmarkRunView</a></code>
 - <code><a href="./src/resources/benchmarks/benchmarks.ts">BenchmarkScenarioUpdateParameters</a></code>
+- <code><a href="./src/resources/benchmarks/benchmarks.ts">BenchmarkUpdateParameters</a></code>
 - <code><a href="./src/resources/benchmarks/benchmarks.ts">BenchmarkView</a></code>
 - <code><a href="./src/resources/benchmarks/benchmarks.ts">ScenarioDefinitionListView</a></code>
 - <code><a href="./src/resources/benchmarks/benchmarks.ts">StartBenchmarkRunParameters</a></code>
