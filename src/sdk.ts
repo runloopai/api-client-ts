@@ -6,6 +6,9 @@ import { Blueprint, type CreateParams as BlueprintCreateParams } from './sdk/blu
 import { Snapshot } from './sdk/snapshot';
 import { StorageObject } from './sdk/storage-object';
 import { Agent } from './sdk/agent';
+import { Scenario } from './sdk/scenario';
+import { ScenarioBuilder } from './sdk/scenario-builder';
+import { Scorer } from './sdk/scorer';
 
 // Import types used in this file
 import type {
@@ -17,6 +20,8 @@ import type {
 import type { BlueprintListParams } from './resources/blueprints';
 import type { ObjectCreateParams, ObjectListParams } from './resources/objects';
 import type { AgentCreateParams, AgentListParams } from './resources/agents';
+import type { ScenarioListParams } from './resources/scenarios/scenarios';
+import type { ScorerCreateParams, ScorerListParams } from './resources/scenarios/scorers';
 import { PollingOptions } from './lib/polling';
 import * as Shared from './resources/shared';
 
@@ -261,6 +266,23 @@ export class RunloopSDK {
   public readonly agent: AgentOps;
 
   /**
+   * **Scenario Operations** - {@link ScenarioOps} for creating and accessing {@link Scenario} class instances.
+   *
+   * Scenarios are repeatable AI coding evaluation tests that define the starting environment and
+   * evaluation success criteria. Use these operations to create scenarios using the builder pattern,
+   * run scenarios, and manage scenario lifecycle.
+   */
+  public readonly scenario: ScenarioOps;
+
+  /**
+   * **Scorer Operations** - {@link ScorerOps} for creating and accessing {@link Scorer} class instances.
+   *
+   * Scorers are custom scoring functions that evaluate scenario outputs. They define bash scripts
+   * that produce a score in the range [0.0, 1.0] for scenario runs.
+   */
+  public readonly scorer: ScorerOps;
+
+  /**
    * Creates a new RunloopSDK instance.
    * @param {ClientOptions} [options] - Optional client configuration options.
    */
@@ -271,6 +293,8 @@ export class RunloopSDK {
     this.snapshot = new SnapshotOps(this.api);
     this.storageObject = new StorageObjectOps(this.api);
     this.agent = new AgentOps(this.api);
+    this.scenario = new ScenarioOps(this.api);
+    this.scorer = new ScorerOps(this.api);
   }
 }
 
@@ -1255,6 +1279,220 @@ export class AgentOps {
   }
 }
 
+/**
+ * Scenario SDK interface for managing scenarios.
+ *
+ * @category Scenario
+ *
+ * @remarks
+ * ## Overview
+ *
+ * The `ScenarioOps` class provides a high-level abstraction for managing scenarios,
+ * which are repeatable AI coding evaluation tests that define the starting environment
+ * and evaluation success criteria.
+ *
+ * ## Usage
+ *
+ * This interface is accessed via {@link RunloopSDK.scenario}. You should construct
+ * a {@link RunloopSDK} instance and use it from there:
+ *
+ * @example
+ * ```typescript
+ * const runloop = new RunloopSDK();
+ *
+ * // Create a scenario using the builder
+ * const scenario = await runloop.scenario.builder('my-scenario')
+ *   .withProblemStatement('Fix the bug in main.py')
+ *   .addTestCommandScorer('tests', { testCommand: 'pytest' })
+ *   .push();
+ *
+ * // Run the scenario
+ * const run = await scenario.run();
+ * await run.devbox.cmd.exec('python fix_bug.py');
+ * await run.scoreAndComplete();
+ * ```
+ */
+export class ScenarioOps {
+  /**
+   * @private
+   */
+  constructor(private client: RunloopAPI) {}
+
+  /**
+   * Create a new scenario builder with the given name.
+   *
+   * The builder provides a fluent API for configuring all aspects of a scenario
+   * before creating it on the platform.
+   *
+   * @example
+   * ```typescript
+   * const scenario = await runloop.scenario.builder('my-scenario')
+   *   .fromBlueprint(blueprint)
+   *   .withWorkingDirectory('/app')
+   *   .withProblemStatement('Fix the bug in main.py')
+   *   .addTestCommandScorer('tests', { testCommand: 'pytest' })
+   *   .push();
+   * ```
+   *
+   * @param {string} name - Name for the scenario
+   * @returns {ScenarioBuilder} A {@link ScenarioBuilder} instance
+   */
+  builder(name: string): ScenarioBuilder {
+    return new ScenarioBuilder(name, this.client);
+  }
+
+  /**
+   * Get a scenario object by its ID.
+   *
+   * @example
+   * ```typescript
+   * const scenario = runloop.scenario.fromId('scn-xxx');
+   * const info = await scenario.getInfo();
+   * ```
+   *
+   * @param {string} id - The ID of the scenario
+   * @returns {Scenario} A {@link Scenario} instance
+   */
+  fromId(id: string): Scenario {
+    return Scenario.fromId(this.client, id);
+  }
+
+  /**
+   * List all scenarios with optional filters.
+   *
+   * @example
+   * ```typescript
+   * // List all scenarios
+   * const scenarios = await runloop.scenario.list();
+   *
+   * // Filter by name
+   * const filtered = await runloop.scenario.list({ name: 'my-scenario' });
+   * ```
+   *
+   * @param {ScenarioListParams} [params] - Optional filter parameters
+   * @param {Core.RequestOptions} [options] - Request options
+   * @returns {Promise<Scenario[]>} An array of {@link Scenario} instances
+   */
+  async list(params?: ScenarioListParams, options?: Core.RequestOptions): Promise<Scenario[]> {
+    const result = await this.client.scenarios.list(params, options);
+    const scenarios: Scenario[] = [];
+
+    for await (const scenario of result) {
+      scenarios.push(Scenario.fromId(this.client, scenario.id));
+    }
+
+    return scenarios;
+  }
+}
+
+/**
+ * Scorer SDK interface for managing custom scorers.
+ *
+ * @category Scorer
+ *
+ * @remarks
+ * ## Overview
+ *
+ * The `ScorerOps` class provides a high-level abstraction for managing custom scorers.
+ * Scorers define bash scripts that produce a score in the range [0.0, 1.0] for scenario runs.
+ *
+ * ## Usage
+ *
+ * This interface is accessed via {@link RunloopSDK.scorer}. You should construct
+ * a {@link RunloopSDK} instance and use it from there:
+ *
+ * @example
+ * ```typescript
+ * const runloop = new RunloopSDK();
+ *
+ * // Create a custom scorer
+ * const scorer = await runloop.scorer.create({
+ *   type: 'my_scorer',
+ *   bash_script: 'echo "score=1.0"'
+ * });
+ *
+ * // Validate the scorer
+ * const result = await scorer.validate({ scoring_context: { output: 'test' } });
+ * console.log(`Score: ${result.scoring_result.score}`);
+ * ```
+ */
+export class ScorerOps {
+  /**
+   * @private
+   */
+  constructor(private client: RunloopAPI) {}
+
+  /**
+   * Create a new custom scorer.
+   *
+   * @example
+   * ```typescript
+   * const scorer = await runloop.scorer.create({
+   *   type: 'my_custom_scorer',
+   *   bash_script: `
+   *     result=$(cat $RL_SCORER_CONTEXT | jq -r '.output')
+   *     if [ "$result" = "expected" ]; then
+   *       echo "score=1.0"
+   *     else
+   *       echo "score=0.0"
+   *     fi
+   *   `
+   * });
+   * ```
+   *
+   * @param {ScorerCreateParams} params - Parameters for creating the scorer
+   * @param {Core.RequestOptions} [options] - Request options
+   * @returns {Promise<Scorer>} A {@link Scorer} instance
+   */
+  async create(params: ScorerCreateParams, options?: Core.RequestOptions): Promise<Scorer> {
+    const response = await this.client.scenarios.scorers.create(params, options);
+    return Scorer.fromId(this.client, response.id);
+  }
+
+  /**
+   * Get a scorer object by its ID.
+   *
+   * @example
+   * ```typescript
+   * const scorer = runloop.scorer.fromId('scr-xxx');
+   * const info = await scorer.getInfo();
+   * ```
+   *
+   * @param {string} id - The ID of the scorer
+   * @returns {Scorer} A {@link Scorer} instance
+   */
+  fromId(id: string): Scorer {
+    return Scorer.fromId(this.client, id);
+  }
+
+  /**
+   * List all scorers with optional filters.
+   *
+   * @example
+   * ```typescript
+   * const scorers = await runloop.scorer.list();
+   * for (const scorer of scorers) {
+   *   const info = await scorer.getInfo();
+   *   console.log(`${info.type}: ${info.bash_script}`);
+   * }
+   * ```
+   *
+   * @param {ScorerListParams} [params] - Optional filter parameters
+   * @param {Core.RequestOptions} [options] - Request options
+   * @returns {Promise<Scorer[]>} An array of {@link Scorer} instances
+   */
+  async list(params?: ScorerListParams, options?: Core.RequestOptions): Promise<Scorer[]> {
+    const result = await this.client.scenarios.scorers.list(params, options);
+    const scorers: Scorer[] = [];
+
+    for await (const scorer of result) {
+      scorers.push(Scorer.fromId(this.client, scorer.id));
+    }
+
+    return scorers;
+  }
+}
+
 // @deprecated Use {@link RunloopSDK} instead.
 /**
  * @deprecated Use {@link RunloopSDK} instead.
@@ -1275,11 +1513,16 @@ export declare namespace RunloopSDK {
     SnapshotOps as SnapshotOps,
     StorageObjectOps as StorageObjectOps,
     AgentOps as AgentOps,
+    ScenarioOps as ScenarioOps,
+    ScorerOps as ScorerOps,
     Devbox as Devbox,
     Blueprint as Blueprint,
     Snapshot as Snapshot,
     StorageObject as StorageObject,
     Agent as Agent,
+    Scenario as Scenario,
+    ScenarioBuilder as ScenarioBuilder,
+    Scorer as Scorer,
   };
 }
 // Export SDK classes from sdk/sdk.ts - these are separate from RunloopSDK to avoid circular dependencies
@@ -1295,4 +1538,12 @@ export {
   Agent,
   Execution,
   ExecutionResult,
+  Scenario,
+  ScenarioRun,
+  ScenarioBuilder,
+  type ScenarioPreview,
+  type TestFile,
+  type ScenarioTestFile,
+  Scorer,
+  BenchmarkRun,
 } from './sdk/index';
