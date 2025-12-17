@@ -50,8 +50,8 @@ describe('resource benchmarks', () => {
     );
   });
 
-  test('update: only required params', async () => {
-    const responsePromise = client.benchmarks.update('id', { name: 'name' });
+  test('update', async () => {
+    const responsePromise = client.benchmarks.update('id');
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
     const response = await responsePromise;
@@ -61,16 +61,30 @@ describe('resource benchmarks', () => {
     expect(dataAndResponse.response).toBe(rawResponse);
   });
 
-  test('update: required and optional params', async () => {
-    const response = await client.benchmarks.update('id', {
-      name: 'name',
-      attribution: 'attribution',
-      description: 'description',
-      metadata: { foo: 'string' },
-      required_environment_variables: ['string'],
-      required_secret_names: ['string'],
-      scenario_ids: ['string'],
-    });
+  test('update: request options instead of params are passed correctly', async () => {
+    // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
+    await expect(client.benchmarks.update('id', { path: '/_stainless_unknown_path' })).rejects.toThrow(
+      Runloop.NotFoundError,
+    );
+  });
+
+  test('update: request options and params are passed correctly', async () => {
+    // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
+    await expect(
+      client.benchmarks.update(
+        'id',
+        {
+          attribution: 'attribution',
+          description: 'description',
+          metadata: { foo: 'string' },
+          name: 'name',
+          required_environment_variables: ['string'],
+          required_secret_names: ['string'],
+          scenario_ids: ['string'],
+        },
+        { path: '/_stainless_unknown_path' },
+      ),
+    ).rejects.toThrow(Runloop.NotFoundError);
   });
 
   test('list', async () => {

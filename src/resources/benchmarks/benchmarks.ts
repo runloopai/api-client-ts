@@ -31,13 +31,24 @@ export class Benchmarks extends APIResource {
   }
 
   /**
-   * Update a Benchmark with a set of Scenarios.
+   * Update a Benchmark. Fields that are null will preserve the existing value.
+   * Fields that are provided (including empty values) will replace the existing
+   * value entirely.
    */
   update(
     id: string,
-    body: BenchmarkUpdateParams,
+    body?: BenchmarkUpdateParams,
+    options?: Core.RequestOptions,
+  ): Core.APIPromise<BenchmarkView>;
+  update(id: string, options?: Core.RequestOptions): Core.APIPromise<BenchmarkView>;
+  update(
+    id: string,
+    body: BenchmarkUpdateParams | Core.RequestOptions = {},
     options?: Core.RequestOptions,
   ): Core.APIPromise<BenchmarkView> {
+    if (isRequestOptions(body)) {
+      return this.update(id, {}, body);
+    }
     return this._client.post(`/v1/benchmarks/${id}`, { body, ...options });
   }
 
@@ -142,7 +153,7 @@ export class BenchmarkRunViewsBenchmarkRunsCursorIDPage extends BenchmarkRunsCur
  */
 export interface BenchmarkCreateParameters {
   /**
-   * The name of the Benchmark. This must be unique.
+   * The unique name of the Benchmark.
    */
   name: string;
 
@@ -157,13 +168,13 @@ export interface BenchmarkCreateParameters {
   description?: string | null;
 
   /**
-   * User defined metadata to attach to the benchmark for organization.
+   * User defined metadata to attach to the benchmark.
    */
   metadata?: { [key: string]: string } | null;
 
   /**
    * Environment variables required to run the benchmark. If any required variables
-   * are not supplied, the benchmark will fail to start
+   * are not supplied, the benchmark will fail to start.
    */
   required_environment_variables?: Array<string> | null;
 
@@ -270,6 +281,52 @@ export interface BenchmarkScenarioUpdateParameters {
 }
 
 /**
+ * BenchmarkUpdateParameters contain the set of parameters to update a Benchmark.
+ * All fields are optional - null fields preserve existing values, provided fields
+ * replace entirely.
+ */
+export interface BenchmarkUpdateParameters {
+  /**
+   * Attribution information for the benchmark. Pass in empty string to clear.
+   */
+  attribution?: string | null;
+
+  /**
+   * Detailed description of the benchmark. Pass in empty string to clear.
+   */
+  description?: string | null;
+
+  /**
+   * User defined metadata to attach to the benchmark. Pass in empty map to clear.
+   */
+  metadata?: { [key: string]: string } | null;
+
+  /**
+   * The unique name of the Benchmark. Cannot be blank.
+   */
+  name?: string | null;
+
+  /**
+   * Environment variables required to run the benchmark. If any required variables
+   * are not supplied, the benchmark will fail to start. Pass in empty list to clear.
+   */
+  required_environment_variables?: Array<string> | null;
+
+  /**
+   * Secrets required to run the benchmark with (environment variable name will be
+   * mapped to the your user secret by name). If any of these secrets are not
+   * provided or the mapping is incorrect, the benchmark will fail to start. Pass in
+   * empty list to clear.
+   */
+  required_secret_names?: Array<string> | null;
+
+  /**
+   * The Scenario IDs that make up the Benchmark. Pass in empty list to clear.
+   */
+  scenario_ids?: Array<string> | null;
+}
+
+/**
  * A BenchmarkDefinitionView represents a grouped set of Scenarios that together
  * form a Benchmark.
  */
@@ -359,7 +416,7 @@ export interface StartBenchmarkRunParameters {
 
 export interface BenchmarkCreateParams {
   /**
-   * The name of the Benchmark. This must be unique.
+   * The unique name of the Benchmark.
    */
   name: string;
 
@@ -374,13 +431,13 @@ export interface BenchmarkCreateParams {
   description?: string | null;
 
   /**
-   * User defined metadata to attach to the benchmark for organization.
+   * User defined metadata to attach to the benchmark.
    */
   metadata?: { [key: string]: string } | null;
 
   /**
    * Environment variables required to run the benchmark. If any required variables
-   * are not supplied, the benchmark will fail to start
+   * are not supplied, the benchmark will fail to start.
    */
   required_environment_variables?: Array<string> | null;
 
@@ -399,40 +456,41 @@ export interface BenchmarkCreateParams {
 
 export interface BenchmarkUpdateParams {
   /**
-   * The name of the Benchmark. This must be unique.
-   */
-  name: string;
-
-  /**
-   * Attribution information for the benchmark.
+   * Attribution information for the benchmark. Pass in empty string to clear.
    */
   attribution?: string | null;
 
   /**
-   * Detailed description of the benchmark.
+   * Detailed description of the benchmark. Pass in empty string to clear.
    */
   description?: string | null;
 
   /**
-   * User defined metadata to attach to the benchmark for organization.
+   * User defined metadata to attach to the benchmark. Pass in empty map to clear.
    */
   metadata?: { [key: string]: string } | null;
 
   /**
+   * The unique name of the Benchmark. Cannot be blank.
+   */
+  name?: string | null;
+
+  /**
    * Environment variables required to run the benchmark. If any required variables
-   * are not supplied, the benchmark will fail to start
+   * are not supplied, the benchmark will fail to start. Pass in empty list to clear.
    */
   required_environment_variables?: Array<string> | null;
 
   /**
    * Secrets required to run the benchmark with (environment variable name will be
    * mapped to the your user secret by name). If any of these secrets are not
-   * provided or the mapping is incorrect, the benchmark will fail to start.
+   * provided or the mapping is incorrect, the benchmark will fail to start. Pass in
+   * empty list to clear.
    */
-  required_secret_names?: Array<string>;
+  required_secret_names?: Array<string> | null;
 
   /**
-   * The Scenario IDs that make up the Benchmark.
+   * The Scenario IDs that make up the Benchmark. Pass in empty list to clear.
    */
   scenario_ids?: Array<string> | null;
 }
@@ -501,6 +559,7 @@ export declare namespace Benchmarks {
     type BenchmarkRunListView as BenchmarkRunListView,
     type BenchmarkRunView as BenchmarkRunView,
     type BenchmarkScenarioUpdateParameters as BenchmarkScenarioUpdateParameters,
+    type BenchmarkUpdateParameters as BenchmarkUpdateParameters,
     type BenchmarkView as BenchmarkView,
     type ScenarioDefinitionListView as ScenarioDefinitionListView,
     type StartBenchmarkRunParameters as StartBenchmarkRunParameters,
