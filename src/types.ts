@@ -86,6 +86,7 @@ export type * from './resources/secrets';
 // =============================================================================
 
 export type * from './resources/scenarios/scenarios';
+export type * from './resources/scenarios/scorers';
 
 // =============================================================================
 // Benchmark Types
