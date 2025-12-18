@@ -116,8 +116,10 @@ export class Scorer {
    * @param {Core.RequestOptions} [options] - Request options
    * @returns {Promise<ScorerValidateResponse>} Validation result with score
    */
-  async validate(params: ScorerValidateParams, options?: Core.RequestOptions): Promise<ScorerValidateResponse> {
+  async validate(
+    params: ScorerValidateParams,
+    options?: Core.RequestOptions,
+  ): Promise<ScorerValidateResponse> {
     return this.client.scenarios.scorers.validate(this._id, params, options);
   }
 }
-

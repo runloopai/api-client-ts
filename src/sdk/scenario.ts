@@ -159,4 +159,3 @@ export class Scenario {
     return ScenarioRun.fromRunView(this.client, runView);
   }
 }
-

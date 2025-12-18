@@ -1,9 +1,6 @@
 import { Runloop } from '../index';
 import type * as Core from '../core';
-import type {
-  ScenarioRunView,
-  ScoringContractResultView,
-} from '../resources/scenarios/scenarios';
+import type { ScenarioRunView, ScoringContractResultView } from '../resources/scenarios/scenarios';
 import type { DevboxView } from '../resources/devboxes/devboxes';
 import type { PollingOptions } from '../lib/polling';
 import type { Response } from '../_shims/index';
@@ -309,4 +306,3 @@ export class ScenarioRun {
     return info.scoring_contract_result ?? null;
   }
 }
-

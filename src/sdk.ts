@@ -9,6 +9,7 @@ import { Agent } from './sdk/agent';
 import { Scenario } from './sdk/scenario';
 import { ScenarioBuilder } from './sdk/scenario-builder';
 import { Scorer } from './sdk/scorer';
+import { Benchmark } from './sdk/benchmark';
 
 // Import types used in this file
 import type {
@@ -22,6 +23,7 @@ import type { ObjectCreateParams, ObjectListParams } from './resources/objects';
 import type { AgentCreateParams, AgentListParams } from './resources/agents';
 import type { ScenarioListParams } from './resources/scenarios/scenarios';
 import type { ScorerCreateParams, ScorerListParams } from './resources/scenarios/scorers';
+import type { BenchmarkCreateParams, BenchmarkListParams } from './resources/benchmarks/benchmarks';
 import { PollingOptions } from './lib/polling';
 import * as Shared from './resources/shared';
 
@@ -266,6 +268,13 @@ export class RunloopSDK {
   public readonly agent: AgentOps;
 
   /**
+   * **Benchmark Operations** - {@link BenchmarkOps} for creating and accessing {@link Benchmark} class instances.
+   *
+   * Benchmarks are grouped sets of scenarios that can be run together to evaluate performance at scale.
+   */
+  public readonly benchmark: BenchmarkOps;
+
+  /**
    * **Scenario Operations** - {@link ScenarioOps} for creating and accessing {@link Scenario} class instances.
    *
    * Scenarios are repeatable AI coding evaluation tests that define the starting environment and
@@ -293,8 +302,61 @@ export class RunloopSDK {
     this.snapshot = new SnapshotOps(this.api);
     this.storageObject = new StorageObjectOps(this.api);
     this.agent = new AgentOps(this.api);
+    this.benchmark = new BenchmarkOps(this.api);
     this.scenario = new ScenarioOps(this.api);
     this.scorer = new ScorerOps(this.api);
+  }
+}
+
+/**
+ * Benchmark SDK interface for managing benchmarks.
+ *
+ * @category Benchmark
+ */
+export class BenchmarkOps {
+  /**
+   * @private
+   */
+  constructor(private client: RunloopAPI) {}
+
+  /**
+   * Create a new benchmark.
+   *
+   * @param {BenchmarkCreateParams} params - Benchmark creation parameters
+   * @param {Core.RequestOptions} [options] - Request options
+   * @returns {Promise<Benchmark>} A {@link Benchmark} instance
+   */
+  async create(params: BenchmarkCreateParams, options?: Core.RequestOptions): Promise<Benchmark> {
+    const benchmarkView = await this.client.benchmarks.create(params, options);
+    return Benchmark.fromId(this.client, benchmarkView.id);
+  }
+
+  /**
+   * Get a benchmark object by its ID.
+   *
+   * @param {string} id - The benchmark ID.
+   * @returns {Benchmark} A {@link Benchmark} instance.
+   */
+  fromId(id: string): Benchmark {
+    return Benchmark.fromId(this.client, id);
+  }
+
+  /**
+   * List all benchmarks with optional filters.
+   *
+   * @param {BenchmarkListParams} [params] - Optional filter parameters.
+   * @param {Core.RequestOptions} [options] - Request options.
+   * @returns {Promise<Benchmark[]>} An array of {@link Benchmark} instances.
+   */
+  async list(params?: BenchmarkListParams, options?: Core.RequestOptions): Promise<Benchmark[]> {
+    const page = await this.client.benchmarks.list(params, options);
+    const benchmarks: Benchmark[] = [];
+
+    for await (const benchmark of page) {
+      benchmarks.push(Benchmark.fromId(this.client, benchmark.id));
+    }
+
+    return benchmarks;
   }
 }
 
@@ -1513,6 +1575,7 @@ export declare namespace RunloopSDK {
     SnapshotOps as SnapshotOps,
     StorageObjectOps as StorageObjectOps,
     AgentOps as AgentOps,
+    BenchmarkOps as BenchmarkOps,
     ScenarioOps as ScenarioOps,
     ScorerOps as ScorerOps,
     Devbox as Devbox,
@@ -1520,6 +1583,7 @@ export declare namespace RunloopSDK {
     Snapshot as Snapshot,
     StorageObject as StorageObject,
     Agent as Agent,
+    Benchmark as Benchmark,
     Scenario as Scenario,
     ScenarioBuilder as ScenarioBuilder,
     Scorer as Scorer,
@@ -1538,6 +1602,7 @@ export {
   Agent,
   Execution,
   ExecutionResult,
+  Benchmark,
   Scenario,
   ScenarioRun,
   ScenarioBuilder,

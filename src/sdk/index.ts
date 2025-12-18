@@ -14,4 +14,5 @@ export {
   type ScenarioTestFile,
 } from './scenario-builder';
 export { Scorer } from './scorer';
+export { Benchmark } from './benchmark';
 export { BenchmarkRun } from './benchmark-run';

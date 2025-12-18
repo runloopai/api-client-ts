@@ -176,4 +176,3 @@ export class BenchmarkRun {
     return runs;
   }
 }
-

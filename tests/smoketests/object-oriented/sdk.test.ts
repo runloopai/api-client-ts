@@ -10,6 +10,7 @@ describe('smoketest: object-oriented SDK', () => {
       expect(sdk.blueprint).toBeDefined();
       expect(sdk.snapshot).toBeDefined();
       expect(sdk.storageObject).toBeDefined();
+      expect(sdk.benchmark).toBeDefined();
       expect(sdk.api).toBeDefined();
     });
 

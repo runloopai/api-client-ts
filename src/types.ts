@@ -100,4 +100,5 @@ export type * from './resources/benchmarks/runs';
 // =============================================================================
 
 export type * from './sdk/devbox';
+export type * from './sdk/benchmark';
 export type * from './sdk';
