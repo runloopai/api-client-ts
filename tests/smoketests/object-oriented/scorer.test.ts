@@ -19,6 +19,21 @@ describe('smoketest: object-oriented scorers', () => {
       scorerId = scorer.id;
     });
 
+    test('create scorer via Scorer.create (static)', async () => {
+      const created = await Scorer.create(sdk.api, {
+        type: uniqueName('sdk-scorer-static-create'),
+        bash_script: 'echo "score=1.0"',
+      });
+
+      expect(created).toBeDefined();
+      expect(created.id).toBeTruthy();
+
+      const info = await created.getInfo();
+      expect(info.id).toBe(created.id);
+      expect(info.type).toBeTruthy();
+      expect(info.bash_script).toBeTruthy();
+    });
+
     test('get scorer info', async () => {
       const info = await scorer.getInfo();
       expect(info.id).toBe(scorerId);

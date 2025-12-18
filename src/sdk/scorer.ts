@@ -1,6 +1,7 @@
 import { Runloop } from '../index';
 import type * as Core from '../core';
 import type {
+  ScorerCreateParams,
   ScorerRetrieveResponse,
   ScorerUpdateResponse,
   ScorerUpdateParams,
@@ -43,6 +44,26 @@ export class Scorer {
   private constructor(client: Runloop, scorerId: string) {
     this.client = client;
     this._id = scorerId;
+  }
+
+  /**
+   * Create a new custom scorer.
+   *
+   * See the {@link ScorerOps.create} method for calling this
+   * @private
+   *
+   * @param {Runloop} client - The Runloop client instance
+   * @param {ScorerCreateParams} params - Scorer creation parameters
+   * @param {Core.RequestOptions} [options] - Request options
+   * @returns {Promise<Scorer>} A new {@link Scorer} instance
+   */
+  static async create(
+    client: Runloop,
+    params: ScorerCreateParams,
+    options?: Core.RequestOptions,
+  ): Promise<Scorer> {
+    const scorerData = await client.scenarios.scorers.create(params, options);
+    return new Scorer(client, scorerData.id);
   }
 
   /**

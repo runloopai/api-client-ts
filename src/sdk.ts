@@ -1286,8 +1286,7 @@ export class ScorerOps {
    * @returns {Promise<Scorer>} A {@link Scorer} instance
    */
   async create(params: ScorerCreateParams, options?: Core.RequestOptions): Promise<Scorer> {
-    const response = await this.client.scenarios.scorers.create(params, options);
-    return Scorer.fromId(this.client, response.id);
+    return Scorer.create(this.client, params, options);
   }
 
   /**
