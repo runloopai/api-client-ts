@@ -21,6 +21,7 @@ describe('Scorer', () => {
           retrieve: jest.fn(),
           update: jest.fn(),
           validate: jest.fn(),
+          list: jest.fn(),
         },
       },
     } as any;
