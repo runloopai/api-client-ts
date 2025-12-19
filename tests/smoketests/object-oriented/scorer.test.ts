@@ -50,6 +50,7 @@ describe('smoketest: object-oriented scorers', () => {
 
       expect(updated.id).toBe(scorerId);
       expect(updated.type).toBe(newType);
+      expect(updated.bash_script).toBe('echo "score=0.5"');
     });
 
     // TODO: reenable this post-API fixes

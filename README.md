@@ -61,6 +61,7 @@ The SDK provides object-oriented interfaces for all major Runloop resources:
 - **[`runloop.blueprint`](https://runloopai.github.io/api-client-ts/stable/classes/BlueprintOps.html)** - Blueprint management (create, list, build blueprints)
 - **[`runloop.snapshot`](https://runloopai.github.io/api-client-ts/stable/classes/SnapshotOps.html)** - Snapshot management (list disk snapshots)
 - **[`runloop.storageObject`](https://runloopai.github.io/api-client-ts/stable/classes/StorageObjectOps.html)** - Storage object management (upload, download, list objects)
+- **[`runloop.scorer`](https://runloopai.github.io/api-client-ts/stable/classes/ScorerOps.html)** - Scorer management (create, list, validate, update)
 - **[`runloop.api`](https://runloopai.github.io/api-client-ts/stable/classes/Runloop.html)** - Direct access to the REST API client
 
 ## TypeScript Support
@@ -72,6 +73,25 @@ import { RunloopSDK, type DevboxView } from '@runloop/api-client';
 
 const runloop = new RunloopSDK();
 const devbox: DevboxView = await runloop.devbox.create();
+```
+
+### Scorers
+
+Scorers are custom scoring functions used to evaluate scenario outputs. Create scorers via `runloop.scorer.create()`, then update or validate them with the returned `Scorer` instance:
+
+```typescript
+import { RunloopSDK } from '@runloop/api-client';
+
+const runloop = new RunloopSDK();
+
+const scorer = await runloop.scorer.create({
+  type: 'my_scorer',
+  bash_script: 'echo "score=1.0"',
+});
+
+await scorer.update({ bash_script: 'echo "score=0.5"' });
+const result = await scorer.validate({ scoring_context: { output: 'hello' } });
+console.log(result.scoring_result.score);
 ```
 
 ## Migration from API Client
