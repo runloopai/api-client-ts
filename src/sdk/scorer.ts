@@ -17,22 +17,20 @@ import type {
  * @remarks
  * ## Overview
  *
- * The `Scorer` class provides a high-level API for managing custom scorers.
+ * The `Scorer` class provides a high-level, object-oriented API for managing custom scorers.
  * Scorers define bash scripts that produce a score in the range [0.0, 1.0] for scenario runs.
  *
- * ## Usage
+ * ## Quickstart
  *
- * Obtain instances via `runloop.scorer.create()` or `runloop.scorer.fromId()`:
- *
- * @example
  * ```typescript
+ * import { RunloopSDK } from '@runloop/api-client-ts';
+ *
  * const runloop = new RunloopSDK();
  * const scorer = await runloop.scorer.create({
  *   type: 'my_scorer',
- *   bash_script: 'echo "score=1.0"'
+ *   bash_script: 'echo "1.0"',
  * });
  *
- * // Validate the scorer
  * const result = await scorer.validate({ scoring_context: { output: 'test' } });
  * console.log(`Score: ${result.scoring_result.score}`);
  * ```
@@ -49,8 +47,17 @@ export class Scorer {
   /**
    * Create a new custom scorer.
    *
-   * See the {@link ScorerOps.create} method for calling this
+   * See the {@link ScorerOps.create} method for calling this.
    * @private
+   *
+   * @example
+   * ```typescript
+   * const runloop = new RunloopSDK();
+   * const scorer = await runloop.scorer.create({
+   *   type: 'my_scorer',
+   *   bash_script: 'echo "1.0"',
+   * });
+   * ```
    *
    * @param {Runloop} client - The Runloop client instance
    * @param {ScorerCreateParams} params - Scorer creation parameters
@@ -69,6 +76,17 @@ export class Scorer {
   /**
    * Create a Scorer instance by ID without retrieving from API.
    * Use getInfo() to fetch the actual data when needed.
+   *
+   * See the {@link ScorerOps.fromId} method for calling this.
+   * @private
+   *
+   * @example
+   * ```typescript
+   * const runloop = new RunloopSDK();
+   * const scorer = runloop.scorer.fromId('scs-123');
+   * const info = await scorer.getInfo();
+   * console.log(`Scorer type: ${info.type}`);
+   * ```
    *
    * @param {Runloop} client - The Runloop client instance
    * @param {string} id - The scorer ID
