@@ -86,10 +86,10 @@ const runloop = new RunloopSDK();
 
 const scorer = await runloop.scorer.create({
   type: 'my_scorer',
-  bash_script: 'echo "score=1.0"',
+  bash_script: 'echo "1.0"',
 });
 
-await scorer.update({ bash_script: 'echo "score=0.5"' });
+await scorer.update({ bash_script: 'echo "0.5"' });
 const result = await scorer.validate({ scoring_context: { output: 'hello' } });
 console.log(result.scoring_result.score);
 ```

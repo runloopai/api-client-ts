@@ -1276,7 +1276,7 @@ export class AgentOps {
  * ## Overview
  *
  * Scorers are custom scoring functions used to evaluate scenario outputs. A scorer is a
- * script that runs and prints a score in the range [0.0, 1.0], e.g. `echo "score=0.5"`.
+ * script that runs and prints a score in the range [0.0, 1.0], e.g. `echo "0.5"`.
  *
  * ## Usage
  *
@@ -1292,11 +1292,11 @@ export class AgentOps {
  * // Create a scorer
  * const scorer = await runloop.scorer.create({
  *   type: 'my_scorer',
- *   bash_script: 'echo "score=1.0"',
+ *   bash_script: 'echo "1.0"',
  * });
  *
  * // Update the scorer
- * await scorer.update({ bash_script: 'echo "score=0.5"' });
+ * await scorer.update({ bash_script: 'echo "0.5"' });
  *
  * // Validate the scorer with a scoring context
  * const result = await scorer.validate({ scoring_context: { output: 'hello' } });
@@ -1325,6 +1325,18 @@ export class ScorerOps {
   /**
    * Create a new custom scorer.
    *
+   * @example
+   * ```typescript
+   * const runloop = new RunloopSDK();
+   * const scorer = await runloop.scorer.create({
+   *   type: 'my_scorer',
+   *   bash_script: 'echo "1.0"',
+   * });
+   *
+   * const info = await scorer.getInfo();
+   * console.log(info.id);
+   * ```
+   *
    * @param {ScorerCreateParams} params - Parameters for creating the scorer
    * @param {Core.RequestOptions} [options] - Request options
    * @returns {Promise<Scorer>} A {@link Scorer} instance
@@ -1336,6 +1348,14 @@ export class ScorerOps {
   /**
    * Get a scorer object by its ID.
    *
+   * @example
+   * ```typescript
+   * const runloop = new RunloopSDK();
+   * const scorer = runloop.scorer.fromId('scs_123');
+   * const info = await scorer.getInfo();
+   * console.log(info.type);
+   * ```
+   *
    * @param {string} id - The ID of the scorer
    * @returns {Scorer} A {@link Scorer} instance
    */
@@ -1346,19 +1366,19 @@ export class ScorerOps {
   /**
    * List all scorers with optional filters.
    *
+   * @example
+   * ```typescript
+   * const runloop = new RunloopSDK();
+   * const scorers = await runloop.scorer.list({ limit: 10 });
+   * console.log(scorers.map((s) => s.id));
+   * ```
+   *
    * @param {ScorerListParams} [params] - Optional filter parameters
    * @param {Core.RequestOptions} [options] - Request options
    * @returns {Promise<Scorer[]>} An array of {@link Scorer} instances
    */
   async list(params?: ScorerListParams, options?: Core.RequestOptions): Promise<Scorer[]> {
-    const page = await this.client.scenarios.scorers.list(params, options);
-    const scorers: Scorer[] = [];
-
-    for await (const scorer of page) {
-      scorers.push(Scorer.fromId(this.client, scorer.id));
-    }
-
-    return scorers;
+    return Scorer.list(this.client, params, options);
   }
 }
 

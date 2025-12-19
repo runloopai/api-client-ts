@@ -7,58 +7,54 @@ describe('smoketest: object-oriented scorers', () => {
   describe('scorer lifecycle', () => {
     let scorer: Scorer;
     let scorerId: string | undefined;
+    let scorerType: string;
 
     beforeAll(async () => {
       // Create a scorer first (no delete endpoint currently, so we keep it small + uniquely named)
+      scorerType = uniqueName('sdk-scorer');
       scorer = await sdk.scorer.create({
-        type: uniqueName('sdk-scorer'),
-        bash_script: 'echo "score=1.0"',
+        type: scorerType,
+        bash_script: 'echo "1.0"',
       });
       expect(scorer).toBeDefined();
-      expect(scorer.id).toBeTruthy();
+      expect(scorer.id).toMatch(/^scs_/);
       scorerId = scorer.id;
     });
 
     test('create scorer via Scorer.create (static)', async () => {
+      const type = uniqueName('sdk-scorer-static-create');
+      const bashScript = 'echo "1.0"';
       const created = await Scorer.create(sdk.api, {
-        type: uniqueName('sdk-scorer-static-create'),
-        bash_script: 'echo "score=1.0"',
+        type,
+        bash_script: bashScript,
       });
 
       expect(created).toBeDefined();
-      expect(created.id).toBeTruthy();
+      expect(created.id).toMatch(/^scs_/);
 
       const info = await created.getInfo();
       expect(info.id).toBe(created.id);
-      expect(info.type).toBeTruthy();
-      expect(info.bash_script).toBeTruthy();
-    });
-
-    test('get scorer info', async () => {
-      const info = await scorer.getInfo();
-      expect(info.id).toBe(scorerId);
-      expect(info.type).toBeTruthy();
-      expect(info.bash_script).toBeTruthy();
+      expect(info.type).toBe(type);
+      expect(info.bash_script).toBe(bashScript);
     });
 
     test('update scorer', async () => {
       const newType = uniqueName('sdk-scorer-updated');
       const updated = await scorer.update({
         type: newType,
-        bash_script: 'echo "score=0.5"',
+        bash_script: 'echo "0.5"',
       });
 
       expect(updated.id).toBe(scorerId);
       expect(updated.type).toBe(newType);
-      expect(updated.bash_script).toBe('echo "score=0.5"');
+      expect(updated.bash_script).toBe('echo "0.5"');
     });
 
-    // TODO: reenable this post-API fixes
-    // test('validate scorer', async () => {
-    //   const result = await scorer.validate({ scoring_context: { test: true } });
-    //   expect(result.scoring_result).toBeDefined();
-    //   expect(typeof result.scoring_result.score).toBe('number');
-    // });
+    test('validate scorer', async () => {
+       const result = await scorer.validate({ scoring_context: { test: true } });
+       expect(result.scoring_result).toBeDefined();
+       expect(typeof result.scoring_result.score).toBe('number');
+    });
 
     test('get scorer by ID (ScorerOps.fromId)', async () => {
       const retrieved = sdk.scorer.fromId(scorerId!);
@@ -66,6 +62,7 @@ describe('smoketest: object-oriented scorers', () => {
 
       const info = await retrieved.getInfo();
       expect(info.id).toBe(scorerId);
+      expect(info.type).toBe(scorerType);
     });
 
     test('list scorers (ScorerOps.list)', async () => {

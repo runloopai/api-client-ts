@@ -2,6 +2,7 @@ import { Runloop } from '../index';
 import type * as Core from '../core';
 import type {
   ScorerCreateParams,
+  ScorerListParams,
   ScorerRetrieveResponse,
   ScorerUpdateResponse,
   ScorerUpdateParams,
@@ -74,6 +75,43 @@ export class Scorer {
   }
 
   /**
+   * List all scorers with optional filters.
+   *
+   * See the {@link ScorerOps.list} method for calling this.
+   * @private
+   *
+   * @example
+   * ```typescript
+   * const runloop = new RunloopSDK();
+   * const scorers = await runloop.scorer.list({ limit: 10 });
+   *
+   * for (const scorer of scorers) {
+   *   const info = await scorer.getInfo();
+   *   console.log(`${info.id}: ${info.type}`);
+   * }
+   * ```
+   *
+   * @param {Runloop} client - The Runloop client instance
+   * @param {ScorerListParams} [params] - Optional filter parameters
+   * @param {Core.RequestOptions} [options] - Request options
+   * @returns {Promise<Scorer[]>} Array of {@link Scorer} instances
+   */
+  static async list(
+    client: Runloop,
+    params?: ScorerListParams,
+    options?: Core.RequestOptions,
+  ): Promise<Scorer[]> {
+    const scorers = await client.scenarios.scorers.list(params, options);
+    const result: Scorer[] = [];
+
+    for await (const scorer of scorers) {
+      result.push(Scorer.fromId(client, scorer.id));
+    }
+
+    return result;
+  }
+
+  /**
    * Create a Scorer instance by ID without retrieving from API.
    * Use getInfo() to fetch the actual data when needed.
    *
@@ -83,7 +121,7 @@ export class Scorer {
    * @example
    * ```typescript
    * const runloop = new RunloopSDK();
-   * const scorer = runloop.scorer.fromId('scs-123');
+   * const scorer = runloop.scorer.fromId('scs_123');
    * const info = await scorer.getInfo();
    * console.log(`Scorer type: ${info.type}`);
    * ```
@@ -127,7 +165,7 @@ export class Scorer {
    * ```typescript
    * const updated = await scorer.update({
    *   type: 'my_scorer_v2',
-   *   bash_script: 'echo "score=0.5"'
+   *   bash_script: 'echo "0.5"'
    * });
    * ```
    *
