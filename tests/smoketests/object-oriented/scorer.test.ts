@@ -56,9 +56,12 @@ describe('smoketest: object-oriented scorers', () => {
        expect(typeof result.scoring_result.score).toBe('number');
     });
 
-    test('get scorer by ID (ScorerOps.fromId)', async () => {
+    test('get scorer by ID', async () => {
       const retrieved = sdk.scorer.fromId(scorerId!);
       expect(retrieved.id).toBe(scorerId);
+
+      const staticRetrieved = Scorer.fromId(sdk.api, scorerId!);
+      expect(staticRetrieved.id).toBe(scorerId);
 
       const info = await retrieved.getInfo();
       expect(info.id).toBe(scorerId);
@@ -71,6 +74,7 @@ describe('smoketest: object-oriented scorers', () => {
       expect(scorers.length).toBeGreaterThan(0);
       expect(scorers.every((s) => typeof s.id === 'string' && s.id.length > 0)).toBe(true);
     });
+
   });
 });
 
