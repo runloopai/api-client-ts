@@ -6,6 +6,7 @@ import { Blueprint, type CreateParams as BlueprintCreateParams } from './sdk/blu
 import { Snapshot } from './sdk/snapshot';
 import { StorageObject } from './sdk/storage-object';
 import { Agent } from './sdk/agent';
+import { Scorer } from './sdk/scorer';
 
 // Import types used in this file
 import type {
@@ -17,6 +18,7 @@ import type {
 import type { BlueprintListParams } from './resources/blueprints';
 import type { ObjectCreateParams, ObjectListParams } from './resources/objects';
 import type { AgentCreateParams, AgentListParams } from './resources/agents';
+import type { ScorerCreateParams, ScorerListParams } from './resources/scenarios/scorers';
 import { PollingOptions } from './lib/polling';
 import * as Shared from './resources/shared';
 
@@ -190,6 +192,7 @@ type ContentType = ObjectCreateParams['content_type'];
  * - `snapshot` - {@link SnapshotOps}
  * - `storageObject` - {@link StorageObjectOps}
  * - `agent` - {@link AgentOps}
+ * - `scorer` - {@link ScorerOps}
  *
  * See the documentation for each Operations class for more details.
  *
@@ -261,6 +264,14 @@ export class RunloopSDK {
   public readonly agent: AgentOps;
 
   /**
+   * **Scorer Operations** - {@link ScorerOps} for creating and accessing {@link Scorer} class instances.
+   *
+   * Scorers are custom scoring functions that evaluate scenario outputs. They define scripts
+   * that produce a score in the range [0.0, 1.0] for scenario runs.
+   */
+  public readonly scorer: ScorerOps;
+
+  /**
    * Creates a new RunloopSDK instance.
    * @param {ClientOptions} [options] - Optional client configuration options.
    */
@@ -271,6 +282,7 @@ export class RunloopSDK {
     this.snapshot = new SnapshotOps(this.api);
     this.storageObject = new StorageObjectOps(this.api);
     this.agent = new AgentOps(this.api);
+    this.scorer = new ScorerOps(this.api);
   }
 }
 
@@ -1255,6 +1267,121 @@ export class AgentOps {
   }
 }
 
+/**
+ * Scorer SDK interface for managing custom scorers.
+ *
+ * @category Scorer
+ *
+ * @remarks
+ * ## Overview
+ *
+ * Scorers are custom scoring functions used to evaluate scenario outputs. A scorer is a
+ * script that runs and prints a score in the range [0.0, 1.0], e.g. `echo "0.5"`.
+ *
+ * ## Usage
+ *
+ * This interface is accessed via {@link RunloopSDK.scorer}. Create scorers with {@link ScorerOps.create}
+ * or reference an existing scorer by ID with {@link ScorerOps.fromId} to obtain a {@link Scorer} instance.
+ *
+ * @example
+ * ```typescript
+ * import { RunloopSDK } from '@runloop/api-client';
+ *
+ * const runloop = new RunloopSDK();
+ *
+ * // Create a scorer
+ * const scorer = await runloop.scorer.create({
+ *   type: 'my_scorer',
+ *   bash_script: 'echo "1.0"',
+ * });
+ *
+ * // Update the scorer
+ * await scorer.update({ bash_script: 'echo "0.5"' });
+ *
+ * // Validate the scorer with a scoring context
+ * const result = await scorer.validate({ scoring_context: { output: 'hello' } });
+ * console.log(result.scoring_result.score);
+ * ```
+ *
+ * @example
+ * Get scorer info (typical usage):
+ * ```typescript
+ * const runloop = new RunloopSDK();
+ * const scorer = await runloop.scorer.create({
+ *   type: 'my_scorer',
+ *   bash_script: 'echo "1.0"',
+ * });
+ *
+ * const info = await scorer.getInfo();
+ * console.log(`Scorer ${info.id} (${info.type})`);
+ * ```
+ */
+export class ScorerOps {
+  /**
+   * @private
+   */
+  constructor(private client: RunloopAPI) {}
+
+  /**
+   * Create a new custom scorer.
+   *
+   * @example
+   * ```typescript
+   * const runloop = new RunloopSDK();
+   * const scorer = await runloop.scorer.create({
+   *   type: 'my_scorer',
+   *   bash_script: 'echo "1.0"',
+   * });
+   *
+   * const info = await scorer.getInfo();
+   * console.log(info.id);
+   * ```
+   *
+   * @param {ScorerCreateParams} params - Parameters for creating the scorer
+   * @param {Core.RequestOptions} [options] - Request options
+   * @returns {Promise<Scorer>} A {@link Scorer} instance
+   */
+  async create(params: ScorerCreateParams, options?: Core.RequestOptions): Promise<Scorer> {
+    return Scorer.create(this.client, params, options);
+  }
+
+  /**
+   * Get a scorer object by its ID.
+   *
+   * @example
+   * ```typescript
+   * const runloop = new RunloopSDK();
+   * const scorer = runloop.scorer.fromId('scs_123');
+   * const info = await scorer.getInfo();
+   * console.log(info.type);
+   * ```
+   *
+   * @param {string} id - The ID of the scorer
+   * @returns {Scorer} A {@link Scorer} instance
+   */
+  fromId(id: string): Scorer {
+    return Scorer.fromId(this.client, id);
+  }
+
+  /**
+   * List all scorers with optional filters.
+   *
+   * @example
+   * ```typescript
+   * const runloop = new RunloopSDK();
+   * const scorers = await runloop.scorer.list({ limit: 10 });
+   * console.log(scorers.map((s) => s.id));
+   * ```
+   *
+   * @param {ScorerListParams} [params] - Optional filter parameters
+   * @param {Core.RequestOptions} [options] - Request options
+   * @returns {Promise<Scorer[]>} An array of {@link Scorer} instances
+   */
+  async list(params?: ScorerListParams, options?: Core.RequestOptions): Promise<Scorer[]> {
+    return Scorer.list(this.client, params, options);
+  }
+}
+
 // @deprecated Use {@link RunloopSDK} instead.
 /**
  * @deprecated Use {@link RunloopSDK} instead.
@@ -1275,11 +1402,13 @@ export declare namespace RunloopSDK {
     SnapshotOps as SnapshotOps,
     StorageObjectOps as StorageObjectOps,
     AgentOps as AgentOps,
+    ScorerOps as ScorerOps,
     Devbox as Devbox,
     Blueprint as Blueprint,
     Snapshot as Snapshot,
     StorageObject as StorageObject,
     Agent as Agent,
+    Scorer as Scorer,
   };
 }
 // Export SDK classes from sdk/sdk.ts - these are separate from RunloopSDK to avoid circular dependencies
@@ -1293,6 +1422,7 @@ export {
   Snapshot,
   StorageObject,
   Agent,
+  Scorer,
   Execution,
   ExecutionResult,
 } from './sdk/index';
