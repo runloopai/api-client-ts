@@ -48,9 +48,9 @@ export class Scenarios extends APIResource {
   }
 
   /**
-   * Update a Scenario, a repeatable AI coding evaluation test that defines the
-   * starting environment as well as evaluation success criteria. Only provided
-   * fields will be updated.
+   * Update a Scenario. Fields that are null will preserve the existing value. Fields
+   * that are provided (including empty values) will replace the existing value
+   * entirely.
    */
   update(
     id: string,
@@ -329,6 +329,11 @@ export interface ScenarioRunView {
   start_time_ms?: number;
 }
 
+/**
+ * ScenarioUpdateParameters contain the set of parameters to update a Scenario. All
+ * fields are optional - null fields preserve existing values, provided fields
+ * replace entirely.
+ */
 export interface ScenarioUpdateParameters {
   /**
    * The Environment in which the Scenario will run.
@@ -341,29 +346,29 @@ export interface ScenarioUpdateParameters {
   input_context?: InputContextUpdate | null;
 
   /**
-   * User defined metadata to attach to the scenario for organization.
+   * User defined metadata to attach to the scenario. Pass in empty map to clear.
    */
   metadata?: { [key: string]: string } | null;
 
   /**
-   * Name of the scenario.
+   * Name of the scenario. Cannot be blank.
    */
   name?: string | null;
 
   /**
    * A string representation of the reference output to solve the scenario. Commonly
    * can be the result of a git diff or a sequence of command actions to apply to the
-   * environment.
+   * environment. Pass in empty string to clear.
    */
   reference_output?: string | null;
 
   /**
-   * Environment variables required to run the scenario.
+   * Environment variables required to run the scenario. Pass in empty list to clear.
    */
   required_environment_variables?: Array<string> | null;
 
   /**
-   * Secrets required to run the scenario.
+   * Secrets required to run the scenario. Pass in empty list to clear.
    */
   required_secret_names?: Array<string> | null;
 
@@ -373,7 +378,7 @@ export interface ScenarioUpdateParameters {
   scoring_contract?: ScoringContractUpdate | null;
 
   /**
-   * Validation strategy.
+   * Validation strategy. Pass in empty string to clear.
    */
   validation_type?: 'UNSPECIFIED' | 'FORWARD' | 'REVERSE' | 'EVALUATION' | null;
 }
@@ -752,29 +757,29 @@ export interface ScenarioUpdateParams {
   input_context?: InputContextUpdate | null;
 
   /**
-   * User defined metadata to attach to the scenario for organization.
+   * User defined metadata to attach to the scenario. Pass in empty map to clear.
    */
   metadata?: { [key: string]: string } | null;
 
   /**
-   * Name of the scenario.
+   * Name of the scenario. Cannot be blank.
    */
   name?: string | null;
 
   /**
    * A string representation of the reference output to solve the scenario. Commonly
    * can be the result of a git diff or a sequence of command actions to apply to the
-   * environment.
+   * environment. Pass in empty string to clear.
    */
   reference_output?: string | null;
 
   /**
-   * Environment variables required to run the scenario.
+   * Environment variables required to run the scenario. Pass in empty list to clear.
    */
   required_environment_variables?: Array<string> | null;
 
   /**
-   * Secrets required to run the scenario.
+   * Secrets required to run the scenario. Pass in empty list to clear.
    */
   required_secret_names?: Array<string> | null;
 
@@ -784,7 +789,7 @@ export interface ScenarioUpdateParams {
   scoring_contract?: ScoringContractUpdate | null;
 
   /**
-   * Validation strategy.
+   * Validation strategy. Pass in empty string to clear.
    */
   validation_type?: 'UNSPECIFIED' | 'FORWARD' | 'REVERSE' | 'EVALUATION' | null;
 }
