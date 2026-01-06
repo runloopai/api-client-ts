@@ -1,5 +1,26 @@
 # Changelog
 
+## 1.2.0 (2026-01-06)
+
+Full Changelog: [v1.1.0...v1.2.0](https://github.com/runloopai/api-client-ts/compare/v1.1.0...v1.2.0)
+
+### Features
+
+* **benchmarks:** add `update_scenarios` method to benchmarks resource ([4ef2680](https://github.com/runloopai/api-client-ts/commit/4ef26807dbb81cd171a1d1a91a4eadf4ec0cde73))
+* **mounts:** add convenience helper for inline mounting storage objects ([#675](https://github.com/runloopai/api-client-ts/issues/675)) ([2e5866c](https://github.com/runloopai/api-client-ts/commit/2e5866c4b4f80078144f218c4c7145f767e8b2a0))
+* **sdk:** added scorers to OO SDK ([#679](https://github.com/runloopai/api-client-ts/issues/679)) ([ee67c94](https://github.com/runloopai/api-client-ts/commit/ee67c9406a97731d38f2ce0ab8dcb16226322304))
+
+
+### Bug Fixes
+
+* **benchmarks:** `update()` for benchmarks and scenarios replaces all provided fields and does not modify unspecified fields ([#6702](https://github.com/runloopai/api-client-ts/issues/6702)) ([0c2e0f0](https://github.com/runloopai/api-client-ts/commit/0c2e0f017684ddc578b80c31e3a08925bc582765))
+* **documentation:** added types to the typedoc main list and fixed some decorators ([#677](https://github.com/runloopai/api-client-ts/issues/677)) ([392007d](https://github.com/runloopai/api-client-ts/commit/392007d6555582d9a00b877e2ba6c1ea0de4236d))
+
+
+### Chores
+
+* **internal:** codegen related update ([f2acb64](https://github.com/runloopai/api-client-ts/commit/f2acb645f6854253dd74676570b03c1c6f325b2c))
+
 ## 1.1.0 (2025-12-13)
 
 Full Changelog: [v1.0.0...v1.1.0](https://github.com/runloopai/api-client-ts/compare/v1.0.0...v1.1.0)
