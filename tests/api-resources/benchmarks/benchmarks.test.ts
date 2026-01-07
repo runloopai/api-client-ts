@@ -109,7 +109,11 @@ describe('resource benchmarks', () => {
     // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
     await expect(
       client.benchmarks.list(
-        { limit: 0, name: 'name', starting_after: 'starting_after' },
+        {
+          limit: 0,
+          name: 'name',
+          starting_after: 'starting_after',
+        },
         { path: '/_stainless_unknown_path' },
       ),
     ).rejects.toThrow(Runloop.NotFoundError);
@@ -203,7 +207,13 @@ describe('resource benchmarks', () => {
           resource_size_request: 'X_SMALL',
           user_parameters: { uid: 0, username: 'username' },
         },
-        mounts: [{ object_id: 'object_id', object_path: 'object_path', type: 'object_mount' }],
+        mounts: [
+          {
+            object_id: 'object_id',
+            object_path: 'object_path',
+            type: 'object_mount',
+          },
+        ],
         purpose: 'purpose',
         secrets: { foo: 'string' },
       },
