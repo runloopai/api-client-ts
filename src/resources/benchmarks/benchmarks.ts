@@ -206,18 +206,13 @@ export interface BenchmarkRunListView {
 
 /**
  * A BenchmarkRunView represents a run of a complete set of Scenarios, organized
- * under a Benchmark.
+ * under a Benchmark or created by a BenchmarkJob.
  */
 export interface BenchmarkRunView {
   /**
    * The ID of the BenchmarkRun.
    */
   id: string;
-
-  /**
-   * The ID of the Benchmark.
-   */
-  benchmark_id: string;
 
   /**
    * User defined metadata to attach to the benchmark run for organization.
@@ -233,6 +228,12 @@ export interface BenchmarkRunView {
    * The state of the BenchmarkRun.
    */
   state: 'running' | 'canceled' | 'completed';
+
+  /**
+   * The ID of the Benchmark definition. Present if run was created from a benchmark
+   * definition.
+   */
+  benchmark_id?: string | null;
 
   /**
    * The duration for the BenchmarkRun to complete.

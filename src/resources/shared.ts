@@ -209,6 +209,13 @@ export interface LaunchParameters {
   launch_commands?: Array<string> | null;
 
   /**
+   * (Optional) ID of the network policy to apply to Devboxes launched with these
+   * parameters. When set on a Blueprint launch parameters, Devboxes created from it
+   * will inherit this policy unless explicitly overridden.
+   */
+  network_policy_id?: string | null;
+
+  /**
    * A list of ContainerizedService names to be started when a Devbox is created. A
    * valid ContainerizedService must be specified in Blueprint to be started.
    */
