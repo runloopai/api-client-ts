@@ -369,7 +369,7 @@ export class Devboxes extends APIResource {
 
   /**
    * Polls the asynchronous execution's status until it reaches one of the desired
-   * statuses or times out. Defaults to 60 seconds.
+   * statuses or times out. Max is 25 seconds.
    */
   waitForCommand(
     devboxId: string,
@@ -675,7 +675,7 @@ export interface DevboxView {
   /**
    * The type of initiator that created the Devbox.
    */
-  initiator_type?: 'unknown' | 'api' | 'scenario';
+  initiator_type?: 'unknown' | 'api' | 'scenario' | 'scoring_validation';
 
   /**
    * The name of the Devbox.
@@ -817,6 +817,12 @@ export interface DevboxCreateParams {
   name?: string | null;
 
   /**
+   * (Optional) ID of the network policy to apply to this Devbox. If not specified,
+   * the default network policy will be used.
+   */
+  network_policy_id?: string | null;
+
+  /**
    * Repository connection id the devbox should source its base image from.
    */
   repo_connection_id?: string | null;
@@ -899,8 +905,8 @@ export interface DevboxExecuteParams {
   last_n?: string;
 
   /**
-   * Body param: Timeout in seconds to wait for command completion. Operation is not
-   * killed. Max is 600 seconds.
+   * Body param: Timeout in seconds to wait for command completion, up to 25 seconds.
+   * Defaults to 25 seconds. Operation is not killed.
    */
   optimistic_timeout?: number | null;
 
@@ -1055,8 +1061,8 @@ export interface DevboxWaitForCommandParams {
   last_n?: string;
 
   /**
-   * Body param: (Optional) Timeout in seconds to wait for the status, up to 60
-   * seconds. Defaults to 60 seconds.
+   * Body param: (Optional) Timeout in seconds to wait for the status, up to 25
+   * seconds. Defaults to 25 seconds.
    */
   timeout_seconds?: number | null;
 }
