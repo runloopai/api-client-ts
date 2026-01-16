@@ -17,7 +17,11 @@ describe('resource scenarios', () => {
         scoring_function_parameters: [
           {
             name: 'name',
-            scorer: { pattern: 'pattern', search_directory: 'search_directory', type: 'ast_grep_scorer' },
+            scorer: {
+              pattern: 'pattern',
+              search_directory: 'search_directory',
+              type: 'ast_grep_scorer',
+            },
             weight: 0,
           },
         ],
@@ -34,7 +38,10 @@ describe('resource scenarios', () => {
 
   test('create: required and optional params', async () => {
     const response = await client.scenarios.create({
-      input_context: { problem_statement: 'problem_statement', additional_context: {} },
+      input_context: {
+        problem_statement: 'problem_statement',
+        additional_context: {},
+      },
       name: 'name',
       scoring_contract: {
         scoring_function_parameters: [
@@ -136,7 +143,10 @@ describe('resource scenarios', () => {
             snapshot_id: 'snapshot_id',
             working_directory: 'working_directory',
           },
-          input_context: { additional_context: {}, problem_statement: 'problem_statement' },
+          input_context: {
+            additional_context: {},
+            problem_statement: 'problem_statement',
+          },
           metadata: { foo: 'string' },
           name: 'name',
           reference_output: 'reference_output',
@@ -219,7 +229,11 @@ describe('resource scenarios', () => {
     // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
     await expect(
       client.scenarios.listPublic(
-        { limit: 0, name: 'name', starting_after: 'starting_after' },
+        {
+          limit: 0,
+          name: 'name',
+          starting_after: 'starting_after',
+        },
         { path: '/_stainless_unknown_path' },
       ),
     ).rejects.toThrow(Runloop.NotFoundError);
@@ -257,7 +271,13 @@ describe('resource scenarios', () => {
           resource_size_request: 'X_SMALL',
           user_parameters: { uid: 0, username: 'username' },
         },
-        mounts: [{ object_id: 'object_id', object_path: 'object_path', type: 'object_mount' }],
+        mounts: [
+          {
+            object_id: 'object_id',
+            object_path: 'object_path',
+            type: 'object_mount',
+          },
+        ],
         purpose: 'purpose',
         secrets: { foo: 'string' },
       },

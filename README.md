@@ -68,13 +68,6 @@ The SDK provides object-oriented interfaces for all major Runloop resources:
 
 The SDK is fully typed with comprehensive TypeScript definitions:
 
-```typescript
-import { RunloopSDK, type DevboxView } from '@runloop/api-client';
-
-const runloop = new RunloopSDK();
-const devbox: DevboxView = await runloop.devbox.create();
-```
-
 ### Scorers
 
 Scorers are custom scoring functions used to evaluate scenario outputs. Create scorers via `runloop.scorer.create()`, then update or validate them with the returned `Scorer` instance:
@@ -141,7 +134,59 @@ const snapshot = await devbox.snapshotDisk();
 await snapshot.createDevbox();
 ...
 await devbox.shutdown();
+
 ```
+
+## File write
+
+
+// You can also pass a `fetch` `Response`:
+await client.devboxes.uploadFile('id', {
+  path: 'path',
+  file: await fetch('https://somesite/file'),
+});
+
+// Finally, if none of the above are convenient, you can use our `toFile` helper:
+await client.devboxes.uploadFile('id', {
+  path: 'path',
+  file: await toFile(Buffer.from('my bytes'), 'file'),
+});
+await client.devboxes.uploadFile('id', {
+  path: 'path',
+  file: await toFile(new Uint8Array([0, 1, 2]), 'file'),
+});
+```
+
+## Handling errors
+
+When the library is unable to connect to the API,
+or if the API returns a non-success status code (i.e., 4xx or 5xx response),
+a subclass of `APIError` will be thrown:
+
+<!-- prettier-ignore -->
+```ts
+const devboxView = await client.devboxes.create().catch(async (err) => {
+  if (err instanceof Runloop.APIError) {
+    console.log(err.status); // 400
+    console.log(err.name); // BadRequestError
+    console.log(err.headers); // {server: 'nginx', ...}
+  } else {
+    throw err;
+  }
+});
+```typescript
+import { RunloopSDK, type DevboxView } from '@runloop/api-client';
+
+const runloop = new RunloopSDK();
+const devbox: DevboxView = await runloop.devbox.create();
+```
+
+
+// If you have access to Node `fs` we recommend using `fs.createReadStream()`:
+await client.devboxes.uploadFile('id', {
+  path: 'path',
+  file: fs.createReadStream('/path/to/file'),
+});
 
 ## Advanced Configuration
 
