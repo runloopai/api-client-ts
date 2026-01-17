@@ -86,6 +86,18 @@ export {
   type DevboxWriteFileContentsParams,
 } from './devboxes/devboxes';
 export {
+  NetworkPolicyViewsNetworkPoliciesCursorIDPage,
+  NetworkPolicies,
+  type NetworkPolicyCreateParameters,
+  type NetworkPolicyListView,
+  type NetworkPolicyUpdateParameters,
+  type NetworkPolicyView,
+  type NetworkPolicyCreateParams,
+  type NetworkPolicyUpdateParams,
+  type NetworkPolicyListParams,
+  type NetworkPolicyDeleteParams,
+} from './network-policies';
+export {
   ObjectViewsObjectsCursorIDPage,
   Objects,
   type ObjectCreateParameters,

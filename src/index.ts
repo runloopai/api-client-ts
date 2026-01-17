@@ -17,6 +17,8 @@ import {
   DevboxesCursorIDPageResponse,
   type DiskSnapshotsCursorIDPageParams,
   DiskSnapshotsCursorIDPageResponse,
+  type NetworkPoliciesCursorIDPageParams,
+  NetworkPoliciesCursorIDPageResponse,
   type ObjectsCursorIDPageParams,
   ObjectsCursorIDPageResponse,
   type RepositoriesCursorIDPageParams,
@@ -57,6 +59,18 @@ import {
   Blueprints,
   InspectionSource,
 } from './resources/blueprints';
+import {
+  NetworkPolicies,
+  NetworkPolicyCreateParameters,
+  NetworkPolicyCreateParams,
+  NetworkPolicyDeleteParams,
+  NetworkPolicyListParams,
+  NetworkPolicyListView,
+  NetworkPolicyUpdateParameters,
+  NetworkPolicyUpdateParams,
+  NetworkPolicyView,
+  NetworkPolicyViewsNetworkPoliciesCursorIDPage,
+} from './resources/network-policies';
 import {
   ObjectCompleteParams,
   ObjectCreateParameters,
@@ -303,6 +317,7 @@ export class Runloop extends Core.APIClient {
   objects: API.Objects = new API.Objects(this);
   repositories: API.Repositories = new API.Repositories(this);
   secrets: API.Secrets = new API.Secrets(this);
+  networkPolicies: API.NetworkPolicies = new API.NetworkPolicies(this);
 
   /**
    * Check whether the base URL is set to its default.
@@ -363,6 +378,8 @@ Runloop.ObjectViewsObjectsCursorIDPage = ObjectViewsObjectsCursorIDPage;
 Runloop.Repositories = Repositories;
 Runloop.RepositoryConnectionViewsRepositoriesCursorIDPage = RepositoryConnectionViewsRepositoriesCursorIDPage;
 Runloop.Secrets = Secrets;
+Runloop.NetworkPolicies = NetworkPolicies;
+Runloop.NetworkPolicyViewsNetworkPoliciesCursorIDPage = NetworkPolicyViewsNetworkPoliciesCursorIDPage;
 
 export declare namespace Runloop {
   export type RequestOptions = Core.RequestOptions;
@@ -431,6 +448,12 @@ export declare namespace Runloop {
   export {
     type ObjectsCursorIDPageParams as ObjectsCursorIDPageParams,
     type ObjectsCursorIDPageResponse as ObjectsCursorIDPageResponse,
+  };
+
+  export import NetworkPoliciesCursorIDPage = Pagination.NetworkPoliciesCursorIDPage;
+  export {
+    type NetworkPoliciesCursorIDPageParams as NetworkPoliciesCursorIDPageParams,
+    type NetworkPoliciesCursorIDPageResponse as NetworkPoliciesCursorIDPageResponse,
   };
 
   export {
@@ -588,11 +611,26 @@ export declare namespace Runloop {
     type SecretDeleteParams as SecretDeleteParams,
   };
 
+  export {
+    NetworkPolicies as NetworkPolicies,
+    type NetworkPolicyCreateParameters as NetworkPolicyCreateParameters,
+    type NetworkPolicyListView as NetworkPolicyListView,
+    type NetworkPolicyUpdateParameters as NetworkPolicyUpdateParameters,
+    type NetworkPolicyView as NetworkPolicyView,
+    NetworkPolicyViewsNetworkPoliciesCursorIDPage as NetworkPolicyViewsNetworkPoliciesCursorIDPage,
+    type NetworkPolicyCreateParams as NetworkPolicyCreateParams,
+    type NetworkPolicyUpdateParams as NetworkPolicyUpdateParams,
+    type NetworkPolicyListParams as NetworkPolicyListParams,
+    type NetworkPolicyDeleteParams as NetworkPolicyDeleteParams,
+  };
+
   export type AfterIdle = API.AfterIdle;
+  export type AgentMount = API.AgentMount;
   export type AgentSource = API.AgentSource;
   export type CodeMountParameters = API.CodeMountParameters;
   export type LaunchParameters = API.LaunchParameters;
   export type Mount = API.Mount;
+  export type ObjectMount = API.ObjectMount;
   export type RunProfile = API.RunProfile;
 }
 

@@ -3,10 +3,12 @@
 Types:
 
 - <code><a href="./src/resources/shared.ts">AfterIdle</a></code>
+- <code><a href="./src/resources/shared.ts">AgentMount</a></code>
 - <code><a href="./src/resources/shared.ts">AgentSource</a></code>
 - <code><a href="./src/resources/shared.ts">CodeMountParameters</a></code>
 - <code><a href="./src/resources/shared.ts">LaunchParameters</a></code>
 - <code><a href="./src/resources/shared.ts">Mount</a></code>
+- <code><a href="./src/resources/shared.ts">ObjectMount</a></code>
 - <code><a href="./src/resources/shared.ts">RunProfile</a></code>
 
 # Benchmarks
@@ -311,3 +313,20 @@ Methods:
 - <code title="post /v1/secrets/{name}">client.secrets.<a href="./src/resources/secrets.ts">update</a>(name, { ...params }) -> SecretView</code>
 - <code title="get /v1/secrets">client.secrets.<a href="./src/resources/secrets.ts">list</a>({ ...params }) -> SecretListView</code>
 - <code title="post /v1/secrets/{name}/delete">client.secrets.<a href="./src/resources/secrets.ts">delete</a>(name) -> SecretView</code>
+
+# NetworkPolicies
+
+Types:
+
+- <code><a href="./src/resources/network-policies.ts">NetworkPolicyCreateParameters</a></code>
+- <code><a href="./src/resources/network-policies.ts">NetworkPolicyListView</a></code>
+- <code><a href="./src/resources/network-policies.ts">NetworkPolicyUpdateParameters</a></code>
+- <code><a href="./src/resources/network-policies.ts">NetworkPolicyView</a></code>
+
+Methods:
+
+- <code title="post /v1/network-policies">client.networkPolicies.<a href="./src/resources/network-policies.ts">create</a>({ ...params }) -> NetworkPolicyView</code>
+- <code title="get /v1/network-policies/{id}">client.networkPolicies.<a href="./src/resources/network-policies.ts">retrieve</a>(id) -> NetworkPolicyView</code>
+- <code title="post /v1/network-policies/{id}">client.networkPolicies.<a href="./src/resources/network-policies.ts">update</a>(id, { ...params }) -> NetworkPolicyView</code>
+- <code title="get /v1/network-policies">client.networkPolicies.<a href="./src/resources/network-policies.ts">list</a>({ ...params }) -> NetworkPolicyViewsNetworkPoliciesCursorIDPage</code>
+- <code title="post /v1/network-policies/{id}/delete">client.networkPolicies.<a href="./src/resources/network-policies.ts">delete</a>(id) -> NetworkPolicyView</code>
