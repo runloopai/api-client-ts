@@ -4,7 +4,6 @@ import type {
   NetworkPolicyView,
   NetworkPolicyCreateParams,
   NetworkPolicyUpdateParams,
-  NetworkPolicyListParams,
 } from '../resources/network-policies';
 
 /**
