@@ -159,9 +159,27 @@ describe('Agent (SDK)', () => {
   describe('list', () => {
     it('should list agents and return Agent instances', async () => {
       const mockAgents = [
-        { id: 'agent-001', name: 'first-agent', version: '1.0.0', create_time_ms: Date.now(), is_public: false },
-        { id: 'agent-002', name: 'second-agent', version: '1.0.0', create_time_ms: Date.now(), is_public: true },
-        { id: 'agent-003', name: 'third-agent', version: '1.0.0', create_time_ms: Date.now(), is_public: false },
+        {
+          id: 'agent-001',
+          name: 'first-agent',
+          version: '1.0.0',
+          create_time_ms: Date.now(),
+          is_public: false,
+        },
+        {
+          id: 'agent-002',
+          name: 'second-agent',
+          version: '1.0.0',
+          create_time_ms: Date.now(),
+          is_public: true,
+        },
+        {
+          id: 'agent-003',
+          name: 'third-agent',
+          version: '1.0.0',
+          create_time_ms: Date.now(),
+          is_public: false,
+        },
       ];
 
       // Mock async iterator
@@ -188,7 +206,13 @@ describe('Agent (SDK)', () => {
     it('should pass filter parameters to list', async () => {
       const asyncIterator = {
         async *[Symbol.asyncIterator]() {
-          yield { id: 'agent-001', name: 'filtered-agent', version: '1.0.0', create_time_ms: Date.now(), is_public: false };
+          yield {
+            id: 'agent-001',
+            name: 'filtered-agent',
+            version: '1.0.0',
+            create_time_ms: Date.now(),
+            is_public: false,
+          };
         },
       };
 

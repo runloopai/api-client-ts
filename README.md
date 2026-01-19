@@ -139,23 +139,23 @@ await devbox.shutdown();
 
 ## File write
 
-
 // You can also pass a `fetch` `Response`:
 await client.devboxes.uploadFile('id', {
-  path: 'path',
-  file: await fetch('https://somesite/file'),
+path: 'path',
+file: await fetch('https://somesite/file'),
 });
 
 // Finally, if none of the above are convenient, you can use our `toFile` helper:
 await client.devboxes.uploadFile('id', {
-  path: 'path',
-  file: await toFile(Buffer.from('my bytes'), 'file'),
+path: 'path',
+file: await toFile(Buffer.from('my bytes'), 'file'),
 });
 await client.devboxes.uploadFile('id', {
-  path: 'path',
-  file: await toFile(new Uint8Array([0, 1, 2]), 'file'),
+path: 'path',
+file: await toFile(new Uint8Array([0, 1, 2]), 'file'),
 });
-```
+
+````
 
 ## Handling errors
 
@@ -179,13 +179,12 @@ import { RunloopSDK, type DevboxView } from '@runloop/api-client';
 
 const runloop = new RunloopSDK();
 const devbox: DevboxView = await runloop.devbox.create();
-```
-
+````
 
 // If you have access to Node `fs` we recommend using `fs.createReadStream()`:
 await client.devboxes.uploadFile('id', {
-  path: 'path',
-  file: fs.createReadStream('/path/to/file'),
+path: 'path',
+file: fs.createReadStream('/path/to/file'),
 });
 
 ## Advanced Configuration

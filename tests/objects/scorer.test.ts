@@ -218,8 +218,6 @@ describe('Scorer', () => {
         { timeout: 30000 },
       );
     });
-
-
   });
 
   describe('error handling', () => {
@@ -238,7 +236,9 @@ describe('Scorer', () => {
 
       const scorer = Scorer.fromId(mockClient, 'scs_123');
 
-      await expect(scorer.update({ type: 'new_type', bash_script: 'echo 1' })).rejects.toThrow('Update failed');
+      await expect(scorer.update({ type: 'new_type', bash_script: 'echo 1' })).rejects.toThrow(
+        'Update failed',
+      );
     });
 
     it('should handle API errors on validate', async () => {
@@ -251,4 +251,3 @@ describe('Scorer', () => {
     });
   });
 });
-

@@ -860,7 +860,7 @@ describe('StorageObject (New API)', () => {
       mockFs.mkdtemp.mockResolvedValue('/tmp/runloop-upload-123');
       // Mock reading the tarball file
       mockFs.readFile.mockResolvedValue(Buffer.from('mock tarball content'));
-      
+
       // Mock write stream
       const mockWriteStream = {
         on: jest.fn().mockReturnThis(),
@@ -870,10 +870,10 @@ describe('StorageObject (New API)', () => {
       // Mock tar stream
       const mockTarStream = {
         pipe: jest.fn((dest) => {
-            // Trigger finish immediately for test
-            const finishCall = dest.on.mock.calls.find((c: any) => c[0] === 'finish');
-            if (finishCall) finishCall[1]();
-            return dest;
+          // Trigger finish immediately for test
+          const finishCall = dest.on.mock.calls.find((c: any) => c[0] === 'finish');
+          if (finishCall) finishCall[1]();
+          return dest;
         }),
         on: jest.fn(),
       };
@@ -931,9 +931,9 @@ describe('StorageObject (New API)', () => {
       // Mock tar stream
       const mockTarStream = {
         pipe: jest.fn((dest) => {
-            const finishCall = dest.on.mock.calls.find((c: any) => c[0] === 'finish');
-            if (finishCall) finishCall[1]();
-            return dest;
+          const finishCall = dest.on.mock.calls.find((c: any) => c[0] === 'finish');
+          if (finishCall) finishCall[1]();
+          return dest;
         }),
         on: jest.fn(),
       };
@@ -981,9 +981,9 @@ describe('StorageObject (New API)', () => {
       // Mock tar stream
       const mockTarStream = {
         pipe: jest.fn((dest) => {
-            const finishCall = dest.on.mock.calls.find((c: any) => c[0] === 'finish');
-            if (finishCall) finishCall[1]();
-            return dest;
+          const finishCall = dest.on.mock.calls.find((c: any) => c[0] === 'finish');
+          if (finishCall) finishCall[1]();
+          return dest;
         }),
         on: jest.fn(),
       };
@@ -1046,7 +1046,7 @@ describe('StorageObject (New API)', () => {
       mockFs.mkdtemp.mockResolvedValue('/tmp/runloop-upload-123');
       // Mock reading the tarball file
       mockFs.readFile.mockResolvedValue(Buffer.from('mock tarball content'));
-      
+
       const mockWriteStream = {
         on: jest.fn().mockReturnThis(),
       };
@@ -1054,9 +1054,9 @@ describe('StorageObject (New API)', () => {
 
       const mockTarStream = {
         pipe: jest.fn((dest) => {
-            const finishCall = dest.on.mock.calls.find((c: any) => c[0] === 'finish');
-            if (finishCall) finishCall[1]();
-            return dest;
+          const finishCall = dest.on.mock.calls.find((c: any) => c[0] === 'finish');
+          if (finishCall) finishCall[1]();
+          return dest;
         }),
         on: jest.fn(),
       };

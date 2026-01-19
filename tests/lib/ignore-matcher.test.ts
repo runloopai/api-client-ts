@@ -48,9 +48,9 @@ describe('DockerIgnoreMatcher', () => {
   });
 
   it('normalizes patterns in constructor', () => {
-     // constructor should handle normalization just like createIgnoreMatcher might be expected to
-     // (though current createIgnoreMatcher implementation might also be flawed for exclusions)
-     const matcher = new DockerIgnoreMatcher(['/foo']);
-     expect(matcher.matches('foo')).toBe(true);
+    // constructor should handle normalization just like createIgnoreMatcher might be expected to
+    // (though current createIgnoreMatcher implementation might also be flawed for exclusions)
+    const matcher = new DockerIgnoreMatcher(['/foo']);
+    expect(matcher.matches('foo')).toBe(true);
   });
 });

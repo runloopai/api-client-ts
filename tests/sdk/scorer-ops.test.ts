@@ -63,7 +63,9 @@ describe('ScorerOps', () => {
 
   describe('list', () => {
     it('should delegate to Scorer.list', async () => {
-      jest.spyOn(Scorer as any, 'list').mockResolvedValue([{ id: 'scs_1' }, { id: 'scs_2' }] as unknown as Scorer[]);
+      jest
+        .spyOn(Scorer as any, 'list')
+        .mockResolvedValue([{ id: 'scs_1' }, { id: 'scs_2' }] as unknown as Scorer[]);
 
       const scorers = await scorerOps.list({ limit: 2 });
 
@@ -74,5 +76,3 @@ describe('ScorerOps', () => {
     });
   });
 });
-
-
