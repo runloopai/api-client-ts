@@ -39,7 +39,7 @@ describe('smoketest: object-oriented network policy', () => {
 
     test('get network policy info', async () => {
       expect(policy).toBeDefined();
-      const info = await policy.getInfo();
+      const info = await policy!.getInfo();
       expect(info.id).toBe(policyId);
       expect(info.name).toContain('sdk-network-policy');
       expect(info.egress).toBeDefined();
@@ -52,7 +52,7 @@ describe('smoketest: object-oriented network policy', () => {
 
     test('update network policy', async () => {
       expect(policy).toBeDefined();
-      const updated = await policy.update({
+      const updated = await policy!.update({
         name: uniqueName('sdk-network-policy-updated'),
         allow_all: false,
         allowed_hostnames: ['github.com', 'api.openai.com'],
@@ -64,42 +64,42 @@ describe('smoketest: object-oriented network policy', () => {
       expect(updated.description).toBe('Updated test network policy');
 
       // Verify the update persisted
-      const info = await policy.getInfo();
+      const info = await policy!.getInfo();
       expect(info.name).toContain('sdk-network-policy-updated');
       expect(info.description).toBe('Updated test network policy');
     });
 
     test('update network policy - allow_all', async () => {
       expect(policy).toBeDefined();
-      const updated = await policy.update({
+      const updated = await policy!.update({
         allow_all: true,
       });
       expect(updated.egress.allow_all).toBe(true);
 
       // Verify the update persisted
-      const info = await policy.getInfo();
+      const info = await policy!.getInfo();
       expect(info.egress.allow_all).toBe(true);
     });
 
     test('update network policy - allow_devbox_to_devbox', async () => {
       expect(policy).toBeDefined();
-      const updated = await policy.update({
+      const updated = await policy!.update({
         allow_devbox_to_devbox: true,
       });
       expect(updated.egress.allow_devbox_to_devbox).toBe(true);
 
       // Verify the update persisted
-      const info = await policy.getInfo();
+      const info = await policy!.getInfo();
       expect(info.egress.allow_devbox_to_devbox).toBe(true);
     });
 
     test('delete network policy', async () => {
       expect(policy).toBeDefined();
-      await policy.delete();
+      await policy!.delete();
 
       // Verify it's deleted by trying to get info (should fail)
       try {
-        await policy.getInfo();
+        await policy!.getInfo();
         fail('Expected network policy to be deleted');
       } catch (error) {
         expect(error).toBeDefined();
@@ -253,7 +253,8 @@ describe('smoketest: object-oriented network policy', () => {
     test('create policy with wildcard hostnames', async () => {
       let policy: NetworkPolicy | undefined;
       try {
-        const hostnames = ['*.github.com', '*.npmjs.org', 'api.*.com'];
+        // Wildcards are only allowed as the first label (e.g., *.example.com)
+        const hostnames = ['*.github.com', '*.npmjs.org', '*.openai.com'];
         policy = await sdk.networkPolicy.create({
           name: uniqueName('sdk-policy-wildcards'),
           allow_all: false,
@@ -304,35 +305,35 @@ describe('smoketest: object-oriented network policy', () => {
 
     test('update name only', async () => {
       const newName = uniqueName('sdk-policy-updated-name');
-      const updated = await policy.update({ name: newName });
+      const updated = await policy!.update({ name: newName });
       expect(updated.name).toContain('sdk-policy-updated-name');
 
-      const info = await policy.getInfo();
+      const info = await policy!.getInfo();
       expect(info.name).toContain('sdk-policy-updated-name');
     });
 
     test('update description only', async () => {
-      const updated = await policy.update({ description: 'New description' });
+      const updated = await policy!.update({ description: 'New description' });
       expect(updated.description).toBe('New description');
 
-      const info = await policy.getInfo();
+      const info = await policy!.getInfo();
       expect(info.description).toBe('New description');
     });
 
     test('update allowed_hostnames only', async () => {
       const newHostnames = ['api.openai.com', '*.googleapis.com'];
-      const updated = await policy.update({ allowed_hostnames: newHostnames });
+      const updated = await policy!.update({ allowed_hostnames: newHostnames });
       expect(updated.egress.allowed_hostnames.length).toBe(newHostnames.length);
       for (const hostname of newHostnames) {
         expect(updated.egress.allowed_hostnames).toContain(hostname);
       }
 
-      const info = await policy.getInfo();
+      const info = await policy!.getInfo();
       expect(info.egress.allowed_hostnames.length).toBe(newHostnames.length);
     });
 
     test('update multiple fields at once', async () => {
-      const updated = await policy.update({
+      const updated = await policy!.update({
         name: uniqueName('sdk-policy-multi-update'),
         description: 'Multi-update description',
         allow_devbox_to_devbox: true,
@@ -346,7 +347,7 @@ describe('smoketest: object-oriented network policy', () => {
       expect(updated.egress.allowed_hostnames).toContain('github.com');
       expect(updated.egress.allowed_hostnames).toContain('api.openai.com');
 
-      const info = await policy.getInfo();
+      const info = await policy!.getInfo();
       expect(info.name).toContain('sdk-policy-multi-update');
       expect(info.description).toBe('Multi-update description');
       expect(info.egress.allow_devbox_to_devbox).toBe(true);
@@ -354,26 +355,26 @@ describe('smoketest: object-oriented network policy', () => {
 
     test('update allow_all from false to true', async () => {
       // Start with allow_all=false
-      let info = await policy.getInfo();
+      let info = await policy!.getInfo();
       expect(info.egress.allow_all).toBe(false);
 
       // Update to allow_all=true
-      const updated = await policy.update({ allow_all: true });
+      const updated = await policy!.update({ allow_all: true });
       expect(updated.egress.allow_all).toBe(true);
 
       // Verify persisted
-      info = await policy.getInfo();
+      info = await policy!.getInfo();
       expect(info.egress.allow_all).toBe(true);
     });
 
     test('update allow_all from true to false', async () => {
       // First set allow_all=true
-      await policy.update({ allow_all: true });
-      let info = await policy.getInfo();
+      await policy!.update({ allow_all: true });
+      let info = await policy!.getInfo();
       expect(info.egress.allow_all).toBe(true);
 
       // Update to allow_all=false with hostnames
-      const updated = await policy.update({
+      const updated = await policy!.update({
         allow_all: false,
         allowed_hostnames: ['github.com'],
       });
@@ -381,7 +382,7 @@ describe('smoketest: object-oriented network policy', () => {
       expect(updated.egress.allowed_hostnames).toContain('github.com');
 
       // Verify persisted
-      info = await policy.getInfo();
+      info = await policy!.getInfo();
       expect(info.egress.allow_all).toBe(false);
       expect(info.egress.allowed_hostnames).toContain('github.com');
     });

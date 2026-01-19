@@ -48,6 +48,9 @@ describe('smoketest: object-oriented scorers', () => {
       expect(updated.id).toBe(scorerId);
       expect(updated.type).toBe(newType);
       expect(updated.bash_script).toBe('echo "0.5"');
+
+      // Update scorerType so subsequent tests reflect the new type
+      scorerType = newType;
     });
 
     test('validate scorer', async () => {
