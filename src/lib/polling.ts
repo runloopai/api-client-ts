@@ -5,7 +5,7 @@ export interface PollingOptions<T> {
   initialDelayMs?: number;
   /** Delay between subsequent polling attempts (in milliseconds) */
   pollingIntervalMs?: number;
-  /** Maximum number of polling attempts before throwing an error */
+  /** Maximum number of polling attempts before throwing an error. Defaults to infinite (no limit). */
   maxAttempts?: number;
   /** Optional timeout for the entire polling operation (in milliseconds) */
   timeoutMs?: number;
@@ -26,7 +26,6 @@ export interface PollingOptions<T> {
 const DEFAULT_OPTIONS: Partial<PollingOptions<any>> = {
   initialDelayMs: 1000,
   pollingIntervalMs: 1000,
-  maxAttempts: 120,
 };
 
 export class PollingTimeoutError extends Error {
@@ -112,7 +111,7 @@ export async function poll<T>(
 
     let attempts = 0;
 
-    while (attempts < maxAttempts!) {
+    while (maxAttempts === undefined || attempts < maxAttempts) {
       ++attempts;
 
       const pollingPromise = async () => {
@@ -132,7 +131,7 @@ export async function poll<T>(
           return result;
         }
 
-        if (attempts === maxAttempts) {
+        if (maxAttempts !== undefined && attempts === maxAttempts) {
           throw new MaxAttemptsExceededError(`Polling exceeded maximum attempts (${maxAttempts})`, result);
         }
 
@@ -150,7 +149,8 @@ export async function poll<T>(
       }
     }
 
-    throw new MaxAttemptsExceededError(`Polling exceeded maximum attempts (${maxAttempts})`, result);
+    // This should only be reachable if maxAttempts is defined
+    throw new MaxAttemptsExceededError(`Polling exceeded maximum attempts (${maxAttempts})`, result!);
   } catch (error) {
     clearTimeoutIfExists();
     throw error;

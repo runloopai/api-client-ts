@@ -1,6 +1,6 @@
 import { toFile } from '@runloop/api-client';
 import { Devbox } from '@runloop/api-client/sdk';
-import { makeClientSDK, THIRTY_SECOND_TIMEOUT, uniqueName } from '../utils';
+import { makeClientSDK, THIRTY_SECOND_TIMEOUT, TEN_MINUTE_TIMEOUT, uniqueName } from '../utils';
 import { uuidv7 } from 'uuidv7';
 
 const sdk = makeClientSDK();
@@ -241,56 +241,70 @@ describe('smoketest: object-oriented devbox', () => {
   });
 
   describe('devbox creation from blueprint and snapshot', () => {
-    test('create devbox from blueprint ID', async () => {
-      // First create a blueprint
-      const blueprint = await sdk.blueprint.create({
-        name: uniqueName('sdk-blueprint-for-devbox'),
-        dockerfile: 'FROM ubuntu:20.04\nRUN apt-get update && apt-get install -y curl',
-      });
-      expect(blueprint).toBeDefined();
+    test(
+      'create devbox from blueprint ID',
+      async () => {
+        // First create a blueprint with extended polling timeout
+        const blueprint = await sdk.blueprint.create(
+          {
+            name: uniqueName('sdk-blueprint-for-devbox'),
+            dockerfile: 'FROM ubuntu:20.04\nRUN apt-get update && apt-get install -y curl',
+          },
+          { polling: { timeoutMs: 10 * 60 * 1000 } },
+        );
+        expect(blueprint).toBeDefined();
 
-      // Create devbox from blueprint using SDK method with blueprint ID
-      const devbox = await sdk.devbox.createFromBlueprintId(blueprint.id, {
-        name: uniqueName('sdk-devbox-from-blueprint-id'),
-        launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 },
-      });
-      expect(devbox).toBeDefined();
-      expect(devbox.id).toBeTruthy();
+        // Create devbox from blueprint using SDK method with blueprint ID
+        const devbox = await sdk.devbox.createFromBlueprintId(blueprint.id, {
+          name: uniqueName('sdk-devbox-from-blueprint-id'),
+          launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 },
+        });
+        expect(devbox).toBeDefined();
+        expect(devbox.id).toBeTruthy();
 
-      // Verify it's running
-      const info = await devbox.getInfo();
-      expect(info.status).toBe('running');
+        // Verify it's running
+        const info = await devbox.getInfo();
+        expect(info.status).toBe('running');
 
-      // Clean up
-      await devbox.shutdown();
-      await blueprint.delete();
-    });
+        // Clean up
+        await devbox.shutdown();
+        await blueprint.delete();
+      },
+      TEN_MINUTE_TIMEOUT,
+    );
 
-    test('create devbox from blueprint name', async () => {
-      // First create a blueprint with a specific name
-      const blueprintName = uniqueName('sdk-blueprint-name-test');
-      const blueprint = await sdk.blueprint.create({
-        name: blueprintName,
-        dockerfile: 'FROM ubuntu:20.04\nRUN apt-get update && apt-get install -y wget',
-      });
-      expect(blueprint).toBeDefined();
+    test(
+      'create devbox from blueprint name',
+      async () => {
+        // First create a blueprint with a specific name and extended polling timeout
+        const blueprintName = uniqueName('sdk-blueprint-name-test');
+        const blueprint = await sdk.blueprint.create(
+          {
+            name: blueprintName,
+            dockerfile: 'FROM ubuntu:20.04\nRUN apt-get update && apt-get install -y wget',
+          },
+          { polling: { timeoutMs: 10 * 60 * 1000 } },
+        );
+        expect(blueprint).toBeDefined();
 
-      // Create devbox from blueprint using SDK method with blueprint name
-      const devbox = await sdk.devbox.createFromBlueprintName(blueprintName, {
-        name: uniqueName('sdk-devbox-from-blueprint-name'),
-        launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 },
-      });
-      expect(devbox).toBeDefined();
-      expect(devbox.id).toBeTruthy();
+        // Create devbox from blueprint using SDK method with blueprint name
+        const devbox = await sdk.devbox.createFromBlueprintName(blueprintName, {
+          name: uniqueName('sdk-devbox-from-blueprint-name'),
+          launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 },
+        });
+        expect(devbox).toBeDefined();
+        expect(devbox.id).toBeTruthy();
 
-      // Verify it's running
-      const info = await devbox.getInfo();
-      expect(info.status).toBe('running');
+        // Verify it's running
+        const info = await devbox.getInfo();
+        expect(info.status).toBe('running');
 
-      // Clean up
-      await devbox.shutdown();
-      await blueprint.delete();
-    });
+        // Clean up
+        await devbox.shutdown();
+        await blueprint.delete();
+      },
+      TEN_MINUTE_TIMEOUT,
+    );
 
     test('create devbox from snapshot', async () => {
       // First create a devbox
