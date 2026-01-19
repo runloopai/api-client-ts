@@ -822,6 +822,11 @@ export interface DevboxView {
   name?: string | null;
 
   /**
+   * The network policy ID used to create the Devbox.
+   */
+  network_policy_id?: string | null;
+
+  /**
    * The shutdown reason if the Devbox shutdown, if the Devbox has a 'shutdown'
    * status.
    */
@@ -959,12 +964,6 @@ export interface DevboxCreateParams {
    * (Optional) A user specified name to give the Devbox.
    */
   name?: string | null;
-
-  /**
-   * (Optional) ID of the network policy to apply to this Devbox. If not specified,
-   * the default network policy will be used.
-   */
-  network_policy_id?: string | null;
 
   /**
    * Repository connection id the devbox should source its base image from.
