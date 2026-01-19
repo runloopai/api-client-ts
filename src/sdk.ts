@@ -7,6 +7,7 @@ import { Snapshot } from './sdk/snapshot';
 import { StorageObject } from './sdk/storage-object';
 import { Agent } from './sdk/agent';
 import { Scorer } from './sdk/scorer';
+import { NetworkPolicy } from './sdk/network-policy';
 
 // Import types used in this file
 import type {
@@ -19,6 +20,7 @@ import type { BlueprintListParams } from './resources/blueprints';
 import type { ObjectCreateParams, ObjectListParams } from './resources/objects';
 import type { AgentCreateParams, AgentListParams } from './resources/agents';
 import type { ScorerCreateParams, ScorerListParams } from './resources/scenarios/scorers';
+import type { NetworkPolicyCreateParams, NetworkPolicyListParams } from './resources/network-policies';
 import { PollingOptions } from './lib/polling';
 import * as Shared from './resources/shared';
 
@@ -193,6 +195,7 @@ type ContentType = ObjectCreateParams['content_type'];
  * - `storageObject` - {@link StorageObjectOps}
  * - `agent` - {@link AgentOps}
  * - `scorer` - {@link ScorerOps}
+ * - `networkPolicy` - {@link NetworkPolicyOps}
  *
  * See the documentation for each Operations class for more details.
  *
@@ -272,6 +275,14 @@ export class RunloopSDK {
   public readonly scorer: ScorerOps;
 
   /**
+   * **Network Policy Operations** - {@link NetworkPolicyOps} for creating and accessing {@link NetworkPolicy} class instances.
+   *
+   * Network policies define egress network access rules for devboxes. Policies can be applied to
+   * blueprints, devboxes, and snapshot resumes to control network access.
+   */
+  public readonly networkPolicy: NetworkPolicyOps;
+
+  /**
    * Creates a new RunloopSDK instance.
    * @param {ClientOptions} [options] - Optional client configuration options.
    */
@@ -283,6 +294,7 @@ export class RunloopSDK {
     this.storageObject = new StorageObjectOps(this.api);
     this.agent = new AgentOps(this.api);
     this.scorer = new ScorerOps(this.api);
+    this.networkPolicy = new NetworkPolicyOps(this.api);
   }
 }
 
@@ -1382,6 +1394,109 @@ export class ScorerOps {
   }
 }
 
+/**
+ * Network Policy SDK interface for managing network policies.
+ *
+ * @category Network Policy
+ *
+ * @remarks
+ * ## Overview
+ *
+ * The `NetworkPolicyOps` class provides a high-level abstraction for managing network policies,
+ * which define egress network access rules for devboxes. Policies can be applied to blueprints,
+ * devboxes, and snapshot resumes to control network access.
+ *
+ * ## Usage
+ *
+ * This interface is accessed via {@link RunloopSDK.networkPolicy}. You should construct
+ * a {@link RunloopSDK} instance and use it from there:
+ *
+ * @example
+ * ```typescript
+ * const runloop = new RunloopSDK();
+ * const policy = await runloop.networkPolicy.create({
+ *   name: 'restricted-policy',
+ *   allow_all: false,
+ *   allowed_hostnames: ['github.com', 'api.openai.com'],
+ * });
+ *
+ * const info = await policy.getInfo();
+ * console.log(`Policy: ${info.name}`);
+ * ```
+ */
+export class NetworkPolicyOps {
+  /**
+   * @private
+   */
+  constructor(private client: RunloopAPI) {}
+
+  /**
+   * Create a new network policy.
+   *
+   * @example
+   * ```typescript
+   * const runloop = new RunloopSDK();
+   * const policy = await runloop.networkPolicy.create({
+   *   name: 'my-policy',
+   *   allow_all: false,
+   *   allowed_hostnames: ['github.com', '*.npmjs.org'],
+   *   allow_devbox_to_devbox: true,
+   *   description: 'Policy for restricted network access',
+   * });
+   * ```
+   *
+   * @param {NetworkPolicyCreateParams} params - Parameters for creating the network policy.
+   * @param {Core.RequestOptions} [options] - Request options.
+   * @returns {Promise<NetworkPolicy>} A {@link NetworkPolicy} instance.
+   */
+  async create(params: NetworkPolicyCreateParams, options?: Core.RequestOptions): Promise<NetworkPolicy> {
+    return NetworkPolicy.create(this.client, params, options);
+  }
+
+  /**
+   * Get a network policy object by its ID.
+   *
+   * @example
+   * ```typescript
+   * const runloop = new RunloopSDK();
+   * const policy = runloop.networkPolicy.fromId('npol_1234567890');
+   * const info = await policy.getInfo();
+   * console.log(`Policy name: ${info.name}`);
+   * ```
+   *
+   * @param {string} id - The ID of the network policy.
+   * @returns {NetworkPolicy} A {@link NetworkPolicy} instance.
+   */
+  fromId(id: string): NetworkPolicy {
+    return NetworkPolicy.fromId(this.client, id);
+  }
+
+  /**
+   * List all network policies with optional filters.
+   *
+   * @example
+   * ```typescript
+   * const runloop = new RunloopSDK();
+   * const policies = await runloop.networkPolicy.list({ limit: 10 });
+   * console.log(policies.map((p) => p.id));
+   * ```
+   *
+   * @param {NetworkPolicyListParams} [params] - Optional filter parameters.
+   * @param {Core.RequestOptions} [options] - Request options.
+   * @returns {Promise<NetworkPolicy[]>} An array of {@link NetworkPolicy} instances.
+   */
+  async list(params?: NetworkPolicyListParams, options?: Core.RequestOptions): Promise<NetworkPolicy[]> {
+    const result = await this.client.networkPolicies.list(params, options);
+    const policies: NetworkPolicy[] = [];
+
+    for await (const policy of result) {
+      policies.push(NetworkPolicy.fromId(this.client, policy.id));
+    }
+
+    return policies;
+  }
+}
+
 // @deprecated Use {@link RunloopSDK} instead.
 /**
  * @deprecated Use {@link RunloopSDK} instead.
@@ -1403,12 +1518,14 @@ export declare namespace RunloopSDK {
     StorageObjectOps as StorageObjectOps,
     AgentOps as AgentOps,
     ScorerOps as ScorerOps,
+    NetworkPolicyOps as NetworkPolicyOps,
     Devbox as Devbox,
     Blueprint as Blueprint,
     Snapshot as Snapshot,
     StorageObject as StorageObject,
     Agent as Agent,
     Scorer as Scorer,
+    NetworkPolicy as NetworkPolicy,
   };
 }
 // Export SDK classes from sdk/sdk.ts - these are separate from RunloopSDK to avoid circular dependencies
@@ -1423,6 +1540,7 @@ export {
   StorageObject,
   Agent,
   Scorer,
+  NetworkPolicy,
   Execution,
   ExecutionResult,
 } from './sdk/index';
