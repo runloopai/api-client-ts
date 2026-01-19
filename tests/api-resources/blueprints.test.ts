@@ -52,6 +52,7 @@ describe('resource blueprints', () => {
         user_parameters: { uid: 0, username: 'username' },
       },
       metadata: { foo: 'string' },
+      network_policy_id: 'network_policy_id',
       secrets: { foo: 'string' },
       services: [
         {
@@ -170,6 +171,7 @@ describe('resource blueprints', () => {
         user_parameters: { uid: 0, username: 'username' },
       },
       metadata: { foo: 'string' },
+      network_policy_id: 'network_policy_id',
       secrets: { foo: 'string' },
       system_setup_commands: ['string'],
     });
@@ -269,6 +271,7 @@ describe('resource blueprints', () => {
         user_parameters: { uid: 0, username: 'username' },
       },
       metadata: { foo: 'string' },
+      network_policy_id: 'network_policy_id',
       secrets: { foo: 'string' },
       services: [
         {
