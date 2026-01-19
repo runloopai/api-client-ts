@@ -298,7 +298,7 @@ describe('smoketest: object-oriented storage object', () => {
   });
 
   describe('storage object mounting to devbox', () => {
-    test('mount storage object to devbox', async () => {
+    test('mount storage object to devbox (explicit format)', async () => {
       let storageObject: StorageObject | undefined;
       let devbox: Devbox | undefined;
       try {
@@ -309,7 +309,7 @@ describe('smoketest: object-oriented storage object', () => {
         await storageObject.uploadContent('Hello from mounted storage object!');
         await storageObject.complete();
 
-        // Create devbox with mounted storage object
+        // Create devbox with mounted storage object using explicit API format
         devbox = await sdk.devbox.create({
           name: uniqueName('sdk-devbox-mount'),
           launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 }, // 5 minutes
@@ -323,6 +323,40 @@ describe('smoketest: object-oriented storage object', () => {
         });
         expect(devbox).toBeDefined();
         expect(devbox.id).toBeTruthy();
+      } finally {
+        if (devbox) {
+          await devbox.shutdown();
+        }
+        if (storageObject) {
+          await storageObject.delete();
+        }
+      }
+    });
+
+    test('mount storage object to devbox (inline SDK format)', async () => {
+      let storageObject: StorageObject | undefined;
+      let devbox: Devbox | undefined;
+      try {
+        storageObject = await sdk.storageObject.create({
+          name: uniqueName('sdk-mount-inline'),
+          content_type: 'text',
+        });
+        await storageObject.uploadContent('Hello from inline mounted storage object!');
+        await storageObject.complete();
+
+        // Create devbox with mounted storage object using SDK inline format: { path: StorageObject }
+        // This tests the isInlineObjectMount and transformMounts helper functions
+        devbox = await sdk.devbox.create({
+          name: uniqueName('sdk-devbox-mount-inline'),
+          launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 }, // 5 minutes
+          mounts: [{ '/home/user/inline-mounted-data': storageObject }],
+        });
+        expect(devbox).toBeDefined();
+        expect(devbox.id).toBeTruthy();
+
+        // Verify the content was mounted correctly
+        const content = await devbox.file.read({ file_path: '/home/user/inline-mounted-data' });
+        expect(content).toBe('Hello from inline mounted storage object!');
       } finally {
         if (devbox) {
           await devbox.shutdown();

@@ -95,6 +95,30 @@ describe('smoketest: object-oriented devbox', () => {
     });
   });
 
+  describe('devbox creation edge cases', () => {
+    test(
+      'create devbox with empty mounts array',
+      async () => {
+        // This tests the transformSDKDevboxCreateParams branch for empty mounts
+        let devbox: Devbox | undefined;
+        try {
+          devbox = await sdk.devbox.create({
+            name: uniqueName('sdk-devbox-empty-mounts'),
+            launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 },
+            mounts: [],
+          });
+          expect(devbox).toBeDefined();
+          expect(devbox.id).toBeTruthy();
+        } finally {
+          if (devbox) {
+            await devbox.shutdown();
+          }
+        }
+      },
+      THIRTY_SECOND_TIMEOUT,
+    );
+  });
+
   describe('devbox list and retrieval', () => {
     test('list devboxes', async () => {
       const devboxes = await sdk.devbox.list({ limit: 10 });

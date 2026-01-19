@@ -5,12 +5,18 @@ const sdk = makeClientSDK();
 
 describe('smoketest: object-oriented network policy', () => {
   describe('network policy lifecycle', () => {
-    let policy: NetworkPolicy;
+    let policy: NetworkPolicy | undefined;
     let policyId: string | undefined;
 
     afterAll(async () => {
       if (policy) {
-        await policy.delete().catch(() => {});
+        try {
+          await policy.getInfo();
+          // Policy still exists, delete it
+          await policy.delete();
+        } catch {
+          // Policy already deleted, ignore
+        }
       }
     });
 
@@ -98,6 +104,9 @@ describe('smoketest: object-oriented network policy', () => {
       } catch (error) {
         expect(error).toBeDefined();
       }
+      
+      // Mark as deleted so afterAll doesn't try to delete again
+      policy = undefined;
     });
   });
 
@@ -128,7 +137,13 @@ describe('smoketest: object-oriented network policy', () => {
         expect(info.name).toContain('sdk-network-policy-retrieve');
       } finally {
         if (policy) {
-          await policy.delete().catch(() => {});
+          try {
+            await policy.getInfo();
+            // Policy still exists, delete it
+            await policy.delete();
+          } catch {
+            // Policy already deleted, ignore
+          }
         }
       }
     });
@@ -146,7 +161,13 @@ describe('smoketest: object-oriented network policy', () => {
         expect(info.egress.allow_all).toBe(true);
       } finally {
         if (policy) {
-          await policy.delete().catch(() => {});
+          try {
+            await policy.getInfo();
+            // Policy still exists, delete it
+            await policy.delete();
+          } catch {
+            // Policy already deleted, ignore
+          }
         }
       }
     });
@@ -166,7 +187,13 @@ describe('smoketest: object-oriented network policy', () => {
         expect(info.egress.allowed_hostnames).toContain('github.com');
       } finally {
         if (policy) {
-          await policy.delete().catch(() => {});
+          try {
+            await policy.getInfo();
+            // Policy still exists, delete it
+            await policy.delete();
+          } catch {
+            // Policy already deleted, ignore
+          }
         }
       }
     });
@@ -188,7 +215,13 @@ describe('smoketest: object-oriented network policy', () => {
         }
       } finally {
         if (policy) {
-          await policy.delete().catch(() => {});
+          try {
+            await policy.getInfo();
+            // Policy still exists, delete it
+            await policy.delete();
+          } catch {
+            // Policy already deleted, ignore
+          }
         }
       }
     });
@@ -206,7 +239,13 @@ describe('smoketest: object-oriented network policy', () => {
         expect(info.egress.allowed_hostnames).toEqual([]);
       } finally {
         if (policy) {
-          await policy.delete().catch(() => {});
+          try {
+            await policy.getInfo();
+            // Policy still exists, delete it
+            await policy.delete();
+          } catch {
+            // Policy already deleted, ignore
+          }
         }
       }
     });
@@ -227,14 +266,20 @@ describe('smoketest: object-oriented network policy', () => {
         }
       } finally {
         if (policy) {
-          await policy.delete().catch(() => {});
+          try {
+            await policy.getInfo();
+            // Policy still exists, delete it
+            await policy.delete();
+          } catch {
+            // Policy already deleted, ignore
+          }
         }
       }
     });
   });
 
   describe('network policy update operations', () => {
-    let policy: NetworkPolicy;
+    let policy: NetworkPolicy | undefined;
 
     beforeEach(async () => {
       policy = await sdk.networkPolicy.create({
@@ -246,7 +291,14 @@ describe('smoketest: object-oriented network policy', () => {
 
     afterEach(async () => {
       if (policy) {
-        await policy.delete().catch(() => {});
+        try {
+          await policy.getInfo();
+          // Policy still exists, delete it
+          await policy.delete();
+        } catch {
+          // Policy already deleted, ignore
+        }
+        policy = undefined;
       }
     });
 
