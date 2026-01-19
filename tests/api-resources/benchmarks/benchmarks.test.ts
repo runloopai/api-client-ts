@@ -50,8 +50,8 @@ describe('resource benchmarks', () => {
     );
   });
 
-  test('update: only required params', async () => {
-    const responsePromise = client.benchmarks.update('id', { name: 'name' });
+  test('update', async () => {
+    const responsePromise = client.benchmarks.update('id');
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
     const response = await responsePromise;
@@ -61,16 +61,30 @@ describe('resource benchmarks', () => {
     expect(dataAndResponse.response).toBe(rawResponse);
   });
 
-  test('update: required and optional params', async () => {
-    const response = await client.benchmarks.update('id', {
-      name: 'name',
-      attribution: 'attribution',
-      description: 'description',
-      metadata: { foo: 'string' },
-      required_environment_variables: ['string'],
-      required_secret_names: ['string'],
-      scenario_ids: ['string'],
-    });
+  test('update: request options instead of params are passed correctly', async () => {
+    // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
+    await expect(client.benchmarks.update('id', { path: '/_stainless_unknown_path' })).rejects.toThrow(
+      Runloop.NotFoundError,
+    );
+  });
+
+  test('update: request options and params are passed correctly', async () => {
+    // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
+    await expect(
+      client.benchmarks.update(
+        'id',
+        {
+          attribution: 'attribution',
+          description: 'description',
+          metadata: { foo: 'string' },
+          name: 'name',
+          required_environment_variables: ['string'],
+          required_secret_names: ['string'],
+          scenario_ids: ['string'],
+        },
+        { path: '/_stainless_unknown_path' },
+      ),
+    ).rejects.toThrow(Runloop.NotFoundError);
   });
 
   test('list', async () => {
@@ -95,7 +109,11 @@ describe('resource benchmarks', () => {
     // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
     await expect(
       client.benchmarks.list(
-        { limit: 0, name: 'name', starting_after: 'starting_after' },
+        {
+          limit: 0,
+          name: 'name',
+          starting_after: 'starting_after',
+        },
         { path: '/_stainless_unknown_path' },
       ),
     ).rejects.toThrow(Runloop.NotFoundError);
@@ -185,14 +203,50 @@ describe('resource benchmarks', () => {
           custom_gb_memory: 0,
           keep_alive_time_seconds: 0,
           launch_commands: ['string'],
+          network_policy_id: 'network_policy_id',
           required_services: ['string'],
           resource_size_request: 'X_SMALL',
           user_parameters: { uid: 0, username: 'username' },
         },
-        mounts: [{ object_id: 'object_id', object_path: 'object_path', type: 'object_mount' }],
+        mounts: [
+          {
+            object_id: 'object_id',
+            object_path: 'object_path',
+            type: 'object_mount',
+          },
+        ],
         purpose: 'purpose',
         secrets: { foo: 'string' },
       },
     });
+  });
+
+  test('updateScenarios', async () => {
+    const responsePromise = client.benchmarks.updateScenarios('id');
+    const rawResponse = await responsePromise.asResponse();
+    expect(rawResponse).toBeInstanceOf(Response);
+    const response = await responsePromise;
+    expect(response).not.toBeInstanceOf(Response);
+    const dataAndResponse = await responsePromise.withResponse();
+    expect(dataAndResponse.data).toBe(response);
+    expect(dataAndResponse.response).toBe(rawResponse);
+  });
+
+  test('updateScenarios: request options instead of params are passed correctly', async () => {
+    // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
+    await expect(
+      client.benchmarks.updateScenarios('id', { path: '/_stainless_unknown_path' }),
+    ).rejects.toThrow(Runloop.NotFoundError);
+  });
+
+  test('updateScenarios: request options and params are passed correctly', async () => {
+    // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
+    await expect(
+      client.benchmarks.updateScenarios(
+        'id',
+        { scenarios_to_add: ['string'], scenarios_to_remove: ['string'] },
+        { path: '/_stainless_unknown_path' },
+      ),
+    ).rejects.toThrow(Runloop.NotFoundError);
   });
 });

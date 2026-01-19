@@ -51,9 +51,9 @@ describe('smoketest: object-oriented scorers', () => {
     });
 
     test('validate scorer', async () => {
-       const result = await scorer.validate({ scoring_context: { test: true } });
-       expect(result.scoring_result).toBeDefined();
-       expect(typeof result.scoring_result.score).toBe('number');
+      const result = await scorer.validate({ scoring_context: { test: true } });
+      expect(result.scoring_result).toBeDefined();
+      expect(typeof result.scoring_result.score).toBe('number');
     });
 
     test('get scorer by ID', async () => {
@@ -74,8 +74,5 @@ describe('smoketest: object-oriented scorers', () => {
       expect(scorers.length).toBeGreaterThan(0);
       expect(scorers.every((s) => typeof s.id === 'string' && s.id.length > 0)).toBe(true);
     });
-
   });
 });
-
-

@@ -121,9 +121,21 @@ describe('smoketest: object-oriented agent', () => {
         };
 
         // Create multiple agents
-        const agent1 = await runloop.agent.create({ name: uniqueName('sdk-agent-test-list-1'), version: '1.0.0', source: sourceConfig });
-        const agent2 = await runloop.agent.create({ name: uniqueName('sdk-agent-test-list-2'), version: '1.0.0', source: sourceConfig });
-        const agent3 = await runloop.agent.create({ name: uniqueName('sdk-agent-test-list-3'), version: '1.0.0', source: sourceConfig });
+        const agent1 = await runloop.agent.create({
+          name: uniqueName('sdk-agent-test-list-1'),
+          version: '1.0.0',
+          source: sourceConfig,
+        });
+        const agent2 = await runloop.agent.create({
+          name: uniqueName('sdk-agent-test-list-2'),
+          version: '1.0.0',
+          source: sourceConfig,
+        });
+        const agent3 = await runloop.agent.create({
+          name: uniqueName('sdk-agent-test-list-3'),
+          version: '1.0.0',
+          source: sourceConfig,
+        });
 
         try {
           // List agents

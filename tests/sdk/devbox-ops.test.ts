@@ -177,7 +177,7 @@ describe('DevboxOps', () => {
       });
 
       it('should pass through standard ObjectMountParameters unchanged', async () => {
-        const standardObjectMount: Shared.Mount.ObjectMount = {
+        const standardObjectMount: Shared.ObjectMount = {
           type: 'object_mount',
           object_id: 'obj-789',
           object_path: '/home/user/existing.txt',
@@ -342,4 +342,3 @@ describe('DevboxOps', () => {
     });
   });
 });
-

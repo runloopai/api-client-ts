@@ -1,5 +1,31 @@
 # Changelog
 
+## 1.2.0-beta (2026-01-19)
+
+Full Changelog: [v1.1.0...v1.2.0-beta](https://github.com/runloopai/api-client-ts/compare/v1.1.0...v1.2.0-beta)
+
+### Features
+
+* **benchmarks:** add `update_scenarios` method to benchmarks resource ([4ef2680](https://github.com/runloopai/api-client-ts/commit/4ef26807dbb81cd171a1d1a91a4eadf4ec0cde73))
+* **devbox:** remove this one ([ffe23be](https://github.com/runloopai/api-client-ts/commit/ffe23bea59c737ad845bc179e007fecb07a721b7))
+* **mounts:** add convenience helper for inline mounting storage objects ([#675](https://github.com/runloopai/api-client-ts/issues/675)) ([2e5866c](https://github.com/runloopai/api-client-ts/commit/2e5866c4b4f80078144f218c4c7145f767e8b2a0))
+* **network-policy:** add network policies to api ([fd7c42c](https://github.com/runloopai/api-client-ts/commit/fd7c42c760cd5d80f5843fbf7e97b85d29d925d5))
+* **sdk:** added scorers to OO SDK ([#679](https://github.com/runloopai/api-client-ts/issues/679)) ([ee67c94](https://github.com/runloopai/api-client-ts/commit/ee67c9406a97731d38f2ce0ab8dcb16226322304))
+
+
+### Bug Fixes
+
+* **benchmarks:** `update()` for benchmarks and scenarios replaces all provided fields and does not modify unspecified fields ([#6702](https://github.com/runloopai/api-client-ts/issues/6702)) ([0c2e0f0](https://github.com/runloopai/api-client-ts/commit/0c2e0f017684ddc578b80c31e3a08925bc582765))
+* **documentation:** added types to the typedoc main list and fixed some decorators ([#677](https://github.com/runloopai/api-client-ts/issues/677)) ([392007d](https://github.com/runloopai/api-client-ts/commit/392007d6555582d9a00b877e2ba6c1ea0de4236d))
+
+
+### Chores
+
+* break long lines in snippets into multiline ([aea51a8](https://github.com/runloopai/api-client-ts/commit/aea51a857a3ec4f741281782bd7d1b40b3e33ca9))
+* **internal:** codegen related update ([f2acb64](https://github.com/runloopai/api-client-ts/commit/f2acb645f6854253dd74676570b03c1c6f325b2c))
+* **internal:** update `actions/checkout` version ([6f2a8ae](https://github.com/runloopai/api-client-ts/commit/6f2a8ae880dbe17fdfd66389fbe674baf5e75dc8))
+* **internal:** upgrade babel, qs, js-yaml ([3c31dd4](https://github.com/runloopai/api-client-ts/commit/3c31dd460e6f8e487ff326763bbe39b555fd136e))
+
 ## 1.1.0 (2025-12-13)
 
 Full Changelog: [v1.0.0...v1.1.0](https://github.com/runloopai/api-client-ts/compare/v1.0.0...v1.1.0)

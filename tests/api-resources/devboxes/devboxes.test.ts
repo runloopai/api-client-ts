@@ -55,13 +55,21 @@ describe('resource devboxes', () => {
             custom_gb_memory: 0,
             keep_alive_time_seconds: 0,
             launch_commands: ['string'],
+            network_policy_id: 'network_policy_id',
             required_services: ['string'],
             resource_size_request: 'X_SMALL',
             user_parameters: { uid: 0, username: 'username' },
           },
           metadata: { foo: 'string' },
-          mounts: [{ object_id: 'object_id', object_path: 'object_path', type: 'object_mount' }],
+          mounts: [
+            {
+              object_id: 'object_id',
+              object_path: 'object_path',
+              type: 'object_mount',
+            },
+          ],
           name: 'name',
+          network_policy_id: 'network_policy_id',
           repo_connection_id: 'repo_connection_id',
           secrets: { foo: 'string' },
           snapshot_id: 'snapshot_id',
@@ -112,7 +120,10 @@ describe('resource devboxes', () => {
     await expect(
       client.devboxes.update(
         'id',
-        { metadata: { foo: 'string' }, name: 'name' },
+        {
+          metadata: { foo: 'string' },
+          name: 'name',
+        },
         { path: '/_stainless_unknown_path' },
       ),
     ).rejects.toThrow(Runloop.NotFoundError);
@@ -140,7 +151,11 @@ describe('resource devboxes', () => {
     // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
     await expect(
       client.devboxes.list(
-        { limit: 0, starting_after: 'starting_after', status: 'provisioning' },
+        {
+          limit: 0,
+          starting_after: 'starting_after',
+          status: 'provisioning',
+        },
         { path: '/_stainless_unknown_path' },
       ),
     ).rejects.toThrow(Runloop.NotFoundError);
@@ -403,7 +418,11 @@ describe('resource devboxes', () => {
     await expect(
       client.devboxes.snapshotDisk(
         'id',
-        { commit_message: 'commit_message', metadata: { foo: 'string' }, name: 'name' },
+        {
+          commit_message: 'commit_message',
+          metadata: { foo: 'string' },
+          name: 'name',
+        },
         { path: '/_stainless_unknown_path' },
       ),
     ).rejects.toThrow(Runloop.NotFoundError);
@@ -432,7 +451,11 @@ describe('resource devboxes', () => {
     await expect(
       client.devboxes.snapshotDiskAsync(
         'id',
-        { commit_message: 'commit_message', metadata: { foo: 'string' }, name: 'name' },
+        {
+          commit_message: 'commit_message',
+          metadata: { foo: 'string' },
+          name: 'name',
+        },
         { path: '/_stainless_unknown_path' },
       ),
     ).rejects.toThrow(Runloop.NotFoundError);
