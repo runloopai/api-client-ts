@@ -140,10 +140,7 @@ export class NetworkPolicy {
    * @param {Core.RequestOptions} [options] - Request options
    * @returns {Promise<NetworkPolicyView>} The updated network policy data
    */
-  async update(
-    params: NetworkPolicyUpdateParams,
-    options?: Core.RequestOptions,
-  ): Promise<NetworkPolicyView> {
+  async update(params: NetworkPolicyUpdateParams, options?: Core.RequestOptions): Promise<NetworkPolicyView> {
     return this.client.networkPolicies.update(this._id, params, options);
   }
 
