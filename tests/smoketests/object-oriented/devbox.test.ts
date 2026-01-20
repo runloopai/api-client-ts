@@ -1,6 +1,6 @@
 import { toFile } from '@runloop/api-client';
 import { Devbox, NetworkPolicy } from '@runloop/api-client/sdk';
-import { makeClientSDK, TWO_MINUTE_TIMEOUT, TEN_MINUTE_TIMEOUT, uniqueName, cleanUpPolicy } from '../utils';
+import { makeClientSDK, SHORT_TIMEOUT, LONG_TIMEOUT, uniqueName, cleanUpPolicy } from '../utils';
 import { uuidv7 } from 'uuidv7';
 
 const sdk = makeClientSDK();
@@ -17,7 +17,7 @@ describe('smoketest: object-oriented devbox', () => {
         launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 }, // 5 minutes
       });
       devboxId = devbox.id;
-    }, TWO_MINUTE_TIMEOUT);
+    }, SHORT_TIMEOUT);
 
     afterAll(async () => {
       if (devbox) {
@@ -117,7 +117,7 @@ describe('smoketest: object-oriented devbox', () => {
           }
         }
       },
-      TWO_MINUTE_TIMEOUT,
+      SHORT_TIMEOUT,
     );
 
     test(
@@ -156,7 +156,7 @@ describe('smoketest: object-oriented devbox', () => {
           await cleanUpPolicy(policy);
         }
       },
-      TWO_MINUTE_TIMEOUT,
+      SHORT_TIMEOUT,
     );
   });
 
@@ -311,7 +311,7 @@ describe('smoketest: object-oriented devbox', () => {
         await devbox.shutdown();
         await blueprint.delete();
       },
-      TEN_MINUTE_TIMEOUT,
+      LONG_TIMEOUT,
     );
 
     test(
@@ -344,7 +344,7 @@ describe('smoketest: object-oriented devbox', () => {
         await devbox.shutdown();
         await blueprint.delete();
       },
-      TEN_MINUTE_TIMEOUT,
+      LONG_TIMEOUT,
     );
 
     test('create devbox from snapshot', async () => {
@@ -389,7 +389,7 @@ describe('smoketest: object-oriented devbox', () => {
         name: uniqueName('sdk-devbox-streaming'),
         launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 },
       });
-    }, TWO_MINUTE_TIMEOUT);
+    }, SHORT_TIMEOUT);
 
     afterAll(async () => {
       if (devbox) {
@@ -671,7 +671,7 @@ describe('smoketest: object-oriented devbox', () => {
         name: uniqueName('sdk-devbox-named-shell'),
         launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 },
       });
-    }, TWO_MINUTE_TIMEOUT);
+    }, SHORT_TIMEOUT);
 
     afterAll(async () => {
       if (devbox) {

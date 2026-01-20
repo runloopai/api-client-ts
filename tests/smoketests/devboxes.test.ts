@@ -1,5 +1,5 @@
 import { DevboxView } from '@runloop/api-client/resources/devboxes';
-import { makeClient, TWO_MINUTE_TIMEOUT, uniqueName } from './utils';
+import { makeClient, SHORT_TIMEOUT, uniqueName } from './utils';
 
 const client = makeClient();
 
@@ -32,7 +32,7 @@ describe('smoketest: devboxes', () => {
           }
         }
       },
-      TWO_MINUTE_TIMEOUT,
+      SHORT_TIMEOUT,
     );
 
     test('await running (createAndAwaitRunning)', async () => {
@@ -84,7 +84,7 @@ describe('smoketest: devboxes', () => {
       );
       expect(created.status).toBe('running');
     },
-    TWO_MINUTE_TIMEOUT * 4,
+    SHORT_TIMEOUT * 4,
   );
 
   test(
@@ -103,6 +103,6 @@ describe('smoketest: devboxes', () => {
         ),
       ).rejects.toThrow();
     },
-    TWO_MINUTE_TIMEOUT * 4,
+    SHORT_TIMEOUT * 4,
   );
 });

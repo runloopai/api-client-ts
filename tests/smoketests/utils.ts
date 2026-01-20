@@ -26,9 +26,9 @@ export function makeClientSDK() {
 export const uniqueName = (prefix: string) =>
   `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 
-export const TWO_MINUTE_TIMEOUT = 120_000;
-export const FIVE_MINUTE_TIMEOUT = 300_000;
-export const TEN_MINUTE_TIMEOUT = 600_000;
+export const SHORT_TIMEOUT = 120_000;
+export const MEDIUM_TIMEOUT = 300_000;
+export const LONG_TIMEOUT = 600_000;
 
 /**
  * Helper to clean up a network policy, ignoring errors if already deleted.

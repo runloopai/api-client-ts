@@ -1,5 +1,5 @@
 import { ScenarioRun } from '@runloop/api-client/sdk';
-import { makeClient, TWO_MINUTE_TIMEOUT, uniqueName } from '../utils';
+import { makeClient, SHORT_TIMEOUT, uniqueName } from '../utils';
 
 const client = makeClient();
 
@@ -24,7 +24,7 @@ describe('smoketest: object-oriented scenario-run', () => {
       },
     });
     scenarioId = scenario.id;
-  }, TWO_MINUTE_TIMEOUT);
+  }, SHORT_TIMEOUT);
 
   afterAll(async () => {
     // Cleanup: shutdown devbox if still running
@@ -63,7 +63,7 @@ describe('smoketest: object-oriented scenario-run', () => {
         expect(run.id).toBe(runView.id);
         expect(run.devboxId).toBe(runView.devbox_id);
       },
-      TWO_MINUTE_TIMEOUT,
+      SHORT_TIMEOUT,
     );
 
     test(
@@ -79,7 +79,7 @@ describe('smoketest: object-oriented scenario-run', () => {
         expect(result.id).toBe(runId);
         expect(['running', 'scoring', 'scored', 'completed']).toContain(result.state);
       },
-      TWO_MINUTE_TIMEOUT,
+      SHORT_TIMEOUT,
     );
 
     test('getInfo - retrieve scenario run info', async () => {
@@ -120,7 +120,7 @@ describe('smoketest: object-oriented scenario-run', () => {
         expect(result).toBeDefined();
         expect(['completed', 'scored', 'failed', 'timeout', 'canceled']).toContain(result.state);
       },
-      TWO_MINUTE_TIMEOUT,
+      SHORT_TIMEOUT,
     );
 
     test('getScore - retrieve scoring result', async () => {
@@ -176,7 +176,7 @@ describe('smoketest: object-oriented scenario-run', () => {
         expect(result).toBeDefined();
         expect(['canceled', 'completed', 'failed']).toContain(result.state);
       },
-      TWO_MINUTE_TIMEOUT,
+      SHORT_TIMEOUT,
     );
   });
 
@@ -227,7 +227,7 @@ describe('smoketest: object-oriented scenario-run', () => {
         // Complete the run
         await run.complete();
       },
-      TWO_MINUTE_TIMEOUT,
+      SHORT_TIMEOUT,
     );
   });
 
@@ -273,7 +273,7 @@ describe('smoketest: object-oriented scenario-run', () => {
         // Complete the run
         await run.complete();
       },
-      TWO_MINUTE_TIMEOUT,
+      SHORT_TIMEOUT,
     );
   });
 });
