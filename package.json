@@ -68,7 +68,7 @@
     "jest": "^30.2.0",
     "prettier": "^3.0.0",
     "ts-jest": "^29.4.6",
-    "ts-node": "^1.7.1",
+    "ts-node": "^10.9.2",
     "tsc-multi": "^1.1.0",
     "tsconfig-paths": "^4.0.0",
     "typedoc": "^0.28.14",
