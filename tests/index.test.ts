@@ -127,7 +127,7 @@ describe('instantiate client', () => {
 
     const spy = jest.spyOn(client, 'request');
 
-    await expect(client.get('/foo', { signal: controller.signal })).rejects.toThrowError(APIUserAbortError);
+    await expect(client.get('/foo', { signal: controller.signal })).rejects.toThrow(APIUserAbortError);
     expect(spy).toHaveBeenCalledTimes(1);
   });
 
@@ -285,16 +285,23 @@ describe('retries', () => {
     let count = 0;
     const testFetch = async (url: RequestInfo, { signal }: RequestInit = {}): Promise<Response> => {
       if (count++ === 0) {
-        return new Promise((resolve, reject) =>
-          signal?.addEventListener('abort', () => reject(new Error('timed out'))),
-        );
+        return new Promise((resolve, reject) => {
+          const abortHandler = () => {
+            reject(new Error('timed out'));
+          };
+          if (signal?.aborted) {
+            abortHandler();
+          } else {
+            signal?.addEventListener('abort', abortHandler);
+          }
+        });
       }
       return new Response(JSON.stringify({ a: 1 }), { headers: { 'Content-Type': 'application/json' } });
     };
 
     const client = new Runloop({
       bearerToken: 'My Bearer Token',
-      timeout: 10,
+      timeout: 100,
       fetch: testFetch,
     });
 

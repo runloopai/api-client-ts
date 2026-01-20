@@ -332,7 +332,7 @@ describe('Polling', () => {
       // Advance through default timing but only a few attempts to avoid test timeout
       await jest.advanceTimersByTimeAsync(1000); // Default initial delay
 
-      // Let a couple polling attempts happen (default maxAttempts is 120, but we don't need to wait that long)
+      // Let a couple polling attempts happen (default maxAttempts is infinite, but we don't need to wait that long)
       await jest.advanceTimersByTimeAsync(1000); // First polling attempt
       await jest.advanceTimersByTimeAsync(1000); // Second polling attempt
 
