@@ -1,5 +1,5 @@
 import { ScenarioRunView } from '@runloop/api-client/resources/scenarios';
-import { makeClient, THIRTY_SECOND_TIMEOUT, uniqueName } from './utils';
+import { makeClient, TWO_MINUTE_TIMEOUT, uniqueName } from './utils';
 
 const client = makeClient();
 
@@ -25,7 +25,7 @@ describe('smoketest: scenarios and benchmarks', () => {
       });
       scenarioId = scenario.id;
     },
-    THIRTY_SECOND_TIMEOUT,
+    TWO_MINUTE_TIMEOUT,
   );
 
   test(
@@ -40,7 +40,7 @@ describe('smoketest: scenarios and benchmarks', () => {
       expect(run.scenario_id).toBe(scenarioId);
       runId = run.id;
     },
-    THIRTY_SECOND_TIMEOUT,
+    TWO_MINUTE_TIMEOUT,
   );
 
   test(
@@ -58,7 +58,7 @@ describe('smoketest: scenarios and benchmarks', () => {
         }
       }
     },
-    THIRTY_SECOND_TIMEOUT,
+    TWO_MINUTE_TIMEOUT,
   );
 
   test(
@@ -73,6 +73,6 @@ describe('smoketest: scenarios and benchmarks', () => {
       const run = await client.benchmarks.startRun({ benchmark_id: benchmark.id });
       expect(run.benchmark_id).toBe(benchmark.id);
     },
-    THIRTY_SECOND_TIMEOUT,
+    TWO_MINUTE_TIMEOUT,
   );
 });

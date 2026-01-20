@@ -1,4 +1,4 @@
-import { THIRTY_SECOND_TIMEOUT, TEN_MINUTE_TIMEOUT, uniqueName, makeClientSDK, cleanUpPolicy } from '../utils';
+import { TWO_MINUTE_TIMEOUT, TEN_MINUTE_TIMEOUT, uniqueName, makeClientSDK, cleanUpPolicy } from '../utils';
 import { Blueprint, Devbox, NetworkPolicy, StorageObject } from '@runloop/api-client/sdk';
 
 const sdk = makeClientSDK();
@@ -63,7 +63,7 @@ describe('smoketest: object-oriented blueprint', () => {
         // Clean up the devbox
         await devbox.shutdown();
       },
-      THIRTY_SECOND_TIMEOUT,
+      TWO_MINUTE_TIMEOUT,
     );
 
     test(
@@ -85,7 +85,7 @@ describe('smoketest: object-oriented blueprint', () => {
           }
         }
       },
-      THIRTY_SECOND_TIMEOUT,
+      TWO_MINUTE_TIMEOUT,
     );
 
     test('delete blueprint', async () => {

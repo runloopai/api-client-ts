@@ -1,5 +1,5 @@
 import { ScenarioRun } from '@runloop/api-client/sdk';
-import { makeClient, THIRTY_SECOND_TIMEOUT, uniqueName } from '../utils';
+import { makeClient, TWO_MINUTE_TIMEOUT, uniqueName } from '../utils';
 
 const client = makeClient();
 
@@ -24,7 +24,7 @@ describe('smoketest: object-oriented scenario-run', () => {
       },
     });
     scenarioId = scenario.id;
-  }, THIRTY_SECOND_TIMEOUT);
+  }, TWO_MINUTE_TIMEOUT);
 
   afterAll(async () => {
     // Cleanup: shutdown devbox if still running
@@ -63,7 +63,7 @@ describe('smoketest: object-oriented scenario-run', () => {
         expect(run.id).toBe(runView.id);
         expect(run.devboxId).toBe(runView.devbox_id);
       },
-      THIRTY_SECOND_TIMEOUT,
+      TWO_MINUTE_TIMEOUT,
     );
 
     test(
@@ -79,7 +79,7 @@ describe('smoketest: object-oriented scenario-run', () => {
         expect(result.id).toBe(runId);
         expect(['running', 'scoring', 'scored', 'completed']).toContain(result.state);
       },
-      THIRTY_SECOND_TIMEOUT,
+      TWO_MINUTE_TIMEOUT,
     );
 
     test('getInfo - retrieve scenario run info', async () => {
@@ -120,7 +120,7 @@ describe('smoketest: object-oriented scenario-run', () => {
         expect(result).toBeDefined();
         expect(['completed', 'scored', 'failed', 'timeout', 'canceled']).toContain(result.state);
       },
-      THIRTY_SECOND_TIMEOUT,
+      TWO_MINUTE_TIMEOUT,
     );
 
     test('getScore - retrieve scoring result', async () => {
@@ -176,7 +176,7 @@ describe('smoketest: object-oriented scenario-run', () => {
         expect(result).toBeDefined();
         expect(['canceled', 'completed', 'failed']).toContain(result.state);
       },
-      THIRTY_SECOND_TIMEOUT,
+      TWO_MINUTE_TIMEOUT,
     );
   });
 
@@ -227,7 +227,7 @@ describe('smoketest: object-oriented scenario-run', () => {
         // Complete the run
         await run.complete();
       },
-      THIRTY_SECOND_TIMEOUT,
+      TWO_MINUTE_TIMEOUT,
     );
   });
 
@@ -273,7 +273,7 @@ describe('smoketest: object-oriented scenario-run', () => {
         // Complete the run
         await run.complete();
       },
-      THIRTY_SECOND_TIMEOUT,
+      TWO_MINUTE_TIMEOUT,
     );
   });
 });

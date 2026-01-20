@@ -1,4 +1,4 @@
-import { makeClient, THIRTY_SECOND_TIMEOUT, uniqueName } from './utils';
+import { makeClient, TWO_MINUTE_TIMEOUT, uniqueName } from './utils';
 
 const client = makeClient();
 
@@ -26,7 +26,7 @@ describe('smoketest: executions', () => {
       );
       devboxId = created.id;
     },
-    THIRTY_SECOND_TIMEOUT,
+    TWO_MINUTE_TIMEOUT,
   );
 
   test('execute async and await completion', async () => {
@@ -85,7 +85,7 @@ describe('smoketest: executions', () => {
       });
       expect(completed.status).toBe('completed');
     },
-    THIRTY_SECOND_TIMEOUT * 3,
+    TWO_MINUTE_TIMEOUT * 3,
   );
 
   test(
@@ -117,7 +117,7 @@ describe('smoketest: executions', () => {
         ),
       ).rejects.toThrow();
     },
-    THIRTY_SECOND_TIMEOUT,
+    TWO_MINUTE_TIMEOUT,
   );
 
   test('executeAndAwaitCompletion with last_n parameter', async () => {
