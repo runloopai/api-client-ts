@@ -12,6 +12,14 @@ export {
 } from './agents';
 export {
   BenchmarkRunViewsBenchmarkRunsCursorIDPage,
+  BenchmarkRuns,
+  type BenchmarkRunListView,
+  type BenchmarkRunView,
+  type ScenarioRunListView,
+  type BenchmarkRunListParams,
+  type BenchmarkRunListScenarioRunsParams,
+} from './benchmark-runs';
+export {
   BenchmarkViewsBenchmarksCursorIDPage,
   Benchmarks,
   type BenchmarkCreateParameters,

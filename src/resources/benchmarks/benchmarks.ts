@@ -3,15 +3,12 @@
 import { APIResource } from '../../resource';
 import { isRequestOptions } from '../../core';
 import * as Core from '../../core';
+import * as BenchmarkRunsAPI from '../benchmark-runs';
 import * as Shared from '../shared';
 import * as RunsAPI from './runs';
 import { RunListParams, RunListScenarioRunsParams, Runs } from './runs';
 import * as ScenariosAPI from '../scenarios/scenarios';
-import {
-  BenchmarkRunsCursorIDPage,
-  BenchmarksCursorIDPage,
-  type BenchmarksCursorIDPageParams,
-} from '../../pagination';
+import { BenchmarksCursorIDPage, type BenchmarksCursorIDPageParams } from '../../pagination';
 
 export class Benchmarks extends APIResource {
   runs: RunsAPI.Runs = new RunsAPI.Runs(this._client);
@@ -119,7 +116,10 @@ export class Benchmarks extends APIResource {
   /**
    * Start a new BenchmarkRun based on the provided Benchmark.
    */
-  startRun(body: BenchmarkStartRunParams, options?: Core.RequestOptions): Core.APIPromise<BenchmarkRunView> {
+  startRun(
+    body: BenchmarkStartRunParams,
+    options?: Core.RequestOptions,
+  ): Core.APIPromise<BenchmarkRunsAPI.BenchmarkRunView> {
     return this._client.post('/v1/benchmarks/start_run', { body, ...options });
   }
 
@@ -145,8 +145,6 @@ export class Benchmarks extends APIResource {
 }
 
 export class BenchmarkViewsBenchmarksCursorIDPage extends BenchmarksCursorIDPage<BenchmarkView> {}
-
-export class BenchmarkRunViewsBenchmarkRunsCursorIDPage extends BenchmarkRunsCursorIDPage<BenchmarkRunView> {}
 
 /**
  * BenchmarkCreateParameters contain the set of parameters to create a Benchmark.
@@ -199,7 +197,7 @@ export interface BenchmarkRunListView {
   /**
    * List of BenchmarkRuns matching filter.
    */
-  runs: Array<BenchmarkRunView>;
+  runs: Array<BenchmarkRunsAPI.BenchmarkRunView>;
 
   total_count: number;
 }
