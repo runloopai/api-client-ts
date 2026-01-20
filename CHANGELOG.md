@@ -1,5 +1,18 @@
 # Changelog
 
+## 1.2.0-beta-2 (2026-01-20)
+
+Full Changelog: [v1.2.0-beta...v1.2.0-beta-2](https://github.com/runloopai/api-client-ts/compare/v1.2.0-beta...v1.2.0-beta-2)
+
+### Features
+
+* **blueprint:** Set cilium network policy on blueprint build ([#7006](https://github.com/runloopai/api-client-ts/issues/7006)) ([038fc8a](https://github.com/runloopai/api-client-ts/commit/038fc8a393d533d4a29532b570fc7b48ef3292f3))
+
+
+### Chores
+
+* **devbox:** Remove network policy from devbox view; use launch params instead ([#7025](https://github.com/runloopai/api-client-ts/issues/7025)) ([849bcfa](https://github.com/runloopai/api-client-ts/commit/849bcfab616e79e5b52612afd09ee3eab36d3f91))
+
 ## 1.2.0-beta (2026-01-19)
 
 Full Changelog: [v1.1.0...v1.2.0-beta](https://github.com/runloopai/api-client-ts/compare/v1.1.0...v1.2.0-beta)
