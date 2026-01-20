@@ -961,12 +961,6 @@ export interface DevboxCreateParams {
   name?: string | null;
 
   /**
-   * (Optional) ID of the network policy to apply to this Devbox. If not specified,
-   * the default network policy will be used.
-   */
-  network_policy_id?: string | null;
-
-  /**
    * Repository connection id the devbox should source its base image from.
    */
   repo_connection_id?: string | null;
