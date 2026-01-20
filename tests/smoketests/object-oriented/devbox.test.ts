@@ -1,6 +1,6 @@
 import { toFile } from '@runloop/api-client';
-import { Devbox } from '@runloop/api-client/sdk';
-import { makeClientSDK, THIRTY_SECOND_TIMEOUT, TEN_MINUTE_TIMEOUT, uniqueName } from '../utils';
+import { Devbox, NetworkPolicy } from '@runloop/api-client/sdk';
+import { makeClientSDK, THIRTY_SECOND_TIMEOUT, TEN_MINUTE_TIMEOUT, uniqueName, cleanUpPolicy } from '../utils';
 import { uuidv7 } from 'uuidv7';
 
 const sdk = makeClientSDK();
@@ -10,25 +10,27 @@ describe('smoketest: object-oriented devbox', () => {
     let devbox: Devbox;
     let devboxId: string | undefined;
 
+    // Create devbox in beforeAll to avoid test order dependency
+    beforeAll(async () => {
+      devbox = await sdk.devbox.create({
+        name: uniqueName('sdk-devbox'),
+        launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 }, // 5 minutes
+      });
+      devboxId = devbox.id;
+    }, THIRTY_SECOND_TIMEOUT);
+
     afterAll(async () => {
       if (devbox) {
         await devbox.shutdown();
       }
     });
 
-    test(
-      'create devbox',
-      async () => {
-        devbox = await sdk.devbox.create({
-          name: uniqueName('sdk-devbox'),
-          launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 }, // 5 minutes
-        });
-        expect(devbox).toBeDefined();
-        expect(devbox.id).toBeTruthy();
-        devboxId = devbox.id;
-      },
-      THIRTY_SECOND_TIMEOUT,
-    );
+    test('create devbox', async () => {
+      // Devbox was created in beforeAll - just verify it exists
+      expect(devbox).toBeDefined();
+      expect(devbox.id).toBeTruthy();
+      expect(devboxId).toBeTruthy();
+    });
 
     test('get devbox info', async () => {
       expect(devbox).toBeDefined();
@@ -113,6 +115,45 @@ describe('smoketest: object-oriented devbox', () => {
           if (devbox) {
             await devbox.shutdown();
           }
+        }
+      },
+      THIRTY_SECOND_TIMEOUT,
+    );
+
+    test(
+      'create devbox with network policy',
+      async () => {
+        let policy: NetworkPolicy | undefined;
+        let devbox: Devbox | undefined;
+        try {
+          // Create a network policy
+          policy = await sdk.networkPolicy.create({
+            name: uniqueName('sdk-policy-for-devbox'),
+            allow_all: false,
+            allowed_hostnames: ['github.com'],
+          });
+          expect(policy.id).toBeTruthy();
+
+          // Create a devbox with the network policy
+          devbox = await sdk.devbox.create({
+            name: uniqueName('sdk-devbox-with-policy'),
+            launch_parameters: {
+              resource_size_request: 'X_SMALL',
+              keep_alive_time_seconds: 60 * 5,
+              network_policy_id: policy.id,
+            },
+          });
+          expect(devbox).toBeDefined();
+          expect(devbox.id).toBeTruthy();
+
+          // Verify devbox was created successfully
+          const info = await devbox.getInfo();
+          expect(info.status).toBeDefined();
+        } finally {
+          if (devbox) {
+            await devbox.shutdown();
+          }
+          await cleanUpPolicy(policy);
         }
       },
       THIRTY_SECOND_TIMEOUT,

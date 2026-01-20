@@ -1,5 +1,5 @@
-import { THIRTY_SECOND_TIMEOUT, TEN_MINUTE_TIMEOUT, uniqueName, makeClientSDK } from '../utils';
-import { Blueprint, Devbox, StorageObject } from '@runloop/api-client/sdk';
+import { THIRTY_SECOND_TIMEOUT, TEN_MINUTE_TIMEOUT, uniqueName, makeClientSDK, cleanUpPolicy } from '../utils';
+import { Blueprint, Devbox, NetworkPolicy, StorageObject } from '@runloop/api-client/sdk';
 
 const sdk = makeClientSDK();
 
@@ -8,29 +8,31 @@ describe('smoketest: object-oriented blueprint', () => {
     let blueprint: Blueprint;
     let blueprintId: string | undefined;
 
+    // Create blueprint in beforeAll to avoid test order dependency
+    beforeAll(async () => {
+      blueprint = await sdk.blueprint.create(
+        {
+          name: uniqueName('sdk-blueprint'),
+          dockerfile: 'FROM ubuntu:20.04\nRUN apt-get update && apt-get install -y curl',
+          system_setup_commands: ['echo "Blueprint setup complete"'],
+        },
+        { polling: { timeoutMs: 10 * 60 * 1000 } },
+      );
+      blueprintId = blueprint.id;
+    }, TEN_MINUTE_TIMEOUT);
+
     afterAll(async () => {
       if (blueprint) {
         await blueprint.delete();
       }
     });
 
-    test(
-      'create blueprint',
-      async () => {
-        blueprint = await sdk.blueprint.create(
-          {
-            name: uniqueName('sdk-blueprint'),
-            dockerfile: 'FROM ubuntu:20.04\nRUN apt-get update && apt-get install -y curl',
-            system_setup_commands: ['echo "Blueprint setup complete"'],
-          },
-          { polling: { timeoutMs: 10 * 60 * 1000 } },
-        );
-        expect(blueprint).toBeDefined();
-        expect(blueprint.id).toBeTruthy();
-        blueprintId = blueprint.id;
-      },
-      TEN_MINUTE_TIMEOUT,
-    );
+    test('create blueprint', async () => {
+      // Blueprint was created in beforeAll - just verify it exists
+      expect(blueprint).toBeDefined();
+      expect(blueprint.id).toBeTruthy();
+      expect(blueprintId).toBeTruthy();
+    });
 
     test('get blueprint info', async () => {
       expect(blueprint).toBeDefined();
@@ -297,6 +299,102 @@ COPY . .`,
           if (blueprint) {
             await blueprint.delete();
           }
+        }
+      },
+      TEN_MINUTE_TIMEOUT,
+    );
+  });
+
+  describe('blueprint with network policy', () => {
+    test(
+      'create blueprint with network_policy_id for build',
+      async () => {
+        let policy: NetworkPolicy | undefined;
+        let blueprint: Blueprint | undefined;
+        try {
+          // Create a network policy for the build process
+          policy = await sdk.networkPolicy.create({
+            name: uniqueName('sdk-policy-for-blueprint-build'),
+            allow_all: true, // Allow all for build to download packages
+          });
+          expect(policy.id).toBeTruthy();
+
+          // Create blueprint with network_policy_id at top level (for build)
+          blueprint = await sdk.blueprint.create(
+            {
+              name: uniqueName('sdk-blueprint-with-build-policy'),
+              dockerfile: 'FROM ubuntu:20.04\nRUN apt-get update',
+              network_policy_id: policy.id,
+            },
+            { polling: { timeoutMs: 10 * 60 * 1000 } },
+          );
+
+          expect(blueprint).toBeDefined();
+          expect(blueprint.id).toBeTruthy();
+
+          // Verify blueprint was created
+          const info = await blueprint.getInfo();
+          expect(info.id).toBe(blueprint.id);
+        } finally {
+          if (blueprint) {
+            await blueprint.delete().catch(() => {});
+          }
+          await cleanUpPolicy(policy);
+        }
+      },
+      TEN_MINUTE_TIMEOUT,
+    );
+
+    test(
+      'create blueprint with launch_parameters.network_policy_id',
+      async () => {
+        let policy: NetworkPolicy | undefined;
+        let blueprint: Blueprint | undefined;
+        let devbox: Devbox | undefined;
+        try {
+          // Create a network policy for devboxes launched from this blueprint
+          policy = await sdk.networkPolicy.create({
+            name: uniqueName('sdk-policy-for-blueprint-launch'),
+            allow_all: false,
+            allowed_hostnames: ['github.com'],
+          });
+          expect(policy.id).toBeTruthy();
+
+          // Create blueprint with launch_parameters including network_policy_id
+          blueprint = await sdk.blueprint.create(
+            {
+              name: uniqueName('sdk-blueprint-with-launch-policy'),
+              dockerfile: 'FROM ubuntu:20.04',
+              launch_parameters: {
+                resource_size_request: 'X_SMALL',
+                keep_alive_time_seconds: 60 * 5,
+                network_policy_id: policy.id,
+              },
+            },
+            { polling: { timeoutMs: 10 * 60 * 1000 } },
+          );
+
+          expect(blueprint).toBeDefined();
+          expect(blueprint.id).toBeTruthy();
+
+          // Verify blueprint was created
+          const info = await blueprint.getInfo();
+          expect(info.id).toBe(blueprint.id);
+
+          // Create a devbox from the blueprint to verify it works
+          devbox = await blueprint.createDevbox({
+            name: uniqueName('devbox-from-policy-blueprint'),
+          });
+          expect(devbox).toBeDefined();
+          expect(devbox.id).toBeTruthy();
+        } finally {
+          if (devbox) {
+            await devbox.shutdown().catch(() => {});
+          }
+          if (blueprint) {
+            await blueprint.delete().catch(() => {});
+          }
+          await cleanUpPolicy(policy);
         }
       },
       TEN_MINUTE_TIMEOUT,

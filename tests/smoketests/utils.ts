@@ -1,4 +1,5 @@
 import { Runloop, RunloopSDK } from '@runloop/api-client';
+import { NetworkPolicy } from '@runloop/api-client/sdk';
 
 export function makeClient(overrides: Partial<ConstructorParameters<typeof Runloop>[0]> = {}) {
   const baseURL = process.env['RUNLOOP_BASE_URL'];
@@ -28,3 +29,18 @@ export const uniqueName = (prefix: string) =>
 export const THIRTY_SECOND_TIMEOUT = 120_000;
 export const FIVE_MINUTE_TIMEOUT = 300_000;
 export const TEN_MINUTE_TIMEOUT = 600_000;
+
+/**
+ * Helper to clean up a network policy, ignoring errors if already deleted.
+ */
+export async function cleanUpPolicy(policy: NetworkPolicy | undefined): Promise<void> {
+  if (policy) {
+    try {
+      await policy.getInfo();
+      // Policy still exists, delete it
+      await policy.delete();
+    } catch {
+      // Policy already deleted or doesn't exist, ignore
+    }
+  }
+}

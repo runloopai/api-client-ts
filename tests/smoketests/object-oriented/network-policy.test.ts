@@ -1,4 +1,4 @@
-import { THIRTY_SECOND_TIMEOUT, uniqueName, makeClientSDK } from '../utils';
+import { THIRTY_SECOND_TIMEOUT, uniqueName, makeClientSDK, cleanUpPolicy } from '../utils';
 import { NetworkPolicy } from '@runloop/api-client/sdk';
 
 const sdk = makeClientSDK();
@@ -8,34 +8,28 @@ describe('smoketest: object-oriented network policy', () => {
     let policy: NetworkPolicy | undefined;
     let policyId: string | undefined;
 
+    // Create policy in beforeAll to avoid test order dependency
+    beforeAll(async () => {
+      policy = await sdk.networkPolicy.create({
+        name: uniqueName('sdk-network-policy'),
+        allow_all: false,
+        allowed_hostnames: ['github.com', '*.npmjs.org'],
+        allow_devbox_to_devbox: false,
+        description: 'Test network policy',
+      });
+      policyId = policy.id;
+    }, THIRTY_SECOND_TIMEOUT);
+
     afterAll(async () => {
-      if (policy) {
-        try {
-          await policy.getInfo();
-          // Policy still exists, delete it
-          await policy.delete();
-        } catch {
-          // Policy already deleted, ignore
-        }
-      }
+      await cleanUpPolicy(policy);
     });
 
-    test(
-      'create network policy',
-      async () => {
-        policy = await sdk.networkPolicy.create({
-          name: uniqueName('sdk-network-policy'),
-          allow_all: false,
-          allowed_hostnames: ['github.com', '*.npmjs.org'],
-          allow_devbox_to_devbox: false,
-          description: 'Test network policy',
-        });
-        expect(policy).toBeDefined();
-        expect(policy.id).toBeTruthy();
-        policyId = policy.id;
-      },
-      THIRTY_SECOND_TIMEOUT,
-    );
+    test('create network policy', async () => {
+      // Policy was created in beforeAll - just verify it exists
+      expect(policy).toBeDefined();
+      expect(policy!.id).toBeTruthy();
+      expect(policyId).toBeTruthy();
+    });
 
     test('get network policy info', async () => {
       expect(policy).toBeDefined();
@@ -136,15 +130,7 @@ describe('smoketest: object-oriented network policy', () => {
         expect(info.id).toBe(policy.id);
         expect(info.name).toContain('sdk-network-policy-retrieve');
       } finally {
-        if (policy) {
-          try {
-            await policy.getInfo();
-            // Policy still exists, delete it
-            await policy.delete();
-          } catch {
-            // Policy already deleted, ignore
-          }
-        }
+        await cleanUpPolicy(policy);
       }
     });
   });
@@ -160,15 +146,7 @@ describe('smoketest: object-oriented network policy', () => {
         const info = await policy.getInfo();
         expect(info.egress.allow_all).toBe(true);
       } finally {
-        if (policy) {
-          try {
-            await policy.getInfo();
-            // Policy still exists, delete it
-            await policy.delete();
-          } catch {
-            // Policy already deleted, ignore
-          }
-        }
+        await cleanUpPolicy(policy);
       }
     });
 
@@ -186,15 +164,7 @@ describe('smoketest: object-oriented network policy', () => {
         expect(info.egress.allow_all).toBe(false);
         expect(info.egress.allowed_hostnames).toContain('github.com');
       } finally {
-        if (policy) {
-          try {
-            await policy.getInfo();
-            // Policy still exists, delete it
-            await policy.delete();
-          } catch {
-            // Policy already deleted, ignore
-          }
-        }
+        await cleanUpPolicy(policy);
       }
     });
 
@@ -214,15 +184,7 @@ describe('smoketest: object-oriented network policy', () => {
           expect(info.egress.allowed_hostnames).toContain(hostname);
         }
       } finally {
-        if (policy) {
-          try {
-            await policy.getInfo();
-            // Policy still exists, delete it
-            await policy.delete();
-          } catch {
-            // Policy already deleted, ignore
-          }
-        }
+        await cleanUpPolicy(policy);
       }
     });
 
@@ -238,15 +200,7 @@ describe('smoketest: object-oriented network policy', () => {
         expect(info.egress.allow_all).toBe(false);
         expect(info.egress.allowed_hostnames).toEqual([]);
       } finally {
-        if (policy) {
-          try {
-            await policy.getInfo();
-            // Policy still exists, delete it
-            await policy.delete();
-          } catch {
-            // Policy already deleted, ignore
-          }
-        }
+        await cleanUpPolicy(policy);
       }
     });
 
@@ -266,15 +220,7 @@ describe('smoketest: object-oriented network policy', () => {
           expect(info.egress.allowed_hostnames).toContain(hostname);
         }
       } finally {
-        if (policy) {
-          try {
-            await policy.getInfo();
-            // Policy still exists, delete it
-            await policy.delete();
-          } catch {
-            // Policy already deleted, ignore
-          }
-        }
+        await cleanUpPolicy(policy);
       }
     });
   });
@@ -291,16 +237,8 @@ describe('smoketest: object-oriented network policy', () => {
     });
 
     afterEach(async () => {
-      if (policy) {
-        try {
-          await policy.getInfo();
-          // Policy still exists, delete it
-          await policy.delete();
-        } catch {
-          // Policy already deleted, ignore
-        }
-        policy = undefined;
-      }
+      await cleanUpPolicy(policy);
+      policy = undefined;
     });
 
     test('update name only', async () => {

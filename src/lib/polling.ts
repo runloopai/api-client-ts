@@ -111,6 +111,7 @@ export async function poll<T>(
 
     let attempts = 0;
 
+    // maxAttempts === undefined means infinite polling (by design, see PollingOptions.maxAttempts JSDoc)
     while (maxAttempts === undefined || attempts < maxAttempts) {
       ++attempts;
 
