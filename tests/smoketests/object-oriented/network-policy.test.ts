@@ -1,4 +1,4 @@
-import { THIRTY_SECOND_TIMEOUT, uniqueName, makeClientSDK, cleanUpPolicy } from '../utils';
+import { SHORT_TIMEOUT, uniqueName, makeClientSDK, cleanUpPolicy } from '../utils';
 import { NetworkPolicy } from '@runloop/api-client/sdk';
 
 const sdk = makeClientSDK();
@@ -18,7 +18,7 @@ describe('smoketest: object-oriented network policy', () => {
         description: 'Test network policy',
       });
       policyId = policy.id;
-    }, THIRTY_SECOND_TIMEOUT);
+    }, SHORT_TIMEOUT);
 
     afterAll(async () => {
       await cleanUpPolicy(policy);

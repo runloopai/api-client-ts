@@ -1,5 +1,5 @@
 import { Agent, Devbox, StorageObject } from '@runloop/api-client/sdk';
-import { makeClientSDK, THIRTY_SECOND_TIMEOUT, uniqueName } from '../utils';
+import { makeClientSDK, SHORT_TIMEOUT, uniqueName } from '../utils';
 
 const runloop = makeClientSDK();
 
@@ -34,7 +34,7 @@ describe('smoketest: object-oriented agent', () => {
           // Once implemented, add: await agent.delete();
         }
       },
-      THIRTY_SECOND_TIMEOUT,
+      SHORT_TIMEOUT,
     );
 
     test(
@@ -63,7 +63,7 @@ describe('smoketest: object-oriented agent', () => {
           // TODO: Add agent cleanup once delete endpoint is implemented
         }
       },
-      THIRTY_SECOND_TIMEOUT,
+      SHORT_TIMEOUT,
     );
   });
 
@@ -77,7 +77,7 @@ describe('smoketest: object-oriented agent', () => {
         // List might be empty, that's okay
         expect(agents.length).toBeGreaterThanOrEqual(0);
       },
-      THIRTY_SECOND_TIMEOUT,
+      SHORT_TIMEOUT,
     );
 
     test(
@@ -107,7 +107,7 @@ describe('smoketest: object-oriented agent', () => {
           // TODO: Add agent cleanup once delete endpoint is implemented
         }
       },
-      THIRTY_SECOND_TIMEOUT,
+      SHORT_TIMEOUT,
     );
 
     test(
@@ -154,7 +154,7 @@ describe('smoketest: object-oriented agent', () => {
           // Should delete: agent1, agent2, agent3
         }
       },
-      THIRTY_SECOND_TIMEOUT,
+      SHORT_TIMEOUT,
     );
   });
 
@@ -185,7 +185,7 @@ describe('smoketest: object-oriented agent', () => {
           // TODO: Add agent cleanup once delete endpoint is implemented
         }
       },
-      THIRTY_SECOND_TIMEOUT,
+      SHORT_TIMEOUT,
     );
 
     test(
@@ -215,7 +215,7 @@ describe('smoketest: object-oriented agent', () => {
           // TODO: Add agent cleanup once delete endpoint is implemented
         }
       },
-      THIRTY_SECOND_TIMEOUT,
+      SHORT_TIMEOUT,
     );
   });
 
@@ -240,7 +240,7 @@ describe('smoketest: object-oriented agent', () => {
           // TODO: Add agent cleanup once delete endpoint is implemented
         }
       },
-      THIRTY_SECOND_TIMEOUT,
+      SHORT_TIMEOUT,
     );
 
     test(
@@ -263,7 +263,7 @@ describe('smoketest: object-oriented agent', () => {
           // TODO: Add agent cleanup once delete endpoint is implemented
         }
       },
-      THIRTY_SECOND_TIMEOUT,
+      SHORT_TIMEOUT,
     );
 
     test(
@@ -287,7 +287,7 @@ describe('smoketest: object-oriented agent', () => {
           // TODO: Add agent cleanup once delete endpoint is implemented
         }
       },
-      THIRTY_SECOND_TIMEOUT,
+      SHORT_TIMEOUT,
     );
 
     test(
@@ -327,7 +327,7 @@ describe('smoketest: object-oriented agent', () => {
           // TODO: Add agent cleanup once delete endpoint is implemented
         }
       },
-      THIRTY_SECOND_TIMEOUT,
+      SHORT_TIMEOUT,
     );
   });
 
@@ -404,7 +404,7 @@ describe('smoketest: object-oriented agent', () => {
           // TODO: Add agent cleanup once delete endpoint is implemented
         }
       },
-      THIRTY_SECOND_TIMEOUT * 8,
+      SHORT_TIMEOUT * 8,
     );
   });
 });

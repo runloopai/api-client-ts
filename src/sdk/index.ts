@@ -7,3 +7,4 @@ export { Execution } from './execution';
 export { ExecutionResult } from './execution-result';
 export { Scorer } from './scorer';
 export { NetworkPolicy } from './network-policy';
+export { ScenarioRun } from './scenario-run';

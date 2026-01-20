@@ -1,5 +1,5 @@
 import { BlueprintView } from '@runloop/api-client/resources/blueprints';
-import { makeClient, THIRTY_SECOND_TIMEOUT, uniqueName } from './utils';
+import { makeClient, SHORT_TIMEOUT, uniqueName } from './utils';
 import { DevboxView } from '@runloop/api-client/resources/devboxes';
 
 const client = makeClient();
@@ -30,7 +30,7 @@ describe('smoketest: blueprints', () => {
         expect(created.status).toBe('build_complete');
         blueprintId = created.id;
       },
-      THIRTY_SECOND_TIMEOUT,
+      SHORT_TIMEOUT,
     );
 
     test(
@@ -54,7 +54,7 @@ describe('smoketest: blueprints', () => {
           }
         }
       },
-      THIRTY_SECOND_TIMEOUT,
+      SHORT_TIMEOUT,
     );
 
     test(
@@ -78,7 +78,7 @@ describe('smoketest: blueprints', () => {
           }
         }
       },
-      THIRTY_SECOND_TIMEOUT,
+      SHORT_TIMEOUT,
     );
   });
 
@@ -113,7 +113,7 @@ describe('smoketest: blueprints', () => {
           }
         }
       },
-      THIRTY_SECOND_TIMEOUT,
+      SHORT_TIMEOUT,
     );
   });
 });

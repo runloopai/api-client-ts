@@ -1,5 +1,5 @@
 import { ReadEntry } from 'tar';
-import { THIRTY_SECOND_TIMEOUT, uniqueName, makeClientSDK } from '../utils';
+import { SHORT_TIMEOUT, uniqueName, makeClientSDK } from '../utils';
 import { Devbox, StorageObject } from '@runloop/api-client/sdk';
 
 const sdk = makeClientSDK();
@@ -24,7 +24,7 @@ describe('smoketest: object-oriented storage object', () => {
           }
         }
       },
-      THIRTY_SECOND_TIMEOUT,
+      SHORT_TIMEOUT,
     );
 
     test('get storage object info', async () => {
