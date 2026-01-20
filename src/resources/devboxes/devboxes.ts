@@ -822,11 +822,6 @@ export interface DevboxView {
   name?: string | null;
 
   /**
-   * The network policy ID used to create the Devbox.
-   */
-  network_policy_id?: string | null;
-
-  /**
    * The shutdown reason if the Devbox shutdown, if the Devbox has a 'shutdown'
    * status.
    */
