@@ -29,9 +29,9 @@ import * as fs from 'fs';
  * const scenario = runloop.scenario.fromId('scenario-123');
  * const run = await scenario.run({ run_name: 'my-run' });
  *
- * // Access the devbox
+ * // Access the devbox and execute your agent to solve the scenario
  * const devbox = run.devbox;
- * await devbox.cmd.exec('echo "Hello from scenario!"');
+ * await devbox.cmd.exec('python /home/user/agent/main.py');
  *
  * // Score and complete the run
  * await run.scoreAndComplete();
