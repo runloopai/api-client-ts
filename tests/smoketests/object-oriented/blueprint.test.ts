@@ -1,4 +1,4 @@
-import { THIRTY_SECOND_TIMEOUT, TEN_MINUTE_TIMEOUT, uniqueName, makeClientSDK, cleanUpPolicy } from '../utils';
+import { SHORT_TIMEOUT, LONG_TIMEOUT, uniqueName, makeClientSDK, cleanUpPolicy } from '../utils';
 import { Blueprint, Devbox, NetworkPolicy, StorageObject } from '@runloop/api-client/sdk';
 
 const sdk = makeClientSDK();
@@ -19,7 +19,7 @@ describe('smoketest: object-oriented blueprint', () => {
         { polling: { timeoutMs: 10 * 60 * 1000 } },
       );
       blueprintId = blueprint.id;
-    }, TEN_MINUTE_TIMEOUT);
+    }, LONG_TIMEOUT);
 
     afterAll(async () => {
       if (blueprint) {
@@ -63,7 +63,7 @@ describe('smoketest: object-oriented blueprint', () => {
         // Clean up the devbox
         await devbox.shutdown();
       },
-      THIRTY_SECOND_TIMEOUT,
+      SHORT_TIMEOUT,
     );
 
     test(
@@ -85,7 +85,7 @@ describe('smoketest: object-oriented blueprint', () => {
           }
         }
       },
-      THIRTY_SECOND_TIMEOUT,
+      SHORT_TIMEOUT,
     );
 
     test('delete blueprint', async () => {
@@ -193,7 +193,7 @@ COPY . .`,
           }
         }
       },
-      TEN_MINUTE_TIMEOUT,
+      LONG_TIMEOUT,
     );
 
     test(
@@ -267,7 +267,7 @@ COPY . .`,
           }
         }
       },
-      TEN_MINUTE_TIMEOUT,
+      LONG_TIMEOUT,
     );
   });
 
@@ -301,7 +301,7 @@ COPY . .`,
           }
         }
       },
-      TEN_MINUTE_TIMEOUT,
+      LONG_TIMEOUT,
     );
   });
 
@@ -342,7 +342,7 @@ COPY . .`,
           await cleanUpPolicy(policy);
         }
       },
-      TEN_MINUTE_TIMEOUT,
+      LONG_TIMEOUT,
     );
 
     test(
@@ -397,7 +397,7 @@ COPY . .`,
           await cleanUpPolicy(policy);
         }
       },
-      TEN_MINUTE_TIMEOUT,
+      LONG_TIMEOUT,
     );
   });
 });
