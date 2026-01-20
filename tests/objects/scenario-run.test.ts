@@ -81,9 +81,9 @@ describe('ScenarioRun', () => {
     };
   });
 
-  describe('fromId', () => {
-    it('should create a ScenarioRun instance from ID', () => {
-      const run = ScenarioRun.fromId(mockClient, 'run-123', 'devbox-456');
+  describe('constructor', () => {
+    it('should create a ScenarioRun instance', () => {
+      const run = new ScenarioRun(mockClient, 'run-123', 'devbox-456');
 
       expect(run).toBeInstanceOf(ScenarioRun);
       expect(run.id).toBe('run-123');
@@ -95,7 +95,7 @@ describe('ScenarioRun', () => {
     let run: ScenarioRun;
 
     beforeEach(() => {
-      run = ScenarioRun.fromId(mockClient, 'run-123', 'devbox-456');
+      run = new ScenarioRun(mockClient, 'run-123', 'devbox-456');
     });
 
     it('should expose devbox property with lazy loading', () => {
@@ -117,7 +117,7 @@ describe('ScenarioRun', () => {
     let run: ScenarioRun;
 
     beforeEach(() => {
-      run = ScenarioRun.fromId(mockClient, 'run-123', 'devbox-456');
+      run = new ScenarioRun(mockClient, 'run-123', 'devbox-456');
     });
 
     it('should retrieve scenario run info from API', async () => {
@@ -143,7 +143,7 @@ describe('ScenarioRun', () => {
     let run: ScenarioRun;
 
     beforeEach(() => {
-      run = ScenarioRun.fromId(mockClient, 'run-123', 'devbox-456');
+      run = new ScenarioRun(mockClient, 'run-123', 'devbox-456');
     });
 
     it('should wait for devbox to be running and return run info', async () => {
@@ -172,7 +172,7 @@ describe('ScenarioRun', () => {
     let run: ScenarioRun;
 
     beforeEach(() => {
-      run = ScenarioRun.fromId(mockClient, 'run-123', 'devbox-456');
+      run = new ScenarioRun(mockClient, 'run-123', 'devbox-456');
     });
 
     it('should submit run for scoring', async () => {
@@ -190,7 +190,7 @@ describe('ScenarioRun', () => {
     let run: ScenarioRun;
 
     beforeEach(() => {
-      run = ScenarioRun.fromId(mockClient, 'run-123', 'devbox-456');
+      run = new ScenarioRun(mockClient, 'run-123', 'devbox-456');
     });
 
     it('should wait for scoring to complete', async () => {
@@ -213,7 +213,7 @@ describe('ScenarioRun', () => {
     let run: ScenarioRun;
 
     beforeEach(() => {
-      run = ScenarioRun.fromId(mockClient, 'run-123', 'devbox-456');
+      run = new ScenarioRun(mockClient, 'run-123', 'devbox-456');
     });
 
     it('should score and wait for completion', async () => {
@@ -235,7 +235,7 @@ describe('ScenarioRun', () => {
     let run: ScenarioRun;
 
     beforeEach(() => {
-      run = ScenarioRun.fromId(mockClient, 'run-123', 'devbox-456');
+      run = new ScenarioRun(mockClient, 'run-123', 'devbox-456');
     });
 
     it('should score, wait, and complete the run', async () => {
@@ -271,7 +271,7 @@ describe('ScenarioRun', () => {
     let run: ScenarioRun;
 
     beforeEach(() => {
-      run = ScenarioRun.fromId(mockClient, 'run-123', 'devbox-456');
+      run = new ScenarioRun(mockClient, 'run-123', 'devbox-456');
     });
 
     it('should complete the run', async () => {
@@ -289,7 +289,7 @@ describe('ScenarioRun', () => {
     let run: ScenarioRun;
 
     beforeEach(() => {
-      run = ScenarioRun.fromId(mockClient, 'run-123', 'devbox-456');
+      run = new ScenarioRun(mockClient, 'run-123', 'devbox-456');
     });
 
     it('should cancel the run', async () => {
@@ -308,7 +308,7 @@ describe('ScenarioRun', () => {
     const fs = require('fs');
 
     beforeEach(() => {
-      run = ScenarioRun.fromId(mockClient, 'run-123', 'devbox-456');
+      run = new ScenarioRun(mockClient, 'run-123', 'devbox-456');
       jest.clearAllMocks();
     });
 
@@ -340,7 +340,7 @@ describe('ScenarioRun', () => {
     let run: ScenarioRun;
 
     beforeEach(() => {
-      run = ScenarioRun.fromId(mockClient, 'run-123', 'devbox-456');
+      run = new ScenarioRun(mockClient, 'run-123', 'devbox-456');
     });
 
     it('should return scoring result when available', async () => {
@@ -380,7 +380,7 @@ describe('ScenarioRun', () => {
     let run: ScenarioRun;
 
     beforeEach(() => {
-      run = ScenarioRun.fromId(mockClient, 'run-123', 'devbox-456');
+      run = new ScenarioRun(mockClient, 'run-123', 'devbox-456');
     });
 
     it('should propagate errors from getInfo', async () => {

@@ -36,7 +36,7 @@ import * as path from 'path';
  *
  * // Score and complete the run
  * await run.scoreAndComplete();
- * const score = run.getScore();
+ * const score = await run.getScore();
  * ```
  */
 export class ScenarioRun {
@@ -52,21 +52,6 @@ export class ScenarioRun {
     this.client = client;
     this._id = id;
     this._devboxId = devboxId;
-  }
-
-  /**
-   * Create a ScenarioRun instance from an ID.
-   *
-   * See the {@link ScenarioOps.fromId} method for calling this
-   * @private
-   *
-   * @param {Runloop} client - The Runloop client instance
-   * @param {string} id - The scenario run ID
-   * @param {string} devboxId - The associated devbox ID
-   * @returns {ScenarioRun} A {@link ScenarioRun} instance
-   */
-  static fromId(client: Runloop, id: string, devboxId: string): ScenarioRun {
-    return new ScenarioRun(client, id, devboxId);
   }
 
   /**

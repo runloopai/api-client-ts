@@ -57,7 +57,7 @@ describe('smoketest: object-oriented scenario-run', () => {
         devboxId = runView.devbox_id;
 
         // Wrap with ScenarioRun
-        run = ScenarioRun.fromId(client, runView.id, runView.devbox_id);
+        run = new ScenarioRun(client, runView.id, runView.devbox_id);
 
         expect(run).toBeInstanceOf(ScenarioRun);
         expect(run.id).toBe(runView.id);
@@ -163,7 +163,7 @@ describe('smoketest: object-oriented scenario-run', () => {
         });
 
         cancelDevboxId = runView.devbox_id;
-        run = ScenarioRun.fromId(client, runView.id, runView.devbox_id);
+        run = new ScenarioRun(client, runView.id, runView.devbox_id);
 
         // Wait for environment to be ready
         await run.awaitEnvReady({
@@ -205,7 +205,7 @@ describe('smoketest: object-oriented scenario-run', () => {
         });
 
         scoreDevboxId = runView.devbox_id;
-        run = ScenarioRun.fromId(client, runView.id, runView.devbox_id);
+        run = new ScenarioRun(client, runView.id, runView.devbox_id);
 
         // Wait for environment to be ready
         await run.awaitEnvReady({
@@ -256,7 +256,7 @@ describe('smoketest: object-oriented scenario-run', () => {
         });
 
         scoreAwaitDevboxId = runView.devbox_id;
-        run = ScenarioRun.fromId(client, runView.id, runView.devbox_id);
+        run = new ScenarioRun(client, runView.id, runView.devbox_id);
 
         // Wait for environment to be ready
         await run.awaitEnvReady({
