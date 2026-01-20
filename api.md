@@ -45,6 +45,22 @@ Methods:
 - <code title="post /v1/benchmarks/runs/{id}/complete">client.benchmarks.runs.<a href="./src/resources/benchmarks/runs.ts">complete</a>(id) -> BenchmarkRunView</code>
 - <code title="get /v1/benchmarks/runs/{id}/scenario_runs">client.benchmarks.runs.<a href="./src/resources/benchmarks/runs.ts">listScenarioRuns</a>(id, { ...params }) -> ScenarioRunViewsBenchmarkRunsCursorIDPage</code>
 
+# BenchmarkRuns
+
+Types:
+
+- <code><a href="./src/resources/benchmark-runs.ts">BenchmarkRunListView</a></code>
+- <code><a href="./src/resources/benchmark-runs.ts">BenchmarkRunView</a></code>
+- <code><a href="./src/resources/benchmark-runs.ts">ScenarioRunListView</a></code>
+
+Methods:
+
+- <code title="get /v1/benchmark_runs/{id}">client.benchmarkRuns.<a href="./src/resources/benchmark-runs.ts">retrieve</a>(id) -> BenchmarkRunView</code>
+- <code title="get /v1/benchmark_runs">client.benchmarkRuns.<a href="./src/resources/benchmark-runs.ts">list</a>({ ...params }) -> BenchmarkRunViewsBenchmarkRunsCursorIDPage</code>
+- <code title="post /v1/benchmark_runs/{id}/cancel">client.benchmarkRuns.<a href="./src/resources/benchmark-runs.ts">cancel</a>(id) -> BenchmarkRunView</code>
+- <code title="post /v1/benchmark_runs/{id}/complete">client.benchmarkRuns.<a href="./src/resources/benchmark-runs.ts">complete</a>(id) -> BenchmarkRunView</code>
+- <code title="get /v1/benchmark_runs/{id}/scenario_runs">client.benchmarkRuns.<a href="./src/resources/benchmark-runs.ts">listScenarioRuns</a>(id, { ...params }) -> ScenarioRunViewsBenchmarkRunsCursorIDPage</code>
+
 # Agents
 
 Types:
