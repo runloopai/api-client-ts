@@ -5,6 +5,7 @@ import type { DevboxView } from '../resources/devboxes/devboxes';
 import { PollingOptions } from '../lib/polling';
 import { Devbox } from './devbox';
 import * as fs from 'fs';
+import * as path from 'path';
 
 /**
  * Object-oriented interface for working with Scenario Runs.
@@ -295,13 +296,22 @@ export class ScenarioRun {
    * @returns {Promise<void>}
    */
   async downloadLogs(filePath: string, options?: Core.RequestOptions): Promise<void> {
+    // Validate the parent directory exists and is writable
+    const parentDir = path.dirname(filePath);
+    try {
+      await fs.promises.access(parentDir, fs.constants.W_OK);
+    } catch {
+      throw new Error(
+        `Cannot write to ${filePath}: parent directory '${parentDir}' does not exist or is not writable`,
+      );
+    }
+
     const response = await this.client.scenarios.runs.downloadLogs(this._id, options);
 
     // Get the response as an ArrayBuffer and write to file
     const arrayBuffer = await response.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
 
-    // Write to file synchronously for simplicity
     await fs.promises.writeFile(filePath, buffer);
   }
 

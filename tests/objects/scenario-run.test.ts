@@ -10,6 +10,10 @@ jest.mock('../../src/index');
 jest.mock('fs', () => ({
   promises: {
     writeFile: jest.fn().mockResolvedValue(undefined),
+    access: jest.fn().mockResolvedValue(undefined),
+  },
+  constants: {
+    W_OK: 2,
   },
 }));
 
@@ -301,20 +305,34 @@ describe('ScenarioRun', () => {
 
   describe('downloadLogs', () => {
     let run: ScenarioRun;
+    const fs = require('fs');
 
     beforeEach(() => {
       run = ScenarioRun.fromId(mockClient, 'run-123', 'devbox-456');
+      jest.clearAllMocks();
     });
 
-    it('should download logs to file', async () => {
+    it('should validate parent directory and download logs to file', async () => {
       const mockArrayBuffer = new ArrayBuffer(8);
       mockClient.scenarios.runs.downloadLogs.mockResolvedValue({
         arrayBuffer: jest.fn().mockResolvedValue(mockArrayBuffer),
       });
 
-      await run.downloadLogs('./logs.zip');
+      await run.downloadLogs('/some/path/logs.zip');
 
+      expect(fs.promises.access).toHaveBeenCalledWith('/some/path', fs.constants.W_OK);
       expect(mockClient.scenarios.runs.downloadLogs).toHaveBeenCalledWith('run-123', undefined);
+      expect(fs.promises.writeFile).toHaveBeenCalledWith('/some/path/logs.zip', expect.any(Buffer));
+    });
+
+    it('should throw error when parent directory is not writable', async () => {
+      fs.promises.access.mockRejectedValueOnce(new Error('ENOENT'));
+
+      await expect(run.downloadLogs('/invalid/path/logs.zip')).rejects.toThrow(
+        "Cannot write to /invalid/path/logs.zip: parent directory '/invalid/path' does not exist or is not writable",
+      );
+
+      expect(mockClient.scenarios.runs.downloadLogs).not.toHaveBeenCalled();
     });
   });
 
