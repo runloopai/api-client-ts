@@ -252,6 +252,12 @@ export interface BlueprintBuildFromInspectionParameters {
   metadata?: { [key: string]: string } | null;
 
   /**
+   * (Optional) ID of the network policy to apply during blueprint build. This
+   * restricts network access during the build process.
+   */
+  network_policy_id?: string | null;
+
+  /**
    * (Optional) Map of mount IDs/environment variable names to secret names. Secrets
    * can be used as environment variables in system_setup_commands. Example:
    * {"GITHUB_TOKEN": "gh_secret"} makes 'gh_secret' available as GITHUB_TOKEN.
@@ -347,6 +353,15 @@ export interface BlueprintBuildParameters {
    * (Optional) User defined metadata for the Blueprint.
    */
   metadata?: { [key: string]: string } | null;
+
+  /**
+   * (Optional) ID of the network policy to apply during blueprint build. This
+   * restricts network access during the build process. This does not affect devboxes
+   * created from this blueprint; if you want devboxes created from this blueprint to
+   * inherit the network policy, set the network_policy_id on the blueprint launch
+   * parameters.
+   */
+  network_policy_id?: string | null;
 
   /**
    * (Optional) Map of mount IDs/environment variable names to secret names. Secrets
@@ -658,6 +673,15 @@ export interface BlueprintCreateParams {
   metadata?: { [key: string]: string } | null;
 
   /**
+   * (Optional) ID of the network policy to apply during blueprint build. This
+   * restricts network access during the build process. This does not affect devboxes
+   * created from this blueprint; if you want devboxes created from this blueprint to
+   * inherit the network policy, set the network_policy_id on the blueprint launch
+   * parameters.
+   */
+  network_policy_id?: string | null;
+
+  /**
    * (Optional) Map of mount IDs/environment variable names to secret names. Secrets
    * will be available to commands during the build. Secrets are NOT stored in the
    * blueprint image. Example: {"DB_PASS": "DATABASE_PASSWORD"} makes the secret
@@ -783,6 +807,12 @@ export interface BlueprintCreateFromInspectionParams {
   metadata?: { [key: string]: string } | null;
 
   /**
+   * (Optional) ID of the network policy to apply during blueprint build. This
+   * restricts network access during the build process.
+   */
+  network_policy_id?: string | null;
+
+  /**
    * (Optional) Map of mount IDs/environment variable names to secret names. Secrets
    * can be used as environment variables in system_setup_commands. Example:
    * {"GITHUB_TOKEN": "gh_secret"} makes 'gh_secret' available as GITHUB_TOKEN.
@@ -861,6 +891,15 @@ export interface BlueprintPreviewParams {
    * (Optional) User defined metadata for the Blueprint.
    */
   metadata?: { [key: string]: string } | null;
+
+  /**
+   * (Optional) ID of the network policy to apply during blueprint build. This
+   * restricts network access during the build process. This does not affect devboxes
+   * created from this blueprint; if you want devboxes created from this blueprint to
+   * inherit the network policy, set the network_policy_id on the blueprint launch
+   * parameters.
+   */
+  network_policy_id?: string | null;
 
   /**
    * (Optional) Map of mount IDs/environment variable names to secret names. Secrets
