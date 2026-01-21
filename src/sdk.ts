@@ -1528,7 +1528,7 @@ export class NetworkPolicyOps {
  * @example
  * ```typescript
  * const runloop = new RunloopSDK();
- * const scenario = runloop.scenario.fromId('scenario-123');
+ * const scenario = runloop.scenario.fromId('scn_123');
  *
  * // Get scenario details
  * const info = await scenario.getInfo();
@@ -1556,7 +1556,7 @@ export class ScenarioOps {
    * @example
    * ```typescript
    * const runloop = new RunloopSDK();
-   * const scenario = runloop.scenario.fromId('scenario-123');
+   * const scenario = runloop.scenario.fromId('scn_123');
    * const info = await scenario.getInfo();
    * console.log(info.name);
    * ```

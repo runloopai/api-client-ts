@@ -27,7 +27,7 @@ import * as path from 'path';
  * import { RunloopSDK } from '@runloop/api-client';
  *
  * const runloop = new RunloopSDK();
- * const scenario = runloop.scenario.fromId('scenario-123');
+ * const scenario = runloop.scenario.fromId('scn_123');
  * const run = await scenario.run({ run_name: 'my-run' });
  *
  * // Access the devbox and execute your agent to solve the scenario

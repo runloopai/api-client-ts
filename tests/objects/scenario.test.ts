@@ -12,7 +12,7 @@ describe('Scenario', () => {
 
   beforeEach(() => {
     mockScenarioData = {
-      id: 'scenario-123',
+      id: 'scn_123',
       name: 'Test Scenario',
       input_context: {
         problem_statement: 'Solve this problem',
@@ -27,7 +27,7 @@ describe('Scenario', () => {
     mockScenarioRunData = {
       id: 'run-456',
       devbox_id: 'devbox-789',
-      scenario_id: 'scenario-123',
+      scenario_id: 'scn_123',
       state: 'running',
     } as ScenarioRunView;
 
@@ -43,31 +43,31 @@ describe('Scenario', () => {
 
   describe('fromId', () => {
     it('should create a Scenario instance with correct id', () => {
-      const scenario = Scenario.fromId(mockClient, 'scenario-123');
+      const scenario = Scenario.fromId(mockClient, 'scn_123');
 
       expect(scenario).toBeInstanceOf(Scenario);
-      expect(scenario.id).toBe('scenario-123');
+      expect(scenario.id).toBe('scn_123');
     });
   });
 
   describe('getInfo', () => {
     it('should retrieve scenario info from API', async () => {
-      const scenario = Scenario.fromId(mockClient, 'scenario-123');
+      const scenario = Scenario.fromId(mockClient, 'scn_123');
 
       const info = await scenario.getInfo();
 
-      expect(mockClient.scenarios.retrieve).toHaveBeenCalledWith('scenario-123', undefined);
-      expect(info.id).toBe('scenario-123');
+      expect(mockClient.scenarios.retrieve).toHaveBeenCalledWith('scn_123', undefined);
+      expect(info.id).toBe('scn_123');
       expect(info.name).toBe('Test Scenario');
     });
 
     it('should pass options to the API client', async () => {
-      const scenario = Scenario.fromId(mockClient, 'scenario-123');
+      const scenario = Scenario.fromId(mockClient, 'scn_123');
       const options = { timeout: 5000 };
 
       await scenario.getInfo(options);
 
-      expect(mockClient.scenarios.retrieve).toHaveBeenCalledWith('scenario-123', options);
+      expect(mockClient.scenarios.retrieve).toHaveBeenCalledWith('scn_123', options);
     });
   });
 
@@ -75,12 +75,12 @@ describe('Scenario', () => {
     it('should update scenario with provided params', async () => {
       const updatedData = { ...mockScenarioData, name: 'Updated Name' };
       mockClient.scenarios.update.mockResolvedValue(updatedData);
-      const scenario = Scenario.fromId(mockClient, 'scenario-123');
+      const scenario = Scenario.fromId(mockClient, 'scn_123');
 
       const result = await scenario.update({ name: 'Updated Name' });
 
       expect(mockClient.scenarios.update).toHaveBeenCalledWith(
-        'scenario-123',
+        'scn_123',
         { name: 'Updated Name' },
         undefined,
       );
@@ -88,22 +88,22 @@ describe('Scenario', () => {
     });
 
     it('should allow calling update without params', async () => {
-      const scenario = Scenario.fromId(mockClient, 'scenario-123');
+      const scenario = Scenario.fromId(mockClient, 'scn_123');
 
       await scenario.update();
 
-      expect(mockClient.scenarios.update).toHaveBeenCalledWith('scenario-123', undefined, undefined);
+      expect(mockClient.scenarios.update).toHaveBeenCalledWith('scn_123', undefined, undefined);
     });
   });
 
   describe('runAsync', () => {
     it('should start a run and return ScenarioRun instance', async () => {
-      const scenario = Scenario.fromId(mockClient, 'scenario-123');
+      const scenario = Scenario.fromId(mockClient, 'scn_123');
 
       const run = await scenario.runAsync({ run_name: 'test-run' });
 
       expect(mockClient.scenarios.startRun).toHaveBeenCalledWith(
-        { scenario_id: 'scenario-123', run_name: 'test-run' },
+        { scenario_id: 'scn_123', run_name: 'test-run' },
         undefined,
       );
       expect(run).toBeInstanceOf(ScenarioRun);
@@ -112,12 +112,12 @@ describe('Scenario', () => {
     });
 
     it('should work without params', async () => {
-      const scenario = Scenario.fromId(mockClient, 'scenario-123');
+      const scenario = Scenario.fromId(mockClient, 'scn_123');
 
       const run = await scenario.runAsync();
 
       expect(mockClient.scenarios.startRun).toHaveBeenCalledWith(
-        { scenario_id: 'scenario-123' },
+        { scenario_id: 'scn_123' },
         undefined,
       );
       expect(run).toBeInstanceOf(ScenarioRun);
@@ -126,12 +126,12 @@ describe('Scenario', () => {
 
   describe('run', () => {
     it('should start a run and wait for devbox, returning ScenarioRun instance', async () => {
-      const scenario = Scenario.fromId(mockClient, 'scenario-123');
+      const scenario = Scenario.fromId(mockClient, 'scn_123');
 
       const run = await scenario.run({ run_name: 'test-run' });
 
       expect(mockClient.scenarios.startRunAndAwaitEnvReady).toHaveBeenCalledWith(
-        { scenario_id: 'scenario-123', run_name: 'test-run' },
+        { scenario_id: 'scn_123', run_name: 'test-run' },
         undefined,
       );
       expect(run).toBeInstanceOf(ScenarioRun);
@@ -140,13 +140,13 @@ describe('Scenario', () => {
     });
 
     it('should pass polling options', async () => {
-      const scenario = Scenario.fromId(mockClient, 'scenario-123');
+      const scenario = Scenario.fromId(mockClient, 'scn_123');
       const options = { polling: { pollingIntervalMs: 1000 } };
 
       await scenario.run({ run_name: 'test-run' }, options);
 
       expect(mockClient.scenarios.startRunAndAwaitEnvReady).toHaveBeenCalledWith(
-        { scenario_id: 'scenario-123', run_name: 'test-run' },
+        { scenario_id: 'scn_123', run_name: 'test-run' },
         options,
       );
     });
@@ -156,7 +156,7 @@ describe('Scenario', () => {
     it('should propagate errors from getInfo', async () => {
       const error = new Error('API error');
       mockClient.scenarios.retrieve.mockRejectedValue(error);
-      const scenario = Scenario.fromId(mockClient, 'scenario-123');
+      const scenario = Scenario.fromId(mockClient, 'scn_123');
 
       await expect(scenario.getInfo()).rejects.toThrow('API error');
     });
@@ -164,7 +164,7 @@ describe('Scenario', () => {
     it('should propagate errors from startRun', async () => {
       const error = new Error('Failed to start run');
       mockClient.scenarios.startRun.mockRejectedValue(error);
-      const scenario = Scenario.fromId(mockClient, 'scenario-123');
+      const scenario = Scenario.fromId(mockClient, 'scn_123');
 
       await expect(scenario.runAsync()).rejects.toThrow('Failed to start run');
     });

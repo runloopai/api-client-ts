@@ -61,7 +61,7 @@ describe('ScenarioRun', () => {
 
     // Mock scenario run data
     mockScenarioRunData = {
-      id: 'run-123',
+      id: 'scr_123',
       devbox_id: 'devbox-456',
       scenario_id: 'scenario-789',
       state: 'running',
@@ -83,10 +83,10 @@ describe('ScenarioRun', () => {
 
   describe('constructor', () => {
     it('should create a ScenarioRun instance', () => {
-      const run = new ScenarioRun(mockClient, 'run-123', 'devbox-456');
+      const run = new ScenarioRun(mockClient, 'scr_123', 'devbox-456');
 
       expect(run).toBeInstanceOf(ScenarioRun);
-      expect(run.id).toBe('run-123');
+      expect(run.id).toBe('scr_123');
       expect(run.devboxId).toBe('devbox-456');
     });
   });
@@ -95,7 +95,7 @@ describe('ScenarioRun', () => {
     let run: ScenarioRun;
 
     beforeEach(() => {
-      run = new ScenarioRun(mockClient, 'run-123', 'devbox-456');
+      run = new ScenarioRun(mockClient, 'scr_123', 'devbox-456');
     });
 
     it('should expose devbox property with lazy loading', () => {
@@ -117,7 +117,7 @@ describe('ScenarioRun', () => {
     let run: ScenarioRun;
 
     beforeEach(() => {
-      run = new ScenarioRun(mockClient, 'run-123', 'devbox-456');
+      run = new ScenarioRun(mockClient, 'scr_123', 'devbox-456');
     });
 
     it('should retrieve scenario run info from API', async () => {
@@ -125,7 +125,7 @@ describe('ScenarioRun', () => {
 
       const info = await run.getInfo();
 
-      expect(mockClient.scenarios.runs.retrieve).toHaveBeenCalledWith('run-123', undefined);
+      expect(mockClient.scenarios.runs.retrieve).toHaveBeenCalledWith('scr_123', undefined);
       expect(info).toEqual(mockScenarioRunData);
     });
 
@@ -135,7 +135,7 @@ describe('ScenarioRun', () => {
 
       await run.getInfo(options);
 
-      expect(mockClient.scenarios.runs.retrieve).toHaveBeenCalledWith('run-123', options);
+      expect(mockClient.scenarios.runs.retrieve).toHaveBeenCalledWith('scr_123', options);
     });
   });
 
@@ -143,7 +143,7 @@ describe('ScenarioRun', () => {
     let run: ScenarioRun;
 
     beforeEach(() => {
-      run = new ScenarioRun(mockClient, 'run-123', 'devbox-456');
+      run = new ScenarioRun(mockClient, 'scr_123', 'devbox-456');
     });
 
     it('should wait for devbox to be running and return run info', async () => {
@@ -153,7 +153,7 @@ describe('ScenarioRun', () => {
       const result = await run.awaitEnvReady();
 
       expect(mockClient.devboxes.awaitRunning).toHaveBeenCalledWith('devbox-456', undefined);
-      expect(mockClient.scenarios.runs.retrieve).toHaveBeenCalledWith('run-123', undefined);
+      expect(mockClient.scenarios.runs.retrieve).toHaveBeenCalledWith('scr_123', undefined);
       expect(result).toEqual(mockScenarioRunData);
     });
 
@@ -172,7 +172,7 @@ describe('ScenarioRun', () => {
     let run: ScenarioRun;
 
     beforeEach(() => {
-      run = new ScenarioRun(mockClient, 'run-123', 'devbox-456');
+      run = new ScenarioRun(mockClient, 'scr_123', 'devbox-456');
     });
 
     it('should submit run for scoring', async () => {
@@ -181,7 +181,7 @@ describe('ScenarioRun', () => {
 
       const result = await run.score();
 
-      expect(mockClient.scenarios.runs.score).toHaveBeenCalledWith('run-123', undefined);
+      expect(mockClient.scenarios.runs.score).toHaveBeenCalledWith('scr_123', undefined);
       expect(result.state).toBe('scoring');
     });
   });
@@ -190,7 +190,7 @@ describe('ScenarioRun', () => {
     let run: ScenarioRun;
 
     beforeEach(() => {
-      run = new ScenarioRun(mockClient, 'run-123', 'devbox-456');
+      run = new ScenarioRun(mockClient, 'scr_123', 'devbox-456');
     });
 
     it('should wait for scoring to complete', async () => {
@@ -203,7 +203,7 @@ describe('ScenarioRun', () => {
 
       const result = await run.awaitScored();
 
-      expect(mockClient.scenarios.runs.awaitScored).toHaveBeenCalledWith('run-123', undefined);
+      expect(mockClient.scenarios.runs.awaitScored).toHaveBeenCalledWith('scr_123', undefined);
       expect(result.state).toBe('scored');
       expect(result.scoring_contract_result).toEqual(mockScoringResult);
     });
@@ -213,7 +213,7 @@ describe('ScenarioRun', () => {
     let run: ScenarioRun;
 
     beforeEach(() => {
-      run = new ScenarioRun(mockClient, 'run-123', 'devbox-456');
+      run = new ScenarioRun(mockClient, 'scr_123', 'devbox-456');
     });
 
     it('should score and wait for completion', async () => {
@@ -226,7 +226,7 @@ describe('ScenarioRun', () => {
 
       const result = await run.scoreAndAwait();
 
-      expect(mockClient.scenarios.runs.scoreAndAwait).toHaveBeenCalledWith('run-123', undefined);
+      expect(mockClient.scenarios.runs.scoreAndAwait).toHaveBeenCalledWith('scr_123', undefined);
       expect(result.state).toBe('scored');
     });
   });
@@ -235,7 +235,7 @@ describe('ScenarioRun', () => {
     let run: ScenarioRun;
 
     beforeEach(() => {
-      run = new ScenarioRun(mockClient, 'run-123', 'devbox-456');
+      run = new ScenarioRun(mockClient, 'scr_123', 'devbox-456');
     });
 
     it('should score, wait, and complete the run', async () => {
@@ -248,7 +248,7 @@ describe('ScenarioRun', () => {
 
       const result = await run.scoreAndComplete();
 
-      expect(mockClient.scenarios.runs.scoreAndComplete).toHaveBeenCalledWith('run-123', undefined);
+      expect(mockClient.scenarios.runs.scoreAndComplete).toHaveBeenCalledWith('scr_123', undefined);
       expect(result.state).toBe('completed');
     });
 
@@ -263,7 +263,7 @@ describe('ScenarioRun', () => {
 
       await run.scoreAndComplete(options);
 
-      expect(mockClient.scenarios.runs.scoreAndComplete).toHaveBeenCalledWith('run-123', options);
+      expect(mockClient.scenarios.runs.scoreAndComplete).toHaveBeenCalledWith('scr_123', options);
     });
   });
 
@@ -271,7 +271,7 @@ describe('ScenarioRun', () => {
     let run: ScenarioRun;
 
     beforeEach(() => {
-      run = new ScenarioRun(mockClient, 'run-123', 'devbox-456');
+      run = new ScenarioRun(mockClient, 'scr_123', 'devbox-456');
     });
 
     it('should complete the run', async () => {
@@ -280,7 +280,7 @@ describe('ScenarioRun', () => {
 
       const result = await run.complete();
 
-      expect(mockClient.scenarios.runs.complete).toHaveBeenCalledWith('run-123', undefined);
+      expect(mockClient.scenarios.runs.complete).toHaveBeenCalledWith('scr_123', undefined);
       expect(result.state).toBe('completed');
     });
   });
@@ -289,7 +289,7 @@ describe('ScenarioRun', () => {
     let run: ScenarioRun;
 
     beforeEach(() => {
-      run = new ScenarioRun(mockClient, 'run-123', 'devbox-456');
+      run = new ScenarioRun(mockClient, 'scr_123', 'devbox-456');
     });
 
     it('should cancel the run', async () => {
@@ -298,7 +298,7 @@ describe('ScenarioRun', () => {
 
       const result = await run.cancel();
 
-      expect(mockClient.scenarios.runs.cancel).toHaveBeenCalledWith('run-123', undefined);
+      expect(mockClient.scenarios.runs.cancel).toHaveBeenCalledWith('scr_123', undefined);
       expect(result.state).toBe('canceled');
     });
   });
@@ -308,7 +308,7 @@ describe('ScenarioRun', () => {
     const fs = require('fs');
 
     beforeEach(() => {
-      run = new ScenarioRun(mockClient, 'run-123', 'devbox-456');
+      run = new ScenarioRun(mockClient, 'scr_123', 'devbox-456');
       jest.clearAllMocks();
     });
 
@@ -321,7 +321,7 @@ describe('ScenarioRun', () => {
       await run.downloadLogs('/some/path/logs.zip');
 
       expect(fs.promises.access).toHaveBeenCalledWith('/some/path', fs.constants.W_OK);
-      expect(mockClient.scenarios.runs.downloadLogs).toHaveBeenCalledWith('run-123', undefined);
+      expect(mockClient.scenarios.runs.downloadLogs).toHaveBeenCalledWith('scr_123', undefined);
       expect(fs.promises.writeFile).toHaveBeenCalledWith('/some/path/logs.zip', expect.any(Buffer));
     });
 
@@ -340,7 +340,7 @@ describe('ScenarioRun', () => {
     let run: ScenarioRun;
 
     beforeEach(() => {
-      run = new ScenarioRun(mockClient, 'run-123', 'devbox-456');
+      run = new ScenarioRun(mockClient, 'scr_123', 'devbox-456');
     });
 
     it('should return scoring result when available', async () => {
@@ -380,7 +380,7 @@ describe('ScenarioRun', () => {
     let run: ScenarioRun;
 
     beforeEach(() => {
-      run = new ScenarioRun(mockClient, 'run-123', 'devbox-456');
+      run = new ScenarioRun(mockClient, 'scr_123', 'devbox-456');
     });
 
     it('should propagate errors from getInfo', async () => {

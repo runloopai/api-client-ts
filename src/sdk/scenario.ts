@@ -29,13 +29,13 @@ export type ScenarioRunParams = Omit<ScenarioStartRunParams, 'scenario_id'>;
  *
  * ## Quickstart
  *
- * Scenarios can be obtained from `runloop.scenario.fromId()`:
+ * Scenarios can be obtained from `runloop.scenario.fromId(scn_123)`:
  *
  * ```typescript
  * import { RunloopSDK } from '@runloop/api-client';
  *
  * const runloop = new RunloopSDK();
- * const scenario = runloop.scenario.fromId('scenario-123');
+ * const scenario = runloop.scenario.fromId('scn_123');
  *
  * // Get scenario details
  * const info = await scenario.getInfo();
