@@ -8,6 +8,7 @@ import { StorageObject } from './sdk/storage-object';
 import { Agent } from './sdk/agent';
 import { Scorer } from './sdk/scorer';
 import { NetworkPolicy } from './sdk/network-policy';
+import { Scenario } from './sdk/scenario';
 
 // Import types used in this file
 import type {
@@ -21,6 +22,7 @@ import type { ObjectCreateParams, ObjectListParams } from './resources/objects';
 import type { AgentCreateParams, AgentListParams } from './resources/agents';
 import type { ScorerCreateParams, ScorerListParams } from './resources/scenarios/scorers';
 import type { NetworkPolicyCreateParams, NetworkPolicyListParams } from './resources/network-policies';
+import type { ScenarioListParams } from './resources/scenarios/scenarios';
 import { PollingOptions } from './lib/polling';
 import * as Shared from './resources/shared';
 
@@ -283,6 +285,14 @@ export class RunloopSDK {
   public readonly networkPolicy: NetworkPolicyOps;
 
   /**
+   * **Scenario Operations** - {@link ScenarioOps} for accessing {@link Scenario} class instances.
+   *
+   * Scenarios define repeatable AI coding evaluation tests with starting environments and
+   * success criteria. Use these operations to get existing scenarios by ID or list all scenarios.
+   */
+  public readonly scenario: ScenarioOps;
+
+  /**
    * Creates a new RunloopSDK instance.
    * @param {ClientOptions} [options] - Optional client configuration options.
    */
@@ -295,6 +305,7 @@ export class RunloopSDK {
     this.agent = new AgentOps(this.api);
     this.scorer = new ScorerOps(this.api);
     this.networkPolicy = new NetworkPolicyOps(this.api);
+    this.scenario = new ScenarioOps(this.api);
   }
 }
 
@@ -1497,6 +1508,92 @@ export class NetworkPolicyOps {
   }
 }
 
+/**
+ * Scenario SDK interface for managing scenarios.
+ *
+ * @category Scenario
+ *
+ * @remarks
+ * ## Overview
+ *
+ * The `ScenarioOps` class provides a high-level abstraction for managing scenarios,
+ * which define repeatable AI coding evaluation tests with starting environments and
+ * success criteria.
+ *
+ * ## Usage
+ *
+ * This interface is accessed via {@link RunloopSDK.scenario}. You should construct
+ * a {@link RunloopSDK} instance and use it from there:
+ *
+ * @example
+ * ```typescript
+ * const runloop = new RunloopSDK();
+ * const scenario = runloop.scenario.fromId('scenario-123');
+ *
+ * // Get scenario details
+ * const info = await scenario.getInfo();
+ * console.log(info.name);
+ *
+ * // Start a run and wait for the devbox to be ready
+ * const run = await scenario.run({ run_name: 'my-run' });
+ *
+ * // Execute your agent on the devbox
+ * await run.devbox.cmd.exec('python /home/user/agent/main.py');
+ *
+ * // Score and complete
+ * await run.scoreAndComplete();
+ * ```
+ */
+export class ScenarioOps {
+  /**
+   * @private
+   */
+  constructor(private client: RunloopAPI) {}
+
+  /**
+   * Get a scenario object by its ID.
+   *
+   * @example
+   * ```typescript
+   * const runloop = new RunloopSDK();
+   * const scenario = runloop.scenario.fromId('scenario-123');
+   * const info = await scenario.getInfo();
+   * console.log(info.name);
+   * ```
+   *
+   * @param {string} id - The ID of the scenario
+   * @returns {Scenario} A {@link Scenario} instance
+   */
+  fromId(id: string): Scenario {
+    return Scenario.fromId(this.client, id);
+  }
+
+  /**
+   * List all scenarios with optional filters.
+   *
+   * @example
+   * ```typescript
+   * const runloop = new RunloopSDK();
+   * const scenarios = await runloop.scenario.list({ limit: 10 });
+   * console.log(scenarios.map((s) => s.id));
+   * ```
+   *
+   * @param {ScenarioListParams} [params] - Optional filter parameters
+   * @param {Core.RequestOptions} [options] - Request options
+   * @returns {Promise<Scenario[]>} An array of {@link Scenario} instances
+   */
+  async list(params?: ScenarioListParams, options?: Core.RequestOptions): Promise<Scenario[]> {
+    const result = await this.client.scenarios.list(params, options);
+    const scenarios: Scenario[] = [];
+
+    for (const scenario of result.scenarios) {
+      scenarios.push(Scenario.fromId(this.client, scenario.id));
+    }
+
+    return scenarios;
+  }
+}
+
 // @deprecated Use {@link RunloopSDK} instead.
 /**
  * @deprecated Use {@link RunloopSDK} instead.
@@ -1519,6 +1616,7 @@ export declare namespace RunloopSDK {
     AgentOps as AgentOps,
     ScorerOps as ScorerOps,
     NetworkPolicyOps as NetworkPolicyOps,
+    ScenarioOps as ScenarioOps,
     Devbox as Devbox,
     Blueprint as Blueprint,
     Snapshot as Snapshot,
@@ -1526,6 +1624,7 @@ export declare namespace RunloopSDK {
     Agent as Agent,
     Scorer as Scorer,
     NetworkPolicy as NetworkPolicy,
+    Scenario as Scenario,
   };
 }
 // Export SDK classes from sdk/sdk.ts - these are separate from RunloopSDK to avoid circular dependencies
@@ -1543,4 +1642,6 @@ export {
   NetworkPolicy,
   Execution,
   ExecutionResult,
+  Scenario,
+  ScenarioRun,
 } from './sdk/index';
