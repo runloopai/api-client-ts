@@ -61,12 +61,32 @@ The SDK provides object-oriented interfaces for all major Runloop resources:
 - **[`runloop.blueprint`](https://runloopai.github.io/api-client-ts/stable/classes/BlueprintOps.html)** - Blueprint management (create, list, build blueprints)
 - **[`runloop.snapshot`](https://runloopai.github.io/api-client-ts/stable/classes/SnapshotOps.html)** - Snapshot management (list disk snapshots)
 - **[`runloop.storageObject`](https://runloopai.github.io/api-client-ts/stable/classes/StorageObjectOps.html)** - Storage object management (upload, download, list objects)
+- **[`runloop.agent`](https://runloopai.github.io/api-client-ts/stable/classes/AgentOps.html)** - Agent management (create, list agents from npm/pip/git)
+- **[`runloop.scenario`](https://runloopai.github.io/api-client-ts/stable/classes/ScenarioOps.html)** - Scenario management (list scenarios, start runs)
 - **[`runloop.scorer`](https://runloopai.github.io/api-client-ts/stable/classes/ScorerOps.html)** - Scorer management (create, list, validate, update)
 - **[`runloop.api`](https://runloopai.github.io/api-client-ts/stable/classes/Runloop.html)** - Direct access to the REST API client
 
 ## TypeScript Support
 
 The SDK is fully typed with comprehensive TypeScript definitions:
+
+### Blueprints
+
+Blueprints define reusable devbox configurations. Create blueprints via `runloop.blueprint.create()` and access build logs with `blueprint.logs()`:
+
+```typescript
+const blueprint = await runloop.blueprint.create({
+  name: 'my-blueprint',
+  dockerfile: 'FROM ubuntu:22.04\nRUN apt-get update',
+});
+
+// Get build logs
+const logs = await blueprint.logs();
+console.log(logs.logs);
+
+// Create a devbox from the blueprint
+const devbox = await blueprint.createDevbox({ name: 'my-devbox' });
+```
 
 ### Scorers
 
@@ -85,6 +105,35 @@ const scorer = await runloop.scorer.create({
 await scorer.update({ bash_script: 'echo "0.5"' });
 const result = await scorer.validate({ scoring_context: { output: 'hello' } });
 console.log(result.scoring_result.score);
+```
+
+### Scenarios
+
+Scenarios define tasks with a well defined starting environment, task evaluation scorer and an optional reference solution.. Use `runloop.scenario.fromId()` to get a scenario, then `scenario.run()` to start a run with your agent mounted:
+
+```typescript
+const scenario = runloop.scenario.fromId('scn_123');
+const run = await scenario.run({
+  run_name: 'my-run',
+  runProfile: {
+    mounts: [{
+      type: 'agent_mount',
+      agent_id: 'agt_123',
+      agent_path: '/home/user/agent',
+    }],
+  },
+});
+await run.devbox.cmd.exec('python /home/user/agent/main.py');
+await run.scoreAndComplete();
+```
+
+### Benchmarks
+
+Benchmarks are collections of scenarios for evaluating AI agents. Access via `runloop.api.benchmarks`:
+
+```typescript
+const benchmarks = await runloop.api.benchmarks.listPublic();
+const definitions = await runloop.api.benchmarks.definitions('benchmark_id');
 ```
 
 ## Migration from API Client
