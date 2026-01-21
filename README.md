@@ -116,11 +116,13 @@ const scenario = runloop.scenario.fromId('scn_123');
 const run = await scenario.run({
   run_name: 'my-run',
   runProfile: {
-    mounts: [{
-      type: 'agent_mount',
-      agent_id: 'agt_123',
-      agent_path: '/home/user/agent',
-    }],
+    mounts: [
+      {
+        type: 'agent_mount',
+        agent_id: 'agt_123',
+        agent_path: '/home/user/agent',
+      },
+    ],
   },
 });
 await run.devbox.cmd.exec('python /home/user/agent/main.py');

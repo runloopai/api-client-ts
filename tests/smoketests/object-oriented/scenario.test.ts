@@ -51,9 +51,7 @@ describe('smoketest: object-oriented scenario', () => {
         expect(info).toBeDefined();
         expect(info.id).toBe(scenarioId);
         expect(info.name).toContain('sdk-scenario-test');
-        expect(info.input_context?.problem_statement).toBe(
-          'Test problem statement for Scenario class',
-        );
+        expect(info.input_context?.problem_statement).toBe('Test problem statement for Scenario class');
       },
       SHORT_TIMEOUT,
     );

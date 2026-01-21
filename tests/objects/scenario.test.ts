@@ -116,10 +116,7 @@ describe('Scenario', () => {
 
       const run = await scenario.runAsync();
 
-      expect(mockClient.scenarios.startRun).toHaveBeenCalledWith(
-        { scenario_id: 'scn_123' },
-        undefined,
-      );
+      expect(mockClient.scenarios.startRun).toHaveBeenCalledWith({ scenario_id: 'scn_123' }, undefined);
       expect(run).toBeInstanceOf(ScenarioRun);
     });
   });
