@@ -444,7 +444,7 @@ export class DevboxOps {
   }
 
   /**
-   * List all devboxes with optional filters.
+   * List devboxes with optional filters (paginated).
    * @param {DevboxListParams} [params] - Optional filter parameters.
    * @param {Core.RequestOptions} [options] - Request options.
    * @returns {Promise<Devbox[]>} An array of {@link Devbox} instances.
@@ -540,7 +540,7 @@ export class BlueprintOps {
   }
 
   /**
-   * List all blueprints with optional filters.
+   * List blueprints with optional filters (paginated).
    * @param {BlueprintListParams} [params] - Optional filter parameters.
    * @param {Core.RequestOptions} [options] - Request options.
    * @returns {Promise<Blueprint[]>} An array of {@link Blueprint} instances.
@@ -598,7 +598,7 @@ export class SnapshotOps {
   }
 
   /**
-   * List all snapshots.
+   * List snapshots with optional filters (paginated).
    * @param {DevboxListDiskSnapshotsParams} [params] - Optional filter parameters.
    * @param {Core.RequestOptions} [options] - Request options.
    * @returns {Promise<Snapshot[]>} An array of {@link Snapshot} instances.
@@ -674,7 +674,7 @@ export class StorageObjectOps {
   }
 
   /**
-   * List all storage objects with optional filters.
+   * List storage objects with optional filters (paginated).
    * @param {ObjectListParams} [params] - Optional filter parameters.
    * @param {Core.RequestOptions} [options] - Request options.
    * @returns {Promise<StorageObject[]>} An array of {@link StorageObject} instances.
@@ -1257,7 +1257,7 @@ export class AgentOps {
   }
 
   /**
-   * List all agents with optional filters.
+   * List agents with optional filters (paginated).
    *
    * @example
    * List all agents:
@@ -1387,7 +1387,7 @@ export class ScorerOps {
   }
 
   /**
-   * List all scorers with optional filters.
+   * List scorers with optional filters (paginated).
    *
    * @example
    * ```typescript
@@ -1483,7 +1483,7 @@ export class NetworkPolicyOps {
   }
 
   /**
-   * List all network policies with optional filters.
+   * List network policies with optional filters (paginated).
    *
    * @example
    * ```typescript
@@ -1583,7 +1583,7 @@ export class ScenarioOps {
   }
 
   /**
-   * List all scenarios with optional filters.
+   * List scenarios with optional filters (paginated).
    *
    * @example
    * ```typescript
