@@ -24,12 +24,13 @@ export type ScenarioRunParams = Omit<ScenarioStartRunParams, 'scenario_id'>;
  * ## Overview
  *
  * The `Scenario` class provides a high-level API for managing scenarios and
- * starting scenario runs. A scenario defines a repeatable AI coding evaluation
- * test with a starting environment and success criteria.
+ * starting scenario runs. A scenario defines a repeatable task with a well
+ * defined starting environment, task evaluation scorer and an optional
+ * reference solution.
  *
  * ## Quickstart
  *
- * Scenarios can be obtained from `runloop.scenario.fromId(scn_123)`:
+ * Scenarios can be instantiated with `runloop.scenario.fromId(scn_123)`:
  *
  * ```typescript
  * import { RunloopSDK } from '@runloop/api-client';
@@ -41,8 +42,18 @@ export type ScenarioRunParams = Omit<ScenarioStartRunParams, 'scenario_id'>;
  * const info = await scenario.getInfo();
  * console.log(info.name);
  *
- * // Start a run and wait for the devbox to be ready
- * const run = await scenario.run({ run_name: 'my-run' });
+ * // Start a run with agent mounted and wait for the devbox to be ready
+ * const run = await scenario.run({
+ *   run_name: 'my-run',
+ *   runProfile: {
+ *     mounts: [{
+ *       type: 'agent_mount',
+ *       agent_id: 'agt_123',
+ *       agent_name: null,
+ *       agent_path: '/home/user/agent',
+ *     }],
+ *   },
+ * });
  *
  * // Execute your agent on the devbox
  * await run.devbox.cmd.exec('python /home/user/agent/main.py');
@@ -104,7 +115,7 @@ export class Scenario {
    * Update the scenario.
    *
    * Only provided fields will be updated. Fields that are null will preserve
-   * the existing value.
+   * existing values.
    *
    * @example
    * ```typescript
@@ -123,7 +134,7 @@ export class Scenario {
   }
 
   /**
-   * Start a new scenario run without waiting for the devbox.
+   * Start a new scenario run without waiting for the devbox to be ready.
    *
    * Creates a new scenario run and returns immediately. The devbox may still
    * be starting; call `awaitEnvReady()` on the returned ScenarioRun to wait

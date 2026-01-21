@@ -1516,9 +1516,13 @@ export class NetworkPolicyOps {
  * @remarks
  * ## Overview
  *
- * The `ScenarioOps` class provides a high-level abstraction for managing scenarios,
- * which define repeatable AI coding evaluation tests with starting environments and
- * success criteria.
+ * The `ScenarioOps` class provides a high-level abstraction for managing scenarios.
+ *
+ * ## Quickstart
+ *
+ * Use `fromId()` to get a {@link Scenario} by ID, or `list()` to retrieve all scenarios.
+ * Once you have a scenario, call `scenario.run()` to start a {@link ScenarioRun} with
+ * your agent mounted.
  *
  * ## Usage
  *
@@ -1534,8 +1538,18 @@ export class NetworkPolicyOps {
  * const info = await scenario.getInfo();
  * console.log(info.name);
  *
- * // Start a run and wait for the devbox to be ready
- * const run = await scenario.run({ run_name: 'my-run' });
+ * // Start a run with agent mounted and wait for the devbox to be ready
+ * const run = await scenario.run({
+ *   run_name: 'my-run',
+ *   runProfile: {
+ *     mounts: [{
+ *       type: 'agent_mount',
+ *       agent_id: 'agt_123',
+ *       agent_name: null,
+ *       agent_path: '/home/user/agent',
+ *     }],
+ *   },
+ * });
  *
  * // Execute your agent on the devbox
  * await run.devbox.cmd.exec('python /home/user/agent/main.py');
