@@ -89,18 +89,20 @@ export interface NetworkPolicyCreateParameters {
   name: string;
 
   /**
-   * If true, all egress traffic is allowed (ALLOW_ALL policy). Defaults to false.
+   * (Optional) If true, all egress traffic is allowed (ALLOW_ALL policy). Defaults
+   * to false.
    */
   allow_all?: boolean | null;
 
   /**
-   * If true, allows traffic between the account's own devboxes via tunnels. Defaults
-   * to false.
+   * (Optional) If true, allows traffic between the account's own devboxes via
+   * tunnels. Defaults to false. If allow_all is true, this is automatically set to
+   * true.
    */
   allow_devbox_to_devbox?: boolean | null;
 
   /**
-   * DNS-based allow list with wildcard support. Examples: ['github.com',
+   * (Optional) DNS-based allow list with wildcard support. Examples: ['github.com',
    * '*.npmjs.org'].
    */
   allowed_hostnames?: Array<string> | null;
@@ -231,18 +233,20 @@ export interface NetworkPolicyCreateParams {
   name: string;
 
   /**
-   * If true, all egress traffic is allowed (ALLOW_ALL policy). Defaults to false.
+   * (Optional) If true, all egress traffic is allowed (ALLOW_ALL policy). Defaults
+   * to false.
    */
   allow_all?: boolean | null;
 
   /**
-   * If true, allows traffic between the account's own devboxes via tunnels. Defaults
-   * to false.
+   * (Optional) If true, allows traffic between the account's own devboxes via
+   * tunnels. Defaults to false. If allow_all is true, this is automatically set to
+   * true.
    */
   allow_devbox_to_devbox?: boolean | null;
 
   /**
-   * DNS-based allow list with wildcard support. Examples: ['github.com',
+   * (Optional) DNS-based allow list with wildcard support. Examples: ['github.com',
    * '*.npmjs.org'].
    */
   allowed_hostnames?: Array<string> | null;
