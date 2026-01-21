@@ -27,12 +27,23 @@ import * as path from 'path';
  * import { RunloopSDK } from '@runloop/api-client';
  *
  * const runloop = new RunloopSDK();
- * const scenario = runloop.scenario.fromId('scenario-123');
- * const run = await scenario.run({ run_name: 'my-run' });
+ * const scenario = runloop.scenario.fromId('scn_123');
  *
- * // Access the devbox and execute your agent to solve the scenario
- * const devbox = run.devbox;
- * await devbox.cmd.exec('python /home/user/agent/main.py');
+ * // Start a run with agent mounted
+ * const run = await scenario.run({
+ *   run_name: 'my-run',
+ *   runProfile: {
+ *     mounts: [{
+ *       type: 'agent_mount',
+ *       agent_id: 'agt_123',
+ *       agent_name: null,
+ *       agent_path: '/home/user/agent',
+ *     }],
+ *   },
+ * });
+ *
+ * // Execute your agent on the devbox
+ * await run.devbox.cmd.exec('python /home/user/agent/main.py');
  *
  * // Score and complete the run
  * await run.scoreAndComplete();

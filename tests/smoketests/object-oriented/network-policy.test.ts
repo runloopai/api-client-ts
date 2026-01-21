@@ -98,7 +98,7 @@ describe('smoketest: object-oriented network policy', () => {
       } catch (error) {
         expect(error).toBeDefined();
       }
-      
+
       // Mark as deleted so afterAll doesn't try to delete again
       policy = undefined;
     });
