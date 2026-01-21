@@ -193,6 +193,7 @@ describe('instantiate client', () => {
     });
 
     test('in request options', () => {
+      process.env['RUNLOOP_BASE_URL'] = ''; // empty
       const client = new Runloop({ bearerToken: 'My Bearer Token' });
       expect(client.buildURL('/foo', null, 'http://localhost:5000/option')).toEqual(
         'http://localhost:5000/option/foo',
