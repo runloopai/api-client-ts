@@ -92,7 +92,7 @@ export type * from './resources/scenarios/scorers';
 // Benchmark Types
 // =============================================================================
 
-export type * from './resources/benchmarks/benchmarks';
+export type * from './resources/benchmarks';
 
 // =============================================================================
 // SDK Types
