@@ -1,5 +1,27 @@
 # Changelog
 
+## 1.3.0 (2026-01-22)
+
+Full Changelog: [v1.2.0-beta-2...v1.3.0](https://github.com/runloopai/api-client-ts/compare/v1.2.0-beta-2...v1.3.0)
+
+### Features
+
+* adding network policies oo concepts ([#680](https://github.com/runloopai/api-client-ts/issues/680)) ([4f01339](https://github.com/runloopai/api-client-ts/commit/4f0133956634fefbc761de1183b6d900f7b2e28c))
+* **sdk:** Scenario ([#684](https://github.com/runloopai/api-client-ts/issues/684)) ([c7c3274](https://github.com/runloopai/api-client-ts/commit/c7c3274ac0dd74000414299c490346e71bcd1bf4))
+* **sdk:** ScenarioRun class ([#681](https://github.com/runloopai/api-client-ts/issues/681)) ([52a9275](https://github.com/runloopai/api-client-ts/commit/52a92754f31211dbc970f621ea931a05037de114))
+
+
+### Chores
+
+* fix stainless spec / remove deprecated benchmark/runs ([#7074](https://github.com/runloopai/api-client-ts/issues/7074)) ([d772c92](https://github.com/runloopai/api-client-ts/commit/d772c92acae9b124a797d204a0d1a9bdaa0eec19))
+* make smoketest workflow support workflow_call event ([#686](https://github.com/runloopai/api-client-ts/issues/686)) ([505de6b](https://github.com/runloopai/api-client-ts/commit/505de6b3b73fb355f606088cfcb4265fd3b25db5))
+* update network policy create params descriptions ([#7069](https://github.com/runloopai/api-client-ts/issues/7069)) ([159b43f](https://github.com/runloopai/api-client-ts/commit/159b43f2864105b83fa47cef591a216aedeb2b7c))
+
+
+### Refactors
+
+* **benchmark:** Deprecate /benchmark/{id}/runs in favor of /benchmark_runs ([#7019](https://github.com/runloopai/api-client-ts/issues/7019)) ([33624ce](https://github.com/runloopai/api-client-ts/commit/33624ce149003dfb1eaa49c10c8efa233b875ab9))
+
 ## 1.2.0-beta-2 (2026-01-20)
 
 Full Changelog: [v1.2.0-beta...v1.2.0-beta-2](https://github.com/runloopai/api-client-ts/compare/v1.2.0-beta...v1.2.0-beta-2)

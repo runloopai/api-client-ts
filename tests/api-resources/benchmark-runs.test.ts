@@ -1,6 +1,6 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-import { Runloop } from '@runloop/api-client';
+import Runloop from '@runloop/api-client';
 import { Response } from 'node-fetch';
 
 const client = new Runloop({
@@ -8,9 +8,9 @@ const client = new Runloop({
   baseURL: process.env['TEST_API_BASE_URL'] ?? 'http://127.0.0.1:4010',
 });
 
-describe('resource runs', () => {
+describe('resource benchmarkRuns', () => {
   test('retrieve', async () => {
-    const responsePromise = client.benchmarks.runs.retrieve('id');
+    const responsePromise = client.benchmarkRuns.retrieve('id');
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
     const response = await responsePromise;
@@ -22,13 +22,13 @@ describe('resource runs', () => {
 
   test('retrieve: request options instead of params are passed correctly', async () => {
     // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
-    await expect(client.benchmarks.runs.retrieve('id', { path: '/_stainless_unknown_path' })).rejects.toThrow(
+    await expect(client.benchmarkRuns.retrieve('id', { path: '/_stainless_unknown_path' })).rejects.toThrow(
       Runloop.NotFoundError,
     );
   });
 
   test('list', async () => {
-    const responsePromise = client.benchmarks.runs.list();
+    const responsePromise = client.benchmarkRuns.list();
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
     const response = await responsePromise;
@@ -40,7 +40,7 @@ describe('resource runs', () => {
 
   test('list: request options instead of params are passed correctly', async () => {
     // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
-    await expect(client.benchmarks.runs.list({ path: '/_stainless_unknown_path' })).rejects.toThrow(
+    await expect(client.benchmarkRuns.list({ path: '/_stainless_unknown_path' })).rejects.toThrow(
       Runloop.NotFoundError,
     );
   });
@@ -48,7 +48,7 @@ describe('resource runs', () => {
   test('list: request options and params are passed correctly', async () => {
     // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
     await expect(
-      client.benchmarks.runs.list(
+      client.benchmarkRuns.list(
         {
           benchmark_id: 'benchmark_id',
           limit: 0,
@@ -61,7 +61,7 @@ describe('resource runs', () => {
   });
 
   test('cancel', async () => {
-    const responsePromise = client.benchmarks.runs.cancel('id');
+    const responsePromise = client.benchmarkRuns.cancel('id');
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
     const response = await responsePromise;
@@ -73,13 +73,13 @@ describe('resource runs', () => {
 
   test('cancel: request options instead of params are passed correctly', async () => {
     // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
-    await expect(client.benchmarks.runs.cancel('id', { path: '/_stainless_unknown_path' })).rejects.toThrow(
+    await expect(client.benchmarkRuns.cancel('id', { path: '/_stainless_unknown_path' })).rejects.toThrow(
       Runloop.NotFoundError,
     );
   });
 
   test('complete', async () => {
-    const responsePromise = client.benchmarks.runs.complete('id');
+    const responsePromise = client.benchmarkRuns.complete('id');
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
     const response = await responsePromise;
@@ -91,13 +91,13 @@ describe('resource runs', () => {
 
   test('complete: request options instead of params are passed correctly', async () => {
     // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
-    await expect(client.benchmarks.runs.complete('id', { path: '/_stainless_unknown_path' })).rejects.toThrow(
+    await expect(client.benchmarkRuns.complete('id', { path: '/_stainless_unknown_path' })).rejects.toThrow(
       Runloop.NotFoundError,
     );
   });
 
   test('listScenarioRuns', async () => {
-    const responsePromise = client.benchmarks.runs.listScenarioRuns('id');
+    const responsePromise = client.benchmarkRuns.listScenarioRuns('id');
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
     const response = await responsePromise;
@@ -110,14 +110,14 @@ describe('resource runs', () => {
   test('listScenarioRuns: request options instead of params are passed correctly', async () => {
     // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
     await expect(
-      client.benchmarks.runs.listScenarioRuns('id', { path: '/_stainless_unknown_path' }),
+      client.benchmarkRuns.listScenarioRuns('id', { path: '/_stainless_unknown_path' }),
     ).rejects.toThrow(Runloop.NotFoundError);
   });
 
   test('listScenarioRuns: request options and params are passed correctly', async () => {
     // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
     await expect(
-      client.benchmarks.runs.listScenarioRuns(
+      client.benchmarkRuns.listScenarioRuns(
         'id',
         {
           limit: 0,

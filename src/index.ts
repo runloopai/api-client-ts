@@ -42,6 +42,31 @@ import {
   Agents,
 } from './resources/agents';
 import {
+  BenchmarkRunListParams,
+  BenchmarkRunListScenarioRunsParams,
+  BenchmarkRunListView,
+  BenchmarkRunView,
+  BenchmarkRunViewsBenchmarkRunsCursorIDPage,
+  BenchmarkRuns,
+} from './resources/benchmark-runs';
+import {
+  BenchmarkCreateParameters,
+  BenchmarkCreateParams,
+  BenchmarkDefinitionsParams,
+  BenchmarkListParams,
+  BenchmarkListPublicParams,
+  BenchmarkScenarioUpdateParameters,
+  BenchmarkStartRunParams,
+  BenchmarkUpdateParameters,
+  BenchmarkUpdateParams,
+  BenchmarkUpdateScenariosParams,
+  BenchmarkView,
+  BenchmarkViewsBenchmarksCursorIDPage,
+  Benchmarks,
+  ScenarioDefinitionListView,
+  StartBenchmarkRunParameters,
+} from './resources/benchmarks';
+import {
   BlueprintBuildFromInspectionParameters,
   BlueprintBuildLog,
   BlueprintBuildLogsListView,
@@ -112,25 +137,6 @@ import {
   SecretView,
   Secrets,
 } from './resources/secrets';
-import {
-  BenchmarkCreateParameters,
-  BenchmarkCreateParams,
-  BenchmarkDefinitionsParams,
-  BenchmarkListParams,
-  BenchmarkListPublicParams,
-  BenchmarkRunListView,
-  BenchmarkRunView,
-  BenchmarkScenarioUpdateParameters,
-  BenchmarkStartRunParams,
-  BenchmarkUpdateParameters,
-  BenchmarkUpdateParams,
-  BenchmarkUpdateScenariosParams,
-  BenchmarkView,
-  BenchmarkViewsBenchmarksCursorIDPage,
-  Benchmarks,
-  ScenarioDefinitionListView,
-  StartBenchmarkRunParameters,
-} from './resources/benchmarks/benchmarks';
 import {
   DevboxAsyncExecutionDetailView,
   DevboxCreateParams,
@@ -317,6 +323,7 @@ export class Runloop extends Core.APIClient {
   }
 
   benchmarks: API.Benchmarks = new API.Benchmarks(this);
+  benchmarkRuns: API.BenchmarkRuns = new API.BenchmarkRuns(this);
   agents: API.Agents = new API.Agents(this);
   blueprints: API.Blueprints = new API.Blueprints(this);
   devboxes: API.Devboxes = new API.Devboxes(this);
@@ -371,6 +378,8 @@ export class Runloop extends Core.APIClient {
 
 Runloop.Benchmarks = Benchmarks;
 Runloop.BenchmarkViewsBenchmarksCursorIDPage = BenchmarkViewsBenchmarksCursorIDPage;
+Runloop.BenchmarkRuns = BenchmarkRuns;
+Runloop.BenchmarkRunViewsBenchmarkRunsCursorIDPage = BenchmarkRunViewsBenchmarkRunsCursorIDPage;
 Runloop.Agents = Agents;
 Runloop.AgentViewsAgentsCursorIDPage = AgentViewsAgentsCursorIDPage;
 Runloop.Blueprints = Blueprints;
@@ -466,8 +475,6 @@ export declare namespace Runloop {
   export {
     Benchmarks as Benchmarks,
     type BenchmarkCreateParameters as BenchmarkCreateParameters,
-    type BenchmarkRunListView as BenchmarkRunListView,
-    type BenchmarkRunView as BenchmarkRunView,
     type BenchmarkScenarioUpdateParameters as BenchmarkScenarioUpdateParameters,
     type BenchmarkUpdateParameters as BenchmarkUpdateParameters,
     type BenchmarkView as BenchmarkView,
@@ -481,6 +488,15 @@ export declare namespace Runloop {
     type BenchmarkListPublicParams as BenchmarkListPublicParams,
     type BenchmarkStartRunParams as BenchmarkStartRunParams,
     type BenchmarkUpdateScenariosParams as BenchmarkUpdateScenariosParams,
+  };
+
+  export {
+    BenchmarkRuns as BenchmarkRuns,
+    type BenchmarkRunListView as BenchmarkRunListView,
+    type BenchmarkRunView as BenchmarkRunView,
+    BenchmarkRunViewsBenchmarkRunsCursorIDPage as BenchmarkRunViewsBenchmarkRunsCursorIDPage,
+    type BenchmarkRunListParams as BenchmarkRunListParams,
+    type BenchmarkRunListScenarioRunsParams as BenchmarkRunListScenarioRunsParams,
   };
 
   export {
