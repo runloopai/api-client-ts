@@ -4,8 +4,6 @@
 
 This library provides convenient access to the Runloop SDK & REST API from server-side TypeScript or JavaScript.
 
-The additional documentation guides can be found at [docs.runloop.ai](https://docs.runloop.ai). The full API of this library can be found in [api.md](api.md).
-
 The **RunloopSDK** is the recommended, modern way to interact with the Runloop API. It provides high-level object-oriented interfaces for common operations while maintaining full access to the underlying REST API through the `.api` property.
 
 ## Installation
