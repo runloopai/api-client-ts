@@ -15,7 +15,6 @@ export {
   BenchmarkRuns,
   type BenchmarkRunListView,
   type BenchmarkRunView,
-  type ScenarioRunListView,
   type BenchmarkRunListParams,
   type BenchmarkRunListScenarioRunsParams,
 } from './benchmark-runs';
@@ -23,8 +22,6 @@ export {
   BenchmarkViewsBenchmarksCursorIDPage,
   Benchmarks,
   type BenchmarkCreateParameters,
-  type BenchmarkRunListView,
-  type BenchmarkRunView,
   type BenchmarkScenarioUpdateParameters,
   type BenchmarkUpdateParameters,
   type BenchmarkView,
@@ -37,7 +34,7 @@ export {
   type BenchmarkListPublicParams,
   type BenchmarkStartRunParams,
   type BenchmarkUpdateScenariosParams,
-} from './benchmarks/benchmarks';
+} from './benchmarks';
 export {
   BlueprintViewsBlueprintsCursorIDPage,
   Blueprints,
