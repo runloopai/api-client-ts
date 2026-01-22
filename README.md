@@ -4,8 +4,6 @@
 
 This library provides convenient access to the Runloop SDK & REST API from server-side TypeScript or JavaScript.
 
-The additional documentation guides can be found at [docs.runloop.ai](https://docs.runloop.ai). The full API of this library can be found in [api.md](api.md).
-
 The **RunloopSDK** is the recommended, modern way to interact with the Runloop API. It provides high-level object-oriented interfaces for common operations while maintaining full access to the underlying REST API through the `.api` property.
 
 ## Installation
@@ -336,8 +334,6 @@ The following runtimes are supported:
 - Vercel Edge Runtime.
 - Jest 28 or greater with the `"node"` environment (`"jsdom"` is not supported at this time).
 - Nitro v2.6 or greater.
-
-Note that React Native is not supported at this time.
 
 If you are interested in other runtime environments, please open or upvote an issue on GitHub.
 

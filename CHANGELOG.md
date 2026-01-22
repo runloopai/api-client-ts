@@ -1,24 +1,15 @@
 # Changelog
 
-## 1.2.0-beta-2 (2026-01-20)
+## 1.3.0 (2026-01-22)
 
-Full Changelog: [v1.2.0-beta...v1.2.0-beta-2](https://github.com/runloopai/api-client-ts/compare/v1.2.0-beta...v1.2.0-beta-2)
+Full Changelog: [v1.2.0-beta-2...v1.3.0](https://github.com/runloopai/api-client-ts/compare/v1.2.0-beta-2...v1.3.0)
 
 ### Features
 
+* adding network policies oo concepts ([#680](https://github.com/runloopai/api-client-ts/issues/680)) ([4f01339](https://github.com/runloopai/api-client-ts/commit/4f0133956634fefbc761de1183b6d900f7b2e28c))
+* **sdk:** Scenario ([#684](https://github.com/runloopai/api-client-ts/issues/684)) ([c7c3274](https://github.com/runloopai/api-client-ts/commit/c7c3274ac0dd74000414299c490346e71bcd1bf4))
+* **sdk:** ScenarioRun class ([#681](https://github.com/runloopai/api-client-ts/issues/681)) ([52a9275](https://github.com/runloopai/api-client-ts/commit/52a92754f31211dbc970f621ea931a05037de114))
 * **blueprint:** Set cilium network policy on blueprint build ([#7006](https://github.com/runloopai/api-client-ts/issues/7006)) ([038fc8a](https://github.com/runloopai/api-client-ts/commit/038fc8a393d533d4a29532b570fc7b48ef3292f3))
-
-
-### Chores
-
-* **devbox:** Remove network policy from devbox view; use launch params instead ([#7025](https://github.com/runloopai/api-client-ts/issues/7025)) ([849bcfa](https://github.com/runloopai/api-client-ts/commit/849bcfab616e79e5b52612afd09ee3eab36d3f91))
-
-## 1.2.0-beta (2026-01-19)
-
-Full Changelog: [v1.1.0...v1.2.0-beta](https://github.com/runloopai/api-client-ts/compare/v1.1.0...v1.2.0-beta)
-
-### Features
-
 * **benchmarks:** add `update_scenarios` method to benchmarks resource ([4ef2680](https://github.com/runloopai/api-client-ts/commit/4ef26807dbb81cd171a1d1a91a4eadf4ec0cde73))
 * **devbox:** remove this one ([ffe23be](https://github.com/runloopai/api-client-ts/commit/ffe23bea59c737ad845bc179e007fecb07a721b7))
 * **mounts:** add convenience helper for inline mounting storage objects ([#675](https://github.com/runloopai/api-client-ts/issues/675)) ([2e5866c](https://github.com/runloopai/api-client-ts/commit/2e5866c4b4f80078144f218c4c7145f767e8b2a0))
@@ -26,18 +17,29 @@ Full Changelog: [v1.1.0...v1.2.0-beta](https://github.com/runloopai/api-client-t
 * **sdk:** added scorers to OO SDK ([#679](https://github.com/runloopai/api-client-ts/issues/679)) ([ee67c94](https://github.com/runloopai/api-client-ts/commit/ee67c9406a97731d38f2ce0ab8dcb16226322304))
 
 
+### Chores
+
+* fix npm publish ([#689](https://github.com/runloopai/api-client-ts/issues/689)) ([f161f1c](https://github.com/runloopai/api-client-ts/commit/f161f1c3454e69b99ce5142af79830bb1b6fdce5))
+* fix stainless spec / remove deprecated benchmark/runs ([#7074](https://github.com/runloopai/api-client-ts/issues/7074)) ([d772c92](https://github.com/runloopai/api-client-ts/commit/d772c92acae9b124a797d204a0d1a9bdaa0eec19))
+* make smoketest workflow support workflow_call event ([#686](https://github.com/runloopai/api-client-ts/issues/686)) ([505de6b](https://github.com/runloopai/api-client-ts/commit/505de6b3b73fb355f606088cfcb4265fd3b25db5))
+* update network policy create params descriptions ([#7069](https://github.com/runloopai/api-client-ts/issues/7069)) ([159b43f](https://github.com/runloopai/api-client-ts/commit/159b43f2864105b83fa47cef591a216aedeb2b7c))
+* **devbox:** Remove network policy from devbox view; use launch params instead ([#7025](https://github.com/runloopai/api-client-ts/issues/7025)) ([849bcfa](https://github.com/runloopai/api-client-ts/commit/849bcfab616e79e5b52612afd09ee3eab36d3f91))
+* break long lines in snippets into multiline ([aea51a8](https://github.com/runloopai/api-client-ts/commit/aea51a857a3ec4f741281782bd7d1b40b3e33ca9))
+* **internal:** codegen related update ([f2acb64](https://github.com/runloopai/api-client-ts/commit/f2acb645f6854253dd74676570b03c1c6f325b2c))
+* **internal:** update `actions/checkout` version ([6f2a8ae](https://github.com/runloopai/api-client-ts/commit/6f2a8ae880dbe17fdfd66389fbe674baf5e75dc8))
+* **internal:** upgrade babel, qs, js-yaml ([3c31dd4](https://github.com/runloopai/api-client-ts/commit/3c31dd460e6f8e487ff326763bbe39b555fd136e))
+
+
+### Refactors
+
+* **benchmark:** Deprecate /benchmark/{id}/runs in favor of /benchmark_runs ([#7019](https://github.com/runloopai/api-client-ts/issues/7019)) ([33624ce](https://github.com/runloopai/api-client-ts/commit/33624ce149003dfb1eaa49c10c8efa233b875ab9))
+
+
 ### Bug Fixes
 
 * **benchmarks:** `update()` for benchmarks and scenarios replaces all provided fields and does not modify unspecified fields ([#6702](https://github.com/runloopai/api-client-ts/issues/6702)) ([0c2e0f0](https://github.com/runloopai/api-client-ts/commit/0c2e0f017684ddc578b80c31e3a08925bc582765))
 * **documentation:** added types to the typedoc main list and fixed some decorators ([#677](https://github.com/runloopai/api-client-ts/issues/677)) ([392007d](https://github.com/runloopai/api-client-ts/commit/392007d6555582d9a00b877e2ba6c1ea0de4236d))
 
-
-### Chores
-
-* break long lines in snippets into multiline ([aea51a8](https://github.com/runloopai/api-client-ts/commit/aea51a857a3ec4f741281782bd7d1b40b3e33ca9))
-* **internal:** codegen related update ([f2acb64](https://github.com/runloopai/api-client-ts/commit/f2acb645f6854253dd74676570b03c1c6f325b2c))
-* **internal:** update `actions/checkout` version ([6f2a8ae](https://github.com/runloopai/api-client-ts/commit/6f2a8ae880dbe17fdfd66389fbe674baf5e75dc8))
-* **internal:** upgrade babel, qs, js-yaml ([3c31dd4](https://github.com/runloopai/api-client-ts/commit/3c31dd460e6f8e487ff326763bbe39b555fd136e))
 
 ## 1.1.0 (2025-12-13)
 
