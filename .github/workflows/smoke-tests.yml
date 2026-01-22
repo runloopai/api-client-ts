@@ -7,6 +7,9 @@ on:
         description: 'Target environment'
         required: true
         type: string
+      discriminator:
+        default: "true"
+        type: string
   workflow_dispatch:
     inputs:
       environment:
@@ -25,7 +28,7 @@ jobs:
       - name: Checkout
         uses: runloopai/checkout@main
         with:
-          repository: ${{ github.event_name == 'workflow_call' && format('{0}/{1}', github.repository_owner, 'api-client-ts') || github.repository }}
+          repository: ${{ inputs.discriminator && format('{0}/{1}', github.repository_owner, 'api-client-ts') || github.repository }}
 
       - name: Setup Node
         uses: runloopai/setup-node@main
