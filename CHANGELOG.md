@@ -1,5 +1,19 @@
 # Changelog
 
+## 1.3.1 (2026-01-22)
+
+Full Changelog: [v1.3.0...v1.3.1](https://github.com/runloopai/api-client-ts/compare/v1.3.0...v1.3.1)
+
+### Bug Fixes
+
+* smoketest workflow workflow_call event checkout on caller repo ([#687](https://github.com/runloopai/api-client-ts/issues/687)) ([77d82a9](https://github.com/runloopai/api-client-ts/commit/77d82a97fc468aafb29780d472f90c24b1a0041a))
+* updating the readme ([#692](https://github.com/runloopai/api-client-ts/issues/692)) ([80fb27a](https://github.com/runloopai/api-client-ts/commit/80fb27a9f7f4b99c3581b5121dae0c6346064f6c))
+
+
+### Chores
+
+* remove api docs readme reference ([#690](https://github.com/runloopai/api-client-ts/issues/690)) ([dd16be0](https://github.com/runloopai/api-client-ts/commit/dd16be0ff1797427d813a5bc98a6a8cc1583a57a))
+
 ## 1.3.0 (2026-01-22)
 
 Full Changelog: [v1.2.0-beta-2...v1.3.0](https://github.com/runloopai/api-client-ts/compare/v1.2.0-beta-2...v1.3.0)
