@@ -160,19 +160,6 @@ export interface BenchmarkRunView {
   secrets_provided?: { [key: string]: string } | null;
 }
 
-export interface ScenarioRunListView {
-  has_more: boolean;
-
-  remaining_count: number;
-
-  /**
-   * List of ScenarioRuns matching filter.
-   */
-  runs: Array<ScenariosAPI.ScenarioRunView>;
-
-  total_count: number;
-}
-
 export interface BenchmarkRunListParams extends BenchmarkRunsCursorIDPageParams {
   /**
    * The Benchmark ID to filter by.
@@ -198,7 +185,6 @@ export declare namespace BenchmarkRuns {
   export {
     type BenchmarkRunListView as BenchmarkRunListView,
     type BenchmarkRunView as BenchmarkRunView,
-    type ScenarioRunListView as ScenarioRunListView,
     BenchmarkRunViewsBenchmarkRunsCursorIDPage as BenchmarkRunViewsBenchmarkRunsCursorIDPage,
     type BenchmarkRunListParams as BenchmarkRunListParams,
     type BenchmarkRunListScenarioRunsParams as BenchmarkRunListScenarioRunsParams,
