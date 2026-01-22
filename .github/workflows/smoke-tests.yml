@@ -1,6 +1,12 @@
 name: Smoke Tests
 
 on:
+  workflow_call:
+    inputs:
+      environment:
+        description: 'Target environment'
+        required: true
+        type: string
   workflow_dispatch:
     inputs:
       environment:
