@@ -498,7 +498,7 @@ export class DevboxOps {
  *   './',
  *   {
  *     name: 'build-context',
- *     ttl_ms: 3600000, // 1 hour
+ *     ttl_ms: 604800000, // 1 week
  *   }
  * );
  * const blueprint = await runloop.blueprint.create({
@@ -805,7 +805,7 @@ export class StorageObjectOps {
    *   './my-project',
    *   {
    *     name: 'my-project.tar.gz',
-   *     ttl_ms: 3600000, // 1 hour
+   *     ttl_ms: 604800000, // 1 week
    *     metadata: { project: 'demo' }
    *   }
    * );

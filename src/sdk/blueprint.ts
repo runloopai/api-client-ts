@@ -31,7 +31,7 @@ export interface BuildContextDirOptions {
   dockerignorePath?: string;
 
   /**
-   * TTL (ms) for the backing StorageObject. Defaults to 1 hour if omitted.
+   * TTL (ms) for the backing StorageObject. Defaults to 1 week if omitted.
    */
   ttlMs?: number;
 }
@@ -97,7 +97,7 @@ export class Blueprint {
       const dirConfig: BuildContextDirOptions =
         typeof build_context_dir === 'string' ? { path: build_context_dir } : build_context_dir;
 
-      const ttlMs = dirConfig.ttlMs ?? 3600000;
+      const ttlMs = dirConfig.ttlMs ?? 604800000;
 
       const storageObject = await StorageObject.uploadFromDir(
         client,

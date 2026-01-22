@@ -132,7 +132,7 @@ describe('smoketest: object-oriented blueprint', () => {
           }
           storageObject = await sdk.storageObject.uploadFromDir(contextDir, {
             name: uniqueName('sdk-context-object'),
-            ttl_ms: 3600000, // 1 hour
+            ttl_ms: 604800000, // 1 week
           });
 
           // Create blueprint that uses the uploaded object as build context
