@@ -11,6 +11,14 @@ export {
   type AgentListParams,
 } from './agents';
 export {
+  BenchmarkJobs,
+  type BenchmarkJobCreateParameters,
+  type BenchmarkJobListView,
+  type BenchmarkJobView,
+  type BenchmarkJobCreateParams,
+  type BenchmarkJobListParams,
+} from './benchmark-jobs';
+export {
   BenchmarkRunViewsBenchmarkRunsCursorIDPage,
   BenchmarkRuns,
   type BenchmarkRunListView,
