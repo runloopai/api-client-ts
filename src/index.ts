@@ -42,6 +42,14 @@ import {
   Agents,
 } from './resources/agents';
 import {
+  BenchmarkJobCreateParameters,
+  BenchmarkJobCreateParams,
+  BenchmarkJobListParams,
+  BenchmarkJobListView,
+  BenchmarkJobView,
+  BenchmarkJobs,
+} from './resources/benchmark-jobs';
+import {
   BenchmarkRunListParams,
   BenchmarkRunListScenarioRunsParams,
   BenchmarkRunListView,
@@ -324,6 +332,7 @@ export class Runloop extends Core.APIClient {
 
   benchmarks: API.Benchmarks = new API.Benchmarks(this);
   benchmarkRuns: API.BenchmarkRuns = new API.BenchmarkRuns(this);
+  benchmarkJobs: API.BenchmarkJobs = new API.BenchmarkJobs(this);
   agents: API.Agents = new API.Agents(this);
   blueprints: API.Blueprints = new API.Blueprints(this);
   devboxes: API.Devboxes = new API.Devboxes(this);
@@ -380,6 +389,7 @@ Runloop.Benchmarks = Benchmarks;
 Runloop.BenchmarkViewsBenchmarksCursorIDPage = BenchmarkViewsBenchmarksCursorIDPage;
 Runloop.BenchmarkRuns = BenchmarkRuns;
 Runloop.BenchmarkRunViewsBenchmarkRunsCursorIDPage = BenchmarkRunViewsBenchmarkRunsCursorIDPage;
+Runloop.BenchmarkJobs = BenchmarkJobs;
 Runloop.Agents = Agents;
 Runloop.AgentViewsAgentsCursorIDPage = AgentViewsAgentsCursorIDPage;
 Runloop.Blueprints = Blueprints;
@@ -497,6 +507,15 @@ export declare namespace Runloop {
     BenchmarkRunViewsBenchmarkRunsCursorIDPage as BenchmarkRunViewsBenchmarkRunsCursorIDPage,
     type BenchmarkRunListParams as BenchmarkRunListParams,
     type BenchmarkRunListScenarioRunsParams as BenchmarkRunListScenarioRunsParams,
+  };
+
+  export {
+    BenchmarkJobs as BenchmarkJobs,
+    type BenchmarkJobCreateParameters as BenchmarkJobCreateParameters,
+    type BenchmarkJobListView as BenchmarkJobListView,
+    type BenchmarkJobView as BenchmarkJobView,
+    type BenchmarkJobCreateParams as BenchmarkJobCreateParams,
+    type BenchmarkJobListParams as BenchmarkJobListParams,
   };
 
   export {

@@ -48,6 +48,20 @@ Methods:
 - <code title="post /v1/benchmark_runs/{id}/complete">client.benchmarkRuns.<a href="./src/resources/benchmark-runs.ts">complete</a>(id) -> BenchmarkRunView</code>
 - <code title="get /v1/benchmark_runs/{id}/scenario_runs">client.benchmarkRuns.<a href="./src/resources/benchmark-runs.ts">listScenarioRuns</a>(id, { ...params }) -> ScenarioRunViewsBenchmarkRunsCursorIDPage</code>
 
+# BenchmarkJobs
+
+Types:
+
+- <code><a href="./src/resources/benchmark-jobs.ts">BenchmarkJobCreateParameters</a></code>
+- <code><a href="./src/resources/benchmark-jobs.ts">BenchmarkJobListView</a></code>
+- <code><a href="./src/resources/benchmark-jobs.ts">BenchmarkJobView</a></code>
+
+Methods:
+
+- <code title="post /v1/benchmark_jobs">client.benchmarkJobs.<a href="./src/resources/benchmark-jobs.ts">create</a>({ ...params }) -> BenchmarkJobView</code>
+- <code title="get /v1/benchmark_jobs/{id}">client.benchmarkJobs.<a href="./src/resources/benchmark-jobs.ts">retrieve</a>(id) -> BenchmarkJobView</code>
+- <code title="get /v1/benchmark_jobs">client.benchmarkJobs.<a href="./src/resources/benchmark-jobs.ts">list</a>({ ...params }) -> BenchmarkJobListView</code>
+
 # Agents
 
 Types:
