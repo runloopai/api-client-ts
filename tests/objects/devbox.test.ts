@@ -30,6 +30,7 @@ describe('Devbox (New API)', () => {
         snapshotDiskAsync: jest.fn(),
         createSSHKey: jest.fn(),
         createTunnel: jest.fn(),
+        enableTunnel: jest.fn(),
         removeTunnel: jest.fn(),
         diskSnapshots: {
           queryStatus: jest.fn(),
@@ -241,6 +242,69 @@ describe('Devbox (New API)', () => {
       });
     });
 
+    describe('net operations', () => {
+      it('should create SSH key', async () => {
+        const mockSSHKey = { url: 'ssh.example.com', ssh_private_key: 'private-key' };
+        mockClient.devboxes.createSSHKey.mockResolvedValue(mockSSHKey);
+
+        const result = await devbox.net.createSSHKey();
+
+        expect(mockClient.devboxes.createSSHKey).toHaveBeenCalledWith('devbox-123', undefined);
+        expect(result).toEqual(mockSSHKey);
+      });
+
+      it('should create legacy tunnel', async () => {
+        const mockTunnel = { devbox_id: 'devbox-123', port: 8080 };
+        mockClient.devboxes.createTunnel.mockResolvedValue(mockTunnel);
+
+        const result = await devbox.net.createTunnel({ port: 8080 });
+
+        expect(mockClient.devboxes.createTunnel).toHaveBeenCalledWith(
+          'devbox-123',
+          { port: 8080 },
+          undefined,
+        );
+        expect(result).toEqual(mockTunnel);
+      });
+
+      it('should enable V2 tunnel with params', async () => {
+        const mockTunnel = { tunnel_key: 'abc123', auth_mode: 'open', create_time_ms: Date.now() };
+        mockClient.devboxes.enableTunnel.mockResolvedValue(mockTunnel);
+
+        const result = await devbox.net.enableTunnel({ auth_mode: 'open' });
+
+        expect(mockClient.devboxes.enableTunnel).toHaveBeenCalledWith(
+          'devbox-123',
+          { auth_mode: 'open' },
+          undefined,
+        );
+        expect(result).toEqual(mockTunnel);
+      });
+
+      it('should enable V2 tunnel without params', async () => {
+        const mockTunnel = { tunnel_key: 'abc123', auth_mode: 'open', create_time_ms: Date.now() };
+        mockClient.devboxes.enableTunnel.mockResolvedValue(mockTunnel);
+
+        const result = await devbox.net.enableTunnel();
+
+        expect(mockClient.devboxes.enableTunnel).toHaveBeenCalledWith('devbox-123', undefined, undefined);
+        expect(result).toEqual(mockTunnel);
+      });
+
+      it('should remove legacy tunnel', async () => {
+        mockClient.devboxes.removeTunnel.mockResolvedValue(undefined);
+
+        const result = await devbox.net.removeTunnel({ port: 8080 });
+
+        expect(mockClient.devboxes.removeTunnel).toHaveBeenCalledWith(
+          'devbox-123',
+          { port: 8080 },
+          undefined,
+        );
+        expect(result).toBeUndefined();
+      });
+    });
+
     describe('snapshotDisk', () => {
       it('should create a disk snapshot and return Snapshot object', async () => {
         const mockSnapshotData = { id: 'snapshot-456', name: 'test-snapshot' };
@@ -294,6 +358,141 @@ describe('Devbox (New API)', () => {
       mockClient.devboxes.executeAndAwaitCompletion.mockRejectedValue(error);
 
       await expect(devbox.cmd.exec('failing-command')).rejects.toThrow('Command failed');
+    });
+
+    it('should throw when awaitCompleted rejects while using streaming callbacks', async () => {
+      mockClient.devboxes.createAndAwaitRunning.mockResolvedValue(mockDevboxData);
+      const devbox = await Devbox.create(mockClient, { name: 'test-devbox' });
+
+      // Mock executeAsync to return a valid execution
+      const mockExecution: DevboxAsyncExecutionDetailView = {
+        devbox_id: 'devbox-123',
+        execution_id: 'exec-456',
+        status: 'running',
+      };
+      mockClient.devboxes.executeAsync.mockResolvedValue(mockExecution);
+
+      // Mock executions.awaitCompleted to reject
+      mockClient.devboxes.executions = {
+        awaitCompleted: jest.fn().mockRejectedValue(new Error('Execution timed out')),
+        streamStdoutUpdates: jest.fn().mockResolvedValue({
+          [Symbol.asyncIterator]: () => ({
+            next: () => Promise.resolve({ done: true }),
+          }),
+        }),
+        streamStderrUpdates: jest.fn().mockResolvedValue({
+          [Symbol.asyncIterator]: () => ({
+            next: () => Promise.resolve({ done: true }),
+          }),
+        }),
+      };
+
+      // Call exec with a callback to trigger the streaming code path
+      await expect(devbox.cmd.exec('failing-command', { stdout: () => {} })).rejects.toThrow(
+        'Execution timed out',
+      );
+    });
+
+    it('should handle streaming errors gracefully and not block execution', async () => {
+      mockClient.devboxes.createAndAwaitRunning.mockResolvedValue(mockDevboxData);
+      const devbox = await Devbox.create(mockClient, { name: 'test-devbox' });
+
+      const mockExecution: DevboxAsyncExecutionDetailView = {
+        devbox_id: 'devbox-123',
+        execution_id: 'exec-456',
+        status: 'running',
+      };
+      mockClient.devboxes.executeAsync.mockResolvedValue(mockExecution);
+
+      const completedExecution: DevboxAsyncExecutionDetailView = {
+        devbox_id: 'devbox-123',
+        execution_id: 'exec-456',
+        status: 'completed',
+        exit_status: 0,
+        stdout: 'output',
+        stderr: '',
+      };
+
+      mockClient.devboxes.executions = {
+        awaitCompleted: jest.fn().mockResolvedValue(completedExecution),
+        streamStdoutUpdates: jest.fn().mockRejectedValue(new Error('Streaming stdout failed')),
+        streamStderrUpdates: jest.fn().mockRejectedValue(new Error('Streaming stderr failed')),
+      };
+
+      const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+
+      const result = await devbox.cmd.exec('echo hello', {
+        stdout: () => {},
+        stderr: () => {},
+      });
+
+      expect(result.exitCode).toBe(0);
+
+      expect(consoleErrorSpy).toHaveBeenCalledWith('Error streaming stdout:', expect.any(Error));
+      expect(consoleErrorSpy).toHaveBeenCalledWith('Error streaming stderr:', expect.any(Error));
+
+      consoleErrorSpy.mockRestore();
+    });
+
+    it('should invoke streaming callbacks when stream yields data', async () => {
+      mockClient.devboxes.createAndAwaitRunning.mockResolvedValue(mockDevboxData);
+      const devbox = await Devbox.create(mockClient, { name: 'test-devbox' });
+
+      const mockExecution: DevboxAsyncExecutionDetailView = {
+        devbox_id: 'devbox-123',
+        execution_id: 'exec-456',
+        status: 'running',
+      };
+      mockClient.devboxes.executeAsync.mockResolvedValue(mockExecution);
+
+      const completedExecution: DevboxAsyncExecutionDetailView = {
+        devbox_id: 'devbox-123',
+        execution_id: 'exec-456',
+        status: 'completed',
+        exit_status: 0,
+        stdout: 'line1\nline2',
+        stderr: 'err1',
+      };
+
+      const createMockStream = (chunks: { output: string }[]) => {
+        let index = 0;
+        return {
+          [Symbol.asyncIterator]: () => ({
+            next: () => {
+              if (index < chunks.length) {
+                return Promise.resolve({ value: chunks[index++], done: false });
+              }
+              return Promise.resolve({ value: undefined, done: true });
+            },
+          }),
+        };
+      };
+
+      mockClient.devboxes.executions = {
+        awaitCompleted: jest.fn().mockResolvedValue(completedExecution),
+        streamStdoutUpdates: jest
+          .fn()
+          .mockResolvedValue(createMockStream([{ output: 'line1\n' }, { output: 'line2\n' }])),
+        streamStderrUpdates: jest.fn().mockResolvedValue(createMockStream([{ output: 'err1\n' }])),
+      };
+
+      const stdoutLines: string[] = [];
+      const stderrLines: string[] = [];
+      const outputLines: string[] = [];
+
+      const result = await devbox.cmd.exec('echo hello', {
+        stdout: (line) => stdoutLines.push(line),
+        stderr: (line) => stderrLines.push(line),
+        output: (line) => outputLines.push(line),
+      });
+
+      expect(result.exitCode).toBe(0);
+
+      expect(stdoutLines).toEqual(['line1\n', 'line2\n']);
+      expect(stderrLines).toEqual(['err1\n']);
+      expect(outputLines).toContain('line1\n');
+      expect(outputLines).toContain('line2\n');
+      expect(outputLines).toContain('err1\n');
     });
   });
 });
