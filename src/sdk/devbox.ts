@@ -6,6 +6,7 @@ import type {
   DevboxAsyncExecutionDetailView,
   DevboxSnapshotDiskParams,
   DevboxCreateTunnelParams,
+  DevboxEnableTunnelParams,
   DevboxRemoveTunnelParams,
   DevboxReadFileContentsParams,
   DevboxWriteFileContentsParams,
@@ -99,6 +100,8 @@ export class DevboxNetOps {
   }
 
   /**
+   * [Deprecated] Use enableTunnel instead. This method creates a legacy tunnel.
+   *
    * Open a port on the devbox to be accessible from the internet.
    *
    * @example
@@ -109,12 +112,44 @@ export class DevboxNetOps {
    * @param {DevboxCreateTunnelParams} params - Tunnel creation parameters
    * @param {Core.RequestOptions} [options] - Request options
    * @returns {Promise<DevboxTunnelView>} Tunnel creation result
+   * @deprecated Use enableTunnel instead for V2 tunnels
    */
   async createTunnel(params: DevboxCreateTunnelParams, options?: Core.RequestOptions) {
     return this.client.devboxes.createTunnel(this.devboxId, params, options);
   }
 
   /**
+   * Enable a V2 tunnel for the devbox. V2 tunnels provide encrypted URL-based access
+   * to the devbox without exposing internal IDs. The tunnel URL format is:
+   * `https://{port}-{tunnel_key}.tunnel.runloop.ai`
+   *
+   * Each devbox can have one tunnel. Tunnels can be configured with different
+   * authentication modes:
+   * - `open`: No authentication required (default), returns `auth_mode: 'open'`
+   * - `authenticated`: Requires a token for access, returns `auth_token`
+   *
+   * @example
+   * ```typescript
+   * // Enable a public tunnel
+   * const tunnel = await devbox.net.enableTunnel();
+   * console.log(`Tunnel URL: https://8080-${tunnel.tunnel_key}.tunnel.runloop.ai`);
+   *
+   * // Enable an authenticated tunnel
+   * const authTunnel = await devbox.net.enableTunnel({ auth_mode: 'authenticated' });
+   * console.log(`Auth token: ${authTunnel.auth_token}`);
+   * ```
+   *
+   * @param {DevboxEnableTunnelParams} [params] - Optional tunnel configuration
+   * @param {Core.RequestOptions} [options] - Request options
+   * @returns {Promise<TunnelView>} Tunnel details including tunnel_key and auth configuration
+   */
+  async enableTunnel(params?: DevboxEnableTunnelParams, options?: Core.RequestOptions) {
+    return this.client.devboxes.enableTunnel(this.devboxId, params, options);
+  }
+
+  /**
+   * [Deprecated] Tunnels remain active until devbox is shutdown. This removes legacy tunnels only.
+   *
    * Remove a tunnel from the devbox.
    *
    * @example
@@ -125,6 +160,7 @@ export class DevboxNetOps {
    * @param {DevboxRemoveTunnelParams} params - Tunnel removal parameters
    * @param {Core.RequestOptions} [options] - Request options
    * @returns {Promise<DevboxRemoveTunnelResponse>} Tunnel removal result
+   * @deprecated Legacy tunnels only. V2 tunnels (from enableTunnel) remain active until devbox shutdown.
    */
   async removeTunnel(params: DevboxRemoveTunnelParams, options?: Core.RequestOptions) {
     return this.client.devboxes.removeTunnel(this.devboxId, params, options);
