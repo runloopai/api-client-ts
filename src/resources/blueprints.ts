@@ -109,7 +109,7 @@ export class Blueprints extends APIResource {
       {
         ...options?.polling,
         shouldStop: (result) => {
-          return !['provisioning', 'building'].includes(result.status);
+          return !['queued', 'provisioning', 'building'].includes(result.status);
         },
       },
     );
