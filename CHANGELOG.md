@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.5.1 (2026-01-30)
+
+Full Changelog: [v1.5.0...v1.5.1](https://github.com/runloopai/api-client-ts/compare/v1.5.0...v1.5.1)
+
+### Chores
+
+* **devbox:** rename tunnel auth enum ([#7239](https://github.com/runloopai/api-client-ts/issues/7239)) ([e5d273e](https://github.com/runloopai/api-client-ts/commit/e5d273e8dacee31c9f440162d3aa6806c1618d4b))
+
 ## 1.5.0 (2026-01-30)
 
 Full Changelog: [v1.4.1...v1.5.0](https://github.com/runloopai/api-client-ts/compare/v1.4.1...v1.5.0)
