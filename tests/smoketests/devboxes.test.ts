@@ -1,9 +1,151 @@
-import { DevboxView } from '@runloop/api-client/resources/devboxes';
+import { DevboxView, TunnelView } from '@runloop/api-client/resources/devboxes';
 import { makeClient, SHORT_TIMEOUT, uniqueName } from './utils';
 
 const client = makeClient();
 
 describe('smoketest: devboxes', () => {
+  /**
+   * Test V2 tunnel functionality.
+   */
+  describe('devbox tunnels', () => {
+    test(
+      'create devbox with tunnel in create params',
+      async () => {
+        let devbox: DevboxView | undefined;
+        try {
+          devbox = await client.devboxes.createAndAwaitRunning(
+            {
+              name: uniqueName('smoke-devbox-tunnel-create'),
+              launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 },
+              tunnel: { auth_mode: 'open' },
+            },
+            {
+              polling: { maxAttempts: 120, pollingIntervalMs: 5_000, timeoutMs: 20 * 60 * 1000 },
+            },
+          );
+
+          expect(devbox.id).toBeTruthy();
+          expect(devbox.status).toBe('running');
+
+          expect(devbox.tunnel).toBeDefined();
+          expect(devbox.tunnel?.tunnel_key).toBeTruthy();
+          expect(devbox.tunnel?.auth_mode).toBe('open');
+        } finally {
+          if (devbox) {
+            await client.devboxes.shutdown(devbox.id);
+          }
+        }
+      },
+      SHORT_TIMEOUT,
+    );
+
+    test(
+      'create devbox with authenticated tunnel in create params',
+      async () => {
+        let devbox: DevboxView | undefined;
+        try {
+          devbox = await client.devboxes.createAndAwaitRunning(
+            {
+              name: uniqueName('smoke-devbox-tunnel-auth'),
+              launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 },
+              tunnel: { auth_mode: 'authenticated' },
+            },
+            {
+              polling: { maxAttempts: 120, pollingIntervalMs: 5_000, timeoutMs: 20 * 60 * 1000 },
+            },
+          );
+
+          expect(devbox.id).toBeTruthy();
+          expect(devbox.status).toBe('running');
+
+          expect(devbox.tunnel).toBeDefined();
+          expect(devbox.tunnel?.tunnel_key).toBeTruthy();
+          expect(devbox.tunnel?.auth_mode).toBe('authenticated');
+          expect(devbox.tunnel?.auth_token).toBeTruthy();
+        } finally {
+          if (devbox) {
+            await client.devboxes.shutdown(devbox.id);
+          }
+        }
+      },
+      SHORT_TIMEOUT,
+    );
+
+    test(
+      'create devbox then enable tunnel',
+      async () => {
+        let devbox: DevboxView | undefined;
+        try {
+          devbox = await client.devboxes.createAndAwaitRunning(
+            {
+              name: uniqueName('smoke-devbox-enable-tunnel'),
+              launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 },
+            },
+            {
+              polling: { maxAttempts: 120, pollingIntervalMs: 5_000, timeoutMs: 20 * 60 * 1000 },
+            },
+          );
+
+          expect(devbox.id).toBeTruthy();
+          expect(devbox.status).toBe('running');
+
+          expect(devbox.tunnel).toBeFalsy();
+
+          const tunnel: TunnelView = await client.devboxes.enableTunnel(devbox.id, { auth_mode: 'open' });
+
+          expect(tunnel).toBeDefined();
+          expect(tunnel.tunnel_key).toBeTruthy();
+          expect(tunnel.auth_mode).toBe('open');
+          expect(tunnel.create_time_ms).toBeTruthy();
+
+          const updatedDevbox = await client.devboxes.retrieve(devbox.id);
+          expect(updatedDevbox.tunnel).toBeDefined();
+          expect(updatedDevbox.tunnel?.tunnel_key).toBe(tunnel.tunnel_key);
+        } finally {
+          if (devbox) {
+            await client.devboxes.shutdown(devbox.id);
+          }
+        }
+      },
+      SHORT_TIMEOUT,
+    );
+
+    test(
+      'create devbox then enable authenticated tunnel',
+      async () => {
+        let devbox: DevboxView | undefined;
+        try {
+          // Create devbox without tunnel
+          devbox = await client.devboxes.createAndAwaitRunning(
+            {
+              name: uniqueName('smoke-devbox-enable-auth-tunnel'),
+              launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 },
+            },
+            {
+              polling: { maxAttempts: 120, pollingIntervalMs: 5_000, timeoutMs: 20 * 60 * 1000 },
+            },
+          );
+
+          expect(devbox.id).toBeTruthy();
+          expect(devbox.status).toBe('running');
+
+          const tunnel: TunnelView = await client.devboxes.enableTunnel(devbox.id, {
+            auth_mode: 'authenticated',
+          });
+
+          expect(tunnel).toBeDefined();
+          expect(tunnel.tunnel_key).toBeTruthy();
+          expect(tunnel.auth_mode).toBe('authenticated');
+          expect(tunnel.auth_token).toBeTruthy();
+        } finally {
+          if (devbox) {
+            await client.devboxes.shutdown(devbox.id);
+          }
+        }
+      },
+      SHORT_TIMEOUT,
+    );
+  });
   /**
    * Test the lifecycle of a devbox. These tests are dependent on each other to save time.
    */

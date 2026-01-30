@@ -279,6 +279,107 @@ describe('smoketest: object-oriented devbox', () => {
       // Clean up
       await devbox.shutdown();
     });
+
+    test('enable V2 tunnel (open)', async () => {
+      const devbox = await sdk.devbox.create({
+        name: uniqueName('sdk-devbox-enable-tunnel'),
+        launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 },
+      });
+
+      try {
+        // Enable V2 tunnel with open auth mode
+        const tunnel = await devbox.net.enableTunnel({ auth_mode: 'open' });
+
+        expect(tunnel).toBeDefined();
+        expect(tunnel.tunnel_key).toBeTruthy();
+        expect(tunnel.auth_mode).toBe('open');
+        expect(tunnel.create_time_ms).toBeTruthy();
+
+        // Verify tunnel is present on devbox info
+        const info = await devbox.getInfo();
+        expect(info.tunnel).toBeDefined();
+        expect(info.tunnel?.tunnel_key).toBe(tunnel.tunnel_key);
+      } finally {
+        await devbox.shutdown();
+      }
+    });
+
+    test('enable V2 tunnel (authenticated)', async () => {
+      const devbox = await sdk.devbox.create({
+        name: uniqueName('sdk-devbox-enable-auth-tunnel'),
+        launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 },
+      });
+
+      try {
+        // Enable V2 tunnel with authenticated mode
+        const tunnel = await devbox.net.enableTunnel({ auth_mode: 'authenticated' });
+
+        expect(tunnel).toBeDefined();
+        expect(tunnel.tunnel_key).toBeTruthy();
+        expect(tunnel.auth_mode).toBe('authenticated');
+        // Authenticated tunnels should have an auth token
+        expect(tunnel.auth_token).toBeTruthy();
+      } finally {
+        await devbox.shutdown();
+      }
+    });
+
+    test('enable V2 tunnel with default params', async () => {
+      const devbox = await sdk.devbox.create({
+        name: uniqueName('sdk-devbox-enable-tunnel-default'),
+        launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 },
+      });
+
+      try {
+        // Enable V2 tunnel without specifying params (should default to open/public)
+        const tunnel = await devbox.net.enableTunnel();
+
+        expect(tunnel).toBeDefined();
+        expect(tunnel.tunnel_key).toBeTruthy();
+        expect(tunnel.create_time_ms).toBeTruthy();
+      } finally {
+        await devbox.shutdown();
+      }
+    });
+
+    test('create devbox with tunnel in create params', async () => {
+      // Create devbox with tunnel configured at launch time
+      const devbox = await sdk.devbox.create({
+        name: uniqueName('sdk-devbox-tunnel-create'),
+        launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 },
+        tunnel: { auth_mode: 'open' },
+      });
+
+      try {
+        // Verify tunnel was created at launch time
+        const info = await devbox.getInfo();
+        expect(info.tunnel).toBeDefined();
+        expect(info.tunnel?.tunnel_key).toBeTruthy();
+        expect(info.tunnel?.auth_mode).toBe('open');
+      } finally {
+        await devbox.shutdown();
+      }
+    });
+
+    test('create devbox with authenticated tunnel in create params', async () => {
+      // Create devbox with authenticated tunnel at launch time
+      const devbox = await sdk.devbox.create({
+        name: uniqueName('sdk-devbox-tunnel-auth-create'),
+        launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 },
+        tunnel: { auth_mode: 'authenticated' },
+      });
+
+      try {
+        // Verify authenticated tunnel was created
+        const info = await devbox.getInfo();
+        expect(info.tunnel).toBeDefined();
+        expect(info.tunnel?.tunnel_key).toBeTruthy();
+        expect(info.tunnel?.auth_mode).toBe('authenticated');
+        expect(info.tunnel?.auth_token).toBeTruthy();
+      } finally {
+        await devbox.shutdown();
+      }
+    });
   });
 
   describe('devbox creation from blueprint and snapshot', () => {
