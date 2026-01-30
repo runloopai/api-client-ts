@@ -889,3 +889,77 @@ export class NetworkPoliciesCursorIDPage<Item extends { id: string }>
     return { params: { starting_after: id } };
   }
 }
+
+export interface GatewayConfigsCursorIDPageResponse<Item> {
+  gateway_configs: Array<Item>;
+
+  has_more: boolean;
+
+  total_count: number;
+}
+
+export interface GatewayConfigsCursorIDPageParams {
+  starting_after?: string;
+
+  limit?: number;
+}
+
+export class GatewayConfigsCursorIDPage<Item extends { id: string }>
+  extends AbstractPage<Item>
+  implements GatewayConfigsCursorIDPageResponse<Item>
+{
+  gateway_configs: Array<Item>;
+
+  has_more: boolean;
+
+  total_count: number;
+
+  constructor(
+    client: APIClient,
+    response: Response,
+    body: GatewayConfigsCursorIDPageResponse<Item>,
+    options: FinalRequestOptions,
+  ) {
+    super(client, response, body, options);
+
+    this.gateway_configs = body.gateway_configs || [];
+    this.has_more = body.has_more || false;
+    this.total_count = body.total_count || 0;
+  }
+
+  getPaginatedItems(): Item[] {
+    return this.gateway_configs ?? [];
+  }
+
+  override hasNextPage(): boolean {
+    if (this.has_more === false) {
+      return false;
+    }
+
+    return super.hasNextPage();
+  }
+
+  // @deprecated Please use `nextPageInfo()` instead
+  nextPageParams(): Partial<GatewayConfigsCursorIDPageParams> | null {
+    const info = this.nextPageInfo();
+    if (!info) return null;
+    if ('params' in info) return info.params;
+    const params = Object.fromEntries(info.url.searchParams);
+    if (!Object.keys(params).length) return null;
+    return params;
+  }
+
+  nextPageInfo(): PageInfo | null {
+    const gatewayConfigs = this.getPaginatedItems();
+    if (!gatewayConfigs.length) {
+      return null;
+    }
+
+    const id = gatewayConfigs[gatewayConfigs.length - 1]?.id;
+    if (!id) {
+      return null;
+    }
+
+    return { params: { starting_after: id } };
+  }
+}

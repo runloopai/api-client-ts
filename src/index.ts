@@ -17,6 +17,8 @@ import {
   DevboxesCursorIDPageResponse,
   type DiskSnapshotsCursorIDPageParams,
   DiskSnapshotsCursorIDPageResponse,
+  type GatewayConfigsCursorIDPageParams,
+  GatewayConfigsCursorIDPageResponse,
   type NetworkPoliciesCursorIDPageParams,
   NetworkPoliciesCursorIDPageResponse,
   type ObjectsCursorIDPageParams,
@@ -92,6 +94,18 @@ import {
   Blueprints,
   InspectionSource,
 } from './resources/blueprints';
+import {
+  GatewayConfigCreateParameters,
+  GatewayConfigCreateParams,
+  GatewayConfigDeleteParams,
+  GatewayConfigListParams,
+  GatewayConfigListView,
+  GatewayConfigUpdateParameters,
+  GatewayConfigUpdateParams,
+  GatewayConfigView,
+  GatewayConfigViewsGatewayConfigsCursorIDPage,
+  GatewayConfigs,
+} from './resources/gateway-configs';
 import {
   NetworkPolicies,
   NetworkPolicyCreateParameters,
@@ -341,6 +355,7 @@ export class Runloop extends Core.APIClient {
   repositories: API.Repositories = new API.Repositories(this);
   secrets: API.Secrets = new API.Secrets(this);
   networkPolicies: API.NetworkPolicies = new API.NetworkPolicies(this);
+  gatewayConfigs: API.GatewayConfigs = new API.GatewayConfigs(this);
 
   /**
    * Check whether the base URL is set to its default.
@@ -406,6 +421,8 @@ Runloop.RepositoryConnectionViewsRepositoriesCursorIDPage = RepositoryConnection
 Runloop.Secrets = Secrets;
 Runloop.NetworkPolicies = NetworkPolicies;
 Runloop.NetworkPolicyViewsNetworkPoliciesCursorIDPage = NetworkPolicyViewsNetworkPoliciesCursorIDPage;
+Runloop.GatewayConfigs = GatewayConfigs;
+Runloop.GatewayConfigViewsGatewayConfigsCursorIDPage = GatewayConfigViewsGatewayConfigsCursorIDPage;
 
 export declare namespace Runloop {
   export type RequestOptions = Core.RequestOptions;
@@ -480,6 +497,12 @@ export declare namespace Runloop {
   export {
     type NetworkPoliciesCursorIDPageParams as NetworkPoliciesCursorIDPageParams,
     type NetworkPoliciesCursorIDPageResponse as NetworkPoliciesCursorIDPageResponse,
+  };
+
+  export import GatewayConfigsCursorIDPage = Pagination.GatewayConfigsCursorIDPage;
+  export {
+    type GatewayConfigsCursorIDPageParams as GatewayConfigsCursorIDPageParams,
+    type GatewayConfigsCursorIDPageResponse as GatewayConfigsCursorIDPageResponse,
   };
 
   export {
@@ -664,6 +687,19 @@ export declare namespace Runloop {
     type NetworkPolicyUpdateParams as NetworkPolicyUpdateParams,
     type NetworkPolicyListParams as NetworkPolicyListParams,
     type NetworkPolicyDeleteParams as NetworkPolicyDeleteParams,
+  };
+
+  export {
+    GatewayConfigs as GatewayConfigs,
+    type GatewayConfigCreateParameters as GatewayConfigCreateParameters,
+    type GatewayConfigListView as GatewayConfigListView,
+    type GatewayConfigUpdateParameters as GatewayConfigUpdateParameters,
+    type GatewayConfigView as GatewayConfigView,
+    GatewayConfigViewsGatewayConfigsCursorIDPage as GatewayConfigViewsGatewayConfigsCursorIDPage,
+    type GatewayConfigCreateParams as GatewayConfigCreateParams,
+    type GatewayConfigUpdateParams as GatewayConfigUpdateParams,
+    type GatewayConfigListParams as GatewayConfigListParams,
+    type GatewayConfigDeleteParams as GatewayConfigDeleteParams,
   };
 
   export type AfterIdle = API.AfterIdle;

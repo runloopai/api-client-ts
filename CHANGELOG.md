@@ -1,5 +1,19 @@
 # Changelog
 
+## 1.4.0 (2026-01-30)
+
+Full Changelog: [v1.3.2...v1.4.0](https://github.com/runloopai/api-client-ts/compare/v1.3.2...v1.4.0)
+
+### Features
+
+* **devbox:** add gateway routes ([#7212](https://github.com/runloopai/api-client-ts/issues/7212)) ([4e46620](https://github.com/runloopai/api-client-ts/commit/4e46620b9eaa3ea1e18114fd8ba5687e1f892153))
+* **devbox:** add new tunnel APIs and deprecate old tunnel API ([#7227](https://github.com/runloopai/api-client-ts/issues/7227)) ([8f8d43b](https://github.com/runloopai/api-client-ts/commit/8f8d43be17e322106484ca99ad1efa464fc87096))
+
+
+### Chores
+
+* **documentation:** made warning message language more accurate ([#7215](https://github.com/runloopai/api-client-ts/issues/7215)) ([ea2cdbe](https://github.com/runloopai/api-client-ts/commit/ea2cdbe1eb3c02fbbaa11eb6b6e7f51d9c8edf91))
+
 ## 1.3.2 (2026-01-30)
 
 Full Changelog: [v1.3.1...v1.3.2](https://github.com/runloopai/api-client-ts/compare/v1.3.1...v1.3.2)

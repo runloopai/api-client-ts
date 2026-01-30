@@ -347,3 +347,20 @@ Methods:
 - <code title="post /v1/network-policies/{id}">client.networkPolicies.<a href="./src/resources/network-policies.ts">update</a>(id, { ...params }) -> NetworkPolicyView</code>
 - <code title="get /v1/network-policies">client.networkPolicies.<a href="./src/resources/network-policies.ts">list</a>({ ...params }) -> NetworkPolicyViewsNetworkPoliciesCursorIDPage</code>
 - <code title="post /v1/network-policies/{id}/delete">client.networkPolicies.<a href="./src/resources/network-policies.ts">delete</a>(id) -> NetworkPolicyView</code>
+
+# GatewayConfigs
+
+Types:
+
+- <code><a href="./src/resources/gateway-configs.ts">GatewayConfigCreateParameters</a></code>
+- <code><a href="./src/resources/gateway-configs.ts">GatewayConfigListView</a></code>
+- <code><a href="./src/resources/gateway-configs.ts">GatewayConfigUpdateParameters</a></code>
+- <code><a href="./src/resources/gateway-configs.ts">GatewayConfigView</a></code>
+
+Methods:
+
+- <code title="post /v1/gateway-configs">client.gatewayConfigs.<a href="./src/resources/gateway-configs.ts">create</a>({ ...params }) -> GatewayConfigView</code>
+- <code title="get /v1/gateway-configs/{id}">client.gatewayConfigs.<a href="./src/resources/gateway-configs.ts">retrieve</a>(id) -> GatewayConfigView</code>
+- <code title="post /v1/gateway-configs/{id}">client.gatewayConfigs.<a href="./src/resources/gateway-configs.ts">update</a>(id, { ...params }) -> GatewayConfigView</code>
+- <code title="get /v1/gateway-configs">client.gatewayConfigs.<a href="./src/resources/gateway-configs.ts">list</a>({ ...params }) -> GatewayConfigViewsGatewayConfigsCursorIDPage</code>
+- <code title="post /v1/gateway-configs/{id}/delete">client.gatewayConfigs.<a href="./src/resources/gateway-configs.ts">delete</a>(id) -> GatewayConfigView</code>

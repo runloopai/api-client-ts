@@ -189,7 +189,11 @@ export class Devboxes extends APIResource {
   }
 
   /**
-   * Create a live tunnel to an available port on the Devbox.
+   * [Deprecated] Use POST /v1/devboxes/{id}/enable_tunnel instead. This endpoint
+   * creates a legacy tunnel. The new enable_tunnel endpoint provides improved tunnel
+   * functionality with authentication options.
+   *
+   * @deprecated
    */
   createTunnel(
     id: string,
@@ -807,6 +811,12 @@ export interface DevboxView {
   failure_reason?: 'out_of_memory' | 'out_of_disk' | 'execution_failed' | null;
 
   /**
+   * [Beta] Gateway specifications configured for this devbox. Map key is the
+   * environment variable prefix (e.g., 'GWS_ANTHROPIC').
+   */
+  gateway_specs?: { [key: string]: DevboxView.GatewaySpecs } | null;
+
+  /**
    * The ID of the initiator that created the Devbox.
    */
   initiator_id?: string | null;
@@ -832,6 +842,12 @@ export interface DevboxView {
    * Snapshot.
    */
   snapshot_id?: string | null;
+
+  /**
+   * V2 tunnel information if a tunnel was created at launch time or via the
+   * createTunnel API.
+   */
+  tunnel?: DevboxView.Tunnel | null;
 }
 
 export namespace DevboxView {
@@ -863,6 +879,46 @@ export namespace DevboxView {
      * The time the status change occurred
      */
     transition_time_ms?: unknown;
+  }
+
+  export interface GatewaySpecs {
+    /**
+     * The ID of the gateway config (e.g., gwc_123abc).
+     */
+    gateway_config_id: string;
+
+    /**
+     * The ID of the secret containing the credential.
+     */
+    secret_id: string;
+  }
+
+  /**
+   * V2 tunnel information if a tunnel was created at launch time or via the
+   * createTunnel API.
+   */
+  export interface Tunnel {
+    /**
+     * The authentication mode for the tunnel.
+     */
+    auth_mode: 'public_' | 'authenticated';
+
+    /**
+     * Creation time of the tunnel (Unix timestamp milliseconds).
+     */
+    create_time_ms: number;
+
+    /**
+     * The encrypted tunnel key used to construct the tunnel URL. URL format:
+     * https://{port}-{tunnel_key}.tunnel.runloop.{domain}
+     */
+    tunnel_key: string;
+
+    /**
+     * Bearer token for tunnel authentication. Only present when auth_mode is
+     * 'authenticated'.
+     */
+    auth_token?: string | null;
   }
 }
 
@@ -941,6 +997,15 @@ export interface DevboxCreateParams {
   file_mounts?: { [key: string]: string } | null;
 
   /**
+   * [Beta] (Optional) Gateway specifications for credential proxying. Map key is the
+   * environment variable prefix (e.g., 'GWS_ANTHROPIC'). The gateway will proxy
+   * requests to external APIs using the specified credential without exposing the
+   * real API key. Example: {'GWS_ANTHROPIC': {'gateway': 'anthropic', 'secret':
+   * 'my_claude_key'}}
+   */
+  gateways?: { [key: string]: DevboxCreateParams.Gateways } | null;
+
+  /**
    * Parameters to configure the resources and launch time behavior of the Devbox.
    */
   launch_parameters?: Shared.LaunchParameters | null;
@@ -978,6 +1043,44 @@ export interface DevboxCreateParams {
    * Blueprint name) should be specified.
    */
   snapshot_id?: string | null;
+
+  /**
+   * (Optional) Configuration for creating a V2 tunnel at Devbox launch time. When
+   * specified, a tunnel will be automatically provisioned and the tunnel details
+   * will be included in the Devbox response.
+   */
+  tunnel?: DevboxCreateParams.Tunnel | null;
+}
+
+export namespace DevboxCreateParams {
+  /**
+   * [Beta] GatewaySpec links a gateway configuration to a secret for credential
+   * proxying in a devbox. The gateway will proxy requests to external APIs using the
+   * specified credential without exposing the real API key.
+   */
+  export interface Gateways {
+    /**
+     * The gateway config to use. Can be a gateway config ID (gwc_xxx) or name.
+     */
+    gateway: string;
+
+    /**
+     * The secret containing the credential. Can be a secret ID or name.
+     */
+    secret: string;
+  }
+
+  /**
+   * (Optional) Configuration for creating a V2 tunnel at Devbox launch time. When
+   * specified, a tunnel will be automatically provisioned and the tunnel details
+   * will be included in the Devbox response.
+   */
+  export interface Tunnel {
+    /**
+     * Authentication mode for the tunnel. Defaults to 'public' if not specified.
+     */
+    auth_mode?: 'open' | 'authenticated' | null;
+  }
 }
 
 export interface DevboxUpdateParams {

@@ -46,6 +46,7 @@ describe('resource devboxes', () => {
           entrypoint: 'entrypoint',
           environment_variables: { foo: 'string' },
           file_mounts: { foo: 'string' },
+          gateways: { foo: { gateway: 'gateway', secret: 'secret' } },
           launch_parameters: {
             after_idle: { idle_time_seconds: 0, on_idle: 'shutdown' },
             architecture: 'x86_64',
@@ -72,6 +73,7 @@ describe('resource devboxes', () => {
           repo_connection_id: 'repo_connection_id',
           secrets: { foo: 'string' },
           snapshot_id: 'snapshot_id',
+          tunnel: { auth_mode: 'open' },
         },
         { path: '/_stainless_unknown_path' },
       ),
