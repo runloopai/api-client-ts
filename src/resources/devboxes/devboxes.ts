@@ -267,7 +267,10 @@ export class Devboxes extends APIResource {
   }
 
   /**
-   * Remove a previously opened tunnel on the Devbox.
+   * [Deprecated] Tunnels remain active until devbox is shutdown. This endpoint
+   * removes a legacy tunnel.
+   *
+   * @deprecated
    */
   removeTunnel(
     id: string,
