@@ -72,6 +72,7 @@ describe('resource devboxes', () => {
           repo_connection_id: 'repo_connection_id',
           secrets: { foo: 'string' },
           snapshot_id: 'snapshot_id',
+          tunnel: { auth_mode: 'open' },
         },
         { path: '/_stainless_unknown_path' },
       ),
