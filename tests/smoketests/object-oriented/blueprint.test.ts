@@ -13,7 +13,7 @@ describe('smoketest: object-oriented blueprint', () => {
       blueprint = await sdk.blueprint.create(
         {
           name: uniqueName('sdk-blueprint'),
-          dockerfile: 'FROM ubuntu:20.04\nRUN apt-get update && apt-get install -y curl',
+          dockerfile: 'FROM ubuntu:22.04\nRUN apt-get update && apt-get install -y curl',
           system_setup_commands: ['echo "Blueprint setup complete"'],
         },
         { polling: { timeoutMs: 10 * 60 * 1000 } },
@@ -139,7 +139,7 @@ describe('smoketest: object-oriented blueprint', () => {
           blueprint = await sdk.blueprint.create(
             {
               name: uniqueName('sdk-blueprint-context'),
-              dockerfile: `FROM ubuntu:20.04
+              dockerfile: `FROM ubuntu:22.04
 WORKDIR /app
 COPY . .`,
               build_context: storageObject,
@@ -221,7 +221,7 @@ COPY . .`,
           blueprint = await sdk.blueprint.create(
             {
               name: uniqueName('sdk-blueprint-context-dir'),
-              dockerfile: `FROM ubuntu:20.04
+              dockerfile: `FROM ubuntu:22.04
 WORKDIR /app
 COPY . .`,
               build_context_dir: contextDir,
@@ -286,7 +286,7 @@ COPY . .`,
           blueprint = await sdk.blueprint.create(
             {
               name: uniqueName('sdk-blueprint-retrieve'),
-              dockerfile: 'FROM ubuntu:20.04',
+              dockerfile: 'FROM ubuntu:22.04',
             },
             { polling: { timeoutMs: 10 * 60 * 1000 } },
           );
@@ -323,7 +323,7 @@ COPY . .`,
           blueprint = await sdk.blueprint.create(
             {
               name: uniqueName('sdk-blueprint-with-build-policy'),
-              dockerfile: 'FROM ubuntu:20.04\nRUN apt-get update',
+              dockerfile: 'FROM ubuntu:22.04\nRUN apt-get update',
               network_policy_id: policy.id,
             },
             { polling: { timeoutMs: 10 * 60 * 1000 } },
@@ -364,7 +364,7 @@ COPY . .`,
           blueprint = await sdk.blueprint.create(
             {
               name: uniqueName('sdk-blueprint-with-launch-policy'),
-              dockerfile: 'FROM ubuntu:20.04',
+              dockerfile: 'FROM ubuntu:22.04',
               launch_parameters: {
                 resource_size_request: 'X_SMALL',
                 keep_alive_time_seconds: 60 * 5,
