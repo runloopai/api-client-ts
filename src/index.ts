@@ -166,6 +166,7 @@ import {
   DevboxCreateTunnelParams,
   DevboxDeleteDiskSnapshotResponse,
   DevboxDownloadFileParams,
+  DevboxEnableTunnelParams,
   DevboxExecuteAsyncParams,
   DevboxExecuteParams,
   DevboxExecuteSyncParams,
@@ -195,6 +196,7 @@ import {
   DevboxWaitForCommandParams,
   DevboxWriteFileContentsParams,
   Devboxes,
+  TunnelView,
 } from './resources/devboxes/devboxes';
 import {
   InputContext,
@@ -575,6 +577,7 @@ export declare namespace Runloop {
     type DevboxSnapshotView as DevboxSnapshotView,
     type DevboxTunnelView as DevboxTunnelView,
     type DevboxView as DevboxView,
+    type TunnelView as TunnelView,
     type DevboxCreateSSHKeyResponse as DevboxCreateSSHKeyResponse,
     type DevboxDeleteDiskSnapshotResponse as DevboxDeleteDiskSnapshotResponse,
     type DevboxKeepAliveResponse as DevboxKeepAliveResponse,
@@ -588,6 +591,7 @@ export declare namespace Runloop {
     type DevboxListParams as DevboxListParams,
     type DevboxCreateTunnelParams as DevboxCreateTunnelParams,
     type DevboxDownloadFileParams as DevboxDownloadFileParams,
+    type DevboxEnableTunnelParams as DevboxEnableTunnelParams,
     type DevboxExecuteParams as DevboxExecuteParams,
     type DevboxExecuteAsyncParams as DevboxExecuteAsyncParams,
     type DevboxExecuteSyncParams as DevboxExecuteSyncParams,
