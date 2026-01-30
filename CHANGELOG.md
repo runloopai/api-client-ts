@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.4.1 (2026-01-30)
+
+Full Changelog: [v1.4.0...v1.4.1](https://github.com/runloopai/api-client-ts/compare/v1.4.0...v1.4.1)
+
+### Chores
+
+* **devbox:** deprecate remove tunnel API ([#7230](https://github.com/runloopai/api-client-ts/issues/7230)) ([25d9586](https://github.com/runloopai/api-client-ts/commit/25d9586715e303d52e80adc56ed26fd35faae1fe))
+
 ## 1.4.0 (2026-01-30)
 
 Full Changelog: [v1.3.2...v1.4.0](https://github.com/runloopai/api-client-ts/compare/v1.3.2...v1.4.0)
