@@ -8,6 +8,7 @@ import { StorageObject } from './sdk/storage-object';
 import { Agent } from './sdk/agent';
 import { Scorer } from './sdk/scorer';
 import { NetworkPolicy } from './sdk/network-policy';
+import { GatewayConfig } from './sdk/gateway-config';
 import { Scenario } from './sdk/scenario';
 
 // Import types used in this file
@@ -22,6 +23,7 @@ import type { ObjectCreateParams, ObjectListParams } from './resources/objects';
 import type { AgentCreateParams, AgentListParams } from './resources/agents';
 import type { ScorerCreateParams, ScorerListParams } from './resources/scenarios/scorers';
 import type { NetworkPolicyCreateParams, NetworkPolicyListParams } from './resources/network-policies';
+import type { GatewayConfigCreateParams, GatewayConfigListParams } from './resources/gateway-configs';
 import type { ScenarioListParams } from './resources/scenarios/scenarios';
 import { PollingOptions } from './lib/polling';
 import * as Shared from './resources/shared';
@@ -285,6 +287,15 @@ export class RunloopSDK {
   public readonly networkPolicy: NetworkPolicyOps;
 
   /**
+   * **Gateway Config Operations** - {@link GatewayConfigOps} for creating and accessing {@link GatewayConfig} class instances.
+   *
+   * Gateway configs define how to proxy API requests through the credential gateway. They specify
+   * the target endpoint and how credentials should be applied. Use with devboxes to securely
+   * proxy requests to external APIs without exposing API keys.
+   */
+  public readonly gatewayConfig: GatewayConfigOps;
+
+  /**
    * **Scenario Operations** - {@link ScenarioOps} for accessing {@link Scenario} class instances.
    *
    * Scenarios define repeatable AI coding evaluation tests with starting environments and
@@ -305,6 +316,7 @@ export class RunloopSDK {
     this.agent = new AgentOps(this.api);
     this.scorer = new ScorerOps(this.api);
     this.networkPolicy = new NetworkPolicyOps(this.api);
+    this.gatewayConfig = new GatewayConfigOps(this.api);
     this.scenario = new ScenarioOps(this.api);
   }
 }
@@ -1509,6 +1521,117 @@ export class NetworkPolicyOps {
 }
 
 /**
+ * Gateway Config SDK interface for managing gateway configurations.
+ *
+ * @category Gateway Config
+ *
+ * @remarks
+ * ## Overview
+ *
+ * The `GatewayConfigOps` class provides a high-level abstraction for managing gateway configurations,
+ * which define how to proxy API requests through the credential gateway. Gateway configs specify
+ * the target endpoint and how credentials should be applied, enabling secure API proxying without
+ * exposing API keys.
+ *
+ * ## Usage
+ *
+ * This interface is accessed via {@link RunloopSDK.gatewayConfig}. You should construct
+ * a {@link RunloopSDK} instance and use it from there:
+ *
+ * @example
+ * ```typescript
+ * const runloop = new RunloopSDK();
+ * const gatewayConfig = await runloop.gatewayConfig.create({
+ *   name: 'my-api-gateway',
+ *   endpoint: 'https://api.example.com',
+ *   auth_mechanism: { type: 'bearer' },
+ * });
+ *
+ * // Use with a devbox
+ * const devbox = await runloop.devbox.create({
+ *   name: 'my-devbox',
+ *   gateways: {
+ *     'MY_API': {
+ *       gateway: gatewayConfig.id,
+ *       secret: 'my-api-key-secret',
+ *     },
+ *   },
+ * });
+ * ```
+ */
+export class GatewayConfigOps {
+  /**
+   * @private
+   */
+  constructor(private client: RunloopAPI) {}
+
+  /**
+   * Create a new gateway config.
+   *
+   * @example
+   * ```typescript
+   * const runloop = new RunloopSDK();
+   * const gatewayConfig = await runloop.gatewayConfig.create({
+   *   name: 'my-gateway',
+   *   endpoint: 'https://api.example.com',
+   *   auth_mechanism: { type: 'header', key: 'x-api-key' },
+   *   description: 'Gateway for My API',
+   * });
+   * ```
+   *
+   * @param {GatewayConfigCreateParams} params - Parameters for creating the gateway config.
+   * @param {Core.RequestOptions} [options] - Request options.
+   * @returns {Promise<GatewayConfig>} A {@link GatewayConfig} instance.
+   */
+  async create(params: GatewayConfigCreateParams, options?: Core.RequestOptions): Promise<GatewayConfig> {
+    return GatewayConfig.create(this.client, params, options);
+  }
+
+  /**
+   * Get a gateway config object by its ID.
+   *
+   * @example
+   * ```typescript
+   * const runloop = new RunloopSDK();
+   * const gatewayConfig = runloop.gatewayConfig.fromId('gwc_1234567890');
+   * const info = await gatewayConfig.getInfo();
+   * console.log(`Gateway Config name: ${info.name}`);
+   * ```
+   *
+   * @param {string} id - The ID of the gateway config.
+   * @returns {GatewayConfig} A {@link GatewayConfig} instance.
+   */
+  fromId(id: string): GatewayConfig {
+    return GatewayConfig.fromId(this.client, id);
+  }
+
+  /**
+   * List gateway configs with optional filters (paginated).
+   *
+   * @example
+   * ```typescript
+   * const runloop = new RunloopSDK();
+   * const configs = await runloop.gatewayConfig.list({ limit: 10 });
+   * console.log(configs.map((c) => c.id));
+   * ```
+   *
+   * @param {GatewayConfigListParams} [params] - Optional filter parameters.
+   * @param {Core.RequestOptions} [options] - Request options.
+   * @returns {Promise<GatewayConfig[]>} An array of {@link GatewayConfig} instances.
+   */
+  async list(params?: GatewayConfigListParams, options?: Core.RequestOptions): Promise<GatewayConfig[]> {
+    const result = await this.client.gatewayConfigs.list(params, options);
+    const configs: GatewayConfig[] = [];
+
+    for await (const config of result) {
+      configs.push(GatewayConfig.fromId(this.client, config.id));
+    }
+
+    return configs;
+  }
+}
+
+/**
  * Scenario SDK interface for managing scenarios.
  *
  * @category Scenario
@@ -1630,6 +1753,7 @@ export declare namespace RunloopSDK {
     AgentOps as AgentOps,
     ScorerOps as ScorerOps,
     NetworkPolicyOps as NetworkPolicyOps,
+    GatewayConfigOps as GatewayConfigOps,
     ScenarioOps as ScenarioOps,
     Devbox as Devbox,
     Blueprint as Blueprint,
@@ -1638,6 +1762,7 @@ export declare namespace RunloopSDK {
     Agent as Agent,
     Scorer as Scorer,
     NetworkPolicy as NetworkPolicy,
+    GatewayConfig as GatewayConfig,
     Scenario as Scenario,
   };
 }
