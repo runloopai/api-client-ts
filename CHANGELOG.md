@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.5.0 (2026-01-30)
+
+Full Changelog: [v1.4.1...v1.5.0](https://github.com/runloopai/api-client-ts/compare/v1.4.1...v1.5.0)
+
+### Features
+
+* **devbox:** add enable_tunnel API ([#7236](https://github.com/runloopai/api-client-ts/issues/7236)) ([9ebf964](https://github.com/runloopai/api-client-ts/commit/9ebf964b099983533b9f4ce0bfc43540db876690))
+
 ## 1.4.1 (2026-01-30)
 
 Full Changelog: [v1.4.0...v1.4.1](https://github.com/runloopai/api-client-ts/compare/v1.4.0...v1.4.1)
