@@ -794,7 +794,7 @@ export interface TunnelView {
   /**
    * The authentication mode for the tunnel.
    */
-  auth_mode: 'public_' | 'authenticated';
+  auth_mode: 'open' | 'authenticated';
 
   /**
    * Creation time of the tunnel (Unix timestamp milliseconds).
