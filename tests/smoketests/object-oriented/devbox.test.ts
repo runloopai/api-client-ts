@@ -289,7 +289,7 @@ describe('smoketest: object-oriented devbox', () => {
         const blueprint = await sdk.blueprint.create(
           {
             name: uniqueName('sdk-blueprint-for-devbox'),
-            dockerfile: 'FROM ubuntu:20.04\nRUN apt-get update && apt-get install -y curl',
+            dockerfile: 'FROM ubuntu:22.04\nRUN apt-get update && apt-get install -y curl',
           },
           { polling: { timeoutMs: 10 * 60 * 1000 } },
         );
@@ -322,7 +322,7 @@ describe('smoketest: object-oriented devbox', () => {
         const blueprint = await sdk.blueprint.create(
           {
             name: blueprintName,
-            dockerfile: 'FROM ubuntu:20.04\nRUN apt-get update && apt-get install -y wget',
+            dockerfile: 'FROM ubuntu:22.04\nRUN apt-get update && apt-get install -y wget',
           },
           { polling: { timeoutMs: 10 * 60 * 1000 } },
         );
