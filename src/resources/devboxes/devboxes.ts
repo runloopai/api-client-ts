@@ -668,6 +668,12 @@ export interface DevboxView {
   failure_reason?: 'out_of_memory' | 'out_of_disk' | 'execution_failed' | null;
 
   /**
+   * [Beta] Gateway specifications configured for this devbox. Map key is the
+   * environment variable prefix (e.g., 'GWS_ANTHROPIC').
+   */
+  gateway_specs?: { [key: string]: DevboxView.GatewaySpecs } | null;
+
+  /**
    * The ID of the initiator that created the Devbox.
    */
   initiator_id?: string | null;
@@ -724,6 +730,18 @@ export namespace DevboxView {
      * The time the status change occurred
      */
     transition_time_ms?: unknown;
+  }
+
+  export interface GatewaySpecs {
+    /**
+     * The ID of the gateway config (e.g., gwc_123abc).
+     */
+    gateway_config_id: string;
+
+    /**
+     * The ID of the secret containing the credential.
+     */
+    secret_id: string;
   }
 }
 
@@ -797,6 +815,15 @@ export interface DevboxCreateParams {
   file_mounts?: { [key: string]: string } | null;
 
   /**
+   * [Beta] (Optional) Gateway specifications for credential proxying. Map key is the
+   * environment variable prefix (e.g., 'GWS_ANTHROPIC'). The gateway will proxy
+   * requests to external APIs using the specified credential without exposing the
+   * real API key. Example: {'GWS_ANTHROPIC': {'gateway': 'anthropic', 'secret':
+   * 'my_claude_key'}}
+   */
+  gateways?: { [key: string]: DevboxCreateParams.Gateways } | null;
+
+  /**
    * Parameters to configure the resources and launch time behavior of the Devbox.
    */
   launch_parameters?: Shared.LaunchParameters | null;
@@ -834,6 +861,25 @@ export interface DevboxCreateParams {
    * Blueprint name) should be specified.
    */
   snapshot_id?: string | null;
+}
+
+export namespace DevboxCreateParams {
+  /**
+   * [Beta] GatewaySpec links a gateway configuration to a secret for credential
+   * proxying in a devbox. The gateway will proxy requests to external APIs using the
+   * specified credential without exposing the real API key.
+   */
+  export interface Gateways {
+    /**
+     * The gateway config to use. Can be a gateway config ID (gwc_xxx) or name.
+     */
+    gateway: string;
+
+    /**
+     * The secret containing the credential. Can be a secret ID or name.
+     */
+    secret: string;
+  }
 }
 
 export interface DevboxUpdateParams {

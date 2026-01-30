@@ -99,6 +99,18 @@ export {
   type DevboxWriteFileContentsParams,
 } from './devboxes/devboxes';
 export {
+  GatewayConfigViewsGatewayConfigsCursorIDPage,
+  GatewayConfigs,
+  type GatewayConfigCreateParameters,
+  type GatewayConfigListView,
+  type GatewayConfigUpdateParameters,
+  type GatewayConfigView,
+  type GatewayConfigCreateParams,
+  type GatewayConfigUpdateParams,
+  type GatewayConfigListParams,
+  type GatewayConfigDeleteParams,
+} from './gateway-configs';
+export {
   NetworkPolicyViewsNetworkPoliciesCursorIDPage,
   NetworkPolicies,
   type NetworkPolicyCreateParameters,

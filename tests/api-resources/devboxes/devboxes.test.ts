@@ -45,6 +45,7 @@ describe('resource devboxes', () => {
           entrypoint: 'entrypoint',
           environment_variables: { foo: 'string' },
           file_mounts: { foo: 'string' },
+          gateways: { foo: { gateway: 'gateway', secret: 'secret' } },
           launch_parameters: {
             after_idle: { idle_time_seconds: 0, on_idle: 'shutdown' },
             architecture: 'x86_64',
