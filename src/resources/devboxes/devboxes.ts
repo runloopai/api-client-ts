@@ -229,6 +229,30 @@ export class Devboxes extends APIResource {
   }
 
   /**
+   * Create a V2 tunnel for an existing running Devbox. Tunnels provide encrypted
+   * URL-based access to the Devbox without exposing internal IDs. The tunnel URL
+   * format is: https://{port}-{tunnel_key}.tunnel.runloop.ai
+   *
+   * Each Devbox can have one tunnel.
+   */
+  enableTunnel(
+    id: string,
+    body?: DevboxEnableTunnelParams,
+    options?: Core.RequestOptions,
+  ): Core.APIPromise<TunnelView>;
+  enableTunnel(id: string, options?: Core.RequestOptions): Core.APIPromise<TunnelView>;
+  enableTunnel(
+    id: string,
+    body: DevboxEnableTunnelParams | Core.RequestOptions = {},
+    options?: Core.RequestOptions,
+  ): Core.APIPromise<TunnelView> {
+    if (isRequestOptions(body)) {
+      return this.enableTunnel(id, {}, body);
+    }
+    return this._client.post(`/v1/devboxes/${id}/enable_tunnel`, { body, ...options });
+  }
+
+  /**
    * Execute a command with a known command ID on a devbox, optimistically waiting
    * for it to complete within the specified timeout. If it completes in time, return
    * the result. If not, return a status indicating the command is still running.
@@ -850,7 +874,7 @@ export interface DevboxView {
    * V2 tunnel information if a tunnel was created at launch time or via the
    * createTunnel API.
    */
-  tunnel?: DevboxView.Tunnel | null;
+  tunnel?: TunnelView | null;
 }
 
 export namespace DevboxView {
@@ -895,34 +919,38 @@ export namespace DevboxView {
      */
     secret_id: string;
   }
+}
+
+/**
+ * A V2 tunnel provides secure HTTP access to services running on a Devbox. Tunnels
+ * allow external clients to reach web servers, APIs, or other HTTP services
+ * running inside a Devbox without requiring direct network access. Each tunnel is
+ * uniquely identified by an encrypted tunnel_key and can be configured for either
+ * open (public) or authenticated access. Usage:
+ * https://{port}-{tunnel_key}.tunnel.runloop.ai
+ */
+export interface TunnelView {
+  /**
+   * The authentication mode for the tunnel.
+   */
+  auth_mode: 'public_' | 'authenticated';
 
   /**
-   * V2 tunnel information if a tunnel was created at launch time or via the
-   * createTunnel API.
+   * Creation time of the tunnel (Unix timestamp milliseconds).
    */
-  export interface Tunnel {
-    /**
-     * The authentication mode for the tunnel.
-     */
-    auth_mode: 'public_' | 'authenticated';
+  create_time_ms: number;
 
-    /**
-     * Creation time of the tunnel (Unix timestamp milliseconds).
-     */
-    create_time_ms: number;
+  /**
+   * The encrypted tunnel key used to construct the tunnel URL. URL format:
+   * https://{port}-{tunnel_key}.tunnel.runloop.{domain}
+   */
+  tunnel_key: string;
 
-    /**
-     * The encrypted tunnel key used to construct the tunnel URL. URL format:
-     * https://{port}-{tunnel_key}.tunnel.runloop.{domain}
-     */
-    tunnel_key: string;
-
-    /**
-     * Bearer token for tunnel authentication. Only present when auth_mode is
-     * 'authenticated'.
-     */
-    auth_token?: string | null;
-  }
+  /**
+   * Bearer token for tunnel authentication. Only present when auth_mode is
+   * 'authenticated'.
+   */
+  auth_token?: string | null;
 }
 
 export interface DevboxCreateSSHKeyResponse {
@@ -1126,6 +1154,13 @@ export interface DevboxDownloadFileParams {
    * user home directory.
    */
   path: string;
+}
+
+export interface DevboxEnableTunnelParams {
+  /**
+   * Authentication mode for the tunnel. Defaults to 'public' if not specified.
+   */
+  auth_mode?: 'open' | 'authenticated' | null;
 }
 
 /**
@@ -1349,6 +1384,7 @@ export declare namespace Devboxes {
     type DevboxSnapshotView as DevboxSnapshotView,
     type DevboxTunnelView as DevboxTunnelView,
     type DevboxView as DevboxView,
+    type TunnelView as TunnelView,
     type DevboxCreateSSHKeyResponse as DevboxCreateSSHKeyResponse,
     type DevboxDeleteDiskSnapshotResponse as DevboxDeleteDiskSnapshotResponse,
     type DevboxKeepAliveResponse as DevboxKeepAliveResponse,
@@ -1362,6 +1398,7 @@ export declare namespace Devboxes {
     type DevboxListParams as DevboxListParams,
     type DevboxCreateTunnelParams as DevboxCreateTunnelParams,
     type DevboxDownloadFileParams as DevboxDownloadFileParams,
+    type DevboxEnableTunnelParams as DevboxEnableTunnelParams,
     type DevboxExecuteParams as DevboxExecuteParams,
     type DevboxExecuteAsyncParams as DevboxExecuteAsyncParams,
     type DevboxExecuteSyncParams as DevboxExecuteSyncParams,
