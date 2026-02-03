@@ -236,6 +236,82 @@ describe('Devbox (New API)', () => {
       });
     });
 
+    describe('getTunnel', () => {
+      it('should return tunnel info when tunnel exists', async () => {
+        const mockTunnel = {
+          tunnel_key: 'abc123xyz',
+          auth_mode: 'open' as const,
+          create_time_ms: Date.now(),
+        };
+        const dataWithTunnel = { ...mockDevboxData, tunnel: mockTunnel };
+        mockClient.devboxes.retrieve.mockResolvedValue(dataWithTunnel);
+
+        const tunnel = await devbox.getTunnel();
+
+        expect(mockClient.devboxes.retrieve).toHaveBeenCalledWith('devbox-123', undefined);
+        expect(tunnel).toEqual(mockTunnel);
+        expect(tunnel?.tunnel_key).toBe('abc123xyz');
+      });
+
+      it('should return null when no tunnel exists', async () => {
+        const dataWithoutTunnel = { ...mockDevboxData, tunnel: null };
+        mockClient.devboxes.retrieve.mockResolvedValue(dataWithoutTunnel);
+
+        const tunnel = await devbox.getTunnel();
+
+        expect(mockClient.devboxes.retrieve).toHaveBeenCalledWith('devbox-123', undefined);
+        expect(tunnel).toBeNull();
+      });
+
+      it('should return null when tunnel is undefined', async () => {
+        mockClient.devboxes.retrieve.mockResolvedValue(mockDevboxData);
+
+        const tunnel = await devbox.getTunnel();
+
+        expect(tunnel).toBeNull();
+      });
+    });
+
+    describe('getTunnelUrl', () => {
+      it('should return the correct tunnel URL for a given port', async () => {
+        const mockTunnel = {
+          tunnel_key: 'abc123xyz',
+          auth_mode: 'open' as const,
+          create_time_ms: Date.now(),
+        };
+        const dataWithTunnel = { ...mockDevboxData, tunnel: mockTunnel };
+        mockClient.devboxes.retrieve.mockResolvedValue(dataWithTunnel);
+
+        const url = await devbox.getTunnelUrl(8080);
+
+        expect(url).toBe('https://8080-abc123xyz.tunnel.runloop.ai');
+      });
+
+      it('should work with different port numbers', async () => {
+        const mockTunnel = {
+          tunnel_key: 'mykey456',
+          auth_mode: 'authenticated' as const,
+          create_time_ms: Date.now(),
+          auth_token: 'secret-token',
+        };
+        const dataWithTunnel = { ...mockDevboxData, tunnel: mockTunnel };
+        mockClient.devboxes.retrieve.mockResolvedValue(dataWithTunnel);
+
+        const url = await devbox.getTunnelUrl(3000);
+
+        expect(url).toBe('https://3000-mykey456.tunnel.runloop.ai');
+      });
+
+      it('should throw error when no tunnel has been enabled', async () => {
+        const dataWithoutTunnel = { ...mockDevboxData, tunnel: null };
+        mockClient.devboxes.retrieve.mockResolvedValue(dataWithoutTunnel);
+
+        await expect(devbox.getTunnelUrl(8080)).rejects.toThrow(
+          'No tunnel has been enabled for this devbox. Call net.enableTunnel() first.',
+        );
+      });
+    });
+
     describe('id property', () => {
       it('should expose devbox ID', () => {
         expect(devbox.id).toBe('devbox-123');
