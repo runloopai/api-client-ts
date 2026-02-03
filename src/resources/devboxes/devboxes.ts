@@ -314,6 +314,16 @@ export class Devboxes extends APIResource {
   }
 
   /**
+   * Get resource usage metrics for a specific Devbox. Returns CPU, memory, and disk
+   * consumption calculated from the Devbox's lifecycle, excluding any suspended
+   * periods for CPU and memory. Disk usage includes the full elapsed time since
+   * storage is consumed even when suspended.
+   */
+  retrieveResourceUsage(id: string, options?: Core.RequestOptions): Core.APIPromise<DevboxResourceUsageView> {
+    return this._client.get(`/v1/devboxes/${id}/usage`, options);
+  }
+
+  /**
    * Shutdown a running Devbox. This will permanently stop the Devbox. If you want to
    * save the state of the Devbox, you should take a snapshot before shutting down or
    * should suspend the Devbox instead of shutting down.
@@ -533,6 +543,57 @@ export interface DevboxListView {
   remaining_count: number;
 
   total_count: number;
+}
+
+export interface DevboxResourceUsageView {
+  /**
+   * The devbox ID.
+   */
+  id: string;
+
+  /**
+   * Disk usage in GB-seconds (total_elapsed_seconds multiplied by disk size in GB).
+   * Disk is billed for elapsed time since storage is consumed even when suspended.
+   */
+  disk_gb_seconds: number;
+
+  /**
+   * Memory usage in GB-seconds (total_active_seconds multiplied by memory in GB).
+   */
+  memory_gb_seconds: number;
+
+  /**
+   * The devbox creation time in milliseconds since epoch.
+   */
+  start_time_ms: number;
+
+  /**
+   * The current status of the devbox.
+   */
+  status: string;
+
+  /**
+   * Total time in seconds the devbox was actively running (excludes time spent
+   * suspended).
+   */
+  total_active_seconds: number;
+
+  /**
+   * Total elapsed time in seconds from devbox creation to now (or end time if
+   * terminated). Includes all time regardless of devbox state.
+   */
+  total_elapsed_seconds: number;
+
+  /**
+   * vCPU usage in vCPU-seconds (total_active_seconds multiplied by the number of
+   * vCPUs).
+   */
+  vcpu_seconds: number;
+
+  /**
+   * The devbox end time in milliseconds since epoch, or null if still running.
+   */
+  end_time_ms?: number | null;
 }
 
 export interface DevboxSendStdInRequest {
@@ -1229,6 +1290,7 @@ export declare namespace Devboxes {
     type DevboxExecutionDetailView as DevboxExecutionDetailView,
     type DevboxKillExecutionRequest as DevboxKillExecutionRequest,
     type DevboxListView as DevboxListView,
+    type DevboxResourceUsageView as DevboxResourceUsageView,
     type DevboxSendStdInRequest as DevboxSendStdInRequest,
     type DevboxSendStdInResult as DevboxSendStdInResult,
     type DevboxSnapshotListView as DevboxSnapshotListView,
