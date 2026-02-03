@@ -20,6 +20,7 @@ export {
   type DevboxExecutionDetailView,
   type DevboxKillExecutionRequest,
   type DevboxListView,
+  type DevboxResourceUsageView,
   type DevboxSendStdInRequest,
   type DevboxSendStdInResult,
   type DevboxSnapshotListView,

@@ -109,6 +109,7 @@ Types:
 - <code><a href="./src/resources/devboxes/devboxes.ts">DevboxExecutionDetailView</a></code>
 - <code><a href="./src/resources/devboxes/devboxes.ts">DevboxKillExecutionRequest</a></code>
 - <code><a href="./src/resources/devboxes/devboxes.ts">DevboxListView</a></code>
+- <code><a href="./src/resources/devboxes/devboxes.ts">DevboxResourceUsageView</a></code>
 - <code><a href="./src/resources/devboxes/devboxes.ts">DevboxSendStdInRequest</a></code>
 - <code><a href="./src/resources/devboxes/devboxes.ts">DevboxSendStdInResult</a></code>
 - <code><a href="./src/resources/devboxes/devboxes.ts">DevboxSnapshotListView</a></code>
@@ -142,6 +143,7 @@ Methods:
 - <code title="post /v1/devboxes/{id}/read_file_contents">client.devboxes.<a href="./src/resources/devboxes/devboxes.ts">readFileContents</a>(id, { ...params }) -> string</code>
 - <code title="post /v1/devboxes/{id}/remove_tunnel">client.devboxes.<a href="./src/resources/devboxes/devboxes.ts">removeTunnel</a>(id, { ...params }) -> unknown</code>
 - <code title="post /v1/devboxes/{id}/resume">client.devboxes.<a href="./src/resources/devboxes/devboxes.ts">resume</a>(id) -> DevboxView</code>
+- <code title="get /v1/devboxes/{id}/usage">client.devboxes.<a href="./src/resources/devboxes/devboxes.ts">retrieveResourceUsage</a>(id) -> DevboxResourceUsageView</code>
 - <code title="post /v1/devboxes/{id}/shutdown">client.devboxes.<a href="./src/resources/devboxes/devboxes.ts">shutdown</a>(id) -> DevboxView</code>
 - <code title="post /v1/devboxes/{id}/snapshot_disk">client.devboxes.<a href="./src/resources/devboxes/devboxes.ts">snapshotDisk</a>(id, { ...params }) -> DevboxSnapshotView</code>
 - <code title="post /v1/devboxes/{id}/snapshot_disk_async">client.devboxes.<a href="./src/resources/devboxes/devboxes.ts">snapshotDiskAsync</a>(id, { ...params }) -> DevboxSnapshotView</code>
