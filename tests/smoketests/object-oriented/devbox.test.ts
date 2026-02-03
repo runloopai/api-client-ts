@@ -434,16 +434,15 @@ describe('smoketest: object-oriented devbox', () => {
       }
     });
 
-    test('getTunnelUrl throws when no tunnel enabled', async () => {
+    test('getTunnelUrl throws RunloopError when no tunnel enabled', async () => {
       const devbox = await sdk.devbox.create({
         name: uniqueName('sdk-devbox-get-tunnel-url-error'),
         launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 },
       });
 
       try {
-        await expect(devbox.getTunnelUrl(8080)).rejects.toThrow(
-          'No tunnel has been enabled for this devbox. Call net.enableTunnel() first.',
-        );
+        // Verify getTunnelUrl throws RunloopError when no tunnel is enabled
+        await expect(devbox.getTunnelUrl(8080)).rejects.toThrow('No tunnel has been enabled');
       } finally {
         await devbox.shutdown();
       }

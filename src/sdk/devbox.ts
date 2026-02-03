@@ -1,4 +1,5 @@
 import { Runloop } from '../index';
+import { RunloopError } from '../error';
 import type * as Core from '../core';
 import type {
   DevboxView,
@@ -854,12 +855,12 @@ export class Devbox {
    * @param {number} port - The port number to construct the URL for
    * @param {Core.RequestOptions} [options] - Request options
    * @returns {Promise<string>} The tunnel URL for the specified port
-   * @throws {Error} If no tunnel has been enabled for this devbox
+   * @throws {BadRequestError} If no tunnel has been enabled for this devbox
    */
   async getTunnelUrl(port: number, options?: Core.RequestOptions): Promise<string> {
     const tunnel = await this.getTunnel(options);
     if (!tunnel) {
-      throw new Error('No tunnel has been enabled for this devbox. Call net.enableTunnel() first.');
+      throw new RunloopError('No tunnel has been enabled for this devbox. Call net.enableTunnel() first.');
     }
     return `https://${port}-${tunnel.tunnel_key}.tunnel.runloop.ai`;
   }

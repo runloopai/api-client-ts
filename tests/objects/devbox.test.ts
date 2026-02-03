@@ -1,4 +1,5 @@
 import { Devbox } from '../../src/sdk/devbox';
+import { RunloopError } from '../../src/error';
 import type { DevboxView, DevboxAsyncExecutionDetailView } from '../../src/resources/devboxes/devboxes';
 // Mock the Runloop client
 jest.mock('../../src/index');
@@ -302,10 +303,11 @@ describe('Devbox (New API)', () => {
         expect(url).toBe('https://3000-mykey456.tunnel.runloop.ai');
       });
 
-      it('should throw error when no tunnel has been enabled', async () => {
+      it('should throw RunloopError when no tunnel has been enabled', async () => {
         const dataWithoutTunnel = { ...mockDevboxData, tunnel: null };
         mockClient.devboxes.retrieve.mockResolvedValue(dataWithoutTunnel);
 
+        await expect(devbox.getTunnelUrl(8080)).rejects.toThrow(RunloopError);
         await expect(devbox.getTunnelUrl(8080)).rejects.toThrow(
           'No tunnel has been enabled for this devbox. Call net.enableTunnel() first.',
         );
