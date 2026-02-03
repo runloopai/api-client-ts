@@ -12,7 +12,7 @@ on:
 jobs:
   set-stable-tag:
     name: Set stable tag
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
 
     steps:
       - uses: runloopai/checkout@main

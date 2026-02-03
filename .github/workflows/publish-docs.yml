@@ -12,7 +12,7 @@ permissions:
 
 jobs:
   get_history: # create an artifact from the existing documentation builds
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     steps:
       - name: get the gh-pages repo
         uses: runloopai/checkout@main
@@ -32,7 +32,7 @@ jobs:
 
   build: # builds the distribution and then the documentation
     needs: get_history
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     steps:
       - name: Checkout src
         uses: runloopai/checkout@main
@@ -66,7 +66,7 @@ jobs:
 
   commit: # commit the old and new merged documents to gh-pages/docs
     needs: build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     steps:
       - name: checkout the gh-pages repo
         uses: runloopai/checkout@main
