@@ -1,5 +1,22 @@
 # Changelog
 
+## 1.6.0 (2026-02-04)
+
+Full Changelog: [v1.5.1...v1.6.0](https://github.com/runloopai/api-client-ts/compare/v1.5.1...v1.6.0)
+
+### Features
+
+* add api to query devbox usage ([#7296](https://github.com/runloopai/api-client-ts/issues/7296)) ([7c5fbee](https://github.com/runloopai/api-client-ts/commit/7c5fbee5859eb24604678ad4436414333cb9120f))
+* Add tunnel helpers to OO sdk ([#705](https://github.com/runloopai/api-client-ts/issues/705)) ([d510b53](https://github.com/runloopai/api-client-ts/commit/d510b53304d9fc8c506192c5a3cb078681013ab7))
+* **devbox:** adding gateway config to devbox ([#701](https://github.com/runloopai/api-client-ts/issues/701)) ([173fada](https://github.com/runloopai/api-client-ts/commit/173fadaf97a02e89138addf57bcf9f5e580a81b3))
+
+
+### Chores
+
+* **client:** do not parse responses with empty content-length ([f797b28](https://github.com/runloopai/api-client-ts/commit/f797b28110f08f78867a4e9fb8d45eb2073c3247))
+* deprecate remove tunnel API ([#707](https://github.com/runloopai/api-client-ts/issues/707)) ([e2322e6](https://github.com/runloopai/api-client-ts/commit/e2322e693c17d395f373bc08fc931e32be891b29))
+* Mark legacy tunnel methods deprecated ([#706](https://github.com/runloopai/api-client-ts/issues/706)) ([56a26f9](https://github.com/runloopai/api-client-ts/commit/56a26f950e26d6f86baede3eddeb2282130f8d33))
+
 ## 1.5.1 (2026-01-30)
 
 Full Changelog: [v1.5.0...v1.5.1](https://github.com/runloopai/api-client-ts/compare/v1.5.0...v1.5.1)
