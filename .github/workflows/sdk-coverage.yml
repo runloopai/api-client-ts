@@ -71,135 +71,106 @@ jobs:
           script: |
             const fs = require('fs');
             const testsPassed = '${{ steps.tests.outcome }}' === 'success';
-
-            // Build workflow run URL
             const runUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
-            
-            // Marker to identify our comment
             const COMMENT_MARKER = '<!-- sdk-coverage-report -->';
-
-            let comment = COMMENT_MARKER + '\n';
-
+            
+            let lines = [COMMENT_MARKER];
+            
             if (!testsPassed) {
-              // Try to parse failed tests from the log
-              let failedTests = '';
+              let failedTests = [];
               try {
                 const testOutput = fs.readFileSync('test-output.log', 'utf8');
-                
-                // Extract failed test names using regex
                 const failedMatches = testOutput.match(/● (.+?)(?:\n|$)/g);
-                if (failedMatches && failedMatches.length > 0) {
-                  const failedTestList = failedMatches
-                    .map(match => match.replace('● ', '').trim())
-                    .filter(test => test.length > 0)
-                    .slice(0, 10) // Limit to first 10 failures
-                    .map(test => `- ${test}`)
-                    .join('\n');
-                  
-                  if (failedTestList) {
-                    failedTests = `\n\n**Failed Tests:**\n${failedTestList}`;
-                    if (failedMatches.length > 10) {
-                      failedTests += `\n- ... and ${failedMatches.length - 10} more`;
-                    }
-                  }
+                if (failedMatches) {
+                  failedTests = failedMatches
+                    .map(m => m.replace('● ', '').trim())
+                    .filter(t => t.length > 0)
+                    .slice(0, 10);
                 }
-              } catch (error) {
-                console.log('Could not read test output:', error.message);
-              }
-
-              comment += `## ❌ Object Smoke Tests Failed
+              } catch (e) {}
               
-### Test Results
-❌ Some smoke tests failed
-${failedTests}
-
-**Please fix the failing tests before checking coverage.**
-
-[📋 View full test logs](${runUrl})`;
+              lines.push('## ❌ Object Smoke Tests Failed');
+              lines.push('');
+              lines.push('### Test Results');
+              lines.push('❌ Some smoke tests failed');
+              if (failedTests.length > 0) {
+                lines.push('');
+                lines.push('**Failed Tests:**');
+                failedTests.forEach(t => lines.push(`- ${t}`));
+              }
+              lines.push('');
+              lines.push('**Please fix the failing tests before checking coverage.**');
+              lines.push('');
+              lines.push(`[📋 View full test logs](${runUrl})`);
             } else {
               let coverageSummary = null;
               try {
                 coverageSummary = JSON.parse(fs.readFileSync('coverage-objects/coverage-summary.json', 'utf8'));
-              } catch (error) {
-                console.log('Coverage summary not found:', error.message);
-                comment += `## ⚠️ Coverage Data Missing
-                
-### Test Results
-✅ All smoke tests passed
-
-### Coverage Results
-⚠️ Coverage data could not be read
-
-[📋 View workflow logs](${runUrl})`;
-              }
-
-              if (coverageSummary) {
+              } catch (e) {}
+              
+              if (!coverageSummary) {
+                lines.push('## ⚠️ Coverage Data Missing');
+                lines.push('');
+                lines.push('### Test Results');
+                lines.push('✅ All smoke tests passed');
+                lines.push('');
+                lines.push('### Coverage Results');
+                lines.push('⚠️ Coverage data could not be read');
+                lines.push('');
+                lines.push(`[📋 View workflow logs](${runUrl})`);
+              } else {
                 const total = coverageSummary.total;
-                const functions = total.functions.pct;
-                const lines = total.lines.pct;
+                const funcs = total.functions.pct;
+                const lns = total.lines.pct;
                 const branches = total.branches.pct;
-                const statements = total.statements.pct;
-
-                const coveragePassed = functions === 100;
-                const allPassed = testsPassed && coveragePassed;
-                const statusEmoji = allPassed ? '✅' : '⚠️';
-
-                // Build per-file coverage table
-                let fileTable = '| File | Functions | Lines | Branches | Uncovered Lines |\n';
-                fileTable += '|------|-----------|-------|----------|----------------|\n';
+                const stmts = total.statements.pct;
+                const coveragePassed = funcs === 100;
+                const statusEmoji = coveragePassed ? '✅' : '⚠️';
+                
+                lines.push(`## ${statusEmoji} Object Smoke Tests & Coverage Report`);
+                lines.push('');
+                lines.push('### Test Results');
+                lines.push('✅ All smoke tests passed');
+                lines.push('');
+                lines.push('### Coverage Results');
+                lines.push('| Metric | Coverage | Required | Status |');
+                lines.push('|--------|----------|----------|--------|');
+                lines.push(`| **Functions** | **${funcs}%** | **100%** | ${coveragePassed ? '✅' : '❌'} |`);
+                lines.push(`| Lines | ${lns}% | - | ℹ️ |`);
+                lines.push(`| Branches | ${branches}% | - | ℹ️ |`);
+                lines.push(`| Statements | ${stmts}% | - | ℹ️ |`);
+                lines.push('');
+                lines.push('**Coverage Requirement:** 100% function coverage (all public methods must be called in smoke tests)');
+                lines.push('');
+                lines.push(coveragePassed 
+                  ? '✅ All tests passed and all object methods are covered!' 
+                  : '⚠️ Some object methods are not covered in smoke tests. Please add tests that call all public methods.');
+                lines.push('');
+                lines.push('<details>');
+                lines.push('<summary>View detailed coverage report</summary>');
+                lines.push('');
+                lines.push('| File | Functions | Lines | Branches |');
+                lines.push('|------|-----------|-------|----------|');
                 
                 for (const [filePath, data] of Object.entries(coverageSummary)) {
                   if (filePath === 'total') continue;
-                  
                   const shortPath = filePath.replace(/^.*?src\//, 'src/');
                   const funcPct = data.functions.pct;
                   const linesPct = data.lines.pct;
                   const branchesPct = data.branches.pct;
-                  
-                  // Get uncovered lines
-                  let uncoveredLines = '-';
-                  if (data.lines.uncovered && data.lines.uncovered.length > 0) {
-                    const lines = data.lines.uncovered.slice(0, 5).join(', ');
-                    uncoveredLines = data.lines.uncovered.length > 5 
-                      ? `${lines}, ...` 
-                      : lines;
-                  }
-                  
                   const funcStatus = funcPct === 100 ? '✅' : '❌';
-                  fileTable += `| ${shortPath} | ${funcStatus} ${funcPct}% | ${linesPct}% | ${branchesPct}% | ${uncoveredLines} |\n`;
+                  lines.push(`| ${shortPath} | ${funcStatus} ${funcPct}% | ${linesPct}% | ${branchesPct}% |`);
                 }
-
-                comment += `## ${statusEmoji} Object Smoke Tests & Coverage Report
-
-### Test Results
-✅ All smoke tests passed
-
-### Coverage Results
-| Metric | Coverage | Required | Status |
-|--------|----------|----------|--------|
-| **Functions** | **${functions}%** | **100%** | ${coveragePassed ? '✅' : '❌'} |
-| Lines | ${lines}% | - | ℹ️ |
-| Branches | ${branches}% | - | ℹ️ |
-| Statements | ${statements}% | - | ℹ️ |
-
-**Coverage Requirement:** 100% function coverage (all public methods must be called in smoke tests)
-
-${coveragePassed 
-  ? '✅ All tests passed and all object methods are covered!' 
-  : '⚠️ Some object methods are not covered in smoke tests. Please add tests that call all public methods.'}
-
-<details>
-<summary>View detailed coverage report</summary>
-
-${fileTable}
-
-</details>
-
-[📋 View workflow run](${runUrl})`;
+                
+                lines.push('');
+                lines.push('</details>');
+                lines.push('');
+                lines.push(`[📋 View workflow run](${runUrl})`);
               }
             }
-
-            // Find existing comment
+            
+            const comment = lines.join('\n');
+            
             const { data: comments } = await github.rest.issues.listComments({
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -209,7 +180,6 @@ ${fileTable}
             const existingComment = comments.find(c => c.body.includes(COMMENT_MARKER));
             
             if (existingComment) {
-              // Update existing comment
               await github.rest.issues.updateComment({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
@@ -217,7 +187,6 @@ ${fileTable}
                 body: comment
               });
             } else {
-              // Create new comment
               await github.rest.issues.createComment({
                 issue_number: context.issue.number,
                 owner: context.repo.owner,
