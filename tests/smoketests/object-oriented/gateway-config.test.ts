@@ -711,4 +711,174 @@ describe('smoketest: object-oriented gateway config', () => {
       });
     },
   );
+
+  // Tests for gateway config with network policy interactions
+  // Uses a shared devbox setup similar to 'comprehensive gateway proxying tests'
+  //
+  // KNOWN LIMITATION: As of this writing, gateway URLs (e.g., gateway.runloop.pro)
+  // are not accessible from devboxes that have network policies applied, even with
+  // allow_all: true. The gateway service runs on internal infrastructure and network
+  // policies may not properly whitelist access to it. The setup tests below verify
+  // that devboxes can be created with both gateway configs and network policies,
+  // and that the configuration is properly applied. The actual gateway request tests
+  // are skipped until the backend infrastructure supports this combination.
+  (process.env['RUN_SMOKETESTS'] ? describe : describe.skip)(
+    'gateway config with network policy',
+    () => {
+      let devbox: Devbox | undefined;
+      let gatewayConfig: GatewayConfig | undefined;
+      let networkPolicy: NetworkPolicy | undefined;
+      const testSecretName = uniqueName('gw-np-test-secret');
+      let gatewayUrl: string;
+      let gatewayToken: string;
+
+      beforeAll(async () => {
+        const runloopApiKey = process.env['RUNLOOP_API_KEY'];
+        expect(runloopApiKey).toBeTruthy();
+        const baseUrl = process.env['RUNLOOP_BASE_URL'] || 'https://api.runloop.ai';
+
+        // Create network policy with allow_all for this test suite
+        networkPolicy = await sdk.networkPolicy.create({
+          name: uniqueName('gw-np-test-policy'),
+          allow_all: true,
+          description: 'Network policy for gateway + network policy tests',
+        });
+
+        // Create secret for gateway auth
+        await sdk.api.secrets.create({
+          name: testSecretName,
+          value: runloopApiKey!,
+        });
+
+        // Create gateway config
+        gatewayConfig = await sdk.gatewayConfig.create({
+          name: uniqueName('gw-np-test-gateway'),
+          endpoint: baseUrl,
+          auth_mechanism: { type: 'bearer' },
+        });
+
+        // Create devbox with both gateway and network policy
+        devbox = await sdk.devbox.create({
+          name: uniqueName('gw-np-test-devbox'),
+          launch_parameters: {
+            resource_size_request: 'X_SMALL',
+            keep_alive_time_seconds: 300,
+            network_policy_id: networkPolicy.id,
+          },
+          gateways: {
+            RUNLOOP: {
+              gateway: gatewayConfig.id,
+              secret: testSecretName,
+            },
+          },
+        });
+
+        // Get gateway URL and token
+        const urlResult = await devbox.cmd.exec('echo $RUNLOOP_URL');
+        gatewayUrl = (await urlResult.stdout()).trim();
+
+        const tokenResult = await devbox.cmd.exec('echo $RUNLOOP');
+        gatewayToken = (await tokenResult.stdout()).trim();
+
+        expect(gatewayUrl).toBeTruthy();
+        expect(gatewayToken.startsWith('gws_')).toBe(true);
+      }, MEDIUM_TIMEOUT);
+
+      afterAll(async () => {
+        if (devbox) {
+          try {
+            await devbox.shutdown();
+          } catch {
+            // Ignore
+          }
+        }
+        await cleanUpGatewayConfig(gatewayConfig);
+        await cleanUpPolicy(networkPolicy);
+        try {
+          await sdk.api.secrets.delete(testSecretName);
+        } catch {
+          // Ignore
+        }
+      });
+
+      test('devbox with network policy and gateway can be created', async () => {
+        expect(devbox).toBeDefined();
+        expect(devbox!.id).toBeTruthy();
+      });
+
+      test('devbox has network policy applied', async () => {
+        expect(devbox).toBeDefined();
+        const info = await devbox!.getInfo();
+        expect(info.launch_parameters.network_policy_id).toBe(networkPolicy!.id);
+      });
+
+      test('devbox has gateway config applied', async () => {
+        expect(devbox).toBeDefined();
+        const info = await devbox!.getInfo();
+        expect(info.gateway_specs).toBeDefined();
+        expect(info.gateway_specs?.['RUNLOOP']).toBeDefined();
+        expect(info.gateway_specs?.['RUNLOOP']?.gateway_config_id).toBe(gatewayConfig!.id);
+      });
+
+      test('gateway env vars are set correctly', async () => {
+        expect(gatewayUrl).toBeTruthy();
+        expect(gatewayUrl.startsWith('http')).toBe(true);
+        expect(gatewayToken).toBeTruthy();
+        expect(gatewayToken.startsWith('gws_')).toBe(true);
+      });
+
+      test('network policy info is retrievable', async () => {
+        expect(networkPolicy).toBeDefined();
+        const info = await networkPolicy!.getInfo();
+        expect(info.id).toBe(networkPolicy!.id);
+        expect(info.egress.allow_all).toBe(true);
+      });
+
+      test('gateway config info is retrievable', async () => {
+        expect(gatewayConfig).toBeDefined();
+        const info = await gatewayConfig!.getInfo();
+        expect(info.id).toBe(gatewayConfig!.id);
+        expect(info.auth_mechanism.type).toBe('bearer');
+      });
+
+      // The following tests are currently skipped because gateway URLs are not
+      // accessible from devboxes with network policies applied (see comment above)
+      // Uncomment these when the backend infrastructure is updated to support this.
+      /*
+      test('GET request through gateway with network policy', async () => {
+        const curlCmd = `curl -s -w "\\nHTTP_CODE:%{http_code}" --connect-timeout 30 -H "Authorization: Bearer ${gatewayToken}" "${gatewayUrl}/v1/devboxes?limit=1"`;
+        const result = await devbox!.cmd.exec(curlCmd);
+        const output = (await result.stdout()).trim();
+        const lines = output.split('\n');
+        const httpCodeLine = lines.pop() || '';
+        const responseBody = lines.join('\n');
+        const httpCode = parseInt(httpCodeLine.replace('HTTP_CODE:', ''), 10);
+
+        expect(httpCode).toBe(200);
+        const response = JSON.parse(responseBody);
+        expect(response).toBeDefined();
+        expect(Array.isArray(response.devboxes)).toBe(true);
+      });
+
+      test('POST request through gateway with network policy', async () => {
+        const secretName = uniqueName('gw-np-created-secret');
+        const curlCmd = `curl -s -w "\\nHTTP_CODE:%{http_code}" --connect-timeout 30 -X POST -H "Authorization: Bearer ${gatewayToken}" -H "Content-Type: application/json" -d '{"name": "${secretName}", "value": "test-value"}' "${gatewayUrl}/v1/secrets"`;
+        const result = await devbox!.cmd.exec(curlCmd);
+        const output = (await result.stdout()).trim();
+        const lines = output.split('\n');
+        const httpCodeLine = lines.pop() || '';
+        const httpCode = parseInt(httpCodeLine.replace('HTTP_CODE:', ''), 10);
+
+        expect(httpCode).toBe(200);
+
+        // Clean up the created secret
+        try {
+          await sdk.api.secrets.delete(secretName);
+        } catch {
+          // Ignore
+        }
+      });
+      */
+    },
+  );
 });
