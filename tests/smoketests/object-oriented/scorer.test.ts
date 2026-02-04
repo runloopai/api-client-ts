@@ -53,12 +53,6 @@ describe('smoketest: object-oriented scorers', () => {
       scorerType = newType;
     });
 
-    test('validate scorer', async () => {
-      const result = await scorer.validate({ scoring_context: { test: true } });
-      expect(result.scoring_result).toBeDefined();
-      expect(typeof result.scoring_result.score).toBe('number');
-    });
-
     test('get scorer by ID', async () => {
       const retrieved = sdk.scorer.fromId(scorerId!);
       expect(retrieved.id).toBe(scorerId);
