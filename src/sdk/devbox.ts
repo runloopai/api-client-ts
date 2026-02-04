@@ -155,19 +155,20 @@ export class DevboxNetOps {
   }
 
   /**
-   * [Deprecated] Tunnels remain active until devbox is shutdown. This removes legacy tunnels only.
+   * @deprecated Only works with legacy tunnels created via {@link createTunnel}.
+   * V2 tunnels (from {@link enableTunnel}) remain active until devbox shutdown and cannot be removed.
    *
-   * Remove a tunnel from the devbox.
+   * Remove a legacy tunnel from the devbox.
    *
    * @example
    * ```typescript
+   * // Deprecated - only for legacy tunnels
    * await devbox.net.removeTunnel({ port: 8080 });
    * ```
    *
-   * @param {DevboxRemoveTunnelParams} params - Tunnel removal parameters
+   * @param {DevboxRemoveTunnelParams} params - Tunnel removal parameters including port
    * @param {Core.RequestOptions} [options] - Request options
    * @returns {Promise<DevboxRemoveTunnelResponse>} Tunnel removal result
-   * @deprecated Legacy tunnels only. V2 tunnels (from enableTunnel) remain active until devbox shutdown.
    */
   async removeTunnel(params: DevboxRemoveTunnelParams, options?: Core.RequestOptions) {
     return this.client.devboxes.removeTunnel(this.devboxId, params, options);
