@@ -415,10 +415,10 @@ export class Devboxes extends APIResource {
   }
 
   /**
-   * [Deprecated] Tunnels remain active until devbox is shutdown. This endpoint
-   * removes a legacy tunnel.
+   * @deprecated Only works with legacy tunnels created via {@link createTunnel}.
+   * V2 tunnels (from {@link enableTunnel}) remain active until devbox shutdown and cannot be removed.
    *
-   * @deprecated
+   * Remove a legacy tunnel from the devbox.
    */
   removeTunnel(
     id: string,
