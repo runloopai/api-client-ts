@@ -102,19 +102,24 @@ export class DevboxNetOps {
   }
 
   /**
-   * [Deprecated] Use enableTunnel instead. This method creates a legacy tunnel.
+   * @deprecated Use {@link enableTunnel} instead for V2 tunnels with better URL format.
    *
-   * Open a port on the devbox to be accessible from the internet.
+   * Creates a legacy tunnel to expose a specific port on the devbox.
+   * The legacy tunnel URL format is: `https://{devbox_id}-{port}.tunnel.runloop.ai`
+   *
+   * V2 tunnels (via enableTunnel) provide encrypted URL-based access with the format:
+   * `https://{port}-{tunnel_key}.tunnel.runloop.ai`
    *
    * @example
    * ```typescript
+   * // Deprecated - use enableTunnel instead
    * const tunnel = await devbox.net.createTunnel({ port: 8080 });
+   * console.log(tunnel.url); // Legacy URL format
    * ```
    *
-   * @param {DevboxCreateTunnelParams} params - Tunnel creation parameters
+   * @param {DevboxCreateTunnelParams} params - Tunnel creation parameters including port
    * @param {Core.RequestOptions} [options] - Request options
-   * @returns {Promise<DevboxTunnelView>} Tunnel creation result
-   * @deprecated Use enableTunnel instead for V2 tunnels
+   * @returns {Promise<DevboxTunnelView>} Legacy tunnel view with devbox_id, port, and url
    */
   async createTunnel(params: DevboxCreateTunnelParams, options?: Core.RequestOptions) {
     return this.client.devboxes.createTunnel(this.devboxId, params, options);

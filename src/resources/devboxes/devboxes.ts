@@ -189,11 +189,13 @@ export class Devboxes extends APIResource {
   }
 
   /**
-   * [Deprecated] Use POST /v1/devboxes/{id}/enable_tunnel instead. This endpoint
-   * creates a legacy tunnel. The new enable_tunnel endpoint provides improved tunnel
-   * functionality with authentication options.
+   * @deprecated Use {@link enableTunnel} instead for V2 tunnels with better URL format.
    *
-   * @deprecated
+   * Creates a legacy tunnel to expose a specific port on the devbox.
+   * The legacy tunnel URL format is: `https://{devbox_id}-{port}.tunnel.runloop.ai`
+   *
+   * V2 tunnels (via enableTunnel) provide encrypted URL-based access with the format:
+   * `https://{port}-{tunnel_key}.tunnel.runloop.ai`
    */
   createTunnel(
     id: string,
