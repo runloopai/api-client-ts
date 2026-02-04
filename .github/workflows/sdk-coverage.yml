@@ -183,3 +183,9 @@ jobs:
               repo: context.repo.repo,
               body: comment
             });
+
+      - name: Fail if tests failed
+        if: steps.tests.outcome != 'success'
+        run: |
+          echo "Smoke tests failed. See PR comment for details."
+          exit 1
