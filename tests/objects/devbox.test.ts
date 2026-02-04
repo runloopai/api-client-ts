@@ -331,8 +331,13 @@ describe('Devbox (New API)', () => {
         expect(result).toEqual(mockSSHKey);
       });
 
-      it('should create legacy tunnel', async () => {
-        const mockTunnel = { devbox_id: 'devbox-123', port: 8080 };
+      it('should create legacy tunnel (deprecated) and return old URL format', async () => {
+        // Legacy tunnel response includes the old URL format: https://{devbox_id}-{port}.tunnel.runloop.ai
+        const mockTunnel = {
+          devbox_id: 'devbox-123',
+          port: 8080,
+          url: 'https://devbox-123-8080.tunnel.runloop.ai',
+        };
         mockClient.devboxes.createTunnel.mockResolvedValue(mockTunnel);
 
         const result = await devbox.net.createTunnel({ port: 8080 });
@@ -343,6 +348,10 @@ describe('Devbox (New API)', () => {
           undefined,
         );
         expect(result).toEqual(mockTunnel);
+        expect(result.devbox_id).toBe('devbox-123');
+        expect(result.port).toBe(8080);
+        // Verify the legacy URL format contains devbox_id and port
+        expect(result.url).toBe('https://devbox-123-8080.tunnel.runloop.ai');
       });
 
       it('should enable V2 tunnel with params', async () => {
