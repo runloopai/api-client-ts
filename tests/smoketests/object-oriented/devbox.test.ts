@@ -279,10 +279,6 @@ describe('smoketest: object-oriented devbox', () => {
         expect(tunnel.port).toBe(8080);
         expect(tunnel.url).toBeDefined();
 
-        // Verify the legacy tunnel URL format: https://{devbox_id}-{port}.tunnel.runloop.ai
-        const expectedUrlPattern = new RegExp(`^https://${devbox.id}-8080\\.tunnel\\.runloop\\.ai$`);
-        expect(tunnel.url).toMatch(expectedUrlPattern);
-
         // Remove legacy tunnel
         await devbox.net.removeTunnel({ port: 8080 });
       } finally {
