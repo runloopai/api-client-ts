@@ -1,4 +1,5 @@
 import { Runloop } from '../index';
+import { RunloopError } from '../error';
 import type * as Core from '../core';
 import type {
   DevboxView,
@@ -16,6 +17,7 @@ import type {
   DevboxExecuteAsyncParams,
   DevboxSnapshotView,
   DevboxKeepAliveResponse,
+  TunnelView,
 } from '../resources/devboxes/devboxes';
 import { PollingOptions } from '../lib/polling';
 import { Snapshot } from './snapshot';
@@ -817,6 +819,50 @@ export class Devbox {
    */
   async getInfo(options?: Core.RequestOptions): Promise<DevboxView> {
     return this.client.devboxes.retrieve(this._id, options);
+  }
+
+  /**
+   * Get the tunnel information for this devbox.
+   * Returns null if no tunnel has been enabled.
+   *
+   * @example
+   * ```typescript
+   * const tunnel = await devbox.getTunnel();
+   * if (tunnel) {
+   *   console.log(`Tunnel key: ${tunnel.tunnel_key}`);
+   * }
+   * ```
+   *
+   * @param {Core.RequestOptions} [options] - Request options
+   * @returns {Promise<TunnelView | null>} The tunnel information, or null if no tunnel exists
+   */
+  async getTunnel(options?: Core.RequestOptions): Promise<TunnelView | null> {
+    const info = await this.getInfo(options);
+    return info.tunnel ?? null;
+  }
+
+  /**
+   * Get the tunnel URL for a specific port.
+   * Throws an error if no tunnel has been enabled.
+   *
+   * @example
+   * ```typescript
+   * const url = await devbox.getTunnelUrl(8080);
+   * console.log(`Access your app at: ${url}`);
+   * // Output: https://8080-abc123xyz.tunnel.runloop.ai
+   * ```
+   *
+   * @param {number} port - The port number to construct the URL for
+   * @param {Core.RequestOptions} [options] - Request options
+   * @returns {Promise<string>} The tunnel URL for the specified port
+   * @throws {BadRequestError} If no tunnel has been enabled for this devbox
+   */
+  async getTunnelUrl(port: number, options?: Core.RequestOptions): Promise<string> {
+    const tunnel = await this.getTunnel(options);
+    if (!tunnel) {
+      throw new RunloopError('No tunnel has been enabled for this devbox. Call net.enableTunnel() first.');
+    }
+    return `https://${port}-${tunnel.tunnel_key}.tunnel.runloop.ai`;
   }
 
   /**

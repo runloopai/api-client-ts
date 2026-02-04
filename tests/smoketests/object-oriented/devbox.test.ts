@@ -380,6 +380,73 @@ describe('smoketest: object-oriented devbox', () => {
         await devbox.shutdown();
       }
     });
+
+    test('getTunnel returns null when no tunnel enabled', async () => {
+      const devbox = await sdk.devbox.create({
+        name: uniqueName('sdk-devbox-get-tunnel-null'),
+        launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 },
+      });
+
+      try {
+        const tunnel = await devbox.getTunnel();
+        expect(tunnel).toBeNull();
+      } finally {
+        await devbox.shutdown();
+      }
+    });
+
+    test('getTunnel returns tunnel info after enabling', async () => {
+      const devbox = await sdk.devbox.create({
+        name: uniqueName('sdk-devbox-get-tunnel'),
+        launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 },
+      });
+
+      try {
+        const enabledTunnel = await devbox.net.enableTunnel({ auth_mode: 'open' });
+        expect(enabledTunnel.tunnel_key).toBeTruthy();
+
+        const tunnel = await devbox.getTunnel();
+        expect(tunnel).not.toBeNull();
+        expect(tunnel?.tunnel_key).toBe(enabledTunnel.tunnel_key);
+        expect(tunnel?.auth_mode).toBe('open');
+      } finally {
+        await devbox.shutdown();
+      }
+    });
+
+    test('getTunnelUrl constructs correct URL', async () => {
+      const devbox = await sdk.devbox.create({
+        name: uniqueName('sdk-devbox-get-tunnel-url'),
+        launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 },
+      });
+
+      try {
+        const tunnel = await devbox.net.enableTunnel({ auth_mode: 'open' });
+        expect(tunnel.tunnel_key).toBeTruthy();
+
+        const url = await devbox.getTunnelUrl(8080);
+        expect(url).toBe(`https://8080-${tunnel.tunnel_key}.tunnel.runloop.ai`);
+
+        const url3000 = await devbox.getTunnelUrl(3000);
+        expect(url3000).toBe(`https://3000-${tunnel.tunnel_key}.tunnel.runloop.ai`);
+      } finally {
+        await devbox.shutdown();
+      }
+    });
+
+    test('getTunnelUrl throws RunloopError when no tunnel enabled', async () => {
+      const devbox = await sdk.devbox.create({
+        name: uniqueName('sdk-devbox-get-tunnel-url-error'),
+        launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 },
+      });
+
+      try {
+        // Verify getTunnelUrl throws RunloopError when no tunnel is enabled
+        await expect(devbox.getTunnelUrl(8080)).rejects.toThrow('No tunnel has been enabled');
+      } finally {
+        await devbox.shutdown();
+      }
+    });
   });
 
   describe('devbox creation from blueprint and snapshot', () => {
