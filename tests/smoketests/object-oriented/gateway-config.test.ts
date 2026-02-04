@@ -1,7 +1,6 @@
 import {
   SHORT_TIMEOUT,
   MEDIUM_TIMEOUT,
-  LONG_TIMEOUT,
   uniqueName,
   makeClientSDK,
   cleanUpGatewayConfig,
@@ -143,18 +142,12 @@ describe('smoketest: object-oriented gateway config', () => {
     test('create gateway config with bearer auth and verify roundtrip', async () => {
       let gatewayConfig: GatewayConfig | undefined;
       try {
-        const createParams = {
+        gatewayConfig = await sdk.gatewayConfig.create({
           name: uniqueName('sdk-gateway-bearer'),
           endpoint: 'https://api.bearer-test.com',
           auth_mechanism: { type: 'bearer' as const },
-        };
-        console.log('Creating gateway config with params:', JSON.stringify(createParams, null, 2));
-
-        gatewayConfig = await sdk.gatewayConfig.create(createParams);
+        });
         const info = await gatewayConfig.getInfo();
-
-        console.log('Gateway config info after create:', JSON.stringify(info, null, 2));
-        console.log('Auth mechanism returned:', JSON.stringify(info.auth_mechanism, null, 2));
 
         expect(info.auth_mechanism).toBeDefined();
         expect(info.auth_mechanism.type).toBe('bearer');
@@ -166,18 +159,12 @@ describe('smoketest: object-oriented gateway config', () => {
     test('create gateway config with header auth and verify roundtrip', async () => {
       let gatewayConfig: GatewayConfig | undefined;
       try {
-        const createParams = {
+        gatewayConfig = await sdk.gatewayConfig.create({
           name: uniqueName('sdk-gateway-header'),
           endpoint: 'https://api.header-test.com',
           auth_mechanism: { type: 'header' as const, key: 'x-api-key' },
-        };
-        console.log('Creating gateway config with params:', JSON.stringify(createParams, null, 2));
-
-        gatewayConfig = await sdk.gatewayConfig.create(createParams);
+        });
         const info = await gatewayConfig.getInfo();
-
-        console.log('Gateway config info after create:', JSON.stringify(info, null, 2));
-        console.log('Auth mechanism returned:', JSON.stringify(info.auth_mechanism, null, 2));
 
         expect(info.auth_mechanism).toBeDefined();
         expect(info.auth_mechanism.type).toBe('header');
@@ -190,18 +177,12 @@ describe('smoketest: object-oriented gateway config', () => {
     test('create gateway config with Authorization header auth', async () => {
       let gatewayConfig: GatewayConfig | undefined;
       try {
-        const createParams = {
+        gatewayConfig = await sdk.gatewayConfig.create({
           name: uniqueName('sdk-gateway-auth-header'),
           endpoint: 'https://api.auth-header-test.com',
           auth_mechanism: { type: 'header' as const, key: 'Authorization' },
-        };
-        console.log('Creating gateway config with params:', JSON.stringify(createParams, null, 2));
-
-        gatewayConfig = await sdk.gatewayConfig.create(createParams);
+        });
         const info = await gatewayConfig.getInfo();
-
-        console.log('Gateway config info after create:', JSON.stringify(info, null, 2));
-        console.log('Auth mechanism returned:', JSON.stringify(info.auth_mechanism, null, 2));
 
         expect(info.auth_mechanism).toBeDefined();
         expect(info.auth_mechanism.type).toBe('header');
@@ -296,217 +277,438 @@ describe('smoketest: object-oriented gateway config', () => {
     );
   });
 
-  // End-to-end test: Server devbox with tunnel + Client devbox with gateway
-  // This verifies the gateway actually proxies the secret to the target server
+  // Comprehensive end-to-end gateway tests
+  // Tests various HTTP methods, request types, and response handling through the gateway
   (process.env['RUN_SMOKETESTS'] ? describe : describe.skip)(
-    'end-to-end gateway proxying verification',
+    'comprehensive gateway proxying tests',
     () => {
-      test(
-        'gateway proxies secret header to tunneled server',
-        async () => {
-          let serverDevbox: Devbox | undefined;
-          let clientDevbox: Devbox | undefined;
-          let gatewayConfig: GatewayConfig | undefined;
-          let networkPolicy: NetworkPolicy | undefined;
-          const testSecretName = uniqueName('e2e-gateway-secret');
-          const testSecretValue = 'test-secret-value-12345';
+      let devbox: Devbox | undefined;
+      let gatewayConfig: GatewayConfig | undefined;
+      let networkPolicy: NetworkPolicy | undefined;
+      const testSecretName = uniqueName('e2e-runloop-api-key');
+      let gatewayUrl: string;
+      let gatewayToken: string;
 
+      // Helper to make curl requests through the gateway
+      const curlRequest = async (
+        method: string,
+        path: string,
+        options: {
+          body?: string;
+          contentType?: string;
+          extraHeaders?: string[];
+        } = {},
+      ) => {
+        const { body, contentType, extraHeaders = [] } = options;
+
+        let curlCmd = `curl -s -w "\\nHTTP_CODE:%{http_code}" -X ${method}`;
+        curlCmd += ` -H "Authorization: Bearer ${gatewayToken}"`;
+
+        if (contentType) {
+          curlCmd += ` -H "Content-Type: ${contentType}"`;
+        }
+
+        for (const header of extraHeaders) {
+          curlCmd += ` -H "${header}"`;
+        }
+
+        if (body) {
+          const escapedBody = body.replace(/'/g, "'\\''");
+          curlCmd += ` -d '${escapedBody}'`;
+        }
+
+        curlCmd += ` "${gatewayUrl}${path}"`;
+
+        const result = await devbox!.cmd.exec(curlCmd);
+        const output = (await result.stdout()).trim();
+
+        const lines = output.split('\n');
+        const httpCodeLine = lines.pop() || '';
+        const responseBody = lines.join('\n');
+        const httpCode = parseInt(httpCodeLine.replace('HTTP_CODE:', ''), 10);
+
+        return { httpCode, responseBody, exitCode: result.exitCode };
+      };
+
+      beforeAll(async () => {
+        const runloopApiKey = process.env['RUNLOOP_API_KEY'];
+        expect(runloopApiKey).toBeTruthy();
+
+        const baseUrl = process.env['RUNLOOP_BASE_URL'] || 'https://api.runloop.ai';
+
+        networkPolicy = await sdk.networkPolicy.create({
+          name: uniqueName('e2e-gateway-policy'),
+          allow_all: true,
+          description: 'Allow all traffic for comprehensive gateway tests',
+        });
+
+        await sdk.api.secrets.create({
+          name: testSecretName,
+          value: runloopApiKey!,
+        });
+
+        gatewayConfig = await sdk.gatewayConfig.create({
+          name: uniqueName('e2e-runloop-gateway'),
+          endpoint: baseUrl,
+          auth_mechanism: { type: 'bearer' },
+          description: 'Gateway config for comprehensive e2e tests',
+        });
+
+        devbox = await sdk.devbox.create({
+          name: uniqueName('e2e-gateway-devbox'),
+          launch_parameters: {
+            resource_size_request: 'X_SMALL',
+            keep_alive_time_seconds: 300,
+          },
+          gateways: {
+            RUNLOOP: {
+              gateway: gatewayConfig.id,
+              secret: testSecretName,
+            },
+          },
+        });
+
+        const urlResult = await devbox.cmd.exec('echo $RUNLOOP_URL');
+        gatewayUrl = (await urlResult.stdout()).trim();
+
+        const tokenResult = await devbox.cmd.exec('echo $RUNLOOP');
+        gatewayToken = (await tokenResult.stdout()).trim();
+
+        expect(gatewayUrl).toBeTruthy();
+        expect(gatewayToken.startsWith('gws_')).toBe(true);
+      }, MEDIUM_TIMEOUT);
+
+      afterAll(async () => {
+        if (devbox) {
           try {
-            // Step 0: Create a network policy that allows all traffic
-            console.log('Creating network policy (allow_all)...');
-            networkPolicy = await sdk.networkPolicy.create({
-              name: uniqueName('e2e-gateway-policy'),
-              allow_all: true,
-              description: 'Allow all traffic for e2e gateway test',
-            });
-            console.log('Network policy created:', networkPolicy.id);
-
-            // Step 1: Create a secret with a known value
-            console.log('Creating test secret...');
-            await sdk.api.secrets.create({
-              name: testSecretName,
-              value: testSecretValue,
-            });
-
-            // Step 2: Create server devbox with a tunnel
-            console.log('Creating server devbox with tunnel...');
-            serverDevbox = await sdk.devbox.create({
-              name: uniqueName('e2e-gateway-server'),
-              launch_parameters: {
-                resource_size_request: 'X_SMALL',
-                keep_alive_time_seconds: 300,
-              },
-              tunnel: { auth_mode: 'open' },
-            });
-
-            // Get the tunnel URL from the server devbox
-            const serverInfo = await serverDevbox.getInfo();
-            expect(serverInfo.tunnel).toBeDefined();
-            const tunnelKey = serverInfo.tunnel!.tunnel_key;
-
-            // Construct the tunnel URL (format: https://{port}-{tunnel_key}.tunnel.runloop.{domain})
-            // We'll use port 8080 for our test server
-            const baseUrl = process.env['RUNLOOP_BASE_URL'] || 'https://api.runloop.ai';
-            const domain = baseUrl.includes('ai') ? 'ai' : 'pro';
-            const tunnelUrl = `https://8080-${tunnelKey}.tunnel.runloop.${domain}`;
-            console.log('Server tunnel URL:', tunnelUrl);
-
-            // Step 3: Start a simple HTTP server on the server devbox that logs headers
-            console.log('Starting HTTP server on server devbox...');
-            const serverScript = `
-import http.server
-import json
-
-class HeaderLoggingHandler(http.server.BaseHTTPRequestHandler):
-    def do_GET(self):
-        # Log all headers to a file
-        with open('/tmp/received_headers.json', 'w') as f:
-            json.dump(dict(self.headers), f)
-        
-        # Also print to stdout for debugging
-        print("Received headers:", dict(self.headers), flush=True)
-        
-        self.send_response(200)
-        self.send_header('Content-type', 'application/json')
-        self.end_headers()
-        response = {'status': 'ok', 'headers_received': dict(self.headers)}
-        self.wfile.write(json.dumps(response).encode())
-    
-    def log_message(self, format, *args):
-        print(format % args, flush=True)
-
-print("Starting server on port 8080...", flush=True)
-server = http.server.HTTPServer(('0.0.0.0', 8080), HeaderLoggingHandler)
-server.serve_forever()
-`;
-            // Write and start the server script in the background
-            await serverDevbox.file.write({ file_path: '/tmp/server.py', contents: serverScript });
-            await serverDevbox.cmd.exec('nohup python3 /tmp/server.py > /tmp/server.log 2>&1 &');
-
-            // Wait for server to start
-            await new Promise((resolve) => setTimeout(resolve, 3000));
-
-            // Verify server is running locally
-            const localTest = await serverDevbox.cmd.exec('curl -s http://localhost:8080/');
-            console.log('Local server test:', (await localTest.stdout()).trim());
-
-            // Verify tunnel works by hitting it from this test runner using curl
-            console.log('Testing tunnel from test runner:', tunnelUrl);
-            const { execSync } = await import('child_process');
-            const tunnelCurlOutput = execSync(`curl -s -w "\\n%{http_code}" "${tunnelUrl}"`, {
-              encoding: 'utf-8',
-              timeout: 30000,
-            });
-
-            const tunnelLines = tunnelCurlOutput.trim().split('\n');
-            const tunnelHttpCode = tunnelLines.pop();
-            const tunnelResponseBody = tunnelLines.join('\n');
-            console.log('Tunnel response status:', tunnelHttpCode);
-            console.log('Tunnel response body:', tunnelResponseBody);
-            expect(tunnelHttpCode).toBe('200');
-
-            // Step 4: Create gateway config pointing to the tunnel URL
-            console.log('Creating gateway config...');
-            gatewayConfig = await sdk.gatewayConfig.create({
-              name: uniqueName('e2e-gateway-config'),
-              endpoint: tunnelUrl,
-              auth_mechanism: { type: 'bearer' },
-              description: 'E2E test gateway config',
-            });
-
-            // Step 5: Create client devbox with the gateway
-            console.log('Creating client devbox with gateway...');
-            clientDevbox = await sdk.devbox.create({
-              name: uniqueName('e2e-gateway-client'),
-              launch_parameters: {
-                resource_size_request: 'X_SMALL',
-                keep_alive_time_seconds: 300,
-              },
-              gateways: {
-                TESTGW: {
-                  gateway: gatewayConfig.id,
-                  secret: testSecretName,
-                },
-              },
-            });
-
-            // Verify client devbox has the gateway env vars
-            const clientInfo = await clientDevbox.getInfo();
-            expect(clientInfo.gateway_specs?.['TESTGW']).toBeDefined();
-
-            // Check environment variables on client
-            const urlResult = await clientDevbox.cmd.exec('echo $TESTGW_URL');
-            const urlValue = (await urlResult.stdout()).trim();
-            console.log('TESTGW_URL on client:', urlValue);
-            expect(urlValue).toBeTruthy();
-            expect(urlValue.startsWith('http')).toBe(true);
-
-            const tokenResult = await clientDevbox.cmd.exec('echo $TESTGW');
-            const tokenValue = (await tokenResult.stdout()).trim();
-            console.log('TESTGW token on client:', tokenValue.slice(0, 10) + '...');
-            expect(tokenValue.startsWith('gws_')).toBe(true);
-
-            // Step 6: Make a request from the client through the gateway
-            console.log('Making request from client through gateway...');
-            const curlResult = await clientDevbox.cmd.exec(
-              'curl -s -v -H "Authorization: Bearer $TESTGW" "$TESTGW_URL/"',
-            );
-            const curlOutput = (await curlResult.stdout()).trim();
-            const curlError = (await curlResult.stderr()).trim();
-            console.log('Curl response:', curlOutput);
-            console.log('Curl error:', curlError);
-            console.log('Curl exit code:', curlResult.exitCode);
-
-            expect(curlResult.exitCode).toBe(0);
-
-            // Step 7: Check the headers received by the server
-            console.log('Checking received headers on server...');
-            const headersResult = await serverDevbox.cmd.exec(
-              'cat /tmp/received_headers.json 2>/dev/null || echo "{}"',
-            );
-            const headersJson = (await headersResult.stdout()).trim();
-            console.log('Server received headers:', headersJson);
-
-            // Parse and verify the Authorization header contains our secret
-            const receivedHeaders = JSON.parse(headersJson);
-            const authHeader = receivedHeaders['Authorization'] || receivedHeaders['authorization'];
-            console.log('Received Authorization header:', authHeader);
-
-            // The gateway should have proxied our secret value as a Bearer token
-            expect(authHeader).toBe(`Bearer ${testSecretValue}`);
-          } finally {
-            // Clean up all resources
-            console.log('Cleaning up...');
-
-            if (clientDevbox) {
-              try {
-                await clientDevbox.shutdown();
-              } catch {
-                // Ignore
-              }
-            }
-
-            if (serverDevbox) {
-              try {
-                await serverDevbox.shutdown();
-              } catch {
-                // Ignore
-              }
-            }
-
-            await cleanUpGatewayConfig(gatewayConfig);
-            await cleanUpPolicy(networkPolicy);
-
-            // Delete the test secret
-            try {
-              await sdk.api.secrets.delete(testSecretName);
-            } catch {
-              // Ignore if already deleted
-            }
+            await devbox.shutdown();
+          } catch {
+            // Ignore
           }
-        },
-        15 * 60 * 1000, // 15 minute timeout to allow for 10 min pause
-      );
+        }
+
+        await cleanUpGatewayConfig(gatewayConfig);
+        await cleanUpPolicy(networkPolicy);
+
+        try {
+          await sdk.api.secrets.delete(testSecretName);
+        } catch {
+          // Ignore
+        }
+      });
+
+      test('GET request - list devboxes', async () => {
+        const { httpCode, responseBody } = await curlRequest('GET', '/v1/devboxes?limit=5');
+
+        expect(httpCode).toBe(200);
+        const response = JSON.parse(responseBody);
+        expect(response).toBeDefined();
+        expect(Array.isArray(response.devboxes)).toBe(true);
+      });
+
+      test('GET request - get specific resource', async () => {
+        const { httpCode, responseBody } = await curlRequest('GET', `/v1/devboxes/${devbox!.id}`);
+
+        expect(httpCode).toBe(200);
+        const response = JSON.parse(responseBody);
+        expect(response.id).toBe(devbox!.id);
+      });
+
+      test('GET request - error for non-existent resource', async () => {
+        const { httpCode } = await curlRequest('GET', '/v1/devboxes/dbx_nonexistent12345');
+
+        expect(httpCode).toBe(400);
+      });
+
+      test('POST request - create a secret', async () => {
+        const secretName = uniqueName('gateway-test-secret');
+        const secretValue = 'test-value-from-gateway';
+
+        const createResult = await curlRequest('POST', '/v1/secrets', {
+          body: JSON.stringify({ name: secretName, value: secretValue }),
+          contentType: 'application/json',
+        });
+
+        expect(createResult.httpCode).toBe(200);
+        const created = JSON.parse(createResult.responseBody);
+        expect(created.name).toBe(secretName);
+      });
+
+      test('POST request with JSON body - create blueprint', async () => {
+        const blueprintName = uniqueName('gateway-test-blueprint');
+
+        const createResult = await curlRequest('POST', '/v1/blueprints', {
+          body: JSON.stringify({
+            name: blueprintName,
+            system_setup_commands: ['echo "test"'],
+          }),
+          contentType: 'application/json',
+        });
+
+        expect(createResult.httpCode).toBe(200);
+        const created = JSON.parse(createResult.responseBody);
+        expect(created.name).toBe(blueprintName);
+      });
+
+      test('GET request with query parameters', async () => {
+        const { httpCode, responseBody } = await curlRequest(
+          'GET',
+          '/v1/devboxes?limit=2&status=running',
+        );
+
+        expect(httpCode).toBe(200);
+        const response = JSON.parse(responseBody);
+        expect(response).toBeDefined();
+        expect(Array.isArray(response.devboxes)).toBe(true);
+        for (const dbx of response.devboxes) {
+          expect(dbx.status).toBe('running');
+        }
+      });
+
+      test('custom headers are passed through', async () => {
+        const { httpCode, responseBody } = await curlRequest('GET', '/v1/devboxes?limit=1', {
+          extraHeaders: ['X-Custom-Header: test-value', 'Accept: application/json'],
+        });
+
+        expect(httpCode).toBe(200);
+        const response = JSON.parse(responseBody);
+        expect(response).toBeDefined();
+      });
+
+      test('large response handling - list many devboxes', async () => {
+        const { httpCode, responseBody } = await curlRequest('GET', '/v1/devboxes?limit=100');
+
+        expect(httpCode).toBe(200);
+        const response = JSON.parse(responseBody);
+        expect(response).toBeDefined();
+        expect(Array.isArray(response.devboxes)).toBe(true);
+      });
+
+      test('invalid JSON body returns error', async () => {
+        const { httpCode } = await curlRequest('POST', '/v1/secrets', {
+          body: 'not valid json{{{',
+          contentType: 'application/json',
+        });
+
+        expect(httpCode).toBeGreaterThanOrEqual(400);
+        expect(httpCode).toBeLessThan(500);
+      });
+
+      test('unauthorized request without token fails', async () => {
+        const result = await devbox!.cmd.exec(
+          `curl -s -w "\\nHTTP_CODE:%{http_code}" "${gatewayUrl}/v1/devboxes?limit=1"`,
+        );
+        const output = (await result.stdout()).trim();
+        const lines = output.split('\n');
+        const httpCodeLine = lines.pop() || '';
+        const httpCode = parseInt(httpCodeLine.replace('HTTP_CODE:', ''), 10);
+
+        expect(httpCode).toBeGreaterThanOrEqual(400);
+      });
+
+      test('streaming response - execute command with output', async () => {
+        const execResult = await devbox!.cmd.exec(`
+          curl -s -w "\\nHTTP_CODE:%{http_code}" \\
+            -X POST \\
+            -H "Authorization: Bearer ${gatewayToken}" \\
+            -H "Content-Type: application/json" \\
+            -d '{"command": "echo line1; sleep 0.1; echo line2; sleep 0.1; echo line3"}' \\
+            "${gatewayUrl}/v1/devboxes/${devbox!.id}/execute_sync"
+        `);
+
+        const output = (await execResult.stdout()).trim();
+        const lines = output.split('\n');
+        const httpCodeLine = lines.pop() || '';
+        const responseBody = lines.join('\n');
+        const httpCode = parseInt(httpCodeLine.replace('HTTP_CODE:', ''), 10);
+
+        expect(httpCode).toBe(200);
+        const response = JSON.parse(responseBody);
+        expect(response).toBeDefined();
+        expect(response.stdout || response.output).toBeTruthy();
+      });
+
+      test('multipart form data - upload file via upload_file endpoint', async () => {
+        const testFilePath = `gateway-multipart-test-${Date.now()}.txt`;
+        const testFileContent = 'Hello from gateway multipart test!';
+
+        await devbox!.cmd.exec(`echo '${testFileContent}' > /tmp/upload_test.txt`);
+
+        const uploadResult = await devbox!.cmd.exec(`
+          curl -s -w "\\nHTTP_CODE:%{http_code}" \\
+            -X POST \\
+            -H "Authorization: Bearer ${gatewayToken}" \\
+            -F "file=@/tmp/upload_test.txt" \\
+            -F "path=${testFilePath}" \\
+            "${gatewayUrl}/v1/devboxes/${devbox!.id}/upload_file"
+        `);
+
+        const output = (await uploadResult.stdout()).trim();
+        const lines = output.split('\n');
+        const httpCodeLine = lines.pop() || '';
+        const httpCode = parseInt(httpCodeLine.replace('HTTP_CODE:', ''), 10);
+
+        expect(httpCode).toBe(200);
+
+        const verifyResult = await devbox!.cmd.exec(`cat ~/${testFilePath}`);
+        const verifyContent = (await verifyResult.stdout()).trim();
+        expect(verifyContent).toContain('Hello from gateway multipart test');
+      });
+
+      test('binary data - download file contents', async () => {
+        const testFileName = `/tmp/gateway-binary-test-${Date.now()}.txt`;
+
+        await curlRequest('POST', `/v1/devboxes/${devbox!.id}/write_file`, {
+          body: JSON.stringify({
+            file_path: testFileName,
+            contents: 'Test binary content: special chars <>&"\' and unicode: 你好',
+          }),
+          contentType: 'application/json',
+        });
+
+        const { httpCode, responseBody } = await curlRequest(
+          'POST',
+          `/v1/devboxes/${devbox!.id}/read_file_contents`,
+          {
+            body: JSON.stringify({ file_path: testFileName }),
+            contentType: 'application/json',
+          },
+        );
+
+        expect(httpCode).toBe(200);
+        expect(responseBody).toContain('special chars');
+        expect(responseBody).toContain('你好');
+      });
+
+      test('large request body', async () => {
+        const largeContent = 'x'.repeat(100 * 1024);
+        const testFileName = `/tmp/gateway-large-body-${Date.now()}.txt`;
+
+        const { httpCode } = await curlRequest('POST', `/v1/devboxes/${devbox!.id}/write_file`, {
+          body: JSON.stringify({
+            file_path: testFileName,
+            contents: largeContent,
+          }),
+          contentType: 'application/json',
+        });
+
+        expect(httpCode).toBe(200);
+
+        const sizeResult = await devbox!.cmd.exec(`wc -c < ${testFileName}`);
+        const size = parseInt((await sizeResult.stdout()).trim(), 10);
+        expect(size).toBe(largeContent.length);
+      });
+
+      test('special characters in URL path and query params', async () => {
+        const specialName = uniqueName('gateway-special-!@#');
+
+        const createResult = await curlRequest('POST', '/v1/secrets', {
+          body: JSON.stringify({ name: specialName, value: 'test-value' }),
+          contentType: 'application/json',
+        });
+
+        if (createResult.httpCode === 200) {
+          await curlRequest('DELETE', `/v1/secrets/${encodeURIComponent(specialName)}`);
+        }
+
+        const { httpCode } = await curlRequest(
+          'GET',
+          `/v1/devboxes?limit=1&name=${encodeURIComponent('test with spaces & symbols')}`,
+        );
+        expect(httpCode).toBeLessThan(500);
+      });
+
+      test('concurrent requests', async () => {
+        const concurrentScript = `bash -c '
+          for i in 1 2 3; do
+            (curl -s -o /dev/null -w "%{http_code}\\n" \\
+              -H "Authorization: Bearer ${gatewayToken}" \\
+              "${gatewayUrl}/v1/devboxes?limit=1") &
+          done
+          wait
+        '`;
+
+        const result = await devbox!.cmd.exec(concurrentScript);
+        const output = (await result.stdout()).trim();
+        const responseCodes = output.split('\n').filter((line) => /^\d{3}$/.test(line.trim()));
+
+        expect(responseCodes.length).toBeGreaterThanOrEqual(1);
+        for (const code of responseCodes) {
+          expect(parseInt(code, 10)).toBe(200);
+        }
+      });
+
+      test('HEAD request', async () => {
+        const result = await devbox!.cmd.exec(`
+          curl -s -I -w "\\nHTTP_CODE:%{http_code}" \\
+            -H "Authorization: Bearer ${gatewayToken}" \\
+            "${gatewayUrl}/v1/devboxes?limit=1"
+        `);
+
+        const output = (await result.stdout()).trim();
+        const lines = output.split('\n');
+        const httpCodeLine = lines.pop() || '';
+        const httpCode = parseInt(httpCodeLine.replace('HTTP_CODE:', ''), 10);
+
+        expect([200, 405]).toContain(httpCode);
+      });
+
+      test('request timeout handling', async () => {
+        const startTime = Date.now();
+        const { httpCode } = await curlRequest(
+          'POST',
+          `/v1/devboxes/${devbox!.id}/execute_sync`,
+          {
+            body: JSON.stringify({ command: 'sleep 2 && echo done' }),
+            contentType: 'application/json',
+          },
+        );
+        const elapsed = Date.now() - startTime;
+
+        expect(httpCode).toBe(200);
+        expect(elapsed).toBeGreaterThan(2000);
+        expect(elapsed).toBeLessThan(30000);
+      });
+
+      test('empty/minimal response body handling', async () => {
+        const { httpCode, responseBody } = await curlRequest('GET', '/v1/devboxes?limit=0');
+
+        expect(httpCode).toBe(200);
+        const response = JSON.parse(responseBody);
+        expect(response.devboxes).toBeDefined();
+      });
+
+      test('response with various content types', async () => {
+        const { httpCode } = await curlRequest('GET', '/v1/devboxes?limit=1', {
+          extraHeaders: ['Accept: application/json'],
+        });
+
+        expect(httpCode).toBe(200);
+      });
+
+      test('unicode in request and response', async () => {
+        const unicodeContent = '你好世界 🌍 émojis and spëcial çharacters';
+        const testFileName = `/tmp/gateway-unicode-${Date.now()}.txt`;
+
+        const { httpCode } = await curlRequest('POST', `/v1/devboxes/${devbox!.id}/write_file`, {
+          body: JSON.stringify({
+            file_path: testFileName,
+            contents: unicodeContent,
+          }),
+          contentType: 'application/json',
+        });
+
+        expect(httpCode).toBe(200);
+
+        const readResult = await curlRequest('POST', `/v1/devboxes/${devbox!.id}/read_file_contents`, {
+          body: JSON.stringify({ file_path: testFileName }),
+          contentType: 'application/json',
+        });
+
+        expect(readResult.httpCode).toBe(200);
+        expect(readResult.responseBody).toContain('你好世界');
+        expect(readResult.responseBody).toContain('🌍');
+      });
     },
   );
 });
