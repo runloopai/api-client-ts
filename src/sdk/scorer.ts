@@ -6,19 +6,17 @@ import type {
   ScorerRetrieveResponse,
   ScorerUpdateResponse,
   ScorerUpdateParams,
-  ScorerValidateParams,
-  ScorerValidateResponse,
 } from '../resources/scenarios/scorers';
 
 /**
- * Object-oriented interface for working with custom Scorers.
+ * Object-oriented interface for working with Scorers.
  *
  * @category Scorer
  *
  * @remarks
  * ## Overview
  *
- * The `Scorer` class provides a high-level, object-oriented API for managing custom scorers.
+ * The `Scorer` class provides a high-level, object-oriented API for managing scorers.
  * Scorers define bash scripts that produce a score in the range [0.0, 1.0] for scenario runs.
  *
  * ## Quickstart
@@ -32,8 +30,8 @@ import type {
  *   bash_script: 'echo "1.0"',
  * });
  *
- * const result = await scorer.validate({ scoring_context: { output: 'test' } });
- * console.log(`Score: ${result.scoring_result.score}`);
+ * const info = await scorer.getInfo();
+ * console.log(`Scorer type: ${info.type}`);
  * ```
  */
 export class Scorer {
@@ -175,28 +173,5 @@ export class Scorer {
    */
   async update(params: ScorerUpdateParams, options?: Core.RequestOptions): Promise<ScorerUpdateResponse> {
     return this.client.scenarios.scorers.update(this._id, params, options);
-  }
-
-  /**
-   * Run the scorer against the provided context and return the result.
-   *
-   * @example
-   * ```typescript
-   * const result = await scorer.validate({
-   *   scoring_context: { output: 'test output', expected: 'test output' }
-   * });
-   * console.log(`Validation score: ${result.scoring_result.score}`);
-   * console.log(`Output: ${result.scoring_result.output}`);
-   * ```
-   *
-   * @param {ScorerValidateParams} params - Validation parameters
-   * @param {Core.RequestOptions} [options] - Request options
-   * @returns {Promise<ScorerValidateResponse>} Validation result with score
-   */
-  async validate(
-    params: ScorerValidateParams,
-    options?: Core.RequestOptions,
-  ): Promise<ScorerValidateResponse> {
-    return this.client.scenarios.scorers.validate(this._id, params, options);
   }
 }

@@ -3,7 +3,6 @@
 import { APIResource } from '../../resource';
 import { isRequestOptions } from '../../core';
 import * as Core from '../../core';
-import * as ScenariosAPI from './scenarios';
 import { ScenarioScorersCursorIDPage, type ScenarioScorersCursorIDPageParams } from '../../pagination';
 
 export class Scorers extends APIResource {
@@ -53,17 +52,6 @@ export class Scorers extends APIResource {
       query,
       ...options,
     });
-  }
-
-  /**
-   * Validate a scenario scorer.
-   */
-  validate(
-    id: string,
-    body: ScorerValidateParams,
-    options?: Core.RequestOptions,
-  ): Core.APIPromise<ScorerValidateResponse> {
-    return this._client.post(`/v1/scenarios/scorers/${id}/validate`, { body, ...options });
   }
 }
 
@@ -149,28 +137,6 @@ export interface ScorerListResponse {
   type: string;
 }
 
-export interface ScorerValidateResponse {
-  /**
-   * Name of the custom scorer.
-   */
-  name: string;
-
-  /**
-   * Json context that gets passed to the custom scorer
-   */
-  scoring_context: unknown;
-
-  /**
-   * Result of the scoring function.
-   */
-  scoring_result: ScenariosAPI.ScoringFunctionResultView;
-
-  /**
-   * The Environment in which the Scenario will run.
-   */
-  environment_parameters?: ScenariosAPI.ScenarioEnvironment;
-}
-
 export interface ScorerCreateParams {
   /**
    * Bash script for the custom scorer taking context as a json object
@@ -199,18 +165,6 @@ export interface ScorerUpdateParams {
 
 export interface ScorerListParams extends ScenarioScorersCursorIDPageParams {}
 
-export interface ScorerValidateParams {
-  /**
-   * Json context that gets passed to the custom scorer
-   */
-  scoring_context: unknown;
-
-  /**
-   * The Environment in which the Scenario will run.
-   */
-  environment_parameters?: ScenariosAPI.ScenarioEnvironment;
-}
-
 Scorers.ScorerListResponsesScenarioScorersCursorIDPage = ScorerListResponsesScenarioScorersCursorIDPage;
 
 export declare namespace Scorers {
@@ -219,11 +173,9 @@ export declare namespace Scorers {
     type ScorerRetrieveResponse as ScorerRetrieveResponse,
     type ScorerUpdateResponse as ScorerUpdateResponse,
     type ScorerListResponse as ScorerListResponse,
-    type ScorerValidateResponse as ScorerValidateResponse,
     ScorerListResponsesScenarioScorersCursorIDPage as ScorerListResponsesScenarioScorersCursorIDPage,
     type ScorerCreateParams as ScorerCreateParams,
     type ScorerUpdateParams as ScorerUpdateParams,
     type ScorerListParams as ScorerListParams,
-    type ScorerValidateParams as ScorerValidateParams,
   };
 }
