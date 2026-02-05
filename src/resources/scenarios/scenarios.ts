@@ -8,6 +8,8 @@ import * as RunsAPI from './runs';
 import { RunListParams, Runs } from './runs';
 import * as ScorersAPI from './scorers';
 import {
+  ScorerCreateParams,
+  ScorerCreateResponse,
   ScorerListParams,
   ScorerListResponse,
   ScorerListResponsesScenarioScorersCursorIDPage,
@@ -859,10 +861,12 @@ export declare namespace Scenarios {
 
   export {
     Scorers as Scorers,
+    type ScorerCreateResponse as ScorerCreateResponse,
     type ScorerRetrieveResponse as ScorerRetrieveResponse,
     type ScorerUpdateResponse as ScorerUpdateResponse,
     type ScorerListResponse as ScorerListResponse,
     ScorerListResponsesScenarioScorersCursorIDPage as ScorerListResponsesScenarioScorersCursorIDPage,
+    type ScorerCreateParams as ScorerCreateParams,
     type ScorerUpdateParams as ScorerUpdateParams,
     type ScorerListParams as ScorerListParams,
   };

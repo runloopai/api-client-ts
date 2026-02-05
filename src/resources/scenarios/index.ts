@@ -28,9 +28,11 @@ export {
 export {
   ScorerListResponsesScenarioScorersCursorIDPage,
   Scorers,
+  type ScorerCreateResponse,
   type ScorerRetrieveResponse,
   type ScorerUpdateResponse,
   type ScorerListResponse,
+  type ScorerCreateParams,
   type ScorerUpdateParams,
   type ScorerListParams,
 } from './scorers';

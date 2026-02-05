@@ -263,12 +263,14 @@ Methods:
 
 Types:
 
+- <code><a href="./src/resources/scenarios/scorers.ts">ScorerCreateResponse</a></code>
 - <code><a href="./src/resources/scenarios/scorers.ts">ScorerRetrieveResponse</a></code>
 - <code><a href="./src/resources/scenarios/scorers.ts">ScorerUpdateResponse</a></code>
 - <code><a href="./src/resources/scenarios/scorers.ts">ScorerListResponse</a></code>
 
 Methods:
 
+- <code title="post /v1/scenarios/scorers">client.scenarios.scorers.<a href="./src/resources/scenarios/scorers.ts">create</a>({ ...params }) -> ScorerCreateResponse</code>
 - <code title="get /v1/scenarios/scorers/{id}">client.scenarios.scorers.<a href="./src/resources/scenarios/scorers.ts">retrieve</a>(id) -> ScorerRetrieveResponse</code>
 - <code title="post /v1/scenarios/scorers/{id}">client.scenarios.scorers.<a href="./src/resources/scenarios/scorers.ts">update</a>(id, { ...params }) -> ScorerUpdateResponse</code>
 - <code title="get /v1/scenarios/scorers">client.scenarios.scorers.<a href="./src/resources/scenarios/scorers.ts">list</a>({ ...params }) -> ScorerListResponsesScenarioScorersCursorIDPage</code>
