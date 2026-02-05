@@ -263,19 +263,15 @@ Methods:
 
 Types:
 
-- <code><a href="./src/resources/scenarios/scorers.ts">ScorerCreateResponse</a></code>
 - <code><a href="./src/resources/scenarios/scorers.ts">ScorerRetrieveResponse</a></code>
 - <code><a href="./src/resources/scenarios/scorers.ts">ScorerUpdateResponse</a></code>
 - <code><a href="./src/resources/scenarios/scorers.ts">ScorerListResponse</a></code>
-- <code><a href="./src/resources/scenarios/scorers.ts">ScorerValidateResponse</a></code>
 
 Methods:
 
-- <code title="post /v1/scenarios/scorers">client.scenarios.scorers.<a href="./src/resources/scenarios/scorers.ts">create</a>({ ...params }) -> ScorerCreateResponse</code>
 - <code title="get /v1/scenarios/scorers/{id}">client.scenarios.scorers.<a href="./src/resources/scenarios/scorers.ts">retrieve</a>(id) -> ScorerRetrieveResponse</code>
 - <code title="post /v1/scenarios/scorers/{id}">client.scenarios.scorers.<a href="./src/resources/scenarios/scorers.ts">update</a>(id, { ...params }) -> ScorerUpdateResponse</code>
 - <code title="get /v1/scenarios/scorers">client.scenarios.scorers.<a href="./src/resources/scenarios/scorers.ts">list</a>({ ...params }) -> ScorerListResponsesScenarioScorersCursorIDPage</code>
-- <code title="post /v1/scenarios/scorers/{id}/validate">client.scenarios.scorers.<a href="./src/resources/scenarios/scorers.ts">validate</a>(id, { ...params }) -> ScorerValidateResponse</code>
 
 # Objects
 
@@ -368,3 +364,20 @@ Methods:
 - <code title="post /v1/gateway-configs/{id}">client.gatewayConfigs.<a href="./src/resources/gateway-configs.ts">update</a>(id, { ...params }) -> GatewayConfigView</code>
 - <code title="get /v1/gateway-configs">client.gatewayConfigs.<a href="./src/resources/gateway-configs.ts">list</a>({ ...params }) -> GatewayConfigViewsGatewayConfigsCursorIDPage</code>
 - <code title="post /v1/gateway-configs/{id}/delete">client.gatewayConfigs.<a href="./src/resources/gateway-configs.ts">delete</a>(id) -> GatewayConfigView</code>
+
+# McpConfigs
+
+Types:
+
+- <code><a href="./src/resources/mcp-configs.ts">McpConfigCreateParameters</a></code>
+- <code><a href="./src/resources/mcp-configs.ts">McpConfigListView</a></code>
+- <code><a href="./src/resources/mcp-configs.ts">McpConfigUpdateParameters</a></code>
+- <code><a href="./src/resources/mcp-configs.ts">McpConfigView</a></code>
+
+Methods:
+
+- <code title="post /v1/mcp-configs">client.mcpConfigs.<a href="./src/resources/mcp-configs.ts">create</a>({ ...params }) -> McpConfigView</code>
+- <code title="get /v1/mcp-configs/{id}">client.mcpConfigs.<a href="./src/resources/mcp-configs.ts">retrieve</a>(id) -> McpConfigView</code>
+- <code title="post /v1/mcp-configs/{id}">client.mcpConfigs.<a href="./src/resources/mcp-configs.ts">update</a>(id, { ...params }) -> McpConfigView</code>
+- <code title="get /v1/mcp-configs">client.mcpConfigs.<a href="./src/resources/mcp-configs.ts">list</a>({ ...params }) -> McpConfigViewsMcpConfigsCursorIDPage</code>
+- <code title="post /v1/mcp-configs/{id}/delete">client.mcpConfigs.<a href="./src/resources/mcp-configs.ts">delete</a>(id) -> McpConfigView</code>
