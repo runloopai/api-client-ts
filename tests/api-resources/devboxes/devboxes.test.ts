@@ -61,6 +61,7 @@ describe('resource devboxes', () => {
             resource_size_request: 'X_SMALL',
             user_parameters: { uid: 0, username: 'username' },
           },
+          mcp: [{ mcp_config: 'mcp_config', secret: 'secret' }],
           metadata: { foo: 'string' },
           mounts: [
             {

@@ -185,11 +185,6 @@ export interface McpConfigView {
   name: string;
 
   /**
-   * The account ID that owns this config.
-   */
-  account_id?: string | null;
-
-  /**
    * Optional description for this MCP configuration.
    */
   description?: string | null;

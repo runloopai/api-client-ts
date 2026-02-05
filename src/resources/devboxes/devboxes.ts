@@ -1105,6 +1105,14 @@ export interface DevboxCreateParams {
   launch_parameters?: Shared.LaunchParameters | null;
 
   /**
+   * [Beta] (Optional) MCP specifications for MCP server access. Each spec links an
+   * MCP config to a secret. The devbox will receive environment variables
+   * (RL_MCP_URL, RL_MCP_TOKEN) for accessing MCP servers through the MCP hub.
+   * Example: [{'mcp_config': 'github-readonly', 'secret': 'MY_GITHUB_TOKEN'}]
+   */
+  mcp?: Array<DevboxCreateParams.Mcp> | null;
+
+  /**
    * User defined metadata to attach to the devbox for organization.
    */
   metadata?: { [key: string]: string } | null;
@@ -1160,6 +1168,24 @@ export namespace DevboxCreateParams {
 
     /**
      * The secret containing the credential. Can be a secret ID or name.
+     */
+    secret: string;
+  }
+
+  /**
+   * [Beta] McpSpec links an MCP configuration to a secret for MCP server access in a
+   * devbox. The MCP hub will proxy requests to upstream MCP servers using the
+   * specified credential, with tool-level access control based on the MCP config's
+   * allowed_tools.
+   */
+  export interface Mcp {
+    /**
+     * The MCP config to use. Can be an MCP config ID (mcp_xxx) or name.
+     */
+    mcp_config: string;
+
+    /**
+     * The secret containing the MCP server credential. Can be a secret ID or name.
      */
     secret: string;
   }

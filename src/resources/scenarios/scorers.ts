@@ -7,6 +7,13 @@ import { ScenarioScorersCursorIDPage, type ScenarioScorersCursorIDPageParams } f
 
 export class Scorers extends APIResource {
   /**
+   * Create a custom scenario scorer.
+   */
+  create(body: ScorerCreateParams, options?: Core.RequestOptions): Core.APIPromise<ScorerCreateResponse> {
+    return this._client.post('/v1/scenarios/scorers', { body, ...options });
+  }
+
+  /**
    * Retrieve Scenario Scorer.
    */
   retrieve(id: string, options?: Core.RequestOptions): Core.APIPromise<ScorerRetrieveResponse> {
@@ -49,6 +56,26 @@ export class Scorers extends APIResource {
 }
 
 export class ScorerListResponsesScenarioScorersCursorIDPage extends ScenarioScorersCursorIDPage<ScorerListResponse> {}
+
+/**
+ * A ScenarioScorerView represents a custom scoring function for a Scenario.
+ */
+export interface ScorerCreateResponse {
+  /**
+   * ID for the scenario scorer.
+   */
+  id: string;
+
+  /**
+   * Bash script that takes in $RL_SCORER_CONTEXT as env variable and runs scoring.
+   */
+  bash_script: string;
+
+  /**
+   * Name of the type of scenario scorer.
+   */
+  type: string;
+}
 
 /**
  * A ScenarioScorerView represents a custom scoring function for a Scenario.
@@ -110,6 +137,19 @@ export interface ScorerListResponse {
   type: string;
 }
 
+export interface ScorerCreateParams {
+  /**
+   * Bash script for the custom scorer taking context as a json object
+   * $RL_SCORER_CONTEXT.
+   */
+  bash_script: string;
+
+  /**
+   * Name of the type of custom scorer.
+   */
+  type: string;
+}
+
 export interface ScorerUpdateParams {
   /**
    * Bash script for the custom scorer taking context as a json object
@@ -129,10 +169,12 @@ Scorers.ScorerListResponsesScenarioScorersCursorIDPage = ScorerListResponsesScen
 
 export declare namespace Scorers {
   export {
+    type ScorerCreateResponse as ScorerCreateResponse,
     type ScorerRetrieveResponse as ScorerRetrieveResponse,
     type ScorerUpdateResponse as ScorerUpdateResponse,
     type ScorerListResponse as ScorerListResponse,
     ScorerListResponsesScenarioScorersCursorIDPage as ScorerListResponsesScenarioScorersCursorIDPage,
+    type ScorerCreateParams as ScorerCreateParams,
     type ScorerUpdateParams as ScorerUpdateParams,
     type ScorerListParams as ScorerListParams,
   };
