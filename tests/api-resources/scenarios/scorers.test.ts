@@ -9,21 +9,6 @@ const client = new Runloop({
 });
 
 describe('resource scorers', () => {
-  test('create: only required params', async () => {
-    const responsePromise = client.scenarios.scorers.create({ bash_script: 'bash_script', type: 'type' });
-    const rawResponse = await responsePromise.asResponse();
-    expect(rawResponse).toBeInstanceOf(Response);
-    const response = await responsePromise;
-    expect(response).not.toBeInstanceOf(Response);
-    const dataAndResponse = await responsePromise.withResponse();
-    expect(dataAndResponse.data).toBe(response);
-    expect(dataAndResponse.response).toBe(rawResponse);
-  });
-
-  test('create: required and optional params', async () => {
-    const response = await client.scenarios.scorers.create({ bash_script: 'bash_script', type: 'type' });
-  });
-
   test('retrieve', async () => {
     const responsePromise = client.scenarios.scorers.retrieve('id');
     const rawResponse = await responsePromise.asResponse();
@@ -89,41 +74,5 @@ describe('resource scorers', () => {
         { path: '/_stainless_unknown_path' },
       ),
     ).rejects.toThrow(Runloop.NotFoundError);
-  });
-
-  test('validate: only required params', async () => {
-    const responsePromise = client.scenarios.scorers.validate('id', { scoring_context: {} });
-    const rawResponse = await responsePromise.asResponse();
-    expect(rawResponse).toBeInstanceOf(Response);
-    const response = await responsePromise;
-    expect(response).not.toBeInstanceOf(Response);
-    const dataAndResponse = await responsePromise.withResponse();
-    expect(dataAndResponse.data).toBe(response);
-    expect(dataAndResponse.response).toBe(rawResponse);
-  });
-
-  test('validate: required and optional params', async () => {
-    const response = await client.scenarios.scorers.validate('id', {
-      scoring_context: {},
-      environment_parameters: {
-        blueprint_id: 'blueprint_id',
-        launch_parameters: {
-          after_idle: { idle_time_seconds: 0, on_idle: 'shutdown' },
-          architecture: 'x86_64',
-          available_ports: [0],
-          custom_cpu_cores: 0,
-          custom_disk_size: 0,
-          custom_gb_memory: 0,
-          keep_alive_time_seconds: 0,
-          launch_commands: ['string'],
-          network_policy_id: 'network_policy_id',
-          required_services: ['string'],
-          resource_size_request: 'X_SMALL',
-          user_parameters: { uid: 0, username: 'username' },
-        },
-        snapshot_id: 'snapshot_id',
-        working_directory: 'working_directory',
-      },
-    });
   });
 });

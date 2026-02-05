@@ -114,6 +114,18 @@ export {
   type GatewayConfigDeleteParams,
 } from './gateway-configs';
 export {
+  McpConfigViewsMcpConfigsCursorIDPage,
+  McpConfigs,
+  type McpConfigCreateParameters,
+  type McpConfigListView,
+  type McpConfigUpdateParameters,
+  type McpConfigView,
+  type McpConfigCreateParams,
+  type McpConfigUpdateParams,
+  type McpConfigListParams,
+  type McpConfigDeleteParams,
+} from './mcp-configs';
+export {
   NetworkPolicyViewsNetworkPoliciesCursorIDPage,
   NetworkPolicies,
   type NetworkPolicyCreateParameters,
