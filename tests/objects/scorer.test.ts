@@ -1,9 +1,5 @@
 import { Scorer } from '../../src/sdk/scorer';
-import type {
-  ScorerRetrieveResponse,
-  ScorerUpdateResponse,
-  ScorerValidateResponse,
-} from '../../src/resources/scenarios/scorers';
+import type { ScorerRetrieveResponse, ScorerUpdateResponse } from '../../src/resources/scenarios/scorers';
 
 // Mock the Runloop client
 jest.mock('../../src/index');
@@ -11,7 +7,6 @@ jest.mock('../../src/index');
 describe('Scorer', () => {
   let mockClient: any;
   let mockScorerData: ScorerRetrieveResponse;
-  let mockValidateResult: ScorerValidateResponse;
 
   beforeEach(() => {
     mockClient = {
@@ -20,7 +15,6 @@ describe('Scorer', () => {
           create: jest.fn(),
           retrieve: jest.fn(),
           update: jest.fn(),
-          validate: jest.fn(),
           list: jest.fn(),
         },
       },
@@ -30,17 +24,6 @@ describe('Scorer', () => {
       id: 'scs_123',
       type: 'my_custom_scorer',
       bash_script: 'echo "1.0"',
-    };
-
-    mockValidateResult = {
-      name: 'my_custom_scorer',
-      scoring_context: { output: 'test' },
-      scoring_result: {
-        output: '1.0',
-        score: 1.0,
-        state: 'complete',
-        scoring_function_name: 'test-scorer',
-      },
     };
   });
 
@@ -188,38 +171,6 @@ describe('Scorer', () => {
     });
   });
 
-  describe('validate', () => {
-    it('should validate scorer with scoring context', async () => {
-      mockClient.scenarios.scorers.validate.mockResolvedValue(mockValidateResult);
-
-      const scorer = Scorer.fromId(mockClient, 'scs_123');
-      const result = await scorer.validate({
-        scoring_context: { output: 'test output', expected: 'expected output' },
-      });
-
-      expect(mockClient.scenarios.scorers.validate).toHaveBeenCalledWith(
-        'scs_123',
-        { scoring_context: { output: 'test output', expected: 'expected output' } },
-        undefined,
-      );
-      expect(result.scoring_result.score).toBe(1.0);
-      expect(result.scoring_result.output).toBe('1.0');
-    });
-
-    it('should pass options to the API client', async () => {
-      mockClient.scenarios.scorers.validate.mockResolvedValue(mockValidateResult);
-
-      const scorer = Scorer.fromId(mockClient, 'scs_123');
-      await scorer.validate({ scoring_context: {} }, { timeout: 30000 });
-
-      expect(mockClient.scenarios.scorers.validate).toHaveBeenCalledWith(
-        'scs_123',
-        { scoring_context: {} },
-        { timeout: 30000 },
-      );
-    });
-  });
-
   describe('error handling', () => {
     it('should handle API errors on getInfo', async () => {
       const error = new Error('Scorer not found');
@@ -239,15 +190,6 @@ describe('Scorer', () => {
       await expect(scorer.update({ type: 'new_type', bash_script: 'echo 1' })).rejects.toThrow(
         'Update failed',
       );
-    });
-
-    it('should handle API errors on validate', async () => {
-      const error = new Error('Validation timeout');
-      mockClient.scenarios.scorers.validate.mockRejectedValue(error);
-
-      const scorer = Scorer.fromId(mockClient, 'scs_123');
-
-      await expect(scorer.validate({ scoring_context: {} })).rejects.toThrow('Validation timeout');
     });
   });
 });

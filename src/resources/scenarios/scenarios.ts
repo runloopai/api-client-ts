@@ -16,8 +16,6 @@ import {
   ScorerRetrieveResponse,
   ScorerUpdateParams,
   ScorerUpdateResponse,
-  ScorerValidateParams,
-  ScorerValidateResponse,
   Scorers,
 } from './scorers';
 import {
@@ -499,7 +497,6 @@ export interface ScoringFunction {
     | ScoringFunction.AstGrepScoringFunction
     | ScoringFunction.BashScriptScoringFunction
     | ScoringFunction.CommandScoringFunction
-    | ScoringFunction.CustomScoringFunction
     | ScoringFunction.PythonScriptScoringFunction
     | ScoringFunction.TestBasedScoringFunction;
 
@@ -562,23 +559,6 @@ export namespace ScoringFunction {
      * The command to execute.
      */
     command?: string;
-  }
-
-  /**
-   * CustomScoringFunction is a custom, user defined scoring function.
-   */
-  export interface CustomScoringFunction {
-    /**
-     * Type of the scoring function, previously registered with Runloop.
-     */
-    custom_scorer_type: string;
-
-    type: 'custom_scorer';
-
-    /**
-     * Additional JSON structured context to pass to the scoring function.
-     */
-    scorer_params?: unknown | null;
   }
 
   /**
@@ -882,11 +862,9 @@ export declare namespace Scenarios {
     type ScorerRetrieveResponse as ScorerRetrieveResponse,
     type ScorerUpdateResponse as ScorerUpdateResponse,
     type ScorerListResponse as ScorerListResponse,
-    type ScorerValidateResponse as ScorerValidateResponse,
     ScorerListResponsesScenarioScorersCursorIDPage as ScorerListResponsesScenarioScorersCursorIDPage,
     type ScorerCreateParams as ScorerCreateParams,
     type ScorerUpdateParams as ScorerUpdateParams,
     type ScorerListParams as ScorerListParams,
-    type ScorerValidateParams as ScorerValidateParams,
   };
 }

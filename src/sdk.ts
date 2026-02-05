@@ -1303,14 +1303,14 @@ export class AgentOps {
 }
 
 /**
- * Scorer SDK interface for managing custom scorers.
+ * Scorer SDK interface for managing scorers.
  *
  * @category Scorer
  *
  * @remarks
  * ## Overview
  *
- * Scorers are custom scoring functions used to evaluate scenario outputs. A scorer is a
+ * Scorers are scoring functions used to evaluate scenario outputs. A scorer is a
  * script that runs and prints a score in the range [0.0, 1.0], e.g. `echo "0.5"`.
  *
  * ## Usage
@@ -1331,22 +1331,9 @@ export class AgentOps {
  * });
  *
  * // Update the scorer
- * await scorer.update({ bash_script: 'echo "0.5"' });
+ * await scorer.update({ type: 'my_scorer', bash_script: 'echo "0.5"' });
  *
- * // Validate the scorer with a scoring context
- * const result = await scorer.validate({ scoring_context: { output: 'hello' } });
- * console.log(result.scoring_result.score);
- * ```
- *
- * @example
- * Get scorer info (typical usage):
- * ```typescript
- * const runloop = new RunloopSDK();
- * const scorer = await runloop.scorer.create({
- *   type: 'my_scorer',
- *   bash_script: 'echo "1.0"',
- * });
- *
+ * // Get scorer info
  * const info = await scorer.getInfo();
  * console.log(`Scorer ${info.id} (${info.type})`);
  * ```
