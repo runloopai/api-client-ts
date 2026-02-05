@@ -174,5 +174,4 @@ export class Scorer {
   async update(params: ScorerUpdateParams, options?: Core.RequestOptions): Promise<ScorerUpdateResponse> {
     return this.client.scenarios.scorers.update(this._id, params, options);
   }
-
 }
