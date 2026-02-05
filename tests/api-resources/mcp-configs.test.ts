@@ -1,6 +1,6 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-import { Runloop } from '@runloop/api-client';
+import Runloop from '@runloop/api-client';
 import { Response } from 'node-fetch';
 
 const client = new Runloop({
@@ -8,9 +8,13 @@ const client = new Runloop({
   baseURL: process.env['TEST_API_BASE_URL'] ?? 'http://127.0.0.1:4010',
 });
 
-describe('resource scorers', () => {
+describe('resource mcpConfigs', () => {
   test('create: only required params', async () => {
-    const responsePromise = client.scenarios.scorers.create({ bash_script: 'bash_script', type: 'type' });
+    const responsePromise = client.mcpConfigs.create({
+      allowed_tools: ['string'],
+      endpoint: 'endpoint',
+      name: 'name',
+    });
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
     const response = await responsePromise;
@@ -21,11 +25,16 @@ describe('resource scorers', () => {
   });
 
   test('create: required and optional params', async () => {
-    const response = await client.scenarios.scorers.create({ bash_script: 'bash_script', type: 'type' });
+    const response = await client.mcpConfigs.create({
+      allowed_tools: ['string'],
+      endpoint: 'endpoint',
+      name: 'name',
+      description: 'description',
+    });
   });
 
   test('retrieve', async () => {
-    const responsePromise = client.scenarios.scorers.retrieve('id');
+    const responsePromise = client.mcpConfigs.retrieve('id');
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
     const response = await responsePromise;
@@ -37,16 +46,13 @@ describe('resource scorers', () => {
 
   test('retrieve: request options instead of params are passed correctly', async () => {
     // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
-    await expect(
-      client.scenarios.scorers.retrieve('id', { path: '/_stainless_unknown_path' }),
-    ).rejects.toThrow(Runloop.NotFoundError);
+    await expect(client.mcpConfigs.retrieve('id', { path: '/_stainless_unknown_path' })).rejects.toThrow(
+      Runloop.NotFoundError,
+    );
   });
 
-  test('update: only required params', async () => {
-    const responsePromise = client.scenarios.scorers.update('id', {
-      bash_script: 'bash_script',
-      type: 'type',
-    });
+  test('update', async () => {
+    const responsePromise = client.mcpConfigs.update('id');
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
     const response = await responsePromise;
@@ -56,15 +62,31 @@ describe('resource scorers', () => {
     expect(dataAndResponse.response).toBe(rawResponse);
   });
 
-  test('update: required and optional params', async () => {
-    const response = await client.scenarios.scorers.update('id', {
-      bash_script: 'bash_script',
-      type: 'type',
-    });
+  test('update: request options instead of params are passed correctly', async () => {
+    // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
+    await expect(client.mcpConfigs.update('id', { path: '/_stainless_unknown_path' })).rejects.toThrow(
+      Runloop.NotFoundError,
+    );
+  });
+
+  test('update: request options and params are passed correctly', async () => {
+    // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
+    await expect(
+      client.mcpConfigs.update(
+        'id',
+        {
+          allowed_tools: ['string'],
+          description: 'description',
+          endpoint: 'endpoint',
+          name: 'name',
+        },
+        { path: '/_stainless_unknown_path' },
+      ),
+    ).rejects.toThrow(Runloop.NotFoundError);
   });
 
   test('list', async () => {
-    const responsePromise = client.scenarios.scorers.list();
+    const responsePromise = client.mcpConfigs.list();
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
     const response = await responsePromise;
@@ -76,7 +98,7 @@ describe('resource scorers', () => {
 
   test('list: request options instead of params are passed correctly', async () => {
     // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
-    await expect(client.scenarios.scorers.list({ path: '/_stainless_unknown_path' })).rejects.toThrow(
+    await expect(client.mcpConfigs.list({ path: '/_stainless_unknown_path' })).rejects.toThrow(
       Runloop.NotFoundError,
     );
   });
@@ -84,10 +106,33 @@ describe('resource scorers', () => {
   test('list: request options and params are passed correctly', async () => {
     // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
     await expect(
-      client.scenarios.scorers.list(
-        { limit: 0, starting_after: 'starting_after' },
+      client.mcpConfigs.list(
+        {
+          id: 'id',
+          limit: 0,
+          name: 'name',
+          starting_after: 'starting_after',
+        },
         { path: '/_stainless_unknown_path' },
       ),
     ).rejects.toThrow(Runloop.NotFoundError);
+  });
+
+  test('delete', async () => {
+    const responsePromise = client.mcpConfigs.delete('id');
+    const rawResponse = await responsePromise.asResponse();
+    expect(rawResponse).toBeInstanceOf(Response);
+    const response = await responsePromise;
+    expect(response).not.toBeInstanceOf(Response);
+    const dataAndResponse = await responsePromise.withResponse();
+    expect(dataAndResponse.data).toBe(response);
+    expect(dataAndResponse.response).toBe(rawResponse);
+  });
+
+  test('delete: request options and params are passed correctly', async () => {
+    // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
+    await expect(client.mcpConfigs.delete('id', {}, { path: '/_stainless_unknown_path' })).rejects.toThrow(
+      Runloop.NotFoundError,
+    );
   });
 });

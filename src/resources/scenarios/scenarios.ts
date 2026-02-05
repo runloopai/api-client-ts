@@ -16,8 +16,6 @@ import {
   ScorerRetrieveResponse,
   ScorerUpdateParams,
   ScorerUpdateResponse,
-  ScorerValidateParams,
-  ScorerValidateResponse,
   Scorers,
 } from './scorers';
 import {
@@ -882,11 +880,9 @@ export declare namespace Scenarios {
     type ScorerRetrieveResponse as ScorerRetrieveResponse,
     type ScorerUpdateResponse as ScorerUpdateResponse,
     type ScorerListResponse as ScorerListResponse,
-    type ScorerValidateResponse as ScorerValidateResponse,
     ScorerListResponsesScenarioScorersCursorIDPage as ScorerListResponsesScenarioScorersCursorIDPage,
     type ScorerCreateParams as ScorerCreateParams,
     type ScorerUpdateParams as ScorerUpdateParams,
     type ScorerListParams as ScorerListParams,
-    type ScorerValidateParams as ScorerValidateParams,
   };
 }

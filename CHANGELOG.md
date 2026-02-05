@@ -1,5 +1,26 @@
 # Changelog
 
+## 1.7.0 (2026-02-05)
+
+Full Changelog: [v1.6.0...v1.7.0](https://github.com/runloopai/api-client-ts/compare/v1.6.0...v1.7.0)
+
+### Features
+
+* adding MCP Config routes ([#7331](https://github.com/runloopai/api-client-ts/issues/7331)) ([81054b5](https://github.com/runloopai/api-client-ts/commit/81054b5b53a4e5244d1bf8489b610deda650600e))
+* **devbox:** add mcp configuration to devbox create ([#7341](https://github.com/runloopai/api-client-ts/issues/7341)) ([6ed219b](https://github.com/runloopai/api-client-ts/commit/6ed219bbbc44d105ca43be3f2e4265263d259b22))
+
+
+### Bug Fixes
+
+* publish-docs.yml on main failing b/c yarn binary missing in ubuntu-slim ([#712](https://github.com/runloopai/api-client-ts/issues/712)) ([13c187b](https://github.com/runloopai/api-client-ts/commit/13c187b3efa409ecad35910b11bf041217dd7679))
+
+
+### Chores
+
+* additional e2e tests for gatewayconfig + network config  ([#709](https://github.com/runloopai/api-client-ts/issues/709)) ([ed48249](https://github.com/runloopai/api-client-ts/commit/ed482490613dc503893edaa2808aaad10c7f75c5))
+* **ci:** migrate fast and simple actions to ubuntu-slim runner ([#703](https://github.com/runloopai/api-client-ts/issues/703)) ([3c06589](https://github.com/runloopai/api-client-ts/commit/3c06589447650885fe143c8e5470e6231473f4e8))
+* fix workflow using slim not having yarn ([#713](https://github.com/runloopai/api-client-ts/issues/713)) ([261fc58](https://github.com/runloopai/api-client-ts/commit/261fc580c7ccd3aeda0dbd99af31c2b42b4882ae))
+
 ## 1.6.0 (2026-02-04)
 
 Full Changelog: [v1.5.1...v1.6.0](https://github.com/runloopai/api-client-ts/compare/v1.5.1...v1.6.0)

@@ -19,6 +19,8 @@ import {
   DiskSnapshotsCursorIDPageResponse,
   type GatewayConfigsCursorIDPageParams,
   GatewayConfigsCursorIDPageResponse,
+  type McpConfigsCursorIDPageParams,
+  McpConfigsCursorIDPageResponse,
   type NetworkPoliciesCursorIDPageParams,
   NetworkPoliciesCursorIDPageResponse,
   type ObjectsCursorIDPageParams,
@@ -106,6 +108,18 @@ import {
   GatewayConfigViewsGatewayConfigsCursorIDPage,
   GatewayConfigs,
 } from './resources/gateway-configs';
+import {
+  McpConfigCreateParameters,
+  McpConfigCreateParams,
+  McpConfigDeleteParams,
+  McpConfigListParams,
+  McpConfigListView,
+  McpConfigUpdateParameters,
+  McpConfigUpdateParams,
+  McpConfigView,
+  McpConfigViewsMcpConfigsCursorIDPage,
+  McpConfigs,
+} from './resources/mcp-configs';
 import {
   NetworkPolicies,
   NetworkPolicyCreateParameters,
@@ -359,6 +373,7 @@ export class Runloop extends Core.APIClient {
   secrets: API.Secrets = new API.Secrets(this);
   networkPolicies: API.NetworkPolicies = new API.NetworkPolicies(this);
   gatewayConfigs: API.GatewayConfigs = new API.GatewayConfigs(this);
+  mcpConfigs: API.McpConfigs = new API.McpConfigs(this);
 
   /**
    * Check whether the base URL is set to its default.
@@ -426,6 +441,8 @@ Runloop.NetworkPolicies = NetworkPolicies;
 Runloop.NetworkPolicyViewsNetworkPoliciesCursorIDPage = NetworkPolicyViewsNetworkPoliciesCursorIDPage;
 Runloop.GatewayConfigs = GatewayConfigs;
 Runloop.GatewayConfigViewsGatewayConfigsCursorIDPage = GatewayConfigViewsGatewayConfigsCursorIDPage;
+Runloop.McpConfigs = McpConfigs;
+Runloop.McpConfigViewsMcpConfigsCursorIDPage = McpConfigViewsMcpConfigsCursorIDPage;
 
 export declare namespace Runloop {
   export type RequestOptions = Core.RequestOptions;
@@ -506,6 +523,12 @@ export declare namespace Runloop {
   export {
     type GatewayConfigsCursorIDPageParams as GatewayConfigsCursorIDPageParams,
     type GatewayConfigsCursorIDPageResponse as GatewayConfigsCursorIDPageResponse,
+  };
+
+  export import McpConfigsCursorIDPage = Pagination.McpConfigsCursorIDPage;
+  export {
+    type McpConfigsCursorIDPageParams as McpConfigsCursorIDPageParams,
+    type McpConfigsCursorIDPageResponse as McpConfigsCursorIDPageResponse,
   };
 
   export {
@@ -706,6 +729,19 @@ export declare namespace Runloop {
     type GatewayConfigUpdateParams as GatewayConfigUpdateParams,
     type GatewayConfigListParams as GatewayConfigListParams,
     type GatewayConfigDeleteParams as GatewayConfigDeleteParams,
+  };
+
+  export {
+    McpConfigs as McpConfigs,
+    type McpConfigCreateParameters as McpConfigCreateParameters,
+    type McpConfigListView as McpConfigListView,
+    type McpConfigUpdateParameters as McpConfigUpdateParameters,
+    type McpConfigView as McpConfigView,
+    McpConfigViewsMcpConfigsCursorIDPage as McpConfigViewsMcpConfigsCursorIDPage,
+    type McpConfigCreateParams as McpConfigCreateParams,
+    type McpConfigUpdateParams as McpConfigUpdateParams,
+    type McpConfigListParams as McpConfigListParams,
+    type McpConfigDeleteParams as McpConfigDeleteParams,
   };
 
   export type AfterIdle = API.AfterIdle;
