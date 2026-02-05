@@ -32,7 +32,7 @@ jobs:
 
   build: # builds the distribution and then the documentation
     needs: get_history
-    runs-on: ubuntu-slim
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout src
         uses: runloopai/checkout@main
