@@ -80,6 +80,7 @@ describe('resource scenarios', () => {
       reference_output: 'reference_output',
       required_environment_variables: ['string'],
       required_secret_names: ['string'],
+      scorer_timeout_sec: 0,
       validation_type: 'UNSPECIFIED',
     });
   });
@@ -154,6 +155,7 @@ describe('resource scenarios', () => {
           reference_output: 'reference_output',
           required_environment_variables: ['string'],
           required_secret_names: ['string'],
+          scorer_timeout_sec: 0,
           scoring_contract: {
             scoring_function_parameters: [
               {
