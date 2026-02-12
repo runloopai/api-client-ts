@@ -670,6 +670,11 @@ export interface DevboxSnapshotView {
   name?: string | null;
 
   /**
+   * (Optional) The size of the snapshot in bytes, relative to the base blueprint.
+   */
+  size_bytes?: number | null;
+
+  /**
    * (Optional) The source Blueprint ID this snapshot was created from.
    */
   source_blueprint_id?: string | null;
