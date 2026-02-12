@@ -211,6 +211,11 @@ export interface ScenarioCreateParameters {
   required_secret_names?: Array<string> | null;
 
   /**
+   * Timeout for scoring in seconds. Default 30 minutes (1800s).
+   */
+  scorer_timeout_sec?: number | null;
+
+  /**
    * Validation strategy.
    */
   validation_type?: 'UNSPECIFIED' | 'FORWARD' | 'REVERSE' | 'EVALUATION' | null;
@@ -371,6 +376,11 @@ export interface ScenarioUpdateParameters {
   required_secret_names?: Array<string> | null;
 
   /**
+   * Timeout for scoring in seconds. Default 30 minutes (1800s).
+   */
+  scorer_timeout_sec?: number | null;
+
+  /**
    * The scoring contract for the Scenario.
    */
   scoring_contract?: ScoringContractUpdate | null;
@@ -439,6 +449,11 @@ export interface ScenarioView {
    * missing, the scenario will fail to start.
    */
   required_secret_names?: Array<string>;
+
+  /**
+   * Timeout for scoring in seconds. Default 30 minutes (1800s).
+   */
+  scorer_timeout_sec?: number | null;
 
   /**
    * Validation strategy.
@@ -738,6 +753,11 @@ export interface ScenarioCreateParams {
   required_secret_names?: Array<string> | null;
 
   /**
+   * Timeout for scoring in seconds. Default 30 minutes (1800s).
+   */
+  scorer_timeout_sec?: number | null;
+
+  /**
    * Validation strategy.
    */
   validation_type?: 'UNSPECIFIED' | 'FORWARD' | 'REVERSE' | 'EVALUATION' | null;
@@ -780,6 +800,11 @@ export interface ScenarioUpdateParams {
    * Secrets required to run the scenario. Pass in empty list to clear.
    */
   required_secret_names?: Array<string> | null;
+
+  /**
+   * Timeout for scoring in seconds. Default 30 minutes (1800s).
+   */
+  scorer_timeout_sec?: number | null;
 
   /**
    * The scoring contract for the Scenario.
