@@ -231,9 +231,9 @@ export class Devboxes extends APIResource {
   }
 
   /**
-   * Create a V2 tunnel for an existing running Devbox. Tunnels provide encrypted
+   * Enable a V2 tunnel for an existing running Devbox. Tunnels provide encrypted
    * URL-based access to the Devbox without exposing internal IDs. The tunnel URL
-   * format is: https://{port}-{tunnel_key}.tunnel.runloop.ai
+   * format is: https://&#123;port&#125;-&#123;tunnel_key&#125;.tunnel.runloop.ai
    *
    * Each Devbox can have one tunnel.
    */
