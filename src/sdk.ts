@@ -1332,10 +1332,6 @@ export class AgentOps {
  *
  * // Update the scorer
  * await scorer.update({ bash_script: 'echo "0.5"' });
- *
- * // Validate the scorer with a scoring context
- * const result = await scorer.validate({ scoring_context: { output: 'hello' } });
- * console.log(result.scoring_result.score);
  * ```
  *
  * @example

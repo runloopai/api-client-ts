@@ -61,7 +61,7 @@ The SDK provides object-oriented interfaces for all major Runloop resources:
 - **[`runloop.storageObject`](https://runloopai.github.io/api-client-ts/stable/classes/StorageObjectOps.html)** - Storage object management (upload, download, list objects)
 - **[`runloop.agent`](https://runloopai.github.io/api-client-ts/stable/classes/AgentOps.html)** - Agent management (create, list agents from npm/pip/git)
 - **[`runloop.scenario`](https://runloopai.github.io/api-client-ts/stable/classes/ScenarioOps.html)** - Scenario management (list scenarios, start runs)
-- **[`runloop.scorer`](https://runloopai.github.io/api-client-ts/stable/classes/ScorerOps.html)** - Scorer management (create, list, validate, update)
+- **[`runloop.scorer`](https://runloopai.github.io/api-client-ts/stable/classes/ScorerOps.html)** - Scorer management (create, list, update)
 - **[`runloop.api`](https://runloopai.github.io/api-client-ts/stable/classes/Runloop.html)** - Direct access to the REST API client
 
 ## TypeScript Support
@@ -88,7 +88,7 @@ const devbox = await blueprint.createDevbox({ name: 'my-devbox' });
 
 ### Scorers
 
-Scorers are custom scoring functions used to evaluate scenario outputs. Create scorers via `runloop.scorer.create()`, then update or validate them with the returned `Scorer` instance:
+Scorers are custom scoring functions used to evaluate scenario outputs. Create scorers via `runloop.scorer.create()`, then update them with the returned `Scorer` instance:
 
 ```typescript
 import { RunloopSDK } from '@runloop/api-client';
@@ -101,8 +101,6 @@ const scorer = await runloop.scorer.create({
 });
 
 await scorer.update({ bash_script: 'echo "0.5"' });
-const result = await scorer.validate({ scoring_context: { output: 'hello' } });
-console.log(result.scoring_result.score);
 ```
 
 ### Scenarios
