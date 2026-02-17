@@ -78,14 +78,14 @@ export interface AgentListView {
   has_more: boolean;
 
   /**
-   * The count of remaining Agents.
+   * The count of remaining Agents. Deprecated: always returns null.
    */
-  remaining_count: number;
+  remaining_count: number | null;
 
   /**
-   * The total count of Agents.
+   * The total count of Agents. Deprecated: always returns null.
    */
-  total_count: number;
+  total_count: number | null;
 }
 
 /**

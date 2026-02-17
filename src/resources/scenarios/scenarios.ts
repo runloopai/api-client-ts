@@ -251,14 +251,14 @@ export interface ScenarioEnvironment {
 export interface ScenarioRunListView {
   has_more: boolean;
 
-  remaining_count: number;
+  remaining_count: number | null;
 
   /**
    * List of ScenarioRuns matching filter.
    */
   runs: Array<ScenarioRunView>;
 
-  total_count: number;
+  total_count: number | null;
 }
 
 /**

@@ -77,9 +77,9 @@ export interface SecretListView {
   has_more: boolean;
 
   /**
-   * Number of Secrets remaining after this page.
+   * Number of Secrets remaining after this page. Deprecated: always returns null.
    */
-  remaining_count: number;
+  remaining_count: number | null;
 
   /**
    * List of Secret objects. Values are omitted for security.
@@ -87,9 +87,9 @@ export interface SecretListView {
   secrets: Array<SecretView>;
 
   /**
-   * Total number of Secrets across all pages.
+   * Total number of Secrets across all pages. Deprecated: always returns null.
    */
-  total_count: number;
+  total_count: number | null;
 }
 
 /**

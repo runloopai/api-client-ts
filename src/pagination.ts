@@ -7,7 +7,7 @@ export interface BlueprintsCursorIDPageResponse<Item> {
 
   has_more: boolean;
 
-  total_count: number;
+  total_count: number | null;
 }
 
 export interface BlueprintsCursorIDPageParams {
@@ -24,7 +24,7 @@ export class BlueprintsCursorIDPage<Item extends { id: string }>
 
   has_more: boolean;
 
-  total_count: number;
+  total_count: number | null;
 
   constructor(
     client: APIClient,
@@ -36,7 +36,7 @@ export class BlueprintsCursorIDPage<Item extends { id: string }>
 
     this.blueprints = body.blueprints || [];
     this.has_more = body.has_more || false;
-    this.total_count = body.total_count || 0;
+    this.total_count = body.total_count ?? null;
   }
 
   getPaginatedItems(): Item[] {
@@ -81,7 +81,7 @@ export interface DevboxesCursorIDPageResponse<Item> {
 
   has_more: boolean;
 
-  total_count: number;
+  total_count: number | null;
 }
 
 export interface DevboxesCursorIDPageParams {
@@ -98,7 +98,7 @@ export class DevboxesCursorIDPage<Item extends { id: string }>
 
   has_more: boolean;
 
-  total_count: number;
+  total_count: number | null;
 
   constructor(
     client: APIClient,
@@ -110,7 +110,7 @@ export class DevboxesCursorIDPage<Item extends { id: string }>
 
     this.devboxes = body.devboxes || [];
     this.has_more = body.has_more || false;
-    this.total_count = body.total_count || 0;
+    this.total_count = body.total_count ?? null;
   }
 
   getPaginatedItems(): Item[] {
@@ -155,7 +155,7 @@ export interface RepositoriesCursorIDPageResponse<Item> {
 
   has_more: boolean;
 
-  total_count: number;
+  total_count: number | null;
 }
 
 export interface RepositoriesCursorIDPageParams {
@@ -172,7 +172,7 @@ export class RepositoriesCursorIDPage<Item extends { id: string }>
 
   has_more: boolean;
 
-  total_count: number;
+  total_count: number | null;
 
   constructor(
     client: APIClient,
@@ -184,7 +184,7 @@ export class RepositoriesCursorIDPage<Item extends { id: string }>
 
     this.repositories = body.repositories || [];
     this.has_more = body.has_more || false;
-    this.total_count = body.total_count || 0;
+    this.total_count = body.total_count ?? null;
   }
 
   getPaginatedItems(): Item[] {
@@ -229,7 +229,7 @@ export interface DiskSnapshotsCursorIDPageResponse<Item> {
 
   has_more: boolean;
 
-  total_count: number;
+  total_count: number | null;
 }
 
 export interface DiskSnapshotsCursorIDPageParams {
@@ -246,7 +246,7 @@ export class DiskSnapshotsCursorIDPage<Item extends { id: string }>
 
   has_more: boolean;
 
-  total_count: number;
+  total_count: number | null;
 
   constructor(
     client: APIClient,
@@ -258,7 +258,7 @@ export class DiskSnapshotsCursorIDPage<Item extends { id: string }>
 
     this.snapshots = body.snapshots || [];
     this.has_more = body.has_more || false;
-    this.total_count = body.total_count || 0;
+    this.total_count = body.total_count ?? null;
   }
 
   getPaginatedItems(): Item[] {
@@ -303,7 +303,7 @@ export interface BenchmarksCursorIDPageResponse<Item> {
 
   has_more: boolean;
 
-  total_count: number;
+  total_count: number | null;
 }
 
 export interface BenchmarksCursorIDPageParams {
@@ -320,7 +320,7 @@ export class BenchmarksCursorIDPage<Item extends { id: string }>
 
   has_more: boolean;
 
-  total_count: number;
+  total_count: number | null;
 
   constructor(
     client: APIClient,
@@ -332,7 +332,7 @@ export class BenchmarksCursorIDPage<Item extends { id: string }>
 
     this.benchmarks = body.benchmarks || [];
     this.has_more = body.has_more || false;
-    this.total_count = body.total_count || 0;
+    this.total_count = body.total_count ?? null;
   }
 
   getPaginatedItems(): Item[] {
@@ -377,7 +377,7 @@ export interface AgentsCursorIDPageResponse<Item> {
 
   has_more: boolean;
 
-  total_count: number;
+  total_count: number | null;
 }
 
 export interface AgentsCursorIDPageParams {
@@ -394,7 +394,7 @@ export class AgentsCursorIDPage<Item extends { id: string }>
 
   has_more: boolean;
 
-  total_count: number;
+  total_count: number | null;
 
   constructor(
     client: APIClient,
@@ -406,7 +406,7 @@ export class AgentsCursorIDPage<Item extends { id: string }>
 
     this.agents = body.agents || [];
     this.has_more = body.has_more || false;
-    this.total_count = body.total_count || 0;
+    this.total_count = body.total_count ?? null;
   }
 
   getPaginatedItems(): Item[] {
@@ -451,7 +451,7 @@ export interface BenchmarkRunsCursorIDPageResponse<Item> {
 
   has_more: boolean;
 
-  total_count: number;
+  total_count: number | null;
 }
 
 export interface BenchmarkRunsCursorIDPageParams {
@@ -468,7 +468,7 @@ export class BenchmarkRunsCursorIDPage<Item extends { id: string }>
 
   has_more: boolean;
 
-  total_count: number;
+  total_count: number | null;
 
   constructor(
     client: APIClient,
@@ -480,7 +480,7 @@ export class BenchmarkRunsCursorIDPage<Item extends { id: string }>
 
     this.runs = body.runs || [];
     this.has_more = body.has_more || false;
-    this.total_count = body.total_count || 0;
+    this.total_count = body.total_count ?? null;
   }
 
   getPaginatedItems(): Item[] {
@@ -525,7 +525,7 @@ export interface ScenariosCursorIDPageResponse<Item> {
 
   has_more: boolean;
 
-  total_count: number;
+  total_count: number | null;
 }
 
 export interface ScenariosCursorIDPageParams {
@@ -542,7 +542,7 @@ export class ScenariosCursorIDPage<Item extends { id: string }>
 
   has_more: boolean;
 
-  total_count: number;
+  total_count: number | null;
 
   constructor(
     client: APIClient,
@@ -554,7 +554,7 @@ export class ScenariosCursorIDPage<Item extends { id: string }>
 
     this.scenarios = body.scenarios || [];
     this.has_more = body.has_more || false;
-    this.total_count = body.total_count || 0;
+    this.total_count = body.total_count ?? null;
   }
 
   getPaginatedItems(): Item[] {
@@ -599,7 +599,7 @@ export interface ScenarioRunsCursorIDPageResponse<Item> {
 
   has_more: boolean;
 
-  total_count: number;
+  total_count: number | null;
 }
 
 export interface ScenarioRunsCursorIDPageParams {
@@ -616,7 +616,7 @@ export class ScenarioRunsCursorIDPage<Item extends { id: string }>
 
   has_more: boolean;
 
-  total_count: number;
+  total_count: number | null;
 
   constructor(
     client: APIClient,
@@ -628,7 +628,7 @@ export class ScenarioRunsCursorIDPage<Item extends { id: string }>
 
     this.runs = body.runs || [];
     this.has_more = body.has_more || false;
-    this.total_count = body.total_count || 0;
+    this.total_count = body.total_count ?? null;
   }
 
   getPaginatedItems(): Item[] {
@@ -673,7 +673,7 @@ export interface ScenarioScorersCursorIDPageResponse<Item> {
 
   has_more: boolean;
 
-  total_count: number;
+  total_count: number | null;
 }
 
 export interface ScenarioScorersCursorIDPageParams {
@@ -690,7 +690,7 @@ export class ScenarioScorersCursorIDPage<Item extends { id: string }>
 
   has_more: boolean;
 
-  total_count: number;
+  total_count: number | null;
 
   constructor(
     client: APIClient,
@@ -702,7 +702,7 @@ export class ScenarioScorersCursorIDPage<Item extends { id: string }>
 
     this.scorers = body.scorers || [];
     this.has_more = body.has_more || false;
-    this.total_count = body.total_count || 0;
+    this.total_count = body.total_count ?? null;
   }
 
   getPaginatedItems(): Item[] {
@@ -747,7 +747,7 @@ export interface ObjectsCursorIDPageResponse<Item> {
 
   has_more: boolean;
 
-  total_count: number;
+  total_count: number | null;
 }
 
 export interface ObjectsCursorIDPageParams {
@@ -764,7 +764,7 @@ export class ObjectsCursorIDPage<Item extends { id: string }>
 
   has_more: boolean;
 
-  total_count: number;
+  total_count: number | null;
 
   constructor(
     client: APIClient,
@@ -776,7 +776,7 @@ export class ObjectsCursorIDPage<Item extends { id: string }>
 
     this.objects = body.objects || [];
     this.has_more = body.has_more || false;
-    this.total_count = body.total_count || 0;
+    this.total_count = body.total_count ?? null;
   }
 
   getPaginatedItems(): Item[] {
@@ -821,7 +821,7 @@ export interface NetworkPoliciesCursorIDPageResponse<Item> {
 
   has_more: boolean;
 
-  total_count: number;
+  total_count: number | null;
 }
 
 export interface NetworkPoliciesCursorIDPageParams {
@@ -838,7 +838,7 @@ export class NetworkPoliciesCursorIDPage<Item extends { id: string }>
 
   has_more: boolean;
 
-  total_count: number;
+  total_count: number | null;
 
   constructor(
     client: APIClient,
@@ -850,7 +850,7 @@ export class NetworkPoliciesCursorIDPage<Item extends { id: string }>
 
     this.network_policies = body.network_policies || [];
     this.has_more = body.has_more || false;
-    this.total_count = body.total_count || 0;
+    this.total_count = body.total_count ?? null;
   }
 
   getPaginatedItems(): Item[] {
@@ -895,7 +895,7 @@ export interface GatewayConfigsCursorIDPageResponse<Item> {
 
   has_more: boolean;
 
-  total_count: number;
+  total_count: number | null;
 }
 
 export interface GatewayConfigsCursorIDPageParams {
@@ -912,7 +912,7 @@ export class GatewayConfigsCursorIDPage<Item extends { id: string }>
 
   has_more: boolean;
 
-  total_count: number;
+  total_count: number | null;
 
   constructor(
     client: APIClient,
@@ -924,7 +924,7 @@ export class GatewayConfigsCursorIDPage<Item extends { id: string }>
 
     this.gateway_configs = body.gateway_configs || [];
     this.has_more = body.has_more || false;
-    this.total_count = body.total_count || 0;
+    this.total_count = body.total_count ?? null;
   }
 
   getPaginatedItems(): Item[] {
@@ -969,7 +969,7 @@ export interface McpConfigsCursorIDPageResponse<Item> {
 
   has_more: boolean;
 
-  total_count: number;
+  total_count: number | null;
 }
 
 export interface McpConfigsCursorIDPageParams {
@@ -986,7 +986,7 @@ export class McpConfigsCursorIDPage<Item extends { id: string }>
 
   has_more: boolean;
 
-  total_count: number;
+  total_count: number | null;
 
   constructor(
     client: APIClient,
@@ -998,7 +998,7 @@ export class McpConfigsCursorIDPage<Item extends { id: string }>
 
     this.mcp_configs = body.mcp_configs || [];
     this.has_more = body.has_more || false;
-    this.total_count = body.total_count || 0;
+    this.total_count = body.total_count ?? null;
   }
 
   getPaginatedItems(): Item[] {
