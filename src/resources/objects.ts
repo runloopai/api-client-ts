@@ -159,14 +159,14 @@ export interface ObjectListView {
   objects: Array<ObjectView>;
 
   /**
-   * Number of Objects remaining after this page.
+   * Number of Objects remaining after this page. Deprecated: always returns null.
    */
-  remaining_count: number;
+  remaining_count: number | null;
 
   /**
-   * Total number of Objects across all pages.
+   * Total number of Objects across all pages. Deprecated: always returns null.
    */
-  total_count: number;
+  total_count: number | null;
 }
 
 /**

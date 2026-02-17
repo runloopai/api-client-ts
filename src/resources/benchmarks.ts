@@ -299,14 +299,14 @@ export interface BenchmarkView {
 export interface ScenarioDefinitionListView {
   has_more: boolean;
 
-  remaining_count: number;
+  remaining_count: number | null;
 
   /**
    * List of Scenarios matching filter.
    */
   scenarios: Array<ScenariosAPI.ScenarioView>;
 
-  total_count: number;
+  total_count: number | null;
 }
 
 export interface StartBenchmarkRunParameters {

@@ -674,9 +674,9 @@ export interface DevboxListView {
 
   has_more: boolean;
 
-  remaining_count: number;
+  remaining_count: number | null;
 
-  total_count: number;
+  total_count: number | null;
 }
 
 export interface DevboxResourceUsageView {
@@ -762,14 +762,14 @@ export interface DevboxSendStdInResult {
 export interface DevboxSnapshotListView {
   has_more: boolean;
 
-  remaining_count: number;
+  remaining_count: number | null;
 
   /**
    * List of snapshots matching filter.
    */
   snapshots: Array<DevboxSnapshotView>;
 
-  total_count: number;
+  total_count: number | null;
 }
 
 /**
