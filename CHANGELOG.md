@@ -1,5 +1,18 @@
 # Changelog
 
+## 1.8.1 (2026-02-19)
+
+Full Changelog: [v1.8.0...v1.8.1](https://github.com/runloopai/api-client-ts/compare/v1.8.0...v1.8.1)
+
+### Chores
+
+* **benchmarks:** removed unused validate scorer endpoint ([#716](https://github.com/runloopai/api-client-ts/issues/716)) ([54bb583](https://github.com/runloopai/api-client-ts/commit/54bb5834f011ad10f9cdb086cddca9810c05f13e))
+
+
+### Refactors
+
+* deprecate and make Nullable total_count and remaining_count of ListViews ([#7533](https://github.com/runloopai/api-client-ts/issues/7533)) ([1af5508](https://github.com/runloopai/api-client-ts/commit/1af55086d738d85db55ac5a1116bd01950665902))
+
 ## 1.8.0 (2026-02-12)
 
 Full Changelog: [v1.7.0...v1.8.0](https://github.com/runloopai/api-client-ts/compare/v1.7.0...v1.8.0)
