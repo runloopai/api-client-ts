@@ -17,11 +17,12 @@ describe('Scenario', () => {
       input_context: {
         problem_statement: 'Solve this problem',
       },
-      environment_parameters: {},
+      environment: {},
       scoring_contract: {
         scoring_function_parameters: [],
       },
       metadata: {},
+      status: 'active',
     } as ScenarioView;
 
     mockScenarioRunData = {
