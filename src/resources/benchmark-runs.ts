@@ -85,14 +85,14 @@ export class BenchmarkRunViewsBenchmarkRunsCursorIDPage extends BenchmarkRunsCur
 export interface BenchmarkRunListView {
   has_more: boolean;
 
-  remaining_count: number;
-
   /**
    * List of BenchmarkRuns matching filter.
    */
   runs: Array<BenchmarkRunView>;
 
-  total_count: number;
+  remaining_count?: number | null;
+
+  total_count?: number | null;
 }
 
 /**

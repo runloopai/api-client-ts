@@ -144,7 +144,7 @@ Methods:
 - <code title="post /v1/devboxes/{id}/remove_tunnel">client.devboxes.<a href="./src/resources/devboxes/devboxes.ts">removeTunnel</a>(id, { ...params }) -> unknown</code>
 - <code title="post /v1/devboxes/{id}/resume">client.devboxes.<a href="./src/resources/devboxes/devboxes.ts">resume</a>(id) -> DevboxView</code>
 - <code title="get /v1/devboxes/{id}/usage">client.devboxes.<a href="./src/resources/devboxes/devboxes.ts">retrieveResourceUsage</a>(id) -> DevboxResourceUsageView</code>
-- <code title="post /v1/devboxes/{id}/shutdown">client.devboxes.<a href="./src/resources/devboxes/devboxes.ts">shutdown</a>(id) -> DevboxView</code>
+- <code title="post /v1/devboxes/{id}/shutdown">client.devboxes.<a href="./src/resources/devboxes/devboxes.ts">shutdown</a>(id, { ...params }) -> DevboxView</code>
 - <code title="post /v1/devboxes/{id}/snapshot_disk">client.devboxes.<a href="./src/resources/devboxes/devboxes.ts">snapshotDisk</a>(id, { ...params }) -> DevboxSnapshotView</code>
 - <code title="post /v1/devboxes/{id}/snapshot_disk_async">client.devboxes.<a href="./src/resources/devboxes/devboxes.ts">snapshotDiskAsync</a>(id, { ...params }) -> DevboxSnapshotView</code>
 - <code title="post /v1/devboxes/{id}/suspend">client.devboxes.<a href="./src/resources/devboxes/devboxes.ts">suspend</a>(id) -> DevboxView</code>

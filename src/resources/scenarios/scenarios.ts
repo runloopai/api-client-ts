@@ -236,14 +236,14 @@ export interface ScenarioEnvironment {
 export interface ScenarioRunListView {
   has_more: boolean;
 
-  remaining_count: number;
-
   /**
    * List of ScenarioRuns matching filter.
    */
   runs: Array<ScenarioRunView>;
 
-  total_count: number;
+  remaining_count?: number | null;
+
+  total_count?: number | null;
 }
 
 /**
@@ -405,6 +405,11 @@ export interface ScenarioView {
    * The scoring contract for the Scenario.
    */
   scoring_contract: ScoringContract;
+
+  /**
+   * The state of the scenario.
+   */
+  status: string;
 
   /**
    * The Environment in which the Scenario is run.

@@ -128,9 +128,10 @@ export interface NetworkPolicyListView {
   network_policies: Array<NetworkPolicyView>;
 
   /**
-   * Total count of items in this response.
+   * Total count of items in this response. Deprecated: will be removed in a future
+   * breaking change.
    */
-  total_count: number;
+  total_count?: number | null;
 }
 
 /**

@@ -140,9 +140,10 @@ export interface GatewayConfigListView {
   has_more: boolean;
 
   /**
-   * Total count of GatewayConfigs that match the query.
+   * Total count of GatewayConfigs that match the query. Deprecated: will be removed
+   * in a future breaking change.
    */
-  total_count: number;
+  total_count?: number | null;
 }
 
 /**
