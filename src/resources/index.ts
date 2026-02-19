@@ -95,6 +95,7 @@ export {
   type DevboxListDiskSnapshotsParams,
   type DevboxReadFileContentsParams,
   type DevboxRemoveTunnelParams,
+  type DevboxShutdownParams,
   type DevboxSnapshotDiskParams,
   type DevboxSnapshotDiskAsyncParams,
   type DevboxUploadFileParams,

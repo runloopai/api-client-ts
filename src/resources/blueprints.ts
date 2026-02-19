@@ -456,9 +456,9 @@ export interface BlueprintListView {
 
   has_more: boolean;
 
-  remaining_count: number;
+  remaining_count?: number | null;
 
-  total_count: number;
+  total_count?: number | null;
 }
 
 export interface BlueprintPreviewView {

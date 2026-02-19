@@ -120,9 +120,10 @@ export interface McpConfigListView {
   mcp_configs: Array<McpConfigView>;
 
   /**
-   * Total count of McpConfigs that match the query.
+   * Total count of McpConfigs that match the query. Deprecated: will be removed in a
+   * future breaking change.
    */
-  total_count: number;
+  total_count?: number | null;
 }
 
 /**
