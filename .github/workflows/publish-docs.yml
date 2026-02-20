@@ -22,7 +22,7 @@ jobs:
       - name: tar the existing docs
         run: |
           mkdir -p ./docs
-          tar -cvf documentation.tar ./docs
+          tar -cvf documentation.tar --no-dereference ./docs
 
       - name: create a document artifact
         uses: runloopai/upload-artifact@main
@@ -42,7 +42,13 @@ jobs:
         uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53
         with:
           name: documentation
-      - run: tar -xf documentation.tar ./docs -C ./docs
+      - run: tar -xf documentation.tar
+      - name: Remove any legacy nested docs trees
+        run: |
+          if [ -d ./docs/docs ]; then
+            echo "Removing legacy nested docs content from prior malformed extraction"
+            rm -rf ./docs/docs
+          fi
 
       - name: Build
         uses: runloopai/setup-node@main
@@ -56,7 +62,7 @@ jobs:
         run: yarn docs #set up 'docs' build script in your package.json
 
       - name: tar the new docs
-        run: tar -cvf newdocumentation.tar ./docs
+        run: tar -cvf newdocumentation.tar --no-dereference ./docs
 
       - name: create a new document artifact
         uses: runloopai/upload-artifact@main
@@ -78,7 +84,7 @@ jobs:
         uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53
         with:
           name: newdocumentation
-      - run: tar -xf newdocumentation.tar ./docs -C ./docs
+      - run: tar -xf newdocumentation.tar
 
       - name: commit
         run: |
