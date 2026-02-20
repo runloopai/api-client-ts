@@ -407,9 +407,10 @@ export interface ScenarioView {
   scoring_contract: ScoringContract;
 
   /**
-   * The state of the scenario.
+   * Whether the scenario is active or archived. Archived scenarios are excluded from
+   * listings and cannot be updated.
    */
-  status: string;
+  status: 'active' | 'archived';
 
   /**
    * The Environment in which the Scenario is run.
