@@ -1,5 +1,20 @@
 # Changelog
 
+## 1.8.2 (2026-02-22)
+
+Full Changelog: [v1.8.1...v1.8.2](https://github.com/runloopai/api-client-ts/compare/v1.8.1...v1.8.2)
+
+### Bug Fixes
+
+* **internal:** skip tests that depend on mock server ([ec997db](https://github.com/runloopai/api-client-ts/commit/ec997db07618be0ee8ce4177459a0efee1d45313))
+
+
+### Chores
+
+* **documentation:** fixed bug in doc publishing ([#720](https://github.com/runloopai/api-client-ts/issues/720)) ([1eeb486](https://github.com/runloopai/api-client-ts/commit/1eeb486190d5184e7a9b8c363b68893c5492bf57))
+* **scenarios:** make scenario status enum instead of string ([#7552](https://github.com/runloopai/api-client-ts/issues/7552)) ([3ffa1dc](https://github.com/runloopai/api-client-ts/commit/3ffa1dc08f1db582ebdef71ba6452bbe8a67d7ba))
+* update mock server docs ([f759b32](https://github.com/runloopai/api-client-ts/commit/f759b32c672776429eb71387328f70bdf2f45a37))
+
 ## 1.8.1 (2026-02-19)
 
 Full Changelog: [v1.8.0...v1.8.1](https://github.com/runloopai/api-client-ts/compare/v1.8.0...v1.8.1)
