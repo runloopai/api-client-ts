@@ -231,9 +231,9 @@ export class Devboxes extends APIResource {
   }
 
   /**
-   * Create a V2 tunnel for an existing running Devbox. Tunnels provide encrypted
+   * Enable a V2 tunnel for an existing running Devbox. Tunnels provide encrypted
    * URL-based access to the Devbox without exposing internal IDs. The tunnel URL
-   * format is: https://{port}-{tunnel_key}.tunnel.runloop.ai
+   * format is: https://&#123;port&#125;-&#123;tunnel_key&#125;.tunnel.runloop.ai
    *
    * Each Devbox can have one tunnel.
    */
@@ -450,10 +450,26 @@ export class Devboxes extends APIResource {
   /**
    * Shutdown a running Devbox. This will permanently stop the Devbox. If you want to
    * save the state of the Devbox, you should take a snapshot before shutting down or
-   * should suspend the Devbox instead of shutting down.
+   * should suspend the Devbox instead of shutting down. If the Devbox has any
+   * in-progress snapshots, the shutdown will be rejected with a 409 Conflict unless
+   * force=true is specified.
    */
-  shutdown(id: string, options?: Core.RequestOptions): Core.APIPromise<DevboxView> {
-    return this._client.post(`/v1/devboxes/${id}/shutdown`, options);
+  shutdown(
+    id: string,
+    params?: DevboxShutdownParams,
+    options?: Core.RequestOptions,
+  ): Core.APIPromise<DevboxView>;
+  shutdown(id: string, options?: Core.RequestOptions): Core.APIPromise<DevboxView>;
+  shutdown(
+    id: string,
+    params: DevboxShutdownParams | Core.RequestOptions = {},
+    options?: Core.RequestOptions,
+  ): Core.APIPromise<DevboxView> {
+    if (isRequestOptions(params)) {
+      return this.shutdown(id, {}, params);
+    }
+    const { force } = params;
+    return this._client.post(`/v1/devboxes/${id}/shutdown`, { query: { force }, ...options });
   }
 
   /**
@@ -674,9 +690,9 @@ export interface DevboxListView {
 
   has_more: boolean;
 
-  remaining_count: number;
+  remaining_count?: number | null;
 
-  total_count: number;
+  total_count?: number | null;
 }
 
 export interface DevboxResourceUsageView {
@@ -762,14 +778,14 @@ export interface DevboxSendStdInResult {
 export interface DevboxSnapshotListView {
   has_more: boolean;
 
-  remaining_count: number;
-
   /**
    * List of snapshots matching filter.
    */
   snapshots: Array<DevboxSnapshotView>;
 
-  total_count: number;
+  remaining_count?: number | null;
+
+  total_count?: number | null;
 }
 
 /**
@@ -807,6 +823,11 @@ export interface DevboxSnapshotView {
    * (Optional) The custom name of the snapshot.
    */
   name?: string | null;
+
+  /**
+   * (Optional) The size of the snapshot in bytes, relative to the base blueprint.
+   */
+  size_bytes?: number | null;
 
   /**
    * (Optional) The source Blueprint ID this snapshot was created from.
@@ -1375,6 +1396,13 @@ export interface DevboxRemoveTunnelParams {
   port: number;
 }
 
+export interface DevboxShutdownParams {
+  /**
+   * If true, force shutdown even if snapshots are in progress. Defaults to false.
+   */
+  force?: string;
+}
+
 export interface DevboxSnapshotDiskParams {
   /**
    * (Optional) Commit message associated with the snapshot (max 1000 characters)
@@ -1495,6 +1523,7 @@ export declare namespace Devboxes {
     type DevboxListDiskSnapshotsParams as DevboxListDiskSnapshotsParams,
     type DevboxReadFileContentsParams as DevboxReadFileContentsParams,
     type DevboxRemoveTunnelParams as DevboxRemoveTunnelParams,
+    type DevboxShutdownParams as DevboxShutdownParams,
     type DevboxSnapshotDiskParams as DevboxSnapshotDiskParams,
     type DevboxSnapshotDiskAsyncParams as DevboxSnapshotDiskAsyncParams,
     type DevboxUploadFileParams as DevboxUploadFileParams,

@@ -440,6 +440,13 @@ describe('resource devboxes', () => {
     );
   });
 
+  test('shutdown: request options and params are passed correctly', async () => {
+    // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
+    await expect(
+      client.devboxes.shutdown('id', { force: 'force' }, { path: '/_stainless_unknown_path' }),
+    ).rejects.toThrow(Runloop.NotFoundError);
+  });
+
   test('snapshotDisk', async () => {
     const responsePromise = client.devboxes.snapshotDisk('id');
     const rawResponse = await responsePromise.asResponse();

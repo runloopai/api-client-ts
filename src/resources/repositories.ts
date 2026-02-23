@@ -128,14 +128,14 @@ export class RepositoryConnectionViewsRepositoriesCursorIDPage extends Repositor
 export interface RepositoryConnectionListView {
   has_more: boolean;
 
-  remaining_count: number;
-
   /**
    * List of repositories matching filter.
    */
   repositories: Array<RepositoryConnectionView>;
 
-  total_count: number;
+  remaining_count?: number | null;
+
+  total_count?: number | null;
 }
 
 /**

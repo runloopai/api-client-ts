@@ -308,9 +308,9 @@ export interface BenchmarkJobListView {
    */
   jobs: Array<BenchmarkJobView>;
 
-  remaining_count: number;
+  remaining_count?: number | null;
 
-  total_count: number;
+  total_count?: number | null;
 }
 
 /**

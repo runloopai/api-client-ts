@@ -1,5 +1,37 @@
 # Changelog
 
+## 1.8.1 (2026-02-19)
+
+Full Changelog: [v1.8.0...v1.8.1](https://github.com/runloopai/api-client-ts/compare/v1.8.0...v1.8.1)
+
+### Chores
+
+* **benchmarks:** removed unused validate scorer endpoint ([#716](https://github.com/runloopai/api-client-ts/issues/716)) ([54bb583](https://github.com/runloopai/api-client-ts/commit/54bb5834f011ad10f9cdb086cddca9810c05f13e))
+
+
+### Refactors
+
+* deprecate and make Nullable total_count and remaining_count of ListViews ([#7533](https://github.com/runloopai/api-client-ts/issues/7533)) ([1af5508](https://github.com/runloopai/api-client-ts/commit/1af55086d738d85db55ac5a1116bd01950665902))
+
+## 1.8.0 (2026-02-12)
+
+Full Changelog: [v1.7.0...v1.8.0](https://github.com/runloopai/api-client-ts/compare/v1.7.0...v1.8.0)
+
+### Features
+
+* **benchmarks:** scenario scoring timeout ([#7300](https://github.com/runloopai/api-client-ts/issues/7300)) ([893cd00](https://github.com/runloopai/api-client-ts/commit/893cd0057d67f98f5e9ed2f453aae31e20728db0))
+* **devbox:** expose snapshot size (in bytes) ([#7444](https://github.com/runloopai/api-client-ts/issues/7444)) ([54aa338](https://github.com/runloopai/api-client-ts/commit/54aa338efb7935509bc6b7a47d892f8cddcb7164))
+
+
+### Bug Fixes
+
+* remove duplicate operationId createDevboxTunnel in openapi ([#7397](https://github.com/runloopai/api-client-ts/issues/7397)) ([99b8c23](https://github.com/runloopai/api-client-ts/commit/99b8c23fd3fc44bee446d97f701d3acd0a73a27f))
+
+
+### Chores
+
+* **internal:** avoid type checking errors with ts-reset ([1e3ed19](https://github.com/runloopai/api-client-ts/commit/1e3ed1959f5afbe8235b8f37742e3fb04c9fb877))
+
 ## 1.7.0 (2026-02-05)
 
 Full Changelog: [v1.6.0...v1.7.0](https://github.com/runloopai/api-client-ts/compare/v1.6.0...v1.7.0)
