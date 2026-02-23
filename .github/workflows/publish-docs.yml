@@ -22,7 +22,7 @@ jobs:
       - name: tar the existing docs
         run: |
           mkdir -p ./docs
-          tar -cvf documentation.tar --no-dereference ./docs
+          tar -cvf documentation.tar ./docs
 
       - name: create a document artifact
         uses: runloopai/upload-artifact@main
@@ -62,7 +62,7 @@ jobs:
         run: yarn docs #set up 'docs' build script in your package.json
 
       - name: tar the new docs
-        run: tar -cvf newdocumentation.tar --no-dereference ./docs
+        run: tar -cvf newdocumentation.tar ./docs
 
       - name: create a new document artifact
         uses: runloopai/upload-artifact@main
