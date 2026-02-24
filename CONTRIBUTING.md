@@ -60,7 +60,7 @@ $ yarn link @runloop/api-client
 # With pnpm
 $ pnpm link --global
 $ cd ../my-package
-$ pnpm link -—global @runloop/api-client
+$ pnpm link --global @runloop/api-client
 ```
 
 ## Running tests
