@@ -69,7 +69,7 @@ jobs:
 
       - name: Run smoke tests
         id: tests
-        run: yarn test:smoke ${{ inputs.jest_pattern && format('--testNamePattern=''{0}''', inputs.jest_pattern) }}
+        run: yarn test:smoke ${{ inputs.jest_pattern && format('--testNamePattern=''{0}''', inputs.jest_pattern) }} --json --outputFile=jest-report.json
 
       - name: Comment results on PR
         if: failure() && github.event_name == 'pull_request'
@@ -106,3 +106,52 @@ jobs:
               repo: context.repo.repo,
               body: comment
             });
+
+      - name: Write smoke test summary
+        if: always() && steps.tests.outcome != 'skipped'
+        uses: runloopai/github-script@main
+        with:
+          script: |
+            const fs = require('fs');
+            const env = '${{ inputs.environment }}';
+            const outcome = '${{ steps.tests.outcome }}';
+            const icon = outcome === 'success' ? '✅' : outcome === 'failure' ? '❌' : '⚠️';
+
+            let body = '<table>';
+            body += `<tr><th>Environment</th><td><code>${env}</code></td></tr>`;
+            body += `<tr><th>Status</th><td>${icon} ${outcome}</td></tr>`;
+
+            if (fs.existsSync('jest-report.json')) {
+              const report = JSON.parse(fs.readFileSync('jest-report.json', 'utf8'));
+              const total = report.numTotalTests || 0;
+              const passed = report.numPassedTests || 0;
+              const failed = report.numFailedTests || 0;
+              const skipped = report.numPendingTests || 0;
+              const duration = report.testResults
+                ? (report.testResults.reduce((sum, s) => sum + (s.perfStats?.runtime || 0), 0) / 1000).toFixed(1) + 's'
+                : 'unknown';
+
+              body += `<tr><th>Results</th><td>✅ ${passed} passed &nbsp; ❌ ${failed} failed &nbsp; ⏭️ ${skipped} skipped &nbsp; (${total} total)</td></tr>`;
+              body += `<tr><th>Duration</th><td>${duration}</td></tr>`;
+              body += '</table>';
+
+              const failedTests = (report.testResults || [])
+                .flatMap(suite => (suite.testResults || []).filter(t => t.status === 'failed')
+                  .map(t => ({ suite: suite.testFilePath?.split('/').pop() || '', name: t.fullName, msg: t.failureMessages?.[0]?.split('\n').filter(l => l.trim()).slice(-1)[0] || '' })));
+
+              if (failedTests.length > 0) {
+                body += '<h3>❌ Failed tests</h3><ul>';
+                for (const t of failedTests) {
+                  body += `<li><code>${t.suite} &gt; ${t.name}</code>${t.msg ? ` — <em>${t.msg.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</em>` : ''}</li>`;
+                }
+                body += '</ul>';
+              }
+            } else {
+              body += '</table>';
+              body += '<p><em>jest-report.json not found — Jest may have failed before generating it.</em></p>';
+            }
+
+            await core.summary
+              .addHeading(`${icon} SDK Smoke Tests on \`${env}\``, 2)
+              .addRaw(body)
+              .write();
