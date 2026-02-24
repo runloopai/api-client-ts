@@ -884,6 +884,12 @@ export interface TunnelView {
   create_time_ms: number;
 
   /**
+   * When true, HTTP traffic through the tunnel counts as activity for idle lifecycle
+   * policies, resetting the idle timer.
+   */
+  http_keep_alive: boolean;
+
+  /**
    * The encrypted tunnel key used to construct the tunnel URL. URL format:
    * https://{port}-{tunnel_key}.tunnel.runloop.{domain}
    */
@@ -1075,6 +1081,12 @@ export namespace DevboxCreateParams {
      * Authentication mode for the tunnel. Defaults to 'public' if not specified.
      */
     auth_mode?: 'open' | 'authenticated' | null;
+
+    /**
+     * When true, HTTP traffic through the tunnel counts as activity for idle lifecycle
+     * policies, resetting the idle timer. Defaults to true if not specified.
+     */
+    http_keep_alive?: boolean | null;
   }
 }
 
@@ -1125,6 +1137,12 @@ export interface DevboxEnableTunnelParams {
    * Authentication mode for the tunnel. Defaults to 'public' if not specified.
    */
   auth_mode?: 'open' | 'authenticated' | null;
+
+  /**
+   * When true, HTTP traffic through the tunnel counts as activity for idle lifecycle
+   * policies, resetting the idle timer. Defaults to true if not specified.
+   */
+  http_keep_alive?: boolean | null;
 }
 
 export interface DevboxExecuteParams {

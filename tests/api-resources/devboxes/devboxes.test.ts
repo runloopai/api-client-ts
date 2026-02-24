@@ -73,7 +73,7 @@ describe('resource devboxes', () => {
           repo_connection_id: 'repo_connection_id',
           secrets: { foo: 'string' },
           snapshot_id: 'snapshot_id',
-          tunnel: { auth_mode: 'open' },
+          tunnel: { auth_mode: 'open', http_keep_alive: true },
         },
         { path: '/_stainless_unknown_path' },
       ),
@@ -239,7 +239,11 @@ describe('resource devboxes', () => {
   test('enableTunnel: request options and params are passed correctly', async () => {
     // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
     await expect(
-      client.devboxes.enableTunnel('id', { auth_mode: 'open' }, { path: '/_stainless_unknown_path' }),
+      client.devboxes.enableTunnel(
+        'id',
+        { auth_mode: 'open', http_keep_alive: true },
+        { path: '/_stainless_unknown_path' },
+      ),
     ).rejects.toThrow(Runloop.NotFoundError);
   });
 
