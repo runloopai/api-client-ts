@@ -671,7 +671,8 @@ describe('smoketest: object-oriented gateway config', () => {
       });
 
       test('empty/minimal response body handling', async () => {
-        const { httpCode, responseBody } = await curlRequest('GET', '/v1/devboxes?limit=0');
+        // API requires limit > 0; use limit=1 for a minimal response body
+        const { httpCode, responseBody } = await curlRequest('GET', '/v1/devboxes?limit=1');
 
         expect(httpCode).toBe(200);
         const response = JSON.parse(responseBody);
