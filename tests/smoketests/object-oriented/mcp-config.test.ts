@@ -6,6 +6,9 @@ const sdk = makeClientSDK();
 /** Placeholder endpoint for config-only tests (create/update/list); no real MCP traffic. */
 const MCP_CONFIG_TEST_ENDPOINT = 'https://mcp.example.com';
 
+/** Repo for GitHub MCP tool-call tests (create_issue, etc.). Override with GITHUB_MCP_TEST_REPO. */
+const GITHUB_MCP_TEST_REPO = process.env['GITHUB_MCP_TEST_REPO'] || 'runloopai/api-client-ts';
+
 /** GitHub MCP server — used only where we run real MCP protocol tests from the devbox. */
 const GITHUB_MCP_ENDPOINT = 'https://api.githubcopilot.com/mcp/';
 
@@ -550,10 +553,109 @@ describe('smoketest: object-oriented mcp config', () => {
           }
         }
 
-        const toolNames = result.tools.map((t: any) => t.name);
-        console.log(`GitHub MCP tools (${toolNames.length}): ${toolNames.slice(0, 10).join(', ')}...`);
+        const toolNames: string[] = result.tools.map((t: any) => t.name);
+        console.log(`GitHub MCP tools (${toolNames.length}): ${toolNames.join(', ')}`);
       },
       SHORT_TIMEOUT,
+    );
+
+    test(
+      'create and close a GitHub issue via MCP tools/call',
+      async () => {
+        const [owner, repo] = GITHUB_MCP_TEST_REPO.split('/');
+
+        // Step 1: Initialize
+        const initResponse = await mcpRequest({
+          jsonrpc: '2.0',
+          method: 'initialize',
+          params: {
+            protocolVersion: '2024-11-05',
+            capabilities: {},
+            clientInfo: { name: 'runloop-sdk-test', version: '1.0.0' },
+          },
+          id: 1,
+        });
+        expect(initResponse.httpCode).toBe(200);
+
+        await mcpNotify({ jsonrpc: '2.0', method: 'notifications/initialized' });
+
+        // Step 2: Create issue via issue_write (consolidated tool with method argument)
+        const issueTitle = `MCP smoketest issue ${Date.now()}`;
+        const createResponse = await mcpRequest({
+          jsonrpc: '2.0',
+          method: 'tools/call',
+          params: {
+            name: 'issue_write',
+            arguments: {
+              method: 'create',
+              owner,
+              repo,
+              title: issueTitle,
+              body: 'Automated test — will be closed immediately.',
+            },
+          },
+          id: 2,
+        });
+
+        if (createResponse.httpCode !== 200 || createResponse.jsonRpc?.error) {
+          console.log(
+            `create_issue response: httpCode=${createResponse.httpCode} jsonRpc=${JSON.stringify(createResponse.jsonRpc)} raw=${createResponse.rawOutput}`,
+          );
+        }
+        expect(createResponse.httpCode).toBe(200);
+        expect(createResponse.jsonRpc?.error).toBeUndefined();
+        expect(createResponse.jsonRpc?.result).toBeDefined();
+
+        // The result content is an array of text blocks; parse the first one to get the issue number
+        const content = createResponse.jsonRpc.result.content;
+        expect(Array.isArray(content)).toBe(true);
+        expect(content.length).toBeGreaterThan(0);
+
+        const text = content[0].text;
+        expect(text).toBeDefined();
+
+        // GitHub MCP returns issue details as JSON or markdown; extract issue number
+        let issueNumber: number | undefined;
+        try {
+          const parsed = JSON.parse(text);
+          issueNumber = parsed.number;
+        } catch {
+          const match = text.match(/#(\d+)/);
+          if (match) issueNumber = parseInt(match[1], 10);
+        }
+
+        expect(issueNumber).toBeDefined();
+        expect(issueNumber).toBeGreaterThan(0);
+        console.log(`Created issue #${issueNumber} on ${GITHUB_MCP_TEST_REPO}`);
+
+        // Step 3: Close the issue via issue_write (method: 'update')
+        const closeResponse = await mcpRequest({
+          jsonrpc: '2.0',
+          method: 'tools/call',
+          params: {
+            name: 'issue_write',
+            arguments: {
+              method: 'update',
+              owner,
+              repo,
+              issue_number: issueNumber,
+              state: 'closed',
+            },
+          },
+          id: 3,
+        });
+
+        if (closeResponse.httpCode !== 200 || closeResponse.jsonRpc?.error) {
+          console.log(
+            `update_issue (close) response: httpCode=${closeResponse.httpCode} jsonRpc=${JSON.stringify(closeResponse.jsonRpc)}`,
+          );
+        }
+        expect(closeResponse.httpCode).toBe(200);
+        expect(closeResponse.jsonRpc?.error).toBeUndefined();
+        expect(closeResponse.jsonRpc?.result).toBeDefined();
+        console.log(`Closed issue #${issueNumber} on ${GITHUB_MCP_TEST_REPO}`);
+      },
+      MEDIUM_TIMEOUT,
     );
 
     test(
