@@ -7,7 +7,7 @@ const sdk = makeClientSDK();
 const MCP_CONFIG_TEST_ENDPOINT = 'https://mcp.example.com';
 
 /** GitHub MCP server — used only where we run real MCP protocol tests from the devbox. */
-const GITHUB_MCP_ENDPOINT = 'https://api.githubcopilot.com/mcp';
+const GITHUB_MCP_ENDPOINT = 'https://api.githubcopilot.com/mcp/';
 
 describe('smoketest: object-oriented mcp config', () => {
   describe('mcp config lifecycle', () => {
@@ -301,16 +301,13 @@ describe('smoketest: object-oriented mcp config', () => {
     });
   });
 
-  // MCP hub protocol integration tests using the GitHub MCP server as a real upstream.
-  // Requires both RUN_SMOKETESTS and GITHUB_MCP_TOKEN env vars.
-  // Run: GITHUB_MCP_TOKEN=gho_xxx RUN_SMOKETESTS=1 yarn jest tests/smoketests/object-oriented/mcp-config.test.ts
+  // MCP hub protocol integration tests using the remote GitHub MCP server as a real upstream.
+  // Endpoint: https://api.githubcopilot.com/mcp/ (trailing slash required).
+  // Auth: GitHub PAT with repo scope. `gh auth token` (gho_) may also work.
+  // Run: GITHUB_MCP_TOKEN=$(gh auth token) RUN_SMOKETESTS=1 yarn jest tests/smoketests/object-oriented/mcp-config.test.ts
   //
-  // If Moxy logs "unexpected content type: Some(\"text/plain; charset=utf-8\")": GitHub returns
-  // text/plain; the runloop repo patches rmcp to accept it. Rebuild/redeploy Moxy so the patch is used.
-  // If Moxy logs "expected value", line: 1, column: 1 (Decode error): the upstream response body
-  // is not valid JSON (e.g. empty, or plain-text error). Check GITHUB_MCP_TOKEN is valid and
-  // has required scopes; the GitHub MCP endpoint may be returning an error page or empty body.
-  // If Moxy logs "Status(400)" from api.githubcopilot.com: verify token and request format.
+  // If Moxy returns 4xx: the upstream rejected the request (bad token, missing scopes, wrong URL).
+  // If Moxy returns 502: the upstream returned a non-JSON/HTML response; verify the endpoint URL has a trailing slash.
   (process.env['RUN_SMOKETESTS'] && process.env['GITHUB_MCP_TOKEN']
     ? describe
     : describe.skip)('mcp hub protocol integration (github)', () => {
