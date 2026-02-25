@@ -89,6 +89,12 @@ export interface NetworkPolicyCreateParameters {
   name: string;
 
   /**
+   * (Optional) If true, allows devbox egress to the AI credential gateway for
+   * credential proxying. Defaults to false.
+   */
+  allow_ai_gateway?: boolean | null;
+
+  /**
    * (Optional) If true, all egress traffic is allowed (ALLOW_ALL policy). Defaults
    * to false.
    */
@@ -100,6 +106,12 @@ export interface NetworkPolicyCreateParameters {
    * true.
    */
   allow_devbox_to_devbox?: boolean | null;
+
+  /**
+   * (Optional) If true, allows devbox egress to the MCP hub for MCP server access.
+   * Defaults to false.
+   */
+  allow_mcp_gateway?: boolean | null;
 
   /**
    * (Optional) DNS-based allow list with wildcard support. Examples: ['github.com',
@@ -139,6 +151,11 @@ export interface NetworkPolicyListView {
  */
 export interface NetworkPolicyUpdateParameters {
   /**
+   * If true, allows devbox egress to the AI credential gateway.
+   */
+  allow_ai_gateway?: boolean | null;
+
+  /**
    * If true, all egress traffic is allowed (ALLOW_ALL policy).
    */
   allow_all?: boolean | null;
@@ -147,6 +164,11 @@ export interface NetworkPolicyUpdateParameters {
    * If true, allows traffic between the account's own devboxes via tunnels.
    */
   allow_devbox_to_devbox?: boolean | null;
+
+  /**
+   * If true, allows devbox egress to the MCP hub.
+   */
+  allow_mcp_gateway?: boolean | null;
 
   /**
    * Updated DNS-based allow list with wildcard support. Examples: ['github.com',
@@ -207,6 +229,12 @@ export namespace NetworkPolicyView {
    */
   export interface Egress {
     /**
+     * If true, allows devbox egress to the AI credential gateway for credential
+     * proxying.
+     */
+    allow_ai_gateway: boolean;
+
+    /**
      * If true, all egress traffic is allowed and other fields are ignored. Used for
      * ALLOW_ALL policies.
      */
@@ -216,6 +244,11 @@ export namespace NetworkPolicyView {
      * If true, allows traffic between the account's own devboxes via tunnels.
      */
     allow_devbox_to_devbox: boolean;
+
+    /**
+     * If true, allows devbox egress to the MCP hub for MCP server access.
+     */
+    allow_mcp_gateway: boolean;
 
     /**
      * DNS-based allow list with wildcard support. Examples: ['github.com',
@@ -234,6 +267,12 @@ export interface NetworkPolicyCreateParams {
   name: string;
 
   /**
+   * (Optional) If true, allows devbox egress to the AI credential gateway for
+   * credential proxying. Defaults to false.
+   */
+  allow_ai_gateway?: boolean | null;
+
+  /**
    * (Optional) If true, all egress traffic is allowed (ALLOW_ALL policy). Defaults
    * to false.
    */
@@ -245,6 +284,12 @@ export interface NetworkPolicyCreateParams {
    * true.
    */
   allow_devbox_to_devbox?: boolean | null;
+
+  /**
+   * (Optional) If true, allows devbox egress to the MCP hub for MCP server access.
+   * Defaults to false.
+   */
+  allow_mcp_gateway?: boolean | null;
 
   /**
    * (Optional) DNS-based allow list with wildcard support. Examples: ['github.com',
@@ -260,6 +305,11 @@ export interface NetworkPolicyCreateParams {
 
 export interface NetworkPolicyUpdateParams {
   /**
+   * If true, allows devbox egress to the AI credential gateway.
+   */
+  allow_ai_gateway?: boolean | null;
+
+  /**
    * If true, all egress traffic is allowed (ALLOW_ALL policy).
    */
   allow_all?: boolean | null;
@@ -268,6 +318,11 @@ export interface NetworkPolicyUpdateParams {
    * If true, allows traffic between the account's own devboxes via tunnels.
    */
   allow_devbox_to_devbox?: boolean | null;
+
+  /**
+   * If true, allows devbox egress to the MCP hub.
+   */
+  allow_mcp_gateway?: boolean | null;
 
   /**
    * Updated DNS-based allow list with wildcard support. Examples: ['github.com',
