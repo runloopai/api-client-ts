@@ -60,7 +60,7 @@ $ yarn link @runloop/api-client
 # With pnpm
 $ pnpm link --global
 $ cd ../my-package
-$ pnpm link -—global @runloop/api-client
+$ pnpm link --global @runloop/api-client
 ```
 
 ## Running tests
@@ -68,7 +68,7 @@ $ pnpm link -—global @runloop/api-client
 Most tests require you to [set up a mock server](https://github.com/stoplightio/prism) against the OpenAPI spec to run the tests.
 
 ```sh
-$ npx prism mock path/to/your/openapi.yml
+$ ./scripts/mock
 ```
 
 ```sh

@@ -89,6 +89,14 @@ export class Scenarios extends APIResource {
   }
 
   /**
+   * Archive a previously created Scenario. The scenario will no longer appear in
+   * list endpoints but can still be retrieved by ID.
+   */
+  archive(id: string, options?: Core.RequestOptions): Core.APIPromise<ScenarioView> {
+    return this._client.post(`/v1/scenarios/${id}/archive`, options);
+  }
+
+  /**
    * List all public scenarios matching filter.
    */
   listPublic(
@@ -422,9 +430,10 @@ export interface ScenarioView {
   scoring_contract: ScoringContract;
 
   /**
-   * The state of the scenario.
+   * Whether the scenario is active or archived. Archived scenarios are excluded from
+   * listings and cannot be updated.
    */
-  status: string;
+  status: 'active' | 'archived';
 
   /**
    * The Environment in which the Scenario is run.

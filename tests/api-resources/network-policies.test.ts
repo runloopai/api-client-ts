@@ -23,8 +23,10 @@ describe('resource networkPolicies', () => {
   test('create: required and optional params', async () => {
     const response = await client.networkPolicies.create({
       name: 'name',
+      allow_ai_gateway: true,
       allow_all: true,
       allow_devbox_to_devbox: true,
+      allow_mcp_gateway: true,
       allowed_hostnames: ['string'],
       description: 'description',
     });
@@ -72,8 +74,10 @@ describe('resource networkPolicies', () => {
       client.networkPolicies.update(
         'id',
         {
+          allow_ai_gateway: true,
           allow_all: true,
           allow_devbox_to_devbox: true,
+          allow_mcp_gateway: true,
           allowed_hostnames: ['string'],
           description: 'description',
           name: 'name',

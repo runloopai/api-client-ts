@@ -98,7 +98,8 @@ describe('resource runs', () => {
     );
   });
 
-  test('downloadLogs: request options instead of params are passed correctly', async () => {
+  // Mock server doesn't support application/zip responses
+  test.skip('downloadLogs: request options instead of params are passed correctly', async () => {
     // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
     await expect(
       client.scenarios.runs.downloadLogs('id', { path: '/_stainless_unknown_path' }),
