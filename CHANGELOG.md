@@ -1,5 +1,29 @@
 # Changelog
 
+## 1.9.0 (2026-02-25)
+
+Full Changelog: [v1.8.1...v1.9.0](https://github.com/runloopai/api-client-ts/compare/v1.8.1...v1.9.0)
+
+### Features
+
+* Add AI gateway and MCP gateway flags to network policy create ([#7638](https://github.com/runloopai/api-client-ts/issues/7638)) ([5542b72](https://github.com/runloopai/api-client-ts/commit/5542b727869a411b7828c2779f5f683e4c35f3ea))
+
+
+### Bug Fixes
+
+* **docs/contributing:** correct pnpm link command ([df98444](https://github.com/runloopai/api-client-ts/commit/df98444d096ae0fb8d737476ebb506122e3426b8))
+* **internal:** skip tests that depend on mock server ([284aac3](https://github.com/runloopai/api-client-ts/commit/284aac38f7f281f096ebb2bd4e5605df0db77a71))
+* workflow issues for npm stable tag and docs tar ([#721](https://github.com/runloopai/api-client-ts/issues/721)) ([2c5e7a4](https://github.com/runloopai/api-client-ts/commit/2c5e7a40f2b1cbcb73bb3ec17e2f4dd6e6e2ed6d))
+
+
+### Chores
+
+* Add archive method to stainless ([#7537](https://github.com/runloopai/api-client-ts/issues/7537)) ([b68ac03](https://github.com/runloopai/api-client-ts/commit/b68ac035f2d72bee47c2790c8c814e15e4ea4a1e))
+* allow specifying smoketests jest filter to workflow ([#722](https://github.com/runloopai/api-client-ts/issues/722)) ([b9d117b](https://github.com/runloopai/api-client-ts/commit/b9d117b23b5da12b38d7bc5e138079cedb40622b))
+* **documentation:** fixed bug in doc publishing ([#720](https://github.com/runloopai/api-client-ts/issues/720)) ([1eeb486](https://github.com/runloopai/api-client-ts/commit/1eeb486190d5184e7a9b8c363b68893c5492bf57))
+* **scenarios:** make scenario status enum instead of string ([#7552](https://github.com/runloopai/api-client-ts/issues/7552)) ([c5b244c](https://github.com/runloopai/api-client-ts/commit/c5b244ce0f502984420758c63e7a7c55760026f8))
+* update mock server docs ([875216d](https://github.com/runloopai/api-client-ts/commit/875216d63a50d030df6d5d3233a364a61b1b82b1))
+
 ## 1.8.1 (2026-02-19)
 
 Full Changelog: [v1.8.0...v1.8.1](https://github.com/runloopai/api-client-ts/compare/v1.8.0...v1.8.1)
