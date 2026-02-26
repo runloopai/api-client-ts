@@ -7,23 +7,22 @@ import { GatewayConfigsCursorIDPage, type GatewayConfigsCursorIDPageParams } fro
 
 export class GatewayConfigs extends APIResource {
   /**
-   * [Beta] Create a new GatewayConfig to proxy API requests through the credential
-   * gateway. The config specifies the target endpoint and how credentials should be
-   * applied.
+   * Create a new GatewayConfig to proxy API requests through the credential gateway.
+   * The config specifies the target endpoint and how credentials should be applied.
    */
   create(body: GatewayConfigCreateParams, options?: Core.RequestOptions): Core.APIPromise<GatewayConfigView> {
     return this._client.post('/v1/gateway-configs', { body, ...options });
   }
 
   /**
-   * [Beta] Get a specific GatewayConfig by its unique identifier.
+   * Get a specific GatewayConfig by its unique identifier.
    */
   retrieve(id: string, options?: Core.RequestOptions): Core.APIPromise<GatewayConfigView> {
     return this._client.get(`/v1/gateway-configs/${id}`, options);
   }
 
   /**
-   * [Beta] Update an existing GatewayConfig. All fields are optional.
+   * Update an existing GatewayConfig. All fields are optional.
    */
   update(
     id: string,
@@ -43,8 +42,8 @@ export class GatewayConfigs extends APIResource {
   }
 
   /**
-   * [Beta] List all GatewayConfigs for the authenticated account, including
-   * system-provided configs like 'anthropic' and 'openai'.
+   * List all GatewayConfigs for the authenticated account, including system-provided
+   * configs like 'anthropic' and 'openai'.
    */
   list(
     query?: GatewayConfigListParams,
@@ -67,7 +66,7 @@ export class GatewayConfigs extends APIResource {
   }
 
   /**
-   * [Beta] Delete an existing GatewayConfig. This action is irreversible.
+   * Delete an existing GatewayConfig. This action is irreversible.
    */
   delete(
     id: string,
