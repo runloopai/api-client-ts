@@ -1,10 +1,6 @@
 import { Runloop } from '../index';
 import type * as Core from '../core';
-import type {
-  McpConfigView,
-  McpConfigCreateParams,
-  McpConfigUpdateParams,
-} from '../resources/mcp-configs';
+import type { McpConfigView, McpConfigCreateParams, McpConfigUpdateParams } from '../resources/mcp-configs';
 
 /**
  * Object-oriented interface for working with MCP Configs.
