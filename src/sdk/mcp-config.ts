@@ -1,5 +1,4 @@
 import { Runloop } from '../index';
-import { NotFoundError } from '../error';
 import type * as Core from '../core';
 import type { McpConfigView, McpConfigCreateParams, McpConfigUpdateParams } from '../resources/mcp-configs';
 
@@ -118,22 +117,6 @@ export class McpConfig {
    */
   async getInfo(options?: Core.RequestOptions): Promise<McpConfigView> {
     return this.client.mcpConfigs.retrieve(this._id, options);
-  }
-
-  /**
-   * Check whether this MCP config still exists.
-   *
-   * @param {Core.RequestOptions} [options] - Request options
-   * @returns {Promise<boolean>} `true` if the config exists, `false` if it has been deleted
-   */
-  async exists(options?: Core.RequestOptions): Promise<boolean> {
-    try {
-      await this.client.mcpConfigs.retrieve(this._id, options);
-      return true;
-    } catch (e) {
-      if (e instanceof NotFoundError) return false;
-      throw e;
-    }
   }
 
   /**
