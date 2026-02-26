@@ -36,11 +36,9 @@ export const LONG_TIMEOUT = 600_000;
 export async function cleanUpPolicy(policy: NetworkPolicy | undefined): Promise<void> {
   if (policy) {
     try {
-      await policy.getInfo();
-      // Policy still exists, delete it
       await policy.delete();
     } catch {
-      // Policy already deleted or doesn't exist, ignore
+      // Already deleted or doesn't exist, ignore
     }
   }
 }
@@ -51,11 +49,9 @@ export async function cleanUpPolicy(policy: NetworkPolicy | undefined): Promise<
 export async function cleanUpGatewayConfig(config: GatewayConfig | undefined): Promise<void> {
   if (config) {
     try {
-      await config.getInfo();
-      // Config still exists, delete it
       await config.delete();
     } catch {
-      // Config already deleted or doesn't exist, ignore
+      // Already deleted or doesn't exist, ignore
     }
   }
 }
@@ -66,11 +62,9 @@ export async function cleanUpGatewayConfig(config: GatewayConfig | undefined): P
 export async function cleanUpMcpConfig(config: McpConfig | undefined): Promise<void> {
   if (config) {
     try {
-      await config.getInfo();
-      // Config still exists, delete it
       await config.delete();
     } catch {
-      // Config already deleted or doesn't exist, ignore
+      // Already deleted or doesn't exist, ignore
     }
   }
 }
