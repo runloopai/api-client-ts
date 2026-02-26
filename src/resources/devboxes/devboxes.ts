@@ -781,8 +781,8 @@ export interface DevboxView {
   failure_reason?: 'out_of_memory' | 'out_of_disk' | 'execution_failed' | null;
 
   /**
-   * [Beta] Gateway specifications configured for this devbox. Map key is the
-   * environment variable prefix (e.g., 'GWS_ANTHROPIC').
+   * Gateway specifications configured for this devbox. Map key is the environment
+   * variable prefix (e.g., 'GWS_ANTHROPIC').
    */
   gateway_specs?: { [key: string]: DevboxView.GatewaySpecs } | null;
 
