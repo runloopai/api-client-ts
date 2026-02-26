@@ -1,5 +1,23 @@
 # Changelog
 
+## 1.10.0 (2026-02-26)
+
+Full Changelog: [v1.9.0...v1.10.0](https://github.com/runloopai/api-client-ts/compare/v1.9.0...v1.10.0)
+
+### Features
+
+* add MCP Hub to sdk ([#714](https://github.com/runloopai/api-client-ts/issues/714)) ([4bc5ba4](https://github.com/runloopai/api-client-ts/commit/4bc5ba46742270fa2c8855668c5aa189aee5beff))
+
+
+### Bug Fixes
+
+* **documentation:** fixed doc publishing ([#727](https://github.com/runloopai/api-client-ts/issues/727)) ([e152cdb](https://github.com/runloopai/api-client-ts/commit/e152cdb9eab36b50dca20fdc46775aa9dbd51434))
+
+
+### Chores
+
+* revert "Allow specifying smoketests jest filter to workflow" ([#725](https://github.com/runloopai/api-client-ts/issues/725)) ([a244af3](https://github.com/runloopai/api-client-ts/commit/a244af3f07663e39df73e6ec928123def42077da))
+
 ## 1.9.0 (2026-02-25)
 
 Full Changelog: [v1.8.1...v1.9.0](https://github.com/runloopai/api-client-ts/compare/v1.8.1...v1.9.0)
