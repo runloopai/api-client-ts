@@ -1,5 +1,18 @@
 # Changelog
 
+## 1.10.2 (2026-02-26)
+
+Full Changelog: [v1.10.1...v1.10.2](https://github.com/runloopai/api-client-ts/compare/v1.10.1...v1.10.2)
+
+### Bug Fixes
+
+* remove beta docs from gateway-config ([#7677](https://github.com/runloopai/api-client-ts/issues/7677)) ([2079a07](https://github.com/runloopai/api-client-ts/commit/2079a07164f9563fc717a31c1b2a4a2f3976cbdc))
+
+
+### Chores
+
+* rename AI Gateway to Agent Gateway ([#7687](https://github.com/runloopai/api-client-ts/issues/7687)) ([2262a30](https://github.com/runloopai/api-client-ts/commit/2262a30a573aff3d5c3f8665a4f7e40edba8fd1b))
+
 ## 1.10.1 (2026-02-26)
 
 Full Changelog: [v1.10.0...v1.10.1](https://github.com/runloopai/api-client-ts/compare/v1.10.0...v1.10.1)
