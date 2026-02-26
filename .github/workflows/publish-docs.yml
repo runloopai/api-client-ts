@@ -85,6 +85,7 @@ jobs:
         with:
           name: newdocumentation
       - run: tar -xf newdocumentation.tar
+      - run: rm newdocumentation.tar
 
       - name: commit
         run: |
