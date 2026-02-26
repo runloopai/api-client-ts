@@ -93,12 +93,7 @@ describe('smoketest: object-oriented mcp config', () => {
       expect(mcpConfig).toBeDefined();
       await mcpConfig!.delete();
 
-      try {
-        await mcpConfig!.getInfo();
-        fail('Expected MCP config to be deleted');
-      } catch (error) {
-        expect(error).toBeDefined();
-      }
+      await expect(mcpConfig!.getInfo()).rejects.toBeDefined();
 
       mcpConfig = undefined;
     });
@@ -385,6 +380,33 @@ describe('smoketest: object-oriented mcp config', () => {
         return parseInt((await result.stdout()).trim(), 10);
       };
 
+      /** Initialize an MCP session: send initialize, assert success, send initialized notification. */
+      const initMcpSession = async (): Promise<void> => {
+        const initResponse = await mcpRequest({
+          jsonrpc: '2.0',
+          method: 'initialize',
+          params: {
+            protocolVersion: '2024-11-05',
+            capabilities: {},
+            clientInfo: { name: 'runloop-sdk-test', version: '1.0.0' },
+          },
+          id: 1,
+        });
+
+        if (initResponse.httpCode !== 200) {
+          console.error(
+            `MCP init failed (url=${mcpUrl}): httpCode=${initResponse.httpCode} stdout=${initResponse.rawOutput} stderr=${initResponse.stderr}`,
+          );
+        }
+        expect(initResponse.httpCode).toBe(200);
+        expect(initResponse.jsonRpc?.result).toBeDefined();
+
+        await mcpNotify({
+          jsonrpc: '2.0',
+          method: 'notifications/initialized',
+        });
+      };
+
       beforeAll(async () => {
         const githubToken = process.env['GITHUB_MCP_TOKEN']!;
 
@@ -492,33 +514,8 @@ describe('smoketest: object-oriented mcp config', () => {
       test(
         'list tools from upstream MCP server',
         async () => {
-          // Step 1: Initialize
-          const initResponse = await mcpRequest({
-            jsonrpc: '2.0',
-            method: 'initialize',
-            params: {
-              protocolVersion: '2024-11-05',
-              capabilities: {},
-              clientInfo: { name: 'runloop-sdk-test', version: '1.0.0' },
-            },
-            id: 1,
-          });
+          await initMcpSession();
 
-          if (initResponse.httpCode !== 200) {
-            console.error(
-              `MCP init failed (url=${mcpUrl}): httpCode=${initResponse.httpCode} stdout=${initResponse.rawOutput} stderr=${initResponse.stderr}`,
-            );
-          }
-          expect(initResponse.httpCode).toBe(200);
-          expect(initResponse.jsonRpc?.result).toBeDefined();
-
-          // Step 2: Send initialized notification (per MCP lifecycle)
-          await mcpNotify({
-            jsonrpc: '2.0',
-            method: 'notifications/initialized',
-          });
-
-          // Step 3: List tools
           const toolsResponse = await mcpRequest({
             jsonrpc: '2.0',
             method: 'tools/list',
@@ -559,22 +556,9 @@ describe('smoketest: object-oriented mcp config', () => {
       test(
         'call tools via MCP tools/call (get_me + search_repositories)',
         async () => {
-          // Step 1: Initialize
-          const initResponse = await mcpRequest({
-            jsonrpc: '2.0',
-            method: 'initialize',
-            params: {
-              protocolVersion: '2024-11-05',
-              capabilities: {},
-              clientInfo: { name: 'runloop-sdk-test', version: '1.0.0' },
-            },
-            id: 1,
-          });
-          expect(initResponse.httpCode).toBe(200);
+          await initMcpSession();
 
-          await mcpNotify({ jsonrpc: '2.0', method: 'notifications/initialized' });
-
-          // Step 2: Call get_me — simple tool with no org restrictions
+          // get_me — simple tool with no org restrictions
           const meResponse = await mcpRequest({
             jsonrpc: '2.0',
             method: 'tools/call',
@@ -602,7 +586,7 @@ describe('smoketest: object-oriented mcp config', () => {
           const meData = JSON.parse(meContent[0].text);
           expect(meData.login).toBeTruthy();
 
-          // Step 3: Call search_repositories — verifies argument passing
+          // search_repositories — verifies argument passing
           const [owner, repo] = GITHUB_MCP_TEST_REPO.split('/');
           const searchResponse = await mcpRequest({
             jsonrpc: '2.0',
@@ -660,12 +644,6 @@ describe('smoketest: object-oriented mcp config', () => {
 
           const result = await devbox!.cmd.exec(curlCmd);
           const httpCode = parseInt((await result.stdout()).trim(), 10) || 0;
-          const stderr = (await result.stderr()).trim();
-          if (httpCode < 400) {
-            console.error(
-              `MCP auth rejection test (url=${mcpUrl}): expected 4xx, got httpCode=${httpCode} stderr=${stderr}`,
-            );
-          }
           expect(httpCode).toBeGreaterThanOrEqual(400);
           expect(httpCode).toBeLessThan(500);
         },
