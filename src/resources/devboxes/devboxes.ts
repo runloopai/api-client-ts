@@ -990,10 +990,10 @@ export interface DevboxCreateParams {
   file_mounts?: { [key: string]: string } | null;
 
   /**
-   * [Beta] (Optional) Gateway specifications for credential proxying. Map key is the
-   * environment variable prefix (e.g., 'GWS_ANTHROPIC'). The gateway will proxy
-   * requests to external APIs using the specified credential without exposing the
-   * real API key. Example: {'GWS_ANTHROPIC': {'gateway': 'anthropic', 'secret':
+   * (Optional) Agent gateway specifications for credential proxying. Map key is the
+   * environment variable prefix (e.g., 'GWS_ANTHROPIC'). The agent gateway will
+   * proxy requests to external APIs using the specified credential without exposing
+   * the real API key. Example: {'GWS_ANTHROPIC': {'gateway': 'anthropic', 'secret':
    * 'my_claude_key'}}
    */
   gateways?: { [key: string]: DevboxCreateParams.Gateways } | null;
@@ -1055,9 +1055,9 @@ export interface DevboxCreateParams {
 
 export namespace DevboxCreateParams {
   /**
-   * [Beta] GatewaySpec links a gateway configuration to a secret for credential
-   * proxying in a devbox. The gateway will proxy requests to external APIs using the
-   * specified credential without exposing the real API key.
+   * GatewaySpec links an agent gateway configuration to a secret for credential
+   * proxying in a devbox. The agent gateway will proxy requests to external APIs
+   * using the specified credential without exposing the real API key.
    */
   export interface Gateways {
     /**

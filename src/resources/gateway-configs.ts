@@ -7,8 +7,8 @@ import { GatewayConfigsCursorIDPage, type GatewayConfigsCursorIDPageParams } fro
 
 export class GatewayConfigs extends APIResource {
   /**
-   * Create a new GatewayConfig to proxy API requests through the credential gateway.
-   * The config specifies the target endpoint and how credentials should be applied.
+   * Create a new GatewayConfig to proxy API requests through the agent gateway. The
+   * config specifies the target endpoint and how credentials should be applied.
    */
   create(body: GatewayConfigCreateParams, options?: Core.RequestOptions): Core.APIPromise<GatewayConfigView> {
     return this._client.post('/v1/gateway-configs', { body, ...options });
@@ -190,8 +190,8 @@ export namespace GatewayConfigUpdateParameters {
 
 /**
  * A GatewayConfig defines a configuration for proxying API requests through the
- * credential gateway. It specifies the target endpoint and how credentials should
- * be applied.
+ * agent gateway. It specifies the target endpoint and how credentials should be
+ * applied.
  */
 export interface GatewayConfigView {
   /**

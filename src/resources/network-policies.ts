@@ -89,10 +89,10 @@ export interface NetworkPolicyCreateParameters {
   name: string;
 
   /**
-   * (Optional) If true, allows devbox egress to the AI credential gateway for
-   * credential proxying. Defaults to false.
+   * (Optional) If true, allows devbox egress to the agent gateway for credential
+   * proxying. Defaults to false.
    */
-  allow_ai_gateway?: boolean | null;
+  allow_agent_gateway?: boolean | null;
 
   /**
    * (Optional) If true, all egress traffic is allowed (ALLOW_ALL policy). Defaults
@@ -151,9 +151,9 @@ export interface NetworkPolicyListView {
  */
 export interface NetworkPolicyUpdateParameters {
   /**
-   * If true, allows devbox egress to the AI credential gateway.
+   * If true, allows devbox egress to the agent gateway.
    */
-  allow_ai_gateway?: boolean | null;
+  allow_agent_gateway?: boolean | null;
 
   /**
    * If true, all egress traffic is allowed (ALLOW_ALL policy).
@@ -229,10 +229,9 @@ export namespace NetworkPolicyView {
    */
   export interface Egress {
     /**
-     * If true, allows devbox egress to the AI credential gateway for credential
-     * proxying.
+     * If true, allows devbox egress to the agent gateway for credential proxying.
      */
-    allow_ai_gateway: boolean;
+    allow_agent_gateway: boolean;
 
     /**
      * If true, all egress traffic is allowed and other fields are ignored. Used for
@@ -267,10 +266,10 @@ export interface NetworkPolicyCreateParams {
   name: string;
 
   /**
-   * (Optional) If true, allows devbox egress to the AI credential gateway for
-   * credential proxying. Defaults to false.
+   * (Optional) If true, allows devbox egress to the agent gateway for credential
+   * proxying. Defaults to false.
    */
-  allow_ai_gateway?: boolean | null;
+  allow_agent_gateway?: boolean | null;
 
   /**
    * (Optional) If true, all egress traffic is allowed (ALLOW_ALL policy). Defaults
@@ -305,9 +304,9 @@ export interface NetworkPolicyCreateParams {
 
 export interface NetworkPolicyUpdateParams {
   /**
-   * If true, allows devbox egress to the AI credential gateway.
+   * If true, allows devbox egress to the agent gateway.
    */
-  allow_ai_gateway?: boolean | null;
+  allow_agent_gateway?: boolean | null;
 
   /**
    * If true, all egress traffic is allowed (ALLOW_ALL policy).
