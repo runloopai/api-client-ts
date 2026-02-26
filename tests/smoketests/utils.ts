@@ -1,5 +1,5 @@
 import { Runloop, RunloopSDK } from '@runloop/api-client';
-import { NetworkPolicy, GatewayConfig } from '@runloop/api-client/sdk';
+import { NetworkPolicy, GatewayConfig, McpConfig } from '@runloop/api-client/sdk';
 
 export function makeClient(overrides: Partial<ConstructorParameters<typeof Runloop>[0]> = {}) {
   const baseURL = process.env['RUNLOOP_BASE_URL'];
@@ -36,11 +36,9 @@ export const LONG_TIMEOUT = 600_000;
 export async function cleanUpPolicy(policy: NetworkPolicy | undefined): Promise<void> {
   if (policy) {
     try {
-      await policy.getInfo();
-      // Policy still exists, delete it
       await policy.delete();
     } catch {
-      // Policy already deleted or doesn't exist, ignore
+      // Already deleted or doesn't exist, ignore
     }
   }
 }
@@ -51,11 +49,22 @@ export async function cleanUpPolicy(policy: NetworkPolicy | undefined): Promise<
 export async function cleanUpGatewayConfig(config: GatewayConfig | undefined): Promise<void> {
   if (config) {
     try {
-      await config.getInfo();
-      // Config still exists, delete it
       await config.delete();
     } catch {
-      // Config already deleted or doesn't exist, ignore
+      // Already deleted or doesn't exist, ignore
+    }
+  }
+}
+
+/**
+ * Helper to clean up an MCP config, ignoring errors if already deleted.
+ */
+export async function cleanUpMcpConfig(config: McpConfig | undefined): Promise<void> {
+  if (config) {
+    try {
+      await config.delete();
+    } catch {
+      // Already deleted or doesn't exist, ignore
     }
   }
 }

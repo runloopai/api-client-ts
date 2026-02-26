@@ -9,6 +9,7 @@ import { Agent } from './sdk/agent';
 import { Scorer } from './sdk/scorer';
 import { NetworkPolicy } from './sdk/network-policy';
 import { GatewayConfig } from './sdk/gateway-config';
+import { McpConfig } from './sdk/mcp-config';
 import { Scenario } from './sdk/scenario';
 
 // Import types used in this file
@@ -24,6 +25,7 @@ import type { AgentCreateParams, AgentListParams } from './resources/agents';
 import type { ScorerCreateParams, ScorerListParams } from './resources/scenarios/scorers';
 import type { NetworkPolicyCreateParams, NetworkPolicyListParams } from './resources/network-policies';
 import type { GatewayConfigCreateParams, GatewayConfigListParams } from './resources/gateway-configs';
+import type { McpConfigCreateParams, McpConfigListParams } from './resources/mcp-configs';
 import type { ScenarioListParams } from './resources/scenarios/scenarios';
 import { PollingOptions } from './lib/polling';
 import * as Shared from './resources/shared';
@@ -200,6 +202,8 @@ type ContentType = ObjectCreateParams['content_type'];
  * - `agent` - {@link AgentOps}
  * - `scorer` - {@link ScorerOps}
  * - `networkPolicy` - {@link NetworkPolicyOps}
+ * - `gatewayConfig` - {@link GatewayConfigOps}
+ * - `mcpConfig` - {@link McpConfigOps}
  *
  * See the documentation for each Operations class for more details.
  *
@@ -296,6 +300,15 @@ export class RunloopSDK {
   public readonly gatewayConfig: GatewayConfigOps;
 
   /**
+   * **MCP Config Operations** - {@link McpConfigOps} for creating and accessing {@link McpConfig} class instances.
+   *
+   * MCP configs define how to connect to upstream MCP (Model Context Protocol) servers. They specify
+   * the target endpoint and which tools are allowed. Use with devboxes to securely connect to
+   * MCP servers.
+   */
+  public readonly mcpConfig: McpConfigOps;
+
+  /**
    * **Scenario Operations** - {@link ScenarioOps} for accessing {@link Scenario} class instances.
    *
    * Scenarios define repeatable AI coding evaluation tests with starting environments and
@@ -317,6 +330,7 @@ export class RunloopSDK {
     this.scorer = new ScorerOps(this.api);
     this.networkPolicy = new NetworkPolicyOps(this.api);
     this.gatewayConfig = new GatewayConfigOps(this.api);
+    this.mcpConfig = new McpConfigOps(this.api);
     this.scenario = new ScenarioOps(this.api);
   }
 }
@@ -1628,6 +1642,108 @@ export class GatewayConfigOps {
 }
 
 /**
+ * MCP Config SDK interface for managing MCP configurations.
+ *
+ * @category MCP Config
+ *
+ * @remarks
+ * ## Overview
+ *
+ * The `McpConfigOps` class provides a high-level abstraction for managing MCP configurations,
+ * which define how to connect to upstream MCP (Model Context Protocol) servers. MCP configs
+ * specify the target endpoint and which tools are allowed.
+ *
+ * ## Usage
+ *
+ * This interface is accessed via {@link RunloopSDK.mcpConfig}. You should construct
+ * a {@link RunloopSDK} instance and use it from there:
+ *
+ * @example
+ * ```typescript
+ * const runloop = new RunloopSDK();
+ * const mcpConfig = await runloop.mcpConfig.create({
+ *   name: 'my-mcp-server',
+ *   endpoint: 'https://mcp.example.com',
+ *   allowed_tools: ['*'],
+ * });
+ *
+ * const info = await mcpConfig.getInfo();
+ * console.log(`MCP Config: ${info.name}`);
+ * ```
+ */
+export class McpConfigOps {
+  /**
+   * @private
+   */
+  constructor(private client: RunloopAPI) {}
+
+  /**
+   * Create a new MCP config.
+   *
+   * @example
+   * ```typescript
+   * const runloop = new RunloopSDK();
+   * const mcpConfig = await runloop.mcpConfig.create({
+   *   name: 'my-mcp-server',
+   *   endpoint: 'https://mcp.example.com',
+   *   allowed_tools: ['*'],
+   *   description: 'MCP server for my tools',
+   * });
+   * ```
+   *
+   * @param {McpConfigCreateParams} params - Parameters for creating the MCP config.
+   * @param {Core.RequestOptions} [options] - Request options.
+   * @returns {Promise<McpConfig>} A {@link McpConfig} instance.
+   */
+  async create(params: McpConfigCreateParams, options?: Core.RequestOptions): Promise<McpConfig> {
+    return McpConfig.create(this.client, params, options);
+  }
+
+  /**
+   * Get an MCP config object by its ID.
+   *
+   * @example
+   * ```typescript
+   * const runloop = new RunloopSDK();
+   * const mcpConfig = runloop.mcpConfig.fromId('mcp_1234567890');
+   * const info = await mcpConfig.getInfo();
+   * console.log(`MCP Config name: ${info.name}`);
+   * ```
+   *
+   * @param {string} id - The ID of the MCP config.
+   * @returns {McpConfig} A {@link McpConfig} instance.
+   */
+  fromId(id: string): McpConfig {
+    return McpConfig.fromId(this.client, id);
+  }
+
+  /**
+   * List MCP configs with optional filters (paginated).
+   *
+   * @example
+   * ```typescript
+   * const runloop = new RunloopSDK();
+   * const configs = await runloop.mcpConfig.list({ limit: 10 });
+   * console.log(configs.map((c) => c.id));
+   * ```
+   *
+   * @param {McpConfigListParams} [params] - Optional filter parameters.
+   * @param {Core.RequestOptions} [options] - Request options.
+   * @returns {Promise<McpConfig[]>} An array of {@link McpConfig} instances.
+   */
+  async list(params?: McpConfigListParams, options?: Core.RequestOptions): Promise<McpConfig[]> {
+    const result = await this.client.mcpConfigs.list(params, options);
+    const configs: McpConfig[] = [];
+
+    for await (const config of result) {
+      configs.push(McpConfig.fromId(this.client, config.id));
+    }
+
+    return configs;
+  }
+}
+
+/**
  * Scenario SDK interface for managing scenarios.
  *
  * @category Scenario
@@ -1750,6 +1866,7 @@ export declare namespace RunloopSDK {
     ScorerOps as ScorerOps,
     NetworkPolicyOps as NetworkPolicyOps,
     GatewayConfigOps as GatewayConfigOps,
+    McpConfigOps as McpConfigOps,
     ScenarioOps as ScenarioOps,
     Devbox as Devbox,
     Blueprint as Blueprint,
@@ -1759,6 +1876,7 @@ export declare namespace RunloopSDK {
     Scorer as Scorer,
     NetworkPolicy as NetworkPolicy,
     GatewayConfig as GatewayConfig,
+    McpConfig as McpConfig,
     Scenario as Scenario,
   };
 }
@@ -1775,6 +1893,7 @@ export {
   Agent,
   Scorer,
   NetworkPolicy,
+  McpConfig,
   Execution,
   ExecutionResult,
   Scenario,

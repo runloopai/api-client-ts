@@ -1,15 +1,14 @@
 import { Scenario, ScenarioRun } from '@runloop/api-client/sdk';
-import { makeClient, SHORT_TIMEOUT, uniqueName } from '../utils';
+import { makeClientSDK, SHORT_TIMEOUT, uniqueName } from '../utils';
 
-const client = makeClient();
+const sdk = makeClientSDK();
 
 describe('smoketest: object-oriented scenario', () => {
   let scenarioId: string | undefined;
   let devboxId: string | undefined;
 
-  // Create a scenario to use for testing
   beforeAll(async () => {
-    const scenarioView = await client.scenarios.create({
+    const scenarioView = await sdk.api.scenarios.create({
       name: uniqueName('sdk-scenario-test'),
       input_context: { problem_statement: 'Test problem statement for Scenario class' },
       scoring_contract: {
@@ -26,10 +25,9 @@ describe('smoketest: object-oriented scenario', () => {
   }, SHORT_TIMEOUT);
 
   afterAll(async () => {
-    // Cleanup: shutdown devbox if still running
     if (devboxId) {
       try {
-        await client.devboxes.shutdown(devboxId);
+        await sdk.api.devboxes.shutdown(devboxId);
       } catch {
         // Ignore errors during cleanup
       }
@@ -40,7 +38,11 @@ describe('smoketest: object-oriented scenario', () => {
     let scenario: Scenario;
 
     beforeAll(() => {
-      scenario = Scenario.fromId(client, scenarioId!);
+      scenario = sdk.scenario.fromId(scenarioId!);
+    });
+
+    test('id getter - returns scenario ID', () => {
+      expect(scenario.id).toBe(scenarioId);
     });
 
     test(
@@ -71,11 +73,27 @@ describe('smoketest: object-oriented scenario', () => {
     );
   });
 
+  describe('Scenario list', () => {
+    test(
+      'list - returns scenarios via SDK',
+      async () => {
+        const scenarios = await sdk.scenario.list({ limit: 5 });
+        expect(Array.isArray(scenarios)).toBe(true);
+        expect(scenarios.length).toBeGreaterThan(0);
+
+        for (const s of scenarios) {
+          expect(s.id).toBeTruthy();
+        }
+      },
+      SHORT_TIMEOUT,
+    );
+  });
+
   describe('Scenario run methods', () => {
     let scenario: Scenario;
 
     beforeAll(() => {
-      scenario = Scenario.fromId(client, scenarioId!);
+      scenario = sdk.scenario.fromId(scenarioId!);
     });
 
     test(
@@ -87,10 +105,8 @@ describe('smoketest: object-oriented scenario', () => {
         expect(run.id).toBeTruthy();
         expect(run.devboxId).toBeTruthy();
 
-        // Store for cleanup
         devboxId = run.devboxId;
 
-        // Wait for devbox and cancel the run
         await run.awaitEnvReady({
           polling: { maxAttempts: 120, pollingIntervalMs: 5_000, timeoutMs: SHORT_TIMEOUT },
         });
@@ -111,14 +127,11 @@ describe('smoketest: object-oriented scenario', () => {
         expect(run.id).toBeTruthy();
         expect(run.devboxId).toBeTruthy();
 
-        // Update devboxId for cleanup
         devboxId = run.devboxId;
 
-        // Verify devbox is ready by getting run info
         const info = await run.getInfo();
         expect(['running', 'scoring', 'scored', 'completed']).toContain(info.state);
 
-        // Clean up
         await run.cancel();
       },
       SHORT_TIMEOUT,

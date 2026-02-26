@@ -1,5 +1,8 @@
 import { ScenarioRun } from '@runloop/api-client/sdk';
 import { makeClient, SHORT_TIMEOUT, uniqueName } from '../utils';
+import * as fs from 'fs';
+import * as os from 'os';
+import * as path from 'path';
 
 const client = makeClient();
 
@@ -136,6 +139,29 @@ describe('smoketest: object-oriented scenario-run', () => {
         expect(Array.isArray(score.scoring_function_results)).toBe(true);
       }
     });
+
+    test(
+      'downloadLogs - download run logs to file',
+      async () => {
+        expect(run).toBeDefined();
+
+        const filePath = path.join(os.tmpdir(), `scenario-run-logs-${Date.now()}.zip`);
+
+        try {
+          await run.downloadLogs(filePath);
+
+          const stats = await fs.promises.stat(filePath);
+          expect(stats.size).toBeGreaterThan(0);
+        } finally {
+          try {
+            await fs.promises.unlink(filePath);
+          } catch {
+            // Ignore cleanup errors
+          }
+        }
+      },
+      SHORT_TIMEOUT,
+    );
   });
 
   describe('ScenarioRun cancellation', () => {
