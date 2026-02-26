@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.10.1 (2026-02-26)
+
+Full Changelog: [v1.10.0...v1.10.1](https://github.com/runloopai/api-client-ts/compare/v1.10.0...v1.10.1)
+
+### Bug Fixes
+
+* **devbox:** add mcp configs to DevboxView ([#7680](https://github.com/runloopai/api-client-ts/issues/7680)) ([4be73c0](https://github.com/runloopai/api-client-ts/commit/4be73c0bba99b51d2e8fbbea7d4e5aa52957a883))
+
 ## 1.10.0 (2026-02-26)
 
 Full Changelog: [v1.9.0...v1.10.0](https://github.com/runloopai/api-client-ts/compare/v1.9.0...v1.10.0)
