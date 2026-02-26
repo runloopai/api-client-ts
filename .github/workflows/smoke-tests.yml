@@ -47,7 +47,7 @@ jobs:
           DEV_KEY: ${{ secrets.RUNLOOP_SMOKETEST_DEV_API_KEY }}
           PROD_KEY: ${{ secrets.RUNLOOP_SMOKETEST_PROD_API_KEY }}
         run: |
-          if [ "${{ github.event.inputs.environment }}" = "prod" ]; then
+          if [ "${{ inputs.environment }}" = "prod" ]; then
             echo "RUNLOOP_API_KEY=${PROD_KEY}" >> $GITHUB_ENV
             echo "RUNLOOP_BASE_URL=https://api.runloop.ai" >> $GITHUB_ENV
           else
