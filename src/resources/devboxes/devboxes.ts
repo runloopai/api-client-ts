@@ -938,6 +938,12 @@ export interface DevboxView {
   initiator_type?: 'unknown' | 'api' | 'scenario' | 'scoring_validation';
 
   /**
+   * [Beta] MCP specifications configured for this devbox. Each spec links an MCP
+   * config to a secret for MCP server access through the MCP hub.
+   */
+  mcp_specs?: Array<DevboxView.McpSpec> | null;
+
+  /**
    * The name of the Devbox.
    */
   name?: string | null;
@@ -997,6 +1003,18 @@ export namespace DevboxView {
      * The ID of the gateway config (e.g., gwc_123abc).
      */
     gateway_config_id: string;
+
+    /**
+     * The ID of the secret containing the credential.
+     */
+    secret_id: string;
+  }
+
+  export interface McpSpec {
+    /**
+     * The ID of the MCP config (e.g., mcp_123abc).
+     */
+    mcp_config_id: string;
 
     /**
      * The ID of the secret containing the credential.
