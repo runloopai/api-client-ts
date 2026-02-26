@@ -468,7 +468,7 @@ describe('smoketest: object-oriented mcp config', () => {
           });
 
           if (initResponse.httpCode !== 200) {
-            console.log(
+            console.error(
               `MCP init failed (url=${mcpUrl}): httpCode=${initResponse.httpCode} stdout=${initResponse.rawOutput} stderr=${initResponse.stderr}`,
             );
           }
@@ -505,7 +505,7 @@ describe('smoketest: object-oriented mcp config', () => {
           });
 
           if (initResponse.httpCode !== 200) {
-            console.log(
+            console.error(
               `MCP init failed (url=${mcpUrl}): httpCode=${initResponse.httpCode} stdout=${initResponse.rawOutput} stderr=${initResponse.stderr}`,
             );
           }
@@ -526,7 +526,7 @@ describe('smoketest: object-oriented mcp config', () => {
           });
 
           if (toolsResponse.httpCode !== 200) {
-            console.log(
+            console.error(
               `MCP tools/list failed (url=${mcpUrl}): httpCode=${toolsResponse.httpCode} stdout=${toolsResponse.rawOutput} stderr=${toolsResponse.stderr}`,
             );
           }
@@ -552,9 +552,6 @@ describe('smoketest: object-oriented mcp config', () => {
               expect(typeof tool.inputSchema).toBe('object');
             }
           }
-
-          const toolNames: string[] = result.tools.map((t: any) => t.name);
-          console.log(`GitHub MCP tools (${toolNames.length}): ${toolNames.join(', ')}`);
         },
         SHORT_TIMEOUT,
       );
@@ -589,7 +586,7 @@ describe('smoketest: object-oriented mcp config', () => {
           });
 
           if (meResponse.httpCode !== 200 || meResponse.jsonRpc?.error) {
-            console.log(
+            console.error(
               `get_me response: httpCode=${meResponse.httpCode} jsonRpc=${JSON.stringify(meResponse.jsonRpc)} raw=${meResponse.rawOutput}`,
             );
           }
@@ -604,7 +601,6 @@ describe('smoketest: object-oriented mcp config', () => {
 
           const meData = JSON.parse(meContent[0].text);
           expect(meData.login).toBeTruthy();
-          console.log(`get_me: login=${meData.login}`);
 
           // Step 3: Call search_repositories — verifies argument passing
           const [owner, repo] = GITHUB_MCP_TEST_REPO.split('/');
@@ -621,7 +617,7 @@ describe('smoketest: object-oriented mcp config', () => {
           });
 
           if (searchResponse.httpCode !== 200 || searchResponse.jsonRpc?.error) {
-            console.log(
+            console.error(
               `search_repositories response: httpCode=${searchResponse.httpCode} jsonRpc=${JSON.stringify(searchResponse.jsonRpc)}`,
             );
           }
@@ -637,7 +633,6 @@ describe('smoketest: object-oriented mcp config', () => {
           expect(searchData.total_count).toBeGreaterThan(0);
           const repoNames = searchData.items.map((r: any) => r.full_name);
           expect(repoNames).toContain(GITHUB_MCP_TEST_REPO);
-          console.log(`search_repositories: found ${searchData.total_count} results, includes ${GITHUB_MCP_TEST_REPO}`);
         },
         MEDIUM_TIMEOUT,
       );
@@ -667,7 +662,7 @@ describe('smoketest: object-oriented mcp config', () => {
           const httpCode = parseInt((await result.stdout()).trim(), 10) || 0;
           const stderr = (await result.stderr()).trim();
           if (httpCode < 400) {
-            console.log(
+            console.error(
               `MCP auth rejection test (url=${mcpUrl}): expected 4xx, got httpCode=${httpCode} stderr=${stderr}`,
             );
           }
@@ -722,7 +717,7 @@ describe('smoketest: object-oriented mcp config', () => {
           const urlResult = await devbox.cmd.exec('echo $RL_MCP_URL');
           expect(urlResult.exitCode).toBe(0);
           const urlValue = (await urlResult.stdout()).trim();
-          console.log(`MCP URL from server (by name): ${urlValue}`);
+
           expect(urlValue).toBeTruthy();
           expect(urlValue.startsWith('http')).toBe(true);
 
@@ -807,7 +802,7 @@ describe('smoketest: object-oriented mcp config', () => {
             const mcpUrlResult = await devbox.cmd.exec('echo $RL_MCP_URL');
             expect(mcpUrlResult.exitCode).toBe(0);
             const mcpUrlValue = (await mcpUrlResult.stdout()).trim();
-            console.log(`MCP URL from server (mcp+gateway): ${mcpUrlValue}`);
+
             expect(mcpUrlValue).toBeTruthy();
             expect(mcpUrlValue.startsWith('http')).toBe(true);
 
