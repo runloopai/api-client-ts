@@ -7,11 +7,6 @@ on:
         description: 'Target environment'
         required: true
         type: string
-      jest_pattern:
-        description: 'Jest --testNamePattern regex, or empty string for all tests'
-        type: string
-        default: ''
-        required: false
       discriminator:
         default: "true"
         type: string
@@ -24,11 +19,6 @@ on:
         options:
           - dev
           - prod
-      jest_pattern:
-        description: 'Jest --testNamePattern regex, or empty string for all tests'
-        type: string
-        default: ''
-        required: false
 
 jobs:
   smoke-tests:
@@ -69,7 +59,7 @@ jobs:
 
       - name: Run smoke tests
         id: tests
-        run: yarn test:smoke ${{ inputs.jest_pattern && format('--testNamePattern=''{0}''', inputs.jest_pattern) }}
+        run: yarn test:smoke
 
       - name: Comment results on PR
         if: failure() && github.event_name == 'pull_request'
