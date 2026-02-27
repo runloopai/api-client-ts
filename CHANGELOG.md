@@ -1,5 +1,24 @@
 # Changelog
 
+## 1.10.3 (2026-02-27)
+
+Full Changelog: [v1.10.2...v1.10.3](https://github.com/runloopai/api-client-ts/compare/v1.10.2...v1.10.3)
+
+### Bug Fixes
+
+* switching to MCP definition to specify a secret name per MCP server ([#7715](https://github.com/runloopai/api-client-ts/issues/7715)) ([ee0078f](https://github.com/runloopai/api-client-ts/commit/ee0078f21eedd7fd04d3d9bc39ee7f14dae3009c))
+
+
+### Chores
+
+* add mcp example ([#730](https://github.com/runloopai/api-client-ts/issues/730)) ([ed77255](https://github.com/runloopai/api-client-ts/commit/ed77255e95b49fbc815cb9118df73144bb2bd790))
+* **internal:** move stringifyQuery implementation to internal function ([aab68c2](https://github.com/runloopai/api-client-ts/commit/aab68c2e4c7ac559d1b36f0ec945602b8fc93c12))
+
+
+### Documentation
+
+* fix examples.md ([#732](https://github.com/runloopai/api-client-ts/issues/732)) ([ffef871](https://github.com/runloopai/api-client-ts/commit/ffef871a74138c29791c1b834248a5bbc948c0a8))
+
 ## 1.10.2 (2026-02-26)
 
 Full Changelog: [v1.10.1...v1.10.2](https://github.com/runloopai/api-client-ts/compare/v1.10.1...v1.10.2)
