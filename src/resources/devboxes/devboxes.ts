@@ -797,10 +797,11 @@ export interface DevboxView {
   initiator_type?: 'unknown' | 'api' | 'scenario' | 'scoring_validation';
 
   /**
-   * [Beta] MCP specifications configured for this devbox. Each spec links an MCP
-   * config to a secret for MCP server access through the MCP hub.
+   * [Beta] MCP specifications configured for this devbox. Map key is the environment
+   * variable name for the MCP token envelope. Each spec links an MCP config to a
+   * secret for MCP server access through the MCP hub.
    */
-  mcp_specs?: Array<DevboxView.McpSpec> | null;
+  mcp_specs?: { [key: string]: DevboxView.McpSpecs } | null;
 
   /**
    * The name of the Devbox.
@@ -869,7 +870,7 @@ export namespace DevboxView {
     secret_id: string;
   }
 
-  export interface McpSpec {
+  export interface McpSpecs {
     /**
      * The ID of the MCP config (e.g., mcp_123abc).
      */
@@ -1004,12 +1005,13 @@ export interface DevboxCreateParams {
   launch_parameters?: Shared.LaunchParameters | null;
 
   /**
-   * [Beta] (Optional) MCP specifications for MCP server access. Each spec links an
-   * MCP config to a secret. The devbox will receive environment variables
-   * (RL_MCP_URL, RL_MCP_TOKEN) for accessing MCP servers through the MCP hub.
-   * Example: [{'mcp_config': 'github-readonly', 'secret': 'MY_GITHUB_TOKEN'}]
+   * [Beta] (Optional) MCP specifications for MCP server access. Map key is the
+   * environment variable name for the MCP token envelope. Each spec links an MCP
+   * config to a secret. The devbox will also receive RL_MCP_URL for the MCP hub
+   * endpoint. Example: {'MCP_SECRET': {'mcp_config': 'github-readonly', 'secret':
+   * 'MY_GITHUB_TOKEN'}}
    */
-  mcp?: Array<DevboxCreateParams.Mcp> | null;
+  mcp?: { [key: string]: DevboxCreateParams.Mcp } | null;
 
   /**
    * User defined metadata to attach to the devbox for organization.
