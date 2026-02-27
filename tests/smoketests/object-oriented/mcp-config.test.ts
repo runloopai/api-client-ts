@@ -428,12 +428,12 @@ describe('smoketest: object-oriented mcp config', () => {
             resource_size_request: 'X_SMALL',
             keep_alive_time_seconds: 300,
           },
-          mcp: [
-            {
+          mcp: {
+            MCP_SECRET: {
               mcp_config: mcpConfig.id,
               secret: testSecretName,
             },
-          ],
+          },
         });
 
         const urlResult = await devbox.cmd.exec('echo $RL_MCP_URL');
@@ -681,12 +681,12 @@ describe('smoketest: object-oriented mcp config', () => {
               resource_size_request: 'X_SMALL',
               keep_alive_time_seconds: 60,
             },
-            mcp: [
-              {
+            mcp: {
+              MCP_SECRET: {
                 mcp_config: mcpConfigName,
                 secret: testSecretName,
               },
-            ],
+            },
           });
 
           expect(devbox).toBeDefined();
@@ -759,12 +759,12 @@ describe('smoketest: object-oriented mcp config', () => {
                 resource_size_request: 'X_SMALL',
                 keep_alive_time_seconds: 60,
               },
-              mcp: [
-                {
+              mcp: {
+                MCP_SECRET: {
                   mcp_config: mcpConfig.id,
                   secret: mcpSecretName,
                 },
-              ],
+              },
               gateways: {
                 MY_API: {
                   gateway: gatewayConfig.id,

@@ -75,12 +75,12 @@ async function main() {
       resource_size_request: 'SMALL',
       keep_alive_time_seconds: 300,
     },
-    mcp: [
-      {
+    mcp: {
+      MCP_SECRET: {
         mcp_config: mcpConfig.id,
         secret: SECRET_NAME,
       },
-    ],
+    },
   });
   console.log(`      Devbox: ${devbox.id}`);
 
