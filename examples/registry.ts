@@ -17,14 +17,14 @@ export interface ExampleRegistryEntry {
 export const exampleRegistry: ExampleRegistryEntry[] = [
   {
     slug: 'devbox-from-blueprint-lifecycle',
-    title: "Devbox From Blueprint (Run Command, Shutdown)",
+    title: 'Devbox From Blueprint (Run Command, Shutdown)',
     fileName: 'devbox-from-blueprint-lifecycle.ts',
     requiredEnv: ['RUNLOOP_API_KEY'],
     run: runDevboxFromBlueprintLifecycleExample,
   },
   {
     slug: 'mcp-github-tools',
-    title: "MCP Hub + Claude Code + GitHub",
+    title: 'MCP Hub + Claude Code + GitHub',
     fileName: 'mcp-github-tools.ts',
     requiredEnv: ['RUNLOOP_API_KEY', 'GITHUB_TOKEN', 'ANTHROPIC_API_KEY'],
     run: runMcpGithubToolsExample,
