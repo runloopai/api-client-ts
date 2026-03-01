@@ -1,0 +1,10 @@
+# Runloop TypeScript SDK - Agent Notes
+
+- Start with `EXAMPLES.md` for quick, consolidated recipe checks.
+- Agent fast path:
+  - Devbox lifecycle recipe: `examples/devbox-from-blueprint-lifecycle.ts`
+  - MCP recipe: `examples/mcp-github-tools.ts`
+  - Example validation: `yarn test:examples`
+- Prefer SDK methods where available.
+- Do not mix SDK and API code paths in the same code block.
+- `EXAMPLES.md` is generated from metadata in `examples/*.ts` via `yarn generate:examples-md`.
