@@ -33,7 +33,7 @@
     "fix": "./scripts/format",
     "docs": "typedoc --options typedoc.json",
     "generate:examples-md": "node ./scripts/generate-examples-md.cjs",
-    "check:examples-md": "yarn generate:examples-md && git diff --exit-code EXAMPLES.md",
+    "check:examples-md": "yarn generate:examples-md && git diff --exit-code EXAMPLES.md examples/registry.ts",
     "docs:md": "typedoc --options typedoc.md.json",
     "docs:watch": "typedoc --options typedoc.json --watch",
     "predeploy-gh-pages": "yarn docs:sdk",
