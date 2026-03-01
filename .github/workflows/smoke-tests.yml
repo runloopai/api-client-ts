@@ -56,6 +56,10 @@ jobs:
           fi
           echo "DEBUG=false" >> $GITHUB_ENV
           echo "RUN_SMOKETESTS=1" >> $GITHUB_ENV
+          echo "RUN_EXAMPLE_LIVE_TESTS=1" >> $GITHUB_ENV
+
+      - name: Verify generated example artifacts
+        run: yarn check:examples-md
 
       - name: Run smoke tests
         id: tests

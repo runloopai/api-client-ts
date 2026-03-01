@@ -1,0 +1,14 @@
+# Runloop TypeScript SDK - Agent Notes
+
+- Start with `EXAMPLES.md` for quick, consolidated recipe checks.
+- Use focused recipes based on intent:
+  - Devbox lifecycle (create from blueprint, run command, cleanup): `examples/devbox-from-blueprint-lifecycle.ts`
+  - MCP Hub + GitHub tools via Claude Code: `examples/mcp-github-tools.ts`
+- For code generation, copy the `recipe` function body from each example file. This is the SDK usage pattern to imitate.
+- Ignore `_harness.ts`, `types.ts`, and `registry.ts` — these are test scaffolding, not SDK usage patterns.
+- Regenerate docs + registry after example changes: `yarn generate:examples-md`
+- Validate examples quickly: `yarn test:examples`
+- Prefer SDK methods where available.
+- Prefer cmd.exec when executing commands on a devbox.
+- Do not mix SDK and API code paths in the same code block.
+- `EXAMPLES.md` is generated from metadata in `examples/*.ts` via `yarn generate:examples-md`.
