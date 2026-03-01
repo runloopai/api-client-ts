@@ -57,7 +57,7 @@ export async function recipe(ctx: RecipeContext): Promise<RecipeOutput> {
   const stdout = await result.stdout();
 
   return {
-    resources: [`blueprint:${blueprint.id}`, `devbox:${devbox.id}`],
+    resourcesCreated: [`blueprint:${blueprint.id}`, `devbox:${devbox.id}`],
     checks: [
       {
         name: 'command exits successfully',

@@ -38,7 +38,7 @@ export interface McpExampleOptions {
 
 export async function recipe(ctx: RecipeContext, options: McpExampleOptions): Promise<RecipeOutput> {
   const { sdk, cleanup, uniqueName } = ctx;
-  const resources: string[] = [];
+  const resourcesCreated: string[] = [];
   const checks: ExampleCheck[] = [];
 
   const githubToken = process.env['GITHUB_TOKEN'];
@@ -65,7 +65,7 @@ export async function recipe(ctx: RecipeContext, options: McpExampleOptions): Pr
     ],
     description: 'GitHub MCP server - example',
   });
-  resources.push(`mcp_config:${mcpConfig.id}`);
+  resourcesCreated.push(`mcp_config:${mcpConfig.id}`);
   cleanup.add(`mcp_config:${mcpConfig.id}`, () => sdk.mcpConfig.fromId(mcpConfig.id).delete());
 
   // Store the GitHub PAT as a Runloop secret
@@ -75,7 +75,7 @@ export async function recipe(ctx: RecipeContext, options: McpExampleOptions): Pr
     name: secretName,
     value: githubToken,
   });
-  resources.push(`secret:${secretName}`);
+  resourcesCreated.push(`secret:${secretName}`);
   cleanup.add(`secret:${secretName}`, () => sdk.api.secrets.delete(secretName));
 
   // Launch a devbox with MCP Hub wiring
@@ -92,7 +92,7 @@ export async function recipe(ctx: RecipeContext, options: McpExampleOptions): Pr
       },
     },
   });
-  resources.push(`devbox:${devbox.id}`);
+  resourcesCreated.push(`devbox:${devbox.id}`);
   cleanup.add(`devbox:${devbox.id}`, () => sdk.devbox.fromId(devbox.id).shutdown());
 
   // Install Claude Code
@@ -103,7 +103,7 @@ export async function recipe(ctx: RecipeContext, options: McpExampleOptions): Pr
     details: installResult.exitCode === 0 ? 'installed' : await installResult.stderr(),
   });
   if (installResult.exitCode !== 0) {
-    return { resources, checks };
+    return { resourcesCreated, checks };
   }
 
   // Register MCP Hub endpoint with Claude Code
@@ -117,7 +117,7 @@ export async function recipe(ctx: RecipeContext, options: McpExampleOptions): Pr
     details: addMcpResult.exitCode === 0 ? 'registered' : await addMcpResult.stderr(),
   });
   if (addMcpResult.exitCode !== 0) {
-    return { resources, checks };
+    return { resourcesCreated, checks };
   }
 
   // Ask Claude to summarize latest PR via MCP tools
@@ -133,7 +133,7 @@ export async function recipe(ctx: RecipeContext, options: McpExampleOptions): Pr
     details: claudeResult.exitCode === 0 ? 'non-empty response received' : await claudeResult.stderr(),
   });
 
-  return { resources, checks };
+  return { resourcesCreated, checks };
 }
 
 function validateEnv(options: McpExampleOptions): { skip: boolean; checks: ExampleCheck[] } {

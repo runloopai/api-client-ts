@@ -6,7 +6,7 @@ describe('smoketest: examples', () => {
 
   for (const entry of exampleRegistry) {
     const hasRequiredEnv = entry.requiredEnv.every((name) => Boolean(process.env[name]));
-    const runLiveExample = hasLiveFlag && entry.live && hasRequiredEnv;
+    const runLiveExample = hasLiveFlag && hasRequiredEnv;
     const itLive = runLiveExample ? test : test.skip;
 
     itLive(
@@ -45,8 +45,16 @@ describe('smoketest: examples', () => {
         expect(result.resourcesCreated).toHaveLength(0);
         expect(result.cleanupStatus.attempted).toHaveLength(0);
       } finally {
-        process.env['GITHUB_TOKEN'] = originalGithubToken;
-        process.env['ANTHROPIC_API_KEY'] = originalAnthropicApiKey;
+        if (originalGithubToken === undefined) {
+          delete process.env['GITHUB_TOKEN'];
+        } else {
+          process.env['GITHUB_TOKEN'] = originalGithubToken;
+        }
+        if (originalAnthropicApiKey === undefined) {
+          delete process.env['ANTHROPIC_API_KEY'];
+        } else {
+          process.env['ANTHROPIC_API_KEY'] = originalAnthropicApiKey;
+        }
       }
     },
     SHORT_TIMEOUT,

@@ -89,7 +89,7 @@ export function wrapRecipe<TOptions = Record<string, never>>(
     try {
       const output = await opts.recipe(ctx, options as TOptions);
       return {
-        resourcesCreated: output.resources,
+        resourcesCreated: output.resourcesCreated,
         checks: output.checks,
         cleanupStatus,
       };

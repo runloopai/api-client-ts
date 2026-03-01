@@ -124,6 +124,7 @@ function ensureLlmsReferences(examples) {
 
 function markdownForExample(example) {
   return [
+    `<a id="${example.slug}"></a>`,
     `## ${example.title}`,
     '',
     `**Use case:** ${example.use_case}`,
@@ -203,7 +204,6 @@ function generateRegistry(examples) {
     slug: '${example.slug}',
     title: ${JSON.stringify(example.title)},
     fileName: '${example.fileName}',
-    live: true,
     requiredEnv: [${requiredEnv}],
     run: ${runnerName},
   },`;
@@ -221,7 +221,6 @@ export interface ExampleRegistryEntry {
   slug: string;
   title: string;
   fileName: string;
-  live: boolean;
   requiredEnv: string[];
   run: (options?: any) => Promise<ExampleResult>;
 }

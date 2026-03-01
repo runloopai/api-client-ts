@@ -35,7 +35,7 @@ export interface RecipeContext {
 }
 
 export interface RecipeOutput {
-  resources: string[];
+  resourcesCreated: string[];
   checks: ExampleCheck[];
 }
 

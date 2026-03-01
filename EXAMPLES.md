@@ -10,6 +10,7 @@ Runnable examples live in [`examples/`](./examples).
 - [Devbox From Blueprint (Run Command, Shutdown)](#devbox-from-blueprint-lifecycle)
 - [MCP Hub + Claude Code + GitHub](#mcp-github-tools)
 
+<a id="devbox-from-blueprint-lifecycle"></a>
 ## Devbox From Blueprint (Run Command, Shutdown)
 
 **Use case:** Create a devbox from a blueprint, run a command, validate output, and cleanly tear everything down.
@@ -38,6 +39,7 @@ yarn test:examples
 
 **Source:** [`examples/devbox-from-blueprint-lifecycle.ts`](./examples/devbox-from-blueprint-lifecycle.ts)
 
+<a id="mcp-github-tools"></a>
 ## MCP Hub + Claude Code + GitHub
 
 **Use case:** Connect Claude Code running in a devbox to GitHub tools through MCP Hub without exposing raw GitHub credentials to the devbox.
