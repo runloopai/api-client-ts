@@ -6,5 +6,6 @@
   - MCP recipe: `examples/mcp-github-tools.ts`
   - Example validation: `yarn test:examples`
 - Prefer SDK methods where available.
+- Prefer cmd.exec when executing commands on a devbox.
 - Do not mix SDK and API code paths in the same code block.
 - `EXAMPLES.md` is generated from metadata in `examples/*.ts` via `yarn generate:examples-md`.
