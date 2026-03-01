@@ -61,6 +61,7 @@ export async function runDevboxFromBlueprintLifecycleExample(): Promise<ExampleR
     const devbox = await sdk.devbox.createFromBlueprintId(blueprint.id, {
       name: uniqueName('example-devbox'),
       launch_parameters: {
+        // customize resources sizes: (X_SMALL, SMALL, MEDIUM, LARGE, X_LARGE, XX_LARGE, CUSTOM_SIZE)
         resource_size_request: 'X_SMALL',
         keep_alive_time_seconds: 60 * 5,
       },
@@ -80,7 +81,7 @@ export async function runDevboxFromBlueprintLifecycleExample(): Promise<ExampleR
     });
     checks.push({
       name: 'command output contains expected text',
-      passed: stdout.includes('Hello from blueprint lifecycle example'),
+      passed: stdout.includes('Hello from your devbox'),
       details: stdout.trim(),
     });
     console.log('      Command completed.');

@@ -27,7 +27,7 @@ test: yarn test:examples
 ---
  */
 
-import { Runloop } from '@runloop/api-client';
+import { RunloopSDK } from '@runloop/api-client';
 import { ExampleResult, emptyCleanupStatus, trackCleanup } from './types';
 
 const GITHUB_MCP_ENDPOINT = 'https://api.githubcopilot.com/mcp/';
@@ -68,7 +68,7 @@ export async function runMcpGithubToolsExample(options: McpExampleOptions = {}):
   }
 
   const secretName = `example-github-mcp-${Date.now()}`;
-  const api = new Runloop();
+  const sdk = new RunloopSDK();
   let mcpConfigId: string | undefined;
   let devboxId: string | undefined;
   let secretCreated = false;
@@ -76,7 +76,7 @@ export async function runMcpGithubToolsExample(options: McpExampleOptions = {}):
   try {
     // 1) Register GitHub's MCP server with Runloop.
     console.log('[1/6] Creating MCP config...');
-    const mcpConfig = await api.mcpConfigs.create({
+    const mcpConfig = await sdk.mcpConfig.create({
       name: `github-example-${Date.now()}`,
       endpoint: GITHUB_MCP_ENDPOINT,
       allowed_tools: [
@@ -94,7 +94,8 @@ export async function runMcpGithubToolsExample(options: McpExampleOptions = {}):
 
     // 2) Store the GitHub PAT as a Runloop secret.
     console.log('[2/6] Creating secret...');
-    await api.secrets.create({
+    // SDK gap: secrets are currently available via sdk.api, not sdk.secret ops.
+    await sdk.api.secrets.create({
       name: secretName,
       value: githubToken,
     });
@@ -104,7 +105,7 @@ export async function runMcpGithubToolsExample(options: McpExampleOptions = {}):
 
     // 3) Launch a devbox with MCP Hub.
     console.log('[3/6] Creating devbox...');
-    const devbox = await api.devboxes.createAndAwaitRunning({
+    const devbox = await sdk.devbox.create({
       name: `mcp-claude-code-${Date.now()}`,
       launch_parameters: {
         resource_size_request: 'SMALL',
@@ -123,33 +124,28 @@ export async function runMcpGithubToolsExample(options: McpExampleOptions = {}):
 
     // 4) Install Claude Code.
     console.log('[4/6] Installing Claude Code...');
-    const installResult = await api.devboxes.executeAndAwaitCompletion(devbox.id, {
-      command: 'npm install -g @anthropic-ai/claude-code',
-      last_n: '1000',
-    });
+    const installResult = await devbox.cmd.exec('npm install -g @anthropic-ai/claude-code');
     checks.push({
       name: 'install Claude Code',
-      passed: installResult.exit_status === 0,
-      details: installResult.exit_status === 0 ? 'installed' : (installResult.stderr ?? 'no stderr'),
+      passed: installResult.exitCode === 0,
+      details: installResult.exitCode === 0 ? 'installed' : await installResult.stderr(),
     });
-    if (installResult.exit_status !== 0) {
+    if (installResult.exitCode !== 0) {
       return { resourcesCreated, checks, cleanupStatus };
     }
     console.log('      Installed.');
 
     // 5) Register MCP Hub with Claude Code.
     console.log('[5/6] Registering MCP endpoint with Claude Code...');
-    const addMcpResult = await api.devboxes.executeAndAwaitCompletion(devbox.id, {
-      command:
-        'claude mcp add runloop-mcp --transport http "$RL_MCP_URL" --header "Authorization: Bearer $RL_MCP_TOKEN"',
-      last_n: '1000',
-    });
+    const addMcpResult = await devbox.cmd.exec(
+      'claude mcp add runloop-mcp --transport http "$RL_MCP_URL" --header "Authorization: Bearer $RL_MCP_TOKEN"',
+    );
     checks.push({
       name: 'register MCP Hub in Claude',
-      passed: addMcpResult.exit_status === 0,
-      details: addMcpResult.exit_status === 0 ? 'registered' : (addMcpResult.stderr ?? 'no stderr'),
+      passed: addMcpResult.exitCode === 0,
+      details: addMcpResult.exitCode === 0 ? 'registered' : await addMcpResult.stderr(),
     });
-    if (addMcpResult.exit_status !== 0) {
+    if (addMcpResult.exitCode !== 0) {
       return { resourcesCreated, checks, cleanupStatus };
     }
     console.log('      Registered.');
@@ -158,16 +154,15 @@ export async function runMcpGithubToolsExample(options: McpExampleOptions = {}):
     const prompt =
       'Use the MCP tools to get my last pr and describe what it does in 2-3 sentences. Also detail how you collected this information';
     console.log(`[6/6] Running Claude prompt...\n      ${prompt}`);
-    const claudeResult = await api.devboxes.executeAndAwaitCompletion(devbox.id, {
-      command: `ANTHROPIC_API_KEY=${anthropicKey} claude -p "${prompt}" --dangerously-skip-permissions`,
-      last_n: '1000',
-    });
-    const claudeStdout = (claudeResult.stdout ?? '').trim();
+    const claudeResult = await devbox.cmd.exec(
+      `ANTHROPIC_API_KEY=${anthropicKey} claude -p "${prompt}" --dangerously-skip-permissions`,
+    );
+    const claudeStdout = (await claudeResult.stdout()).trim();
     const claudeCheckDetails =
-      claudeResult.exit_status === 0 ? 'non-empty response received' : (claudeResult.stderr ?? 'no stderr');
+      claudeResult.exitCode === 0 ? 'non-empty response received' : await claudeResult.stderr();
     checks.push({
       name: 'Claude prompt through MCP succeeds',
-      passed: claudeResult.exit_status === 0 && claudeStdout.length > 0,
+      passed: claudeResult.exitCode === 0 && claudeStdout.length > 0,
       details: claudeCheckDetails,
     });
     if (claudeStdout.length > 0) {
@@ -183,20 +178,21 @@ export async function runMcpGithubToolsExample(options: McpExampleOptions = {}):
     if (devboxId) {
       const id = devboxId;
       await trackCleanup(cleanupStatus, `devbox:${id}`, async () => {
-        await api.devboxes.shutdown(id);
+        await sdk.devbox.fromId(id).shutdown();
       });
     }
 
     if (mcpConfigId) {
       const id = mcpConfigId;
       await trackCleanup(cleanupStatus, `mcp_config:${id}`, async () => {
-        await api.mcpConfigs.delete(id);
+        await sdk.mcpConfig.fromId(id).delete();
       });
     }
 
     if (secretCreated) {
       await trackCleanup(cleanupStatus, `secret:${secretName}`, async () => {
-        await api.secrets.delete(secretName);
+        // SDK gap: secrets are currently available via sdk.api, not sdk.secret ops.
+        await sdk.api.secrets.delete(secretName);
       });
     }
 
