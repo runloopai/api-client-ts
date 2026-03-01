@@ -23,7 +23,9 @@ export function uniqueName(prefix: string): string {
   return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 }
 
-function createCleanupTracker(cleanupStatus: ExampleResult['cleanupStatus']): CleanupTracker & { run(): Promise<void> } {
+function createCleanupTracker(
+  cleanupStatus: ExampleResult['cleanupStatus'],
+): CleanupTracker & { run(): Promise<void> } {
   const cleanupActions: CleanupAction[] = [];
 
   return {

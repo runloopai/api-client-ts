@@ -148,7 +148,11 @@ function validateEnv(options: McpExampleOptions): { skip: boolean; checks: Examp
 
   const anthropicKey = process.env['ANTHROPIC_API_KEY'];
   if (!anthropicKey && skipIfMissing) {
-    checks.push({ name: 'ANTHROPIC_API_KEY provided', passed: false, details: 'Skipped: missing ANTHROPIC_API_KEY' });
+    checks.push({
+      name: 'ANTHROPIC_API_KEY provided',
+      passed: false,
+      details: 'Skipped: missing ANTHROPIC_API_KEY',
+    });
     return { skip: true, checks };
   }
 

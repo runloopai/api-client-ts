@@ -59,8 +59,16 @@ export async function recipe(ctx: RecipeContext): Promise<RecipeOutput> {
   return {
     resources: [`blueprint:${blueprint.id}`, `devbox:${devbox.id}`],
     checks: [
-      { name: 'command exits successfully', passed: result.exitCode === 0, details: `exitCode=${result.exitCode}` },
-      { name: 'command output contains expected text', passed: stdout.includes('Hello from your devbox'), details: stdout.trim() },
+      {
+        name: 'command exits successfully',
+        passed: result.exitCode === 0,
+        details: `exitCode=${result.exitCode}`,
+      },
+      {
+        name: 'command output contains expected text',
+        passed: stdout.includes('Hello from your devbox'),
+        details: stdout.trim(),
+      },
     ],
   };
 }

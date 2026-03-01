@@ -18,7 +18,7 @@ export interface ExampleRegistryEntry {
 export const exampleRegistry: ExampleRegistryEntry[] = [
   {
     slug: 'devbox-from-blueprint-lifecycle',
-    title: "Devbox From Blueprint (Run Command, Shutdown)",
+    title: 'Devbox From Blueprint (Run Command, Shutdown)',
     fileName: 'devbox-from-blueprint-lifecycle.ts',
     live: true,
     requiredEnv: ['RUNLOOP_API_KEY'],
@@ -26,7 +26,7 @@ export const exampleRegistry: ExampleRegistryEntry[] = [
   },
   {
     slug: 'mcp-github-tools',
-    title: "MCP Hub + Claude Code + GitHub",
+    title: 'MCP Hub + Claude Code + GitHub',
     fileName: 'mcp-github-tools.ts',
     live: true,
     requiredEnv: ['RUNLOOP_API_KEY', 'GITHUB_TOKEN', 'ANTHROPIC_API_KEY'],
