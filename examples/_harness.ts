@@ -1,4 +1,3 @@
-import { RunloopSDK } from '@runloop/api-client';
 import {
   ExampleResult,
   ExampleCheck,
@@ -17,10 +16,6 @@ type CleanupAction = {
 function shouldFailProcess(result: ExampleResult): boolean {
   const hasFailedChecks = result.checks.some((check) => !check.passed);
   return Boolean(result.skipped) || hasFailedChecks || result.cleanupStatus.failed.length > 0;
-}
-
-export function uniqueName(prefix: string): string {
-  return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 }
 
 function createCleanupTracker(
@@ -76,14 +71,8 @@ export function wrapRecipe<TOptions = Record<string, never>>(
       }
     }
 
-    const sdk = new RunloopSDK({
-      bearerToken: process.env['RUNLOOP_API_KEY'],
-    });
-
     const ctx: RecipeContext = {
-      sdk,
       cleanup,
-      uniqueName,
     };
 
     try {

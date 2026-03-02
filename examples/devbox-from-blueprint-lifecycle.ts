@@ -23,13 +23,22 @@ test: yarn test:examples
 ---
 */
 
+import { RunloopSDK } from '@runloop/api-client';
 import { wrapRecipe, runAsCli } from './_harness';
 import type { RecipeContext, RecipeOutput } from './types';
+
+function uniqueName(prefix: string): string {
+  return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+}
 
 const BLUEPRINT_POLL_TIMEOUT_MS = 10 * 60 * 1000;
 
 export async function recipe(ctx: RecipeContext): Promise<RecipeOutput> {
-  const { sdk, cleanup, uniqueName } = ctx;
+  const { cleanup } = ctx;
+
+  const sdk = new RunloopSDK({
+    bearerToken: process.env['RUNLOOP_API_KEY'],
+  });
 
   // Create a blueprint with a simple Dockerfile
   const blueprint = await sdk.blueprint.create(

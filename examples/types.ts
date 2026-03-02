@@ -1,5 +1,3 @@
-import type { RunloopSDK } from '@runloop/api-client';
-
 export interface ExampleCheck {
   name: string;
   passed: boolean;
@@ -29,9 +27,7 @@ export interface CleanupTracker {
 }
 
 export interface RecipeContext {
-  sdk: RunloopSDK;
   cleanup: CleanupTracker;
-  uniqueName: (prefix: string) => string;
 }
 
 export interface RecipeOutput {

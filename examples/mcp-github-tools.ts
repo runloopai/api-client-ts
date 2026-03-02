@@ -27,8 +27,13 @@ test: yarn test:examples
 ---
  */
 
+import { RunloopSDK } from '@runloop/api-client';
 import { wrapRecipe, runAsCli } from './_harness';
 import type { RecipeContext, RecipeOutput, ExampleCheck } from './types';
+
+function uniqueName(prefix: string): string {
+  return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+}
 
 const GITHUB_MCP_ENDPOINT = 'https://api.githubcopilot.com/mcp/';
 
@@ -37,7 +42,11 @@ export interface McpExampleOptions {
 }
 
 export async function recipe(ctx: RecipeContext, options: McpExampleOptions): Promise<RecipeOutput> {
-  const { sdk, cleanup, uniqueName } = ctx;
+  const { cleanup } = ctx;
+
+  const sdk = new RunloopSDK({
+    bearerToken: process.env['RUNLOOP_API_KEY'],
+  });
   const resourcesCreated: string[] = [];
   const checks: ExampleCheck[] = [];
 

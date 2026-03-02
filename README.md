@@ -60,6 +60,8 @@ yarn generate:examples-md
 
 Detailed agent-specific instructions live in [`llms.txt`](./llms.txt). Consolidated recipes for frequent tasks are in [`EXAMPLES.md`](./EXAMPLES.md).
 
+After completing any modifications to this project, ensure `llms.txt` and `README.md` are kept in sync.
+
 ## Core Concepts
 
 ### Runloop SDK
