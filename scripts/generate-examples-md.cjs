@@ -200,9 +200,10 @@ function generateRegistry(examples) {
         .filter(Boolean)
         .map((envName) => `'${envName}'`)
         .join(', ');
+      const escapedTitle = example.title.replace(/'/g, "\\'");
       return `  {
     slug: '${example.slug}',
-    title: ${JSON.stringify(example.title)},
+    title: '${escapedTitle}',
     fileName: '${example.fileName}',
     requiredEnv: [${requiredEnv}],
     run: ${runnerName},
