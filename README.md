@@ -66,7 +66,7 @@ After completing any modifications to this project, ensure `llms.txt` and `READM
 
 ### Runloop SDK
 
-The main SDK class that provides access to all Runloop functionality construct view the [RunloopSDK documentation](https://runloopai.github.io/api-client-ts/stable/) to see specific capabilities.
+The main SDK class that provides access to all Runloop functionality. View the [RunloopSDK documentation](https://runloopai.github.io/api-client-ts/stable/) to see specific capabilities.
 
 ### Available Resources
 
@@ -122,7 +122,7 @@ await scorer.update({ bash_script: 'echo "0.5"' });
 
 ### Scenarios
 
-Scenarios define tasks with a well defined starting environment, task evaluation scorer and an optional reference solution.. Use `runloop.scenario.fromId()` to get a scenario, then `scenario.run()` to start a run with your agent mounted:
+Scenarios define tasks with a well defined starting environment, task evaluation scorer and an optional reference solution. Use `runloop.scenario.fromId()` to get a scenario, then `scenario.run()` to start a run with your agent mounted:
 
 ```typescript
 const scenario = runloop.scenario.fromId('scn_123');
@@ -170,7 +170,7 @@ const runloop  = new RunloopSDK();
 const secretResult = await runloop.api.secrets.create({ ... });
 ```
 
-Once you've migrated your existing code to the new SDK client you can optionally go through and move from the API paradime to the object oriented SDK.
+Once you've migrated your existing code to the new SDK client you can optionally go through and move from the API paradigm to the object oriented SDK.
 
 ```ts
 // Before (Legacy api client)
@@ -203,23 +203,23 @@ await devbox.shutdown();
 
 ## File write
 
+```ts
 // You can also pass a `fetch` `Response`:
 await client.devboxes.uploadFile('id', {
-path: 'path',
-file: await fetch('https://somesite/file'),
+  path: 'path',
+  file: await fetch('https://somesite/file'),
 });
 
 // Finally, if none of the above are convenient, you can use our `toFile` helper:
 await client.devboxes.uploadFile('id', {
-path: 'path',
-file: await toFile(Buffer.from('my bytes'), 'file'),
+  path: 'path',
+  file: await toFile(Buffer.from('my bytes'), 'file'),
 });
 await client.devboxes.uploadFile('id', {
-path: 'path',
-file: await toFile(new Uint8Array([0, 1, 2]), 'file'),
+  path: 'path',
+  file: await toFile(new Uint8Array([0, 1, 2]), 'file'),
 });
-
-````
+```
 
 ## Handling errors
 
@@ -238,18 +238,7 @@ const devboxView = await client.devboxes.create().catch(async (err) => {
     throw err;
   }
 });
-```typescript
-import { RunloopSDK, type DevboxView } from '@runloop/api-client';
-
-const runloop = new RunloopSDK();
-const devbox: DevboxView = await runloop.devbox.create();
-````
-
-// If you have access to Node `fs` we recommend using `fs.createReadStream()`:
-await client.devboxes.uploadFile('id', {
-path: 'path',
-file: fs.createReadStream('/path/to/file'),
-});
+```
 
 ## Advanced Configuration
 
