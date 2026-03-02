@@ -32,6 +32,9 @@ jobs:
       - name: Check types
         run: ./scripts/lint
 
+      - name: Verify generated examples docs
+        run: yarn check:examples-md
+
   build:
     timeout-minutes: 5
     name: build

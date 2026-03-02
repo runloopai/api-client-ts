@@ -1,0 +1,32 @@
+# Runloop TypeScript SDK
+
+> TypeScript client for Runloop.ai—create cloud devboxes, execute commands, manage blueprints and snapshots. Additional platform documentation is available at [docs.runloop.ai](https://docs.runloop.ai) and [docs.runloop.ai/llms.txt](https://docs.runloop.ai/llms.txt).
+
+## Quick Start
+
+- [README.md](README.md): Installation, authentication, and quickstart example
+- [EXAMPLES.md](EXAMPLES.md): Consolidated workflow recipes
+
+## Core Patterns
+
+- [Devbox lifecycle example](examples/devbox-from-blueprint-lifecycle.ts): Create blueprint, launch devbox, run commands, cleanup
+- [MCP GitHub example](examples/mcp-github-tools.ts): MCP Hub integration with Claude Code
+
+## API Reference
+
+- [SDK entry point](src/index.ts): `RunloopSDK` class and all operations
+- [Type definitions](src/types.ts): TypeScript types for all resources
+
+## Key Guidance
+
+- Always use `RunloopSDK` as the entry point (not legacy `Runloop` default export)
+- Prefer SDK methods (`sdk.devbox`, `sdk.blueprint`, etc.) for object-oriented patterns and convenience
+- For resources without SDK coverage (e.g., secrets, benchmarks), use `sdk.api.*` as a fallback
+- Use `sdk.devbox.create()` to create devboxes; they auto-await readiness
+- Execute commands with `devbox.cmd.exec('command')`, not raw API calls
+- Always call `devbox.shutdown()` to clean up resources
+- In example files, focus on the `recipe` function body for SDK usage patterns; ignore test harness files in the examples folder (`_harness.ts`, `registry.ts`, `types.ts`)
+
+## Optional
+
+- [External docs](https://docs.runloop.ai/llms.txt): Additional agent guidance from Runloop platform documentation

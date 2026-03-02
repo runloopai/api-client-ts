@@ -45,6 +45,23 @@ await serverExec.kill();
 await devbox.shutdown();
 ```
 
+## Examples
+
+Workflow-oriented runnable examples are documented in [`EXAMPLES.md`](./EXAMPLES.md).
+
+`EXAMPLES.md` is generated from metadata in `examples/*.ts` and should not be edited manually.
+Regenerate it with:
+
+```sh
+yarn generate:examples-md
+```
+
+## Agent Guidance
+
+Detailed agent-specific instructions live in [`llms.txt`](./llms.txt). Consolidated recipes for frequent tasks are in [`EXAMPLES.md`](./EXAMPLES.md).
+
+After completing any modifications to this project, ensure `llms.txt` and `README.md` are kept in sync.
+
 ## Core Concepts
 
 ### Runloop SDK
