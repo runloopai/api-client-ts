@@ -66,7 +66,7 @@ After completing any modifications to this project, ensure `llms.txt` and `READM
 
 ### Runloop SDK
 
-The main SDK class that provides access to all Runloop functionality construct view the [RunloopSDK documentation](https://runloopai.github.io/api-client-ts/stable/classes/RunloopSDK.html) to see specific capabilities.
+The main SDK class that provides access to all Runloop functionality construct view the [RunloopSDK documentation](https://runloopai.github.io/api-client-ts/stable/) to see specific capabilities.
 
 ### Available Resources
 
