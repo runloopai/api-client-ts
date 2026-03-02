@@ -58,7 +58,7 @@ yarn generate:examples-md
 
 ## Agent Guidance
 
-Detailed agent-specific instructions live in [`llms.txt`](./llms.txt).
+Detailed agent-specific instructions live in [`llms.txt`](./llms.txt). Consolidated recipes for frequent tasks are in [`EXAMPLES.md`](./EXAMPLES.md).
 
 ## Core Concepts
 
