@@ -72,14 +72,14 @@ The main SDK class that provides access to all Runloop functionality construct v
 
 The SDK provides object-oriented interfaces for all major Runloop resources:
 
-- **[`runloop.devbox`](https://runloopai.github.io/api-client-ts/stable/classes/DevboxOps.html)** - Devbox management (create, list, execute commands, file operations)
-- **[`runloop.blueprint`](https://runloopai.github.io/api-client-ts/stable/classes/BlueprintOps.html)** - Blueprint management (create, list, build blueprints)
-- **[`runloop.snapshot`](https://runloopai.github.io/api-client-ts/stable/classes/SnapshotOps.html)** - Snapshot management (list disk snapshots)
-- **[`runloop.storageObject`](https://runloopai.github.io/api-client-ts/stable/classes/StorageObjectOps.html)** - Storage object management (upload, download, list objects)
-- **[`runloop.agent`](https://runloopai.github.io/api-client-ts/stable/classes/AgentOps.html)** - Agent management (create, list agents from npm/pip/git)
-- **[`runloop.scenario`](https://runloopai.github.io/api-client-ts/stable/classes/ScenarioOps.html)** - Scenario management (list scenarios, start runs)
-- **[`runloop.scorer`](https://runloopai.github.io/api-client-ts/stable/classes/ScorerOps.html)** - Scorer management (create, list, update)
-- **[`runloop.api`](https://runloopai.github.io/api-client-ts/stable/classes/Runloop.html)** - Direct access to the REST API client
+- **[`runloop.devbox`](https://runloopai.github.io/api-client-ts/stable/classes/sdk.DevboxOps.html)** - Devbox management (create, list, execute commands, file operations)
+- **[`runloop.blueprint`](https://runloopai.github.io/api-client-ts/stable/classes/sdk.BlueprintOps.html)** - Blueprint management (create, list, build blueprints)
+- **[`runloop.snapshot`](https://runloopai.github.io/api-client-ts/stable/classes/sdk.SnapshotOps.html)** - Snapshot management (list disk snapshots)
+- **[`runloop.storageObject`](https://runloopai.github.io/api-client-ts/stable/classes/sdk.StorageObjectOps.html)** - Storage object management (upload, download, list objects)
+- **[`runloop.agent`](https://runloopai.github.io/api-client-ts/stable/classes/sdk.AgentOps.html)** - Agent management (create, list agents from npm/pip/git)
+- **[`runloop.scenario`](https://runloopai.github.io/api-client-ts/stable/classes/sdk.ScenarioOps.html)** - Scenario management (list scenarios, start runs)
+- **[`runloop.scorer`](https://runloopai.github.io/api-client-ts/stable/classes/sdk.ScorerOps.html)** - Scorer management (create, list, update)
+- **[`runloop.api`](https://runloopai.github.io/api-client-ts/stable/modules/types.html)** - Direct access to the REST API client
 
 ## TypeScript Support
 
