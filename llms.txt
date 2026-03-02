@@ -25,7 +25,7 @@
 - Use `sdk.devbox.create()` to create devboxes; they auto-await readiness
 - Execute commands with `devbox.cmd.exec('command')`, not raw API calls
 - Always call `devbox.shutdown()` to clean up resources
-- In example files, focus on the `recipe` function body for SDK usage patterns; ignore test harness infrastructure (`_harness.ts`, `registry.ts`, `examples/types.ts`)
+- In example files, focus on the `recipe` function body for SDK usage patterns; ignore test harness files in the examples folder (`_harness.ts`, `registry.ts`, `types.ts`)
 
 ## Optional
 
