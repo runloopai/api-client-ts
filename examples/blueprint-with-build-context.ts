@@ -38,7 +38,8 @@ function uniqueName(prefix: string): string {
 
 // building can take time: make sure to set a long blueprint build timeout
 const BLUEPRINT_POLL_TIMEOUT_MS = 10 * 60 * 1000;
-const ONE_WEEK_MS = 7 * 24 * 60 * 60 * 1000;
+// set the TTL to one day for build context files
+const BUILD_CTXT_TTL_MS = 24 * 60 * 60 * 1000;
 
 export async function recipe(ctx: RecipeContext): Promise<RecipeOutput> {
   const { cleanup } = ctx;
@@ -58,7 +59,7 @@ export async function recipe(ctx: RecipeContext): Promise<RecipeOutput> {
   // upload the build context to object storage
   const storageObject = await sdk.storageObject.uploadFromDir(contextDir, {
     name: uniqueName('example-build-context'),
-    ttl_ms: ONE_WEEK_MS,
+    ttl_ms: BUILD_CTXT_TTL_MS,
   });
   cleanup.add(`storageObject:${storageObject.id}`, () => storageObject.delete());
 
