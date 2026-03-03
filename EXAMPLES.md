@@ -7,8 +7,39 @@ Runnable examples live in [`examples/`](./examples).
 
 ## Table of Contents
 
+- [Blueprint with Build Context](#blueprint-with-build-context)
 - [Devbox From Blueprint (Run Command, Shutdown)](#devbox-from-blueprint-lifecycle)
 - [MCP Hub + Claude Code + GitHub](#mcp-github-tools)
+
+<a id="blueprint-with-build-context"></a>
+## Blueprint with Build Context
+
+**Use case:** Create a blueprint using the object store to provide docker build context files, then verify files are copied into the image.
+
+**Tags:** `blueprint`, `object-store`, `build-context`, `devbox`, `cleanup`
+
+### Workflow
+- Create a temporary directory with sample application files
+- Upload the directory to object storage as build context
+- Create a blueprint with a Dockerfile that copies the context files
+- Create a devbox from the blueprint
+- Verify the files were copied into the image
+- Shutdown devbox and delete blueprint and storage object
+
+### Prerequisites
+- `RUNLOOP_API_KEY`
+
+### Run
+```sh
+yarn tsn -T examples/blueprint-with-build-context.ts
+```
+
+### Test
+```sh
+yarn test:examples
+```
+
+**Source:** [`examples/blueprint-with-build-context.ts`](./examples/blueprint-with-build-context.ts)
 
 <a id="devbox-from-blueprint-lifecycle"></a>
 ## Devbox From Blueprint (Run Command, Shutdown)
