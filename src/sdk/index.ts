@@ -9,5 +9,6 @@ export { Scorer } from './scorer';
 export { NetworkPolicy } from './network-policy';
 export { GatewayConfig } from './gateway-config';
 export { McpConfig } from './mcp-config';
+export { Secret } from './secret';
 export { ScenarioRun } from './scenario-run';
 export { Scenario, type ScenarioRunParams } from './scenario';

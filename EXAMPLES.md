@@ -9,6 +9,7 @@ Runnable examples live in [`examples/`](./examples).
 
 - [Devbox From Blueprint (Run Command, Shutdown)](#devbox-from-blueprint-lifecycle)
 - [MCP Hub + Claude Code + GitHub](#mcp-github-tools)
+- [Secrets with Devbox (Create, Inject, Verify, Delete)](#secrets-with-devbox)
 
 <a id="devbox-from-blueprint-lifecycle"></a>
 ## Devbox From Blueprint (Run Command, Shutdown)
@@ -70,3 +71,32 @@ yarn test:examples
 ```
 
 **Source:** [`examples/mcp-github-tools.ts`](./examples/mcp-github-tools.ts)
+
+<a id="secrets-with-devbox"></a>
+## Secrets with Devbox (Create, Inject, Verify, Delete)
+
+**Use case:** Create a secret, inject it into a devbox as an environment variable, verify access, and clean up.
+
+**Tags:** `secrets`, `devbox`, `environment-variables`, `cleanup`
+
+### Workflow
+- Create a secret with a test value
+- Create a devbox with the secret mapped to an env var
+- Execute a command that reads the secret from the environment
+- Verify the value matches
+- Shutdown devbox and delete secret
+
+### Prerequisites
+- `RUNLOOP_API_KEY`
+
+### Run
+```sh
+yarn tsn -T examples/secrets-with-devbox.ts
+```
+
+### Test
+```sh
+yarn test:examples
+```
+
+**Source:** [`examples/secrets-with-devbox.ts`](./examples/secrets-with-devbox.ts)
