@@ -38,8 +38,8 @@ function uniqueName(prefix: string): string {
 
 // building can take time: make sure to set a long blueprint build timeout
 const BLUEPRINT_POLL_TIMEOUT_MS = 10 * 60 * 1000;
-// set the TTL to one day for build context files
-const BUILD_CTXT_TTL_MS = 24 * 60 * 60 * 1000;
+// set the TTL for build context object
+const BUILD_CTXT_TTL_MS = 60 * 60 * 1000;
 
 export async function recipe(ctx: RecipeContext): Promise<RecipeOutput> {
   const { cleanup } = ctx;
