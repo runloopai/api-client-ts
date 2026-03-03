@@ -10,6 +10,7 @@
 ## Core Patterns
 
 - [Devbox lifecycle example](examples/devbox-from-blueprint-lifecycle.ts): Create blueprint, launch devbox, run commands, cleanup
+- [Devbox snapshot and resume example](examples/devbox-snapshot-resume.ts): Snapshot disk, resume from snapshot, verify state isolation
 - [MCP GitHub example](examples/mcp-github-tools.ts): MCP Hub integration with Claude Code
 
 ## API Reference

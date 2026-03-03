@@ -8,6 +8,7 @@ Runnable examples live in [`examples/`](./examples).
 ## Table of Contents
 
 - [Devbox From Blueprint (Run Command, Shutdown)](#devbox-from-blueprint-lifecycle)
+- [Devbox Snapshot and Resume](#devbox-snapshot-resume)
 - [MCP Hub + Claude Code + GitHub](#mcp-github-tools)
 
 <a id="devbox-from-blueprint-lifecycle"></a>
@@ -38,6 +39,37 @@ yarn test:examples
 ```
 
 **Source:** [`examples/devbox-from-blueprint-lifecycle.ts`](./examples/devbox-from-blueprint-lifecycle.ts)
+
+<a id="devbox-snapshot-resume"></a>
+## Devbox Snapshot and Resume
+
+**Use case:** Create a devbox, snapshot its disk, resume from the snapshot, and demonstrate that changes in the original devbox do not affect the clone.
+
+**Tags:** `devbox`, `snapshot`, `resume`, `cleanup`
+
+### Workflow
+- Create a devbox
+- Write a file to the devbox
+- Create a disk snapshot
+- Create a new devbox from the snapshot
+- Modify the file on the original devbox
+- Verify the clone has the original content
+- Shutdown both devboxes and delete the snapshot
+
+### Prerequisites
+- `RUNLOOP_API_KEY`
+
+### Run
+```sh
+yarn tsn -T examples/devbox-snapshot-resume.ts
+```
+
+### Test
+```sh
+yarn test:examples
+```
+
+**Source:** [`examples/devbox-snapshot-resume.ts`](./examples/devbox-snapshot-resume.ts)
 
 <a id="mcp-github-tools"></a>
 ## MCP Hub + Claude Code + GitHub
