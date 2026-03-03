@@ -35,6 +35,8 @@ export async function recipe(ctx: RecipeContext): Promise<RecipeOutput> {
   });
 
   const secretName = 'RUNLOOP_SECRET_EXAMPLE';
+  // Note: do NOT hardcode secret values in your code!
+  // this is example code only; use environment variables instead!
   const secretValue = 'my-secret-value';
 
   const secret = await sdk.secret.create({
