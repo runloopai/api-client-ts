@@ -42,7 +42,6 @@ export async function recipe(ctx: RecipeContext): Promise<RecipeOutput> {
     name: 'devbox-tunnel-example',
     launch_parameters: {
       resource_size_request: 'X_SMALL',
-      keep_alive_time_seconds: 60 * 5,
     },
   });
   cleanup.add(`devbox:${devbox.id}`, () => sdk.devbox.fromId(devbox.id).shutdown());
