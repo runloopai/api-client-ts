@@ -26,12 +26,12 @@ const sdk = new RunloopSDK({
 // Create a new devbox and wait for it to be ready
 const devbox = await sdk.devbox.create();
 
-// Execute a synchronous command
+// Execute a command that returns immediately - exec blocks until completion
 const result = await devbox.cmd.exec('echo "Hello, World!"');
 console.log('Output:', await result.stdout()); // "Hello, World!"
 console.log('Exit code:', result.exitCode); // 0
 
-// Start a long-running HTTP server asynchronously
+// Start a long-running HTTP server - execAsync returns immediately
 const serverExec = await devbox.cmd.execAsync('npx http-server -p 8080');
 console.log(`Started server with execution ID: ${serverExec.executionId}`);
 
@@ -41,6 +41,10 @@ console.log('Server status:', state.status); // "running"
 
 // Later... kill the server when done
 await serverExec.kill();
+
+// Retrieve devbox logs
+const logs = await devbox.logs();
+console.log('Devbox logs:', logs.logs);
 
 await devbox.shutdown();
 ```
@@ -84,6 +88,25 @@ The SDK provides object-oriented interfaces for all major Runloop resources:
 ## TypeScript Support
 
 The SDK is fully typed with comprehensive TypeScript definitions:
+
+### Devbox Logs
+
+Retrieve logs from a devbox, optionally filtered by execution ID or shell name:
+
+```typescript
+const devbox = await runloop.devbox.create();
+
+// Get all devbox logs
+const logs = await devbox.logs();
+console.log(logs.logs);
+
+// Filter logs by execution ID
+const result = await devbox.cmd.exec('echo "hello"');
+const execLogs = await devbox.logs({ execution_id: result.executionId });
+
+// Filter logs by shell name
+const shellLogs = await devbox.logs({ shell_name: 'my-shell' });
+```
 
 ### Blueprints
 
