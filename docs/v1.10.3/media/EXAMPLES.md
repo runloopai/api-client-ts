@@ -13,15 +13,17 @@ Runnable examples live in [`examples/`](./examples).
 <a id="devbox-from-blueprint-lifecycle"></a>
 ## Devbox From Blueprint (Run Command, Shutdown)
 
-**Use case:** Create a devbox from a blueprint, run a command, validate output, and cleanly tear everything down.
+**Use case:** Create a devbox from a blueprint, run a command, fetch logs, validate output, and cleanly tear everything down.
 
-**Tags:** `devbox`, `blueprint`, `commands`, `cleanup`
+**Tags:** `devbox`, `blueprint`, `commands`, `logs`, `cleanup`
 
 ### Workflow
 - Create a blueprint
+- Fetch blueprint build logs
 - Create a devbox from the blueprint
 - Execute a command in the devbox
-- Validate exit code and stdout
+- Fetch devbox logs
+- Validate exit code, stdout, and logs
 - Shutdown devbox and delete blueprint
 
 ### Prerequisites
