@@ -4,6 +4,7 @@
  */
 import type { ExampleResult } from './types';
 import { runDevboxFromBlueprintLifecycleExample } from './devbox-from-blueprint-lifecycle';
+import { runDevboxTunnelExample } from './devbox-tunnel';
 import { runMcpGithubToolsExample } from './mcp-github-tools';
 
 export interface ExampleRegistryEntry {
@@ -21,6 +22,13 @@ export const exampleRegistry: ExampleRegistryEntry[] = [
     fileName: 'devbox-from-blueprint-lifecycle.ts',
     requiredEnv: ['RUNLOOP_API_KEY'],
     run: runDevboxFromBlueprintLifecycleExample,
+  },
+  {
+    slug: 'devbox-tunnel',
+    title: 'Devbox Tunnel (HTTP Server Access)',
+    fileName: 'devbox-tunnel.ts',
+    requiredEnv: ['RUNLOOP_API_KEY'],
+    run: runDevboxTunnelExample,
   },
   {
     slug: 'mcp-github-tools',
