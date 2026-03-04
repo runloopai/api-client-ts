@@ -341,6 +341,17 @@ The following runtimes are supported:
 
 If you are interested in other runtime environments, please open or upvote an issue on GitHub.
 
+## Development
+
+After cloning the repository, run the bootstrap script and install git hooks:
+
+```sh
+./scripts/bootstrap
+./scripts/install-hooks
+```
+
+This installs pre-push hooks that run linting and verify generated files are up to date.
+
 ## Contributing
 
 See [the contributing documentation](./CONTRIBUTING.md).
