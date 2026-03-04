@@ -51,7 +51,7 @@ export async function recipe(ctx: RecipeContext): Promise<RecipeOutput> {
   cleanup.add(`devbox:${dbxOriginal.id}`, () => sdk.devbox.fromId(dbxOriginal.id).shutdown());
 
   // Write a file to the original devbox
-  await dbxOriginal.file.write(FILE_PATH, ORIGINAL_CONTENT);
+  await dbxOriginal.file.write({ file_path: FILE_PATH, contents: ORIGINAL_CONTENT });
 
   // Read and display the file contents
   const catOriginalBefore = await dbxOriginal.cmd.exec(`cat ${FILE_PATH}`);
@@ -74,7 +74,7 @@ export async function recipe(ctx: RecipeContext): Promise<RecipeOutput> {
   cleanup.add(`devbox:${dbxClone.id}`, () => sdk.devbox.fromId(dbxClone.id).shutdown());
 
   // Modify the file on the original devbox
-  await dbxOriginal.file.write(FILE_PATH, MODIFIED_CONTENT);
+  await dbxOriginal.file.write({ file_path: FILE_PATH, contents: MODIFIED_CONTENT });
 
   // Read the file contents from both devboxes
   const catClone = await dbxClone.cmd.exec(`cat ${FILE_PATH}`);
