@@ -1134,4 +1134,65 @@ describe('smoketest: object-oriented devbox', () => {
       expect(output).toContain('test');
     });
   });
+
+  describe('devbox logs', () => {
+    let devbox: Devbox;
+
+    beforeAll(async () => {
+      devbox = await sdk.devbox.create({
+        name: uniqueName('sdk-devbox-logs'),
+        launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 },
+      });
+    }, SHORT_TIMEOUT);
+
+    afterAll(async () => {
+      if (devbox) {
+        await devbox.shutdown();
+      }
+    });
+
+    test('logs - basic retrieval', async () => {
+      expect(devbox).toBeDefined();
+
+      // Fetch logs - verifies API returns valid response structure
+      // Logs may be empty depending on timing
+      const logs = await devbox.logs();
+
+      expect(logs).toBeDefined();
+      expect(logs.logs).toBeDefined();
+      expect(Array.isArray(logs.logs)).toBe(true);
+    });
+
+    test('logs - with execution_id filter', async () => {
+      expect(devbox).toBeDefined();
+
+      // Run a command and get its execution ID
+      const execution = await devbox.cmd.execAsync('echo "filtered log test"');
+      const result = await execution.result();
+      expect(result.exitCode).toBe(0);
+
+      // Fetch logs filtered by execution ID - verifies API accepts the filter
+      const logs = await devbox.logs({ execution_id: execution.executionId });
+
+      expect(logs).toBeDefined();
+      expect(Array.isArray(logs.logs)).toBe(true);
+    });
+
+    test('logs - with shell_name filter', async () => {
+      expect(devbox).toBeDefined();
+
+      const shellName = 'test-logs-shell';
+      const shell = devbox.shell(shellName);
+
+      // Run a command in the named shell
+      const result = await shell.exec('echo "shell log test"');
+      expect(result.exitCode).toBe(0);
+
+      // Fetch logs filtered by shell name - verifies API accepts the filter
+      const logs = await devbox.logs({ shell_name: shellName });
+
+      expect(logs).toBeDefined();
+      expect(Array.isArray(logs.logs)).toBe(true);
+    });
+  });
 });

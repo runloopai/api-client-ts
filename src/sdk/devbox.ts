@@ -19,6 +19,7 @@ import type {
   DevboxKeepAliveResponse,
   TunnelView,
 } from '../resources/devboxes/devboxes';
+import type { DevboxLogsListView, LogListParams } from '../resources/devboxes/logs';
 import { PollingOptions } from '../lib/polling';
 import { Snapshot } from './snapshot';
 import { Execution } from './execution';
@@ -869,6 +870,32 @@ export class Devbox {
       throw new RunloopError('No tunnel has been enabled for this devbox. Call net.enableTunnel() first.');
     }
     return `https://${port}-${tunnel.tunnel_key}.tunnel.runloop.ai`;
+  }
+
+  /**
+   * Get all logs from a running or completed devbox.
+   * Optionally filter by execution ID or shell name.
+   *
+   * @example
+   * ```typescript
+   * const logs = await devbox.logs();
+   * for (const log of logs.logs) {
+   *   console.log(`[${log.level}] ${log.message}`);
+   * }
+   *
+   * // Filter by execution ID
+   * const execLogs = await devbox.logs({ execution_id: 'exec-123' });
+   *
+   * // Filter by shell name
+   * const shellLogs = await devbox.logs({ shell_name: 'my-shell' });
+   * ```
+   *
+   * @param {LogListParams} [params] - Optional filter parameters (execution_id, shell_name)
+   * @param {Core.RequestOptions} [options] - Request options
+   * @returns {Promise<DevboxLogsListView>} The devbox logs
+   */
+  async logs(params?: LogListParams, options?: Core.RequestOptions): Promise<DevboxLogsListView> {
+    return this.client.devboxes.logs.list(this._id, params, options);
   }
 
   /**
