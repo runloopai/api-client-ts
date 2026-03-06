@@ -11,6 +11,7 @@ import { NetworkPolicy } from './sdk/network-policy';
 import { GatewayConfig } from './sdk/gateway-config';
 import { McpConfig } from './sdk/mcp-config';
 import { Scenario } from './sdk/scenario';
+import { Secret } from './sdk/secret';
 
 // Import types used in this file
 import type {
@@ -27,6 +28,12 @@ import type { NetworkPolicyCreateParams, NetworkPolicyListParams } from './resou
 import type { GatewayConfigCreateParams, GatewayConfigListParams } from './resources/gateway-configs';
 import type { McpConfigCreateParams, McpConfigListParams } from './resources/mcp-configs';
 import type { ScenarioListParams } from './resources/scenarios/scenarios';
+import type {
+  SecretCreateParams,
+  SecretUpdateParams,
+  SecretListParams,
+  SecretView,
+} from './resources/secrets';
 import { PollingOptions } from './lib/polling';
 import * as Shared from './resources/shared';
 
@@ -57,12 +64,47 @@ export type InlineObjectMount = { [path: string]: StorageObject };
 export type MountInstance = Shared.Mount | InlineObjectMount;
 
 /**
- * Extended DevboxCreateParams that accepts the convenient SDK mount syntax.
+ * SDK-specific gateway spec that accepts Secret objects for credentials.
+ *
+ * @category SDK Types
+ */
+export interface SDKGatewaySpec {
+  /**
+   * The gateway config to use. Can be a gateway config ID (gwc_xxx) or name.
+   */
+  gateway: string;
+
+  /**
+   * The secret containing the credential. Can be a Secret object or string (ID or name).
+   */
+  secret: Secret | string;
+}
+
+/**
+ * SDK-specific MCP spec that accepts Secret objects for credentials.
+ *
+ * @category SDK Types
+ */
+export interface SDKMcpSpec {
+  /**
+   * The MCP config to use. Can be an MCP config ID (mcp_xxx) or name.
+   */
+  mcp_config: string;
+
+  /**
+   * The secret containing the MCP server credential. Can be a Secret object or string (ID or name).
+   */
+  secret: Secret | string;
+}
+
+/**
+ * Extended DevboxCreateParams that accepts the convenient SDK mount syntax and Secret objects.
  * Use this type when creating devboxes through the SDK's DevboxOps.create() method.
  *
  * @category SDK Types
  */
-export interface SDKDevboxCreateParams extends Omit<DevboxCreateParams, 'mounts'> {
+export interface SDKDevboxCreateParams
+  extends Omit<DevboxCreateParams, 'mounts' | 'secrets' | 'gateways' | 'mcp'> {
   /**
    * A list of mounts to be included in the Devbox.
    * Accepts both standard API mount format and the convenient `{ path: StorageObject }` syntax.
@@ -76,6 +118,47 @@ export interface SDKDevboxCreateParams extends Omit<DevboxCreateParams, 'mounts'
    * ```
    */
   mounts?: Array<MountInstance> | null;
+
+  /**
+   * (Optional) Map of environment variable names to secrets. The secret values
+   * will be securely injected as environment variables in the Devbox.
+   * Values can be Secret objects or string names.
+   *
+   * @example
+   * ```typescript
+   * secrets: {
+   *   'DB_PASS': secret,           // Using Secret object
+   *   'API_KEY': 'MY_API_SECRET',  // Using string name
+   * }
+   * ```
+   */
+  secrets?: { [key: string]: Secret | string } | null;
+
+  /**
+   * (Optional) Agent gateway specifications for credential proxying.
+   * The secret field can be a Secret object or string (ID or name).
+   *
+   * @example
+   * ```typescript
+   * gateways: {
+   *   'GWS_ANTHROPIC': { gateway: 'anthropic', secret: mySecret },
+   * }
+   * ```
+   */
+  gateways?: { [key: string]: SDKGatewaySpec } | null;
+
+  /**
+   * [Beta] (Optional) MCP specifications for MCP server access.
+   * The secret field can be a Secret object or string (ID or name).
+   *
+   * @example
+   * ```typescript
+   * mcp: {
+   *   'MCP_SECRET': { mcp_config: 'github-readonly', secret: mySecret },
+   * }
+   * ```
+   */
+  mcp?: { [key: string]: SDKMcpSpec } | null;
 }
 
 /**
@@ -131,8 +214,85 @@ function transformMounts(mounts: Array<MountInstance>): Array<Shared.Mount> {
   });
 }
 
+// ============================================================================
+// SDK-specific secret types for convenient Secret object usage
+// ============================================================================
+
 /**
- * Transforms SDKDevboxCreateParams to DevboxCreateParams by converting SDK mount syntax.
+ * Resolves a Secret object or string name to a string name.
+ * Used internally to normalize secret inputs for API calls.
+ *
+ * @param secret - Secret object or string name
+ * @returns The secret name as a string
+ */
+function resolveSecretName(secret: Secret | string): string {
+  return typeof secret === 'string' ? secret : secret.name;
+}
+
+/**
+ * Transforms SDK secrets map (with Secret objects) to API-compatible format (string names).
+ *
+ * @param secrets - Map of env var names to Secret objects or string names
+ * @returns Map of env var names to string secret names
+ */
+function transformSecrets(
+  secrets: { [key: string]: Secret | string } | null,
+): { [key: string]: string } | null {
+  if (secrets === null) {
+    return null;
+  }
+  return Object.fromEntries(Object.entries(secrets).map(([k, v]) => [k, resolveSecretName(v)]));
+}
+
+/**
+ * Transforms SDK gateway specs (with Secret objects) to API-compatible format.
+ *
+ * @param gateways - Map of gateway specs with Secret objects or string names
+ * @returns Map of gateway specs with string secret names
+ */
+function transformGateways(
+  gateways: { [key: string]: SDKGatewaySpec } | null,
+): { [key: string]: DevboxCreateParams.Gateways } | null {
+  if (gateways === null) {
+    return null;
+  }
+  return Object.fromEntries(
+    Object.entries(gateways).map(([k, v]) => [
+      k,
+      {
+        gateway: v.gateway,
+        secret: resolveSecretName(v.secret),
+      },
+    ]),
+  );
+}
+
+/**
+ * Transforms SDK MCP specs (with Secret objects) to API-compatible format.
+ *
+ * @param mcp - Map of MCP specs with Secret objects or string names
+ * @returns Map of MCP specs with string secret names
+ */
+function transformMcp(
+  mcp: { [key: string]: SDKMcpSpec } | null,
+): { [key: string]: DevboxCreateParams.Mcp } | null {
+  if (mcp === null) {
+    return null;
+  }
+  return Object.fromEntries(
+    Object.entries(mcp).map(([k, v]) => [
+      k,
+      {
+        mcp_config: v.mcp_config,
+        secret: resolveSecretName(v.secret),
+      },
+    ]),
+  );
+}
+
+/**
+ * Transforms SDKDevboxCreateParams to DevboxCreateParams by converting SDK-specific types.
+ * Handles mounts (StorageObject), secrets (Secret objects), gateways, and mcp.
  *
  * @param params - SDK devbox creation parameters
  * @returns API-compatible devbox creation parameters
@@ -142,27 +302,36 @@ function transformSDKDevboxCreateParams(params?: SDKDevboxCreateParams): DevboxC
     return undefined;
   }
 
-  // Extract mounts and rest of params
-  const { mounts, ...rest } = params;
+  // Extract SDK-specific fields
+  const { mounts, secrets, gateways, mcp, ...rest } = params;
 
-  // If mounts is undefined, don't include it in the result (preserves the optional property)
-  if (mounts === undefined) {
-    return rest as DevboxCreateParams;
+  const result: DevboxCreateParams = { ...rest };
+
+  // Transform mounts if provided
+  if (mounts !== undefined) {
+    if (mounts === null || mounts.length === 0) {
+      result.mounts = mounts as Array<Shared.Mount> | null;
+    } else {
+      result.mounts = transformMounts(mounts);
+    }
   }
 
-  // If mounts is null or empty array, pass through as-is with correct type
-  if (mounts === null || mounts.length === 0) {
-    return {
-      ...rest,
-      mounts: mounts as Array<Shared.Mount> | null,
-    };
+  // Transform secrets if provided
+  if (secrets !== undefined) {
+    result.secrets = transformSecrets(secrets);
   }
 
-  // Transform non-empty mounts array
-  return {
-    ...rest,
-    mounts: transformMounts(mounts),
-  };
+  // Transform gateways if provided
+  if (gateways !== undefined) {
+    result.gateways = transformGateways(gateways);
+  }
+
+  // Transform mcp if provided
+  if (mcp !== undefined) {
+    result.mcp = transformMcp(mcp);
+  }
+
+  return result;
 }
 
 export * from './index';
@@ -204,19 +373,9 @@ type ContentType = ObjectCreateParams['content_type'];
  * - `networkPolicy` - {@link NetworkPolicyOps}
  * - `gatewayConfig` - {@link GatewayConfigOps}
  * - `mcpConfig` - {@link McpConfigOps}
+ * - `secret` - {@link SecretOps}
  *
  * See the documentation for each Operations class for more details.
- *
- * ## Use the HTTP API directly
- * This is useful when you need to access features not yet exposed through the high-level interfaces.
- *
- * See the {@link RunloopAPI} for the Runloop class for more details.
- *
- * ```typescript
- * const runloop = new RunloopSDK();
- * const createResult = await runloop.api.secrets.create({ name: 'my-secret', value: 'my-secret-value' });
- * console.log(createResult.name);
- * ```
  *
  */
 export class RunloopSDK {
@@ -317,6 +476,14 @@ export class RunloopSDK {
   public readonly scenario: ScenarioOps;
 
   /**
+   * **Secret Operations** - {@link SecretOps} for managing secrets.
+   *
+   * Secrets are encrypted key-value pairs that can be injected into devboxes as environment
+   * variables. Use these operations to create, update, list, and delete secrets.
+   */
+  public readonly secret: SecretOps;
+
+  /**
    * Creates a new RunloopSDK instance.
    * @param {ClientOptions} [options] - Optional client configuration options.
    */
@@ -332,6 +499,7 @@ export class RunloopSDK {
     this.gatewayConfig = new GatewayConfigOps(this.api);
     this.mcpConfig = new McpConfigOps(this.api);
     this.scenario = new ScenarioOps(this.api);
+    this.secret = new SecretOps(this.api);
   }
 }
 
@@ -1843,6 +2011,174 @@ export class ScenarioOps {
   }
 }
 
+/**
+ * Secret SDK interface for managing secrets.
+ *
+ * @category Secret
+ *
+ * @remarks
+ * ## Overview
+ *
+ * The `SecretOps` class provides methods for managing secrets, which are encrypted key-value
+ * pairs that can be injected into devboxes as environment variables. Secrets are identified
+ * by their globally unique name.
+ *
+ * ## Usage
+ *
+ * This interface is accessed via {@link RunloopSDK.secret}. You should construct
+ * a {@link RunloopSDK} instance and use it from there:
+ *
+ * @example
+ * ```typescript
+ * const runloop = new RunloopSDK();
+ *
+ * // Create a secret
+ * const secret = await runloop.secret.create({
+ *   name: 'MY_API_KEY',
+ *   value: process.env.SOME_API_KEY,
+ * });
+ *
+ * // Use the secret object directly in a devbox
+ * const devbox = await runloop.devbox.create({
+ *   name: 'my-devbox',
+ *   secrets: { 'API_KEY': secret },  // Can use Secret object or string name
+ * });
+ *
+ * // The secret is now available as $API_KEY in the devbox
+ * const result = await devbox.cmd.exec('echo $API_KEY');
+ * ```
+ */
+export class SecretOps {
+  /**
+   * @private
+   */
+  constructor(private client: RunloopAPI) {}
+
+  /**
+   * Create a new secret.
+   *
+   * @example
+   * ```typescript
+   * const runloop = new RunloopSDK();
+   * const secret = await runloop.secret.create({
+   *   name: 'DATABASE_PASSWORD',
+   *   value: 'my-secure-password',
+   * });
+   * console.log(`Created secret: ${secret.name}`);
+   * ```
+   *
+   * @param {SecretCreateParams} params - Parameters for creating the secret.
+   * @param {Core.RequestOptions} [options] - Request options.
+   * @returns {Promise<Secret>} The created {@link Secret} instance.
+   */
+  async create(params: SecretCreateParams, options?: Core.RequestOptions): Promise<Secret> {
+    const view = await this.client.secrets.create(params, options);
+    return Secret.fromView(this.client, view);
+  }
+
+  /**
+   * Get a Secret instance by name without making an API call.
+   * Use getInfo() on the returned Secret to fetch the actual data.
+   *
+   * @example
+   * ```typescript
+   * const runloop = new RunloopSDK();
+   * const secret = runloop.secret.fromName('MY_API_KEY');
+   * const info = await secret.getInfo();
+   * console.log(`Secret ID: ${info.id}`);
+   * ```
+   *
+   * @param {string} name - The globally unique name of the secret.
+   * @returns {Secret} A {@link Secret} instance.
+   */
+  fromName(name: string): Secret {
+    return Secret.fromName(this.client, name);
+  }
+
+  /**
+   * Update an existing secret's value.
+   *
+   * @example
+   * ```typescript
+   * const runloop = new RunloopSDK();
+   * // Using a secret name string
+   * const updated = await runloop.secret.update('DATABASE_PASSWORD', {
+   *   value: 'my-new-password',
+   * });
+   *
+   * // Or using a Secret object
+   * const secret = runloop.secret.fromName('DATABASE_PASSWORD');
+   * const updated2 = await runloop.secret.update(secret, {
+   *   value: 'another-new-password',
+   * });
+   * ```
+   *
+   * @param {Secret | string} secret - The secret to update (Secret object or name string).
+   * @param {SecretUpdateParams} params - Parameters for updating the secret.
+   * @param {Core.RequestOptions} [options] - Request options.
+   * @returns {Promise<Secret>} The updated {@link Secret} instance.
+   */
+  async update(
+    secret: Secret | string,
+    params: SecretUpdateParams,
+    options?: Core.RequestOptions,
+  ): Promise<Secret> {
+    const name = resolveSecretName(secret);
+    const view = await this.client.secrets.update(name, params, options);
+    return Secret.fromView(this.client, view);
+  }
+
+  /**
+   * List all secrets.
+   *
+   * @example
+   * ```typescript
+   * const runloop = new RunloopSDK();
+   * const secrets = await runloop.secret.list();
+   * for (const secret of secrets) {
+   *   console.log(`${secret.name}`);
+   * }
+   * ```
+   *
+   * @example
+   * ```typescript
+   * // With pagination
+   * const secrets = await runloop.secret.list({ limit: 10 });
+   * ```
+   *
+   * @param {SecretListParams} [params] - Optional filter parameters.
+   * @param {Core.RequestOptions} [options] - Request options.
+   * @returns {Promise<Secret[]>} An array of {@link Secret} instances.
+   */
+  async list(params?: SecretListParams, options?: Core.RequestOptions): Promise<Secret[]> {
+    const result = await this.client.secrets.list(params, options);
+    return result.secrets.map((view) => Secret.fromView(this.client, view));
+  }
+
+  /**
+   * Delete a secret.
+   *
+   * @example
+   * ```typescript
+   * const runloop = new RunloopSDK();
+   * // Using a secret name string
+   * const deleted = await runloop.secret.delete('DATABASE_PASSWORD');
+   *
+   * // Or using a Secret object
+   * const secret = runloop.secret.fromName('MY_SECRET');
+   * await runloop.secret.delete(secret);
+   * ```
+   *
+   * @param {Secret | string} secret - The secret to delete (Secret object or name string).
+   * @param {Core.RequestOptions} [options] - Request options.
+   * @returns {Promise<SecretView>} The deleted secret metadata.
+   */
+  async delete(secret: Secret | string, options?: Core.RequestOptions): Promise<SecretView> {
+    const name = resolveSecretName(secret);
+    return this.client.secrets.delete(name, {}, options);
+  }
+}
+
 // @deprecated Use {@link RunloopSDK} instead.
 /**
  * @deprecated Use {@link RunloopSDK} instead.
@@ -1868,6 +2204,7 @@ export declare namespace RunloopSDK {
     GatewayConfigOps as GatewayConfigOps,
     McpConfigOps as McpConfigOps,
     ScenarioOps as ScenarioOps,
+    SecretOps as SecretOps,
     Devbox as Devbox,
     Blueprint as Blueprint,
     Snapshot as Snapshot,
@@ -1877,6 +2214,7 @@ export declare namespace RunloopSDK {
     NetworkPolicy as NetworkPolicy,
     GatewayConfig as GatewayConfig,
     McpConfig as McpConfig,
+    Secret as Secret,
     Scenario as Scenario,
   };
 }
@@ -1894,6 +2232,7 @@ export {
   Scorer,
   NetworkPolicy,
   McpConfig,
+  Secret,
   Execution,
   ExecutionResult,
   Scenario,

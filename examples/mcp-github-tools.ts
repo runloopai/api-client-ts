@@ -78,14 +78,13 @@ export async function recipe(ctx: RecipeContext, options: McpExampleOptions): Pr
   cleanup.add(`mcp_config:${mcpConfig.id}`, () => sdk.mcpConfig.fromId(mcpConfig.id).delete());
 
   // Store the GitHub PAT as a Runloop secret
-  // Note: secrets are currently available via sdk.api, not sdk.secret ops
-  const secretName = uniqueName('example-github-mcp');
-  await sdk.api.secrets.create({
+  const secretName = 'GITHUB_MCP_EXAMPLE';
+  const secret = await sdk.secret.create({
     name: secretName,
     value: githubToken,
   });
   resourcesCreated.push(`secret:${secretName}`);
-  cleanup.add(`secret:${secretName}`, () => sdk.api.secrets.delete(secretName));
+  cleanup.add(`secret:${secretName}`, () => secret.delete());
 
   // Launch a devbox with MCP Hub wiring
   const devbox = await sdk.devbox.create({
@@ -97,7 +96,7 @@ export async function recipe(ctx: RecipeContext, options: McpExampleOptions): Pr
     mcp: {
       MCP_SECRET: {
         mcp_config: mcpConfig.id,
-        secret: secretName,
+        secret: secret,
       },
     },
   });

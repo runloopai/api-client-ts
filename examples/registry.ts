@@ -6,6 +6,7 @@ import type { ExampleResult } from './types';
 import { runBlueprintWithBuildContextExample } from './blueprint-with-build-context';
 import { runDevboxFromBlueprintLifecycleExample } from './devbox-from-blueprint-lifecycle';
 import { runMcpGithubToolsExample } from './mcp-github-tools';
+import { runSecretsWithDevboxExample } from './secrets-with-devbox';
 
 export interface ExampleRegistryEntry {
   slug: string;
@@ -36,5 +37,12 @@ export const exampleRegistry: ExampleRegistryEntry[] = [
     fileName: 'mcp-github-tools.ts',
     requiredEnv: ['RUNLOOP_API_KEY', 'GITHUB_TOKEN', 'ANTHROPIC_API_KEY'],
     run: runMcpGithubToolsExample,
+  },
+  {
+    slug: 'secrets-with-devbox',
+    title: 'Secrets with Devbox (Create, Inject, Verify, Delete)',
+    fileName: 'secrets-with-devbox.ts',
+    requiredEnv: ['RUNLOOP_API_KEY'],
+    run: runSecretsWithDevboxExample,
   },
 ];

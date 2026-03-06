@@ -204,7 +204,7 @@ describe('smoketest: object-oriented gateway config', () => {
 
         try {
           // Create a secret for this test
-          await sdk.api.secrets.create({
+          await sdk.secret.create({
             name: testSecretName,
             value: 'test-secret-value-for-gateway',
           });
@@ -267,7 +267,7 @@ describe('smoketest: object-oriented gateway config', () => {
           await cleanUpGatewayConfig(gatewayConfig);
           // Clean up the secret
           try {
-            await sdk.api.secrets.delete(testSecretName);
+            await sdk.secret.delete(testSecretName);
           } catch {
             // Ignore if already deleted
           }
@@ -342,7 +342,7 @@ describe('smoketest: object-oriented gateway config', () => {
           description: 'Allow all traffic for comprehensive gateway tests',
         });
 
-        await sdk.api.secrets.create({
+        await sdk.secret.create({
           name: testSecretName,
           value: runloopApiKey!,
         });
@@ -391,7 +391,7 @@ describe('smoketest: object-oriented gateway config', () => {
         await cleanUpPolicy(networkPolicy);
 
         try {
-          await sdk.api.secrets.delete(testSecretName);
+          await sdk.secret.delete(testSecretName);
         } catch {
           // Ignore
         }
@@ -746,7 +746,7 @@ describe('smoketest: object-oriented gateway config', () => {
         });
 
         // Create secret for gateway auth
-        await sdk.api.secrets.create({
+        await sdk.secret.create({
           name: testSecretName,
           value: runloopApiKey!,
         });
@@ -796,7 +796,7 @@ describe('smoketest: object-oriented gateway config', () => {
         await cleanUpGatewayConfig(gatewayConfig);
         await cleanUpPolicy(networkPolicy);
         try {
-          await sdk.api.secrets.delete(testSecretName);
+          await sdk.secret.delete(testSecretName);
         } catch {
           // Ignore
         }
@@ -874,7 +874,7 @@ describe('smoketest: object-oriented gateway config', () => {
 
         // Clean up the created secret
         try {
-          await sdk.api.secrets.delete(secretName);
+          await sdk.secret.delete(secretName);
         } catch {
           // Ignore
         }
