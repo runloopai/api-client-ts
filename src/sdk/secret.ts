@@ -40,11 +40,13 @@ import type { SecretView, SecretUpdateParams } from '../resources/secrets';
  */
 export class Secret {
   private client: Runloop;
+  private _id: string | undefined;
   private _name: string;
 
-  private constructor(client: Runloop, name: string) {
+  private constructor(client: Runloop, name: string, id?: string) {
     this.client = client;
     this._name = name;
+    this._id = id;
   }
 
   /**
@@ -58,7 +60,7 @@ export class Secret {
    * @returns {Secret} A {@link Secret} instance
    */
   static fromView(client: Runloop, view: SecretView): Secret {
-    return new Secret(client, view.name);
+    return new Secret(client, view.name, view.id);
   }
 
   /**
@@ -82,6 +84,14 @@ export class Secret {
    */
   static fromName(client: Runloop, name: string): Secret {
     return new Secret(client, name);
+  }
+
+  /**
+   * Get the secret ID.
+   * @returns {string | undefined} The secret ID, or undefined if not yet fetched from API
+   */
+  get id(): string | undefined {
+    return this._id;
   }
 
   /**
