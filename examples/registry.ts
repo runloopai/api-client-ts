@@ -5,6 +5,7 @@
 import type { ExampleResult } from './types';
 import { runBlueprintWithBuildContextExample } from './blueprint-with-build-context';
 import { runDevboxFromBlueprintLifecycleExample } from './devbox-from-blueprint-lifecycle';
+import { runDevboxSnapshotResumeExample } from './devbox-snapshot-resume';
 import { runMcpGithubToolsExample } from './mcp-github-tools';
 import { runSecretsWithDevboxExample } from './secrets-with-devbox';
 
@@ -30,6 +31,13 @@ export const exampleRegistry: ExampleRegistryEntry[] = [
     fileName: 'devbox-from-blueprint-lifecycle.ts',
     requiredEnv: ['RUNLOOP_API_KEY'],
     run: runDevboxFromBlueprintLifecycleExample,
+  },
+  {
+    slug: 'devbox-snapshot-resume',
+    title: 'Devbox Snapshot and Resume',
+    fileName: 'devbox-snapshot-resume.ts',
+    requiredEnv: ['RUNLOOP_API_KEY'],
+    run: runDevboxSnapshotResumeExample,
   },
   {
     slug: 'mcp-github-tools',
