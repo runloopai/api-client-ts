@@ -9,6 +9,7 @@ Runnable examples live in [`examples/`](./examples).
 
 - [Blueprint with Build Context](#blueprint-with-build-context)
 - [Devbox From Blueprint (Run Command, Shutdown)](#devbox-from-blueprint-lifecycle)
+- [Devbox Tunnel (HTTP Server Access)](#devbox-tunnel)
 - [MCP Hub + Claude Code + GitHub](#mcp-github-tools)
 - [Secrets with Devbox (Create, Inject, Verify, Delete)](#secrets-with-devbox)
 
@@ -72,6 +73,36 @@ yarn test:examples
 ```
 
 **Source:** [`examples/devbox-from-blueprint-lifecycle.ts`](./examples/devbox-from-blueprint-lifecycle.ts)
+
+<a id="devbox-tunnel"></a>
+## Devbox Tunnel (HTTP Server Access)
+
+**Use case:** Create a devbox, start an HTTP server, enable a tunnel, and access the server from the local machine through the tunnel.
+
+**Tags:** `devbox`, `tunnel`, `networking`, `http`
+
+### Workflow
+- Create a devbox
+- Start an HTTP server inside the devbox
+- Enable a tunnel for external access
+- Make an HTTP request from the local machine through the tunnel
+- Validate the response
+- Shutdown the devbox
+
+### Prerequisites
+- `RUNLOOP_API_KEY`
+
+### Run
+```sh
+yarn tsn -T examples/devbox-tunnel.ts
+```
+
+### Test
+```sh
+yarn test:examples
+```
+
+**Source:** [`examples/devbox-tunnel.ts`](./examples/devbox-tunnel.ts)
 
 <a id="mcp-github-tools"></a>
 ## MCP Hub + Claude Code + GitHub
