@@ -3,6 +3,7 @@
  * Do not edit manually.
  */
 import type { ExampleResult } from './types';
+import { runBlueprintWithBuildContextExample } from './blueprint-with-build-context';
 import { runDevboxFromBlueprintLifecycleExample } from './devbox-from-blueprint-lifecycle';
 import { runMcpGithubToolsExample } from './mcp-github-tools';
 
@@ -15,6 +16,13 @@ export interface ExampleRegistryEntry {
 }
 
 export const exampleRegistry: ExampleRegistryEntry[] = [
+  {
+    slug: 'blueprint-with-build-context',
+    title: 'Blueprint with Build Context',
+    fileName: 'blueprint-with-build-context.ts',
+    requiredEnv: ['RUNLOOP_API_KEY'],
+    run: runBlueprintWithBuildContextExample,
+  },
   {
     slug: 'devbox-from-blueprint-lifecycle',
     title: 'Devbox From Blueprint (Run Command, Shutdown)',
