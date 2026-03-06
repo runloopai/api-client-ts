@@ -14,6 +14,13 @@ export class Secrets extends APIResource {
   }
 
   /**
+   * Retrieve a Secret by name.
+   */
+  retrieve(name: string, options?: Core.RequestOptions): Core.APIPromise<SecretView> {
+    return this._client.get(`/v1/secrets/${name}`, options);
+  }
+
+  /**
    * Update the value of an existing Secret by name. The new value will be encrypted
    * at rest.
    */

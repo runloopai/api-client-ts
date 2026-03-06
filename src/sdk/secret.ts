@@ -108,12 +108,7 @@ export class Secret {
    * @returns {Promise<SecretView>} The secret data (value is not included)
    */
   async getInfo(options?: Core.RequestOptions): Promise<SecretView> {
-    const result = await this.client.secrets.list({ limit: 5000 }, options);
-    const secret = result.secrets.find((s) => s.name === this._name);
-    if (!secret) {
-      throw new Error(`Secret not found: ${this._name}`);
-    }
-    return secret;
+    return this.client.secrets.retrieve(this._name, options);
   }
 
   /**
