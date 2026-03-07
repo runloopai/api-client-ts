@@ -1,5 +1,32 @@
 # Changelog
 
+## 1.11.0 (2026-03-07)
+
+Full Changelog: [v1.10.3...v1.11.0](https://github.com/runloopai/api-client-ts/compare/v1.10.3...v1.11.0)
+
+### Features
+
+* **documentation:** added self-documenting examples ([#733](https://github.com/runloopai/api-client-ts/issues/733)) ([c11402d](https://github.com/runloopai/api-client-ts/commit/c11402d2c8e8493dd05dad63316280921429ee94))
+* **sdk:** added secrets as first class concepts and examples ([#739](https://github.com/runloopai/api-client-ts/issues/739)) ([c82944a](https://github.com/runloopai/api-client-ts/commit/c82944a8ffd5342073c247edad72a7ddf69490b7))
+
+
+### Bug Fixes
+
+* add logs to devboxes, smoke tests & examples ([#742](https://github.com/runloopai/api-client-ts/issues/742)) ([0462122](https://github.com/runloopai/api-client-ts/commit/04621224e5dde6fef942da969fbed84f19053066))
+* **client:** preserve URL params already embedded in path ([92c35e9](https://github.com/runloopai/api-client-ts/commit/92c35e97ebb145209534a2ac58b8fd096e2deb2c))
+
+
+### Chores
+
+* **ci:** skip uploading artifacts on stainless-internal branches ([5bd0aaf](https://github.com/runloopai/api-client-ts/commit/5bd0aaf1b89da36f80065f5129292d971f74440b))
+* **documentation:** correct exec advice ([#738](https://github.com/runloopai/api-client-ts/issues/738)) ([4d9624c](https://github.com/runloopai/api-client-ts/commit/4d9624c80bfa4ab1f8490ca093307c0d961a930d))
+* **documentation:** fix some broken links and bad example code ([#736](https://github.com/runloopai/api-client-ts/issues/736)) ([842c9bc](https://github.com/runloopai/api-client-ts/commit/842c9bc2ec33aba85ec4b943ebfe86527ec49d05))
+* fix smoketest tunnel removal ([#735](https://github.com/runloopai/api-client-ts/issues/735)) ([2b15fa6](https://github.com/runloopai/api-client-ts/commit/2b15fa6f9ea185256d8a2b25008643b12dd6b732))
+* **internal:** codegen related update ([abca1f3](https://github.com/runloopai/api-client-ts/commit/abca1f3dc468ae6b265770cb18a8103196f95e13))
+* shard smoketests in workflow ([#743](https://github.com/runloopai/api-client-ts/issues/743)) ([ea55929](https://github.com/runloopai/api-client-ts/commit/ea5592921982a98baaf6766d934f0a2cec079178))
+* **test:** do not count install time for mock server timeout ([5555c20](https://github.com/runloopai/api-client-ts/commit/5555c20d519aecc070e18d2502a4d33d93298899))
+* update placeholder string ([a3b0fb2](https://github.com/runloopai/api-client-ts/commit/a3b0fb2fb93878f15eaa19dfae63d70b86542c9a))
+
 ## 1.10.3 (2026-02-27)
 
 Full Changelog: [v1.10.2...v1.10.3](https://github.com/runloopai/api-client-ts/compare/v1.10.2...v1.10.3)
