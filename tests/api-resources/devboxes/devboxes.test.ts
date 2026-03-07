@@ -548,7 +548,7 @@ describe('resource devboxes', () => {
   test('uploadFile: required and optional params', async () => {
     const response = await client.devboxes.uploadFile('id', {
       path: 'path',
-      file: await toFile(Buffer.from('# my file contents'), 'README.md'),
+      file: await toFile(Buffer.from('Example data'), 'README.md'),
     });
   });
 
