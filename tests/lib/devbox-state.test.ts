@@ -61,7 +61,7 @@ describe('awaitDevboxState', () => {
 
   test('should enforce timeout mid-request via Promise.race', async () => {
     const post = jest.fn().mockImplementation(
-      () => new Promise((resolve) => setTimeout(() => resolve({ status: 'provisioning', id: 'dbx-123' }), 5000)),
+      () => new Promise((resolve) => { setTimeout(() => resolve({ status: 'provisioning', id: 'dbx-123' }), 5000).unref(); }),
     );
 
     const start = Date.now();

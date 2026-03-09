@@ -488,7 +488,7 @@ describe('longPollUntil', () => {
 
   test('should enforce timeout mid-request via Promise.race', async () => {
     const request = jest.fn().mockImplementation(
-      () => new Promise((resolve) => setTimeout(() => resolve({ status: 'provisioning' }), 5000)),
+      () => new Promise((resolve) => { setTimeout(() => resolve({ status: 'provisioning' }), 5000).unref(); }),
     );
 
     const start = Date.now();
@@ -588,7 +588,7 @@ describe('longPollUntil', () => {
   test('should throw LongPollAbortError when signal is aborted mid-request', async () => {
     const controller = new AbortController();
     const request = jest.fn().mockImplementation(
-      () => new Promise((resolve) => setTimeout(() => resolve({ status: 'provisioning' }), 5000)),
+      () => new Promise((resolve) => { setTimeout(() => resolve({ status: 'provisioning' }), 5000).unref(); }),
     );
 
     const start = Date.now();
@@ -629,7 +629,7 @@ describe('longPollUntil', () => {
     const request = jest.fn().mockImplementation(() => {
       callCount++;
       if (callCount === 2) {
-        return new Promise((resolve) => setTimeout(() => resolve({ status: 'provisioning' }), 5000));
+        return new Promise((resolve) => { setTimeout(() => resolve({ status: 'provisioning' }), 5000).unref(); });
       }
       return Promise.resolve(provisioning);
     });
@@ -652,7 +652,7 @@ describe('longPollUntil', () => {
   test('abort signal should work together with timeoutMs', async () => {
     const controller = new AbortController();
     const request = jest.fn().mockImplementation(
-      () => new Promise((resolve) => setTimeout(() => resolve({ status: 'provisioning' }), 5000)),
+      () => new Promise((resolve) => { setTimeout(() => resolve({ status: 'provisioning' }), 5000).unref(); }),
     );
 
     setTimeout(() => controller.abort(), 50);

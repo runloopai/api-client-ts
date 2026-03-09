@@ -717,7 +717,7 @@ describe('resource devboxes', () => {
       };
       mockPost.mockResolvedValueOnce(executeResponse);
 
-      // Mock the waitForCommand call to return completed status (both initial and polling calls)
+      // Mock the waitForCommand call to return completed status
       const waitForCommandResponse = {
         devbox_id: 'devbox-123',
         execution_id: 'exec-123',
@@ -729,24 +729,15 @@ describe('resource devboxes', () => {
       };
       mockPost.mockResolvedValueOnce(waitForCommandResponse);
 
-      const result = await client.devboxes.executeAndAwaitCompletion(
-        'devbox-123',
-        {
-          command: 'echo hello',
-          last_n: '10', // This should be passed to waitForCommand
-        },
-        {
-          polling: {
-            maxAttempts: 1,
-            pollingIntervalMs: 10,
-          },
-        },
-      );
+      const result = await client.devboxes.executeAndAwaitCompletion('devbox-123', {
+        command: 'echo hello',
+        last_n: '10', // This should be passed to waitForCommand
+      });
 
       expect(result.status).toBe('completed');
       expect(result.execution_id).toBe('exec-123');
 
-      // Verify execute was called
+      // Verify execute was called (longPoll options are stripped before passing to execute)
       expect(mockPost).toHaveBeenCalledTimes(2); // execute + waitForCommand
       expect(mockPost).toHaveBeenNthCalledWith(1, '/v1/devboxes/devbox-123/execute', {
         body: expect.objectContaining({
@@ -754,10 +745,6 @@ describe('resource devboxes', () => {
           command_id: expect.any(String),
         }),
         query: { last_n: '10' },
-        polling: {
-          maxAttempts: 1,
-          pollingIntervalMs: 10,
-        },
         timeout: 600000,
       });
 
@@ -788,7 +775,7 @@ describe('resource devboxes', () => {
     };
     mockPost.mockResolvedValueOnce(executeResponse);
 
-    // Mock the waitForCommand call to return completed status (both initial and polling calls)
+    // Mock the waitForCommand call to return completed status
     const waitForCommandResponse = {
       devbox_id: 'devbox-123',
       execution_id: 'exec-123',
@@ -800,24 +787,15 @@ describe('resource devboxes', () => {
     };
     mockPost.mockResolvedValueOnce(waitForCommandResponse);
 
-    const result = await client.devboxes.executeAndAwaitCompletion(
-      'devbox-123',
-      {
-        command: 'echo hello',
-        // No last_n parameter
-      },
-      {
-        polling: {
-          maxAttempts: 1,
-          pollingIntervalMs: 10,
-        },
-      },
-    );
+    const result = await client.devboxes.executeAndAwaitCompletion('devbox-123', {
+      command: 'echo hello',
+      // No last_n parameter
+    });
 
     expect(result.status).toBe('completed');
     expect(result.execution_id).toBe('exec-123');
 
-    // Verify execute was called
+    // Verify execute was called (longPoll options are stripped before passing to execute)
     expect(mockPost).toHaveBeenCalledTimes(2); // execute + waitForCommand
     expect(mockPost).toHaveBeenNthCalledWith(1, '/v1/devboxes/devbox-123/execute', {
       body: expect.objectContaining({
@@ -825,10 +803,6 @@ describe('resource devboxes', () => {
         command_id: expect.any(String),
       }),
       query: { last_n: undefined },
-      polling: {
-        maxAttempts: 1,
-        pollingIntervalMs: 10,
-      },
       timeout: 600000,
     });
 
