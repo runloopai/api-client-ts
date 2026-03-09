@@ -21,7 +21,7 @@ describe('smoketest: executions', () => {
           launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 }, // 5 minutes
         },
         {
-          polling: { maxAttempts: 120, pollingIntervalMs: 5_000, timeoutMs: 20 * 60 * 1000 },
+          longPoll: { timeoutMs: 20 * 60 * 1000 },
         },
       );
       devboxId = created.id;
@@ -29,13 +29,13 @@ describe('smoketest: executions', () => {
     SHORT_TIMEOUT,
   );
 
-  test('execute async and await completion', async () => {
+  test('execute async and await completion (deprecated polling path)', async () => {
     const started = await client.devboxes.executions.executeAsync(devboxId!, {
       command: 'echo hello && sleep 1',
     });
     execId = started.execution_id;
     const completed = await client.devboxes.executions.awaitCompleted(devboxId!, execId!, {
-      polling: { maxAttempts: 120, pollingIntervalMs: 2_000, timeoutMs: 10 * 60 * 1000 },
+      polling: { timeoutMs: 10 * 60 * 1000 },
     });
     expect(completed.status).toBe('completed');
   });
@@ -57,7 +57,7 @@ describe('smoketest: executions', () => {
     });
     const stderrExecId = stderrExec.execution_id;
     await client.devboxes.executions.awaitCompleted(devboxId!, stderrExecId, {
-      polling: { maxAttempts: 120, pollingIntervalMs: 2_000, timeoutMs: 10 * 60 * 1000 },
+      longPoll: { timeoutMs: 10 * 60 * 1000 },
     });
 
     const stream = await client.devboxes.executions.streamStderrUpdates(devboxId!, stderrExecId, {});
@@ -91,7 +91,6 @@ describe('smoketest: executions', () => {
   test(
     'executeAndAwaitCompletion timeout',
     async () => {
-      // Use polling options
       await expect(
         client.devboxes.executeAndAwaitCompletion(
           devboxId!,
@@ -99,7 +98,7 @@ describe('smoketest: executions', () => {
             command: 'sleep 30',
           },
           {
-            polling: { pollingIntervalMs: 100, maxAttempts: 1, timeoutMs: 3000 },
+            longPoll: { timeoutMs: 3000 },
           },
         ),
       ).rejects.toThrow();

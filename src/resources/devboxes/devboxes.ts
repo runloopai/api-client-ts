@@ -47,7 +47,7 @@ import {
   type DiskSnapshotsCursorIDPageParams,
 } from '../../pagination';
 import { type Response } from '../../_shims/index';
-import { longPollUntil, PollingOptions } from '@runloop/api-client/lib/polling';
+import { longPollUntil, LongPollRequestOptions, PollingOptions } from '@runloop/api-client/lib/polling';
 import { awaitDevboxState } from '@runloop/api-client/lib/devbox-state';
 import { DevboxTools } from './tools';
 import { uuidv7 } from 'uuidv7';
@@ -93,26 +93,16 @@ export class Devboxes extends APIResource {
    * Long Polls the devbox status until it reaches running state.
    *
    * @param id - Devbox ID
-   * @param options - request options.
-   * @param options.timeoutMs - Timeout in milliseconds for the long-poll operation.
-   * @param options.polling - @deprecated Only `polling.timeoutMs` is used; all other PollingOptions fields are ignored. Use `timeoutMs` instead.
+   * @param options - request options with optional long-poll configuration.
    */
-  async awaitRunning(
-    id: string,
-    options?: Core.RequestOptions & {
-      /** Timeout in milliseconds for the long-poll operation. */
-      timeoutMs?: number;
-      /** @deprecated Use `timeoutMs` instead. Only `timeoutMs` is extracted; other fields are ignored for long-poll endpoints. */
-      polling?: Partial<PollingOptions<DevboxView>>;
-    },
-  ): Promise<DevboxView> {
+  async awaitRunning(id: string, options?: LongPollRequestOptions<DevboxView>): Promise<DevboxView> {
     return awaitDevboxState<DevboxView>({
       client: this._client,
       devboxId: id,
       targetState: 'running',
       statesToCheck: ['running', 'failure', 'shutdown'],
       transitionStates: DEVBOX_BOOTING_STATES,
-      timeoutMs: options?.timeoutMs ?? options?.polling?.timeoutMs,
+      timeoutMs: options?.longPoll?.timeoutMs ?? options?.polling?.timeoutMs,
       pollingOptions: options?.polling as Partial<PollingOptions<DevboxView>> | undefined,
       errorMessage: (devboxId, actualState) => `Devbox ${devboxId} is in non-running state ${actualState}`,
     });
@@ -123,26 +113,16 @@ export class Devboxes extends APIResource {
    * Long Polls the devbox status until it reaches suspended state.
    *
    * @param id - Devbox ID
-   * @param options - request options.
-   * @param options.timeoutMs - Timeout in milliseconds for the long-poll operation.
-   * @param options.polling - @deprecated Only `polling.timeoutMs` is used; all other PollingOptions fields are ignored. Use `timeoutMs` instead.
+   * @param options - request options with optional long-poll configuration.
    */
-  async awaitSuspended(
-    id: string,
-    options?: Core.RequestOptions & {
-      /** Timeout in milliseconds for the long-poll operation. */
-      timeoutMs?: number;
-      /** @deprecated Use `timeoutMs` instead. Only `timeoutMs` is extracted; other fields are ignored for long-poll endpoints. */
-      polling?: Partial<PollingOptions<DevboxView>>;
-    },
-  ): Promise<DevboxView> {
+  async awaitSuspended(id: string, options?: LongPollRequestOptions<DevboxView>): Promise<DevboxView> {
     return awaitDevboxState<DevboxView>({
       client: this._client,
       devboxId: id,
       targetState: 'suspended',
       statesToCheck: ['suspended', 'failure', 'shutdown'],
       transitionStates: ['suspending'],
-      timeoutMs: options?.timeoutMs ?? options?.polling?.timeoutMs,
+      timeoutMs: options?.longPoll?.timeoutMs ?? options?.polling?.timeoutMs,
       pollingOptions: options?.polling as Partial<PollingOptions<DevboxView>> | undefined,
       errorMessage: (devboxId, actualState) => `Devbox ${devboxId} is in non-suspended state ${actualState}`,
     });
@@ -153,20 +133,14 @@ export class Devboxes extends APIResource {
    * This is a convenience method that combines create() and awaitDevboxRunning().
    *
    * @param body - DevboxCreateParams
-   * @param options - request options.
-   * @param options.timeoutMs - Timeout in milliseconds for the long-poll operation.
-   * @param options.polling - @deprecated Only `polling.timeoutMs` is used; all other PollingOptions fields are ignored. Use `timeoutMs` instead.
+   * @param options - request options with optional long-poll configuration.
    */
   async createAndAwaitRunning(
     body?: DevboxCreateParams,
-    options?: Core.RequestOptions & {
-      /** Timeout in milliseconds for the long-poll operation. */
-      timeoutMs?: number;
-      /** @deprecated Use `timeoutMs` instead. Only `timeoutMs` is extracted; other fields are ignored for long-poll endpoints. */
-      polling?: Partial<PollingOptions<DevboxView>>;
-    },
+    options?: LongPollRequestOptions<DevboxView>,
   ): Promise<DevboxView> {
-    const devbox = await this.create(body, options);
+    const { longPoll, polling, ...requestOptions } = options ?? {};
+    const devbox = await this.create(body, requestOptions);
     return this.awaitRunning(devbox.id, options);
   }
   /**
@@ -306,26 +280,20 @@ export class Devboxes extends APIResource {
    *
    * @param devboxId - Devbox ID
    * @param params - Execution parameters.
-   * @param options - request options.
-   * @param options.timeoutMs - Timeout in milliseconds for the long-poll operation.
-   * @param options.polling - @deprecated Only `polling.timeoutMs` is used; all other PollingOptions fields are ignored. Use `timeoutMs` instead.
+   * @param options - request options with optional long-poll configuration.
    */
   async executeAndAwaitCompletion(
     devboxId: string,
     params: Omit<DevboxExecuteParams, 'command_id'>,
-    options?: Core.RequestOptions & {
-      /** Timeout in milliseconds for the long-poll operation. */
-      timeoutMs?: number;
-      /** @deprecated Use `timeoutMs` instead. Only `timeoutMs` is extracted; other fields are ignored for long-poll endpoints. */
-      polling?: Partial<PollingOptions<DevboxAsyncExecutionDetailView>>;
-    },
+    options?: LongPollRequestOptions<DevboxAsyncExecutionDetailView>,
   ): Promise<DevboxAsyncExecutionDetailView> {
-    const effectiveTimeoutMs = options?.timeoutMs ?? options?.polling?.timeoutMs;
+    const { longPoll, polling, ...requestOptions } = options ?? {};
+    const effectiveTimeoutMs = longPoll?.timeoutMs ?? polling?.timeoutMs;
     const commandId = uuidv7();
     const execution = await this.execute(
       devboxId,
       { ...params, command_id: commandId },
-      { ...{ timeout: options?.timeout ?? effectiveTimeoutMs ?? 600000 }, ...options },
+      { ...{ timeout: requestOptions?.timeout ?? effectiveTimeoutMs ?? 600000 }, ...requestOptions },
     );
 
     if (execution.status === 'completed') {

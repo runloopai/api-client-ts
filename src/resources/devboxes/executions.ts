@@ -5,7 +5,7 @@ import { isRequestOptions } from '../../core';
 import { APIPromise } from '../../core';
 import * as Core from '../../core';
 import * as DevboxesAPI from './devboxes';
-import { PollingOptions, longPollUntil } from '@runloop/api-client/lib/polling';
+import { LongPollRequestOptions, longPollUntil } from '@runloop/api-client/lib/polling';
 import { Stream } from '../../streaming';
 import { withStreamAutoReconnect } from '@runloop/api-client/lib/streaming-reconnection';
 
@@ -55,19 +55,12 @@ export class Executions extends APIResource {
    *
    * @param id - Devbox ID
    * @param executionId - Execution ID
-   * @param options - request options.
-   * @param options.timeoutMs - Timeout in milliseconds for the long-poll operation.
-   * @param options.polling - @deprecated Only `polling.timeoutMs` is used; all other PollingOptions fields are ignored. Use `timeoutMs` instead.
+   * @param options - request options with optional long-poll configuration.
    */
   async awaitCompleted(
     id: string,
     executionId: string,
-    options?: Core.RequestOptions & {
-      /** Timeout in milliseconds for the long-poll operation. */
-      timeoutMs?: number;
-      /** @deprecated Use `timeoutMs` instead. Only `timeoutMs` is extracted; other fields are ignored for long-poll endpoints. */
-      polling?: Partial<PollingOptions<DevboxesAPI.DevboxAsyncExecutionDetailView>>;
-    },
+    options?: LongPollRequestOptions<DevboxesAPI.DevboxAsyncExecutionDetailView>,
   ): Promise<DevboxesAPI.DevboxAsyncExecutionDetailView> {
     return longPollUntil(
       () =>
@@ -75,7 +68,7 @@ export class Executions extends APIResource {
           body: { statuses: ['completed'] },
         }),
       {
-        timeoutMs: options?.timeoutMs ?? options?.polling?.timeoutMs,
+        timeoutMs: options?.longPoll?.timeoutMs ?? options?.polling?.timeoutMs,
         shouldStop: (result) => result.status === 'completed',
       },
     );

@@ -1,4 +1,5 @@
 import { APIError } from '../error';
+import type * as Core from '../core';
 
 export interface PollingOptions<T> {
   /** Delay after the initial request completes before the first poll iteration (in milliseconds) */
@@ -56,6 +57,21 @@ export interface LongPollOptions<T> {
   /** Optional callback for each long-poll attempt */
   onAttempt?: ((attempt: number, result: T) => void) | undefined;
 }
+
+/**
+ * Request options for methods that use server-side long-polling.
+ * Extends `Core.RequestOptions` with long-poll configuration alongside
+ * the deprecated `polling` field for backwards compatibility.
+ */
+export type LongPollRequestOptions<T> = Core.RequestOptions & {
+  /** Options for the long-poll operation. */
+  longPoll?: {
+    /** Timeout in milliseconds for the entire long-poll operation. */
+    timeoutMs?: number;
+  };
+  /** @deprecated Use `longPoll` instead. Only `timeoutMs` is extracted; other fields are ignored for long-poll endpoints. */
+  polling?: Partial<PollingOptions<T>>;
+};
 
 /**
  * Long-poll loop for server-side blocking endpoints (e.g. wait_for_status).
