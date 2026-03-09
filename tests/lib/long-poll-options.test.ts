@@ -1,4 +1,4 @@
-import { PollingTimeoutError } from '../../src/lib/polling';
+import { PollingTimeoutError, resolveLongPollTimeoutMs, _resetDeprecationWarning } from '../../src/lib/polling';
 import { awaitDevboxState, DevboxStateWaitOptions } from '../../src/lib/devbox-state';
 
 type MockDevbox = { status: string; id: string };
@@ -127,5 +127,70 @@ describe('LongPollRequestOptions resolution', () => {
       const value = await awaitDevboxState(makeOptions({ client: { post }, timeoutMs }));
       expect(value.status).toBe('running');
     });
+  });
+});
+
+describe('resolveLongPollTimeoutMs deprecation warnings', () => {
+  let warnSpy: jest.SpyInstance;
+
+  beforeEach(() => {
+    _resetDeprecationWarning();
+    warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+  });
+
+  afterEach(() => {
+    warnSpy.mockRestore();
+  });
+
+  test('warns when ignored polling fields are present', () => {
+    resolveLongPollTimeoutMs({ polling: { maxAttempts: 5 } } as any);
+    expect(warnSpy).toHaveBeenCalledTimes(1);
+    expect(warnSpy).toHaveBeenCalledWith(
+      expect.stringContaining('maxAttempts'),
+    );
+  });
+
+  test('lists all ignored fields in a single warning', () => {
+    resolveLongPollTimeoutMs({
+      polling: { maxAttempts: 5, pollingIntervalMs: 200, initialDelayMs: 100 },
+    } as any);
+    expect(warnSpy).toHaveBeenCalledTimes(1);
+    const msg: string = warnSpy.mock.calls[0][0];
+    expect(msg).toContain('maxAttempts');
+    expect(msg).toContain('pollingIntervalMs');
+    expect(msg).toContain('initialDelayMs');
+  });
+
+  test('warns only once across multiple calls', () => {
+    resolveLongPollTimeoutMs({ polling: { maxAttempts: 3 } } as any);
+    resolveLongPollTimeoutMs({ polling: { pollingIntervalMs: 500 } } as any);
+    expect(warnSpy).toHaveBeenCalledTimes(1);
+  });
+
+  test('warns about deprecated polling.timeoutMs when longPoll is absent', () => {
+    resolveLongPollTimeoutMs({ polling: { timeoutMs: 3000 } });
+    expect(warnSpy).toHaveBeenCalledTimes(1);
+    expect(warnSpy).toHaveBeenCalledWith(
+      expect.stringContaining('deprecated'),
+    );
+  });
+
+  test('does not warn when only longPoll is used', () => {
+    resolveLongPollTimeoutMs({ longPoll: { timeoutMs: 5000 } });
+    expect(warnSpy).not.toHaveBeenCalled();
+  });
+
+  test('does not warn when no options are provided', () => {
+    resolveLongPollTimeoutMs(undefined);
+    resolveLongPollTimeoutMs({});
+    expect(warnSpy).not.toHaveBeenCalled();
+  });
+
+  test('still returns the correct timeoutMs', () => {
+    expect(resolveLongPollTimeoutMs({ polling: { maxAttempts: 5, timeoutMs: 3000 } } as any)).toBe(3000);
+    _resetDeprecationWarning();
+    expect(resolveLongPollTimeoutMs({ longPoll: { timeoutMs: 7000 }, polling: { timeoutMs: 1000 } })).toBe(7000);
+    _resetDeprecationWarning();
+    expect(resolveLongPollTimeoutMs(undefined)).toBeUndefined();
   });
 });

@@ -1,7 +1,7 @@
 import { Runloop } from '../index';
 import type * as Core from '../core';
 import type { DevboxAsyncExecutionDetailView } from '../resources/devboxes/devboxes';
-import type { PollingOptions } from '../lib/polling';
+import { longPollUntil, type LongPollRequestOptions } from '../lib/polling';
 import { ExecutionResult } from './execution-result';
 
 /**
@@ -102,24 +102,29 @@ export class Execution {
    * }
    * ```
    *
-   * @param {Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxAsyncExecutionDetailView>> }} [options] - Request options with optional polling configuration
+   * @param {LongPollRequestOptions<DevboxAsyncExecutionDetailView>} [options] - Request options with optional long-poll configuration
    * @returns {Promise<ExecutionResult>} {@link ExecutionResult} with stdout, stderr, and exit code
    */
-  async result(
-    options?: Core.RequestOptions & {
-      polling?: Partial<PollingOptions<DevboxAsyncExecutionDetailView>>;
-    },
-  ): Promise<ExecutionResult> {
+  async result(options?: LongPollRequestOptions<DevboxAsyncExecutionDetailView>): Promise<ExecutionResult> {
+    const { longPoll, polling, ...requestOptions } = options ?? {};
+    const effectiveTimeoutMs = longPoll?.timeoutMs ?? polling?.timeoutMs;
+
+    const commandPromise = longPollUntil(
+      () =>
+        this.client.devboxes.waitForCommand(
+          this._devboxId,
+          this._executionId,
+          { statuses: ['completed'] },
+          requestOptions,
+        ),
+      {
+        timeoutMs: effectiveTimeoutMs,
+        shouldStop: (result) => result.status === 'completed',
+      },
+    );
+
     // Wait for both command completion and streaming to finish (using allSettled for robustness)
-    const results = await Promise.allSettled([
-      this.client.devboxes.waitForCommand(
-        this._devboxId,
-        this._executionId,
-        { statuses: ['completed'] },
-        options,
-      ),
-      this._streamingPromise || Promise.resolve(),
-    ]);
+    const results = await Promise.allSettled([commandPromise, this._streamingPromise || Promise.resolve()]);
 
     // Extract command result (throw if it failed, ignore streaming errors)
     if (results[0].status === 'rejected') {

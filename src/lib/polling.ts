@@ -79,6 +79,42 @@ export type LongPollRequestOptions<T> = Core.RequestOptions & {
   polling?: Partial<PollingOptions<T>> | undefined;
 };
 
+const DEPRECATED_POLLING_FIELDS = ['maxAttempts', 'pollingIntervalMs', 'initialDelayMs'] as const;
+let _warnedDeprecatedPolling = false;
+
+/**
+ * Resolve the effective `timeoutMs` from {@link LongPollRequestOptions},
+ * preferring `longPoll.timeoutMs` over the deprecated `polling.timeoutMs`.
+ *
+ * Emits a one-time `console.warn` when callers supply deprecated polling
+ * fields that are silently ignored by long-poll endpoints.
+ */
+export function resolveLongPollTimeoutMs<T>(options?: LongPollRequestOptions<T>): number | undefined {
+  if (options?.polling && !_warnedDeprecatedPolling) {
+    const ignored = DEPRECATED_POLLING_FIELDS.filter(
+      (f) => (options.polling as Record<string, unknown>)?.[f] !== undefined,
+    );
+    if (ignored.length > 0) {
+      console.warn(
+        `[runloop-api-client] polling options { ${ignored.join(', ')} } are ignored for long-poll endpoints. ` +
+          `Only \`timeoutMs\` is honoured. Migrate to \`longPoll: { timeoutMs }\` instead.`,
+      );
+      _warnedDeprecatedPolling = true;
+    } else if (options.polling.timeoutMs !== undefined && !options.longPoll?.timeoutMs) {
+      console.warn(
+        '[runloop-api-client] `polling: { timeoutMs }` is deprecated. Use `longPoll: { timeoutMs }` instead.',
+      );
+      _warnedDeprecatedPolling = true;
+    }
+  }
+  return options?.longPoll?.timeoutMs ?? options?.polling?.timeoutMs;
+}
+
+/** @internal Resets the deprecation warning flag — only for tests. */
+export function _resetDeprecationWarning(): void {
+  _warnedDeprecatedPolling = false;
+}
+
 /**
  * Long-poll loop for server-side blocking endpoints (e.g. wait_for_status).
  * Retries automatically on 408 (server timeout). No sleep between attempts

@@ -5,7 +5,11 @@ import { isRequestOptions } from '../../core';
 import { APIPromise } from '../../core';
 import * as Core from '../../core';
 import * as DevboxesAPI from './devboxes';
-import { LongPollRequestOptions, longPollUntil } from '@runloop/api-client/lib/polling';
+import {
+  LongPollRequestOptions,
+  longPollUntil,
+  resolveLongPollTimeoutMs,
+} from '@runloop/api-client/lib/polling';
 import { Stream } from '../../streaming';
 import { withStreamAutoReconnect } from '@runloop/api-client/lib/streaming-reconnection';
 
@@ -68,7 +72,7 @@ export class Executions extends APIResource {
           body: { statuses: ['completed'] },
         }),
       {
-        timeoutMs: options?.longPoll?.timeoutMs ?? options?.polling?.timeoutMs,
+        timeoutMs: resolveLongPollTimeoutMs(options),
         shouldStop: (result) => result.status === 'completed',
       },
     );
