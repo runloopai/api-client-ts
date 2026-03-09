@@ -1,4 +1,4 @@
-import { longPollUntil, PollingOptions } from './polling';
+import { longPollUntil } from './polling';
 
 export interface DevboxStateWaitOptions<T> {
   client: {
@@ -10,11 +10,6 @@ export interface DevboxStateWaitOptions<T> {
   transitionStates: string[];
   /** Timeout in milliseconds for the long-poll operation. */
   timeoutMs?: number | undefined;
-  /**
-   * @deprecated Only `timeoutMs` is extracted; all other fields are ignored for long-poll endpoints.
-   * Use the top-level `timeoutMs` field instead.
-   */
-  pollingOptions?: Partial<PollingOptions<T>> | undefined;
   errorMessage: (id: string, actualState: string) => string;
 }
 
@@ -25,8 +20,7 @@ export interface DevboxStateWaitOptions<T> {
 export async function awaitDevboxState<T extends { status: string }>(
   options: DevboxStateWaitOptions<T>,
 ): Promise<T> {
-  const { client, devboxId, targetState, statesToCheck, transitionStates, pollingOptions, errorMessage } =
-    options;
+  const { client, devboxId, targetState, statesToCheck, transitionStates, errorMessage } = options;
 
   const finalResult = await longPollUntil(
     () =>
@@ -34,7 +28,7 @@ export async function awaitDevboxState<T extends { status: string }>(
         body: { statuses: statesToCheck },
       }),
     {
-      timeoutMs: options.timeoutMs ?? pollingOptions?.timeoutMs,
+      timeoutMs: options.timeoutMs,
       shouldStop: (result) => !transitionStates.includes(result.status),
     },
   );

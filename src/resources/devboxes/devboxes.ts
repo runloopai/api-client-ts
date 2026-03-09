@@ -47,7 +47,7 @@ import {
   type DiskSnapshotsCursorIDPageParams,
 } from '../../pagination';
 import { type Response } from '../../_shims/index';
-import { longPollUntil, LongPollRequestOptions, PollingOptions } from '@runloop/api-client/lib/polling';
+import { longPollUntil, LongPollRequestOptions } from '@runloop/api-client/lib/polling';
 import { awaitDevboxState } from '@runloop/api-client/lib/devbox-state';
 import { DevboxTools } from './tools';
 import { uuidv7 } from 'uuidv7';
@@ -103,7 +103,6 @@ export class Devboxes extends APIResource {
       statesToCheck: ['running', 'failure', 'shutdown'],
       transitionStates: DEVBOX_BOOTING_STATES,
       timeoutMs: options?.longPoll?.timeoutMs ?? options?.polling?.timeoutMs,
-      pollingOptions: options?.polling as Partial<PollingOptions<DevboxView>> | undefined,
       errorMessage: (devboxId, actualState) => `Devbox ${devboxId} is in non-running state ${actualState}`,
     });
   }
@@ -123,7 +122,6 @@ export class Devboxes extends APIResource {
       statesToCheck: ['suspended', 'failure', 'shutdown'],
       transitionStates: ['suspending'],
       timeoutMs: options?.longPoll?.timeoutMs ?? options?.polling?.timeoutMs,
-      pollingOptions: options?.polling as Partial<PollingOptions<DevboxView>> | undefined,
       errorMessage: (devboxId, actualState) => `Devbox ${devboxId} is in non-suspended state ${actualState}`,
     });
   }
@@ -141,7 +139,7 @@ export class Devboxes extends APIResource {
   ): Promise<DevboxView> {
     const { longPoll, polling, ...requestOptions } = options ?? {};
     const devbox = await this.create(body, requestOptions);
-    return this.awaitRunning(devbox.id, options);
+    return this.awaitRunning(devbox.id, { ...requestOptions, longPoll, polling });
   }
   /**
    * Updates a devbox by doing a complete update the existing name,metadata fields.

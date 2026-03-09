@@ -50,11 +50,15 @@ export class MaxAttemptsExceededError extends Error {
 }
 
 export interface LongPollOptions<T> {
-  /** Optional timeout for the entire long-poll operation (in milliseconds) */
+  /** Optional timeout for the entire long-poll operation (in milliseconds). Enforced mid-request via Promise.race. */
   timeoutMs?: number | undefined;
   /** Condition to check if long-polling should stop. Return true when done. */
   shouldStop: (result: T) => boolean;
-  /** Optional callback for each long-poll attempt */
+  /**
+   * Optional callback for each successful long-poll attempt.
+   * The attempt counter includes 408 retries, but this callback is only
+   * invoked when the server returns a non-error response.
+   */
   onAttempt?: ((attempt: number, result: T) => void) | undefined;
 }
 
@@ -65,18 +69,21 @@ export interface LongPollOptions<T> {
  */
 export type LongPollRequestOptions<T> = Core.RequestOptions & {
   /** Options for the long-poll operation. */
-  longPoll?: {
-    /** Timeout in milliseconds for the entire long-poll operation. */
-    timeoutMs?: number;
-  };
+  longPoll?:
+    | {
+        /** Timeout in milliseconds for the entire long-poll operation. */
+        timeoutMs?: number;
+      }
+    | undefined;
   /** @deprecated Use `longPoll` instead. Only `timeoutMs` is extracted; other fields are ignored for long-poll endpoints. */
-  polling?: Partial<PollingOptions<T>>;
+  polling?: Partial<PollingOptions<T>> | undefined;
 };
 
 /**
  * Long-poll loop for server-side blocking endpoints (e.g. wait_for_status).
  * Retries automatically on 408 (server timeout). No sleep between attempts
- * because the server already blocks.
+ * because the server already blocks. Each request is raced against the
+ * remaining deadline so a hanging server cannot block past `timeoutMs`.
  */
 export async function longPollUntil<T>(request: () => Promise<T>, options: LongPollOptions<T>): Promise<T> {
   const { timeoutMs, shouldStop, onAttempt } = options;
@@ -89,14 +96,27 @@ export async function longPollUntil<T>(request: () => Promise<T>, options: LongP
   let attempts = 0;
   let lastResult: T | undefined;
 
-  while (true) {
-    if (deadline && Date.now() >= deadline) {
-      throw new PollingTimeoutError(`Long poll timed out after ${timeoutMs}ms`, lastResult);
+  const raceDeadline = <R>(promise: Promise<R>): Promise<R> => {
+    if (!deadline) return promise;
+    const remaining = deadline - Date.now();
+    if (remaining <= 0) {
+      return Promise.reject(new PollingTimeoutError(`Long poll timed out after ${timeoutMs}ms`, lastResult));
     }
+    let timeoutId: ReturnType<typeof setTimeout>;
+    const timeoutPromise = new Promise<never>((_, reject) => {
+      timeoutId = setTimeout(
+        () => reject(new PollingTimeoutError(`Long poll timed out after ${timeoutMs}ms`, lastResult)),
+        remaining,
+      );
+    });
+    return Promise.race([promise, timeoutPromise]).finally(() => clearTimeout(timeoutId));
+  };
+
+  while (true) {
+    attempts++;
     try {
-      const result = await request();
+      const result = await raceDeadline(request());
       lastResult = result;
-      attempts++;
       onAttempt?.(attempts, result);
       if (shouldStop(result)) return result;
     } catch (error) {

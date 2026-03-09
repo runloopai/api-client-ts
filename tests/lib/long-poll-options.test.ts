@@ -59,15 +59,15 @@ describe('LongPollRequestOptions resolution', () => {
   });
 
   describe('end-to-end via awaitDevboxState', () => {
-    function neverResolve(): jest.Mock {
+    function slowTransition(): jest.Mock {
       return jest.fn().mockImplementation(
-        () => new Promise((resolve) => setTimeout(() => resolve({ status: 'provisioning', id: 'dbx-123' }), 50)),
+        () => new Promise((resolve) => setTimeout(() => resolve({ status: 'provisioning', id: 'dbx-123' }), 100)),
       );
     }
 
     test('times out via longPoll.timeoutMs path', async () => {
-      const post = neverResolve();
-      const timeoutMs = resolveTimeoutMs({ longPoll: { timeoutMs: 100 } });
+      const post = slowTransition();
+      const timeoutMs = resolveTimeoutMs({ longPoll: { timeoutMs: 150 } });
 
       await expect(
         awaitDevboxState(makeOptions({ client: { post }, timeoutMs })),
@@ -75,8 +75,8 @@ describe('LongPollRequestOptions resolution', () => {
     });
 
     test('times out via deprecated polling.timeoutMs path', async () => {
-      const post = neverResolve();
-      const timeoutMs = resolveTimeoutMs({ polling: { timeoutMs: 100 } });
+      const post = slowTransition();
+      const timeoutMs = resolveTimeoutMs({ polling: { timeoutMs: 150 } });
 
       await expect(
         awaitDevboxState(makeOptions({ client: { post }, timeoutMs })),

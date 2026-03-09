@@ -475,15 +475,31 @@ describe('longPollUntil', () => {
 
   test('should throw PollingTimeoutError when timeoutMs is exceeded', async () => {
     const request = jest.fn().mockImplementation(
-      () => new Promise((resolve) => setTimeout(() => resolve({ status: 'provisioning' }), 50)),
+      () => new Promise((resolve) => setTimeout(() => resolve({ status: 'provisioning' }), 100)),
     );
 
+    await expect(
+      longPollUntil(request, {
+        timeoutMs: 150,
+        shouldStop: () => false,
+      }),
+    ).rejects.toThrow(PollingTimeoutError);
+  });
+
+  test('should enforce timeout mid-request via Promise.race', async () => {
+    const request = jest.fn().mockImplementation(
+      () => new Promise((resolve) => setTimeout(() => resolve({ status: 'provisioning' }), 5000)),
+    );
+
+    const start = Date.now();
     await expect(
       longPollUntil(request, {
         timeoutMs: 100,
         shouldStop: () => false,
       }),
     ).rejects.toThrow(PollingTimeoutError);
+    const elapsed = Date.now() - start;
+    expect(elapsed).toBeLessThan(1000);
   });
 
   test('should throw when timeoutMs is zero or negative', async () => {
@@ -510,7 +526,7 @@ describe('longPollUntil', () => {
     expect(value).toBe(result);
   });
 
-  test('should call onAttempt callback for each attempt', async () => {
+  test('should call onAttempt callback for each successful attempt', async () => {
     const provisioning = { status: 'provisioning' };
     const running = { status: 'running' };
     const request = jest.fn().mockResolvedValueOnce(provisioning).mockResolvedValueOnce(running);
@@ -523,6 +539,23 @@ describe('longPollUntil', () => {
 
     expect(onAttempt).toHaveBeenCalledTimes(2);
     expect(onAttempt).toHaveBeenCalledWith(1, provisioning);
+    expect(onAttempt).toHaveBeenCalledWith(2, running);
+  });
+
+  test('should count 408 retries in attempt number', async () => {
+    const timeoutError = new APIError(408, {}, 'Request timeout', {});
+    const running = { status: 'running' };
+    const request = jest.fn().mockRejectedValueOnce(timeoutError).mockResolvedValueOnce(running);
+    const onAttempt = jest.fn();
+
+    await longPollUntil<{ status: string }>(request, {
+      shouldStop: (r) => r.status === 'running',
+      onAttempt,
+    });
+
+    expect(request).toHaveBeenCalledTimes(2);
+    // onAttempt is only called for successful responses, but attempt counter includes 408s
+    expect(onAttempt).toHaveBeenCalledTimes(1);
     expect(onAttempt).toHaveBeenCalledWith(2, running);
   });
 

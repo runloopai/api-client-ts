@@ -51,52 +51,25 @@ describe('awaitDevboxState', () => {
 
   test('should use timeoutMs field for the long-poll deadline', async () => {
     const post = jest.fn().mockImplementation(
-      () => new Promise((resolve) => setTimeout(() => resolve({ status: 'provisioning', id: 'dbx-123' }), 50)),
+      () => new Promise((resolve) => setTimeout(() => resolve({ status: 'provisioning', id: 'dbx-123' }), 100)),
     );
 
+    await expect(
+      awaitDevboxState(makeOptions({ client: { post }, timeoutMs: 150 })),
+    ).rejects.toThrow(PollingTimeoutError);
+  });
+
+  test('should enforce timeout mid-request via Promise.race', async () => {
+    const post = jest.fn().mockImplementation(
+      () => new Promise((resolve) => setTimeout(() => resolve({ status: 'provisioning', id: 'dbx-123' }), 5000)),
+    );
+
+    const start = Date.now();
     await expect(
       awaitDevboxState(makeOptions({ client: { post }, timeoutMs: 100 })),
     ).rejects.toThrow(PollingTimeoutError);
-  });
-
-  test('should fall back to pollingOptions.timeoutMs when timeoutMs is not set', async () => {
-    const post = jest.fn().mockImplementation(
-      () => new Promise((resolve) => setTimeout(() => resolve({ status: 'provisioning', id: 'dbx-123' }), 50)),
-    );
-
-    await expect(
-      awaitDevboxState(
-        makeOptions({
-          client: { post },
-          pollingOptions: { timeoutMs: 100 },
-        }),
-      ),
-    ).rejects.toThrow(PollingTimeoutError);
-  });
-
-  test('should prefer timeoutMs over pollingOptions.timeoutMs', async () => {
-    let callCount = 0;
-    const post = jest.fn().mockImplementation(() => {
-      callCount++;
-      if (callCount <= 3) {
-        return new Promise((resolve) =>
-          setTimeout(() => resolve({ status: 'provisioning', id: 'dbx-123' }), 10),
-        );
-      }
-      return Promise.resolve({ status: 'running', id: 'dbx-123' });
-    });
-
-    // timeoutMs=5000 is generous, pollingOptions.timeoutMs=1 would fail immediately.
-    // If timeoutMs is preferred, the call succeeds.
-    const value = await awaitDevboxState(
-      makeOptions({
-        client: { post },
-        timeoutMs: 5000,
-        pollingOptions: { timeoutMs: 1 },
-      }),
-    );
-
-    expect(value.status).toBe('running');
+    const elapsed = Date.now() - start;
+    expect(elapsed).toBeLessThan(1000);
   });
 
   test('should work with no timeout at all', async () => {
