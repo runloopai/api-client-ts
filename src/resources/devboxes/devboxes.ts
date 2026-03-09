@@ -107,6 +107,7 @@ export class Devboxes extends APIResource {
       statesToCheck: ['running', 'failure', 'shutdown'],
       transitionStates: DEVBOX_BOOTING_STATES,
       timeoutMs: resolveLongPollTimeoutMs(options),
+      signal: options?.signal,
       errorMessage: (devboxId, actualState) => `Devbox ${devboxId} is in non-running state ${actualState}`,
     });
   }
@@ -126,6 +127,7 @@ export class Devboxes extends APIResource {
       statesToCheck: ['suspended', 'failure', 'shutdown'],
       transitionStates: ['suspending'],
       timeoutMs: resolveLongPollTimeoutMs(options),
+      signal: options?.signal,
       errorMessage: (devboxId, actualState) => `Devbox ${devboxId} is in non-suspended state ${actualState}`,
     });
   }
@@ -315,6 +317,7 @@ export class Devboxes extends APIResource {
       {
         timeoutMs: effectiveTimeoutMs,
         shouldStop: (result) => result.status === 'completed',
+        signal: requestOptions.signal,
       },
     );
 

@@ -1,4 +1,4 @@
-import { poll, longPollUntil, PollingTimeoutError, MaxAttemptsExceededError } from '../src/lib/polling';
+import { poll, longPollUntil, PollingTimeoutError, MaxAttemptsExceededError, LongPollAbortError } from '../src/lib/polling';
 import { APIError } from '../src/error';
 
 describe('Polling', () => {
@@ -569,5 +569,100 @@ describe('longPollUntil', () => {
 
     expect(value).toBe(result);
     expect(request).toHaveBeenCalledTimes(1);
+  });
+
+  test('should throw LongPollAbortError when signal is already aborted', async () => {
+    const controller = new AbortController();
+    controller.abort();
+    const request = jest.fn().mockResolvedValue({ status: 'running' });
+
+    await expect(
+      longPollUntil(request, {
+        shouldStop: () => true,
+        signal: controller.signal,
+      }),
+    ).rejects.toThrow(LongPollAbortError);
+    expect(request).not.toHaveBeenCalled();
+  });
+
+  test('should throw LongPollAbortError when signal is aborted mid-request', async () => {
+    const controller = new AbortController();
+    const request = jest.fn().mockImplementation(
+      () => new Promise((resolve) => setTimeout(() => resolve({ status: 'provisioning' }), 5000)),
+    );
+
+    const start = Date.now();
+    setTimeout(() => controller.abort(), 50);
+
+    await expect(
+      longPollUntil(request, {
+        shouldStop: () => false,
+        signal: controller.signal,
+      }),
+    ).rejects.toThrow(LongPollAbortError);
+    const elapsed = Date.now() - start;
+    expect(elapsed).toBeLessThan(1000);
+  });
+
+  test('should throw LongPollAbortError when signal is aborted between attempts', async () => {
+    const controller = new AbortController();
+    const provisioning = { status: 'provisioning' };
+    let callCount = 0;
+    const request = jest.fn().mockImplementation(() => {
+      callCount++;
+      if (callCount === 2) controller.abort();
+      return Promise.resolve(provisioning);
+    });
+
+    await expect(
+      longPollUntil(request, {
+        shouldStop: () => false,
+        signal: controller.signal,
+      }),
+    ).rejects.toThrow(LongPollAbortError);
+  });
+
+  test('should include lastResult in LongPollAbortError', async () => {
+    const controller = new AbortController();
+    const provisioning = { status: 'provisioning' };
+    let callCount = 0;
+    const request = jest.fn().mockImplementation(() => {
+      callCount++;
+      if (callCount === 2) {
+        return new Promise((resolve) => setTimeout(() => resolve({ status: 'provisioning' }), 5000));
+      }
+      return Promise.resolve(provisioning);
+    });
+
+    // Abort after first successful result but during the second (slow) request
+    setTimeout(() => controller.abort(), 50);
+
+    try {
+      await longPollUntil(request, {
+        shouldStop: () => false,
+        signal: controller.signal,
+      });
+      fail('Expected LongPollAbortError');
+    } catch (error) {
+      expect(error).toBeInstanceOf(LongPollAbortError);
+      expect((error as LongPollAbortError).lastResult).toBe(provisioning);
+    }
+  });
+
+  test('abort signal should work together with timeoutMs', async () => {
+    const controller = new AbortController();
+    const request = jest.fn().mockImplementation(
+      () => new Promise((resolve) => setTimeout(() => resolve({ status: 'provisioning' }), 5000)),
+    );
+
+    setTimeout(() => controller.abort(), 50);
+
+    await expect(
+      longPollUntil(request, {
+        timeoutMs: 10000,
+        shouldStop: () => false,
+        signal: controller.signal,
+      }),
+    ).rejects.toThrow(LongPollAbortError);
   });
 });

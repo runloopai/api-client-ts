@@ -10,6 +10,8 @@ export interface DevboxStateWaitOptions<T> {
   transitionStates: string[];
   /** Timeout in milliseconds for the long-poll operation. */
   timeoutMs?: number | undefined;
+  /** Optional AbortSignal to cancel the long-poll loop externally. */
+  signal?: AbortSignal | null | undefined;
   errorMessage: (id: string, actualState: string) => string;
 }
 
@@ -30,6 +32,7 @@ export async function awaitDevboxState<T extends { status: string }>(
     {
       timeoutMs: options.timeoutMs,
       shouldStop: (result) => !transitionStates.includes(result.status),
+      signal: options.signal,
     },
   );
 

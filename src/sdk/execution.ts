@@ -1,7 +1,7 @@
 import { Runloop } from '../index';
 import type * as Core from '../core';
 import type { DevboxAsyncExecutionDetailView } from '../resources/devboxes/devboxes';
-import { longPollUntil, type LongPollRequestOptions } from '../lib/polling';
+import { longPollUntil, resolveLongPollTimeoutMs, type LongPollRequestOptions } from '../lib/polling';
 import { ExecutionResult } from './execution-result';
 
 /**
@@ -106,8 +106,8 @@ export class Execution {
    * @returns {Promise<ExecutionResult>} {@link ExecutionResult} with stdout, stderr, and exit code
    */
   async result(options?: LongPollRequestOptions<DevboxAsyncExecutionDetailView>): Promise<ExecutionResult> {
-    const { longPoll, polling, ...requestOptions } = options ?? {};
-    const effectiveTimeoutMs = longPoll?.timeoutMs ?? polling?.timeoutMs;
+    const effectiveTimeoutMs = resolveLongPollTimeoutMs(options);
+    const { longPoll: _lp, polling: _p, ...requestOptions } = options ?? {};
 
     const commandPromise = longPollUntil(
       () =>
@@ -120,6 +120,7 @@ export class Execution {
       {
         timeoutMs: effectiveTimeoutMs,
         shouldStop: (result) => result.status === 'completed',
+        signal: requestOptions.signal,
       },
     );
 

@@ -74,6 +74,7 @@ export class Executions extends APIResource {
       {
         timeoutMs: resolveLongPollTimeoutMs(options),
         shouldStop: (result) => result.status === 'completed',
+        signal: options?.signal,
       },
     );
   }

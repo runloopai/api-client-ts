@@ -60,6 +60,8 @@ export interface LongPollOptions<T> {
    * invoked when the server returns a non-error response.
    */
   onAttempt?: ((attempt: number, result: T) => void) | undefined;
+  /** Optional AbortSignal to cancel the long-poll loop externally. */
+  signal?: AbortSignal | null | undefined;
 }
 
 /**
@@ -122,10 +124,14 @@ export function _resetDeprecationWarning(): void {
  * remaining deadline so a hanging server cannot block past `timeoutMs`.
  */
 export async function longPollUntil<T>(request: () => Promise<T>, options: LongPollOptions<T>): Promise<T> {
-  const { timeoutMs, shouldStop, onAttempt } = options;
+  const { timeoutMs, shouldStop, onAttempt, signal } = options;
 
   if (timeoutMs !== undefined && timeoutMs <= 0) {
     throw new Error('timeoutMs must be positive');
+  }
+
+  if (signal?.aborted) {
+    throw new LongPollAbortError('Long poll aborted', undefined);
   }
 
   const deadline = timeoutMs ? Date.now() + timeoutMs : undefined;
@@ -133,19 +139,44 @@ export async function longPollUntil<T>(request: () => Promise<T>, options: LongP
   let lastResult: T | undefined;
 
   const raceDeadline = <R>(promise: Promise<R>): Promise<R> => {
-    if (!deadline) return promise;
-    const remaining = deadline - Date.now();
-    if (remaining <= 0) {
-      return Promise.reject(new PollingTimeoutError(`Long poll timed out after ${timeoutMs}ms`, lastResult));
+    if (signal?.aborted) {
+      return Promise.reject(new LongPollAbortError('Long poll aborted', lastResult));
     }
-    let timeoutId: ReturnType<typeof setTimeout>;
-    const timeoutPromise = new Promise<never>((_, reject) => {
-      timeoutId = setTimeout(
-        () => reject(new PollingTimeoutError(`Long poll timed out after ${timeoutMs}ms`, lastResult)),
-        remaining,
+
+    const racers: Promise<R>[] = [promise];
+    const cleanups: (() => void)[] = [];
+
+    if (deadline) {
+      const remaining = deadline - Date.now();
+      if (remaining <= 0) {
+        return Promise.reject(
+          new PollingTimeoutError(`Long poll timed out after ${timeoutMs}ms`, lastResult),
+        );
+      }
+      let timeoutId: ReturnType<typeof setTimeout>;
+      racers.push(
+        new Promise<never>((_, reject) => {
+          timeoutId = setTimeout(
+            () => reject(new PollingTimeoutError(`Long poll timed out after ${timeoutMs}ms`, lastResult)),
+            remaining,
+          );
+        }),
       );
-    });
-    return Promise.race([promise, timeoutPromise]).finally(() => clearTimeout(timeoutId));
+      cleanups.push(() => clearTimeout(timeoutId));
+    }
+
+    if (signal) {
+      racers.push(
+        new Promise<never>((_, reject) => {
+          const onAbort = () => reject(new LongPollAbortError('Long poll aborted', lastResult));
+          signal.addEventListener('abort', onAbort, { once: true });
+          cleanups.push(() => signal.removeEventListener('abort', onAbort));
+        }),
+      );
+    }
+
+    if (racers.length === 1) return promise;
+    return Promise.race(racers).finally(() => cleanups.forEach((fn) => fn()));
   };
 
   while (true) {
@@ -159,6 +190,16 @@ export async function longPollUntil<T>(request: () => Promise<T>, options: LongP
       if (error instanceof APIError && error.status === 408) continue;
       throw error;
     }
+  }
+}
+
+export class LongPollAbortError extends Error {
+  constructor(
+    message: string,
+    public lastResult: unknown,
+  ) {
+    super(message);
+    this.name = 'LongPollAbortError';
   }
 }
 
