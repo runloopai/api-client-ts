@@ -1,4 +1,4 @@
-import { poll, PollingOptions } from './polling';
+import { longPollUntil, PollingOptions } from './polling';
 
 export interface DevboxStateWaitOptions<T> {
   client: {
@@ -8,13 +8,19 @@ export interface DevboxStateWaitOptions<T> {
   targetState: string;
   statesToCheck: string[];
   transitionStates: string[];
+  /** Timeout in milliseconds for the long-poll operation. */
+  timeoutMs?: number | undefined;
+  /**
+   * @deprecated Only `timeoutMs` is extracted; all other fields are ignored for long-poll endpoints.
+   * Use the top-level `timeoutMs` field instead.
+   */
   pollingOptions?: Partial<PollingOptions<T>> | undefined;
   errorMessage: (id: string, actualState: string) => string;
 }
 
 /**
  * Shared utility for waiting for a devbox to reach a specific state.
- * Uses the /wait_for_status endpoint with polling.
+ * Uses the /wait_for_status long-poll endpoint.
  */
 export async function awaitDevboxState<T extends { status: string }>(
   options: DevboxStateWaitOptions<T>,
@@ -22,31 +28,14 @@ export async function awaitDevboxState<T extends { status: string }>(
   const { client, devboxId, targetState, statesToCheck, transitionStates, pollingOptions, errorMessage } =
     options;
 
-  const longPoll = (): Promise<T> => {
-    // This either returns a DevboxView when status matches one of statesToCheck;
-    // Otherwise it throws an 408 error when times out.
-    return client.post(`/v1/devboxes/${devboxId}/wait_for_status`, {
-      body: { statuses: statesToCheck },
-    });
-  };
-
-  const finalResult = await poll(
-    () => longPoll(),
-    () => longPoll(),
+  const finalResult = await longPollUntil(
+    () =>
+      client.post(`/v1/devboxes/${devboxId}/wait_for_status`, {
+        body: { statuses: statesToCheck },
+      }),
     {
-      ...pollingOptions,
-      shouldStop: (result) => {
-        return !transitionStates.includes(result.status);
-      },
-      onError: (error: any) => {
-        if (error.status === 408) {
-          // Return a placeholder result to continue polling
-          return { status: transitionStates[0] } as T;
-        }
-
-        // For any other error, rethrow it
-        throw error;
-      },
+      timeoutMs: options.timeoutMs ?? pollingOptions?.timeoutMs,
+      shouldStop: (result) => !transitionStates.includes(result.status),
     },
   );
 

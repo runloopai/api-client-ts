@@ -5,7 +5,7 @@ import { isRequestOptions } from '../../core';
 import { APIPromise } from '../../core';
 import * as Core from '../../core';
 import * as DevboxesAPI from './devboxes';
-import { PollingOptions, poll } from '@runloop/api-client/lib/polling';
+import { PollingOptions, longPollUntil } from '@runloop/api-client/lib/polling';
 import { Stream } from '../../streaming';
 import { withStreamAutoReconnect } from '@runloop/api-client/lib/streaming-reconnection';
 
@@ -51,48 +51,34 @@ export class Executions extends APIResource {
 
   /**
    * Wait for an async execution to complete.
-   * Polls the execution status until it reaches completed state.
+   * Long Polls the execution status until it reaches completed state.
    *
    * @param id - Devbox ID
    * @param executionId - Execution ID
-   * @param options - request options to specify retries, timeout, polling, etc.
+   * @param options - request options.
+   * @param options.timeoutMs - Timeout in milliseconds for the long-poll operation.
+   * @param options.polling - @deprecated Only `polling.timeoutMs` is used; all other PollingOptions fields are ignored. Use `timeoutMs` instead.
    */
   async awaitCompleted(
     id: string,
     executionId: string,
     options?: Core.RequestOptions & {
+      /** Timeout in milliseconds for the long-poll operation. */
+      timeoutMs?: number;
+      /** @deprecated Use `timeoutMs` instead. Only `timeoutMs` is extracted; other fields are ignored for long-poll endpoints. */
       polling?: Partial<PollingOptions<DevboxesAPI.DevboxAsyncExecutionDetailView>>;
     },
   ): Promise<DevboxesAPI.DevboxAsyncExecutionDetailView> {
-    const longPoll = (): Promise<DevboxesAPI.DevboxAsyncExecutionDetailView> => {
-      // This either returns a DevboxAsyncExecutionDetailView when execution status is completed;
-      // Otherwise it throws an 408 error when times out.
-      return this._client.post(`/v1/devboxes/${id}/executions/${executionId}/wait_for_status`, {
-        body: { statuses: ['completed'] },
-      });
-    };
-
-    const finalResult = await poll(
-      () => longPoll(),
-      () => longPoll(),
+    return longPollUntil(
+      () =>
+        this._client.post(`/v1/devboxes/${id}/executions/${executionId}/wait_for_status`, {
+          body: { statuses: ['completed'] },
+        }),
       {
-        ...options?.polling,
-        shouldStop: (result: DevboxesAPI.DevboxAsyncExecutionDetailView) => {
-          return result.status === 'completed';
-        },
-        onError: (error) => {
-          if (error.status === 408) {
-            // Return a placeholder result to continue polling
-            return { status: 'running' } as DevboxesAPI.DevboxAsyncExecutionDetailView;
-          }
-
-          // For any other error, rethrow it
-          throw error;
-        },
+        timeoutMs: options?.timeoutMs ?? options?.polling?.timeoutMs,
+        shouldStop: (result) => result.status === 'completed',
       },
     );
-
-    return finalResult;
   }
 
   /**
@@ -109,7 +95,7 @@ export class Executions extends APIResource {
   ): Core.APIPromise<DevboxesAPI.DevboxExecutionDetailView> {
     return this._client.post(`/v1/devboxes/${id}/execute_sync`, {
       body,
-      timeout: (this._client as any)._options.timeout ?? 600000,
+      timeout: this._client.timeout ?? 600000,
       ...options,
     });
   }
