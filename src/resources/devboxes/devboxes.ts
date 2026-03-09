@@ -322,7 +322,7 @@ export class Devboxes extends APIResource {
   ): Promise<DevboxAsyncExecutionDetailView> {
     const effectiveTimeoutMs = options?.timeoutMs ?? options?.polling?.timeoutMs;
     const commandId = uuidv7();
-    const execution = await this.execute(// TODO THIS IS NEEDS TO BE FIXED IDK WHATS HAPPENING HERE
+    const execution = await this.execute(
       devboxId,
       { ...params, command_id: commandId },
       { ...{ timeout: options?.timeout ?? effectiveTimeoutMs ?? 600000 }, ...options },
