@@ -24,7 +24,7 @@ export interface PollingOptions<T> {
 }
 
 const DEFAULT_OPTIONS: Partial<PollingOptions<any>> = {
-  initialDelayMs: 1000,
+  initialDelayMs: 0,
   pollingIntervalMs: 1000,
 };
 
