@@ -416,7 +416,7 @@ describe('longPollUntil', () => {
     const result = { status: 'running', id: 'devbox-1' };
     const request = jest.fn().mockResolvedValue(result);
 
-    const value = await longPollUntil(request, {
+    const value = await longPollUntil<{ status: string }>(request, {
       shouldStop: (r) => r.status === 'running',
     });
 
@@ -433,7 +433,7 @@ describe('longPollUntil', () => {
       .mockResolvedValueOnce(provisioning)
       .mockResolvedValueOnce(running);
 
-    const value = await longPollUntil(request, {
+    const value = await longPollUntil<{ status: string }>(request, {
       shouldStop: (r) => r.status === 'running',
     });
 
@@ -446,7 +446,7 @@ describe('longPollUntil', () => {
     const result = { status: 'running' };
     const request = jest.fn().mockRejectedValueOnce(timeoutError).mockResolvedValueOnce(result);
 
-    const value = await longPollUntil(request, {
+    const value = await longPollUntil<{ status: string }>(request, {
       shouldStop: (r) => r.status === 'running',
     });
 
@@ -502,7 +502,7 @@ describe('longPollUntil', () => {
     const result = { status: 'running' };
     const request = jest.fn().mockResolvedValue(result);
 
-    const value = await longPollUntil(request, {
+    const value = await longPollUntil<{ status: string }>(request, {
       timeoutMs: 5000,
       shouldStop: (r) => r.status === 'running',
     });
@@ -516,7 +516,7 @@ describe('longPollUntil', () => {
     const request = jest.fn().mockResolvedValueOnce(provisioning).mockResolvedValueOnce(running);
     const onAttempt = jest.fn();
 
-    await longPollUntil(request, {
+    await longPollUntil<{ status: string }>(request, {
       shouldStop: (r) => r.status === 'running',
       onAttempt,
     });
@@ -530,7 +530,7 @@ describe('longPollUntil', () => {
     const result = { status: 'done' };
     const request = jest.fn().mockResolvedValue(result);
 
-    const value = await longPollUntil(request, {
+    const value = await longPollUntil<{ status: string }>(request, {
       shouldStop: (r) => r.status === 'done',
     });
 
