@@ -316,6 +316,10 @@ export class Devboxes extends APIResource {
       (signal) =>
         this.waitForCommand(devboxId, execution.execution_id, waitForCommandBody, {
           signal,
+          // Per-request HTTP timeout must exceed the server's max long-poll hold (25s)
+          // so the server's 408 always arrives before the client aborts the connection.
+          // The longPollUntil AbortSignal enforces the caller's actual deadline.
+          timeout: 600000,
           // Disable base-client retries so 408s surface immediately to longPollUntil
           // (the server's wait_for_status endpoint sets x-should-retry: true for executions).
           maxRetries: 0,

@@ -610,6 +610,7 @@ describe('resource devboxes', () => {
     expect(mockPost).toHaveBeenCalledWith('/v1/devboxes/test-id/wait_for_status', {
       body: { statuses: ['running', 'failure', 'shutdown'] },
       signal: expect.any(AbortSignal),
+      timeout: 600000,
       maxRetries: 0,
     });
 
@@ -690,6 +691,7 @@ describe('resource devboxes', () => {
     expect(mockPost).toHaveBeenNthCalledWith(2, '/v1/devboxes/new-devbox-id/wait_for_status', {
       body: { statuses: ['running', 'failure', 'shutdown'] },
       signal: expect.any(AbortSignal),
+      timeout: 600000,
       maxRetries: 0,
     });
 
@@ -762,6 +764,7 @@ describe('resource devboxes', () => {
             statuses: ['completed'],
           },
           signal: expect.any(AbortSignal),
+          timeout: 600000,
           maxRetries: 0,
         },
       );
@@ -822,6 +825,7 @@ describe('resource devboxes', () => {
           statuses: ['completed'],
         },
         signal: expect.any(AbortSignal),
+        timeout: 600000,
         maxRetries: 0,
       },
     );

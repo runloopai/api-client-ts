@@ -29,6 +29,10 @@ export async function awaitDevboxState<T extends { status: string }>(
       client.post(`/v1/devboxes/${devboxId}/wait_for_status`, {
         body: { statuses: statesToCheck },
         signal,
+        // Per-request HTTP timeout must exceed the server's max long-poll hold (30s)
+        // so the server's 408 always arrives before the client aborts the connection.
+        // The longPollUntil AbortSignal enforces the caller's actual deadline.
+        timeout: 600000,
         maxRetries: 0,
       }),
     {

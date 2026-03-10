@@ -577,8 +577,9 @@ describe('smoketest: object-oriented devbox', () => {
         launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 },
       });
 
+      let snapshot: Awaited<ReturnType<typeof sourceDevbox.snapshotDiskAsync>> | undefined;
       try {
-        const snapshot = await sourceDevbox.snapshotDiskAsync({
+        snapshot = await sourceDevbox.snapshotDiskAsync({
           name: uniqueName('sdk-async-snapshot'),
           commit_message: 'Async snapshot test',
         });
@@ -586,6 +587,7 @@ describe('smoketest: object-oriented devbox', () => {
         expect(snapshot.id).toBeTruthy();
       } finally {
         await sourceDevbox.shutdown();
+        if (snapshot) await snapshot.delete();
       }
     });
   });

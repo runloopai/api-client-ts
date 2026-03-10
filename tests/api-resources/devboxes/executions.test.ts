@@ -217,6 +217,7 @@ describe('resource executions', () => {
     expect(mockPost).toHaveBeenCalledWith('/v1/devboxes/devbox-id/executions/exec-id/wait_for_status', {
       body: { statuses: ['completed'] },
       signal: expect.any(AbortSignal),
+      timeout: 600000,
       maxRetries: 0,
     });
 
