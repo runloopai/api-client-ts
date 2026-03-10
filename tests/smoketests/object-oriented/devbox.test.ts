@@ -288,6 +288,21 @@ describe('smoketest: object-oriented devbox', () => {
       }
     });
 
+    test('remove legacy tunnel (deprecated)', async () => {
+      const devbox = await sdk.devbox.create({
+        name: uniqueName('sdk-devbox-remove-tunnel'),
+        launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 },
+      });
+
+      try {
+        await devbox.net.createTunnel({ port: 9090 });
+        // Server rejects removeTunnel on portal tunnels with 400
+        await expect(devbox.net.removeTunnel({ port: 9090 })).rejects.toThrow(/400/);
+      } finally {
+        await devbox.shutdown();
+      }
+    });
+
     test('enable V2 tunnel (open)', async () => {
       const devbox = await sdk.devbox.create({
         name: uniqueName('sdk-devbox-enable-tunnel'),
@@ -554,6 +569,27 @@ describe('smoketest: object-oriented devbox', () => {
       await devbox.shutdown();
       await sourceDevbox.shutdown();
       await snapshot.delete();
+    });
+
+    test('snapshot disk async', async () => {
+      const sourceDevbox = await sdk.devbox.create({
+        name: uniqueName('sdk-devbox-for-async-snapshot'),
+        launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 },
+      });
+
+      let snapshot: Awaited<ReturnType<typeof sourceDevbox.snapshotDiskAsync>> | undefined;
+      try {
+        snapshot = await sourceDevbox.snapshotDisk({
+          name: uniqueName('sdk-async-snapshot'),
+          commit_message: 'Async snapshot test',
+        });
+        expect(snapshot).toBeDefined();
+        expect(snapshot.id).toBeTruthy();
+      } finally {
+        // force=true required because the async snapshot may still be in progress
+        await sdk.api.devboxes.shutdown(sourceDevbox.id);
+        if (snapshot) await snapshot.delete();
+      }
     });
   });
 

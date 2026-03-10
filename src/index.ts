@@ -756,6 +756,7 @@ export declare namespace Runloop {
   export type RunProfile = API.RunProfile;
 }
 
+export { type LongPollRequestOptions, LongPollAbortError, PollingTimeoutError } from './lib/polling';
 export { toFile, fileFromPath } from './uploads';
 export {
   RunloopError,

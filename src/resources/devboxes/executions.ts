@@ -5,7 +5,11 @@ import { isRequestOptions } from '../../core';
 import { APIPromise } from '../../core';
 import * as Core from '../../core';
 import * as DevboxesAPI from './devboxes';
-import { PollingOptions, poll } from '@runloop/api-client/lib/polling';
+import {
+  LongPollRequestOptions,
+  longPollUntil,
+  resolveLongPollTimeoutMs,
+} from '@runloop/api-client/lib/polling';
 import { Stream } from '../../streaming';
 import { withStreamAutoReconnect } from '@runloop/api-client/lib/streaming-reconnection';
 
@@ -51,48 +55,36 @@ export class Executions extends APIResource {
 
   /**
    * Wait for an async execution to complete.
-   * Polls the execution status until it reaches completed state.
+   * Long Polls the execution status until it reaches completed state.
    *
    * @param id - Devbox ID
    * @param executionId - Execution ID
-   * @param options - request options to specify retries, timeout, polling, etc.
+   * @param options - request options with optional long-poll configuration.
    */
   async awaitCompleted(
     id: string,
     executionId: string,
-    options?: Core.RequestOptions & {
-      polling?: Partial<PollingOptions<DevboxesAPI.DevboxAsyncExecutionDetailView>>;
-    },
+    options?: LongPollRequestOptions<DevboxesAPI.DevboxAsyncExecutionDetailView>,
   ): Promise<DevboxesAPI.DevboxAsyncExecutionDetailView> {
-    const longPoll = (): Promise<DevboxesAPI.DevboxAsyncExecutionDetailView> => {
-      // This either returns a DevboxAsyncExecutionDetailView when execution status is completed;
-      // Otherwise it throws an 408 error when times out.
-      return this._client.post(`/v1/devboxes/${id}/executions/${executionId}/wait_for_status`, {
-        body: { statuses: ['completed'] },
-      });
-    };
-
-    const finalResult = await poll(
-      () => longPoll(),
-      () => longPoll(),
+    return longPollUntil(
+      (signal) =>
+        this._client.post(`/v1/devboxes/${id}/executions/${executionId}/wait_for_status`, {
+          body: { statuses: ['completed'] },
+          signal,
+          // Per-request HTTP timeout must exceed the server's max long-poll hold (25s)
+          // so the server's 408 always arrives before the client aborts the connection.
+          // The longPollUntil AbortSignal enforces the caller's actual deadline.
+          timeout: 600000,
+          // Disable base-client retries so 408s surface immediately to longPollUntil
+          // (the server's wait_for_status endpoint sets x-should-retry: true for executions).
+          maxRetries: 0,
+        }),
       {
-        ...options?.polling,
-        shouldStop: (result: DevboxesAPI.DevboxAsyncExecutionDetailView) => {
-          return result.status === 'completed';
-        },
-        onError: (error) => {
-          if (error.status === 408) {
-            // Return a placeholder result to continue polling
-            return { status: 'running' } as DevboxesAPI.DevboxAsyncExecutionDetailView;
-          }
-
-          // For any other error, rethrow it
-          throw error;
-        },
+        timeoutMs: resolveLongPollTimeoutMs(options),
+        shouldStop: (result) => result.status === 'completed',
+        signal: options?.signal,
       },
     );
-
-    return finalResult;
   }
 
   /**
@@ -109,7 +101,7 @@ export class Executions extends APIResource {
   ): Core.APIPromise<DevboxesAPI.DevboxExecutionDetailView> {
     return this._client.post(`/v1/devboxes/${id}/execute_sync`, {
       body,
-      timeout: (this._client as any)._options.timeout ?? 600000,
+      timeout: this._client.timeout ?? 600000,
       ...options,
     });
   }

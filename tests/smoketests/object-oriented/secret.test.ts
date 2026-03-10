@@ -31,6 +31,7 @@ describe('smoketest: object-oriented secrets', () => {
 
       expect(createdSecret).toBeDefined();
       expect(createdSecret.name).toBe(secretName);
+      expect(createdSecret.id).toMatch(/^sec_/);
 
       const info = await createdSecret.getInfo();
       expect(info.id).toMatch(/^sec_/);
@@ -74,13 +75,14 @@ describe('smoketest: object-oriented secrets', () => {
       const secrets = await sdk.secret.list({ limit: 5 });
 
       expect(Array.isArray(secrets)).toBe(true);
-      expect(secrets.length).toBeLessThanOrEqual(5);
+      expect(secrets.length).toBeGreaterThan(0);
     });
 
     test('fromName creates Secret without API call', () => {
       const secret = sdk.secret.fromName(secretName);
       expect(secret).toBeDefined();
       expect(secret.name).toBe(secretName);
+      expect(secret.id).toBeUndefined();
     });
 
     test('delete secret', async () => {

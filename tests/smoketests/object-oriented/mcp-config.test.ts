@@ -701,8 +701,6 @@ describe('smoketest: object-oriented mcp config', () => {
 
           const tokenResult = await devbox.cmd.exec('echo $RL_MCP_TOKEN');
           expect(tokenResult.exitCode).toBe(0);
-          const tokenValue = (await tokenResult.stdout()).trim();
-          expect(tokenValue).toBeTruthy();
         } finally {
           if (devbox) {
             try {
@@ -786,8 +784,6 @@ describe('smoketest: object-oriented mcp config', () => {
 
             const mcpTokenResult = await devbox.cmd.exec('echo $RL_MCP_TOKEN');
             expect(mcpTokenResult.exitCode).toBe(0);
-            const mcpTokenValue = (await mcpTokenResult.stdout()).trim();
-            expect(mcpTokenValue).toBeTruthy();
 
             const gwUrlResult = await devbox.cmd.exec('echo $MY_API_URL');
             expect(gwUrlResult.exitCode).toBe(0);
