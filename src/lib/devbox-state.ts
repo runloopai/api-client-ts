@@ -29,6 +29,7 @@ export async function awaitDevboxState<T extends { status: string }>(
       client.post(`/v1/devboxes/${devboxId}/wait_for_status`, {
         body: { statuses: statesToCheck },
         signal,
+        maxRetries: 0,
       }),
     {
       timeoutMs: options.timeoutMs,

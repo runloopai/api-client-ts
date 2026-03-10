@@ -27,6 +27,7 @@ describe('awaitDevboxState', () => {
     expect(post).toHaveBeenCalledWith('/v1/devboxes/dbx-123/wait_for_status', {
       body: { statuses: ['running', 'failure', 'shutdown'] },
       signal: expect.any(AbortSignal),
+      maxRetries: 0,
     });
   });
 
