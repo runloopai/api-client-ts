@@ -313,7 +313,13 @@ export class Devboxes extends APIResource {
     }
 
     const finalResult = await longPollUntil(
-      (signal) => this.waitForCommand(devboxId, execution.execution_id, waitForCommandBody, { signal }),
+      (signal) =>
+        this.waitForCommand(devboxId, execution.execution_id, waitForCommandBody, {
+          signal,
+          // Disable base-client retries so 408s surface immediately to longPollUntil
+          // (the server's wait_for_status endpoint sets x-should-retry: true for executions).
+          maxRetries: 0,
+        }),
       {
         timeoutMs: effectiveTimeoutMs,
         shouldStop: (result) => result.status === 'completed',

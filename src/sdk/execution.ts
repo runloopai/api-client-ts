@@ -115,7 +115,13 @@ export class Execution {
           this._devboxId,
           this._executionId,
           { statuses: ['completed'] },
-          { ...requestOptions, signal },
+          {
+            ...requestOptions,
+            signal,
+            // Disable base-client retries so 408s surface immediately to longPollUntil
+            // (the server's wait_for_status endpoint sets x-should-retry: true for executions).
+            maxRetries: 0,
+          },
         ),
       {
         timeoutMs: effectiveTimeoutMs,

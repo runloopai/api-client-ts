@@ -760,6 +760,7 @@ describe('resource devboxes', () => {
             statuses: ['completed'],
           },
           signal: expect.any(AbortSignal),
+          maxRetries: 0,
         },
       );
     } finally {
@@ -819,6 +820,7 @@ describe('resource devboxes', () => {
           statuses: ['completed'],
         },
         signal: expect.any(AbortSignal),
+        maxRetries: 0,
       },
     );
 
