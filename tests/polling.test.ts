@@ -475,7 +475,10 @@ describe('longPollUntil', () => {
 
   test('should throw PollingTimeoutError when timeoutMs is exceeded', async () => {
     const request = jest.fn().mockImplementation(
-      () => new Promise((resolve) => setTimeout(() => resolve({ status: 'provisioning' }), 100)),
+      (signal: AbortSignal) => new Promise((resolve, reject) => {
+        const timer = setTimeout(() => resolve({ status: 'provisioning' }), 100);
+        signal.addEventListener('abort', () => { clearTimeout(timer); reject(new Error('aborted')); }, { once: true });
+      }),
     );
 
     await expect(
@@ -486,9 +489,13 @@ describe('longPollUntil', () => {
     ).rejects.toThrow(PollingTimeoutError);
   });
 
-  test('should enforce timeout mid-request via Promise.race', async () => {
+  test('should enforce timeout mid-request by aborting the request', async () => {
     const request = jest.fn().mockImplementation(
-      () => new Promise((resolve) => { setTimeout(() => resolve({ status: 'provisioning' }), 5000).unref(); }),
+      (signal: AbortSignal) => new Promise((resolve, reject) => {
+        const timer = setTimeout(() => resolve({ status: 'provisioning' }), 5000);
+        timer.unref();
+        signal.addEventListener('abort', () => { clearTimeout(timer); reject(new Error('aborted')); }, { once: true });
+      }),
     );
 
     const start = Date.now();
@@ -588,7 +595,11 @@ describe('longPollUntil', () => {
   test('should throw LongPollAbortError when signal is aborted mid-request', async () => {
     const controller = new AbortController();
     const request = jest.fn().mockImplementation(
-      () => new Promise((resolve) => { setTimeout(() => resolve({ status: 'provisioning' }), 5000).unref(); }),
+      (signal: AbortSignal) => new Promise((resolve, reject) => {
+        const timer = setTimeout(() => resolve({ status: 'provisioning' }), 5000);
+        timer.unref();
+        signal.addEventListener('abort', () => { clearTimeout(timer); reject(new Error('aborted')); }, { once: true });
+      }),
     );
 
     const start = Date.now();
@@ -626,10 +637,14 @@ describe('longPollUntil', () => {
     const controller = new AbortController();
     const provisioning = { status: 'provisioning' };
     let callCount = 0;
-    const request = jest.fn().mockImplementation(() => {
+    const request = jest.fn().mockImplementation((signal: AbortSignal) => {
       callCount++;
       if (callCount === 2) {
-        return new Promise((resolve) => { setTimeout(() => resolve({ status: 'provisioning' }), 5000).unref(); });
+        return new Promise((resolve, reject) => {
+          const timer = setTimeout(() => resolve({ status: 'provisioning' }), 5000);
+          timer.unref();
+          signal.addEventListener('abort', () => { clearTimeout(timer); reject(new Error('aborted')); }, { once: true });
+        });
       }
       return Promise.resolve(provisioning);
     });
@@ -652,7 +667,11 @@ describe('longPollUntil', () => {
   test('abort signal should work together with timeoutMs', async () => {
     const controller = new AbortController();
     const request = jest.fn().mockImplementation(
-      () => new Promise((resolve) => { setTimeout(() => resolve({ status: 'provisioning' }), 5000).unref(); }),
+      (signal: AbortSignal) => new Promise((resolve, reject) => {
+        const timer = setTimeout(() => resolve({ status: 'provisioning' }), 5000);
+        timer.unref();
+        signal.addEventListener('abort', () => { clearTimeout(timer); reject(new Error('aborted')); }, { once: true });
+      }),
     );
 
     setTimeout(() => controller.abort(), 50);
@@ -664,5 +683,56 @@ describe('longPollUntil', () => {
         signal: controller.signal,
       }),
     ).rejects.toThrow(LongPollAbortError);
+  });
+
+  test('should pass AbortSignal to request and abort it on timeout', async () => {
+    const receivedSignals: AbortSignal[] = [];
+    const request = jest.fn().mockImplementation(
+      (signal: AbortSignal) => {
+        receivedSignals.push(signal);
+        return new Promise((resolve, reject) => {
+          const timer = setTimeout(() => resolve({ status: 'provisioning' }), 5000);
+          timer.unref();
+          signal.addEventListener('abort', () => { clearTimeout(timer); reject(new Error('aborted')); }, { once: true });
+        });
+      },
+    );
+
+    await expect(
+      longPollUntil(request, {
+        timeoutMs: 50,
+        shouldStop: () => false,
+      }),
+    ).rejects.toThrow(PollingTimeoutError);
+
+    expect(receivedSignals.length).toBeGreaterThan(0);
+    expect(receivedSignals[receivedSignals.length - 1]!.aborted).toBe(true);
+  });
+
+  test('should pass AbortSignal to request and abort it on external signal', async () => {
+    const controller = new AbortController();
+    const receivedSignals: AbortSignal[] = [];
+    const request = jest.fn().mockImplementation(
+      (signal: AbortSignal) => {
+        receivedSignals.push(signal);
+        return new Promise((resolve, reject) => {
+          const timer = setTimeout(() => resolve({ status: 'provisioning' }), 5000);
+          timer.unref();
+          signal.addEventListener('abort', () => { clearTimeout(timer); reject(new Error('aborted')); }, { once: true });
+        });
+      },
+    );
+
+    setTimeout(() => controller.abort(), 50);
+
+    await expect(
+      longPollUntil(request, {
+        shouldStop: () => false,
+        signal: controller.signal,
+      }),
+    ).rejects.toThrow(LongPollAbortError);
+
+    expect(receivedSignals.length).toBeGreaterThan(0);
+    expect(receivedSignals[receivedSignals.length - 1]!.aborted).toBe(true);
   });
 });

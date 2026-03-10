@@ -120,10 +120,14 @@ export function _resetDeprecationWarning(): void {
 /**
  * Long-poll loop for server-side blocking endpoints (e.g. wait_for_status).
  * Retries automatically on 408 (server timeout). No sleep between attempts
- * because the server already blocks. Each request is raced against the
- * remaining deadline so a hanging server cannot block past `timeoutMs`.
+ * because the server already blocks. Each iteration's request is given an
+ * AbortSignal so that timeouts and external cancellation actually cancel the
+ * in-flight HTTP request rather than just racing past it.
  */
-export async function longPollUntil<T>(request: () => Promise<T>, options: LongPollOptions<T>): Promise<T> {
+export async function longPollUntil<T>(
+  request: (signal: AbortSignal) => Promise<T>,
+  options: LongPollOptions<T>,
+): Promise<T> {
   const { timeoutMs, shouldStop, onAttempt, signal } = options;
 
   if (timeoutMs !== undefined && timeoutMs <= 0) {
@@ -138,57 +142,45 @@ export async function longPollUntil<T>(request: () => Promise<T>, options: LongP
   let attempts = 0;
   let lastResult: T | undefined;
 
-  const raceDeadline = <R>(promise: Promise<R>): Promise<R> => {
+  while (true) {
     if (signal?.aborted) {
-      return Promise.reject(new LongPollAbortError('Long poll aborted', lastResult));
+      throw new LongPollAbortError('Long poll aborted', lastResult);
     }
 
-    const racers: Promise<R>[] = [promise];
-    const cleanups: (() => void)[] = [];
+    attempts++;
+    const iterationController = new AbortController();
+    const iterationSignal = iterationController.signal;
 
+    const onExternalAbort = () => iterationController.abort();
+    signal?.addEventListener('abort', onExternalAbort, { once: true });
+
+    let deadlineTimer: ReturnType<typeof setTimeout> | undefined;
     if (deadline) {
       const remaining = deadline - Date.now();
       if (remaining <= 0) {
-        return Promise.reject(
-          new PollingTimeoutError(`Long poll timed out after ${timeoutMs}ms`, lastResult),
-        );
+        signal?.removeEventListener('abort', onExternalAbort);
+        throw new PollingTimeoutError(`Long poll timed out after ${timeoutMs}ms`, lastResult);
       }
-      let timeoutId: ReturnType<typeof setTimeout>;
-      racers.push(
-        new Promise<never>((_, reject) => {
-          timeoutId = setTimeout(
-            () => reject(new PollingTimeoutError(`Long poll timed out after ${timeoutMs}ms`, lastResult)),
-            remaining,
-          );
-        }),
-      );
-      cleanups.push(() => clearTimeout(timeoutId));
+      deadlineTimer = setTimeout(() => iterationController.abort(), remaining);
     }
 
-    if (signal) {
-      racers.push(
-        new Promise<never>((_, reject) => {
-          const onAbort = () => reject(new LongPollAbortError('Long poll aborted', lastResult));
-          signal.addEventListener('abort', onAbort, { once: true });
-          cleanups.push(() => signal.removeEventListener('abort', onAbort));
-        }),
-      );
-    }
-
-    if (racers.length === 1) return promise;
-    return Promise.race(racers).finally(() => cleanups.forEach((fn) => fn()));
-  };
-
-  while (true) {
-    attempts++;
     try {
-      const result = await raceDeadline(request());
+      const result = await request(iterationSignal);
       lastResult = result;
       onAttempt?.(attempts, result);
       if (shouldStop(result)) return result;
     } catch (error) {
       if (error instanceof APIError && error.status === 408) continue;
+      if (iterationSignal.aborted) {
+        if (signal?.aborted) {
+          throw new LongPollAbortError('Long poll aborted', lastResult);
+        }
+        throw new PollingTimeoutError(`Long poll timed out after ${timeoutMs}ms`, lastResult);
+      }
       throw error;
+    } finally {
+      clearTimeout(deadlineTimer);
+      signal?.removeEventListener('abort', onExternalAbort);
     }
   }
 }

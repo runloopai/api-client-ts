@@ -25,9 +25,10 @@ export async function awaitDevboxState<T extends { status: string }>(
   const { client, devboxId, targetState, statesToCheck, transitionStates, errorMessage } = options;
 
   const finalResult = await longPollUntil(
-    () =>
+    (signal) =>
       client.post(`/v1/devboxes/${devboxId}/wait_for_status`, {
         body: { statuses: statesToCheck },
+        signal,
       }),
     {
       timeoutMs: options.timeoutMs,

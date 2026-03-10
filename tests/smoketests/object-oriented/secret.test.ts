@@ -31,6 +31,7 @@ describe('smoketest: object-oriented secrets', () => {
 
       expect(createdSecret).toBeDefined();
       expect(createdSecret.name).toBe(secretName);
+      expect(createdSecret.id).toMatch(/^sec_/);
 
       const info = await createdSecret.getInfo();
       expect(info.id).toMatch(/^sec_/);
@@ -81,6 +82,7 @@ describe('smoketest: object-oriented secrets', () => {
       const secret = sdk.secret.fromName(secretName);
       expect(secret).toBeDefined();
       expect(secret.name).toBe(secretName);
+      expect(secret.id).toBeUndefined();
     });
 
     test('delete secret', async () => {

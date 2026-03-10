@@ -313,7 +313,7 @@ export class Devboxes extends APIResource {
     }
 
     const finalResult = await longPollUntil(
-      () => this.waitForCommand(devboxId, execution.execution_id, waitForCommandBody),
+      (signal) => this.waitForCommand(devboxId, execution.execution_id, waitForCommandBody, { signal }),
       {
         timeoutMs: effectiveTimeoutMs,
         shouldStop: (result) => result.status === 'completed',

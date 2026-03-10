@@ -609,6 +609,7 @@ describe('resource devboxes', () => {
     expect(mockPost).toHaveBeenCalledTimes(2);
     expect(mockPost).toHaveBeenCalledWith('/v1/devboxes/test-id/wait_for_status', {
       body: { statuses: ['running', 'failure', 'shutdown'] },
+      signal: expect.any(AbortSignal),
     });
 
     mockPost.mockRestore();
@@ -687,6 +688,7 @@ describe('resource devboxes', () => {
     // Check polling calls
     expect(mockPost).toHaveBeenNthCalledWith(2, '/v1/devboxes/new-devbox-id/wait_for_status', {
       body: { statuses: ['running', 'failure', 'shutdown'] },
+      signal: expect.any(AbortSignal),
     });
 
     mockPost.mockRestore();
@@ -757,6 +759,7 @@ describe('resource devboxes', () => {
           body: {
             statuses: ['completed'],
           },
+          signal: expect.any(AbortSignal),
         },
       );
     } finally {
@@ -815,6 +818,7 @@ describe('resource devboxes', () => {
         body: {
           statuses: ['completed'],
         },
+        signal: expect.any(AbortSignal),
       },
     );
 

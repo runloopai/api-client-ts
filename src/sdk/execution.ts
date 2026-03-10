@@ -110,12 +110,12 @@ export class Execution {
     const { longPoll: _lp, polling: _p, ...requestOptions } = options ?? {};
 
     const commandPromise = longPollUntil(
-      () =>
+      (signal) =>
         this.client.devboxes.waitForCommand(
           this._devboxId,
           this._executionId,
           { statuses: ['completed'] },
-          requestOptions,
+          { ...requestOptions, signal },
         ),
       {
         timeoutMs: effectiveTimeoutMs,

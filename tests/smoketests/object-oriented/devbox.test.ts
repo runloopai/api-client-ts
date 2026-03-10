@@ -288,6 +288,21 @@ describe('smoketest: object-oriented devbox', () => {
       }
     });
 
+    test('remove legacy tunnel (deprecated)', async () => {
+      const devbox = await sdk.devbox.create({
+        name: uniqueName('sdk-devbox-remove-tunnel'),
+        launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 },
+      });
+
+      try {
+        await devbox.net.createTunnel({ port: 9090 });
+        const result = await devbox.net.removeTunnel({ port: 9090 });
+        expect(result).toBeDefined();
+      } finally {
+        await devbox.shutdown();
+      }
+    });
+
     test('enable V2 tunnel (open)', async () => {
       const devbox = await sdk.devbox.create({
         name: uniqueName('sdk-devbox-enable-tunnel'),
@@ -554,6 +569,24 @@ describe('smoketest: object-oriented devbox', () => {
       await devbox.shutdown();
       await sourceDevbox.shutdown();
       await snapshot.delete();
+    });
+
+    test('snapshot disk async', async () => {
+      const sourceDevbox = await sdk.devbox.create({
+        name: uniqueName('sdk-devbox-for-async-snapshot'),
+        launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 },
+      });
+
+      try {
+        const snapshot = await sourceDevbox.snapshotDiskAsync({
+          name: uniqueName('sdk-async-snapshot'),
+          commit_message: 'Async snapshot test',
+        });
+        expect(snapshot).toBeDefined();
+        expect(snapshot.id).toBeTruthy();
+      } finally {
+        await sourceDevbox.shutdown();
+      }
     });
   });
 

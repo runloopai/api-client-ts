@@ -67,9 +67,10 @@ export class Executions extends APIResource {
     options?: LongPollRequestOptions<DevboxesAPI.DevboxAsyncExecutionDetailView>,
   ): Promise<DevboxesAPI.DevboxAsyncExecutionDetailView> {
     return longPollUntil(
-      () =>
+      (signal) =>
         this._client.post(`/v1/devboxes/${id}/executions/${executionId}/wait_for_status`, {
           body: { statuses: ['completed'] },
+          signal,
         }),
       {
         timeoutMs: resolveLongPollTimeoutMs(options),

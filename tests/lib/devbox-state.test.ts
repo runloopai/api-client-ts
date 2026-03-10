@@ -26,6 +26,7 @@ describe('awaitDevboxState', () => {
     expect(value).toBe(result);
     expect(post).toHaveBeenCalledWith('/v1/devboxes/dbx-123/wait_for_status', {
       body: { statuses: ['running', 'failure', 'shutdown'] },
+      signal: expect.any(AbortSignal),
     });
   });
 
@@ -51,7 +52,10 @@ describe('awaitDevboxState', () => {
 
   test('should use timeoutMs field for the long-poll deadline', async () => {
     const post = jest.fn().mockImplementation(
-      () => new Promise((resolve) => setTimeout(() => resolve({ status: 'provisioning', id: 'dbx-123' }), 100)),
+      (_url: string, opts: { signal?: AbortSignal }) => new Promise((resolve, reject) => {
+        const timer = setTimeout(() => resolve({ status: 'provisioning', id: 'dbx-123' }), 100);
+        opts?.signal?.addEventListener('abort', () => { clearTimeout(timer); reject(new Error('aborted')); }, { once: true });
+      }),
     );
 
     await expect(
@@ -59,9 +63,13 @@ describe('awaitDevboxState', () => {
     ).rejects.toThrow(PollingTimeoutError);
   });
 
-  test('should enforce timeout mid-request via Promise.race', async () => {
+  test('should enforce timeout mid-request by aborting the request', async () => {
     const post = jest.fn().mockImplementation(
-      () => new Promise((resolve) => { setTimeout(() => resolve({ status: 'provisioning', id: 'dbx-123' }), 5000).unref(); }),
+      (_url: string, opts: { signal?: AbortSignal }) => new Promise((resolve, reject) => {
+        const timer = setTimeout(() => resolve({ status: 'provisioning', id: 'dbx-123' }), 5000);
+        timer.unref();
+        opts?.signal?.addEventListener('abort', () => { clearTimeout(timer); reject(new Error('aborted')); }, { once: true });
+      }),
     );
 
     const start = Date.now();
