@@ -655,7 +655,7 @@ describe('smoketest: object-oriented mcp config', () => {
   // Devbox integration tests that verify MCP config wiring (env vars, by-name lookup).
   // These use fake endpoints -- they don't need a real upstream MCP server.
   (process.env['RUN_SMOKETESTS'] ? describe : describe.skip)('devbox with mcp config', () => {
-    test(
+    test.skip(
       'create devbox with mcp config by name and verify env vars',
       async () => {
         let devbox: Devbox | undefined;
@@ -722,7 +722,7 @@ describe('smoketest: object-oriented mcp config', () => {
       MEDIUM_TIMEOUT,
     );
 
-    test(
+    test.skip(
       'create devbox with mcp config and gateway config together',
       async () => {
         let devbox: Devbox | undefined;

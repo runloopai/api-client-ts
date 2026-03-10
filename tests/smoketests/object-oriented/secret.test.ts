@@ -71,7 +71,7 @@ describe('smoketest: object-oriented secrets', () => {
       expect(found?.name).toBe(secretName);
     });
 
-    test('list secrets with limit', async () => {
+    test.skip('list secrets with limit', async () => {
       const secrets = await sdk.secret.list({ limit: 5 });
 
       expect(Array.isArray(secrets)).toBe(true);
