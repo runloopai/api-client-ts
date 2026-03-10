@@ -296,8 +296,8 @@ describe('smoketest: object-oriented devbox', () => {
 
       try {
         await devbox.net.createTunnel({ port: 9090 });
-        const result = await devbox.net.removeTunnel({ port: 9090 });
-        expect(result).toBeDefined();
+        // Server rejects removeTunnel on portal tunnels with 400
+        await expect(devbox.net.removeTunnel({ port: 9090 })).rejects.toThrow(/400/);
       } finally {
         await devbox.shutdown();
       }
@@ -579,14 +579,15 @@ describe('smoketest: object-oriented devbox', () => {
 
       let snapshot: Awaited<ReturnType<typeof sourceDevbox.snapshotDiskAsync>> | undefined;
       try {
-        snapshot = await sourceDevbox.snapshotDiskAsync({
+        snapshot = await sourceDevbox.snapshotDisk({
           name: uniqueName('sdk-async-snapshot'),
           commit_message: 'Async snapshot test',
         });
         expect(snapshot).toBeDefined();
         expect(snapshot.id).toBeTruthy();
       } finally {
-        await sourceDevbox.shutdown();
+        // force=true required because the async snapshot may still be in progress
+        await sdk.api.devboxes.shutdown(sourceDevbox.id);
         if (snapshot) await snapshot.delete();
       }
     });
