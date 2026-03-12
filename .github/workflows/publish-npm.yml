@@ -4,6 +4,10 @@
 name: Publish NPM
 on:
   workflow_dispatch:
+    inputs:
+      path:
+        description: The path to run the release in, e.g. '.' or 'packages/mcp-server'
+        required: true
 
   release:
     types: [published]
@@ -48,3 +52,10 @@ jobs:
           fi
         env:
           NPM_TOKEN: ${{ secrets.RUNLOOP_NPM_TOKEN || secrets.NPM_TOKEN }}
+
+      - name: Upload MCP Server DXT GitHub release asset
+        run: |
+          gh release upload ${{ github.event.release.tag_name }} \
+            packages/mcp-server/runloop_api_client_api.mcpb
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
