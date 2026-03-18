@@ -263,46 +263,6 @@ describe('smoketest: object-oriented devbox', () => {
       await devbox.shutdown();
     });
 
-    test('create legacy tunnel (deprecated - now creates v2 tunnel)', async () => {
-      const devbox = await sdk.devbox.create({
-        name: uniqueName('sdk-devbox-tunnel'),
-        launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 }, // 5 minutes
-      });
-
-      try {
-        // Create tunnel using deprecated createTunnel method (now creates v2 tunnel)
-        const tunnel = await devbox.net.createTunnel({ port: 8080 });
-
-        // Verify the tunnel response structure
-        expect(tunnel).toBeDefined();
-        expect(tunnel.devbox_id).toBe(devbox.id);
-        expect(tunnel.port).toBe(8080);
-        expect(tunnel.url).toBeDefined();
-
-        // Note: v2 tunnels cannot be removed - they remain active until devbox shutdown
-        // Verify the tunnel is accessible via devbox info
-        const info = await devbox.getInfo();
-        expect(info.tunnel).toBeDefined();
-      } finally {
-        await devbox.shutdown();
-      }
-    });
-
-    test('remove legacy tunnel (deprecated)', async () => {
-      const devbox = await sdk.devbox.create({
-        name: uniqueName('sdk-devbox-remove-tunnel'),
-        launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 },
-      });
-
-      try {
-        await devbox.net.createTunnel({ port: 9090 });
-        // Server rejects removeTunnel on portal tunnels with 400
-        await expect(devbox.net.removeTunnel({ port: 9090 })).rejects.toThrow(/400/);
-      } finally {
-        await devbox.shutdown();
-      }
-    });
-
     test('enable V2 tunnel (open)', async () => {
       const devbox = await sdk.devbox.create({
         name: uniqueName('sdk-devbox-enable-tunnel'),
