@@ -263,15 +263,15 @@ describe('smoketest: object-oriented devbox', () => {
       await devbox.shutdown();
     });
 
-    test('create legacy tunnel (deprecated - now creates v2 tunnel)', async () => {
+    test('enable legacy tunnel (deprecated - now creates v2 tunnel)', async () => {
       const devbox = await sdk.devbox.create({
         name: uniqueName('sdk-devbox-tunnel'),
         launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 }, // 5 minutes
       });
 
       try {
-        // Create tunnel using deprecated createTunnel method (now creates v2 tunnel)
-        const tunnel = await devbox.net.createTunnel({ port: 8080 });
+        // Create tunnel using deprecated enableTunnel method (now creates v2 tunnel)
+        const tunnel = await devbox.net.enableTunnel({ port: 8080 });
 
         // Verify the tunnel response structure
         expect(tunnel).toBeDefined();
@@ -288,14 +288,14 @@ describe('smoketest: object-oriented devbox', () => {
       }
     });
 
-    test('remove legacy tunnel (deprecated)', async () => {
+    test('remove legacy tunnel after enable (deprecated)', async () => {
       const devbox = await sdk.devbox.create({
         name: uniqueName('sdk-devbox-remove-tunnel'),
         launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 },
       });
 
       try {
-        await devbox.net.createTunnel({ port: 9090 });
+        await devbox.net.enableTunnel({ port: 9090 });
         // Server rejects removeTunnel on portal tunnels with 400
         await expect(devbox.net.removeTunnel({ port: 9090 })).rejects.toThrow(/400/);
       } finally {
