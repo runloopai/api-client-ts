@@ -38,28 +38,24 @@ export async function initMcpServer(params: {
 
   let _client: Runloop | undefined;
   let _clientError: Error | undefined;
-  let _logLevel: 'debug' | 'info' | 'warn' | 'error' | 'off' | undefined;
 
   const getClient = (): Runloop => {
     if (_clientError) throw _clientError;
-    if (!_client) {
-      try {
-        _client = new Runloop({
-          ...params.clientOptions,
-          defaultHeaders: {
-            ...params.clientOptions?.defaultHeaders,
-            'X-Stainless-MCP': 'true',
-          },
-        });
-        if (_logLevel) {
-          _client = _client.withOptions({ logLevel: _logLevel });
-        }
-      } catch (e) {
-        _clientError = e instanceof Error ? e : new Error(String(e));
-        throw _clientError;
-      }
+    if (_client) return _client;
+
+    try {
+      _client = new Runloop({
+        ...params.clientOptions,
+        defaultHeaders: {
+          ...params.clientOptions?.defaultHeaders,
+          'X-Stainless-MCP': 'true',
+        },
+      });
+      return _client;
+    } catch (e) {
+      _clientError = e instanceof Error ? e : new Error(String(e));
+      throw _clientError;
     }
-    return _client;
   };
 
   const providedTools = selectTools(params.mcpOptions);
