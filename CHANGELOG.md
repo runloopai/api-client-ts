@@ -1,5 +1,18 @@
 # Changelog
 
+## 1.11.1 (2026-03-18)
+
+Full Changelog: [v1.11.0...v1.11.1](https://github.com/runloopai/api-client-ts/compare/v1.11.0...v1.11.1)
+
+### Chores
+
+* configure new SDK language ([64381c0](https://github.com/runloopai/api-client-ts/commit/64381c018407f0e02a3aaf110158e917efe664ac))
+* configure new SDK language ([c710951](https://github.com/runloopai/api-client-ts/commit/c7109516f4f2c8c860cde297831310781f4addb3))
+* **internal:** make generated MCP servers compatible with Cloudflare worker environments ([53f0208](https://github.com/runloopai/api-client-ts/commit/53f0208346e1ab2283efbc5c665428446db72e64))
+* **internal:** support x-stainless-mcp-client-envs header in MCP servers ([9b4769e](https://github.com/runloopai/api-client-ts/commit/9b4769e31c07f9729492ff87b3f3771bc5c5680a))
+* **internal:** support x-stainless-mcp-client-permissions headers in MCP servers ([624d5f1](https://github.com/runloopai/api-client-ts/commit/624d5f14c20094cf942e92673271e0136fba8fa8))
+* **internal:** tweak CI branches ([1064841](https://github.com/runloopai/api-client-ts/commit/10648417aec063456e8ecab75db62daec1f148fd))
+
 ## 1.11.0 (2026-03-10)
 
 Full Changelog: [v1.10.3...v1.11.0](https://github.com/runloopai/api-client-ts/compare/v1.10.3...v1.11.0)
