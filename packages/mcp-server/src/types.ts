@@ -45,7 +45,6 @@ export type ToolCallResult = {
 export type McpRequestContext = {
   client: Runloop;
   stainlessApiKey?: string | undefined;
-  upstreamClientEnvs?: Record<string, string> | undefined;
 };
 
 export type HandlerFunction = ({

@@ -1,4 +1,4 @@
-configured_endpoints: 118
-openapi_spec_url: https://storage.googleapis.com/stainless-sdk-openapi-specs/runloop-ai%2Frunloop-132ed160716591bdcd9231c00da8c506d9451a5486b165fc27b2a01d93202082.yml
-openapi_spec_hash: c2b44d9e9cda56e32141a7ea3794bbba
-config_hash: 3bd89c812b96708c461fb98286ebf0b5
+configured_endpoints: 117
+openapi_spec_url: https://storage.googleapis.com/stainless-sdk-openapi-specs/runloop-ai%2Frunloop-0568973e19e8af9fa953b2ded109ab2b69e76e90e2b74f33617dbf7092e26274.yml
+openapi_spec_hash: 10ba804ce69510d7985e05c77d0ffcf6
+config_hash: de99cfce88e2d1f02246dc6c2f43bc6c

@@ -12,24 +12,29 @@ interface InstructionsCacheEntry {
 
 const instructionsCache = new Map<string, InstructionsCacheEntry>();
 
-export async function getInstructions(stainlessApiKey: string | undefined): Promise<string> {
+// Periodically evict stale entries so the cache doesn't grow unboundedly.
+const _cacheCleanupInterval = setInterval(() => {
   const now = Date.now();
-  const cacheKey = stainlessApiKey ?? '';
-  const cached = instructionsCache.get(cacheKey);
-
-  if (cached && now - cached.fetchedAt <= INSTRUCTIONS_CACHE_TTL_MS) {
-    return cached.fetchedInstructions;
-  }
-
-  // Evict stale entries so the cache doesn't grow unboundedly.
   for (const [key, entry] of instructionsCache) {
     if (now - entry.fetchedAt > INSTRUCTIONS_CACHE_TTL_MS) {
       instructionsCache.delete(key);
     }
   }
+}, INSTRUCTIONS_CACHE_TTL_MS);
+
+// Don't keep the process alive just for cleanup.
+_cacheCleanupInterval.unref();
+
+export async function getInstructions(stainlessApiKey: string | undefined): Promise<string> {
+  const cacheKey = stainlessApiKey ?? '';
+  const cached = instructionsCache.get(cacheKey);
+
+  if (cached && Date.now() - cached.fetchedAt <= INSTRUCTIONS_CACHE_TTL_MS) {
+    return cached.fetchedInstructions;
+  }
 
   const fetchedInstructions = await fetchLatestInstructions(stainlessApiKey);
-  instructionsCache.set(cacheKey, { fetchedInstructions, fetchedAt: now });
+  instructionsCache.set(cacheKey, { fetchedInstructions, fetchedAt: Date.now() });
   return fetchedInstructions;
 }
 

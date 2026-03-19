@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.11.2 (2026-03-19)
+
+Full Changelog: [v1.11.1...v1.11.2](https://github.com/runloopai/api-client-ts/compare/v1.11.1...v1.11.2)
+
+### Chores
+
+* remove create_tunnel endpoint ([5076da2](https://github.com/runloopai/api-client-ts/commit/5076da21a6729b4d288b530f78cc0e16415175d7))
+
 ## 1.11.1 (2026-03-18)
 
 Full Changelog: [v1.11.0...v1.11.1](https://github.com/runloopai/api-client-ts/compare/v1.11.0...v1.11.1)

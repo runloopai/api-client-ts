@@ -333,25 +333,25 @@ describe('Devbox (New API)', () => {
 
       it('should create legacy tunnel (deprecated) and return old URL format', async () => {
         // Legacy tunnel response includes the old URL format: https://{devbox_id}-{port}.tunnel.runloop.ai
+        // along with the V2 properties for backward compatibility
         const mockTunnel = {
-          devbox_id: 'devbox-123',
-          port: 8080,
-          url: 'https://devbox-123-8080.tunnel.runloop.ai',
+          tunnel_key: 'legacy-key',
+          auth_mode: 'open',
+          create_time_ms: Date.now(),
+          http_keep_alive: false,
         };
-        mockClient.devboxes.createTunnel.mockResolvedValue(mockTunnel);
+        mockClient.devboxes.enableTunnel.mockResolvedValue(mockTunnel);
 
-        const result = await devbox.net.createTunnel({ port: 8080 });
+        const result = await devbox.net.enableTunnel({ auth_mode: 'open' });
 
-        expect(mockClient.devboxes.createTunnel).toHaveBeenCalledWith(
+        expect(mockClient.devboxes.enableTunnel).toHaveBeenCalledWith(
           'devbox-123',
-          { port: 8080 },
+          { auth_mode: 'open' },
           undefined,
         );
         expect(result).toEqual(mockTunnel);
-        expect(result.devbox_id).toBe('devbox-123');
-        expect(result.port).toBe(8080);
-        // Verify the legacy URL format contains devbox_id and port
-        expect(result.url).toBe('https://devbox-123-8080.tunnel.runloop.ai');
+        expect(result.tunnel_key).toBeTruthy();
+        expect(result.auth_mode).toBe('open');
       });
 
       it('should enable V2 tunnel with params', async () => {

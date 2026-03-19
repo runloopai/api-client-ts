@@ -181,21 +181,6 @@ describe('resource devboxes', () => {
     );
   });
 
-  test('createTunnel: only required params', async () => {
-    const responsePromise = client.devboxes.createTunnel('id', { port: 0 });
-    const rawResponse = await responsePromise.asResponse();
-    expect(rawResponse).toBeInstanceOf(Response);
-    const response = await responsePromise;
-    expect(response).not.toBeInstanceOf(Response);
-    const dataAndResponse = await responsePromise.withResponse();
-    expect(dataAndResponse.data).toBe(response);
-    expect(dataAndResponse.response).toBe(rawResponse);
-  });
-
-  test('createTunnel: required and optional params', async () => {
-    const response = await client.devboxes.createTunnel('id', { port: 0 });
-  });
-
   test('deleteDiskSnapshot', async () => {
     const responsePromise = client.devboxes.deleteDiskSnapshot('id');
     const rawResponse = await responsePromise.asResponse();
