@@ -6,7 +6,6 @@ import type {
   DevboxCreateParams,
   DevboxAsyncExecutionDetailView,
   DevboxSnapshotDiskParams,
-  DevboxCreateTunnelParams,
   DevboxEnableTunnelParams,
   DevboxRemoveTunnelParams,
   DevboxReadFileContentsParams,
@@ -100,30 +99,6 @@ export class DevboxNetOps {
    */
   async createSSHKey(options?: Core.RequestOptions) {
     return this.client.devboxes.createSSHKey(this.devboxId, options);
-  }
-
-  /**
-   * @deprecated Use {@link enableTunnel} instead for V2 tunnels with better URL format.
-   *
-   * Creates a legacy tunnel to expose a specific port on the devbox.
-   * The legacy tunnel URL format is: `https://{devbox_id}-{port}.tunnel.runloop.ai`
-   *
-   * V2 tunnels (via enableTunnel) provide encrypted URL-based access with the format:
-   * `https://{port}-{tunnel_key}.tunnel.runloop.ai`
-   *
-   * @example
-   * ```typescript
-   * // Deprecated - use enableTunnel instead
-   * const tunnel = await devbox.net.createTunnel({ port: 8080 });
-   * console.log(tunnel.url); // Legacy URL format
-   * ```
-   *
-   * @param {DevboxCreateTunnelParams} params - Tunnel creation parameters including port
-   * @param {Core.RequestOptions} [options] - Request options
-   * @returns {Promise<DevboxTunnelView>} Legacy tunnel view with devbox_id, port, and url
-   */
-  async createTunnel(params: DevboxCreateTunnelParams, options?: Core.RequestOptions) {
-    return this.client.devboxes.createTunnel(this.devboxId, params, options);
   }
 
   /**
