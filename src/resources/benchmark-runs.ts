@@ -39,7 +39,9 @@ export class BenchmarkRuns extends APIResource {
   }
 
   /**
-   * Cancel a currently running Benchmark run.
+   * Cancel a Benchmark run. This will do the following: 1. Cancel all running
+   * scenarios and shutdown the underlying Devbox resources 2. Update the benchmark
+   * state to CANCELED 3. Calculate final score from completed scenarios
    */
   cancel(id: string, options?: Core.RequestOptions): Core.APIPromise<BenchmarkRunView> {
     return this._client.post(`/v1/benchmark_runs/${id}/cancel`, options);
@@ -118,7 +120,7 @@ export interface BenchmarkRunView {
   /**
    * The state of the BenchmarkRun.
    */
-  state: 'running' | 'canceled' | 'completed';
+  state: 'running' | 'canceled' | 'completed' | 'failed';
 
   /**
    * The ID of the Benchmark definition. Present if run was created from a benchmark

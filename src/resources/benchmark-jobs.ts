@@ -505,7 +505,7 @@ export namespace BenchmarkJobView {
     /**
      * The current state of the run.
      */
-    state: 'running' | 'canceled' | 'completed';
+    state: 'running' | 'canceled' | 'completed' | 'failed';
 
     /**
      * Agent configuration used for this run. Specifies whether the run was driven by

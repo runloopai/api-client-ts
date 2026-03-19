@@ -124,21 +124,6 @@ export class Devboxes extends APIResource {
   }
 
   /**
-   * [Deprecated] Use POST /v1/devboxes/{id}/enable_tunnel instead. This endpoint
-   * creates a legacy tunnel. The new enable_tunnel endpoint provides improved tunnel
-   * functionality with authentication options.
-   *
-   * @deprecated
-   */
-  createTunnel(
-    id: string,
-    body: DevboxCreateTunnelParams,
-    options?: Core.RequestOptions,
-  ): Core.APIPromise<DevboxTunnelView> {
-    return this._client.post(`/v1/devboxes/${id}/create_tunnel`, { body, ...options });
-  }
-
-  /**
    * Delete a previously taken disk snapshot of a Devbox.
    */
   deleteDiskSnapshot(id: string, options?: Core.RequestOptions): Core.APIPromise<unknown> {
@@ -696,23 +681,6 @@ export interface DevboxSnapshotView {
   source_blueprint_id?: string | null;
 }
 
-export interface DevboxTunnelView {
-  /**
-   * ID of the Devbox the tunnel routes to.
-   */
-  devbox_id: string;
-
-  /**
-   * Port of the Devbox the tunnel routes to.
-   */
-  port: number;
-
-  /**
-   * Public url used to access Devbox.
-   */
-  url: string;
-}
-
 /**
  * A Devbox represents a virtual development environment. It is an isolated sandbox
  * that can be given to agents and used to run arbitrary code such as AI generated
@@ -1137,13 +1105,6 @@ export interface DevboxListParams extends DevboxesCursorIDPageParams {
     | 'shutdown';
 }
 
-export interface DevboxCreateTunnelParams {
-  /**
-   * Devbox port that tunnel will expose.
-   */
-  port: number;
-}
-
 export interface DevboxDownloadFileParams {
   /**
    * The path on the Devbox filesystem to read the file from. Path is relative to
@@ -1387,7 +1348,6 @@ export declare namespace Devboxes {
     type DevboxSendStdInResult as DevboxSendStdInResult,
     type DevboxSnapshotListView as DevboxSnapshotListView,
     type DevboxSnapshotView as DevboxSnapshotView,
-    type DevboxTunnelView as DevboxTunnelView,
     type DevboxView as DevboxView,
     type TunnelView as TunnelView,
     type DevboxCreateSSHKeyResponse as DevboxCreateSSHKeyResponse,
@@ -1401,7 +1361,6 @@ export declare namespace Devboxes {
     type DevboxCreateParams as DevboxCreateParams,
     type DevboxUpdateParams as DevboxUpdateParams,
     type DevboxListParams as DevboxListParams,
-    type DevboxCreateTunnelParams as DevboxCreateTunnelParams,
     type DevboxDownloadFileParams as DevboxDownloadFileParams,
     type DevboxEnableTunnelParams as DevboxEnableTunnelParams,
     type DevboxExecuteParams as DevboxExecuteParams,
