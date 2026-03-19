@@ -185,15 +185,23 @@ describe('ScenarioBuilder', () => {
       expect(() => builder.build()).toThrow('At least one scorer is required');
     });
 
-    it('should throw when scorer weight is not positive', () => {
+    it('should throw when scorer weight is not a finite positive number', () => {
       const builder = new ScenarioBuilder('test', mockClient);
 
       expect(() => builder.addShellCommandScorer('s', { command: 'echo 1', weight: 0 })).toThrow(
-        'Scorer weight must be positive',
+        'Scorer weight must be a finite positive number',
       );
 
       expect(() => builder.addShellCommandScorer('s', { command: 'echo 1', weight: -1 })).toThrow(
-        'Scorer weight must be positive',
+        'Scorer weight must be a finite positive number',
+      );
+
+      expect(() => builder.addShellCommandScorer('s', { command: 'echo 1', weight: NaN })).toThrow(
+        'Scorer weight must be a finite positive number',
+      );
+
+      expect(() => builder.addShellCommandScorer('s', { command: 'echo 1', weight: Infinity })).toThrow(
+        'Scorer weight must be a finite positive number',
       );
     });
   });

@@ -435,8 +435,8 @@ export class ScenarioBuilder {
   }
 
   private addScorer(name: string, weight: number, scorer: ScoringFunction['scorer']): this {
-    if (weight <= 0) {
-      throw new Error(`Scorer weight must be positive, got ${weight}`);
+    if (!Number.isFinite(weight) || weight <= 0) {
+      throw new Error(`Scorer weight must be a finite positive number, got ${weight}`);
     }
     this._scorers.push({ name, weight, scorer });
     return this;
