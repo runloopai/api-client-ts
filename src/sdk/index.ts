@@ -12,3 +12,4 @@ export { McpConfig } from './mcp-config';
 export { Secret } from './secret';
 export { ScenarioRun } from './scenario-run';
 export { Scenario, type ScenarioRunParams } from './scenario';
+export { ScenarioBuilder } from './scenario-builder';
