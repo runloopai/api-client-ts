@@ -200,12 +200,6 @@ export interface LaunchParameters {
   architecture?: 'x86_64' | 'arm64' | null;
 
   /**
-   * A list of ports to make available on the Devbox. Only ports made available will
-   * be surfaced to create tunnels via the 'createTunnel' API.
-   */
-  available_ports?: Array<number> | null;
-
-  /**
    * Custom CPU cores. Must be 0.5, 1, or a multiple of 2. Max is 16.
    */
   custom_cpu_cores?: number | null;
