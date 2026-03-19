@@ -1,0 +1,35 @@
+# Runloop TypeScript SDK
+
+> TypeScript client for Runloop.ai—create cloud devboxes, execute commands, manage blueprints and snapshots. Additional platform documentation is available at [docs.runloop.ai](https://docs.runloop.ai) and [docs.runloop.ai/llms.txt](https://docs.runloop.ai/llms.txt).
+
+## Quick Start
+
+- [README.md](README.md): Installation, authentication, and quickstart example
+- [EXAMPLES.md](EXAMPLES.md): Consolidated workflow recipes
+
+## Core Patterns
+
+- [Devbox lifecycle example](examples/devbox-from-blueprint-lifecycle.ts): Create blueprint, launch devbox, run commands, cleanup
+- [MCP GitHub example](examples/mcp-github-tools.ts): MCP Hub integration with Claude Code
+- [Secrets with Devbox example](examples/secrets-with-devbox.ts): Create secret, inject into devbox, verify, cleanup
+
+## API Reference
+
+- [SDK entry point](src/index.ts): `RunloopSDK` class and all operations
+- [Type definitions](src/types.ts): TypeScript types for all resources
+
+## Key Guidance
+
+- Always use `RunloopSDK` as the entry point (not legacy `Runloop` default export)
+- Prefer SDK methods (`sdk.devbox`, `sdk.blueprint`, etc.) for object-oriented patterns and convenience
+- For resources without SDK coverage (e.g., benchmarks), use `sdk.api.*` as a fallback
+- Use `sdk.devbox.create()` to create devboxes; they auto-await readiness
+- Use `devbox.cmd.exec('command')` for commands expected to return immediately (e.g., `echo`, `pwd`, `cat`)—blocks until completion, returns `ExecutionResult` with stdout/stderr
+- Use `devbox.cmd.execAsync('command')` for long-running or background processes (servers, watchers, builds)—returns immediately with `Execution` handle to check status, get result, or kill
+- Both `exec` and `execAsync` support streaming callbacks (`stdout`, `stderr`, `output`) for real-time output
+- Call `devbox.shutdown()` to clean up resources that are no longer in use.
+- In example files, focus on the `recipe` function body for SDK usage patterns; ignore test harness files in the examples folder (`_harness.ts`, `registry.ts`, `types.ts`)
+
+## Optional
+
+- [External docs](https://docs.runloop.ai/llms.txt): Additional agent guidance from Runloop platform documentation
