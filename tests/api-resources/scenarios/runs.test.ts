@@ -51,6 +51,7 @@ describe('resource runs', () => {
       client.scenarios.runs.list(
         {
           benchmark_run_id: 'benchmark_run_id',
+          include_total_count: true,
           limit: 0,
           name: 'name',
           scenario_id: 'scenario_id',

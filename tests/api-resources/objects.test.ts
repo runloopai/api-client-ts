@@ -71,6 +71,7 @@ describe('resource objects', () => {
       client.objects.list(
         {
           content_type: 'unspecified',
+          include_total_count: true,
           limit: 0,
           name: 'name',
           search: 'search',
@@ -167,6 +168,7 @@ describe('resource objects', () => {
       client.objects.listPublic(
         {
           content_type: 'unspecified',
+          include_total_count: true,
           limit: 0,
           name: 'name',
           search: 'search',

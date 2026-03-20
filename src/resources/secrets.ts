@@ -82,14 +82,7 @@ export interface SecretListView {
   secrets: Array<SecretView>;
 
   /**
-   * Number of Secrets remaining after this page. Deprecated: will be removed in a
-   * future breaking change.
-   */
-  remaining_count?: number | null;
-
-  /**
-   * Total number of Secrets across all pages. Deprecated: will be removed in a
-   * future breaking change.
+   * Total number of Secrets across all pages.
    */
   total_count?: number | null;
 }

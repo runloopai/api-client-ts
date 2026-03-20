@@ -113,6 +113,12 @@ export interface DiskSnapshotListParams extends DiskSnapshotsCursorIDPageParams 
   devbox_id?: string;
 
   /**
+   * If true (default), includes total_count in the response. Set to false to skip
+   * the count query for better performance on large datasets.
+   */
+  include_total_count?: boolean;
+
+  /**
    * Filter snapshots by metadata key-value pair. Can be used multiple times for
    * different keys.
    */

@@ -140,8 +140,7 @@ export interface NetworkPolicyListView {
   network_policies: Array<NetworkPolicyView>;
 
   /**
-   * Total count of items in this response. Deprecated: will be removed in a future
-   * breaking change.
+   * Total count of items in this response.
    */
   total_count?: number | null;
 }
@@ -345,6 +344,12 @@ export interface NetworkPolicyListParams extends NetworkPoliciesCursorIDPagePara
    * Filter by ID.
    */
   id?: string;
+
+  /**
+   * If true (default), includes total_count in the response. Set to false to skip
+   * the count query for better performance on large datasets.
+   */
+  include_total_count?: boolean;
 
   /**
    * Filter by name (partial match supported).

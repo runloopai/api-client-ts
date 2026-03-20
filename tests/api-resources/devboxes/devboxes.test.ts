@@ -49,6 +49,7 @@ describe('resource devboxes', () => {
           launch_parameters: {
             after_idle: { idle_time_seconds: 0, on_idle: 'shutdown' },
             architecture: 'x86_64',
+            available_ports: [0],
             custom_cpu_cores: 0,
             custom_disk_size: 0,
             custom_gb_memory: 0,
@@ -152,6 +153,7 @@ describe('resource devboxes', () => {
     await expect(
       client.devboxes.list(
         {
+          include_total_count: true,
           limit: 0,
           starting_after: 'starting_after',
           status: 'provisioning',
@@ -332,6 +334,7 @@ describe('resource devboxes', () => {
       client.devboxes.listDiskSnapshots(
         {
           devbox_id: 'devbox_id',
+          include_total_count: true,
           limit: 0,
           'metadata[key]': 'metadata[key]',
           'metadata[key][in]': 'metadata[key][in]',

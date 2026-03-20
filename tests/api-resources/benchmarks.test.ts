@@ -110,6 +110,7 @@ describe('resource benchmarks', () => {
     await expect(
       client.benchmarks.list(
         {
+          include_total_count: true,
           limit: 0,
           name: 'name',
           starting_after: 'starting_after',
@@ -170,7 +171,11 @@ describe('resource benchmarks', () => {
     // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
     await expect(
       client.benchmarks.listPublic(
-        { limit: 0, starting_after: 'starting_after' },
+        {
+          include_total_count: true,
+          limit: 0,
+          starting_after: 'starting_after',
+        },
         { path: '/_stainless_unknown_path' },
       ),
     ).rejects.toThrow(Runloop.NotFoundError);
@@ -197,6 +202,7 @@ describe('resource benchmarks', () => {
         launchParameters: {
           after_idle: { idle_time_seconds: 0, on_idle: 'shutdown' },
           architecture: 'x86_64',
+          available_ports: [0],
           custom_cpu_cores: 0,
           custom_disk_size: 0,
           custom_gb_memory: 0,

@@ -186,6 +186,12 @@ export interface LaunchParameters {
   architecture?: 'x86_64' | 'arm64' | null;
 
   /**
+   * [Deprecated] A list of ports to make available on the Devbox. This field is
+   * ignored.
+   */
+  available_ports?: Array<number> | null;
+
+  /**
    * Custom CPU cores. Must be 0.5, 1, or a multiple of 2. Max is 16.
    */
   custom_cpu_cores?: number | null;

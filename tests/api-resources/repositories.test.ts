@@ -70,6 +70,7 @@ describe('resource repositories', () => {
     await expect(
       client.repositories.list(
         {
+          include_total_count: true,
           limit: 0,
           name: 'name',
           owner: 'owner',

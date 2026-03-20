@@ -78,14 +78,7 @@ export interface AgentListView {
   has_more: boolean;
 
   /**
-   * The count of remaining Agents. Deprecated: will be removed in a future breaking
-   * change.
-   */
-  remaining_count?: number | null;
-
-  /**
-   * The total count of Agents. Deprecated: will be removed in a future breaking
-   * change.
+   * The total count of Agents.
    */
   total_count?: number | null;
 }
@@ -143,6 +136,12 @@ export interface AgentCreateParams {
 }
 
 export interface AgentListParams extends AgentsCursorIDPageParams {
+  /**
+   * If true (default), includes total_count in the response. Set to false to skip
+   * the count query for better performance on large datasets.
+   */
+  include_total_count?: boolean;
+
   /**
    * Filter agents by public visibility.
    */

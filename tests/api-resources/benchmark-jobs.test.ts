@@ -81,6 +81,7 @@ describe('resource benchmarkJobs', () => {
     await expect(
       client.benchmarkJobs.list(
         {
+          include_total_count: true,
           limit: 0,
           name: 'name',
           starting_after: 'starting_after',

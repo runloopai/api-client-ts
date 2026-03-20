@@ -120,8 +120,7 @@ export interface McpConfigListView {
   mcp_configs: Array<McpConfigView>;
 
   /**
-   * Total count of McpConfigs that match the query. Deprecated: will be removed in a
-   * future breaking change.
+   * Total count of McpConfigs that match the query.
    */
   total_count?: number | null;
 }
@@ -244,6 +243,12 @@ export interface McpConfigListParams extends McpConfigsCursorIDPageParams {
    * Filter by ID.
    */
   id?: string;
+
+  /**
+   * If true (default), includes total_count in the response. Set to false to skip
+   * the count query for better performance on large datasets.
+   */
+  include_total_count?: boolean;
 
   /**
    * Filter by name (prefix match supported).
