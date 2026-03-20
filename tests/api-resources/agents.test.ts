@@ -87,6 +87,7 @@ describe('resource agents', () => {
     await expect(
       client.agents.list(
         {
+          include_total_count: true,
           is_public: true,
           limit: 0,
           name: 'name',

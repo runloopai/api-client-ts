@@ -264,8 +264,6 @@ export interface ScenarioRunListView {
    */
   runs: Array<ScenarioRunView>;
 
-  remaining_count?: number | null;
-
   total_count?: number | null;
 }
 
@@ -838,6 +836,12 @@ export interface ScenarioListParams extends ScenariosCursorIDPageParams {
   benchmark_id?: string;
 
   /**
+   * If true (default), includes total_count in the response. Set to false to skip
+   * the count query for better performance on large datasets.
+   */
+  include_total_count?: boolean;
+
+  /**
    * Query for Scenarios with a given name.
    */
   name?: string;
@@ -849,6 +853,12 @@ export interface ScenarioListParams extends ScenariosCursorIDPageParams {
 }
 
 export interface ScenarioListPublicParams extends ScenariosCursorIDPageParams {
+  /**
+   * If true (default), includes total_count in the response. Set to false to skip
+   * the count query for better performance on large datasets.
+   */
+  include_total_count?: boolean;
+
   /**
    * Query for Scenarios with a given name.
    */

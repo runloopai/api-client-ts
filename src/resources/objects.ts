@@ -159,14 +159,7 @@ export interface ObjectListView {
   objects: Array<ObjectView>;
 
   /**
-   * Number of Objects remaining after this page. Deprecated: will be removed in a
-   * future breaking change.
-   */
-  remaining_count?: number | null;
-
-  /**
-   * Total number of Objects across all pages. Deprecated: will be removed in a
-   * future breaking change.
+   * Total number of Objects across all pages.
    */
   total_count?: number | null;
 }
@@ -253,6 +246,12 @@ export interface ObjectListParams extends ObjectsCursorIDPageParams {
   content_type?: 'unspecified' | 'text' | 'binary' | 'gzip' | 'tar' | 'tgz';
 
   /**
+   * If true (default), includes total_count in the response. Set to false to skip
+   * the count query for better performance on large datasets.
+   */
+  include_total_count?: boolean;
+
+  /**
    * Filter storage objects by name (partial match supported).
    */
   name?: string;
@@ -284,6 +283,12 @@ export interface ObjectListPublicParams extends ObjectsCursorIDPageParams {
    * Filter storage objects by content type.
    */
   content_type?: 'unspecified' | 'text' | 'binary' | 'gzip' | 'tar' | 'tgz';
+
+  /**
+   * If true (default), includes total_count in the response. Set to false to skip
+   * the count query for better performance on large datasets.
+   */
+  include_total_count?: boolean;
 
   /**
    * Filter storage objects by name (partial match supported).

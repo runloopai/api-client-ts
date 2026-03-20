@@ -133,8 +133,6 @@ export interface RepositoryConnectionListView {
    */
   repositories: Array<RepositoryConnectionView>;
 
-  remaining_count?: number | null;
-
   total_count?: number | null;
 }
 
@@ -491,6 +489,12 @@ export interface RepositoryCreateParams {
 }
 
 export interface RepositoryListParams extends RepositoriesCursorIDPageParams {
+  /**
+   * If true (default), includes total_count in the response. Set to false to skip
+   * the count query for better performance on large datasets.
+   */
+  include_total_count?: boolean;
+
   /**
    * Filter by repository name
    */

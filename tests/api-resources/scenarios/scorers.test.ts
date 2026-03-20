@@ -85,7 +85,11 @@ describe('resource scorers', () => {
     // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
     await expect(
       client.scenarios.scorers.list(
-        { limit: 0, starting_after: 'starting_after' },
+        {
+          include_total_count: true,
+          limit: 0,
+          starting_after: 'starting_after',
+        },
         { path: '/_stainless_unknown_path' },
       ),
     ).rejects.toThrow(Runloop.NotFoundError);

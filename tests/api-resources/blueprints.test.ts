@@ -40,6 +40,7 @@ describe('resource blueprints', () => {
       launch_parameters: {
         after_idle: { idle_time_seconds: 0, on_idle: 'shutdown' },
         architecture: 'x86_64',
+        available_ports: [0],
         custom_cpu_cores: 0,
         custom_disk_size: 0,
         custom_gb_memory: 0,
@@ -133,6 +134,7 @@ describe('resource blueprints', () => {
     await expect(
       client.blueprints.list(
         {
+          include_total_count: true,
           limit: 0,
           name: 'name',
           starting_after: 'starting_after',
@@ -183,6 +185,7 @@ describe('resource blueprints', () => {
       launch_parameters: {
         after_idle: { idle_time_seconds: 0, on_idle: 'shutdown' },
         architecture: 'x86_64',
+        available_ports: [0],
         custom_cpu_cores: 0,
         custom_disk_size: 0,
         custom_gb_memory: 0,
@@ -223,6 +226,7 @@ describe('resource blueprints', () => {
     await expect(
       client.blueprints.listPublic(
         {
+          include_total_count: true,
           limit: 0,
           name: 'name',
           starting_after: 'starting_after',
@@ -281,6 +285,7 @@ describe('resource blueprints', () => {
       launch_parameters: {
         after_idle: { idle_time_seconds: 0, on_idle: 'shutdown' },
         architecture: 'x86_64',
+        available_ports: [0],
         custom_cpu_cores: 0,
         custom_disk_size: 0,
         custom_gb_memory: 0,

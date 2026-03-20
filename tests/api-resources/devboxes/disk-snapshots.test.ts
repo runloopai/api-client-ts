@@ -66,6 +66,7 @@ describe('resource diskSnapshots', () => {
       client.devboxes.diskSnapshots.list(
         {
           devbox_id: 'devbox_id',
+          include_total_count: true,
           limit: 0,
           'metadata[key]': 'metadata[key]',
           'metadata[key][in]': 'metadata[key][in]',

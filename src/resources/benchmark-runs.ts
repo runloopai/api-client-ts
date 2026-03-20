@@ -92,8 +92,6 @@ export interface BenchmarkRunListView {
    */
   runs: Array<BenchmarkRunView>;
 
-  remaining_count?: number | null;
-
   total_count?: number | null;
 }
 
@@ -169,12 +167,24 @@ export interface BenchmarkRunListParams extends BenchmarkRunsCursorIDPageParams 
   benchmark_id?: string;
 
   /**
+   * If true (default), includes total_count in the response. Set to false to skip
+   * the count query for better performance on large datasets.
+   */
+  include_total_count?: boolean;
+
+  /**
    * Filter by name
    */
   name?: string;
 }
 
 export interface BenchmarkRunListScenarioRunsParams extends BenchmarkRunsCursorIDPageParams {
+  /**
+   * If true (default), includes total_count in the response. Set to false to skip
+   * the count query for better performance on large datasets.
+   */
+  include_total_count?: boolean;
+
   /**
    * Filter by Scenario Run state
    */

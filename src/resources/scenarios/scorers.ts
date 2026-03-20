@@ -163,7 +163,13 @@ export interface ScorerUpdateParams {
   type: string;
 }
 
-export interface ScorerListParams extends ScenarioScorersCursorIDPageParams {}
+export interface ScorerListParams extends ScenarioScorersCursorIDPageParams {
+  /**
+   * If true (default), includes total_count in the response. Set to false to skip
+   * the count query for better performance on large datasets.
+   */
+  include_total_count?: boolean;
+}
 
 Scorers.ScorerListResponsesScenarioScorersCursorIDPage = ScorerListResponsesScenarioScorersCursorIDPage;
 

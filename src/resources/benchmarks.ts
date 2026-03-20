@@ -304,8 +304,6 @@ export interface ScenarioDefinitionListView {
    */
   scenarios: Array<ScenariosAPI.ScenarioView>;
 
-  remaining_count?: number | null;
-
   total_count?: number | null;
 }
 
@@ -414,6 +412,12 @@ export interface BenchmarkUpdateParams {
 
 export interface BenchmarkListParams extends BenchmarksCursorIDPageParams {
   /**
+   * If true (default), includes total_count in the response. Set to false to skip
+   * the count query for better performance on large datasets.
+   */
+  include_total_count?: boolean;
+
+  /**
    * Filter by name
    */
   name?: string;
@@ -431,7 +435,13 @@ export interface BenchmarkDefinitionsParams {
   starting_after?: string;
 }
 
-export interface BenchmarkListPublicParams extends BenchmarksCursorIDPageParams {}
+export interface BenchmarkListPublicParams extends BenchmarksCursorIDPageParams {
+  /**
+   * If true (default), includes total_count in the response. Set to false to skip
+   * the count query for better performance on large datasets.
+   */
+  include_total_count?: boolean;
+}
 
 export interface BenchmarkStartRunParams {
   /**

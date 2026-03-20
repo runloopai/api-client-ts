@@ -139,8 +139,7 @@ export interface GatewayConfigListView {
   has_more: boolean;
 
   /**
-   * Total count of GatewayConfigs that match the query. Deprecated: will be removed
-   * in a future breaking change.
+   * Total count of GatewayConfigs that match the query.
    */
   total_count?: number | null;
 }
@@ -334,6 +333,12 @@ export interface GatewayConfigListParams extends GatewayConfigsCursorIDPageParam
    * Filter by ID.
    */
   id?: string;
+
+  /**
+   * If true (default), includes total_count in the response. Set to false to skip
+   * the count query for better performance on large datasets.
+   */
+  include_total_count?: boolean;
 
   /**
    * Filter by name (partial match supported).
