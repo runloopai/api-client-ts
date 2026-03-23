@@ -95,7 +95,7 @@ export async function recipe(ctx: RecipeContext): Promise<RecipeOutput> {
   const { agentId, reused } = await ensureClaudeCodeAgent(sdk);
   resourcesCreated.push(reused ? `agent:${agentId}:reused` : `agent:${agentId}`);
 
-  // best practice: create a secret for the agent's credentials and use agent gateway to route it through 
+  // best practice: create a secret for the agent's credentials and use agent gateway to route it through
   // so that credentials are not exposed to the agent.
   const anthropicSecret = await sdk.secret.create({
     name: uniqueName('anthropic-mount-example'),
@@ -118,7 +118,7 @@ export async function recipe(ctx: RecipeContext): Promise<RecipeOutput> {
   // uploadFromDir() compresses the directory as a .tgz, and mounting that archive to a directory path extracts it.
   const archive = await sdk.storageObject.uploadFromDir(tempDir, {
     name: uniqueName('mount-bootstrap'),
-    ttl_ms: OBJECT_TTL_MS, // set a TTL so the object is deleted after a certain time.
+    ttl_ms: OBJECT_TTL_MS, // best practice: set a TTL so the object is deleted after a certain time.
     metadata: { example: 'devbox-mounts' },
   });
   resourcesCreated.push(`storageObject:${archive.id}`);
@@ -184,9 +184,10 @@ export async function recipe(ctx: RecipeContext): Promise<RecipeOutput> {
   );
   const repoMountPath = (await repoPathResult.stdout()).trim();
   const repoPackageJson =
-   
+    repoMountPath ? await devbox.file.read({ file_path: `${repoMountPath}/package.json` }) : '';
+
   const mountedExamplePath = path.posix.join(OBJECT_MOUNT_DIR, COPIED_EXAMPLE_FILE_NAME);
-  const mountedExampleContents = await devbox.file.read({ path: mountedExamplePath });
+  const mountedExampleContents = await devbox.file.read({ file_path: mountedExamplePath });
 
   return {
     resourcesCreated,
