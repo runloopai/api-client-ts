@@ -11,7 +11,7 @@ Runnable examples live in [`examples/`](./examples).
 - [Devbox From Blueprint (Run Command, Shutdown)](#devbox-from-blueprint-lifecycle)
 - [Devbox Tunnel (HTTP Server Access)](#devbox-tunnel)
 - [MCP Hub + Claude Code + GitHub](#mcp-github-tools)
-- [Secrets with Devbox via Agent Gateway](#secrets-with-devbox)
+- [Secrets with Devbox and Agent Gateway](#secrets-with-devbox)
 
 <a id="blueprint-with-build-context"></a>
 ## Blueprint with Build Context
@@ -137,18 +137,19 @@ yarn test:examples
 **Source:** [`examples/mcp-github-tools.ts`](./examples/mcp-github-tools.ts)
 
 <a id="secrets-with-devbox"></a>
-## Secrets with Devbox via Agent Gateway
+## Secrets with Devbox and Agent Gateway
 
-**Use case:** Create a secret, proxy it into a devbox through agent gateway, verify the devbox only gets gateway credentials, and clean up.
+**Use case:** Use a normal secret for sensitive app data in the devbox and agent gateway for upstream API credentials that should never be exposed to the agent.
 
-**Tags:** `secrets`, `devbox`, `agent-gateway`, `credentials`, `cleanup`
+**Tags:** `secrets`, `devbox`, `agent-gateway`, `credentials`, `environment-variables`, `cleanup`
 
 ### Workflow
-- Create a secret with a test credential
+- Create a secret for application data that should be available inside the devbox
+- Create a separate secret for an upstream API credential
 - Create an agent gateway config for an upstream API
-- Launch a devbox with the gateway wired to the secret
-- Verify the devbox receives a gateway URL and token instead of the raw secret
-- Shutdown the devbox and delete the gateway config and secret
+- Launch a devbox with one secret injected directly and the credential wired through agent gateway
+- Verify the devbox can read MAGIC_NUMBER while the upstream API credential is replaced with gateway values
+- Shutdown the devbox and delete the gateway config and both secrets
 
 ### Prerequisites
 - `RUNLOOP_API_KEY`

@@ -48,7 +48,7 @@ export const exampleRegistry: ExampleRegistryEntry[] = [
   },
   {
     slug: 'secrets-with-devbox',
-    title: 'Secrets with Devbox via Agent Gateway',
+    title: 'Secrets with Devbox and Agent Gateway',
     fileName: 'secrets-with-devbox.ts',
     requiredEnv: ['RUNLOOP_API_KEY'],
     run: runSecretsWithDevboxExample,
