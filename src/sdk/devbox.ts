@@ -6,7 +6,6 @@ import type {
   DevboxCreateParams,
   DevboxAsyncExecutionDetailView,
   DevboxSnapshotDiskParams,
-  DevboxCreateTunnelParams,
   DevboxEnableTunnelParams,
   DevboxRemoveTunnelParams,
   DevboxReadFileContentsParams,
@@ -19,7 +18,8 @@ import type {
   DevboxKeepAliveResponse,
   TunnelView,
 } from '../resources/devboxes/devboxes';
-import { PollingOptions } from '../lib/polling';
+import type { DevboxLogsListView, LogListParams } from '../resources/devboxes/logs';
+import { LongPollRequestOptions, PollingOptions } from '../lib/polling';
 import { Snapshot } from './snapshot';
 import { Execution } from './execution';
 import { ExecutionResult } from './execution-result';
@@ -99,30 +99,6 @@ export class DevboxNetOps {
    */
   async createSSHKey(options?: Core.RequestOptions) {
     return this.client.devboxes.createSSHKey(this.devboxId, options);
-  }
-
-  /**
-   * @deprecated Use {@link enableTunnel} instead for V2 tunnels with better URL format.
-   *
-   * Creates a legacy tunnel to expose a specific port on the devbox.
-   * The legacy tunnel URL format is: `https://{devbox_id}-{port}.tunnel.runloop.ai`
-   *
-   * V2 tunnels (via enableTunnel) provide encrypted URL-based access with the format:
-   * `https://{port}-{tunnel_key}.tunnel.runloop.ai`
-   *
-   * @example
-   * ```typescript
-   * // Deprecated - use enableTunnel instead
-   * const tunnel = await devbox.net.createTunnel({ port: 8080 });
-   * console.log(tunnel.url); // Legacy URL format
-   * ```
-   *
-   * @param {DevboxCreateTunnelParams} params - Tunnel creation parameters including port
-   * @param {Core.RequestOptions} [options] - Request options
-   * @returns {Promise<DevboxTunnelView>} Legacy tunnel view with devbox_id, port, and url
-   */
-  async createTunnel(params: DevboxCreateTunnelParams, options?: Core.RequestOptions) {
-    return this.client.devboxes.createTunnel(this.devboxId, params, options);
   }
 
   /**
@@ -218,13 +194,13 @@ export class DevboxCmdOps {
    *
    * @param {string} command - The command to execute
    * @param {Omit<DevboxExecuteParams, 'command' | 'command_id'> & ExecuteStreamingCallbacks} [params] - Optional parameters including shell name and callbacks
-   * @param {Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxAsyncExecutionDetailView>> }} [options] - Request options with optional polling configuration
+   * @param {LongPollRequestOptions<DevboxAsyncExecutionDetailView>} [options] - Request options with optional long-poll configuration
    * @returns {Promise<ExecutionResult>} {@link ExecutionResult} with stdout, stderr, and exit status
    */
   async exec(
     command: string,
     params?: Omit<DevboxExecuteParams, 'command' | 'command_id'> & ExecuteStreamingCallbacks,
-    options?: Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxAsyncExecutionDetailView>> },
+    options?: LongPollRequestOptions<DevboxAsyncExecutionDetailView>,
   ): Promise<ExecutionResult> {
     const fullParams = { ...params, command };
     const hasCallbacks = fullParams.stdout || fullParams.stderr || fullParams.output;
@@ -379,13 +355,13 @@ export class DevboxNamedShell {
    *
    * @param {string} command - The command to execute
    * @param {Omit<DevboxExecuteParams, 'command' | 'command_id' | 'shell_name'> & ExecuteStreamingCallbacks} [params] - Optional parameters (shell_name is automatically set)
-   * @param {Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxAsyncExecutionDetailView>> }} [options] - Request options with optional polling configuration
+   * @param {LongPollRequestOptions<DevboxAsyncExecutionDetailView>} [options] - Request options with optional long-poll configuration
    * @returns {Promise<ExecutionResult>} {@link ExecutionResult} with stdout, stderr, and exit status
    */
   async exec(
     command: string,
     params?: Omit<DevboxExecuteParams, 'command' | 'command_id' | 'shell_name'> & ExecuteStreamingCallbacks,
-    options?: Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxAsyncExecutionDetailView>> },
+    options?: LongPollRequestOptions<DevboxAsyncExecutionDetailView>,
   ): Promise<ExecutionResult> {
     return this.devbox.cmd.exec(command, { ...params, shell_name: this.shellName }, options);
   }
@@ -594,13 +570,13 @@ export class Devbox {
    *
    * @param {Runloop} client - The Runloop client instance
    * @param {DevboxCreateParams} [params] - Parameters for creating the devbox
-   * @param {Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxView>> }} [options] - Request options with optional polling configuration
+   * @param {LongPollRequestOptions<DevboxView>} [options] - Request options with optional long-poll configuration
    * @returns {Promise<Devbox>} A {@link Devbox} instance in the running state
    */
   static async create(
     client: Runloop,
     params?: DevboxCreateParams,
-    options?: Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxView>> },
+    options?: LongPollRequestOptions<DevboxView>,
   ): Promise<Devbox> {
     const devboxData = await client.devboxes.createAndAwaitRunning(params, options);
     return new Devbox(client, devboxData.id);
@@ -615,14 +591,14 @@ export class Devbox {
    * @param {Runloop} client - The Runloop client instance
    * @param {string} blueprintId - The blueprint ID to create from
    * @param {Omit<DevboxCreateParams, 'blueprint_id' | 'snapshot_id' | 'blueprint_name'>} [params] - Additional devbox creation parameters
-   * @param {Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxView>> }} [options] - Request options with optional polling configuration
+   * @param {LongPollRequestOptions<DevboxView>} [options] - Request options with optional long-poll configuration
    * @returns {Promise<Devbox>} A {@link Devbox} instance in the running state
    */
   static async createFromBlueprintId(
     client: Runloop,
     blueprintId: string,
     params?: Omit<DevboxCreateParams, 'blueprint_id' | 'snapshot_id' | 'blueprint_name'>,
-    options?: Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxView>> },
+    options?: LongPollRequestOptions<DevboxView>,
   ): Promise<Devbox> {
     const createParams: DevboxCreateParams = {
       ...params,
@@ -641,14 +617,14 @@ export class Devbox {
    * @param {Runloop} client - The Runloop client instance
    * @param {string} blueprintName - The blueprint name to create from
    * @param {Omit<DevboxCreateParams, 'blueprint_id' | 'snapshot_id' | 'blueprint_name'>} [params] - Additional devbox creation parameters
-   * @param {Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxView>> }} [options] - Request options with optional polling configuration
+   * @param {LongPollRequestOptions<DevboxView>} [options] - Request options with optional long-poll configuration
    * @returns {Promise<Devbox>} A {@link Devbox} instance in the running state
    */
   static async createFromBlueprintName(
     client: Runloop,
     blueprintName: string,
     params?: Omit<DevboxCreateParams, 'blueprint_id' | 'snapshot_id' | 'blueprint_name'>,
-    options?: Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxView>> },
+    options?: LongPollRequestOptions<DevboxView>,
   ): Promise<Devbox> {
     const createParams: DevboxCreateParams = {
       ...params,
@@ -676,14 +652,14 @@ export class Devbox {
    * @param {Runloop} client - The Runloop client instance
    * @param {string} snapshotId - The snapshot ID to create from
    * @param {Omit<DevboxCreateParams, 'snapshot_id' | 'blueprint_id' | 'blueprint_name'>} [params] - Additional devbox creation parameters
-   * @param {Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxView>> }} [options] - Request options with optional polling configuration
+   * @param {LongPollRequestOptions<DevboxView>} [options] - Request options with optional long-poll configuration
    * @returns {Promise<Devbox>} A {@link Devbox} instance in the running state
    */
   static async createFromSnapshot(
     client: Runloop,
     snapshotId: string,
     params?: Omit<DevboxCreateParams, 'snapshot_id' | 'blueprint_id' | 'blueprint_name'>,
-    options?: Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxView>> },
+    options?: LongPollRequestOptions<DevboxView>,
   ): Promise<Devbox> {
     const createParams: DevboxCreateParams = {
       ...params,
@@ -872,6 +848,32 @@ export class Devbox {
   }
 
   /**
+   * Get all logs from a running or completed devbox.
+   * Optionally filter by execution ID or shell name.
+   *
+   * @example
+   * ```typescript
+   * const logs = await devbox.logs();
+   * for (const log of logs.logs) {
+   *   console.log(`[${log.level}] ${log.message}`);
+   * }
+   *
+   * // Filter by execution ID
+   * const execLogs = await devbox.logs({ execution_id: 'exec-123' });
+   *
+   * // Filter by shell name
+   * const shellLogs = await devbox.logs({ shell_name: 'my-shell' });
+   * ```
+   *
+   * @param {LogListParams} [params] - Optional filter parameters (execution_id, shell_name)
+   * @param {Core.RequestOptions} [options] - Request options
+   * @returns {Promise<DevboxLogsListView>} The devbox logs
+   */
+  async logs(params?: LogListParams, options?: Core.RequestOptions): Promise<DevboxLogsListView> {
+    return this.client.devboxes.logs.list(this._id, params, options);
+  }
+
+  /**
    * Wait for the devbox to reach the running state.
    * Uses optimized server-side polling for better performance.
    *
@@ -882,12 +884,10 @@ export class Devbox {
    * console.log('Devbox is now running');
    * ```
    *
-   * @param {Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxView>> }} [options] - Request options with optional polling configuration
+   * @param {LongPollRequestOptions<DevboxView>} [options] - Request options with optional long-poll configuration
    * @returns {Promise<DevboxView>} The devbox data when running state is reached
    */
-  async awaitRunning(
-    options?: Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxView>> },
-  ): Promise<DevboxView> {
+  async awaitRunning(options?: LongPollRequestOptions<DevboxView>): Promise<DevboxView> {
     return this.client.devboxes.awaitRunning(this._id, options);
   }
 
@@ -902,12 +902,10 @@ export class Devbox {
    * console.log('Devbox is now suspended');
    * ```
    *
-   * @param {Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxView>> }} [options] - Request options with optional polling configuration
+   * @param {LongPollRequestOptions<DevboxView>} [options] - Request options with optional long-poll configuration
    * @returns {Promise<DevboxView>} The devbox data when suspended state is reached
    */
-  async awaitSuspended(
-    options?: Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxView>> },
-  ): Promise<DevboxView> {
+  async awaitSuspended(options?: LongPollRequestOptions<DevboxView>): Promise<DevboxView> {
     return this.client.devboxes.awaitSuspended(this._id, options);
   }
 
@@ -995,12 +993,10 @@ export class Devbox {
    * // Devbox is now running
    * ```
    *
-   * @param {Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxView>> }} [options] - Request options with optional polling configuration
+   * @param {LongPollRequestOptions<DevboxView>} [options] - Request options with optional long-poll configuration
    * @returns {Promise<DevboxView>} The devbox data when running state is reached
    */
-  async resume(
-    options?: Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxView>> },
-  ): Promise<DevboxView> {
+  async resume(options?: LongPollRequestOptions<DevboxView>): Promise<DevboxView> {
     await this.resumeAsync(options);
     return this.awaitRunning(options);
   }

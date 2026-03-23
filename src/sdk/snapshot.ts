@@ -9,7 +9,7 @@ import type {
   DevboxSnapshotAsyncStatusView,
   DiskSnapshotUpdateParams,
 } from '../resources/devboxes/disk-snapshots';
-import type { PollingOptions } from '../lib/polling';
+import type { LongPollRequestOptions, PollingOptions } from '../lib/polling';
 import { Devbox } from './devbox';
 
 /**
@@ -175,14 +175,12 @@ export class Snapshot {
    * ```
    *
    * @param {Omit<DevboxCreateParams, 'snapshot_id' | 'blueprint_id' | 'blueprint_name'>} [params] - Additional devbox creation parameters (optional)
-   * @param {Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxView>> }} [options] - Request options with optional polling configuration
+   * @param {LongPollRequestOptions<DevboxView>} [options] - Request options with optional long-poll configuration
    * @returns {Promise<Devbox>} A new {@link Devbox} instance created from this snapshot
    */
   async createDevbox(
     params?: Omit<DevboxCreateParams, 'snapshot_id' | 'blueprint_id' | 'blueprint_name'>,
-    options?: Core.RequestOptions & {
-      polling?: Partial<PollingOptions<DevboxView>>;
-    },
+    options?: LongPollRequestOptions<DevboxView>,
   ): Promise<Devbox> {
     const createParams: DevboxCreateParams = {
       ...params,

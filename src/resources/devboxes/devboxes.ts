@@ -47,7 +47,11 @@ import {
   type DiskSnapshotsCursorIDPageParams,
 } from '../../pagination';
 import { type Response } from '../../_shims/index';
-import { poll, PollingOptions } from '@runloop/api-client/lib/polling';
+import {
+  longPollUntil,
+  LongPollRequestOptions,
+  resolveLongPollTimeoutMs,
+} from '@runloop/api-client/lib/polling';
 import { awaitDevboxState } from '@runloop/api-client/lib/devbox-state';
 import { DevboxTools } from './tools';
 import { uuidv7 } from 'uuidv7';
@@ -90,44 +94,40 @@ export class Devboxes extends APIResource {
 
   /**
    * Wait for a devbox to reach the running state.
-   * Polls the devbox status until it reaches running state or fails with an error.
+   * Long Polls the devbox status until it reaches running state.
    *
    * @param id - Devbox ID
-   * @param options - request options to specify retries, timeout, polling, etc.
+   * @param options - request options with optional long-poll configuration.
    */
-  async awaitRunning(
-    id: string,
-    options?: Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxView>> },
-  ): Promise<DevboxView> {
+  async awaitRunning(id: string, options?: LongPollRequestOptions<DevboxView>): Promise<DevboxView> {
     return awaitDevboxState<DevboxView>({
       client: this._client,
       devboxId: id,
       targetState: 'running',
       statesToCheck: ['running', 'failure', 'shutdown'],
       transitionStates: DEVBOX_BOOTING_STATES,
-      pollingOptions: options?.polling as Partial<PollingOptions<DevboxView>> | undefined,
+      timeoutMs: resolveLongPollTimeoutMs(options),
+      signal: options?.signal,
       errorMessage: (devboxId, actualState) => `Devbox ${devboxId} is in non-running state ${actualState}`,
     });
   }
 
   /**
    * Wait for a devbox to reach the suspended state.
-   * Polls the devbox status until it reaches suspended state or fails with an error.
+   * Long Polls the devbox status until it reaches suspended state.
    *
    * @param id - Devbox ID
-   * @param options - request options to specify retries, timeout, polling, etc.
+   * @param options - request options with optional long-poll configuration.
    */
-  async awaitSuspended(
-    id: string,
-    options?: Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxView>> },
-  ): Promise<DevboxView> {
+  async awaitSuspended(id: string, options?: LongPollRequestOptions<DevboxView>): Promise<DevboxView> {
     return awaitDevboxState<DevboxView>({
       client: this._client,
       devboxId: id,
       targetState: 'suspended',
       statesToCheck: ['suspended', 'failure', 'shutdown'],
       transitionStates: ['suspending'],
-      pollingOptions: options?.polling as Partial<PollingOptions<DevboxView>> | undefined,
+      timeoutMs: resolveLongPollTimeoutMs(options),
+      signal: options?.signal,
       errorMessage: (devboxId, actualState) => `Devbox ${devboxId} is in non-suspended state ${actualState}`,
     });
   }
@@ -137,14 +137,15 @@ export class Devboxes extends APIResource {
    * This is a convenience method that combines create() and awaitDevboxRunning().
    *
    * @param body - DevboxCreateParams
-   * @param options - request options to specify retries, timeout, polling, etc.
+   * @param options - request options with optional long-poll configuration.
    */
   async createAndAwaitRunning(
     body?: DevboxCreateParams,
-    options?: Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxView>> },
+    options?: LongPollRequestOptions<DevboxView>,
   ): Promise<DevboxView> {
-    const devbox = await this.create(body, options);
-    return this.awaitRunning(devbox.id, options);
+    const { longPoll, polling, ...requestOptions } = options ?? {};
+    const devbox = await this.create(body, requestOptions);
+    return this.awaitRunning(devbox.id, { ...requestOptions, longPoll, polling });
   }
   /**
    * Updates a devbox by doing a complete update the existing name,metadata fields.
@@ -189,23 +190,6 @@ export class Devboxes extends APIResource {
   }
 
   /**
-   * @deprecated Use {@link enableTunnel} instead for V2 tunnels with better URL format.
-   *
-   * Creates a legacy tunnel to expose a specific port on the devbox.
-   * The legacy tunnel URL format is: `https://{devbox_id}-{port}.tunnel.runloop.ai`
-   *
-   * V2 tunnels (via enableTunnel) provide encrypted URL-based access with the format:
-   * `https://{port}-{tunnel_key}.tunnel.runloop.ai`
-   */
-  createTunnel(
-    id: string,
-    body: DevboxCreateTunnelParams,
-    options?: Core.RequestOptions,
-  ): Core.APIPromise<DevboxTunnelView> {
-    return this._client.post(`/v1/devboxes/${id}/create_tunnel`, { body, ...options });
-  }
-
-  /**
    * Delete a previously taken disk snapshot of a Devbox.
    */
   deleteDiskSnapshot(id: string, options?: Core.RequestOptions): Core.APIPromise<unknown> {
@@ -223,7 +207,7 @@ export class Devboxes extends APIResource {
   ): Core.APIPromise<Response> {
     return this._client.post(`/v1/devboxes/${id}/download_file`, {
       body,
-      timeout: (this._client as any)._options.timeout ?? 600000,
+      timeout: this._client.timeout ?? 600000,
       ...options,
       headers: { Accept: 'application/octet-stream', ...options?.headers },
       __binaryResponse: true,
@@ -273,31 +257,33 @@ export class Devboxes extends APIResource {
         command_id: body.command_id || uuidv7(),
       },
       query: { last_n },
-      timeout: (this._client as any)._options.timeout ?? 600000,
+      timeout: this._client.timeout ?? 600000,
       ...options,
     });
   }
 
   /**
    * Execute a command and wait for it to complete with optimal latency for long running commands that can't rely on just polling.
+   *
+   * @param devboxId - Devbox ID
+   * @param params - Execution parameters.
+   * @param options - request options with optional long-poll configuration.
    */
   async executeAndAwaitCompletion(
     devboxId: string,
     params: Omit<DevboxExecuteParams, 'command_id'>,
-    options?: Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxAsyncExecutionDetailView>> },
+    options?: LongPollRequestOptions<DevboxAsyncExecutionDetailView>,
   ): Promise<DevboxAsyncExecutionDetailView> {
+    const { longPoll, polling, ...requestOptions } = options ?? {};
+    const effectiveTimeoutMs = resolveLongPollTimeoutMs(options);
     const commandId = uuidv7();
     const execution = await this.execute(
       devboxId,
       { ...params, command_id: commandId },
-      // For first poll, if timeout is provided, use the timeout from the request options
-      // Otherwise, if polling options are provided, use the timeout from the polling options
-      // Otherwise, use the default timeout of 600 seconds
-      { ...{ timeout: options?.timeout ?? options?.polling?.timeoutMs ?? 600000 }, ...options },
+      { ...{ timeout: requestOptions?.timeout ?? effectiveTimeoutMs ?? 600000 }, ...requestOptions },
     );
 
     if (execution.status === 'completed') {
-      // If the execution completes in the initial timeout, return the result
       return execution;
     }
 
@@ -309,23 +295,22 @@ export class Devboxes extends APIResource {
       waitForCommandBody.last_n = params.last_n;
     }
 
-    const finalResult = await poll(
-      () => this.waitForCommand(devboxId, execution.execution_id, waitForCommandBody),
-      () => this.waitForCommand(devboxId, execution.execution_id, waitForCommandBody),
+    const finalResult = await longPollUntil(
+      (signal) =>
+        this.waitForCommand(devboxId, execution.execution_id, waitForCommandBody, {
+          signal,
+          // Per-request HTTP timeout must exceed the server's max long-poll hold (25s)
+          // so the server's 408 always arrives before the client aborts the connection.
+          // The longPollUntil AbortSignal enforces the caller's actual deadline.
+          timeout: 600000,
+          // Disable base-client retries so 408s surface immediately to longPollUntil
+          // (the server's wait_for_status endpoint sets x-should-retry: true for executions).
+          maxRetries: 0,
+        }),
       {
-        ...options?.polling,
-        shouldStop: (result) => {
-          return result.status === 'completed';
-        },
-        onError: (error) => {
-          if (error.status === 408) {
-            // Return a placeholder result to continue polling
-            return execution;
-          }
-
-          // For any other error, rethrow it
-          throw error;
-        },
+        timeoutMs: effectiveTimeoutMs,
+        shouldStop: (result) => result.status === 'completed',
+        signal: requestOptions.signal,
       },
     );
 
@@ -358,7 +343,7 @@ export class Devboxes extends APIResource {
   ): Core.APIPromise<DevboxExecutionDetailView> {
     return this._client.post(`/v1/devboxes/${id}/execute_sync`, {
       body,
-      timeout: (this._client as any)._options.timeout ?? 600000,
+      timeout: this._client.timeout ?? 600000,
       ...options,
     });
   }
@@ -408,7 +393,7 @@ export class Devboxes extends APIResource {
   ): Core.APIPromise<string> {
     return this._client.post(`/v1/devboxes/${id}/read_file_contents`, {
       body,
-      timeout: (this._client as any)._options.timeout ?? 600000,
+      timeout: this._client.timeout ?? 600000,
       ...options,
       headers: { Accept: 'text/plain', ...options?.headers },
     });
@@ -492,7 +477,7 @@ export class Devboxes extends APIResource {
     }
     return this._client.post(`/v1/devboxes/${id}/snapshot_disk`, {
       body,
-      timeout: (this._client as any)._options.timeout ?? 600000,
+      timeout: this._client.timeout ?? 600000,
       ...options,
     });
   }
@@ -542,7 +527,7 @@ export class Devboxes extends APIResource {
       `/v1/devboxes/${id}/upload_file`,
       Core.multipartFormRequestOptions({
         body,
-        timeout: (this._client as any)._options.timeout ?? 600000,
+        timeout: this._client.timeout ?? 600000,
         ...options,
       }),
     );
@@ -577,7 +562,7 @@ export class Devboxes extends APIResource {
   ): Core.APIPromise<DevboxExecutionDetailView> {
     return this._client.post(`/v1/devboxes/${id}/write_file_contents`, {
       body,
-      timeout: (this._client as any)._options.timeout ?? 600000,
+      timeout: this._client.timeout ?? 600000,
       ...options,
     });
   }
@@ -833,23 +818,6 @@ export interface DevboxSnapshotView {
    * (Optional) The source Blueprint ID this snapshot was created from.
    */
   source_blueprint_id?: string | null;
-}
-
-export interface DevboxTunnelView {
-  /**
-   * ID of the Devbox the tunnel routes to.
-   */
-  devbox_id: string;
-
-  /**
-   * Port of the Devbox the tunnel routes to.
-   */
-  port: number;
-
-  /**
-   * Public url used to access Devbox.
-   */
-  url: string;
 }
 
 /**
@@ -1283,13 +1251,6 @@ export interface DevboxListParams extends DevboxesCursorIDPageParams {
     | 'shutdown';
 }
 
-export interface DevboxCreateTunnelParams {
-  /**
-   * Devbox port that tunnel will expose.
-   */
-  port: number;
-}
-
 export interface DevboxDownloadFileParams {
   /**
    * The path on the Devbox filesystem to read the file from. Path is relative to
@@ -1538,7 +1499,6 @@ export declare namespace Devboxes {
     type DevboxSendStdInResult as DevboxSendStdInResult,
     type DevboxSnapshotListView as DevboxSnapshotListView,
     type DevboxSnapshotView as DevboxSnapshotView,
-    type DevboxTunnelView as DevboxTunnelView,
     type DevboxView as DevboxView,
     type TunnelView as TunnelView,
     type DevboxCreateSSHKeyResponse as DevboxCreateSSHKeyResponse,
@@ -1552,7 +1512,6 @@ export declare namespace Devboxes {
     type DevboxCreateParams as DevboxCreateParams,
     type DevboxUpdateParams as DevboxUpdateParams,
     type DevboxListParams as DevboxListParams,
-    type DevboxCreateTunnelParams as DevboxCreateTunnelParams,
     type DevboxDownloadFileParams as DevboxDownloadFileParams,
     type DevboxEnableTunnelParams as DevboxEnableTunnelParams,
     type DevboxExecuteParams as DevboxExecuteParams,

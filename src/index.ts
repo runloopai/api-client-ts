@@ -177,7 +177,6 @@ import {
   DevboxAsyncExecutionDetailView,
   DevboxCreateParams,
   DevboxCreateSSHKeyResponse,
-  DevboxCreateTunnelParams,
   DevboxDeleteDiskSnapshotResponse,
   DevboxDownloadFileParams,
   DevboxEnableTunnelParams,
@@ -203,7 +202,6 @@ import {
   DevboxSnapshotListView,
   DevboxSnapshotView,
   DevboxSnapshotViewsDiskSnapshotsCursorIDPage,
-  DevboxTunnelView,
   DevboxUpdateParams,
   DevboxUploadFileParams,
   DevboxUploadFileResponse,
@@ -608,7 +606,6 @@ export declare namespace Runloop {
     type DevboxSendStdInResult as DevboxSendStdInResult,
     type DevboxSnapshotListView as DevboxSnapshotListView,
     type DevboxSnapshotView as DevboxSnapshotView,
-    type DevboxTunnelView as DevboxTunnelView,
     type DevboxView as DevboxView,
     type TunnelView as TunnelView,
     type DevboxCreateSSHKeyResponse as DevboxCreateSSHKeyResponse,
@@ -622,7 +619,6 @@ export declare namespace Runloop {
     type DevboxCreateParams as DevboxCreateParams,
     type DevboxUpdateParams as DevboxUpdateParams,
     type DevboxListParams as DevboxListParams,
-    type DevboxCreateTunnelParams as DevboxCreateTunnelParams,
     type DevboxDownloadFileParams as DevboxDownloadFileParams,
     type DevboxEnableTunnelParams as DevboxEnableTunnelParams,
     type DevboxExecuteParams as DevboxExecuteParams,
@@ -756,6 +752,7 @@ export declare namespace Runloop {
   export type RunProfile = API.RunProfile;
 }
 
+export { type LongPollRequestOptions, LongPollAbortError, PollingTimeoutError } from './lib/polling';
 export { toFile, fileFromPath } from './uploads';
 export {
   RunloopError,

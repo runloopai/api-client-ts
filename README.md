@@ -6,6 +6,15 @@ This library provides convenient access to the Runloop SDK & REST API from serve
 
 The **RunloopSDK** is the recommended, modern way to interact with the Runloop API. It provides high-level object-oriented interfaces for common operations while maintaining full access to the underlying REST API through the `.api` property.
 
+## MCP Server
+
+Use the Runloop MCP Server to enable AI assistants to interact with this API, allowing them to explore endpoints, make test requests, and use documentation to help integrate this SDK into your application.
+
+[![Add to Cursor](https://cursor.com/deeplink/mcp-install-dark.svg)](https://cursor.com/en-US/install-mcp?name=%40runloop%2Fapi-client-mcp&config=eyJjb21tYW5kIjoibnB4IiwiYXJncyI6WyIteSIsIkBydW5sb29wL2FwaS1jbGllbnQtbWNwIl0sImVudiI6eyJSVU5MT09QX0FQSV9LRVkiOiJNeSBCZWFyZXIgVG9rZW4ifX0)
+[![Install in VS Code](https://img.shields.io/badge/_-Add_to_VS_Code-blue?style=for-the-badge&logo=data:image/svg%2bxml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGZpbGw9Im5vbmUiIHZpZXdCb3g9IjAgMCA0MCA0MCI+PHBhdGggZmlsbD0iI0VFRSIgZmlsbC1ydWxlPSJldmVub2RkIiBkPSJNMzAuMjM1IDM5Ljg4NGEyLjQ5MSAyLjQ5MSAwIDAgMS0xLjc4MS0uNzNMMTIuNyAyNC43OGwtMy40NiAyLjYyNC0zLjQwNiAyLjU4MmExLjY2NSAxLjY2NSAwIDAgMS0xLjA4Mi4zMzggMS42NjQgMS42NjQgMCAwIDEtMS4wNDYtLjQzMWwtMi4yLTJhMS42NjYgMS42NjYgMCAwIDEgMC0yLjQ2M0w3LjQ1OCAyMCA0LjY3IDE3LjQ1MyAxLjUwNyAxNC41N2ExLjY2NSAxLjY2NSAwIDAgMSAwLTIuNDYzbDIuMi0yYTEuNjY1IDEuNjY1IDAgMCAxIDIuMTMtLjA5N2w2Ljg2MyA1LjIwOUwyOC40NTIuODQ0YTIuNDg4IDIuNDg4IDAgMCAxIDEuODQxLS43MjljLjM1MS4wMDkuNjk5LjA5MSAxLjAxOS4yNDVsOC4yMzYgMy45NjFhMi41IDIuNSAwIDAgMSAxLjQxNSAyLjI1M3YuMDk5LS4wNDVWMzMuMzd2LS4wNDUuMDk1YTIuNTAxIDIuNTAxIDAgMCAxLTEuNDE2IDIuMjU3bC04LjIzNSAzLjk2MWEyLjQ5MiAyLjQ5MiAwIDAgMS0xLjA3Ny4yNDZabS43MTYtMjguOTQ3LTExLjk0OCA5LjA2MiAxMS45NTIgOS4wNjUtLjAwNC0xOC4xMjdaIi8+PC9zdmc+)](https://vscode.stainless.com/mcp/%7B%22name%22%3A%22%40runloop%2Fapi-client-mcp%22%2C%22command%22%3A%22npx%22%2C%22args%22%3A%5B%22-y%22%2C%22%40runloop%2Fapi-client-mcp%22%5D%2C%22env%22%3A%7B%22RUNLOOP_API_KEY%22%3A%22My%20Bearer%20Token%22%7D%7D)
+
+> Note: You may need to set environment variables in your MCP client.
+
 ## Installation
 
 ```sh
@@ -26,12 +35,12 @@ const sdk = new RunloopSDK({
 // Create a new devbox and wait for it to be ready
 const devbox = await sdk.devbox.create();
 
-// Execute a synchronous command
+// Execute a command that returns immediately - exec blocks until completion
 const result = await devbox.cmd.exec('echo "Hello, World!"');
 console.log('Output:', await result.stdout()); // "Hello, World!"
 console.log('Exit code:', result.exitCode); // 0
 
-// Start a long-running HTTP server asynchronously
+// Start a long-running HTTP server - execAsync returns immediately
 const serverExec = await devbox.cmd.execAsync('npx http-server -p 8080');
 console.log(`Started server with execution ID: ${serverExec.executionId}`);
 
@@ -41,6 +50,10 @@ console.log('Server status:', state.status); // "running"
 
 // Later... kill the server when done
 await serverExec.kill();
+
+// Retrieve devbox logs
+const logs = await devbox.logs();
+console.log('Devbox logs:', logs.logs);
 
 await devbox.shutdown();
 ```
@@ -79,11 +92,31 @@ The SDK provides object-oriented interfaces for all major Runloop resources:
 - **[`runloop.agent`](https://runloopai.github.io/api-client-ts/stable/classes/sdk.AgentOps.html)** - Agent management (create, list agents from npm/pip/git)
 - **[`runloop.scenario`](https://runloopai.github.io/api-client-ts/stable/classes/sdk.ScenarioOps.html)** - Scenario management (list scenarios, start runs)
 - **[`runloop.scorer`](https://runloopai.github.io/api-client-ts/stable/classes/sdk.ScorerOps.html)** - Scorer management (create, list, update)
+- **[`runloop.secret`](https://runloopai.github.io/api-client-ts/stable/classes/sdk.SecretOps.html)** - Secret management (create, update, list, delete encrypted key-value pairs)
 - **[`runloop.api`](https://runloopai.github.io/api-client-ts/stable/modules/types.html)** - Direct access to the REST API client
 
 ## TypeScript Support
 
 The SDK is fully typed with comprehensive TypeScript definitions:
+
+### Devbox Logs
+
+Retrieve logs from a devbox, optionally filtered by execution ID or shell name:
+
+```typescript
+const devbox = await runloop.devbox.create();
+
+// Get all devbox logs
+const logs = await devbox.logs();
+console.log(logs.logs);
+
+// Filter logs by execution ID
+const result = await devbox.cmd.exec('echo "hello"');
+const execLogs = await devbox.logs({ execution_id: result.executionId });
+
+// Filter logs by shell name
+const shellLogs = await devbox.logs({ shell_name: 'my-shell' });
+```
 
 ### Blueprints
 
@@ -340,6 +373,17 @@ The following runtimes are supported:
 - Nitro v2.6 or greater.
 
 If you are interested in other runtime environments, please open or upvote an issue on GitHub.
+
+## Development
+
+After cloning the repository, run the bootstrap script and install git hooks:
+
+```sh
+./scripts/bootstrap
+./scripts/install-hooks
+```
+
+This installs pre-push hooks that run linting and verify generated files are up to date.
 
 ## Contributing
 

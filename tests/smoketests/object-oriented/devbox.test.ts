@@ -263,31 +263,6 @@ describe('smoketest: object-oriented devbox', () => {
       await devbox.shutdown();
     });
 
-    test('create legacy tunnel (deprecated - now creates v2 tunnel)', async () => {
-      const devbox = await sdk.devbox.create({
-        name: uniqueName('sdk-devbox-tunnel'),
-        launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 }, // 5 minutes
-      });
-
-      try {
-        // Create tunnel using deprecated createTunnel method (now creates v2 tunnel)
-        const tunnel = await devbox.net.createTunnel({ port: 8080 });
-
-        // Verify the tunnel response structure
-        expect(tunnel).toBeDefined();
-        expect(tunnel.devbox_id).toBe(devbox.id);
-        expect(tunnel.port).toBe(8080);
-        expect(tunnel.url).toBeDefined();
-
-        // Note: v2 tunnels cannot be removed - they remain active until devbox shutdown
-        // Verify the tunnel is accessible via devbox info
-        const info = await devbox.getInfo();
-        expect(info.tunnel).toBeDefined();
-      } finally {
-        await devbox.shutdown();
-      }
-    });
-
     test('enable V2 tunnel (open)', async () => {
       const devbox = await sdk.devbox.create({
         name: uniqueName('sdk-devbox-enable-tunnel'),
@@ -554,6 +529,27 @@ describe('smoketest: object-oriented devbox', () => {
       await devbox.shutdown();
       await sourceDevbox.shutdown();
       await snapshot.delete();
+    });
+
+    test('snapshot disk async', async () => {
+      const sourceDevbox = await sdk.devbox.create({
+        name: uniqueName('sdk-devbox-for-async-snapshot'),
+        launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 },
+      });
+
+      let snapshot: Awaited<ReturnType<typeof sourceDevbox.snapshotDiskAsync>> | undefined;
+      try {
+        snapshot = await sourceDevbox.snapshotDisk({
+          name: uniqueName('sdk-async-snapshot'),
+          commit_message: 'Async snapshot test',
+        });
+        expect(snapshot).toBeDefined();
+        expect(snapshot.id).toBeTruthy();
+      } finally {
+        // force=true required because the async snapshot may still be in progress
+        await sdk.api.devboxes.shutdown(sourceDevbox.id);
+        if (snapshot) await snapshot.delete();
+      }
     });
   });
 
@@ -1132,6 +1128,67 @@ describe('smoketest: object-oriented devbox', () => {
       expect(result.exitCode).toBe(0);
       const output = await result.stdout();
       expect(output).toContain('test');
+    });
+  });
+
+  describe('devbox logs', () => {
+    let devbox: Devbox;
+
+    beforeAll(async () => {
+      devbox = await sdk.devbox.create({
+        name: uniqueName('sdk-devbox-logs'),
+        launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 },
+      });
+    }, SHORT_TIMEOUT);
+
+    afterAll(async () => {
+      if (devbox) {
+        await devbox.shutdown();
+      }
+    });
+
+    test('logs - basic retrieval', async () => {
+      expect(devbox).toBeDefined();
+
+      // Fetch logs - verifies API returns valid response structure
+      // Logs may be empty depending on timing
+      const logs = await devbox.logs();
+
+      expect(logs).toBeDefined();
+      expect(logs.logs).toBeDefined();
+      expect(Array.isArray(logs.logs)).toBe(true);
+    });
+
+    test('logs - with execution_id filter', async () => {
+      expect(devbox).toBeDefined();
+
+      // Run a command and get its execution ID
+      const execution = await devbox.cmd.execAsync('echo "filtered log test"');
+      const result = await execution.result();
+      expect(result.exitCode).toBe(0);
+
+      // Fetch logs filtered by execution ID - verifies API accepts the filter
+      const logs = await devbox.logs({ execution_id: execution.executionId });
+
+      expect(logs).toBeDefined();
+      expect(Array.isArray(logs.logs)).toBe(true);
+    });
+
+    test('logs - with shell_name filter', async () => {
+      expect(devbox).toBeDefined();
+
+      const shellName = 'test-logs-shell';
+      const shell = devbox.shell(shellName);
+
+      // Run a command in the named shell
+      const result = await shell.exec('echo "shell log test"');
+      expect(result.exitCode).toBe(0);
+
+      // Fetch logs filtered by shell name - verifies API accepts the filter
+      const logs = await devbox.logs({ shell_name: shellName });
+
+      expect(logs).toBeDefined();
+      expect(Array.isArray(logs.logs)).toBe(true);
     });
   });
 });

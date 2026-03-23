@@ -11,6 +11,7 @@
 
 - [Devbox lifecycle example](examples/devbox-from-blueprint-lifecycle.ts): Create blueprint, launch devbox, run commands, cleanup
 - [MCP GitHub example](examples/mcp-github-tools.ts): MCP Hub integration with Claude Code
+- [Secrets with Devbox example](examples/secrets-with-devbox.ts): Create secret, inject into devbox, verify, cleanup
 
 ## API Reference
 
@@ -21,10 +22,10 @@
 
 - Always use `RunloopSDK` as the entry point (not legacy `Runloop` default export)
 - Prefer SDK methods (`sdk.devbox`, `sdk.blueprint`, etc.) for object-oriented patterns and convenience
-- For resources without SDK coverage (e.g., secrets, benchmarks), use `sdk.api.*` as a fallback
+- For resources without SDK coverage (e.g., benchmarks), use `sdk.api.*` as a fallback
 - Use `sdk.devbox.create()` to create devboxes; they auto-await readiness
-- Use `devbox.cmd.exec('command')` for most commands—blocks until completion, returns `ExecutionResult` with stdout/stderr
-- Use `devbox.cmd.execAsync('command')` for long-running or background processes (servers, watchers)—returns immediately with `Execution` handle to check status, get result, or kill
+- Use `devbox.cmd.exec('command')` for commands expected to return immediately (e.g., `echo`, `pwd`, `cat`)—blocks until completion, returns `ExecutionResult` with stdout/stderr
+- Use `devbox.cmd.execAsync('command')` for long-running or background processes (servers, watchers, builds)—returns immediately with `Execution` handle to check status, get result, or kill
 - Both `exec` and `execAsync` support streaming callbacks (`stdout`, `stderr`, `output`) for real-time output
 - Call `devbox.shutdown()` to clean up resources that are no longer in use.
 - In example files, focus on the `recipe` function body for SDK usage patterns; ignore test harness files in the examples folder (`_harness.ts`, `registry.ts`, `types.ts`)

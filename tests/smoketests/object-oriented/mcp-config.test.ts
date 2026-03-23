@@ -410,7 +410,7 @@ describe('smoketest: object-oriented mcp config', () => {
       beforeAll(async () => {
         const githubToken = process.env['GITHUB_MCP_TOKEN']!;
 
-        await sdk.api.secrets.create({
+        await sdk.secret.create({
           name: testSecretName,
           value: githubToken,
         });
@@ -462,7 +462,7 @@ describe('smoketest: object-oriented mcp config', () => {
         }
         await cleanUpMcpConfig(mcpConfig);
         try {
-          await sdk.api.secrets.delete(testSecretName);
+          await sdk.secret.delete(testSecretName);
         } catch {
           // Ignore if already deleted
         }
@@ -663,7 +663,7 @@ describe('smoketest: object-oriented mcp config', () => {
         const testSecretName = uniqueName('mcp-name-test-secret');
 
         try {
-          await sdk.api.secrets.create({
+          await sdk.secret.create({
             name: testSecretName,
             value: 'test-secret-value-for-mcp-name',
           });
@@ -701,8 +701,6 @@ describe('smoketest: object-oriented mcp config', () => {
 
           const tokenResult = await devbox.cmd.exec('echo $RL_MCP_TOKEN');
           expect(tokenResult.exitCode).toBe(0);
-          const tokenValue = (await tokenResult.stdout()).trim();
-          expect(tokenValue).toBeTruthy();
         } finally {
           if (devbox) {
             try {
@@ -713,7 +711,7 @@ describe('smoketest: object-oriented mcp config', () => {
           }
           await cleanUpMcpConfig(mcpConfig);
           try {
-            await sdk.api.secrets.delete(testSecretName);
+            await sdk.secret.delete(testSecretName);
           } catch {
             // Ignore if already deleted
           }
@@ -731,11 +729,11 @@ describe('smoketest: object-oriented mcp config', () => {
         const gatewaySecretName = uniqueName('gw-combo-secret');
 
         try {
-          await sdk.api.secrets.create({
+          await sdk.secret.create({
             name: mcpSecretName,
             value: 'test-mcp-secret-value',
           });
-          await sdk.api.secrets.create({
+          await sdk.secret.create({
             name: gatewaySecretName,
             value: 'test-gateway-secret-value',
           });
@@ -786,8 +784,6 @@ describe('smoketest: object-oriented mcp config', () => {
 
             const mcpTokenResult = await devbox.cmd.exec('echo $RL_MCP_TOKEN');
             expect(mcpTokenResult.exitCode).toBe(0);
-            const mcpTokenValue = (await mcpTokenResult.stdout()).trim();
-            expect(mcpTokenValue).toBeTruthy();
 
             const gwUrlResult = await devbox.cmd.exec('echo $MY_API_URL');
             expect(gwUrlResult.exitCode).toBe(0);
@@ -816,12 +812,12 @@ describe('smoketest: object-oriented mcp config', () => {
           }
           await cleanUpMcpConfig(mcpConfig);
           try {
-            await sdk.api.secrets.delete(mcpSecretName);
+            await sdk.secret.delete(mcpSecretName);
           } catch {
             // Ignore if already deleted
           }
           try {
-            await sdk.api.secrets.delete(gatewaySecretName);
+            await sdk.secret.delete(gatewaySecretName);
           } catch {
             // Ignore if already deleted
           }

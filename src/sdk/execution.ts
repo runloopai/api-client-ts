@@ -1,7 +1,7 @@
 import { Runloop } from '../index';
 import type * as Core from '../core';
 import type { DevboxAsyncExecutionDetailView } from '../resources/devboxes/devboxes';
-import type { PollingOptions } from '../lib/polling';
+import { longPollUntil, resolveLongPollTimeoutMs, type LongPollRequestOptions } from '../lib/polling';
 import { ExecutionResult } from './execution-result';
 
 /**
@@ -102,24 +102,40 @@ export class Execution {
    * }
    * ```
    *
-   * @param {Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxAsyncExecutionDetailView>> }} [options] - Request options with optional polling configuration
+   * @param {LongPollRequestOptions<DevboxAsyncExecutionDetailView>} [options] - Request options with optional long-poll configuration
    * @returns {Promise<ExecutionResult>} {@link ExecutionResult} with stdout, stderr, and exit code
    */
-  async result(
-    options?: Core.RequestOptions & {
-      polling?: Partial<PollingOptions<DevboxAsyncExecutionDetailView>>;
-    },
-  ): Promise<ExecutionResult> {
+  async result(options?: LongPollRequestOptions<DevboxAsyncExecutionDetailView>): Promise<ExecutionResult> {
+    const effectiveTimeoutMs = resolveLongPollTimeoutMs(options);
+    const { longPoll: _lp, polling: _p, ...requestOptions } = options ?? {};
+
+    const commandPromise = longPollUntil(
+      (signal) =>
+        this.client.devboxes.waitForCommand(
+          this._devboxId,
+          this._executionId,
+          { statuses: ['completed'] },
+          {
+            ...requestOptions,
+            signal,
+            // Per-request HTTP timeout must exceed the server's max long-poll hold (25s)
+            // so the server's 408 always arrives before the client aborts the connection.
+            // The longPollUntil AbortSignal enforces the caller's actual deadline.
+            timeout: 600000,
+            // Disable base-client retries so 408s surface immediately to longPollUntil
+            // (the server's wait_for_status endpoint sets x-should-retry: true for executions).
+            maxRetries: 0,
+          },
+        ),
+      {
+        timeoutMs: effectiveTimeoutMs,
+        shouldStop: (result) => result.status === 'completed',
+        signal: requestOptions.signal,
+      },
+    );
+
     // Wait for both command completion and streaming to finish (using allSettled for robustness)
-    const results = await Promise.allSettled([
-      this.client.devboxes.waitForCommand(
-        this._devboxId,
-        this._executionId,
-        { statuses: ['completed'] },
-        options,
-      ),
-      this._streamingPromise || Promise.resolve(),
-    ]);
+    const results = await Promise.allSettled([commandPromise, this._streamingPromise || Promise.resolve()]);
 
     // Extract command result (throw if it failed, ignore streaming errors)
     if (results[0].status === 'rejected') {

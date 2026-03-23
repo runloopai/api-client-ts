@@ -145,7 +145,7 @@ export class DevboxTools {
    */
   tunnelTools(devboxId: string, options?: Core.RequestOptions) {
     const tools = {
-      create_tunnel: createTool({
+      enable_tunnel: createTool({
         name: 'create_tunnel',
         description: 'Create a new tunnel to expose a port on the devbox',
         parameters: z.object({
@@ -154,13 +154,7 @@ export class DevboxTools {
         }),
         execute: async (params) => {
           try {
-            const result = await this.devboxes.createTunnel(
-              devboxId,
-              {
-                port: params.port,
-              },
-              options,
-            );
+            const result = await this.devboxes.enableTunnel(devboxId, options);
             return `Created tunnel: ${JSON.stringify(result, null, 2)}`;
           } catch (error) {
             return `Failed to create tunnel: ${error}`;

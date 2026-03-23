@@ -54,7 +54,9 @@ jobs:
       - name: Run smoke tests with coverage
         id: tests
         continue-on-error: true
-        run: yarn test:objects-coverage 2>&1 | tee test-output.log
+        run: |
+          set -o pipefail
+          yarn test:objects-coverage 2>&1 | tee test-output.log
 
       - name: Upload coverage report
         uses: runloopai/upload-artifact@main

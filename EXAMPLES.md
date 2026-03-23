@@ -7,22 +7,56 @@ Runnable examples live in [`examples/`](./examples).
 
 ## Table of Contents
 
+- [Blueprint with Build Context](#blueprint-with-build-context)
 - [Devbox From Blueprint (Run Command, Shutdown)](#devbox-from-blueprint-lifecycle)
 - [Devbox Tunnel (HTTP Server Access)](#devbox-tunnel)
 - [MCP Hub + Claude Code + GitHub](#mcp-github-tools)
+- [Secrets with Devbox (Create, Inject, Verify, Delete)](#secrets-with-devbox)
+
+<a id="blueprint-with-build-context"></a>
+## Blueprint with Build Context
+
+**Use case:** Create a blueprint using the object store to provide docker build context files, then verify files are copied into the image.
+
+**Tags:** `blueprint`, `object-store`, `build-context`, `devbox`, `cleanup`
+
+### Workflow
+- Create a temporary directory with sample application files
+- Upload the directory to object storage as build context
+- Create a blueprint with a Dockerfile that copies the context files
+- Create a devbox from the blueprint
+- Verify the files were copied into the image
+- Shutdown devbox and delete blueprint and storage object
+
+### Prerequisites
+- `RUNLOOP_API_KEY`
+
+### Run
+```sh
+yarn tsn -T examples/blueprint-with-build-context.ts
+```
+
+### Test
+```sh
+yarn test:examples
+```
+
+**Source:** [`examples/blueprint-with-build-context.ts`](./examples/blueprint-with-build-context.ts)
 
 <a id="devbox-from-blueprint-lifecycle"></a>
 ## Devbox From Blueprint (Run Command, Shutdown)
 
-**Use case:** Create a devbox from a blueprint, run a command, validate output, and cleanly tear everything down.
+**Use case:** Create a devbox from a blueprint, run a command, fetch logs, validate output, and cleanly tear everything down.
 
-**Tags:** `devbox`, `blueprint`, `commands`, `cleanup`
+**Tags:** `devbox`, `blueprint`, `commands`, `logs`, `cleanup`
 
 ### Workflow
 - Create a blueprint
+- Fetch blueprint build logs
 - Create a devbox from the blueprint
 - Execute a command in the devbox
-- Validate exit code and stdout
+- Fetch devbox logs
+- Validate exit code, stdout, and logs
 - Shutdown devbox and delete blueprint
 
 ### Prerequisites
@@ -101,3 +135,32 @@ yarn test:examples
 ```
 
 **Source:** [`examples/mcp-github-tools.ts`](./examples/mcp-github-tools.ts)
+
+<a id="secrets-with-devbox"></a>
+## Secrets with Devbox (Create, Inject, Verify, Delete)
+
+**Use case:** Create a secret, inject it into a devbox as an environment variable, verify access, and clean up.
+
+**Tags:** `secrets`, `devbox`, `environment-variables`, `cleanup`
+
+### Workflow
+- Create a secret with a test value
+- Create a devbox with the secret mapped to an env var
+- Execute a command that reads the secret from the environment
+- Verify the value matches
+- Shutdown devbox and delete secret
+
+### Prerequisites
+- `RUNLOOP_API_KEY`
+
+### Run
+```sh
+yarn tsn -T examples/secrets-with-devbox.ts
+```
+
+### Test
+```sh
+yarn test:examples
+```
+
+**Source:** [`examples/secrets-with-devbox.ts`](./examples/secrets-with-devbox.ts)
