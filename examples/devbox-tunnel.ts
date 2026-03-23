@@ -4,11 +4,11 @@
 ---
 title: Devbox Tunnel (HTTP Server Access)
 slug: devbox-tunnel
-use_case: Create a devbox, start an HTTP server, enable a tunnel, and access the server from the local machine through the tunnel.
+use_case: Create a devbox with a tunnel, start an HTTP server, and access the server from the local machine through the tunnel.
 workflow:
-  - Create a devbox
+  - Create a devbox with a tunnel
   - Start an HTTP server inside the devbox
-  - Enable a tunnel for external access
+  - Read the tunnel details from the devbox
   - Make an HTTP request from the local machine through the tunnel
   - Validate the response
   - Shutdown the devbox
@@ -43,6 +43,9 @@ export async function recipe(ctx: RecipeContext): Promise<RecipeOutput> {
     launch_parameters: {
       resource_size_request: 'X_SMALL',
     },
+    tunnel: {
+      auth_mode: 'open',
+    },
   });
   cleanup.add(`devbox:${devbox.id}`, () => sdk.devbox.fromId(devbox.id).shutdown());
 
@@ -55,10 +58,13 @@ export async function recipe(ctx: RecipeContext): Promise<RecipeOutput> {
   // Give the server a moment to start
   await new Promise((resolve) => setTimeout(resolve, SERVER_STARTUP_DELAY_MS));
 
-  // Enable a tunnel to expose the HTTP server
-  // For authenticated tunnels, use auth_mode: 'authenticated' and include the auth_token
+  // The tunnel was created with the devbox. For authenticated tunnels, set
+  // tunnel: { auth_mode: 'authenticated' } on create and include the auth_token
   // in your requests via the Authorization header: `Authorization: Bearer ${tunnel.auth_token}`
-  const tunnel = await devbox.net.enableTunnel({ auth_mode: 'open' });
+  const tunnel = await devbox.getTunnel();
+  if (!tunnel) {
+    throw new Error('Failed to create tunnel at devbox launch time');
+  }
 
   // Get the tunnel URL for the server port
   const tunnelUrl = await devbox.getTunnelUrl(HTTP_SERVER_PORT);

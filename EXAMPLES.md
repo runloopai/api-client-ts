@@ -77,14 +77,14 @@ yarn test:examples
 <a id="devbox-tunnel"></a>
 ## Devbox Tunnel (HTTP Server Access)
 
-**Use case:** Create a devbox, start an HTTP server, enable a tunnel, and access the server from the local machine through the tunnel.
+**Use case:** Create a devbox with a tunnel, start an HTTP server, and access the server from the local machine through the tunnel.
 
 **Tags:** `devbox`, `tunnel`, `networking`, `http`
 
 ### Workflow
-- Create a devbox
+- Create a devbox with a tunnel
 - Start an HTTP server inside the devbox
-- Enable a tunnel for external access
+- Read the tunnel details from the devbox
 - Make an HTTP request from the local machine through the tunnel
 - Validate the response
 - Shutdown the devbox
