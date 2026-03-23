@@ -71,6 +71,8 @@ yarn generate:examples-md
 
 Use direct `secrets` injection when code inside the devbox legitimately needs the secret value. For third-party API credentials that should stay off the devbox, prefer wiring a Runloop secret through agent gateway instead. See [`examples/secrets-with-devbox.ts`](./examples/secrets-with-devbox.ts) for both patterns side by side using `devbox.create({ secrets: ... })` and `devbox.create({ gateways: ... })`.
 
+For mount patterns, see [`examples/devbox-mounts.ts`](./examples/devbox-mounts.ts). It shows when to use `agent_mount` for reusable agents like Claude Code, `code_mount` for Git repositories such as [`runloopai/rl-cli`](https://github.com/runloopai/rl-cli.git), and `object_mount` for blobs that should appear on the devbox at startup. The example also demonstrates agent gateway wiring for Anthropic credentials plus object TTL, `.tgz` compression, and extraction-on-mount behavior.
+
 ## Agent Guidance
 
 Detailed agent-specific instructions live in [`llms.txt`](./llms.txt). Consolidated recipes for frequent tasks are in [`EXAMPLES.md`](./EXAMPLES.md).
