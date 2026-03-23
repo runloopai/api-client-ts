@@ -10,6 +10,7 @@
 ## Core Patterns
 
 - [Devbox lifecycle example](examples/devbox-from-blueprint-lifecycle.ts): Create blueprint, launch devbox, run commands, cleanup
+- [Devbox mounts example](examples/devbox-mounts.ts): Show `agent_mount`, `code_mount`, and `object_mount` together, including Claude Code via Anthropic agent gateway, the `runloopai/rl-cli` repo, and object TTL/compression/extraction behavior
 - [MCP GitHub example](examples/mcp-github-tools.ts): MCP Hub integration with Claude Code
 - [Secrets with Devbox example](examples/secrets-with-devbox.ts): Show direct secret injection for app data alongside agent gateway for upstream credentials that should stay off the devbox
 
