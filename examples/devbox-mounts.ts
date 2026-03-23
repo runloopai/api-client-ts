@@ -10,7 +10,7 @@ workflow:
   - Create a secret for an agent and route it through agent gateway
   - Upload a temporary directory as a storage object with a TTL
   - Launch a devbox with agent, code, and object mounts together
-  - Run Claude Code on Opus 4.5 through the Anthropic gateway
+  - Run Claude Code on Opus 4.5 through the Anthropic agent gateway
   - Verify the rl-cli repo and extracted object files are present on the devbox
   - Shutdown the devbox and delete the temporary secret and object
 tags:
