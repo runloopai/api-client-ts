@@ -429,7 +429,7 @@ export class DevboxFileOps {
    *
    * @example
    * ```typescript
-  * const content = await devbox.file.read({ file_path: '/app/config.json' });
+   * const content = await devbox.file.read({ file_path: '/app/config.json' });
    * const config = JSON.parse(content);
    * ```
    *
