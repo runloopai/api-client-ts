@@ -69,6 +69,8 @@ Regenerate it with:
 yarn generate:examples-md
 ```
 
+For third-party API credentials, prefer wiring a Runloop secret through agent gateway instead of injecting the raw credential into the devbox environment. See [`examples/secrets-with-devbox.ts`](./examples/secrets-with-devbox.ts) for the recommended pattern using `gatewayConfig.create(...)` plus `devbox.create({ gateways: ... })`.
+
 ## Agent Guidance
 
 Detailed agent-specific instructions live in [`llms.txt`](./llms.txt). Consolidated recipes for frequent tasks are in [`EXAMPLES.md`](./EXAMPLES.md).

@@ -11,7 +11,7 @@
 
 - [Devbox lifecycle example](examples/devbox-from-blueprint-lifecycle.ts): Create blueprint, launch devbox, run commands, cleanup
 - [MCP GitHub example](examples/mcp-github-tools.ts): MCP Hub integration with Claude Code
-- [Secrets with Devbox example](examples/secrets-with-devbox.ts): Create secret, inject into devbox, verify, cleanup
+- [Secrets with Devbox example](examples/secrets-with-devbox.ts): Create secret, wire it through agent gateway, verify the devbox only gets gateway credentials, cleanup
 
 ## API Reference
 

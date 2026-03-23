@@ -2,19 +2,20 @@
 
 /**
 ---
-title: Secrets with Devbox (Create, Inject, Verify, Delete)
+title: Secrets with Devbox via Agent Gateway
 slug: secrets-with-devbox
-use_case: Create a secret, inject it into a devbox as an environment variable, verify access, and clean up.
+use_case: Create a secret, proxy it into a devbox through agent gateway, verify the devbox only gets gateway credentials, and clean up.
 workflow:
-  - Create a secret with a test value
-  - Create a devbox with the secret mapped to an env var
-  - Execute a command that reads the secret from the environment
-  - Verify the value matches
-  - Shutdown devbox and delete secret
+  - Create a secret with a test credential
+  - Create an agent gateway config for an upstream API
+  - Launch a devbox with the gateway wired to the secret
+  - Verify the devbox receives a gateway URL and token instead of the raw secret
+  - Shutdown the devbox and delete the gateway config and secret
 tags:
   - secrets
   - devbox
-  - environment-variables
+  - agent-gateway
+  - credentials
   - cleanup
 prerequisites:
   - RUNLOOP_API_KEY
@@ -27,51 +28,71 @@ import { RunloopSDK } from '@runloop/api-client';
 import { wrapRecipe, runAsCli } from './_harness';
 import type { RecipeContext, RecipeOutput } from './types';
 
+function uniqueName(prefix: string): string {
+  return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+}
+
+const EXAMPLE_GATEWAY_ENDPOINT = 'https://api.example.com';
+
 export async function recipe(ctx: RecipeContext): Promise<RecipeOutput> {
   const { cleanup } = ctx;
 
   const sdk = new RunloopSDK({
     bearerToken: process.env['RUNLOOP_API_KEY'],
   });
+  const resourcesCreated: string[] = [];
+  const secretValue = 'example-upstream-api-key';
+  const secretName = uniqueName('agent-gateway-secret');
 
-  const secretName = 'RUNLOOP_SECRET_EXAMPLE';
   // Note: do NOT hardcode secret values in your code!
   // this is example code only; use environment variables instead!
-  const secretValue = 'my-secret-value';
-
   const secret = await sdk.secret.create({
     name: secretName,
     value: secretValue,
   });
+  resourcesCreated.push(`secret:${secretName}`);
   cleanup.add(`secret:${secretName}`, () => secret.delete());
 
+  // Note: Here we hide credentials from the devbox by using an agent gateway config.
+  // This is optional but strongly recommended since it prevents secret exfiltration.
+  const gatewayConfig = await sdk.gatewayConfig.create({
+    name: uniqueName('agent-gateway-config'),
+    endpoint: EXAMPLE_GATEWAY_ENDPOINT,
+    auth_mechanism: { type: 'bearer' },
+    description: 'Example gateway that keeps upstream credentials off the devbox',
+  });
+  resourcesCreated.push(`gateway_config:${gatewayConfig.id}`);
+  cleanup.add(`gateway_config:${gatewayConfig.id}`, () =>
+    sdk.gatewayConfig.fromId(gatewayConfig.id).delete(),
+  );
+
   const devbox = await sdk.devbox.create({
-    name: 'secrets-example-devbox',
-    secrets: {
-      MY_SECRET_ENV: secret,
+    name: uniqueName('agent-gateway-devbox'),
+    gateways: {
+      MY_API: {
+        gateway: gatewayConfig.id,
+        secret,
+      },
     },
     launch_parameters: {
       resource_size_request: 'X_SMALL',
       keep_alive_time_seconds: 60 * 5,
     },
   });
+  resourcesCreated.push(`devbox:${devbox.id}`);
   cleanup.add(`devbox:${devbox.id}`, () => sdk.devbox.fromId(devbox.id).shutdown());
 
-  const result = await devbox.cmd.exec('echo $MY_SECRET_ENV');
-  const stdout = await result.stdout();
-
-  const updatedSecret = await sdk.secret.update(secret, {
-    value: 'updated-secret-value',
-  });
-
-  const secrets = await sdk.secret.list();
-  const foundSecret = secrets.find((s) => s.name === secretName);
+  const devboxInfo = await devbox.getInfo();
+  const urlResult = await devbox.cmd.exec('echo $MY_API_URL');
+  const gatewayUrl = (await urlResult.stdout()).trim();
+  const tokenResult = await devbox.cmd.exec('echo $MY_API');
+  const gatewayToken = (await tokenResult.stdout()).trim();
 
   const secretInfo = await secret.getInfo();
-  const updatedInfo = await updatedSecret.getInfo();
+  const gatewayInfo = await gatewayConfig.getInfo();
 
   return {
-    resourcesCreated: [`secret:${secretName}`, `devbox:${devbox.id}`],
+    resourcesCreated,
     checks: [
       {
         name: 'secret created successfully',
@@ -79,19 +100,26 @@ export async function recipe(ctx: RecipeContext): Promise<RecipeOutput> {
         details: `name=${secret.name}, id=${secretInfo.id}`,
       },
       {
-        name: 'devbox can read secret as env var',
-        passed: result.exitCode === 0 && stdout.trim() === secretValue,
-        details: `exitCode=${result.exitCode}, stdout="${stdout.trim()}"`,
+        name: 'gateway config created successfully',
+        passed: gatewayInfo.id.startsWith('gwc_') && gatewayInfo.endpoint === EXAMPLE_GATEWAY_ENDPOINT,
+        details: `id=${gatewayInfo.id}, endpoint=${gatewayInfo.endpoint}`,
       },
       {
-        name: 'secret updated successfully',
-        passed: updatedSecret.name === secretName,
-        details: `update_time_ms=${updatedInfo.update_time_ms}`,
+        name: 'devbox records gateway wiring',
+        passed:
+          devboxInfo.gateway_specs?.['MY_API']?.gateway_config_id === gatewayConfig.id &&
+          devboxInfo.gateway_specs?.['MY_API'] !== undefined,
+        details: `gateway_config_id=${devboxInfo.gateway_specs?.['MY_API']?.gateway_config_id ?? 'missing'}`,
       },
       {
-        name: 'secret appears in list',
-        passed: foundSecret !== undefined && foundSecret.name === secretName,
-        details: foundSecret ? `found name=${foundSecret.name}` : 'not found',
+        name: 'devbox receives gateway URL',
+        passed: urlResult.exitCode === 0 && gatewayUrl.startsWith('http'),
+        details: `exitCode=${urlResult.exitCode}, url=${gatewayUrl}`,
+      },
+      {
+        name: 'devbox receives gateway token instead of raw secret',
+        passed: tokenResult.exitCode === 0 && gatewayToken.startsWith('gws_') && gatewayToken !== secretValue,
+        details: `exitCode=${tokenResult.exitCode}, token_prefix=${gatewayToken.slice(0, 4) || 'missing'}`,
       },
     ],
   };
