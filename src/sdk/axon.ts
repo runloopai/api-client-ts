@@ -1,6 +1,5 @@
 import { Runloop } from '../index';
 import type * as Core from '../core';
-import { APIPromise } from '../core';
 import { Stream } from '../streaming';
 import type {
   AxonView,
@@ -65,7 +64,11 @@ export class Axon {
    * @param {Core.RequestOptions} [options] - Request options
    * @returns {Promise<Axon>} An {@link Axon} instance
    */
-  static async create(client: Runloop, params?: AxonCreateParams, options?: Core.RequestOptions): Promise<Axon> {
+  static async create(
+    client: Runloop,
+    params?: AxonCreateParams,
+    options?: Core.RequestOptions,
+  ): Promise<Axon> {
     const axonData = await client.axons.create(params ?? {}, options);
     return new Axon(client, axonData.id);
   }
