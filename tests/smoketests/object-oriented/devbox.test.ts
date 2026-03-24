@@ -284,6 +284,9 @@ describe('smoketest: object-oriented devbox', () => {
         expect(info.tunnel?.tunnel_key).toBe(tunnel.tunnel_key);
 
         await devbox.net.removeTunnel();
+
+        const tunnelAfterRemoval = await devbox.getTunnel();
+        expect(tunnelAfterRemoval).toBeNull();
       } finally {
         await devbox.shutdown();
       }
