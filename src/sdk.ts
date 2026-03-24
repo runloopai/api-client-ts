@@ -6,6 +6,7 @@ import { Blueprint, type CreateParams as BlueprintCreateParams } from './sdk/blu
 import { Snapshot } from './sdk/snapshot';
 import { StorageObject } from './sdk/storage-object';
 import { Agent } from './sdk/agent';
+import { Axon } from './sdk/axon';
 import { Scorer } from './sdk/scorer';
 import { NetworkPolicy } from './sdk/network-policy';
 import { GatewayConfig } from './sdk/gateway-config';
@@ -23,6 +24,7 @@ import type {
 import type { BlueprintListParams } from './resources/blueprints';
 import type { ObjectCreateParams, ObjectListParams } from './resources/objects';
 import type { AgentCreateParams, AgentListParams } from './resources/agents';
+import type { AxonCreateParams } from './resources/axons';
 import type { ScorerCreateParams, ScorerListParams } from './resources/scenarios/scorers';
 import type { NetworkPolicyCreateParams, NetworkPolicyListParams } from './resources/network-policies';
 import type { GatewayConfigCreateParams, GatewayConfigListParams } from './resources/gateway-configs';
@@ -369,6 +371,7 @@ type ContentType = ObjectCreateParams['content_type'];
  * - `snapshot` - {@link SnapshotOps}
  * - `storageObject` - {@link StorageObjectOps}
  * - `agent` - {@link AgentOps}
+ * - `axon` - {@link AxonOps}
  * - `scorer` - {@link ScorerOps}
  * - `networkPolicy` - {@link NetworkPolicyOps}
  * - `gatewayConfig` - {@link GatewayConfigOps}
@@ -434,6 +437,15 @@ export class RunloopSDK {
   public readonly agent: AgentOps;
 
   /**
+   * **Axon Operations** - {@link AxonOps} for creating and accessing {@link Axon} class instances.
+   *
+   * [Beta] Axons are event communication channels that support publishing events and subscribing
+   * to event streams via server-sent events (SSE). Use these operations to create new axons,
+   * get existing ones by ID, or list all active axons.
+   */
+  public readonly axon: AxonOps;
+
+  /**
    * **Scorer Operations** - {@link ScorerOps} for creating and accessing {@link Scorer} class instances.
    *
    * Scorers are custom scoring functions that evaluate scenario outputs. They define scripts
@@ -494,6 +506,7 @@ export class RunloopSDK {
     this.snapshot = new SnapshotOps(this.api);
     this.storageObject = new StorageObjectOps(this.api);
     this.agent = new AgentOps(this.api);
+    this.axon = new AxonOps(this.api);
     this.scorer = new ScorerOps(this.api);
     this.networkPolicy = new NetworkPolicyOps(this.api);
     this.gatewayConfig = new GatewayConfigOps(this.api);
@@ -1485,6 +1498,107 @@ export class AgentOps {
 }
 
 /**
+ * [Beta] Axon SDK interface for managing axons.
+ *
+ * @category Axon
+ *
+ * @remarks
+ * ## Overview
+ *
+ * The `AxonOps` class provides a high-level abstraction for managing axons,
+ * which are event communication channels. Axons support publishing events
+ * and subscribing to event streams via server-sent events (SSE).
+ *
+ * ## Usage
+ *
+ * This interface is accessed via {@link RunloopSDK.axon}. You should construct
+ * a {@link RunloopSDK} instance and use it from there:
+ *
+ * @example
+ * ```typescript
+ * const runloop = new RunloopSDK();
+ * const axon = await runloop.axon.create({ name: 'my-axon' });
+ *
+ * // Publish an event
+ * await axon.publish({
+ *   event_type: 'task_complete',
+ *   origin: 'AGENT_EVENT',
+ *   payload: JSON.stringify({ result: 'success' }),
+ *   source: 'my-agent',
+ * });
+ *
+ * // Subscribe to events
+ * const stream = await axon.subscribeSse();
+ * for await (const event of stream) {
+ *   console.log(event.event_type, event.payload);
+ * }
+ * ```
+ */
+export class AxonOps {
+  /**
+   * @private
+   */
+  constructor(private client: RunloopAPI) {}
+
+  /**
+   * [Beta] Create a new axon.
+   *
+   * @example
+   * ```typescript
+   * const runloop = new RunloopSDK();
+   * const axon = await runloop.axon.create({ name: 'my-axon' });
+   * console.log(`Created axon: ${axon.id}`);
+   * ```
+   *
+   * @param {AxonCreateParams} [params] - Parameters for creating the axon.
+   * @param {Core.RequestOptions} [options] - Request options.
+   * @returns {Promise<Axon>} An {@link Axon} instance.
+   */
+  async create(params?: AxonCreateParams, options?: Core.RequestOptions): Promise<Axon> {
+    return Axon.create(this.client, params, options);
+  }
+
+  /**
+   * Get an axon object by its ID.
+   *
+   * @example
+   * ```typescript
+   * const runloop = new RunloopSDK();
+   * const axon = runloop.axon.fromId('axn_1234567890');
+   * const info = await axon.getInfo();
+   * console.log(`Axon name: ${info.name}`);
+   * ```
+   *
+   * @param {string} id - The ID of the axon.
+   * @returns {Axon} An {@link Axon} instance.
+   */
+  fromId(id: string): Axon {
+    return Axon.fromId(this.client, id);
+  }
+
+  /**
+   * [Beta] List all active axons.
+   *
+   * @example
+   * ```typescript
+   * const runloop = new RunloopSDK();
+   * const axons = await runloop.axon.list();
+   * for (const axon of axons) {
+   *   const info = await axon.getInfo();
+   *   console.log(`${info.name}: ${info.id}`);
+   * }
+   * ```
+   *
+   * @param {Core.RequestOptions} [options] - Request options.
+   * @returns {Promise<Axon[]>} An array of {@link Axon} instances.
+   */
+  async list(options?: Core.RequestOptions): Promise<Axon[]> {
+    const result = await this.client.axons.list(options);
+    return result.axons.map((axon) => Axon.fromId(this.client, axon.id));
+  }
+}
+
+/**
  * Scorer SDK interface for managing custom scorers.
  *
  * @category Scorer
@@ -2199,6 +2313,7 @@ export declare namespace RunloopSDK {
     SnapshotOps as SnapshotOps,
     StorageObjectOps as StorageObjectOps,
     AgentOps as AgentOps,
+    AxonOps as AxonOps,
     ScorerOps as ScorerOps,
     NetworkPolicyOps as NetworkPolicyOps,
     GatewayConfigOps as GatewayConfigOps,
@@ -2210,6 +2325,7 @@ export declare namespace RunloopSDK {
     Snapshot as Snapshot,
     StorageObject as StorageObject,
     Agent as Agent,
+    Axon as Axon,
     Scorer as Scorer,
     NetworkPolicy as NetworkPolicy,
     GatewayConfig as GatewayConfig,
@@ -2229,6 +2345,7 @@ export {
   Snapshot,
   StorageObject,
   Agent,
+  Axon,
   Scorer,
   NetworkPolicy,
   McpConfig,
