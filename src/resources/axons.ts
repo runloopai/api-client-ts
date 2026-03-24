@@ -1,6 +1,7 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 import { APIResource } from '../resource';
+import { isRequestOptions } from '../core';
 import { APIPromise } from '../core';
 import * as Core from '../core';
 import { Stream } from '../streaming';
@@ -9,10 +10,15 @@ export class Axons extends APIResource {
   /**
    * [Beta] Create a new axon.
    */
+  create(body?: AxonCreateParams, options?: Core.RequestOptions): Core.APIPromise<AxonView>;
+  create(options?: Core.RequestOptions): Core.APIPromise<AxonView>;
   create(
-    body?: AxonCreateParams | null | undefined,
+    body: AxonCreateParams | Core.RequestOptions = {},
     options?: Core.RequestOptions,
   ): Core.APIPromise<AxonView> {
+    if (isRequestOptions(body)) {
+      return this.create({}, body);
+    }
     return this._client.post('/v1/axons', { body, ...options });
   }
 
@@ -51,7 +57,12 @@ export class Axons extends APIResource {
   }
 }
 
-export type AxonCreateParams = unknown;
+export interface AxonCreateParams {
+  /**
+   * (Optional) Name for the axon.
+   */
+  name?: string | null;
+}
 
 export interface AxonEventView {
   /**
@@ -107,6 +118,11 @@ export interface AxonView {
    * Creation time in milliseconds since epoch.
    */
   created_at_ms: number;
+
+  /**
+   * The name of the axon.
+   */
+  name?: string | null;
 }
 
 export interface PublishParams {
@@ -143,7 +159,12 @@ export interface PublishResultView {
   timestamp_ms: number;
 }
 
-export interface AxonCreateParams {}
+export interface AxonCreateParams {
+  /**
+   * (Optional) Name for the axon.
+   */
+  name?: string | null;
+}
 
 export interface AxonPublishParams {
   /**
