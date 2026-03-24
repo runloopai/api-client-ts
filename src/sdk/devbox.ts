@@ -7,7 +7,6 @@ import type {
   DevboxAsyncExecutionDetailView,
   DevboxSnapshotDiskParams,
   DevboxEnableTunnelParams,
-  DevboxRemoveTunnelParams,
   DevboxReadFileContentsParams,
   DevboxWriteFileContentsParams,
   DevboxDownloadFileParams,
@@ -139,15 +138,14 @@ export class DevboxNetOps {
    * @example
    * ```typescript
    * // Deprecated - only for legacy tunnels
-   * await devbox.net.removeTunnel({ port: 8080 });
+   * await devbox.net.removeTunnel();
    * ```
    *
-   * @param {DevboxRemoveTunnelParams} params - Tunnel removal parameters including port
    * @param {Core.RequestOptions} [options] - Request options
    * @returns {Promise<DevboxRemoveTunnelResponse>} Tunnel removal result
    */
-  async removeTunnel(params: DevboxRemoveTunnelParams, options?: Core.RequestOptions) {
-    return this.client.devboxes.removeTunnel(this.devboxId, params, options);
+  async removeTunnel(options?: Core.RequestOptions) {
+    return this.client.devboxes.removeTunnel(this.devboxId, options);
   }
 }
 

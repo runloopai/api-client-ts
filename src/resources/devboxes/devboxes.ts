@@ -400,17 +400,10 @@ export class Devboxes extends APIResource {
   }
 
   /**
-   * @deprecated Only works with legacy tunnels created via {@link createTunnel}.
-   * V2 tunnels (from {@link enableTunnel}) remain active until devbox shutdown and cannot be removed.
-   *
-   * Remove a legacy tunnel from the devbox.
+   * Remove an existing V2 tunnel from the Devbox.
    */
-  removeTunnel(
-    id: string,
-    body: DevboxRemoveTunnelParams,
-    options?: Core.RequestOptions,
-  ): Core.APIPromise<unknown> {
-    return this._client.post(`/v1/devboxes/${id}/remove_tunnel`, { body, ...options });
+  removeTunnel(id: string, options?: Core.RequestOptions): Core.APIPromise<unknown> {
+    return this._client.post(`/v1/devboxes/${id}/remove_tunnel`, options);
   }
 
   /**
@@ -1396,13 +1389,6 @@ export interface DevboxReadFileContentsParams {
   file_path: string;
 }
 
-export interface DevboxRemoveTunnelParams {
-  /**
-   * Devbox port that tunnel will expose.
-   */
-  port: number;
-}
-
 export interface DevboxShutdownParams {
   /**
    * If true, force shutdown even if snapshots are in progress. Defaults to false.
@@ -1527,7 +1513,6 @@ export declare namespace Devboxes {
     type DevboxExecuteSyncParams as DevboxExecuteSyncParams,
     type DevboxListDiskSnapshotsParams as DevboxListDiskSnapshotsParams,
     type DevboxReadFileContentsParams as DevboxReadFileContentsParams,
-    type DevboxRemoveTunnelParams as DevboxRemoveTunnelParams,
     type DevboxShutdownParams as DevboxShutdownParams,
     type DevboxSnapshotDiskParams as DevboxSnapshotDiskParams,
     type DevboxSnapshotDiskAsyncParams as DevboxSnapshotDiskAsyncParams,
