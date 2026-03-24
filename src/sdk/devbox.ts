@@ -138,6 +138,7 @@ export class DevboxNetOps {
    * ```
    *
    * @param {Core.RequestOptions} [options] - Request options
+   * @returns {Promise<void>}
    */
   async removeTunnel(options?: Core.RequestOptions) {
     return this.client.devboxes.removeTunnel(this.devboxId, options);
