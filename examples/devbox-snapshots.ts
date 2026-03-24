@@ -67,6 +67,13 @@ export async function recipe(ctx: RecipeContext): Promise<RecipeOutput> {
   let cloneBNeedsCleanup = false;
   let snapshotNeedsCleanup = false;
 
+  // The harness runs cleanup in LIFO order, so register snapshot cleanup first
+  // to ensure it runs after any live devboxes have been shut down.
+  cleanup.add('snapshot:baseline', async () => {
+    if (snapshotNeedsCleanup && snapshot) {
+      await snapshot.delete();
+    }
+  });
   cleanup.add('devbox:source', async () => {
     if (sourceNeedsCleanup && sourceDevbox) {
       await sourceDevbox.shutdown();
@@ -80,11 +87,6 @@ export async function recipe(ctx: RecipeContext): Promise<RecipeOutput> {
   cleanup.add('devbox:clone-b', async () => {
     if (cloneBNeedsCleanup && cloneB) {
       await cloneB.shutdown();
-    }
-  });
-  cleanup.add('snapshot:baseline', async () => {
-    if (snapshotNeedsCleanup && snapshot) {
-      await snapshot.delete();
     }
   });
 
