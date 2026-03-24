@@ -95,7 +95,6 @@ export async function recipe(ctx: RecipeContext): Promise<RecipeOutput> {
     name: uniqueName('snapshot-source'),
     launch_parameters: {
       resource_size_request: 'X_SMALL',
-      keep_alive_time_seconds: 60 * 5,
     },
   });
   sourceNeedsCleanup = true;
@@ -136,7 +135,6 @@ export async function recipe(ctx: RecipeContext): Promise<RecipeOutput> {
     name: uniqueName('snapshot-clone-a'),
     launch_parameters: {
       resource_size_request: 'X_SMALL',
-      keep_alive_time_seconds: 60 * 5,
     },
   });
   cloneANeedsCleanup = true;
@@ -146,7 +144,6 @@ export async function recipe(ctx: RecipeContext): Promise<RecipeOutput> {
     name: uniqueName('snapshot-clone-b'),
     launch_parameters: {
       resource_size_request: 'X_SMALL',
-      keep_alive_time_seconds: 60 * 5,
     },
   });
   cloneBNeedsCleanup = true;
