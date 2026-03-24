@@ -1,5 +1,43 @@
 # Changelog
 
+## 1.12.0 (2026-03-24)
+
+Full Changelog: [v1.11.2...v1.12.0](https://github.com/runloopai/api-client-ts/compare/v1.11.2...v1.12.0)
+
+### Features
+
+* [beta] adding axon, an event communication channel ([#8268](https://github.com/runloopai/api-client-ts/issues/8268)) ([81f048a](https://github.com/runloopai/api-client-ts/commit/81f048a2ebc688a60fddcf3e047bb12ee60dc41a))
+* tunnel example ([#741](https://github.com/runloopai/api-client-ts/issues/741)) ([222e123](https://github.com/runloopai/api-client-ts/commit/222e123673b1e74dda6a76c55cacbbfbebde0221))
+
+
+### Bug Fixes
+
+* add AxonEventView schema to OpenAPI spec for SSE subscribe endpoint ([#8274](https://github.com/runloopai/api-client-ts/issues/8274)) ([6966e67](https://github.com/runloopai/api-client-ts/commit/6966e67e79a5a605cf7e4a6b60cccf851961eb60))
+* add name to Axon ([#8277](https://github.com/runloopai/api-client-ts/issues/8277)) ([3e9232b](https://github.com/runloopai/api-client-ts/commit/3e9232ba1ba650a4deed68ade5de97a3f80436bf))
+* avoid actually calling claude in example ([#753](https://github.com/runloopai/api-client-ts/issues/753)) ([7425502](https://github.com/runloopai/api-client-ts/commit/742550288e6d83a55635feda2ca3496ea1d70115))
+* **tunnels:** allow tunnel removal ([#8257](https://github.com/runloopai/api-client-ts/issues/8257)) ([049b89c](https://github.com/runloopai/api-client-ts/commit/049b89c2c7ee56ce50794ab21bdc29ffd82d0e0f))
+
+
+### Chores
+
+* **internal:** update gitignore ([52bd497](https://github.com/runloopai/api-client-ts/commit/52bd497f637f69df7c4d0b1b5252e0ebf6e185e5))
+* remove dead port configuration code, mark deprecated / ignored in the API ([#8195](https://github.com/runloopai/api-client-ts/issues/8195)) ([960a249](https://github.com/runloopai/api-client-ts/commit/960a249773062d0b9c3835b6a10edcd16cb0e812))
+* **tests:** bump steady to v0.19.4 ([3b49bf8](https://github.com/runloopai/api-client-ts/commit/3b49bf814b0e2fdb6695f3c1afe84a454af7a28b))
+* **tests:** bump steady to v0.19.5 ([c7d6cc2](https://github.com/runloopai/api-client-ts/commit/c7d6cc25481ee89dab3310885d1cb4d5521a62aa))
+* **tests:** bump steady to v0.19.6 ([695a7d2](https://github.com/runloopai/api-client-ts/commit/695a7d2a8c77c1bb3300a3e9be7e5395273a1bc2))
+
+
+### Documentation
+
+* add mounts example ([#752](https://github.com/runloopai/api-client-ts/issues/752)) ([8b8eda2](https://github.com/runloopai/api-client-ts/commit/8b8eda2764d980a372f8f0d76898e83fceb64f97))
+* add suspend, resume & snapshot documentation ([#754](https://github.com/runloopai/api-client-ts/issues/754)) ([0295cc6](https://github.com/runloopai/api-client-ts/commit/0295cc645201a5c3abae489ae08ad689c5dfadb1))
+
+
+### Refactors
+
+* **tests:** switch from prism to steady ([1ad5e76](https://github.com/runloopai/api-client-ts/commit/1ad5e7623d62f06c3aef1f6f11c57fb1fb6ff162))
+* undeprecate total_count from pagination API, remove remaining_count ([#8084](https://github.com/runloopai/api-client-ts/issues/8084)) ([6d2a604](https://github.com/runloopai/api-client-ts/commit/6d2a6041e49f1f9ca85ae1f43d7be94041e87610))
+
 ## 1.11.2 (2026-03-19)
 
 Full Changelog: [v1.11.1...v1.11.2](https://github.com/runloopai/api-client-ts/compare/v1.11.1...v1.11.2)

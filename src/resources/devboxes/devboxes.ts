@@ -400,17 +400,10 @@ export class Devboxes extends APIResource {
   }
 
   /**
-   * @deprecated Only works with legacy tunnels created via {@link createTunnel}.
-   * V2 tunnels (from {@link enableTunnel}) remain active until devbox shutdown and cannot be removed.
-   *
-   * Remove a legacy tunnel from the devbox.
+   * Remove an existing V2 tunnel from the Devbox.
    */
-  removeTunnel(
-    id: string,
-    body: DevboxRemoveTunnelParams,
-    options?: Core.RequestOptions,
-  ): Core.APIPromise<unknown> {
-    return this._client.post(`/v1/devboxes/${id}/remove_tunnel`, { body, ...options });
+  removeTunnel(id: string, options?: Core.RequestOptions): Core.APIPromise<unknown> {
+    return this._client.post(`/v1/devboxes/${id}/remove_tunnel`, options);
   }
 
   /**
@@ -675,8 +668,6 @@ export interface DevboxListView {
 
   has_more: boolean;
 
-  remaining_count?: number | null;
-
   total_count?: number | null;
 }
 
@@ -767,8 +758,6 @@ export interface DevboxSnapshotListView {
    * List of snapshots matching filter.
    */
   snapshots: Array<DevboxSnapshotView>;
-
-  remaining_count?: number | null;
 
   total_count?: number | null;
 }
@@ -1238,6 +1227,12 @@ export interface DevboxUpdateParams {
 
 export interface DevboxListParams extends DevboxesCursorIDPageParams {
   /**
+   * If true (default), includes total_count in the response. Set to false to skip
+   * the count query for better performance on large datasets.
+   */
+  include_total_count?: boolean;
+
+  /**
    * Filter by status
    */
   status?:
@@ -1364,6 +1359,12 @@ export interface DevboxListDiskSnapshotsParams extends DiskSnapshotsCursorIDPage
   devbox_id?: string;
 
   /**
+   * If true (default), includes total_count in the response. Set to false to skip
+   * the count query for better performance on large datasets.
+   */
+  include_total_count?: boolean;
+
+  /**
    * Filter snapshots by metadata key-value pair. Can be used multiple times for
    * different keys.
    */
@@ -1386,13 +1387,6 @@ export interface DevboxReadFileContentsParams {
    * user home directory.
    */
   file_path: string;
-}
-
-export interface DevboxRemoveTunnelParams {
-  /**
-   * Devbox port that tunnel will expose.
-   */
-  port: number;
 }
 
 export interface DevboxShutdownParams {
@@ -1519,7 +1513,6 @@ export declare namespace Devboxes {
     type DevboxExecuteSyncParams as DevboxExecuteSyncParams,
     type DevboxListDiskSnapshotsParams as DevboxListDiskSnapshotsParams,
     type DevboxReadFileContentsParams as DevboxReadFileContentsParams,
-    type DevboxRemoveTunnelParams as DevboxRemoveTunnelParams,
     type DevboxShutdownParams as DevboxShutdownParams,
     type DevboxSnapshotDiskParams as DevboxSnapshotDiskParams,
     type DevboxSnapshotDiskAsyncParams as DevboxSnapshotDiskAsyncParams,

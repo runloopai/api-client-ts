@@ -200,8 +200,8 @@ export interface LaunchParameters {
   architecture?: 'x86_64' | 'arm64' | null;
 
   /**
-   * A list of ports to make available on the Devbox. Only ports made available will
-   * be surfaced to create tunnels via the 'createTunnel' API.
+   * [Deprecated] A list of ports to make available on the Devbox. This field is
+   * ignored.
    */
   available_ports?: Array<number> | null;
 

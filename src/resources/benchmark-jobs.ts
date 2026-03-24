@@ -308,8 +308,6 @@ export interface BenchmarkJobListView {
    */
   jobs: Array<BenchmarkJobView>;
 
-  remaining_count?: number | null;
-
   total_count?: number | null;
 }
 
@@ -990,6 +988,12 @@ export namespace BenchmarkJobCreateParams {
 }
 
 export interface BenchmarkJobListParams {
+  /**
+   * If true (default), includes total_count in the response. Set to false to skip
+   * the count query for better performance on large datasets.
+   */
+  include_total_count?: boolean;
+
   /**
    * The limit of items to return. Default is 20. Max is 5000.
    */

@@ -11,6 +11,16 @@ export {
   type AgentListParams,
 } from './agents';
 export {
+  Axons,
+  type AxonCreateParams,
+  type AxonEventView,
+  type AxonListView,
+  type AxonView,
+  type PublishParams,
+  type PublishResultView,
+  type AxonPublishParams,
+} from './axons';
+export {
   BenchmarkJobs,
   type BenchmarkJobCreateParameters,
   type BenchmarkJobListView,
@@ -92,7 +102,6 @@ export {
   type DevboxExecuteSyncParams,
   type DevboxListDiskSnapshotsParams,
   type DevboxReadFileContentsParams,
-  type DevboxRemoveTunnelParams,
   type DevboxShutdownParams,
   type DevboxSnapshotDiskParams,
   type DevboxSnapshotDiskAsyncParams,

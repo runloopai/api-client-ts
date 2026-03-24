@@ -381,13 +381,9 @@ describe('Devbox (New API)', () => {
       it('should remove legacy tunnel', async () => {
         mockClient.devboxes.removeTunnel.mockResolvedValue(undefined);
 
-        const result = await devbox.net.removeTunnel({ port: 8080 });
+        const result = await devbox.net.removeTunnel();
 
-        expect(mockClient.devboxes.removeTunnel).toHaveBeenCalledWith(
-          'devbox-123',
-          { port: 8080 },
-          undefined,
-        );
+        expect(mockClient.devboxes.removeTunnel).toHaveBeenCalledWith('devbox-123', undefined);
         expect(result).toBeUndefined();
       });
     });

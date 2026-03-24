@@ -154,6 +154,7 @@ describe('resource devboxes', () => {
     await expect(
       client.devboxes.list(
         {
+          include_total_count: true,
           limit: 0,
           starting_after: 'starting_after',
           status: 'provisioning',
@@ -334,6 +335,7 @@ describe('resource devboxes', () => {
       client.devboxes.listDiskSnapshots(
         {
           devbox_id: 'devbox_id',
+          include_total_count: true,
           limit: 0,
           'metadata[key]': 'metadata[key]',
           'metadata[key][in]': 'metadata[key][in]',
@@ -360,8 +362,8 @@ describe('resource devboxes', () => {
     const response = await client.devboxes.readFileContents('id', { file_path: 'file_path' });
   });
 
-  test('removeTunnel: only required params', async () => {
-    const responsePromise = client.devboxes.removeTunnel('id', { port: 0 });
+  test('removeTunnel', async () => {
+    const responsePromise = client.devboxes.removeTunnel('id');
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
     const response = await responsePromise;
@@ -371,8 +373,11 @@ describe('resource devboxes', () => {
     expect(dataAndResponse.response).toBe(rawResponse);
   });
 
-  test('removeTunnel: required and optional params', async () => {
-    const response = await client.devboxes.removeTunnel('id', { port: 0 });
+  test('removeTunnel: request options instead of params are passed correctly', async () => {
+    // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
+    await expect(client.devboxes.removeTunnel('id', { path: '/_stainless_unknown_path' })).rejects.toThrow(
+      Runloop.NotFoundError,
+    );
   });
 
   test('resume', async () => {

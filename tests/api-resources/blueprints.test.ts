@@ -134,6 +134,7 @@ describe('resource blueprints', () => {
     await expect(
       client.blueprints.list(
         {
+          include_total_count: true,
           limit: 0,
           name: 'name',
           starting_after: 'starting_after',
@@ -225,6 +226,7 @@ describe('resource blueprints', () => {
     await expect(
       client.blueprints.listPublic(
         {
+          include_total_count: true,
           limit: 0,
           name: 'name',
           starting_after: 'starting_after',

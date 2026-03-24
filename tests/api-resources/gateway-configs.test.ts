@@ -109,6 +109,7 @@ describe('resource gatewayConfigs', () => {
       client.gatewayConfigs.list(
         {
           id: 'id',
+          include_total_count: true,
           limit: 0,
           name: 'name',
           starting_after: 'starting_after',

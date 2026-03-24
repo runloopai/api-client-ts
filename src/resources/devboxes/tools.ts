@@ -164,12 +164,10 @@ export class DevboxTools {
       remove_tunnel: createTool({
         name: 'remove_tunnel',
         description: 'Delete a tunnel',
-        parameters: z.object({
-          port: z.number().describe('The port of the tunnel to delete'),
-        }),
-        execute: async (params) => {
+        parameters: z.object({}),
+        execute: async () => {
           try {
-            await this.devboxes.removeTunnel(devboxId, { port: params.port }, options);
+            await this.devboxes.removeTunnel(devboxId, options);
             return 'Tunnel deleted successfully';
           } catch (error) {
             return `Failed to delete tunnel: ${error}`;

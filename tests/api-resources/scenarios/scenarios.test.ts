@@ -201,6 +201,7 @@ describe('resource scenarios', () => {
       client.scenarios.list(
         {
           benchmark_id: 'benchmark_id',
+          include_total_count: true,
           limit: 0,
           name: 'name',
           starting_after: 'starting_after',
@@ -252,6 +253,7 @@ describe('resource scenarios', () => {
     await expect(
       client.scenarios.listPublic(
         {
+          include_total_count: true,
           limit: 0,
           name: 'name',
           starting_after: 'starting_after',

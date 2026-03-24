@@ -51,6 +51,7 @@ describe('resource benchmarkRuns', () => {
       client.benchmarkRuns.list(
         {
           benchmark_id: 'benchmark_id',
+          include_total_count: true,
           limit: 0,
           name: 'name',
           starting_after: 'starting_after',
@@ -120,6 +121,7 @@ describe('resource benchmarkRuns', () => {
       client.benchmarkRuns.listScenarioRuns(
         'id',
         {
+          include_total_count: true,
           limit: 0,
           starting_after: 'starting_after',
           state: 'running',

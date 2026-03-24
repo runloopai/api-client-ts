@@ -76,6 +76,25 @@ Methods:
 - <code title="get /v1/agents/{id}">client.agents.<a href="./src/resources/agents.ts">retrieve</a>(id) -> AgentView</code>
 - <code title="get /v1/agents">client.agents.<a href="./src/resources/agents.ts">list</a>({ ...params }) -> AgentViewsAgentsCursorIDPage</code>
 
+# Axons
+
+Types:
+
+- <code><a href="./src/resources/axons.ts">AxonCreateParams</a></code>
+- <code><a href="./src/resources/axons.ts">AxonEventView</a></code>
+- <code><a href="./src/resources/axons.ts">AxonListView</a></code>
+- <code><a href="./src/resources/axons.ts">AxonView</a></code>
+- <code><a href="./src/resources/axons.ts">PublishParams</a></code>
+- <code><a href="./src/resources/axons.ts">PublishResultView</a></code>
+
+Methods:
+
+- <code title="post /v1/axons">client.axons.<a href="./src/resources/axons.ts">create</a>({ ...params }) -> AxonView</code>
+- <code title="get /v1/axons/{id}">client.axons.<a href="./src/resources/axons.ts">retrieve</a>(id) -> AxonView</code>
+- <code title="get /v1/axons">client.axons.<a href="./src/resources/axons.ts">list</a>() -> AxonListView</code>
+- <code title="post /v1/axons/{id}/publish">client.axons.<a href="./src/resources/axons.ts">publish</a>(id, { ...params }) -> PublishResultView</code>
+- <code title="get /v1/axons/{id}/subscribe/sse">client.axons.<a href="./src/resources/axons.ts">subscribeSse</a>(id) -> AxonEventView</code>
+
 # Blueprints
 
 Types:
@@ -139,7 +158,7 @@ Methods:
 - <code title="post /v1/devboxes/{id}/keep_alive">client.devboxes.<a href="./src/resources/devboxes/devboxes.ts">keepAlive</a>(id) -> unknown</code>
 - <code title="get /v1/devboxes/disk_snapshots">client.devboxes.<a href="./src/resources/devboxes/devboxes.ts">listDiskSnapshots</a>({ ...params }) -> DevboxSnapshotViewsDiskSnapshotsCursorIDPage</code>
 - <code title="post /v1/devboxes/{id}/read_file_contents">client.devboxes.<a href="./src/resources/devboxes/devboxes.ts">readFileContents</a>(id, { ...params }) -> string</code>
-- <code title="post /v1/devboxes/{id}/remove_tunnel">client.devboxes.<a href="./src/resources/devboxes/devboxes.ts">removeTunnel</a>(id, { ...params }) -> unknown</code>
+- <code title="post /v1/devboxes/{id}/remove_tunnel">client.devboxes.<a href="./src/resources/devboxes/devboxes.ts">removeTunnel</a>(id) -> unknown</code>
 - <code title="post /v1/devboxes/{id}/resume">client.devboxes.<a href="./src/resources/devboxes/devboxes.ts">resume</a>(id) -> DevboxView</code>
 - <code title="get /v1/devboxes/{id}/usage">client.devboxes.<a href="./src/resources/devboxes/devboxes.ts">retrieveResourceUsage</a>(id) -> DevboxResourceUsageView</code>
 - <code title="post /v1/devboxes/{id}/shutdown">client.devboxes.<a href="./src/resources/devboxes/devboxes.ts">shutdown</a>(id, { ...params }) -> DevboxView</code>
