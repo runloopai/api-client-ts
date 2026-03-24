@@ -378,7 +378,7 @@ describe('Devbox (New API)', () => {
         expect(result).toEqual(mockTunnel);
       });
 
-      it('should remove legacy tunnel', async () => {
+      it('should remove tunnel', async () => {
         mockClient.devboxes.removeTunnel.mockResolvedValue(undefined);
 
         const result = await devbox.net.removeTunnel();
