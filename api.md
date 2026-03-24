@@ -76,6 +76,24 @@ Methods:
 - <code title="get /v1/agents/{id}">client.agents.<a href="./src/resources/agents.ts">retrieve</a>(id) -> AgentView</code>
 - <code title="get /v1/agents">client.agents.<a href="./src/resources/agents.ts">list</a>({ ...params }) -> AgentViewsAgentsCursorIDPage</code>
 
+# Axons
+
+Types:
+
+- <code><a href="./src/resources/axons.ts">AxonCreateParams</a></code>
+- <code><a href="./src/resources/axons.ts">AxonListView</a></code>
+- <code><a href="./src/resources/axons.ts">AxonView</a></code>
+- <code><a href="./src/resources/axons.ts">PublishParams</a></code>
+- <code><a href="./src/resources/axons.ts">PublishResultView</a></code>
+
+Methods:
+
+- <code title="post /v1/axons">client.axons.<a href="./src/resources/axons.ts">create</a>() -> AxonView</code>
+- <code title="get /v1/axons/{id}">client.axons.<a href="./src/resources/axons.ts">retrieve</a>(id) -> AxonView</code>
+- <code title="get /v1/axons">client.axons.<a href="./src/resources/axons.ts">list</a>() -> AxonListView</code>
+- <code title="post /v1/axons/{id}/publish">client.axons.<a href="./src/resources/axons.ts">publish</a>(id, { ...params }) -> PublishResultView</code>
+- <code title="get /v1/axons/{id}/subscribe/sse">client.axons.<a href="./src/resources/axons.ts">subscribeSse</a>(id) -> void</code>
+
 # Blueprints
 
 Types:

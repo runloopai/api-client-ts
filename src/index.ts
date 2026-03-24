@@ -46,6 +46,15 @@ import {
   Agents,
 } from './resources/agents';
 import {
+  AxonCreateParams,
+  AxonListView,
+  AxonPublishParams,
+  AxonView,
+  Axons,
+  PublishParams,
+  PublishResultView,
+} from './resources/axons';
+import {
   BenchmarkJobCreateParameters,
   BenchmarkJobCreateParams,
   BenchmarkJobListParams,
@@ -356,6 +365,7 @@ export class Runloop extends Core.APIClient {
   benchmarkRuns: API.BenchmarkRuns = new API.BenchmarkRuns(this);
   benchmarkJobs: API.BenchmarkJobs = new API.BenchmarkJobs(this);
   agents: API.Agents = new API.Agents(this);
+  axons: API.Axons = new API.Axons(this);
   blueprints: API.Blueprints = new API.Blueprints(this);
   devboxes: API.Devboxes = new API.Devboxes(this);
   scenarios: API.Scenarios = new API.Scenarios(this);
@@ -416,6 +426,7 @@ Runloop.BenchmarkRunViewsBenchmarkRunsCursorIDPage = BenchmarkRunViewsBenchmarkR
 Runloop.BenchmarkJobs = BenchmarkJobs;
 Runloop.Agents = Agents;
 Runloop.AgentViewsAgentsCursorIDPage = AgentViewsAgentsCursorIDPage;
+Runloop.Axons = Axons;
 Runloop.Blueprints = Blueprints;
 Runloop.BlueprintViewsBlueprintsCursorIDPage = BlueprintViewsBlueprintsCursorIDPage;
 Runloop.Devboxes = Devboxes;
@@ -566,6 +577,16 @@ export declare namespace Runloop {
     AgentViewsAgentsCursorIDPage as AgentViewsAgentsCursorIDPage,
     type AgentCreateParams as AgentCreateParams,
     type AgentListParams as AgentListParams,
+  };
+
+  export {
+    Axons as Axons,
+    type AxonCreateParams as AxonCreateParams,
+    type AxonListView as AxonListView,
+    type AxonView as AxonView,
+    type PublishParams as PublishParams,
+    type PublishResultView as PublishResultView,
+    type AxonPublishParams as AxonPublishParams,
   };
 
   export {

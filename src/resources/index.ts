@@ -11,6 +11,15 @@ export {
   type AgentListParams,
 } from './agents';
 export {
+  Axons,
+  type AxonCreateParams,
+  type AxonListView,
+  type AxonView,
+  type PublishParams,
+  type PublishResultView,
+  type AxonPublishParams,
+} from './axons';
+export {
   BenchmarkJobs,
   type BenchmarkJobCreateParameters,
   type BenchmarkJobListView,
