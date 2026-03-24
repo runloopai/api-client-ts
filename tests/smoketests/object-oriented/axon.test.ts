@@ -75,6 +75,13 @@ const sdk = makeClientSDK();
 
       expect(result2.sequence).toBeGreaterThan(result1.sequence);
     });
+
+    test('subscribe to SSE stream returns a Stream object', async () => {
+      const stream = await axon.subscribeSse();
+      expect(stream).toBeDefined();
+      expect(stream.controller).toBeInstanceOf(AbortController);
+      stream.controller.abort();
+    });
   });
 
   describe('axon list', () => {
