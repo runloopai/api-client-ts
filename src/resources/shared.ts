@@ -145,6 +145,30 @@ export namespace AgentSource {
   }
 }
 
+export interface BrokerMount {
+  /**
+   * The ID of the axon event stream to mount onto the Devbox.
+   */
+  axon_id: string;
+
+  type: 'broker_mount';
+
+  /**
+   * Binary to launch the agent (e.g., 'opencode'). Used by ACP broker.
+   */
+  agent_binary?: string | null;
+
+  /**
+   * Arguments to pass to the agent command (e.g., ['acp']). Used by ACP broker.
+   */
+  launch_args?: Array<string> | null;
+
+  /**
+   * The protocol used by the broker to deliver events to the agent.
+   */
+  protocol?: 'acp' | 'claude' | 'codex' | null;
+}
+
 export interface CodeMountParameters {
   /**
    * The name of the repo to mount. By default, code will be mounted at
@@ -268,7 +292,7 @@ export namespace LaunchParameters {
   }
 }
 
-export type Mount = ObjectMount | AgentMount | Mount.CodeMount | Mount.FileMount;
+export type Mount = ObjectMount | AgentMount | Mount.CodeMount | Mount.FileMount | BrokerMount;
 
 export namespace Mount {
   export interface CodeMount {

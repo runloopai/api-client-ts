@@ -759,6 +759,7 @@ export declare namespace Runloop {
   export type AfterIdle = API.AfterIdle;
   export type AgentMount = API.AgentMount;
   export type AgentSource = API.AgentSource;
+  export type BrokerMount = API.BrokerMount;
   export type CodeMountParameters = API.CodeMountParameters;
   export type LaunchParameters = API.LaunchParameters;
   export type Mount = API.Mount;
