@@ -81,6 +81,7 @@ Methods:
 Types:
 
 - <code><a href="./src/resources/axons.ts">AxonCreateParams</a></code>
+- <code><a href="./src/resources/axons.ts">AxonEventView</a></code>
 - <code><a href="./src/resources/axons.ts">AxonListView</a></code>
 - <code><a href="./src/resources/axons.ts">AxonView</a></code>
 - <code><a href="./src/resources/axons.ts">PublishParams</a></code>
@@ -92,7 +93,7 @@ Methods:
 - <code title="get /v1/axons/{id}">client.axons.<a href="./src/resources/axons.ts">retrieve</a>(id) -> AxonView</code>
 - <code title="get /v1/axons">client.axons.<a href="./src/resources/axons.ts">list</a>() -> AxonListView</code>
 - <code title="post /v1/axons/{id}/publish">client.axons.<a href="./src/resources/axons.ts">publish</a>(id, { ...params }) -> PublishResultView</code>
-- <code title="get /v1/axons/{id}/subscribe/sse">client.axons.<a href="./src/resources/axons.ts">subscribeSse</a>(id) -> void</code>
+- <code title="get /v1/axons/{id}/subscribe/sse">client.axons.<a href="./src/resources/axons.ts">subscribeSse</a>(id) -> AxonEventView</code>
 
 # Blueprints
 

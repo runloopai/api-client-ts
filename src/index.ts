@@ -47,6 +47,7 @@ import {
 } from './resources/agents';
 import {
   AxonCreateParams,
+  AxonEventView,
   AxonListView,
   AxonPublishParams,
   AxonView,
@@ -589,6 +590,7 @@ export declare namespace Runloop {
   export {
     Axons as Axons,
     type AxonCreateParams as AxonCreateParams,
+    type AxonEventView as AxonEventView,
     type AxonListView as AxonListView,
     type AxonView as AxonView,
     type PublishParams as PublishParams,

@@ -1,7 +1,9 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 import { APIResource } from '../resource';
+import { APIPromise } from '../core';
 import * as Core from '../core';
+import { Stream } from '../streaming';
 
 export class Axons extends APIResource {
   /**
@@ -38,9 +40,55 @@ export class Axons extends APIResource {
   ): Core.APIPromise<PublishResultView> {
     return this._client.post(`/v1/axons/${id}/publish`, { body, ...options });
   }
+
+  /**
+   * [Beta] Subscribe to an axon event stream via server-sent events.
+   */
+  subscribeSse(id: string, options?: Core.RequestOptions): APIPromise<Stream<AxonEventView>> {
+    return this._client.get(`/v1/axons/${id}/subscribe/sse`, { ...options, stream: true }) as APIPromise<
+      Stream<AxonEventView>
+    >;
+  }
 }
 
 export type AxonCreateParams = unknown;
+
+export interface AxonEventView {
+  /**
+   * The axon identifier.
+   */
+  axon_id: string;
+
+  /**
+   * Event type (e.g. push, pull_request).
+   */
+  event_type: string;
+
+  /**
+   * Event origin.
+   */
+  origin: 'EXTERNAL_EVENT' | 'AGENT_EVENT' | 'USER_EVENT' | 'SYSTEM_EVENT';
+
+  /**
+   * JSON-encoded event payload.
+   */
+  payload: string;
+
+  /**
+   * Monotonic sequence number.
+   */
+  sequence: number;
+
+  /**
+   * Event source (e.g. github, slack).
+   */
+  source: string;
+
+  /**
+   * Timestamp in milliseconds since epoch.
+   */
+  timestamp_ms: number;
+}
 
 export interface AxonListView {
   /**
@@ -122,6 +170,7 @@ export interface AxonPublishParams {
 export declare namespace Axons {
   export {
     type AxonCreateParams as AxonCreateParams,
+    type AxonEventView as AxonEventView,
     type AxonListView as AxonListView,
     type AxonView as AxonView,
     type PublishParams as PublishParams,
