@@ -76,11 +76,20 @@ const sdk = makeClientSDK();
       expect(result2.sequence).toBeGreaterThan(result1.sequence);
     });
 
-    test('subscribe to SSE stream returns a Stream object', async () => {
+    test('subscribe to SSE stream and receive events', async () => {
       const stream = await axon.subscribeSse();
-      expect(stream).toBeDefined();
-      expect(stream.controller).toBeInstanceOf(AbortController);
-      stream.controller.abort();
+      const events = [];
+      for await (const event of stream) {
+        events.push(event);
+        break;
+      }
+
+      expect(events.length).toBeGreaterThanOrEqual(1);
+      const first = events[0]!;
+      expect(first.axon_id).toBe(axonId);
+      expect(first.event_type).toBeDefined();
+      expect(first.payload).toBeDefined();
+      expect(first.sequence).toBeGreaterThanOrEqual(0);
     });
   });
 
