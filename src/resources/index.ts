@@ -13,6 +13,7 @@ export {
 export {
   Axons,
   type AxonCreateParams,
+  type AxonEventView,
   type AxonListView,
   type AxonView,
   type PublishParams,
