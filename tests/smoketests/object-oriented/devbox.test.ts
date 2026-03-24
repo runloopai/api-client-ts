@@ -413,10 +413,10 @@ describe('smoketest: object-oriented devbox', () => {
         expect(tunnel.tunnel_key).toBeTruthy();
 
         const url = await devbox.getTunnelUrl(8080);
-        expect(url).toBe(`https://8080-${tunnel.tunnel_key}.tunnel.runloop.ai`);
+        expect(url).toContain(`https://8080-${tunnel.tunnel_key}.tunnel.runloop.`);
 
         const url3000 = await devbox.getTunnelUrl(3000);
-        expect(url3000).toBe(`https://3000-${tunnel.tunnel_key}.tunnel.runloop.ai`);
+        expect(url3000).toContain(`https://3000-${tunnel.tunnel_key}.tunnel.runloop.`);
       } finally {
         await devbox.shutdown();
       }

@@ -838,7 +838,9 @@ export class Devbox {
     if (!tunnel) {
       throw new RunloopError('No tunnel has been enabled for this devbox. Call net.enableTunnel() first.');
     }
-    return `https://${port}-${tunnel.tunnel_key}.tunnel.runloop.ai`;
+    const apiHost = new URL(this.client.baseURL).hostname;
+    const baseDomain = apiHost.split('.').slice(-2).join('.');
+    return `https://${port}-${tunnel.tunnel_key}.tunnel.${baseDomain}`;
   }
 
   /**
