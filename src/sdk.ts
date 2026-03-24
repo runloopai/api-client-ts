@@ -1517,7 +1517,7 @@ export class AgentOps {
  * @example
  * ```typescript
  * const runloop = new RunloopSDK();
- * const axon = await runloop.axon.create({ name: 'my-axon' });
+ * const axon = await runloop.axon.create();
  *
  * // Publish an event
  * await axon.publish({
@@ -1543,13 +1543,6 @@ export class AxonOps {
   /**
    * [Beta] Create a new axon.
    *
-   * @example
-   * ```typescript
-   * const runloop = new RunloopSDK();
-   * const axon = await runloop.axon.create({ name: 'my-axon' });
-   * console.log(`Created axon: ${axon.id}`);
-   * ```
-   *
    * @param {AxonCreateParams} [params] - Parameters for creating the axon.
    * @param {Core.RequestOptions} [options] - Request options.
    * @returns {Promise<Axon>} An {@link Axon} instance.
@@ -1561,14 +1554,6 @@ export class AxonOps {
   /**
    * Get an axon object by its ID.
    *
-   * @example
-   * ```typescript
-   * const runloop = new RunloopSDK();
-   * const axon = runloop.axon.fromId('axn_1234567890');
-   * const info = await axon.getInfo();
-   * console.log(`Axon name: ${info.name}`);
-   * ```
-   *
    * @param {string} id - The ID of the axon.
    * @returns {Axon} An {@link Axon} instance.
    */
@@ -1578,16 +1563,6 @@ export class AxonOps {
 
   /**
    * [Beta] List all active axons.
-   *
-   * @example
-   * ```typescript
-   * const runloop = new RunloopSDK();
-   * const axons = await runloop.axon.list();
-   * for (const axon of axons) {
-   *   const info = await axon.getInfo();
-   *   console.log(`${info.name}: ${info.id}`);
-   * }
-   * ```
    *
    * @param {Core.RequestOptions} [options] - Request options.
    * @returns {Promise<Axon[]>} An array of {@link Axon} instances.

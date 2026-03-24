@@ -27,7 +27,7 @@ import type {
  * import { RunloopSDK } from '@runloop/api-client';
  *
  * const runloop = new RunloopSDK();
- * const axon = await runloop.axon.create({ name: 'my-axon' });
+ * const axon = await runloop.axon.create();
  *
  * // Publish an event
  * await axon.publish({
@@ -99,12 +99,6 @@ export class Axon {
   /**
    * [Beta] Get the complete axon data from the API.
    *
-   * @example
-   * ```typescript
-   * const info = await axon.getInfo();
-   * console.log(`Axon: ${info.name}, created: ${info.created_at_ms}`);
-   * ```
-   *
    * @param {Core.RequestOptions} [options] - Request options
    * @returns {Promise<AxonView>} The axon data
    */
@@ -114,17 +108,6 @@ export class Axon {
 
   /**
    * [Beta] Publish an event to this axon.
-   *
-   * @example
-   * ```typescript
-   * const result = await axon.publish({
-   *   event_type: 'push',
-   *   origin: 'EXTERNAL_EVENT',
-   *   payload: JSON.stringify({ repo: 'my-repo' }),
-   *   source: 'github',
-   * });
-   * console.log(`Published with sequence: ${result.sequence}`);
-   * ```
    *
    * @param {AxonPublishParams} params - Parameters for the event to publish
    * @param {Core.RequestOptions} [options] - Request options
