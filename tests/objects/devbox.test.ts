@@ -305,7 +305,6 @@ describe('Devbox (New API)', () => {
       });
 
       it('should derive tunnel domain from client baseURL', async () => {
-        mockClient.baseURL = 'https://api.runloop.pro';
         const mockTunnel = {
           tunnel_key: 'abc123xyz',
           auth_mode: 'open' as const,
@@ -314,9 +313,11 @@ describe('Devbox (New API)', () => {
         const dataWithTunnel = { ...mockDevboxData, tunnel: mockTunnel };
         mockClient.devboxes.retrieve.mockResolvedValue(dataWithTunnel);
 
-        const url = await devbox.getTunnelUrl(8080);
+        mockClient.baseURL = 'https://api.runloop.pro';
+        expect(await devbox.getTunnelUrl(8080)).toBe('https://8080-abc123xyz.tunnel.runloop.pro');
 
-        expect(url).toBe('https://8080-abc123xyz.tunnel.runloop.pro');
+        mockClient.baseURL = 'http://127.0.0.1:8080';
+        expect(await devbox.getTunnelUrl(8080)).toBe('https://8080-abc123xyz.tunnel.127.0.0.1');
 
         mockClient.baseURL = 'https://api.runloop.ai';
       });

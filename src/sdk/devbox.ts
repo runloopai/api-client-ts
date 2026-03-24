@@ -839,7 +839,7 @@ export class Devbox {
       throw new RunloopError('No tunnel has been enabled for this devbox. Call net.enableTunnel() first.');
     }
     const apiHost = new URL(this.client.baseURL).hostname;
-    const baseDomain = apiHost.split('.').slice(-2).join('.');
+    const baseDomain = apiHost.startsWith('api.') ? apiHost.slice(4) : apiHost;
     return `https://${port}-${tunnel.tunnel_key}.tunnel.${baseDomain}`;
   }
 
