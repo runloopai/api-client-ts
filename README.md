@@ -73,6 +73,8 @@ Use direct `secrets` injection when code inside the devbox legitimately needs th
 
 For mount patterns, see [`examples/devbox-mounts.ts`](./examples/devbox-mounts.ts). It shows when to use `agent_mount` for reusable agents like Claude Code, `code_mount` for Git repositories such as [`runloopai/rl-cli`](https://github.com/runloopai/rl-cli.git), and `object_mount` for blobs that should appear on the devbox at startup. The example also demonstrates agent gateway wiring for Anthropic credentials plus object TTL, `.tgz` compression, and extraction-on-mount behavior.
 
+For snapshot workflows, see [`examples/devbox-snapshots.ts`](./examples/devbox-snapshots.ts). It uploads a file to a source devbox, shows `suspend()` plus `resume()`, takes a disk snapshot, restores multiple devboxes from the same snapshot baseline, mutates the file independently in each devbox, and deletes the snapshot after the demo completes.
+
 ## Agent Guidance
 
 Detailed agent-specific instructions live in [`llms.txt`](./llms.txt). Consolidated recipes for frequent tasks are in [`EXAMPLES.md`](./EXAMPLES.md).

@@ -11,6 +11,7 @@
 
 - [Devbox lifecycle example](examples/devbox-from-blueprint-lifecycle.ts): Create blueprint, launch devbox, run commands, cleanup
 - [Devbox mounts example](examples/devbox-mounts.ts): Show `agent_mount`, `code_mount`, and `object_mount` together, including Claude Code via Anthropic agent gateway, the `runloopai/rl-cli` repo, and object TTL/compression/extraction behavior
+- [Devbox snapshots example](examples/devbox-snapshots.ts): Upload a file, suspend and resume the source devbox, snapshot the shared baseline, restore multiple devboxes from it, mutate each copy independently, and delete the snapshot
 - [MCP GitHub example](examples/mcp-github-tools.ts): MCP Hub integration with Claude Code
 - [Secrets with Devbox example](examples/secrets-with-devbox.ts): Show direct secret injection for app data alongside agent gateway for upstream credentials that should stay off the devbox
 
@@ -25,6 +26,8 @@
 - Prefer SDK methods (`sdk.devbox`, `sdk.blueprint`, etc.) for object-oriented patterns and convenience
 - For resources without SDK coverage (e.g., benchmarks), use `sdk.api.*` as a fallback
 - Use `sdk.devbox.create()` to create devboxes; they auto-await readiness
+- Use `devbox.suspend()` plus `devbox.awaitSuspended()` when you want to park a devbox and preserve its disk state, then use `devbox.resume()` to bring the same devbox back to `running`
+- Use `devbox.snapshotDisk()` to capture a reusable disk baseline and `snapshot.createDevbox()` or `sdk.devbox.createFromSnapshot(snapshot.id, ...)` to branch multiple devboxes from that same state
 - Use `devbox.cmd.exec('command')` for commands expected to return immediately (e.g., `echo`, `pwd`, `cat`)—blocks until completion, returns `ExecutionResult` with stdout/stderr
 - Use `devbox.cmd.execAsync('command')` for long-running or background processes (servers, watchers, builds)—returns immediately with `Execution` handle to check status, get result, or kill
 - Both `exec` and `execAsync` support streaming callbacks (`stdout`, `stderr`, `output`) for real-time output

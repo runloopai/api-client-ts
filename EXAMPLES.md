@@ -10,6 +10,7 @@ Runnable examples live in [`examples/`](./examples).
 - [Blueprint with Build Context](#blueprint-with-build-context)
 - [Devbox From Blueprint (Run Command, Shutdown)](#devbox-from-blueprint-lifecycle)
 - [Devbox Mounts (Agent, Code, Object)](#devbox-mounts)
+- [Devbox Snapshots (Suspend, Resume, Restore, Delete)](#devbox-snapshots)
 - [Devbox Tunnel (HTTP Server Access)](#devbox-tunnel)
 - [MCP Hub + Claude Code + GitHub](#mcp-github-tools)
 - [Secrets with Devbox and Agent Gateway](#secrets-with-devbox)
@@ -106,6 +107,37 @@ yarn test:examples
 ```
 
 **Source:** [`examples/devbox-mounts.ts`](./examples/devbox-mounts.ts)
+
+<a id="devbox-snapshots"></a>
+## Devbox Snapshots (Suspend, Resume, Restore, Delete)
+
+**Use case:** Upload a file to a devbox, preserve it across suspend and resume, create a disk snapshot, restore multiple devboxes from that snapshot, mutate each copy independently, and delete the snapshot when finished.
+
+**Tags:** `devbox`, `snapshot`, `suspend`, `resume`, `files`, `cleanup`
+
+### Workflow
+- Create a source devbox
+- Upload a file and mutate it into a shared baseline
+- Suspend and resume the source devbox
+- Create a disk snapshot from the resumed devbox
+- Restore two additional devboxes from the same snapshot baseline
+- Mutate the same file differently in each devbox to prove isolation
+- Shutdown the devboxes and delete the snapshot
+
+### Prerequisites
+- `RUNLOOP_API_KEY`
+
+### Run
+```sh
+yarn tsn -T examples/devbox-snapshots.ts
+```
+
+### Test
+```sh
+yarn test:examples
+```
+
+**Source:** [`examples/devbox-snapshots.ts`](./examples/devbox-snapshots.ts)
 
 <a id="devbox-tunnel"></a>
 ## Devbox Tunnel (HTTP Server Access)
