@@ -81,20 +81,38 @@ Methods:
 
 Types:
 
-- <code><a href="./src/resources/axons.ts">AxonCreateParams</a></code>
-- <code><a href="./src/resources/axons.ts">AxonEventView</a></code>
-- <code><a href="./src/resources/axons.ts">AxonListView</a></code>
-- <code><a href="./src/resources/axons.ts">AxonView</a></code>
-- <code><a href="./src/resources/axons.ts">PublishParams</a></code>
-- <code><a href="./src/resources/axons.ts">PublishResultView</a></code>
+- <code><a href="./src/resources/axons/axons.ts">AxonCreateParams</a></code>
+- <code><a href="./src/resources/axons/axons.ts">AxonEventView</a></code>
+- <code><a href="./src/resources/axons/axons.ts">AxonListView</a></code>
+- <code><a href="./src/resources/axons/axons.ts">AxonView</a></code>
+- <code><a href="./src/resources/axons/axons.ts">PublishParams</a></code>
+- <code><a href="./src/resources/axons/axons.ts">PublishResultView</a></code>
 
 Methods:
 
-- <code title="post /v1/axons">client.axons.<a href="./src/resources/axons.ts">create</a>({ ...params }) -> AxonView</code>
-- <code title="get /v1/axons/{id}">client.axons.<a href="./src/resources/axons.ts">retrieve</a>(id) -> AxonView</code>
-- <code title="get /v1/axons">client.axons.<a href="./src/resources/axons.ts">list</a>() -> AxonListView</code>
-- <code title="post /v1/axons/{id}/publish">client.axons.<a href="./src/resources/axons.ts">publish</a>(id, { ...params }) -> PublishResultView</code>
-- <code title="get /v1/axons/{id}/subscribe/sse">client.axons.<a href="./src/resources/axons.ts">subscribeSse</a>(id) -> AxonEventView</code>
+- <code title="post /v1/axons">client.axons.<a href="./src/resources/axons/axons.ts">create</a>({ ...params }) -> AxonView</code>
+- <code title="get /v1/axons/{id}">client.axons.<a href="./src/resources/axons/axons.ts">retrieve</a>(id) -> AxonView</code>
+- <code title="get /v1/axons">client.axons.<a href="./src/resources/axons/axons.ts">list</a>() -> AxonListView</code>
+- <code title="post /v1/axons/{id}/publish">client.axons.<a href="./src/resources/axons/axons.ts">publish</a>(id, { ...params }) -> PublishResultView</code>
+- <code title="get /v1/axons/{id}/subscribe/sse">client.axons.<a href="./src/resources/axons/axons.ts">subscribeSse</a>(id) -> AxonEventView</code>
+
+## Sql
+
+Types:
+
+- <code><a href="./src/resources/axons/sql.ts">SqlBatchParams</a></code>
+- <code><a href="./src/resources/axons/sql.ts">SqlBatchResultView</a></code>
+- <code><a href="./src/resources/axons/sql.ts">SqlColumnMetaView</a></code>
+- <code><a href="./src/resources/axons/sql.ts">SqlQueryResultView</a></code>
+- <code><a href="./src/resources/axons/sql.ts">SqlResultMetaView</a></code>
+- <code><a href="./src/resources/axons/sql.ts">SqlStatementParams</a></code>
+- <code><a href="./src/resources/axons/sql.ts">SqlStepErrorView</a></code>
+- <code><a href="./src/resources/axons/sql.ts">SqlStepResultView</a></code>
+
+Methods:
+
+- <code title="post /v1/axons/{id}/sql/batch">client.axons.sql.<a href="./src/resources/axons/sql.ts">batch</a>(id, { ...params }) -> SqlBatchResultView</code>
+- <code title="post /v1/axons/{id}/sql/query">client.axons.sql.<a href="./src/resources/axons/sql.ts">query</a>(id, { ...params }) -> SqlQueryResultView</code>
 
 # Blueprints
 
