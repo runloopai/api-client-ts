@@ -166,7 +166,7 @@ export interface BrokerMount {
   /**
    * The protocol used by the broker to deliver events to the agent.
    */
-  protocol?: 'acp' | 'claude' | 'codex' | null;
+  protocol?: 'acp' | 'claude_json' | 'codex_app_server' | null;
 }
 
 export interface CodeMountParameters {
