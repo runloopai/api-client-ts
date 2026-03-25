@@ -11,6 +11,7 @@ describe('Devbox (New API)', () => {
   beforeEach(() => {
     // Create mock client instance with proper structure
     mockClient = {
+      baseURL: 'https://api.runloop.ai',
       devboxes: {
         createAndAwaitRunning: jest.fn(),
         retrieve: jest.fn(),
@@ -301,6 +302,24 @@ describe('Devbox (New API)', () => {
         const url = await devbox.getTunnelUrl(3000);
 
         expect(url).toBe('https://3000-mykey456.tunnel.runloop.ai');
+      });
+
+      it('should derive tunnel domain from client baseURL', async () => {
+        const mockTunnel = {
+          tunnel_key: 'abc123xyz',
+          auth_mode: 'open' as const,
+          create_time_ms: Date.now(),
+        };
+        const dataWithTunnel = { ...mockDevboxData, tunnel: mockTunnel };
+        mockClient.devboxes.retrieve.mockResolvedValue(dataWithTunnel);
+
+        mockClient.baseURL = 'https://api.runloop.pro';
+        expect(await devbox.getTunnelUrl(8080)).toBe('https://8080-abc123xyz.tunnel.runloop.pro');
+
+        mockClient.baseURL = 'http://127.0.0.1:8080';
+        expect(await devbox.getTunnelUrl(8080)).toBe('https://8080-abc123xyz.tunnel.127.0.0.1');
+
+        mockClient.baseURL = 'https://api.runloop.ai';
       });
 
       it('should throw RunloopError when no tunnel has been enabled', async () => {
