@@ -46,16 +46,6 @@ import {
   Agents,
 } from './resources/agents';
 import {
-  AxonCreateParams,
-  AxonEventView,
-  AxonListView,
-  AxonPublishParams,
-  AxonView,
-  Axons,
-  PublishParams,
-  PublishResultView,
-} from './resources/axons';
-import {
   BenchmarkJobCreateParameters,
   BenchmarkJobCreateParams,
   BenchmarkJobListParams,
@@ -183,6 +173,16 @@ import {
   SecretView,
   Secrets,
 } from './resources/secrets';
+import {
+  AxonCreateParams,
+  AxonEventView,
+  AxonListView,
+  AxonPublishParams,
+  AxonView,
+  Axons,
+  PublishParams,
+  PublishResultView,
+} from './resources/axons/axons';
 import {
   DevboxAsyncExecutionDetailView,
   DevboxCreateParams,
