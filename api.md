@@ -5,6 +5,7 @@ Types:
 - <code><a href="./src/resources/shared.ts">AfterIdle</a></code>
 - <code><a href="./src/resources/shared.ts">AgentMount</a></code>
 - <code><a href="./src/resources/shared.ts">AgentSource</a></code>
+- <code><a href="./src/resources/shared.ts">BrokerMount</a></code>
 - <code><a href="./src/resources/shared.ts">CodeMountParameters</a></code>
 - <code><a href="./src/resources/shared.ts">LaunchParameters</a></code>
 - <code><a href="./src/resources/shared.ts">Mount</a></code>

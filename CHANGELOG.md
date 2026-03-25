@@ -1,5 +1,19 @@
 # Changelog
 
+## 1.13.0 (2026-03-25)
+
+Full Changelog: [v1.12.0...v1.13.0](https://github.com/runloopai/api-client-ts/compare/v1.12.0...v1.13.0)
+
+### Features
+
+* add BrokerMount to OpenAPI spec ([#8282](https://github.com/runloopai/api-client-ts/issues/8282)) ([88863c6](https://github.com/runloopai/api-client-ts/commit/88863c61384888bd25bb7d5733a1100b319b62bb))
+* adding axon sdk methods ([#758](https://github.com/runloopai/api-client-ts/issues/758)) ([1681eb3](https://github.com/runloopai/api-client-ts/commit/1681eb385979849a8f95843eba833eaa983031bb))
+
+
+### Chores
+
+* **sdk:** update `removeTunnel()` oo sdk method and add smoketest ([#756](https://github.com/runloopai/api-client-ts/issues/756)) ([db682a9](https://github.com/runloopai/api-client-ts/commit/db682a91d2a2c2a34d71492a11c26f396212f98b))
+
 ## 1.12.0 (2026-03-24)
 
 Full Changelog: [v1.11.2...v1.12.0](https://github.com/runloopai/api-client-ts/compare/v1.11.2...v1.12.0)
