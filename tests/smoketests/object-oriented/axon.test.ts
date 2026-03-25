@@ -77,6 +77,14 @@ const sdk = makeClientSDK();
     });
 
     test('subscribe to SSE stream and receive events', async () => {
+      // Ensure at least one event exists so the stream has something to replay
+      await axon.publish({
+        event_type: 'sse_test',
+        origin: 'USER_EVENT',
+        payload: JSON.stringify({ sse: true }),
+        source: 'sdk-smoke-test',
+      });
+
       const stream = await axon.subscribeSse();
       const events = [];
       for await (const event of stream) {
@@ -90,6 +98,44 @@ const sdk = makeClientSDK();
       expect(first.event_type).toBeDefined();
       expect(first.payload).toBeDefined();
       expect(first.sequence).toBeGreaterThanOrEqual(0);
+    });
+
+    test('sql.query: create table and insert row', async () => {
+      await axon.sql.query({
+        sql: 'CREATE TABLE IF NOT EXISTS smoke_test (id INTEGER PRIMARY KEY, value TEXT)',
+      });
+
+      await axon.sql.query({
+        sql: 'INSERT INTO smoke_test (id, value) VALUES (?, ?)',
+        params: [1, 'hello'],
+      });
+
+      const result = await axon.sql.query({
+        sql: 'SELECT * FROM smoke_test WHERE id = ?',
+        params: [1],
+      });
+
+      expect(result.columns).toBeDefined();
+      expect(result.columns.length).toBeGreaterThan(0);
+      expect(result.rows.length).toBe(1);
+      expect(result.meta.duration_ms).toBeGreaterThanOrEqual(0);
+    });
+
+    test('sql.batch: execute multiple statements atomically', async () => {
+      const result = await axon.sql.batch({
+        statements: [
+          { sql: 'CREATE TABLE IF NOT EXISTS batch_test (id INTEGER PRIMARY KEY, name TEXT)' },
+          { sql: 'INSERT INTO batch_test (id, name) VALUES (?, ?)', params: [1, 'alice'] },
+          { sql: 'INSERT INTO batch_test (id, name) VALUES (?, ?)', params: [2, 'bob'] },
+          { sql: 'SELECT * FROM batch_test ORDER BY id' },
+        ],
+      });
+
+      expect(result.results).toBeDefined();
+      expect(result.results.length).toBe(4);
+      const selectResult = result.results[3]!;
+      expect(selectResult.success).toBeDefined();
+      expect(selectResult.success!.rows.length).toBe(2);
     });
   });
 

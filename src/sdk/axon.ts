@@ -8,6 +8,50 @@ import type {
   PublishResultView,
   AxonEventView,
 } from '../resources/axons';
+import type {
+  SqlBatchParams,
+  SqlBatchResultView,
+  SqlQueryParams,
+  SqlQueryResultView,
+} from '../resources/axons/sql';
+
+/**
+ * SQL operations for an axon's SQLite database.
+ *
+ * @category Axon
+ */
+export class AxonSqlOps {
+  /**
+   * @private
+   */
+  constructor(
+    private client: Runloop,
+    private axonId: string,
+  ) {}
+
+  /**
+   * [Beta] Execute a single parameterized SQL statement against this axon's SQLite database.
+   *
+   * @param {SqlQueryParams} params - The SQL query and optional positional parameters
+   * @param {Core.RequestOptions} [options] - Request options
+   * @returns {Promise<SqlQueryResultView>} The query result with columns, rows, and metadata
+   */
+  async query(params: SqlQueryParams, options?: Core.RequestOptions): Promise<SqlQueryResultView> {
+    return this.client.axons.sql.query(this.axonId, params, options);
+  }
+
+  /**
+   * [Beta] Execute multiple SQL statements atomically within a single transaction
+   * against this axon's SQLite database.
+   *
+   * @param {SqlBatchParams} params - The batch of SQL statements to execute
+   * @param {Core.RequestOptions} [options] - Request options
+   * @returns {Promise<SqlBatchResultView>} One result per statement, in order
+   */
+  async batch(params: SqlBatchParams, options?: Core.RequestOptions): Promise<SqlBatchResultView> {
+    return this.client.axons.sql.batch(this.axonId, params, options);
+  }
+}
 
 /**
  * [Beta] Object-oriented interface for working with Axons.
@@ -42,15 +86,21 @@ import type {
  * for await (const event of stream) {
  *   console.log(event.event_type, event.payload);
  * }
+ *
+ * // Execute SQL queries
+ * await axon.sql.query({ sql: 'CREATE TABLE tasks (id INTEGER PRIMARY KEY, name TEXT)' });
+ * const result = await axon.sql.query({ sql: 'SELECT * FROM tasks WHERE id = ?', params: [1] });
  * ```
  */
 export class Axon {
   private client: Runloop;
   private _id: string;
+  public readonly sql: AxonSqlOps;
 
   private constructor(client: Runloop, id: string) {
     this.client = client;
     this._id = id;
+    this.sql = new AxonSqlOps(this.client, this._id);
   }
 
   /**
