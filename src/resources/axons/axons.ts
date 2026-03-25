@@ -66,12 +66,12 @@ export class Axons extends APIResource {
    * [Beta] Subscribe to an axon event stream via server-sent events.
    */
   subscribeSse(id: string, options?: Core.RequestOptions): APIPromise<Stream<AxonEventView>> {
-    const defaultHeaders = {
-      Accept: 'text/event-stream',
-    };
     const mergedOptions: Core.RequestOptions = {
-      headers: defaultHeaders,
       ...options,
+      headers: {
+        Accept: 'text/event-stream',
+        ...options?.headers,
+      },
     };
     return this._client.get(`/v1/axons/${id}/subscribe/sse`, {
       ...mergedOptions,
