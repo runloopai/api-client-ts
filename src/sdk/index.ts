@@ -3,7 +3,7 @@ export { Blueprint } from './blueprint';
 export { Snapshot } from './snapshot';
 export { StorageObject } from './storage-object';
 export { Agent } from './agent';
-export { Axon } from './axon';
+export { Axon, AxonSqlOps } from './axon';
 export { Execution } from './execution';
 export { ExecutionResult } from './execution-result';
 export { Scorer } from './scorer';
