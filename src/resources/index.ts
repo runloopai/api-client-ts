@@ -19,7 +19,7 @@ export {
   type PublishParams,
   type PublishResultView,
   type AxonPublishParams,
-} from './axons';
+} from './axons/axons';
 export {
   BenchmarkJobs,
   type BenchmarkJobCreateParameters,

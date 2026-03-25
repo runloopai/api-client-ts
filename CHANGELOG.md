@@ -1,5 +1,24 @@
 # Changelog
 
+## 1.14.0 (2026-03-25)
+
+Full Changelog: [v1.13.0...v1.14.0](https://github.com/runloopai/api-client-ts/compare/v1.13.0...v1.14.0)
+
+### Features
+
+* Add axon rest endpoints for raw SQL access ([#8287](https://github.com/runloopai/api-client-ts/issues/8287)) ([4f8b988](https://github.com/runloopai/api-client-ts/commit/4f8b9884344cbb0c0a1a86d66390086e9b397e2a))
+
+
+### Bug Fixes
+
+* **broker:** broker protocol renames for clarity / future proof ([#8285](https://github.com/runloopai/api-client-ts/issues/8285)) ([db4eadd](https://github.com/runloopai/api-client-ts/commit/db4eaddd921cb07879fccf9fbb8ca902b9cdbb6b))
+
+
+### Chores
+
+* **ci:** skip lint on metadata-only changes ([3ea23af](https://github.com/runloopai/api-client-ts/commit/3ea23af6a629913bc7aba2d65c7173df86a817e3))
+* **tests:** bump steady to v0.19.7 ([ef57274](https://github.com/runloopai/api-client-ts/commit/ef57274687f6e364bab6055bc9fca40b531c6602))
+
 ## 1.13.0 (2026-03-25)
 
 Full Changelog: [v1.12.0...v1.13.0](https://github.com/runloopai/api-client-ts/compare/v1.12.0...v1.13.0)
