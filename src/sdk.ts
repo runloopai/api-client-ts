@@ -12,6 +12,7 @@ import { NetworkPolicy } from './sdk/network-policy';
 import { GatewayConfig } from './sdk/gateway-config';
 import { McpConfig } from './sdk/mcp-config';
 import { Scenario } from './sdk/scenario';
+import { ScenarioBuilder } from './sdk/scenario-builder';
 import { Secret } from './sdk/secret';
 
 // Import types used in this file
@@ -2012,7 +2013,8 @@ export class McpConfigOps {
  *
  * ## Quickstart
  *
- * Use `fromId()` to get a {@link Scenario} by ID, or `list()` to retrieve all scenarios.
+ * Use `fromId()` to get a {@link Scenario} by ID, `list()` to retrieve all scenarios,
+ * or `builder()` to construct a new scenario with a fluent API.
  * Once you have a scenario, call `scenario.run()` to start a {@link ScenarioRun} with
  * your agent mounted.
  *
@@ -2055,6 +2057,26 @@ export class ScenarioOps {
    * @private
    */
   constructor(private client: RunloopAPI) {}
+
+  /**
+   * Create a new {@link ScenarioBuilder} for constructing a scenario with a fluent API.
+   *
+   * @example
+   * ```typescript
+   * const runloop = new RunloopSDK();
+   * const scenario = await runloop.scenario
+   *   .builder('my-scenario')
+   *   .withProblemStatement('Fix the bug in main.py')
+   *   .addTestCommandScorer('tests', { test_command: 'pytest' })
+   *   .push();
+   * ```
+   *
+   * @param {string} name - Name for the scenario
+   * @returns {ScenarioBuilder} A {@link ScenarioBuilder} instance
+   */
+  builder(name: string): ScenarioBuilder {
+    return new ScenarioBuilder(name, this.client);
+  }
 
   /**
    * Get a scenario object by its ID.
