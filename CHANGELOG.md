@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.14.1 (2026-03-25)
+
+Full Changelog: [v1.14.0...v1.14.1](https://github.com/runloopai/api-client-ts/compare/v1.14.0...v1.14.1)
+
+### Bug Fixes
+
+* **tunnels:** extract tunnel domain from base url ([#755](https://github.com/runloopai/api-client-ts/issues/755)) ([03b7479](https://github.com/runloopai/api-client-ts/commit/03b7479515ea129bf9ba191d103a05d20e6ee260))
+
 ## 1.14.0 (2026-03-25)
 
 Full Changelog: [v1.13.0...v1.14.0](https://github.com/runloopai/api-client-ts/compare/v1.13.0...v1.14.0)
