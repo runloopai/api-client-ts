@@ -439,11 +439,6 @@ export namespace BenchmarkJobView {
       scenario_name: string;
 
       /**
-       * The ID of the scenario run.
-       */
-      scenario_run_id: string;
-
-      /**
        * The final state of the scenario execution.
        */
       state: 'COMPLETED' | 'FAILED' | 'TIMEOUT' | 'CANCELED';
@@ -458,6 +453,12 @@ export namespace BenchmarkJobView {
        * and message.
        */
       failure_reason?: ScenarioOutcome.FailureReason | null;
+
+      /**
+       * The ID of the scenario run. May be absent if the scenario failed during setup
+       * before a run was created.
+       */
+      scenario_run_id?: string | null;
 
       /**
        * The score achieved for this scenario (0.0 to 1.0). Only present if state is
