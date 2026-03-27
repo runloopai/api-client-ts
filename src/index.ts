@@ -176,6 +176,7 @@ import {
 import {
   AxonCreateParams,
   AxonEventView,
+  AxonListParams,
   AxonListView,
   AxonPublishParams,
   AxonView,
@@ -595,6 +596,7 @@ export declare namespace Runloop {
     type AxonView as AxonView,
     type PublishParams as PublishParams,
     type PublishResultView as PublishResultView,
+    type AxonListParams as AxonListParams,
     type AxonPublishParams as AxonPublishParams,
   };
 
