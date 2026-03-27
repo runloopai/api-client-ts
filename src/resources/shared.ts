@@ -269,7 +269,12 @@ export interface LaunchParameters {
   required_services?: Array<string> | null;
 
   /**
-   * Manual resource configuration for Devbox. If not set, defaults will be used.
+   * Preset Devbox resources (vCPU, RAM in GiB, ephemeral disk in GiB). If not set,
+   * SMALL is used. X_SMALL: 0.5 vCPU, 1 GiB RAM, 4 GiB disk. SMALL: 1 vCPU, 2 GiB
+   * RAM, 4 GiB disk. MEDIUM: 2 vCPU, 4 GiB RAM, 8 GiB disk. LARGE: 2 vCPU, 8 GiB
+   * RAM, 16 GiB disk. X_LARGE: 4 vCPU, 16 GiB RAM, 16 GiB disk. XX_LARGE: 8 vCPU, 32
+   * GiB RAM, 16 GiB disk. CUSTOM_SIZE: set custom_cpu_cores, custom_gb_memory, and
+   * optionally custom_disk_size.
    */
   resource_size_request?:
     | 'X_SMALL'
