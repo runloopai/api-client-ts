@@ -73,7 +73,11 @@ describe('resource devboxes', () => {
           repo_connection_id: 'repo_connection_id',
           secrets: { foo: 'string' },
           snapshot_id: 'snapshot_id',
-          tunnel: { auth_mode: 'open', http_keep_alive: true },
+          tunnel: {
+            auth_mode: 'open',
+            http_keep_alive: true,
+            wake_on_http: true,
+          },
         },
         { path: '/_stainless_unknown_path' },
       ),
@@ -227,7 +231,11 @@ describe('resource devboxes', () => {
     await expect(
       client.devboxes.enableTunnel(
         'id',
-        { auth_mode: 'open', http_keep_alive: true },
+        {
+          auth_mode: 'open',
+          http_keep_alive: true,
+          wake_on_http: true,
+        },
         { path: '/_stainless_unknown_path' },
       ),
     ).rejects.toThrow(Runloop.NotFoundError);

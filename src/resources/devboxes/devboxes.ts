@@ -872,6 +872,12 @@ export interface TunnelView {
   tunnel_key: string;
 
   /**
+   * When true, HTTP traffic to a suspended devbox will automatically trigger a
+   * resume.
+   */
+  wake_on_http: boolean;
+
+  /**
    * Bearer token for tunnel authentication. Only present when auth_mode is
    * 'authenticated'.
    */
@@ -1064,6 +1070,12 @@ export namespace DevboxCreateParams {
      * policies, resetting the idle timer. Defaults to true if not specified.
      */
     http_keep_alive?: boolean | null;
+
+    /**
+     * When true, HTTP traffic to a suspended devbox will automatically trigger a
+     * resume. Defaults to false if not specified.
+     */
+    wake_on_http?: boolean | null;
   }
 }
 
@@ -1119,6 +1131,12 @@ export interface DevboxEnableTunnelParams {
    * policies, resetting the idle timer. Defaults to true if not specified.
    */
   http_keep_alive?: boolean | null;
+
+  /**
+   * When true, HTTP traffic to a suspended devbox will automatically trigger a
+   * resume. Defaults to false if not specified.
+   */
+  wake_on_http?: boolean | null;
 }
 
 export interface DevboxExecuteParams {

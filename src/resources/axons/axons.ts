@@ -47,8 +47,16 @@ export class Axons extends APIResource {
   /**
    * [Beta] List all active axons.
    */
-  list(options?: Core.RequestOptions): Core.APIPromise<AxonListView> {
-    return this._client.get('/v1/axons', options);
+  list(query?: AxonListParams, options?: Core.RequestOptions): Core.APIPromise<AxonListView>;
+  list(options?: Core.RequestOptions): Core.APIPromise<AxonListView>;
+  list(
+    query: AxonListParams | Core.RequestOptions = {},
+    options?: Core.RequestOptions,
+  ): Core.APIPromise<AxonListView> {
+    if (isRequestOptions(query)) {
+      return this.list({}, query);
+    }
+    return this._client.get('/v1/axons', { query, ...options });
   }
 
   /**
@@ -121,6 +129,10 @@ export interface AxonListView {
    * List of active axons.
    */
   axons: Array<AxonView>;
+
+  has_more: boolean;
+
+  total_count?: number | null;
 }
 
 export interface AxonView {
@@ -181,6 +193,24 @@ export interface AxonCreateParams {
   name?: string | null;
 }
 
+export interface AxonListParams {
+  /**
+   * If true (default), includes total_count in the response. Set to false to skip
+   * the count query for better performance on large datasets.
+   */
+  include_total_count?: boolean;
+
+  /**
+   * The limit of items to return. Default is 20. Max is 5000.
+   */
+  limit?: number;
+
+  /**
+   * Load the next page of data starting after the item with the given ID.
+   */
+  starting_after?: string;
+}
+
 export interface AxonPublishParams {
   /**
    * The event type (e.g. push, pull_request).
@@ -213,6 +243,7 @@ export declare namespace Axons {
     type AxonView as AxonView,
     type PublishParams as PublishParams,
     type PublishResultView as PublishResultView,
+    type AxonListParams as AxonListParams,
     type AxonPublishParams as AxonPublishParams,
   };
 
