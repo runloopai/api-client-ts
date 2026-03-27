@@ -8,6 +8,7 @@ export {
   type AxonView,
   type PublishParams,
   type PublishResultView,
+  type AxonListParams,
   type AxonPublishParams,
 } from './axons';
 export {

@@ -70,6 +70,20 @@ describe('resource axons', () => {
     );
   });
 
+  test('list: request options and params are passed correctly', async () => {
+    // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
+    await expect(
+      client.axons.list(
+        {
+          include_total_count: true,
+          limit: 0,
+          starting_after: 'starting_after',
+        },
+        { path: '/_stainless_unknown_path' },
+      ),
+    ).rejects.toThrow(Runloop.NotFoundError);
+  });
+
   test('publish: only required params', async () => {
     const responsePromise = client.axons.publish('id', {
       event_type: 'event_type',
