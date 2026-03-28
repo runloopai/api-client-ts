@@ -203,6 +203,11 @@ export interface AxonCreateParams {
 
 export interface AxonListParams {
   /**
+   * Filter by axon ID.
+   */
+  id?: string;
+
+  /**
    * If true (default), includes total_count in the response. Set to false to skip
    * the count query for better performance on large datasets.
    */
@@ -212,6 +217,11 @@ export interface AxonListParams {
    * The limit of items to return. Default is 20. Max is 5000.
    */
   limit?: number;
+
+  /**
+   * Filter by axon name (prefix match supported).
+   */
+  name?: string;
 
   /**
    * Load the next page of data starting after the item with the given ID.
