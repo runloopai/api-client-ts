@@ -1,5 +1,30 @@
 # Changelog
 
+## 1.15.0 (2026-03-28)
+
+Full Changelog: [v1.14.1...v1.15.0](https://github.com/runloopai/api-client-ts/compare/v1.14.1...v1.15.0)
+
+### Features
+
+* Add axon list filters by id and name ([#8384](https://github.com/runloopai/api-client-ts/issues/8384)) ([f90a701](https://github.com/runloopai/api-client-ts/commit/f90a701edacfe1eb8995fc0c760a0fb3068f0bbd))
+* Add pagination to list active axons ([#8359](https://github.com/runloopai/api-client-ts/issues/8359)) ([7e07f45](https://github.com/runloopai/api-client-ts/commit/7e07f454e813080981196924457ad70ff46774b9))
+* **sdk:** add `ScenarioBuilder` class to OO-SDK ([#748](https://github.com/runloopai/api-client-ts/issues/748)) ([f80ed4c](https://github.com/runloopai/api-client-ts/commit/f80ed4c30c8e4c3998460a6f12bd862f7f9d96ac))
+
+
+### Bug Fixes
+
+* **api:** surface scenario setup failures instead of silently dropping them ([#8300](https://github.com/runloopai/api-client-ts/issues/8300)) ([b459a1f](https://github.com/runloopai/api-client-ts/commit/b459a1f1cb4b443f7bc36e45bc5c217fbb1f5a09))
+
+
+### Chores
+
+* **internal:** update multipart form array serialization ([0e3588b](https://github.com/runloopai/api-client-ts/commit/0e3588bf164cf4aff54a2b0cb4f3ff5776a7e800))
+
+
+### Documentation
+
+* **api:** document vCPU, RAM, and disk for resource_size_request ([#8368](https://github.com/runloopai/api-client-ts/issues/8368)) ([1c89e57](https://github.com/runloopai/api-client-ts/commit/1c89e572b67bba3fe608002373ee94392c4ad9e3))
+
 ## 1.14.1 (2026-03-25)
 
 Full Changelog: [v1.14.0...v1.14.1](https://github.com/runloopai/api-client-ts/compare/v1.14.0...v1.14.1)
