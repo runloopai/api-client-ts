@@ -17,6 +17,7 @@ import {
   SqlStepErrorView,
   SqlStepResultView,
 } from './sql';
+import { AxonsCursorIDPage, type AxonsCursorIDPageParams } from '../../pagination';
 import { Stream } from '../../streaming';
 
 export class Axons extends APIResource {
@@ -47,16 +48,19 @@ export class Axons extends APIResource {
   /**
    * [Beta] List all active axons.
    */
-  list(query?: AxonListParams, options?: Core.RequestOptions): Core.APIPromise<AxonListView>;
-  list(options?: Core.RequestOptions): Core.APIPromise<AxonListView>;
+  list(
+    query?: AxonListParams,
+    options?: Core.RequestOptions,
+  ): Core.PagePromise<AxonViewsAxonsCursorIDPage, AxonView>;
+  list(options?: Core.RequestOptions): Core.PagePromise<AxonViewsAxonsCursorIDPage, AxonView>;
   list(
     query: AxonListParams | Core.RequestOptions = {},
     options?: Core.RequestOptions,
-  ): Core.APIPromise<AxonListView> {
+  ): Core.PagePromise<AxonViewsAxonsCursorIDPage, AxonView> {
     if (isRequestOptions(query)) {
       return this.list({}, query);
     }
-    return this._client.get('/v1/axons', { query, ...options });
+    return this._client.getAPIList('/v1/axons', AxonViewsAxonsCursorIDPage, { query, ...options });
   }
 
   /**
@@ -79,6 +83,8 @@ export class Axons extends APIResource {
     >;
   }
 }
+
+export class AxonViewsAxonsCursorIDPage extends AxonsCursorIDPage<AxonView> {}
 
 export interface AxonCreateParams {
   /**
@@ -193,7 +199,7 @@ export interface AxonCreateParams {
   name?: string | null;
 }
 
-export interface AxonListParams {
+export interface AxonListParams extends AxonsCursorIDPageParams {
   /**
    * Filter by axon ID.
    */
@@ -206,19 +212,9 @@ export interface AxonListParams {
   include_total_count?: boolean;
 
   /**
-   * The limit of items to return. Default is 20. Max is 5000.
-   */
-  limit?: number;
-
-  /**
    * Filter by axon name (prefix match supported).
    */
   name?: string;
-
-  /**
-   * Load the next page of data starting after the item with the given ID.
-   */
-  starting_after?: string;
 }
 
 export interface AxonPublishParams {
@@ -243,6 +239,7 @@ export interface AxonPublishParams {
   source: string;
 }
 
+Axons.AxonViewsAxonsCursorIDPage = AxonViewsAxonsCursorIDPage;
 Axons.Sql = Sql;
 
 export declare namespace Axons {
@@ -253,6 +250,7 @@ export declare namespace Axons {
     type AxonView as AxonView,
     type PublishParams as PublishParams,
     type PublishResultView as PublishResultView,
+    AxonViewsAxonsCursorIDPage as AxonViewsAxonsCursorIDPage,
     type AxonListParams as AxonListParams,
     type AxonPublishParams as AxonPublishParams,
   };
