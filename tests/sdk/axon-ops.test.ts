@@ -1,6 +1,6 @@
 import { AxonOps } from '../../src/sdk';
 import { Axon } from '../../src/sdk/axon';
-import type { AxonView, AxonListView } from '../../src/resources/axons';
+import type { AxonView } from '../../src/resources/axons';
 
 jest.mock('../../src/sdk/axon');
 
@@ -77,19 +77,25 @@ describe('AxonOps', () => {
   });
 
   describe('list', () => {
-    it('should list axons and wrap as Axon instances', async () => {
-      const mockListView: AxonListView = {
-        axons: [
-          { id: 'axn_1', created_at_ms: Date.now(), name: 'axon-1' },
-          { id: 'axn_2', created_at_ms: Date.now(), name: 'axon-2' },
-          { id: 'axn_3', created_at_ms: Date.now() },
-        ],
+    function mockPageResult(items: AxonView[]) {
+      return {
+        [Symbol.asyncIterator]: async function* () {
+          yield* items;
+        },
       };
-      mockClient.axons.list.mockResolvedValue(mockListView);
+    }
+
+    it('should list axons and wrap as Axon instances', async () => {
+      const mockAxons: AxonView[] = [
+        { id: 'axn_1', created_at_ms: Date.now(), name: 'axon-1' },
+        { id: 'axn_2', created_at_ms: Date.now(), name: 'axon-2' },
+        { id: 'axn_3', created_at_ms: Date.now() },
+      ];
+      mockClient.axons.list.mockResolvedValue(mockPageResult(mockAxons));
 
       const axons = await axonOps.list();
 
-      expect(mockClient.axons.list).toHaveBeenCalledWith(undefined);
+      expect(mockClient.axons.list).toHaveBeenCalledWith(undefined, undefined);
       expect(Axon.fromId).toHaveBeenCalledTimes(3);
       expect(Axon.fromId).toHaveBeenCalledWith(mockClient, 'axn_1');
       expect(Axon.fromId).toHaveBeenCalledWith(mockClient, 'axn_2');
@@ -98,19 +104,27 @@ describe('AxonOps', () => {
     });
 
     it('should return empty array when no axons exist', async () => {
-      mockClient.axons.list.mockResolvedValue({ axons: [] });
+      mockClient.axons.list.mockResolvedValue(mockPageResult([]));
 
       const axons = await axonOps.list();
 
       expect(axons).toHaveLength(0);
     });
 
+    it('should pass filter params', async () => {
+      mockClient.axons.list.mockResolvedValue(mockPageResult([]));
+
+      await axonOps.list({ name: 'my-axon', limit: 10 });
+
+      expect(mockClient.axons.list).toHaveBeenCalledWith({ name: 'my-axon', limit: 10 }, undefined);
+    });
+
     it('should pass request options', async () => {
-      mockClient.axons.list.mockResolvedValue({ axons: [] });
+      mockClient.axons.list.mockResolvedValue(mockPageResult([]));
 
-      await axonOps.list({ timeout: 3000 });
+      await axonOps.list(undefined, { timeout: 3000 });
 
-      expect(mockClient.axons.list).toHaveBeenCalledWith({ timeout: 3000 });
+      expect(mockClient.axons.list).toHaveBeenCalledWith(undefined, { timeout: 3000 });
     });
   });
 });
