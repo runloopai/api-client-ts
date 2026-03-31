@@ -11,6 +11,7 @@ export {
   type AgentListParams,
 } from './agents';
 export {
+  AxonViewsAxonsCursorIDPage,
   Axons,
   type AxonCreateParams,
   type AxonEventView,

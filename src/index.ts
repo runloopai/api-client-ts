@@ -7,6 +7,8 @@ import * as Pagination from './pagination';
 import {
   type AgentsCursorIDPageParams,
   AgentsCursorIDPageResponse,
+  type AxonsCursorIDPageParams,
+  AxonsCursorIDPageResponse,
   type BenchmarkRunsCursorIDPageParams,
   BenchmarkRunsCursorIDPageResponse,
   type BenchmarksCursorIDPageParams,
@@ -180,6 +182,7 @@ import {
   AxonListView,
   AxonPublishParams,
   AxonView,
+  AxonViewsAxonsCursorIDPage,
   Axons,
   PublishParams,
   PublishResultView,
@@ -436,6 +439,7 @@ Runloop.BenchmarkJobs = BenchmarkJobs;
 Runloop.Agents = Agents;
 Runloop.AgentViewsAgentsCursorIDPage = AgentViewsAgentsCursorIDPage;
 Runloop.Axons = Axons;
+Runloop.AxonViewsAxonsCursorIDPage = AxonViewsAxonsCursorIDPage;
 Runloop.Blueprints = Blueprints;
 Runloop.BlueprintViewsBlueprintsCursorIDPage = BlueprintViewsBlueprintsCursorIDPage;
 Runloop.Devboxes = Devboxes;
@@ -492,6 +496,12 @@ export declare namespace Runloop {
   export {
     type AgentsCursorIDPageParams as AgentsCursorIDPageParams,
     type AgentsCursorIDPageResponse as AgentsCursorIDPageResponse,
+  };
+
+  export import AxonsCursorIDPage = Pagination.AxonsCursorIDPage;
+  export {
+    type AxonsCursorIDPageParams as AxonsCursorIDPageParams,
+    type AxonsCursorIDPageResponse as AxonsCursorIDPageResponse,
   };
 
   export import BenchmarkRunsCursorIDPage = Pagination.BenchmarkRunsCursorIDPage;
@@ -596,6 +606,7 @@ export declare namespace Runloop {
     type AxonView as AxonView,
     type PublishParams as PublishParams,
     type PublishResultView as PublishResultView,
+    AxonViewsAxonsCursorIDPage as AxonViewsAxonsCursorIDPage,
     type AxonListParams as AxonListParams,
     type AxonPublishParams as AxonPublishParams,
   };
