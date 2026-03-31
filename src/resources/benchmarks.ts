@@ -269,6 +269,12 @@ export interface BenchmarkView {
   scenarioIds: Array<string>;
 
   /**
+   * Whether the benchmark is active or archived. Archived benchmarks are excluded
+   * from listings and cannot be run.
+   */
+  status: 'active' | 'archived';
+
+  /**
    * Attribution information for the benchmark.
    */
   attribution?: string;
