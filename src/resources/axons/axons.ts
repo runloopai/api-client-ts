@@ -77,21 +77,10 @@ export class Axons extends APIResource {
 
   /**
    * [Beta] Subscribe to an axon event stream via server-sent events.
+   * On idle timeout (408), reconnects with `after_sequence` derived from the last
+   * received event (internal to {@link withStreamAutoReconnect}).
    */
-  subscribeSse(
-    id: string,
-    query?: AxonSubscribeSseParams,
-    options?: Core.RequestOptions,
-  ): APIPromise<Stream<AxonEventView>>;
-  subscribeSse(id: string, options?: Core.RequestOptions): APIPromise<Stream<AxonEventView>>;
-  subscribeSse(
-    id: string,
-    query: AxonSubscribeSseParams | Core.RequestOptions = {},
-    options?: Core.RequestOptions,
-  ): APIPromise<Stream<AxonEventView>> {
-    if (isRequestOptions(query)) {
-      return this.subscribeSse(id, {}, query);
-    }
+  subscribeSse(id: string, options?: Core.RequestOptions): APIPromise<Stream<AxonEventView>> {
     const mergedOptions: Core.RequestOptions = {
       ...options,
       headers: {
@@ -103,10 +92,7 @@ export class Axons extends APIResource {
       afterSequence,
     ) =>
       this._client.get(`/v1/axons/${id}/subscribe/sse`, {
-        query: {
-          ...query,
-          ...(afterSequence !== undefined ? { after_sequence: afterSequence.toString() } : {}),
-        },
+        query: afterSequence !== undefined ? { after_sequence: afterSequence.toString() } : undefined,
         ...mergedOptions,
         stream: true,
       }) as APIPromise<Stream<AxonEventView>>;
@@ -247,14 +233,6 @@ export interface AxonListParams extends AxonsCursorIDPageParams {
   name?: string;
 }
 
-export interface AxonSubscribeSseParams {
-  /**
-   * Resume the stream after this sequence number (exclusive). Used internally when
-   * reconnecting after a server-side idle timeout (408).
-   */
-  after_sequence?: string;
-}
-
 export interface AxonPublishParams {
   /**
    * The event type (e.g. push, pull_request).
@@ -291,7 +269,6 @@ export declare namespace Axons {
     AxonViewsAxonsCursorIDPage as AxonViewsAxonsCursorIDPage,
     type AxonListParams as AxonListParams,
     type AxonPublishParams as AxonPublishParams,
-    type AxonSubscribeSseParams as AxonSubscribeSseParams,
   };
 
   export {
