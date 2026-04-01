@@ -1,4 +1,4 @@
-import { APIPromise, type APIResponseProps } from '../../src/core';
+import { APIPromise, StreamBackedAPIPromise, type APIResponseProps } from '../../src/core';
 import { APIError } from '../../src/error';
 import { withStreamAutoReconnect } from '../../src/lib/streaming-reconnection';
 import { Stream } from '../../src/streaming';
@@ -251,5 +251,151 @@ describe('withStreamAutoReconnect', () => {
     await expect(iterate()).rejects.toBe(error);
     expect(creatorCalls).toBe(1);
     expect(offsets).toEqual([0]);
+  });
+
+  test('empty stream completes without reconnect (single creator call)', async () => {
+    const factory = createStreamFactory([]);
+    const offsets: number[] = [];
+
+    const stream = await withStreamAutoReconnect<SampleItem>(
+      (offset) => {
+        offsets.push(offset ?? 0);
+        return factory(offset);
+      },
+      (item) => item.offset,
+    );
+
+    const collected: SampleItem[] = [];
+    for await (const item of stream) {
+      collected.push(item);
+    }
+
+    expect(collected).toEqual([]);
+    expect(offsets).toEqual([0]);
+  });
+
+  test('when getOffset always returns undefined, reconnect still calls streamCreator(undefined)', async () => {
+    const encoder = new TextEncoder();
+    const timeout = makeTimeoutError('mid');
+    const makeStream = (label: string, failOnSecondPull: boolean): APIPromise<Stream<SampleItem>> => {
+      const ac = new AbortController();
+      let n = 0;
+      const readable = new ReadableStream<Uint8Array>({
+        pull(c) {
+          n += 1;
+          if (n === 1) {
+            c.enqueue(encoder.encode(JSON.stringify({ offset: 1, value: label }) + '\n'));
+            return;
+          }
+          if (failOnSecondPull && n === 2) {
+            c.error(timeout);
+            return;
+          }
+          c.close();
+        },
+      });
+      return streamToAPIPromise(Stream.fromReadableStream(readable, ac));
+    };
+
+    const offsets: number[] = [];
+    let leg = 0;
+    const wrapped = withStreamAutoReconnect<SampleItem>(
+      (offset) => {
+        offsets.push(offset ?? 0);
+        leg += 1;
+        return makeStream(leg === 1 ? 'first' : 'second', leg === 1);
+      },
+      () => undefined,
+    );
+
+    const collected: SampleItem[] = [];
+    for await (const item of await wrapped) {
+      collected.push(item);
+    }
+
+    expect(collected.map((i) => i.value)).toEqual(['first', 'second']);
+    expect(leg).toBe(2);
+    expect(offsets).toEqual([0, 0]);
+  });
+
+  test('asResponse resolves without consuming stream body', async () => {
+    const factory = createStreamFactory(items);
+    const wrapped = withStreamAutoReconnect<SampleItem>(
+      (offset) => factory(offset),
+      (item) => item.offset,
+    );
+
+    const raw = await wrapped.asResponse();
+    expect(raw.status).toBe(200);
+
+    const stream = await wrapped;
+    const first = [];
+    for await (const x of stream) {
+      first.push(x);
+      break;
+    }
+    expect(first).toHaveLength(1);
+  });
+
+  test('withResponse returns same stream as await and raw response', async () => {
+    const factory = createStreamFactory([items[0]!]);
+    const wrapped = withStreamAutoReconnect<SampleItem>(
+      (offset) => factory(offset),
+      (item) => item.offset,
+    );
+
+    const { data: stream, response } = await wrapped.withResponse();
+    expect(response.status).toBe(200);
+
+    const row: SampleItem[] = [];
+    for await (const x of stream) {
+      row.push(x);
+    }
+    expect(row).toEqual([items[0]]);
+  });
+
+  test('ensureFirst is single-flight: parallel await asResponse and stream share one creator call', async () => {
+    let creatorCalls = 0;
+    const factory = createStreamFactory(items);
+    const wrapped = withStreamAutoReconnect<SampleItem>(
+      (offset) => {
+        creatorCalls += 1;
+        return factory(offset);
+      },
+      (item) => item.offset,
+    );
+
+    const [raw, stream] = await Promise.all([wrapped.asResponse(), wrapped]);
+    expect(raw.status).toBe(200);
+    expect(creatorCalls).toBe(1);
+
+    const collected: SampleItem[] = [];
+    for await (const x of stream) {
+      collected.push(x);
+    }
+    expect(collected.length).toBe(items.length);
+  });
+
+  test('StreamBackedAPIPromise passes getData lazily (parse not started at construction)', async () => {
+    let dataStarted = false;
+    const props = {
+      response: new Response(null, { status: 200 }),
+      options: { method: 'get', path: '/t', stream: true } as any,
+      controller: new AbortController(),
+    } as unknown as APIResponseProps;
+
+    const p = new StreamBackedAPIPromise(
+      Promise.resolve(props),
+      () => {
+        dataStarted = true;
+        return Promise.resolve(new Stream(async function* () {}, props.controller));
+      },
+    );
+
+    expect(dataStarted).toBe(false);
+    await p.asResponse();
+    expect(dataStarted).toBe(false);
+    await p;
+    expect(dataStarted).toBe(true);
   });
 });
