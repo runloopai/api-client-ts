@@ -289,16 +289,27 @@ export async function poll<T>(
 
   const raceAbort = <R>(promise: Promise<R>): Promise<R> => {
     if (!signal) return promise;
-    const abortPromise = new Promise<never>((_, reject) => {
-      if (signal.aborted) {
+    const abortSignal = signal;
+    if (abortSignal.aborted) {
+      return Promise.reject(new LongPollAbortError('Polling aborted', lastResult));
+    }
+    return new Promise((resolve, reject) => {
+      const onAbort = () => {
+        abortSignal.removeEventListener('abort', onAbort);
         reject(new LongPollAbortError('Polling aborted', lastResult));
-        return;
-      }
-      signal.addEventListener('abort', () => reject(new LongPollAbortError('Polling aborted', lastResult)), {
-        once: true,
-      });
+      };
+      abortSignal.addEventListener('abort', onAbort);
+      promise.then(
+        (value) => {
+          abortSignal.removeEventListener('abort', onAbort);
+          resolve(value);
+        },
+        (err) => {
+          abortSignal.removeEventListener('abort', onAbort);
+          reject(err);
+        },
+      );
     });
-    return Promise.race([promise, abortPromise]);
   };
 
   try {
