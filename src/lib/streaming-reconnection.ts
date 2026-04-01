@@ -1,5 +1,5 @@
 import { Stream } from '../streaming';
-import { APIPromise, StreamBackedAPIPromise } from '../core';
+import { APIPromise, StreamBackedAPIPromise, type APIResponseProps } from '../core';
 
 /**
  * Wraps a stream with automatic reconnection on timeout.
@@ -10,35 +10,49 @@ export function withStreamAutoReconnect<Item>(
   streamCreator: (offset: number | undefined) => APIPromise<Stream<Item>>,
   getOffset: (item: Item) => number | undefined,
 ): StreamBackedAPIPromise<Stream<Item>> {
-  const firstRequest = streamCreator(undefined);
-  const responsePropsPromise = firstRequest._getResponseProps();
+  let firstRequest: APIPromise<Stream<Item>> | undefined;
+  const ensureFirst = () => (firstRequest ??= streamCreator(undefined));
 
-  const dataPromise = (async () => {
-    let lastOffset: number | undefined = undefined;
-    let currentStream = await firstRequest;
+  // Defer the first HTTP request until something awaits this promise (avoids eager
+  // connection attempts and unhandled rejections when the caller only attaches later).
+  const responsePropsPromise = new Promise<APIResponseProps>((resolve, reject) => {
+    queueMicrotask(() => {
+      ensureFirst()._getResponseProps().then(resolve, reject);
+    });
+  });
 
-    async function* createReconnectingIterator(): AsyncIterator<Item> {
-      while (true) {
-        try {
-          for await (const item of currentStream) {
-            if (getOffset(item) !== undefined) {
-              lastOffset = getOffset(item);
+  let dataPromiseMemo: Promise<Stream<Item>> | undefined;
+  const getDataPromise = () => {
+    if (!dataPromiseMemo) {
+      dataPromiseMemo = (async () => {
+        let lastOffset: number | undefined = undefined;
+        let currentStream = await ensureFirst();
+
+        async function* createReconnectingIterator(): AsyncIterator<Item> {
+          while (true) {
+            try {
+              for await (const item of currentStream) {
+                if (getOffset(item) !== undefined) {
+                  lastOffset = getOffset(item);
+                }
+                yield item;
+              }
+              return; // Stream completed normally
+            } catch (error) {
+              if ((error as any)?.status === 408) {
+                currentStream = await streamCreator(lastOffset);
+                continue;
+              }
+              throw error; // Not a timeout, rethrow
             }
-            yield item;
           }
-          return; // Stream completed normally
-        } catch (error) {
-          if ((error as any)?.status === 408) {
-            currentStream = await streamCreator(lastOffset);
-            continue;
-          }
-          throw error; // Not a timeout, rethrow
         }
-      }
+
+        return new Stream(createReconnectingIterator, currentStream.controller);
+      })();
     }
+    return dataPromiseMemo;
+  };
 
-    return new Stream(createReconnectingIterator, currentStream.controller);
-  })();
-
-  return new StreamBackedAPIPromise(responsePropsPromise, dataPromise);
+  return new StreamBackedAPIPromise(responsePropsPromise, getDataPromise);
 }

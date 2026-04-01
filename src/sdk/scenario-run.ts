@@ -135,13 +135,24 @@ export class ScenarioRun {
    * await run.devbox.cmd.exec('ls -la');
    * ```
    *
-   * @param {Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxView>> }} [options] - Request options with optional polling configuration
+   * @param {LongPollRequestOptions<DevboxView>} [options] - Request options with optional long-poll configuration and `signal`
    * @returns {Promise<ScenarioRunView>} The scenario run data after environment is ready
    */
   async awaitEnvReady(options?: LongPollRequestOptions<DevboxView>): Promise<ScenarioRunView> {
-    const { longPoll, polling, signal, ...requestOptions } = options ?? {};
-    await this.client.devboxes.awaitRunning(this._devboxId, { ...requestOptions, longPoll, polling, signal });
-    return this.getInfo(requestOptions);
+    if (options == null) {
+      await this.client.devboxes.awaitRunning(this._devboxId, undefined);
+      return this.getInfo(undefined);
+    }
+    const { longPoll, polling, signal, ...requestOptions } = options;
+    const awaitOpts: LongPollRequestOptions<DevboxView> = {
+      ...requestOptions,
+      ...(longPoll !== undefined ? { longPoll } : {}),
+      ...(polling !== undefined ? { polling } : {}),
+      ...(signal !== undefined ? { signal } : {}),
+    };
+    await this.client.devboxes.awaitRunning(this._devboxId, awaitOpts);
+    const infoOpts = Object.keys(requestOptions).length > 0 ? requestOptions : undefined;
+    return this.getInfo(infoOpts);
   }
 
   /**

@@ -200,8 +200,8 @@ export class APIPromise<T> extends Promise<T> {
  * (e.g. SSE with reconnect). Preserves {@link APIPromise} helpers like {@link APIPromise.asResponse}.
  */
 export class StreamBackedAPIPromise<T> extends APIPromise<T> {
-  constructor(responseProps: Promise<APIResponseProps>, dataPromise: Promise<T>) {
-    super(responseProps, () => dataPromise);
+  constructor(responseProps: Promise<APIResponseProps>, getData: () => Promise<T>) {
+    super(responseProps, () => getData());
   }
 }
 

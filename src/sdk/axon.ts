@@ -192,6 +192,9 @@ export class Axon {
     queryOrOptions?: AxonSubscribeSseParams | Core.RequestOptions,
     options?: Core.RequestOptions,
   ): Promise<Stream<AxonEventView>> {
+    if (queryOrOptions === undefined && options === undefined) {
+      return this.client.axons.subscribeSse(this._id, undefined);
+    }
     if (queryOrOptions && isRequestOptions(queryOrOptions)) {
       return this.client.axons.subscribeSse(this._id, queryOrOptions);
     }
