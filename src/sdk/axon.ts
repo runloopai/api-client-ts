@@ -1,10 +1,12 @@
 import { Runloop } from '../index';
 import type * as Core from '../core';
+import { isRequestOptions } from '../core';
 import { Stream } from '../streaming';
 import type {
   AxonView,
   AxonCreateParams,
   AxonPublishParams,
+  AxonSubscribeSseParams,
   PublishResultView,
   AxonEventView,
 } from '../resources/axons';
@@ -181,7 +183,18 @@ export class Axon {
    * @param {Core.RequestOptions} [options] - Request options
    * @returns {Promise<Stream<AxonEventView>>} An async iterable stream of axon events
    */
-  async subscribeSse(options?: Core.RequestOptions): Promise<Stream<AxonEventView>> {
-    return this.client.axons.subscribeSse(this._id, options);
+  async subscribeSse(
+    query?: AxonSubscribeSseParams,
+    options?: Core.RequestOptions,
+  ): Promise<Stream<AxonEventView>>;
+  async subscribeSse(options?: Core.RequestOptions): Promise<Stream<AxonEventView>>;
+  async subscribeSse(
+    queryOrOptions?: AxonSubscribeSseParams | Core.RequestOptions,
+    options?: Core.RequestOptions,
+  ): Promise<Stream<AxonEventView>> {
+    if (queryOrOptions && isRequestOptions(queryOrOptions)) {
+      return this.client.axons.subscribeSse(this._id, queryOrOptions);
+    }
+    return this.client.axons.subscribeSse(this._id, queryOrOptions ?? {}, options);
   }
 }

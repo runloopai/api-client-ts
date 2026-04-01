@@ -19,6 +19,7 @@ import {
 } from './sql';
 import { AxonsCursorIDPage, type AxonsCursorIDPageParams } from '../../pagination';
 import { Stream } from '../../streaming';
+import { withStreamAutoReconnect } from '@runloop/api-client/lib/streaming-reconnection';
 
 export class Axons extends APIResource {
   sql: SqlAPI.Sql = new SqlAPI.Sql(this._client);
@@ -77,7 +78,20 @@ export class Axons extends APIResource {
   /**
    * [Beta] Subscribe to an axon event stream via server-sent events.
    */
-  subscribeSse(id: string, options?: Core.RequestOptions): APIPromise<Stream<AxonEventView>> {
+  subscribeSse(
+    id: string,
+    query?: AxonSubscribeSseParams,
+    options?: Core.RequestOptions,
+  ): APIPromise<Stream<AxonEventView>>;
+  subscribeSse(id: string, options?: Core.RequestOptions): APIPromise<Stream<AxonEventView>>;
+  subscribeSse(
+    id: string,
+    query: AxonSubscribeSseParams | Core.RequestOptions = {},
+    options?: Core.RequestOptions,
+  ): APIPromise<Stream<AxonEventView>> {
+    if (isRequestOptions(query)) {
+      return this.subscribeSse(id, {}, query);
+    }
     const mergedOptions: Core.RequestOptions = {
       ...options,
       headers: {
@@ -85,10 +99,18 @@ export class Axons extends APIResource {
         ...options?.headers,
       },
     };
-    return this._client.get(`/v1/axons/${id}/subscribe/sse`, {
-      ...mergedOptions,
-      stream: true,
-    }) as APIPromise<Stream<AxonEventView>>;
+    const getStream: (afterSequence: number | undefined) => APIPromise<Stream<AxonEventView>> = (
+      afterSequence,
+    ) =>
+      this._client.get(`/v1/axons/${id}/subscribe/sse`, {
+        query: {
+          ...query,
+          ...(afterSequence !== undefined ? { after_sequence: afterSequence.toString() } : {}),
+        },
+        ...mergedOptions,
+        stream: true,
+      }) as APIPromise<Stream<AxonEventView>>;
+    return withStreamAutoReconnect(getStream, (item) => item.sequence);
   }
 }
 
@@ -225,6 +247,14 @@ export interface AxonListParams extends AxonsCursorIDPageParams {
   name?: string;
 }
 
+export interface AxonSubscribeSseParams {
+  /**
+   * Resume the stream after this sequence number (exclusive). Used internally when
+   * reconnecting after a server-side idle timeout (408).
+   */
+  after_sequence?: string;
+}
+
 export interface AxonPublishParams {
   /**
    * The event type (e.g. push, pull_request).
@@ -261,6 +291,7 @@ export declare namespace Axons {
     AxonViewsAxonsCursorIDPage as AxonViewsAxonsCursorIDPage,
     type AxonListParams as AxonListParams,
     type AxonPublishParams as AxonPublishParams,
+    type AxonSubscribeSseParams as AxonSubscribeSseParams,
   };
 
   export {

@@ -1,6 +1,16 @@
+import { APIPromise, type APIResponseProps } from '../../src/core';
 import { APIError } from '../../src/error';
 import { withStreamAutoReconnect } from '../../src/lib/streaming-reconnection';
 import { Stream } from '../../src/streaming';
+
+function streamToAPIPromise<Item>(stream: Stream<Item>): APIPromise<Stream<Item>> {
+  const props = {
+    response: new Response(null, { status: 200 }),
+    options: { method: 'get', path: '/test', stream: true } as any,
+    controller: stream.controller,
+  } as unknown as APIResponseProps;
+  return new APIPromise(Promise.resolve(props), () => stream);
+}
 
 type SampleItem = { offset: number; value: string };
 type FailureTrigger = { offset: number; error?: unknown };
@@ -18,7 +28,7 @@ function findStartIndex(items: SampleItem[], offset: number | undefined): number
 function createStreamFactory(
   items: SampleItem[],
   options: { failures?: FailureTrigger[] } = {},
-): (offset: number | undefined) => Promise<Stream<SampleItem>> {
+): (offset: number | undefined) => APIPromise<Stream<SampleItem>> {
   const encoder = new TextEncoder();
   const triggers = [...(options.failures ?? [])];
 
@@ -31,7 +41,7 @@ function createStreamFactory(
     return triggers.splice(index, 1)[0];
   };
 
-  return async (offset: number | undefined) => {
+  return (offset: number | undefined) => {
     const abortController = new AbortController();
     let cursor = findStartIndex(items, offset);
     let lastDeliveredOffset = offset ?? 0;
@@ -61,7 +71,7 @@ function createStreamFactory(
       },
     });
 
-    return Stream.fromReadableStream(readable, abortController);
+    return streamToAPIPromise(Stream.fromReadableStream(readable, abortController));
   };
 }
 
@@ -90,7 +100,7 @@ describe('withStreamAutoReconnect', () => {
     let creatorCalls = 0;
 
     const stream = await withStreamAutoReconnect<SampleItem>(
-      async (offset) => {
+      (offset) => {
         const resumeOffset = offset ?? 0;
         offsets.push(resumeOffset);
         creatorCalls += 1;
@@ -118,7 +128,7 @@ describe('withStreamAutoReconnect', () => {
     let creatorCalls = 0;
 
     const stream = await withStreamAutoReconnect<SampleItem>(
-      async (offset) => {
+      (offset) => {
         const resumeOffset = offset ?? 0;
         offsets.push(resumeOffset);
         creatorCalls += 1;
@@ -146,7 +156,7 @@ describe('withStreamAutoReconnect', () => {
     let creatorCalls = 0;
 
     const stream = await withStreamAutoReconnect<SampleItem>(
-      async (offset) => {
+      (offset) => {
         const resumeOffset = offset ?? 0;
         offsets.push(resumeOffset);
         creatorCalls += 1;
@@ -178,7 +188,7 @@ describe('withStreamAutoReconnect', () => {
     let creatorCalls = 0;
 
     const stream = await withStreamAutoReconnect<SampleItem>(
-      async (offset) => {
+      (offset) => {
         const resumeOffset = offset ?? 0;
         offsets.push(resumeOffset);
         creatorCalls += 1;
@@ -214,7 +224,7 @@ describe('withStreamAutoReconnect', () => {
     const offsets: number[] = [];
 
     const stream = await withStreamAutoReconnect<SampleItem>(
-      async (offset) => {
+      (offset) => {
         const resumeOffset = offset ?? 0;
         offsets.push(resumeOffset);
         creatorCalls += 1;
@@ -227,7 +237,7 @@ describe('withStreamAutoReconnect', () => {
             abortController.abort();
           },
         });
-        return Stream.fromReadableStream(readable, abortController);
+        return streamToAPIPromise(Stream.fromReadableStream(readable, abortController));
       },
       (item) => item.offset,
     );

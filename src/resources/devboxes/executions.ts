@@ -184,9 +184,7 @@ export class Executions extends APIResource {
         ...mergedOptions,
         stream: true,
       });
-    return withStreamAutoReconnect(getStream, (item) => item.offset) as APIPromise<
-      Stream<ExecutionUpdateChunk>
-    >;
+    return withStreamAutoReconnect(getStream, (item) => item.offset);
   }
 
   /**
@@ -211,9 +209,7 @@ export class Executions extends APIResource {
         ...mergedOptions,
         stream: true,
       });
-    return withStreamAutoReconnect(getStream, (item) => item.offset) as APIPromise<
-      Stream<ExecutionUpdateChunk>
-    >;
+    return withStreamAutoReconnect(getStream, (item) => item.offset);
   }
 }
 
