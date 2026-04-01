@@ -1,6 +1,7 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 export {
+  AxonViewsAxonsCursorIDPage,
   Axons,
   type AxonCreateParams,
   type AxonEventView,
@@ -8,6 +9,7 @@ export {
   type AxonView,
   type PublishParams,
   type PublishResultView,
+  type AxonListParams,
   type AxonPublishParams,
 } from './axons';
 export {

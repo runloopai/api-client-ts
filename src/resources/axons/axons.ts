@@ -17,6 +17,7 @@ import {
   SqlStepErrorView,
   SqlStepResultView,
 } from './sql';
+import { AxonsCursorIDPage, type AxonsCursorIDPageParams } from '../../pagination';
 import { Stream } from '../../streaming';
 
 export class Axons extends APIResource {
@@ -47,8 +48,19 @@ export class Axons extends APIResource {
   /**
    * [Beta] List all active axons.
    */
-  list(options?: Core.RequestOptions): Core.APIPromise<AxonListView> {
-    return this._client.get('/v1/axons', options);
+  list(
+    query?: AxonListParams,
+    options?: Core.RequestOptions,
+  ): Core.PagePromise<AxonViewsAxonsCursorIDPage, AxonView>;
+  list(options?: Core.RequestOptions): Core.PagePromise<AxonViewsAxonsCursorIDPage, AxonView>;
+  list(
+    query: AxonListParams | Core.RequestOptions = {},
+    options?: Core.RequestOptions,
+  ): Core.PagePromise<AxonViewsAxonsCursorIDPage, AxonView> {
+    if (isRequestOptions(query)) {
+      return this.list({}, query);
+    }
+    return this._client.getAPIList('/v1/axons', AxonViewsAxonsCursorIDPage, { query, ...options });
   }
 
   /**
@@ -79,6 +91,8 @@ export class Axons extends APIResource {
     }) as APIPromise<Stream<AxonEventView>>;
   }
 }
+
+export class AxonViewsAxonsCursorIDPage extends AxonsCursorIDPage<AxonView> {}
 
 export interface AxonCreateParams {
   /**
@@ -129,6 +143,10 @@ export interface AxonListView {
    * List of active axons.
    */
   axons: Array<AxonView>;
+
+  has_more: boolean;
+
+  total_count?: number | null;
 }
 
 export interface AxonView {
@@ -189,6 +207,24 @@ export interface AxonCreateParams {
   name?: string | null;
 }
 
+export interface AxonListParams extends AxonsCursorIDPageParams {
+  /**
+   * Filter by axon ID.
+   */
+  id?: string;
+
+  /**
+   * If true (default), includes total_count in the response. Set to false to skip
+   * the count query for better performance on large datasets.
+   */
+  include_total_count?: boolean;
+
+  /**
+   * Filter by axon name (prefix match supported).
+   */
+  name?: string;
+}
+
 export interface AxonPublishParams {
   /**
    * The event type (e.g. push, pull_request).
@@ -211,6 +247,7 @@ export interface AxonPublishParams {
   source: string;
 }
 
+Axons.AxonViewsAxonsCursorIDPage = AxonViewsAxonsCursorIDPage;
 Axons.Sql = Sql;
 
 export declare namespace Axons {
@@ -221,6 +258,8 @@ export declare namespace Axons {
     type AxonView as AxonView,
     type PublishParams as PublishParams,
     type PublishResultView as PublishResultView,
+    AxonViewsAxonsCursorIDPage as AxonViewsAxonsCursorIDPage,
+    type AxonListParams as AxonListParams,
     type AxonPublishParams as AxonPublishParams,
   };
 

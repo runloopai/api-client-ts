@@ -25,7 +25,7 @@ import type {
 import type { BlueprintListParams } from './resources/blueprints';
 import type { ObjectCreateParams, ObjectListParams } from './resources/objects';
 import type { AgentCreateParams, AgentListParams } from './resources/agents';
-import type { AxonCreateParams } from './resources/axons';
+import type { AxonCreateParams, AxonListParams } from './resources/axons/axons';
 import type { ScorerCreateParams, ScorerListParams } from './resources/scenarios/scorers';
 import type { NetworkPolicyCreateParams, NetworkPolicyListParams } from './resources/network-policies';
 import type { GatewayConfigCreateParams, GatewayConfigListParams } from './resources/gateway-configs';
@@ -1565,12 +1565,24 @@ export class AxonOps {
   /**
    * [Beta] List all active axons.
    *
+   * @example
+   * ```typescript
+   * const runloop = new RunloopSDK();
+   * const axons = await runloop.axon.list({ limit: 10 });
+   * console.log(axons.map((a) => a.id));
+   * ```
+   *
+   * @param {AxonListParams} [params] - Optional filter/pagination parameters.
    * @param {Core.RequestOptions} [options] - Request options.
    * @returns {Promise<Axon[]>} An array of {@link Axon} instances.
    */
-  async list(options?: Core.RequestOptions): Promise<Axon[]> {
-    const result = await this.client.axons.list(options);
-    return result.axons.map((axon) => Axon.fromId(this.client, axon.id));
+  async list(params?: AxonListParams, options?: Core.RequestOptions): Promise<Axon[]> {
+    const result = await this.client.axons.list(params, options);
+    const axons: Axon[] = [];
+    for await (const axon of result) {
+      axons.push(Axon.fromId(this.client, axon.id));
+    }
+    return axons;
   }
 }
 

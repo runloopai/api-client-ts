@@ -11,6 +11,7 @@ export {
   type AgentListParams,
 } from './agents';
 export {
+  AxonViewsAxonsCursorIDPage,
   Axons,
   type AxonCreateParams,
   type AxonEventView,
@@ -18,6 +19,7 @@ export {
   type AxonView,
   type PublishParams,
   type PublishResultView,
+  type AxonListParams,
   type AxonPublishParams,
 } from './axons/axons';
 export {
@@ -159,22 +161,6 @@ export {
   type ObjectDownloadParams,
   type ObjectListPublicParams,
 } from './objects';
-export {
-  RepositoryConnectionViewsRepositoriesCursorIDPage,
-  Repositories,
-  type RepositoryConnectionListView,
-  type RepositoryConnectionView,
-  type RepositoryInspectionDetails,
-  type RepositoryInspectionListView,
-  type RepositoryManifestView,
-  type RepositoryDeleteResponse,
-  type RepositoryRefreshResponse,
-  type RepositoryCreateParams,
-  type RepositoryListParams,
-  type RepositoryDeleteParams,
-  type RepositoryInspectParams,
-  type RepositoryRefreshParams,
-} from './repositories';
 export {
   ScenarioRunViewsBenchmarkRunsCursorIDPage,
   ScenarioViewsScenariosCursorIDPage,
