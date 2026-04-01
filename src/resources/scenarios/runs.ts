@@ -6,7 +6,7 @@ import * as Core from '../../core';
 import * as ScenariosAPI from './scenarios';
 import { ScenarioRunViewsBenchmarkRunsCursorIDPage } from './scenarios';
 import { type BenchmarkRunsCursorIDPageParams } from '../../pagination';
-import { LongPollRequestOptions, poll } from '@runloop/api-client/lib/polling';
+import { LongPollRequestOptions, poll, resolveLongPollTimeoutMs } from '@runloop/api-client/lib/polling';
 import { RunloopError } from '../..';
 import { type Response } from '../../_shims/index';
 
@@ -84,6 +84,7 @@ export class Runs extends APIResource {
     id: string,
     options?: LongPollRequestOptions<ScenariosAPI.ScenarioRunView>,
   ): Promise<ScenariosAPI.ScenarioRunView> {
+    const pollTimeoutMs = resolveLongPollTimeoutMs(options);
     const { longPoll: _lp, polling, signal, ...requestOptions } = options ?? {};
     const finalResult = await poll(
       () => this.retrieve(id, requestOptions),
@@ -91,6 +92,7 @@ export class Runs extends APIResource {
       {
         ...polling,
         signal,
+        ...(pollTimeoutMs !== undefined ? { timeoutMs: pollTimeoutMs } : {}),
         shouldStop: (result) => {
           return result.state !== 'scoring';
         },

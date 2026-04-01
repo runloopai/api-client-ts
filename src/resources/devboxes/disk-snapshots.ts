@@ -6,7 +6,7 @@ import * as Core from '../../core';
 import * as DevboxesAPI from './devboxes';
 import { DevboxSnapshotViewsDiskSnapshotsCursorIDPage } from './devboxes';
 import { type DiskSnapshotsCursorIDPageParams } from '../../pagination';
-import { LongPollRequestOptions, poll } from '../../lib/polling';
+import { LongPollRequestOptions, poll, resolveLongPollTimeoutMs } from '../../lib/polling';
 
 export class DiskSnapshots extends APIResource {
   /**
@@ -81,6 +81,7 @@ export class DiskSnapshots extends APIResource {
     id: string,
     options?: LongPollRequestOptions<DevboxSnapshotAsyncStatusView>,
   ): Promise<DevboxSnapshotAsyncStatusView> {
+    const pollTimeoutMs = resolveLongPollTimeoutMs(options);
     const { longPoll: _lp, polling, signal, ...requestOptions } = options ?? {};
     const finalResult = await poll(
       () => this.queryStatus(id, requestOptions),
@@ -88,6 +89,7 @@ export class DiskSnapshots extends APIResource {
       {
         ...polling,
         signal,
+        ...(pollTimeoutMs !== undefined ? { timeoutMs: pollTimeoutMs } : {}),
         shouldStop: (result) => {
           return result.status === 'complete' || result.status === 'error';
         },

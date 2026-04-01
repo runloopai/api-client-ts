@@ -88,14 +88,24 @@ export class Axons extends APIResource {
         ...options?.headers,
       },
     };
+    const { query: userQuery, ...restMerged } = mergedOptions;
     const getStream: (afterSequence: number | undefined) => APIPromise<Stream<AxonEventView>> = (
       afterSequence,
-    ) =>
-      this._client.get(`/v1/axons/${id}/subscribe/sse`, {
-        query: afterSequence !== undefined ? { after_sequence: afterSequence.toString() } : undefined,
-        ...mergedOptions,
+    ) => {
+      const base =
+        userQuery && typeof userQuery === 'object' && !Array.isArray(userQuery) ?
+          { ...(userQuery as Record<string, string | undefined>) }
+        : {};
+      const query =
+        afterSequence !== undefined ? { ...base, after_sequence: afterSequence.toString() }
+        : Object.keys(base).length > 0 ? base
+        : undefined;
+      return this._client.get(`/v1/axons/${id}/subscribe/sse`, {
+        ...restMerged,
+        ...(query ? { query } : {}),
         stream: true,
       }) as APIPromise<Stream<AxonEventView>>;
+    };
     return withStreamAutoReconnect(getStream, (item) => item.sequence);
   }
 }

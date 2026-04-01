@@ -6,7 +6,7 @@ import * as Core from '../core';
 import * as Shared from './shared';
 import { BlueprintsCursorIDPage, type BlueprintsCursorIDPageParams } from '../pagination';
 import { RunloopError } from '../error';
-import { LongPollRequestOptions, poll } from '../lib/polling';
+import { LongPollRequestOptions, poll, resolveLongPollTimeoutMs } from '../lib/polling';
 import { FILE_MOUNT_MAX_SIZE_BYTES, FILE_MOUNT_TOTAL_MAX_SIZE_BYTES } from '../lib/constants';
 
 function formatBytes(numBytes: number): string {
@@ -103,6 +103,7 @@ export class Blueprints extends APIResource {
     id: string,
     options?: LongPollRequestOptions<BlueprintView>,
   ): Promise<BlueprintView> {
+    const pollTimeoutMs = resolveLongPollTimeoutMs(options);
     const { longPoll: _lp, polling, signal, ...requestOptions } = options ?? {};
     const finalResult = await poll(
       () => this.retrieve(id, requestOptions),
@@ -110,6 +111,7 @@ export class Blueprints extends APIResource {
       {
         ...polling,
         signal,
+        ...(pollTimeoutMs !== undefined ? { timeoutMs: pollTimeoutMs } : {}),
         shouldStop: (result) => {
           return !['queued', 'provisioning', 'building'].includes(result.status);
         },
@@ -132,9 +134,9 @@ export class Blueprints extends APIResource {
     body: BlueprintCreateParams,
     options?: LongPollRequestOptions<BlueprintView>,
   ): Promise<BlueprintView> {
-    const { longPoll, polling, signal, ...requestOptions } = options ?? {};
+    const { longPoll, polling, ...requestOptions } = options ?? {};
     const blueprint = await this.create(body, requestOptions);
-    return this.awaitBuildComplete(blueprint.id, { ...requestOptions, longPoll, polling, signal });
+    return this.awaitBuildComplete(blueprint.id, { ...requestOptions, longPoll, polling });
   }
 
   /**

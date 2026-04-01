@@ -178,12 +178,18 @@ export class Executions extends APIResource {
       headers: defaultHeaders,
       ...options,
     };
-    const getStream: (offset: number | undefined) => APIPromise<Stream<ExecutionUpdateChunk>> = (offset) =>
-      this._client.get(`/v1/devboxes/${devboxId}/executions/${executionId}/stream_stderr_updates`, {
-        query: { ...query, offset: offset?.toString() || '0' },
+    const parsedInitialOffset =
+      query.offset !== undefined && query.offset !== '' && !Number.isNaN(Number(query.offset)) ?
+        Number(query.offset)
+      : undefined;
+    const getStream: (offset: number | undefined) => APIPromise<Stream<ExecutionUpdateChunk>> = (offset) => {
+      const n = offset ?? parsedInitialOffset ?? 0;
+      return this._client.get(`/v1/devboxes/${devboxId}/executions/${executionId}/stream_stderr_updates`, {
+        query: { ...query, offset: String(n) },
         ...mergedOptions,
         stream: true,
       });
+    };
     return withStreamAutoReconnect(getStream, (item) => item.offset);
   }
 
@@ -203,12 +209,18 @@ export class Executions extends APIResource {
       headers: defaultHeaders,
       ...options,
     };
-    const getStream: (offset: number | undefined) => APIPromise<Stream<ExecutionUpdateChunk>> = (offset) =>
-      this._client.get(`/v1/devboxes/${devboxId}/executions/${executionId}/stream_stdout_updates`, {
-        query: { ...query, offset: offset?.toString() || '0' },
+    const parsedInitialOffset =
+      query.offset !== undefined && query.offset !== '' && !Number.isNaN(Number(query.offset)) ?
+        Number(query.offset)
+      : undefined;
+    const getStream: (offset: number | undefined) => APIPromise<Stream<ExecutionUpdateChunk>> = (offset) => {
+      const n = offset ?? parsedInitialOffset ?? 0;
+      return this._client.get(`/v1/devboxes/${devboxId}/executions/${executionId}/stream_stdout_updates`, {
+        query: { ...query, offset: String(n) },
         ...mergedOptions,
         stream: true,
       });
+    };
     return withStreamAutoReconnect(getStream, (item) => item.offset);
   }
 }

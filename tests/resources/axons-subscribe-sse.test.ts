@@ -105,6 +105,47 @@ describe('Axons.subscribeSse query (after_sequence)', () => {
     expect(received.map((e) => e.sequence)).toEqual([7, 8]);
   });
 
+  test('merges options.query with after_sequence on reconnect (after_sequence wins)', async () => {
+    const timeout = new APIError(408, { code: '408', message: 'idle' }, 'idle', undefined);
+    const encoder = new TextEncoder();
+    let first = true;
+    mockGet.mockImplementation((_path: string, opts: { query?: Record<string, string> }) => {
+      if (first) {
+        first = false;
+        let pullCount = 0;
+        const body1 = new ReadableStream<Uint8Array>({
+          pull(c) {
+            pullCount += 1;
+            if (pullCount === 1) {
+              c.enqueue(encoder.encode(`data: ${eventJson(3)}\n\n`));
+            } else {
+              c.error(timeout);
+            }
+          },
+        });
+        expect(opts.query).toEqual({ filter: 'x' });
+        return sseAPIPromiseForResponse(
+          new Response(body1, { headers: { 'content-type': 'text/event-stream' } }),
+          '/v1/axons/axn_q/subscribe/sse',
+        );
+      }
+      expect(opts.query).toEqual({ filter: 'x', after_sequence: '3' });
+      return sseAPIPromiseForResponse(
+        new Response(`data: ${eventJson(4)}\n\n`, {
+          headers: { 'content-type': 'text/event-stream' },
+        }),
+        '/v1/axons/axn_q/subscribe/sse',
+      );
+    });
+
+    const stream = await axons.subscribeSse('axn_q', { query: { filter: 'x' } });
+    const received: AxonEventView[] = [];
+    for await (const ev of stream) {
+      received.push(ev);
+    }
+    expect(received.map((e) => e.sequence)).toEqual([3, 4]);
+  });
+
   test('merges custom headers with Accept text/event-stream', async () => {
     mockGet.mockReturnValue(
       sseAPIPromiseForResponse(
