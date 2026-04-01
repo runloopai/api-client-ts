@@ -2,7 +2,7 @@ import { Runloop } from '../index';
 import type * as Core from '../core';
 import type { ScenarioRunView, ScoringContractResultView } from '../resources/scenarios/scenarios';
 import type { DevboxView } from '../resources/devboxes/devboxes';
-import { PollingOptions } from '../lib/polling';
+import { LongPollRequestOptions } from '../lib/polling';
 import { Devbox } from './devbox';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -138,11 +138,10 @@ export class ScenarioRun {
    * @param {Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxView>> }} [options] - Request options with optional polling configuration
    * @returns {Promise<ScenarioRunView>} The scenario run data after environment is ready
    */
-  async awaitEnvReady(
-    options?: Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxView>> },
-  ): Promise<ScenarioRunView> {
-    await this.client.devboxes.awaitRunning(this._devboxId, options);
-    return this.getInfo(options);
+  async awaitEnvReady(options?: LongPollRequestOptions<DevboxView>): Promise<ScenarioRunView> {
+    const { longPoll, polling, signal, ...requestOptions } = options ?? {};
+    await this.client.devboxes.awaitRunning(this._devboxId, { ...requestOptions, longPoll, polling, signal });
+    return this.getInfo(requestOptions);
   }
 
   /**
@@ -182,9 +181,7 @@ export class ScenarioRun {
    * @param {Core.RequestOptions & { polling?: Partial<PollingOptions<ScenarioRunView>> }} [options] - Request options with optional polling configuration
    * @returns {Promise<ScenarioRunView>} The scored scenario run data
    */
-  async awaitScored(
-    options?: Core.RequestOptions & { polling?: Partial<PollingOptions<ScenarioRunView>> },
-  ): Promise<ScenarioRunView> {
+  async awaitScored(options?: LongPollRequestOptions<ScenarioRunView>): Promise<ScenarioRunView> {
     return this.client.scenarios.runs.awaitScored(this._id, options);
   }
 
@@ -203,9 +200,7 @@ export class ScenarioRun {
    * @param {Core.RequestOptions & { polling?: Partial<PollingOptions<ScenarioRunView>> }} [options] - Request options with optional polling configuration
    * @returns {Promise<ScenarioRunView>} The scored scenario run data
    */
-  async scoreAndAwait(
-    options?: Core.RequestOptions & { polling?: Partial<PollingOptions<ScenarioRunView>> },
-  ): Promise<ScenarioRunView> {
+  async scoreAndAwait(options?: LongPollRequestOptions<ScenarioRunView>): Promise<ScenarioRunView> {
     return this.client.scenarios.runs.scoreAndAwait(this._id, options);
   }
 
@@ -227,9 +222,7 @@ export class ScenarioRun {
    * @param {Core.RequestOptions & { polling?: Partial<PollingOptions<ScenarioRunView>> }} [options] - Request options with optional polling configuration
    * @returns {Promise<ScenarioRunView>} The completed scenario run data with scoring results
    */
-  async scoreAndComplete(
-    options?: Core.RequestOptions & { polling?: Partial<PollingOptions<ScenarioRunView>> },
-  ): Promise<ScenarioRunView> {
+  async scoreAndComplete(options?: LongPollRequestOptions<ScenarioRunView>): Promise<ScenarioRunView> {
     return this.client.scenarios.runs.scoreAndComplete(this._id, options);
   }
 

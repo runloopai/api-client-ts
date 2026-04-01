@@ -1,4 +1,10 @@
-import { poll, longPollUntil, PollingTimeoutError, MaxAttemptsExceededError, LongPollAbortError } from '../src/lib/polling';
+import {
+  poll,
+  longPollUntil,
+  PollingTimeoutError,
+  MaxAttemptsExceededError,
+  LongPollAbortError,
+} from '../src/lib/polling';
 import { APIError } from '../src/error';
 
 describe('Polling', () => {
@@ -341,6 +347,45 @@ describe('Polling', () => {
       // it's still polling by checking that pollingRequest was called
       expect(pollingRequest).toHaveBeenCalled();
       expect(initialRequest).toHaveBeenCalledTimes(1);
+    });
+
+    test('should throw LongPollAbortError when signal is aborted before polling', async () => {
+      jest.useRealTimers();
+      const controller = new AbortController();
+      controller.abort();
+      const initialRequest = jest.fn();
+      const pollingRequest = jest.fn();
+
+      await expect(
+        poll(initialRequest, pollingRequest, {
+          shouldStop: () => false,
+          signal: controller.signal,
+        }),
+      ).rejects.toThrow(LongPollAbortError);
+      expect(initialRequest).not.toHaveBeenCalled();
+      jest.useFakeTimers();
+    });
+
+    test('should throw LongPollAbortError when signal is aborted between polls', async () => {
+      jest.useRealTimers();
+      const controller = new AbortController();
+      const mockResult = { status: 'provisioning', id: 'test-id' };
+      const initialRequest = jest.fn().mockResolvedValue(mockResult);
+      const pollingRequest = jest.fn().mockImplementation(async () => {
+        controller.abort();
+        return mockResult;
+      });
+
+      await expect(
+        poll(initialRequest, pollingRequest, {
+          shouldStop: () => false,
+          signal: controller.signal,
+          maxAttempts: 5,
+          initialDelayMs: 0,
+          pollingIntervalMs: 0,
+        }),
+      ).rejects.toThrow(LongPollAbortError);
+      jest.useFakeTimers();
     });
   });
 
