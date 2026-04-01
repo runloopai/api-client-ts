@@ -111,7 +111,6 @@ describe('smoketest: built package import', () => {
       expect(RunloopAPI.Agents).toBeDefined();
       expect(RunloopAPI.Benchmarks).toBeDefined();
       expect(RunloopAPI.Scenarios).toBeDefined();
-      expect(RunloopAPI.Repositories).toBeDefined();
     });
 
     test('should allow creating new types based on execution.result() return type', () => {

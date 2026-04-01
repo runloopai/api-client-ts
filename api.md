@@ -331,29 +331,6 @@ Methods:
 - <code title="get /v1/objects/{id}/download">client.objects.<a href="./src/resources/objects.ts">download</a>(id, { ...params }) -> ObjectDownloadURLView</code>
 - <code title="get /v1/objects/list_public">client.objects.<a href="./src/resources/objects.ts">listPublic</a>({ ...params }) -> ObjectViewsObjectsCursorIDPage</code>
 
-# Repositories
-
-Types:
-
-- <code><a href="./src/resources/repositories.ts">RepositoryConnectionListView</a></code>
-- <code><a href="./src/resources/repositories.ts">RepositoryConnectionView</a></code>
-- <code><a href="./src/resources/repositories.ts">RepositoryInspectionDetails</a></code>
-- <code><a href="./src/resources/repositories.ts">RepositoryInspectionListView</a></code>
-- <code><a href="./src/resources/repositories.ts">RepositoryManifestView</a></code>
-- <code><a href="./src/resources/repositories.ts">RepositoryDeleteResponse</a></code>
-- <code><a href="./src/resources/repositories.ts">RepositoryRefreshResponse</a></code>
-
-Methods:
-
-- <code title="post /v1/repositories">client.repositories.<a href="./src/resources/repositories.ts">create</a>({ ...params }) -> RepositoryConnectionView</code>
-- <code title="get /v1/repositories/{id}">client.repositories.<a href="./src/resources/repositories.ts">retrieve</a>(id) -> RepositoryConnectionView</code>
-- <code title="get /v1/repositories">client.repositories.<a href="./src/resources/repositories.ts">list</a>({ ...params }) -> RepositoryConnectionViewsRepositoriesCursorIDPage</code>
-- <code title="post /v1/repositories/{id}/delete">client.repositories.<a href="./src/resources/repositories.ts">delete</a>(id) -> unknown</code>
-- <code title="post /v1/repositories/{id}/inspect">client.repositories.<a href="./src/resources/repositories.ts">inspect</a>(id, { ...params }) -> RepositoryInspectionDetails</code>
-- <code title="get /v1/repositories/{id}/inspections">client.repositories.<a href="./src/resources/repositories.ts">listInspections</a>(id) -> RepositoryInspectionListView</code>
-- <code title="post /v1/repositories/{id}/refresh">client.repositories.<a href="./src/resources/repositories.ts">refresh</a>(id, { ...params }) -> unknown</code>
-- <code title="get /v1/repositories/inspections/{id}">client.repositories.<a href="./src/resources/repositories.ts">retrieveInspection</a>(id) -> RepositoryInspectionDetails</code>
-
 # Secrets
 
 Types:
