@@ -1,5 +1,37 @@
 # Changelog
 
+## 1.15.0 (2026-04-01)
+
+Full Changelog: [v1.14.1...v1.15.0](https://github.com/runloopai/api-client-ts/compare/v1.14.1...v1.15.0)
+
+### Features
+
+* add archive / unarchive to benchmarks ([#8391](https://github.com/runloopai/api-client-ts/issues/8391)) ([834bc32](https://github.com/runloopai/api-client-ts/commit/834bc32babefa622451b31bb25a559806fe5a96a))
+* Add axon list filters by id and name ([#8384](https://github.com/runloopai/api-client-ts/issues/8384)) ([4325b97](https://github.com/runloopai/api-client-ts/commit/4325b974e446b5a85e01afbe6a0bd1c62d71e4cf))
+* Add pagination to list active axons ([#8359](https://github.com/runloopai/api-client-ts/issues/8359)) ([5bc0c7d](https://github.com/runloopai/api-client-ts/commit/5bc0c7d5569d3e521c9497686b447d8575e995d2))
+* **sdk:** add `AxonListParams` support and auto-pagination to `AxonOps.list()` ([#763](https://github.com/runloopai/api-client-ts/issues/763)) ([857ab06](https://github.com/runloopai/api-client-ts/commit/857ab06eb3055d5655e0abaa7f79c8a2a9101791))
+* **sdk:** add `ScenarioBuilder` class to OO-SDK ([#748](https://github.com/runloopai/api-client-ts/issues/748)) ([f80ed4c](https://github.com/runloopai/api-client-ts/commit/f80ed4c30c8e4c3998460a6f12bd862f7f9d96ac))
+
+
+### Bug Fixes
+
+* **api:** surface scenario setup failures instead of silently dropping them ([#8300](https://github.com/runloopai/api-client-ts/issues/8300)) ([ae6b11b](https://github.com/runloopai/api-client-ts/commit/ae6b11b8d45efcb6535407bb830605acc5d14da0))
+
+
+### Chores
+
+* **axon:** add axon auto-pagination to stainless sdks ([#8420](https://github.com/runloopai/api-client-ts/issues/8420)) ([28acb74](https://github.com/runloopai/api-client-ts/commit/28acb748e4e198e83d300952eeffe1b96d68c8c4))
+* Hide repository connection APIs from public OpenAPI spec ([#8462](https://github.com/runloopai/api-client-ts/issues/8462)) ([4f0b53f](https://github.com/runloopai/api-client-ts/commit/4f0b53f9d35b28ac8d5386bc05467d7dcfbb70c5))
+* **internal:** update multipart form array serialization ([56437dc](https://github.com/runloopai/api-client-ts/commit/56437dc1b0d8e44607412c96b9be81d4f9a9f1a8))
+* **smoketests:** migrate deprecated polling to longPoll for devbox await methods ([#764](https://github.com/runloopai/api-client-ts/issues/764)) ([e5d866c](https://github.com/runloopai/api-client-ts/commit/e5d866cfd615baccb513193bf14b383a5d16abe4))
+* **tests:** bump steady to v0.20.1 ([a001475](https://github.com/runloopai/api-client-ts/commit/a00147563782a9389b4b9c6b18cb747f7a10b5b9))
+* **tests:** bump steady to v0.20.2 ([c5abc92](https://github.com/runloopai/api-client-ts/commit/c5abc92b4c1de24347d3e91aaefdf4138e2afba8))
+
+
+### Documentation
+
+* **api:** document vCPU, RAM, and disk for resource_size_request ([#8368](https://github.com/runloopai/api-client-ts/issues/8368)) ([0ddaf44](https://github.com/runloopai/api-client-ts/commit/0ddaf443f8669830b9d33d2e1dd551e31a08050a))
+
 ## 1.14.1 (2026-03-25)
 
 Full Changelog: [v1.14.0...v1.14.1](https://github.com/runloopai/api-client-ts/compare/v1.14.0...v1.14.1)
