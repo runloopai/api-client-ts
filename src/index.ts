@@ -27,8 +27,6 @@ import {
   NetworkPoliciesCursorIDPageResponse,
   type ObjectsCursorIDPageParams,
   ObjectsCursorIDPageResponse,
-  type RepositoriesCursorIDPageParams,
-  RepositoriesCursorIDPageResponse,
   type ScenarioRunsCursorIDPageParams,
   ScenarioRunsCursorIDPageResponse,
   type ScenarioScorersCursorIDPageParams,
@@ -148,22 +146,6 @@ import {
   ObjectViewsObjectsCursorIDPage,
   Objects,
 } from './resources/objects';
-import {
-  Repositories,
-  RepositoryConnectionListView,
-  RepositoryConnectionView,
-  RepositoryConnectionViewsRepositoriesCursorIDPage,
-  RepositoryCreateParams,
-  RepositoryDeleteParams,
-  RepositoryDeleteResponse,
-  RepositoryInspectParams,
-  RepositoryInspectionDetails,
-  RepositoryInspectionListView,
-  RepositoryListParams,
-  RepositoryManifestView,
-  RepositoryRefreshParams,
-  RepositoryRefreshResponse,
-} from './resources/repositories';
 import {
   SecretCreateParameters,
   SecretCreateParams,
@@ -375,7 +357,6 @@ export class Runloop extends Core.APIClient {
   devboxes: API.Devboxes = new API.Devboxes(this);
   scenarios: API.Scenarios = new API.Scenarios(this);
   objects: API.Objects = new API.Objects(this);
-  repositories: API.Repositories = new API.Repositories(this);
   secrets: API.Secrets = new API.Secrets(this);
   networkPolicies: API.NetworkPolicies = new API.NetworkPolicies(this);
   gatewayConfigs: API.GatewayConfigs = new API.GatewayConfigs(this);
@@ -442,8 +423,6 @@ Runloop.Scenarios = Scenarios;
 Runloop.ScenarioViewsScenariosCursorIDPage = ScenarioViewsScenariosCursorIDPage;
 Runloop.Objects = Objects;
 Runloop.ObjectViewsObjectsCursorIDPage = ObjectViewsObjectsCursorIDPage;
-Runloop.Repositories = Repositories;
-Runloop.RepositoryConnectionViewsRepositoriesCursorIDPage = RepositoryConnectionViewsRepositoriesCursorIDPage;
 Runloop.Secrets = Secrets;
 Runloop.NetworkPolicies = NetworkPolicies;
 Runloop.NetworkPolicyViewsNetworkPoliciesCursorIDPage = NetworkPolicyViewsNetworkPoliciesCursorIDPage;
@@ -465,12 +444,6 @@ export declare namespace Runloop {
   export {
     type DevboxesCursorIDPageParams as DevboxesCursorIDPageParams,
     type DevboxesCursorIDPageResponse as DevboxesCursorIDPageResponse,
-  };
-
-  export import RepositoriesCursorIDPage = Pagination.RepositoriesCursorIDPage;
-  export {
-    type RepositoriesCursorIDPageParams as RepositoriesCursorIDPageParams,
-    type RepositoriesCursorIDPageResponse as RepositoriesCursorIDPageResponse,
   };
 
   export import DiskSnapshotsCursorIDPage = Pagination.DiskSnapshotsCursorIDPage;
@@ -699,23 +672,6 @@ export declare namespace Runloop {
     type ObjectCompleteParams as ObjectCompleteParams,
     type ObjectDownloadParams as ObjectDownloadParams,
     type ObjectListPublicParams as ObjectListPublicParams,
-  };
-
-  export {
-    Repositories as Repositories,
-    type RepositoryConnectionListView as RepositoryConnectionListView,
-    type RepositoryConnectionView as RepositoryConnectionView,
-    type RepositoryInspectionDetails as RepositoryInspectionDetails,
-    type RepositoryInspectionListView as RepositoryInspectionListView,
-    type RepositoryManifestView as RepositoryManifestView,
-    type RepositoryDeleteResponse as RepositoryDeleteResponse,
-    type RepositoryRefreshResponse as RepositoryRefreshResponse,
-    RepositoryConnectionViewsRepositoriesCursorIDPage as RepositoryConnectionViewsRepositoriesCursorIDPage,
-    type RepositoryCreateParams as RepositoryCreateParams,
-    type RepositoryListParams as RepositoryListParams,
-    type RepositoryDeleteParams as RepositoryDeleteParams,
-    type RepositoryInspectParams as RepositoryInspectParams,
-    type RepositoryRefreshParams as RepositoryRefreshParams,
   };
 
   export {
