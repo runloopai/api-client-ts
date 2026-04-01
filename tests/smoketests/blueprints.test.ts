@@ -44,7 +44,7 @@ describe('smoketest: blueprints', () => {
               launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 }, // 5 minutes
             },
             {
-              polling: { maxAttempts: 120, pollingIntervalMs: 5_000, timeoutMs: 20 * 60 * 1000 },
+              longPoll: { timeoutMs: 20 * 60 * 1000 },
             },
           );
           expect(devbox.blueprint_id).toBe(blueprintId);
@@ -68,7 +68,7 @@ describe('smoketest: blueprints', () => {
               launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 }, // 5 minutes
             },
             {
-              polling: { maxAttempts: 120, pollingIntervalMs: 5_000, timeoutMs: 20 * 60 * 1000 },
+              longPoll: { timeoutMs: 20 * 60 * 1000 },
             },
           );
           expect(devbox.blueprint_id).toBeTruthy();
