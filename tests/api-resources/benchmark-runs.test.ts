@@ -55,6 +55,7 @@ describe('resource benchmarkRuns', () => {
           limit: 0,
           name: 'name',
           starting_after: 'starting_after',
+          state: 'state',
         },
         { path: '/_stainless_unknown_path' },
       ),

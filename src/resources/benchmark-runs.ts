@@ -176,6 +176,11 @@ export interface BenchmarkRunListParams extends BenchmarkRunsCursorIDPageParams 
    * Filter by name
    */
   name?: string;
+
+  /**
+   * Filter by state
+   */
+  state?: string;
 }
 
 export interface BenchmarkRunListScenarioRunsParams extends BenchmarkRunsCursorIDPageParams {
