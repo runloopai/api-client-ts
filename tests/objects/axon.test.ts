@@ -162,7 +162,11 @@ describe('Axon', () => {
 
         const stream = await axon.subscribeSse();
 
-        expect(mockClient.axons.subscribeSse).toHaveBeenCalledWith('axn_123456789', undefined);
+        expect(mockClient.axons.subscribeSse).toHaveBeenCalledWith(
+          'axn_123456789',
+          undefined,
+          undefined,
+        );
         expect(stream).toBe(mockStream);
       });
 
@@ -170,9 +174,13 @@ describe('Axon', () => {
         const mockStream = { [Symbol.asyncIterator]: jest.fn() };
         mockClient.axons.subscribeSse.mockResolvedValue(mockStream);
 
-        await axon.subscribeSse({ timeout: 60000 });
+        await axon.subscribeSse(undefined, { timeout: 60000 });
 
-        expect(mockClient.axons.subscribeSse).toHaveBeenCalledWith('axn_123456789', { timeout: 60000 });
+        expect(mockClient.axons.subscribeSse).toHaveBeenCalledWith(
+          'axn_123456789',
+          undefined,
+          { timeout: 60000 },
+        );
       });
     });
 

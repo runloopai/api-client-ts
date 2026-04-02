@@ -80,7 +80,11 @@ export class Axons extends APIResource {
    * On idle timeout (408), reconnects with `after_sequence` derived from the last
    * received event (internal to {@link withStreamAutoReconnect}).
    */
-  subscribeSse(id: string, options?: Core.RequestOptions): APIPromise<Stream<AxonEventView>> {
+  subscribeSse(
+    id: string,
+    query?: AxonSubscribeSseParams,
+    options?: Core.RequestOptions,
+  ): APIPromise<Stream<AxonEventView>> {
     const mergedOptions: Core.RequestOptions = {
       ...options,
       headers: {
@@ -88,22 +92,17 @@ export class Axons extends APIResource {
         ...options?.headers,
       },
     };
-    const { query: userQuery, ...restMerged } = mergedOptions;
+    const { query: _ignoredOptionsQuery, ...restMerged } = mergedOptions;
+    const initialAfterSequence = query?.after_sequence;
     const getStream: (afterSequence: number | undefined) => APIPromise<Stream<AxonEventView>> = (
       afterSequence,
     ) => {
-      const base =
-        userQuery && typeof userQuery === 'object' && !Array.isArray(userQuery) ?
-          { ...(userQuery as Record<string, string | undefined>) }
-        : {};
-      const query =
-        afterSequence !== undefined ? { ...base, after_sequence: afterSequence.toString() }
-        : Object.keys(base).length > 0 ? base
-        : undefined;
+      const seq = afterSequence ?? initialAfterSequence;
+      const streamQuery = seq !== undefined ? { after_sequence: seq.toString() } : undefined;
       return this._client.get(`/v1/axons/${id}/subscribe/sse`, {
         ...restMerged,
-        ...(query ? { query } : {}),
         stream: true,
+        ...(streamQuery ? { query: streamQuery } : {}),
       }) as APIPromise<Stream<AxonEventView>>;
     };
     return withStreamAutoReconnect(getStream, (item) => item.sequence);
@@ -265,6 +264,14 @@ export interface AxonPublishParams {
   source: string;
 }
 
+export interface AxonSubscribeSseParams {
+  /**
+   * Sequence number after which to start streaming. Events with sequence > this
+   * value are returned. If unset, replay from the beginning.
+   */
+  after_sequence?: number;
+}
+
 Axons.AxonViewsAxonsCursorIDPage = AxonViewsAxonsCursorIDPage;
 Axons.Sql = Sql;
 
@@ -279,6 +286,7 @@ export declare namespace Axons {
     AxonViewsAxonsCursorIDPage as AxonViewsAxonsCursorIDPage,
     type AxonListParams as AxonListParams,
     type AxonPublishParams as AxonPublishParams,
+    type AxonSubscribeSseParams as AxonSubscribeSseParams,
   };
 
   export {

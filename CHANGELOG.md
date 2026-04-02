@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.16.2 (2026-04-02)
+
+Full Changelog: [v1.16.1...v1.16.2](https://github.com/runloopai/api-client-ts/compare/v1.16.1...v1.16.2)
+
+### Bug Fixes
+
+* Add after_sequence param to axon subscribe ([#8497](https://github.com/runloopai/api-client-ts/issues/8497)) ([4e9a274](https://github.com/runloopai/api-client-ts/commit/4e9a2748d6dff095a3850c6a5127bd8e3b4712be))
+
 ## 1.16.1 (2026-04-02)
 
 Full Changelog: [v1.16.0...v1.16.1](https://github.com/runloopai/api-client-ts/compare/v1.16.0...v1.16.1)

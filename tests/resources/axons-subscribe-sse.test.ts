@@ -105,7 +105,7 @@ describe('Axons.subscribeSse query (after_sequence)', () => {
     expect(received.map((e) => e.sequence)).toEqual([7, 8]);
   });
 
-  test('merges options.query with after_sequence on reconnect (after_sequence wins)', async () => {
+  test('ignores options.query and only sends after_sequence on reconnect', async () => {
     const timeout = new APIError(408, { code: '408', message: 'idle' }, 'idle', undefined);
     const encoder = new TextEncoder();
     let first = true;
@@ -123,13 +123,13 @@ describe('Axons.subscribeSse query (after_sequence)', () => {
             }
           },
         });
-        expect(opts.query).toEqual({ filter: 'x' });
+        expect(opts.query).toBeUndefined();
         return sseAPIPromiseForResponse(
           new Response(body1, { headers: { 'content-type': 'text/event-stream' } }),
           '/v1/axons/axn_q/subscribe/sse',
         );
       }
-      expect(opts.query).toEqual({ filter: 'x', after_sequence: '3' });
+      expect(opts.query).toEqual({ after_sequence: '3' });
       return sseAPIPromiseForResponse(
         new Response(`data: ${eventJson(4)}\n\n`, {
           headers: { 'content-type': 'text/event-stream' },
@@ -138,7 +138,7 @@ describe('Axons.subscribeSse query (after_sequence)', () => {
       );
     });
 
-    const stream = await axons.subscribeSse('axn_q', { query: { filter: 'x' } });
+    const stream = await axons.subscribeSse('axn_q', undefined, { query: { filter: 'x' } });
     const received: AxonEventView[] = [];
     for await (const ev of stream) {
       received.push(ev);
@@ -156,7 +156,7 @@ describe('Axons.subscribeSse query (after_sequence)', () => {
       ),
     );
 
-    const stream = await axons.subscribeSse('axn_h', {
+    const stream = await axons.subscribeSse('axn_h', undefined, {
       headers: { 'X-Custom': 'yes' },
     });
     for await (const _ of stream) {
