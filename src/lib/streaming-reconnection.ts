@@ -3,16 +3,12 @@ import { APIPromise, StreamBackedAPIPromise, type APIResponseProps } from '../co
 
 function isIdleTimeoutReconnectError(error: unknown): boolean {
   const status =
-    typeof error === 'object' && error !== null && 'status' in error
-      ? (error as { status?: number }).status
-      : undefined;
+    typeof error === 'object' && error !== null && 'status' in error ?
+      (error as { status?: number }).status
+    : undefined;
   if (status === 408) return true;
   if (error instanceof Error && error.name === 'TimeoutError') return true;
-  if (
-    typeof DOMException !== 'undefined' &&
-    error instanceof DOMException &&
-    error.name === 'TimeoutError'
-  ) {
+  if (typeof DOMException !== 'undefined' && error instanceof DOMException && error.name === 'TimeoutError') {
     return true;
   }
   return false;
