@@ -447,7 +447,7 @@ describe('smoketest: object-oriented devbox', () => {
             name: uniqueName('sdk-blueprint-for-devbox'),
             dockerfile: 'FROM ubuntu:22.04\nRUN apt-get update && apt-get install -y curl',
           },
-          { polling: { timeoutMs: 10 * 60 * 1000 } },
+          { longPoll: { timeoutMs: 10 * 60 * 1000 } },
         );
         expect(blueprint).toBeDefined();
 
@@ -480,7 +480,7 @@ describe('smoketest: object-oriented devbox', () => {
             name: blueprintName,
             dockerfile: 'FROM ubuntu:22.04\nRUN apt-get update && apt-get install -y wget',
           },
-          { polling: { timeoutMs: 10 * 60 * 1000 } },
+          { longPoll: { timeoutMs: 10 * 60 * 1000 } },
         );
         expect(blueprint).toBeDefined();
 

@@ -188,7 +188,7 @@ describe('smoketest: object-oriented scenario', () => {
         devboxId = run.devboxId;
 
         await run.awaitEnvReady({
-          polling: { maxAttempts: 120, pollingIntervalMs: 5_000, timeoutMs: SHORT_TIMEOUT },
+          longPoll: { timeoutMs: SHORT_TIMEOUT },
         });
         await run.cancel();
       },
@@ -200,7 +200,7 @@ describe('smoketest: object-oriented scenario', () => {
       async () => {
         const run = await scenario.run(
           { run_name: uniqueName('sdk-run-sync') },
-          { polling: { maxAttempts: 120, pollingIntervalMs: 5_000, timeoutMs: SHORT_TIMEOUT } },
+          { longPoll: { timeoutMs: SHORT_TIMEOUT } },
         );
 
         expect(run).toBeInstanceOf(ScenarioRun);

@@ -34,7 +34,7 @@ describe('smoketest: scenarios and benchmarks', () => {
       const run = await client.scenarios.startRunAndAwaitEnvReady(
         { scenario_id: scenarioId! },
         {
-          polling: { maxAttempts: 120, pollingIntervalMs: 5_000, timeoutMs: 20 * 60 * 1000 },
+          longPoll: { timeoutMs: 20 * 60 * 1000 },
         },
       );
       expect(run.scenario_id).toBe(scenarioId);
@@ -49,7 +49,7 @@ describe('smoketest: scenarios and benchmarks', () => {
       let scored: ScenarioRunView | undefined;
       try {
         scored = await client.scenarios.runs.scoreAndComplete(runId!, {
-          polling: { maxAttempts: 120, pollingIntervalMs: 5_000, timeoutMs: 20 * 60 * 1000 },
+          longPoll: { timeoutMs: 20 * 60 * 1000 },
         });
         expect(['completed', 'scored', 'running', 'failed', 'timeout', 'canceled']).toContain(scored.state);
       } finally {

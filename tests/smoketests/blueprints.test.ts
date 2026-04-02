@@ -24,7 +24,7 @@ describe('smoketest: blueprints', () => {
             name: blueprintName,
           },
           {
-            polling: { maxAttempts: 180, pollingIntervalMs: 5_000, timeoutMs: 30 * 60 * 1000 },
+            longPoll: { timeoutMs: 30 * 60 * 1000 },
           },
         );
         expect(created.status).toBe('build_complete');
@@ -101,7 +101,7 @@ describe('smoketest: blueprints', () => {
               },
             },
             {
-              polling: { maxAttempts: 180, pollingIntervalMs: 5_000, timeoutMs: 30 * 60 * 1000 },
+              longPoll: { timeoutMs: 30 * 60 * 1000 },
             },
           );
 

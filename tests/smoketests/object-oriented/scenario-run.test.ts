@@ -75,7 +75,7 @@ describe('smoketest: object-oriented scenario-run', () => {
         expect(run).toBeDefined();
 
         const result = await run.awaitEnvReady({
-          polling: { maxAttempts: 120, pollingIntervalMs: 5_000, timeoutMs: 20 * 60 * 1000 },
+          longPoll: { timeoutMs: 20 * 60 * 1000 },
         });
 
         expect(result).toBeDefined();
@@ -117,7 +117,7 @@ describe('smoketest: object-oriented scenario-run', () => {
         expect(run).toBeDefined();
 
         const result = await run.scoreAndComplete({
-          polling: { maxAttempts: 120, pollingIntervalMs: 5_000, timeoutMs: 20 * 60 * 1000 },
+          longPoll: { timeoutMs: 20 * 60 * 1000 },
         });
 
         expect(result).toBeDefined();
@@ -193,7 +193,7 @@ describe('smoketest: object-oriented scenario-run', () => {
 
         // Wait for environment to be ready
         await run.awaitEnvReady({
-          polling: { maxAttempts: 120, pollingIntervalMs: 5_000, timeoutMs: 20 * 60 * 1000 },
+          longPoll: { timeoutMs: 20 * 60 * 1000 },
         });
 
         // Cancel the run
@@ -235,7 +235,7 @@ describe('smoketest: object-oriented scenario-run', () => {
 
         // Wait for environment to be ready
         await run.awaitEnvReady({
-          polling: { maxAttempts: 120, pollingIntervalMs: 5_000, timeoutMs: 20 * 60 * 1000 },
+          longPoll: { timeoutMs: 20 * 60 * 1000 },
         });
 
         // Score
@@ -245,7 +245,7 @@ describe('smoketest: object-oriented scenario-run', () => {
 
         // Wait for scoring to complete
         const awaitResult = await run.awaitScored({
-          polling: { maxAttempts: 120, pollingIntervalMs: 5_000, timeoutMs: 20 * 60 * 1000 },
+          longPoll: { timeoutMs: 20 * 60 * 1000 },
         });
         expect(awaitResult).toBeDefined();
         expect(['scored', 'completed', 'failed']).toContain(awaitResult.state);
@@ -286,12 +286,12 @@ describe('smoketest: object-oriented scenario-run', () => {
 
         // Wait for environment to be ready
         await run.awaitEnvReady({
-          polling: { maxAttempts: 120, pollingIntervalMs: 5_000, timeoutMs: 20 * 60 * 1000 },
+          longPoll: { timeoutMs: 20 * 60 * 1000 },
         });
 
         // Score and await in one call
         const result = await run.scoreAndAwait({
-          polling: { maxAttempts: 120, pollingIntervalMs: 5_000, timeoutMs: 20 * 60 * 1000 },
+          longPoll: { timeoutMs: 20 * 60 * 1000 },
         });
         expect(result).toBeDefined();
         expect(['scored', 'completed', 'failed']).toContain(result.state);
