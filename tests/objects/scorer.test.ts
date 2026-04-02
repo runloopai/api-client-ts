@@ -66,15 +66,11 @@ describe('Scorer', () => {
         { id: 'scs_003', type: 'third', bash_script: 'echo "0.0"' },
       ];
 
-      const asyncIterator = {
-        async *[Symbol.asyncIterator]() {
-          for (const scorer of mockScorers) {
-            yield scorer;
-          }
-        },
+      const mockPage = {
+        getPaginatedItems: () => mockScorers,
       };
 
-      mockClient.scenarios.scorers.list.mockReturnValue(asyncIterator);
+      mockClient.scenarios.scorers.list.mockReturnValue(mockPage);
 
       const scorers = await Scorer.list(mockClient);
 
@@ -87,13 +83,11 @@ describe('Scorer', () => {
     });
 
     it('should pass filter parameters to list', async () => {
-      const asyncIterator = {
-        async *[Symbol.asyncIterator]() {
-          yield { id: 'scs_001' };
-        },
+      const mockPage = {
+        getPaginatedItems: () => [{ id: 'scs_001' }],
       };
 
-      mockClient.scenarios.scorers.list.mockReturnValue(asyncIterator);
+      mockClient.scenarios.scorers.list.mockReturnValue(mockPage);
 
       await Scorer.list(mockClient, { limit: 10 });
 
@@ -101,13 +95,11 @@ describe('Scorer', () => {
     });
 
     it('should handle empty list', async () => {
-      const asyncIterator = {
-        async *[Symbol.asyncIterator]() {
-          // Empty iterator
-        },
+      const mockPage = {
+        getPaginatedItems: () => [],
       };
 
-      mockClient.scenarios.scorers.list.mockReturnValue(asyncIterator);
+      mockClient.scenarios.scorers.list.mockReturnValue(mockPage);
 
       const scorers = await Scorer.list(mockClient);
 

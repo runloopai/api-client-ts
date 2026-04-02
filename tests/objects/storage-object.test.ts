@@ -195,10 +195,7 @@ describe('StorageObject (New API)', () => {
       };
 
       const mockPage = {
-        [Symbol.asyncIterator]: async function* () {
-          yield obj1;
-          yield obj2;
-        },
+        getPaginatedItems: () => [obj1, obj2],
       };
 
       mockClient.objects.list.mockResolvedValue(mockPage as any);
@@ -213,9 +210,7 @@ describe('StorageObject (New API)', () => {
 
     it('should support filtering', async () => {
       const mockPage = {
-        [Symbol.asyncIterator]: async function* () {
-          yield mockObjectData;
-        },
+        getPaginatedItems: () => [mockObjectData],
       };
 
       mockClient.objects.list.mockResolvedValue(mockPage as any);

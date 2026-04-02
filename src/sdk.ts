@@ -1577,9 +1577,9 @@ export class AxonOps {
    * @returns {Promise<Axon[]>} An array of {@link Axon} instances.
    */
   async list(params?: AxonListParams, options?: Core.RequestOptions): Promise<Axon[]> {
-    const result = await this.client.axons.list(params, options);
+    const page = await this.client.axons.list(params, options);
     const axons: Axon[] = [];
-    for await (const axon of result) {
+    for (const axon of page.getPaginatedItems()) {
       axons.push(Axon.fromId(this.client, axon.id));
     }
     return axons;
@@ -1789,10 +1789,10 @@ export class NetworkPolicyOps {
    * @returns {Promise<NetworkPolicy[]>} An array of {@link NetworkPolicy} instances.
    */
   async list(params?: NetworkPolicyListParams, options?: Core.RequestOptions): Promise<NetworkPolicy[]> {
-    const result = await this.client.networkPolicies.list(params, options);
+    const page = await this.client.networkPolicies.list(params, options);
     const policies: NetworkPolicy[] = [];
 
-    for await (const policy of result) {
+    for (const policy of page.getPaginatedItems()) {
       policies.push(NetworkPolicy.fromId(this.client, policy.id));
     }
 
@@ -1900,10 +1900,10 @@ export class GatewayConfigOps {
    * @returns {Promise<GatewayConfig[]>} An array of {@link GatewayConfig} instances.
    */
   async list(params?: GatewayConfigListParams, options?: Core.RequestOptions): Promise<GatewayConfig[]> {
-    const result = await this.client.gatewayConfigs.list(params, options);
+    const page = await this.client.gatewayConfigs.list(params, options);
     const configs: GatewayConfig[] = [];
 
-    for await (const config of result) {
+    for (const config of page.getPaginatedItems()) {
       configs.push(GatewayConfig.fromId(this.client, config.id));
     }
 
@@ -2002,10 +2002,10 @@ export class McpConfigOps {
    * @returns {Promise<McpConfig[]>} An array of {@link McpConfig} instances.
    */
   async list(params?: McpConfigListParams, options?: Core.RequestOptions): Promise<McpConfig[]> {
-    const result = await this.client.mcpConfigs.list(params, options);
+    const page = await this.client.mcpConfigs.list(params, options);
     const configs: McpConfig[] = [];
 
-    for await (const config of result) {
+    for (const config of page.getPaginatedItems()) {
       configs.push(McpConfig.fromId(this.client, config.id));
     }
 

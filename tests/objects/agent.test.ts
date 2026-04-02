@@ -182,16 +182,11 @@ describe('Agent (SDK)', () => {
         },
       ];
 
-      // Mock async iterator
-      const asyncIterator = {
-        async *[Symbol.asyncIterator]() {
-          for (const agent of mockAgents) {
-            yield agent;
-          }
-        },
+      const mockPage = {
+        getPaginatedItems: () => mockAgents,
       };
 
-      mockClient.agents.list.mockReturnValue(asyncIterator);
+      mockClient.agents.list.mockReturnValue(mockPage);
 
       const agents = await Agent.list(mockClient);
 
@@ -204,19 +199,19 @@ describe('Agent (SDK)', () => {
     });
 
     it('should pass filter parameters to list', async () => {
-      const asyncIterator = {
-        async *[Symbol.asyncIterator]() {
-          yield {
+      const mockPage = {
+        getPaginatedItems: () => [
+          {
             id: 'agent-001',
             name: 'filtered-agent',
             version: '1.0.0',
             create_time_ms: Date.now(),
             is_public: false,
-          };
-        },
+          },
+        ],
       };
 
-      mockClient.agents.list.mockReturnValue(asyncIterator);
+      mockClient.agents.list.mockReturnValue(mockPage);
 
       await Agent.list(mockClient, { name: 'filtered-agent' });
 
@@ -224,13 +219,11 @@ describe('Agent (SDK)', () => {
     });
 
     it('should handle empty list', async () => {
-      const asyncIterator = {
-        async *[Symbol.asyncIterator]() {
-          // Empty iterator
-        },
+      const mockPage = {
+        getPaginatedItems: () => [],
       };
 
-      mockClient.agents.list.mockReturnValue(asyncIterator);
+      mockClient.agents.list.mockReturnValue(mockPage);
 
       const agents = await Agent.list(mockClient);
 
