@@ -1,4 +1,4 @@
-import { makeClientSDK, SHORT_TIMEOUT } from '../utils';
+import { makeClientSDK, MEDIUM_TIMEOUT, SHORT_TIMEOUT } from '../utils';
 import { Axon } from '@runloop/api-client/sdk';
 
 const sdk = makeClientSDK();
@@ -75,6 +75,83 @@ const sdk = makeClientSDK();
 
       expect(result2.sequence).toBeGreaterThan(result1.sequence);
     });
+
+    test(
+      'SSE subscribe reconnects after idle (408) and resumes without duplicate sequences',
+      async () => {
+        const tag = 'reconnect-smoke';
+        for (let n = 1; n <= 5; n += 1) {
+          await axon.publish({
+            event_type: 'reconnect_smoke',
+            origin: 'USER_EVENT',
+            payload: JSON.stringify({ tag, n }),
+            source: 'sdk-smoke-test',
+          });
+        }
+
+        const stream = await axon.subscribeSse();
+        const sequences: number[] = [];
+        const markers: number[] = [];
+
+        const failIfNoReconnect = setTimeout(() => {
+          stream.controller.abort();
+        }, 4 * 60 * 1000);
+
+        const publishAfterIdle = (async () => {
+          // Hold the line open with no server traffic so the backend can return 408;
+          // then publish fresh events that must arrive after reconnect with after_sequence.
+          await new Promise((r) => setTimeout(r, 70_000));
+          await axon.publish({
+            event_type: 'reconnect_smoke',
+            origin: 'USER_EVENT',
+            payload: JSON.stringify({ tag, n: 6 }),
+            source: 'sdk-smoke-test',
+          });
+          await axon.publish({
+            event_type: 'reconnect_smoke',
+            origin: 'USER_EVENT',
+            payload: JSON.stringify({ tag, n: 7 }),
+            source: 'sdk-smoke-test',
+          });
+        })();
+
+        try {
+          for await (const ev of stream) {
+            let p: { tag?: string; n?: number };
+            try {
+              p = JSON.parse(ev.payload) as { tag?: string; n?: number };
+            } catch {
+              continue;
+            }
+            if (p.tag !== tag || typeof p.n !== 'number') continue;
+            markers.push(p.n);
+            sequences.push(ev.sequence);
+
+            for (let i = 1; i < sequences.length; i += 1) {
+              expect(sequences[i]).toBeGreaterThan(sequences[i - 1]!);
+            }
+
+            const uniq = new Set(sequences);
+            expect(uniq.size).toBe(sequences.length);
+
+            if (markers.includes(6) && markers.includes(7)) {
+              expect(markers).toEqual(expect.arrayContaining([1, 2, 3, 4, 5, 6, 7]));
+              break;
+            }
+            if (sequences.length > 150) {
+              throw new Error('Too many SSE events without completing reconnect-smoke scenario');
+            }
+          }
+        } finally {
+          clearTimeout(failIfNoReconnect);
+          stream.controller.abort();
+          await publishAfterIdle.catch(() => {});
+        }
+
+        expect(markers).toEqual(expect.arrayContaining([1, 2, 3, 4, 5, 6, 7]));
+      },
+      MEDIUM_TIMEOUT,
+    );
 
     test('subscribe to SSE stream and receive events', async () => {
       // Ensure at least one event exists so the stream has something to replay

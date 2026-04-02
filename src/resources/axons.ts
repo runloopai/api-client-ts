@@ -5,6 +5,7 @@ import { isRequestOptions } from '../core';
 import { APIPromise } from '../core';
 import * as Core from '../core';
 import { Stream } from '../streaming';
+import { withStreamAutoReconnect } from '@runloop/api-client/lib/streaming-reconnection';
 
 export class Axons extends APIResource {
   /**
@@ -49,19 +50,36 @@ export class Axons extends APIResource {
 
   /**
    * [Beta] Subscribe to an axon event stream via server-sent events.
+   * On idle timeout (408), reconnects with `after_sequence` derived from the last
+   * received event (internal to {@link withStreamAutoReconnect}).
    */
   subscribeSse(id: string, options?: Core.RequestOptions): APIPromise<Stream<AxonEventView>> {
-    const defaultHeaders = {
-      Accept: 'text/event-stream',
-    };
     const mergedOptions: Core.RequestOptions = {
-      headers: defaultHeaders,
       ...options,
+      headers: {
+        Accept: 'text/event-stream',
+        ...options?.headers,
+      },
     };
-    return this._client.get(`/v1/axons/${id}/subscribe/sse`, {
-      ...mergedOptions,
-      stream: true,
-    }) as APIPromise<Stream<AxonEventView>>;
+    const { query: userQuery, ...restMerged } = mergedOptions;
+    const getStream: (afterSequence: number | undefined) => APIPromise<Stream<AxonEventView>> = (
+      afterSequence,
+    ) => {
+      const base =
+        userQuery && typeof userQuery === 'object' && !Array.isArray(userQuery) ?
+          { ...(userQuery as Record<string, string | undefined>) }
+        : {};
+      const query =
+        afterSequence !== undefined ? { ...base, after_sequence: afterSequence.toString() }
+        : Object.keys(base).length > 0 ? base
+        : undefined;
+      return this._client.get(`/v1/axons/${id}/subscribe/sse`, {
+        ...restMerged,
+        ...(query ? { query } : {}),
+        stream: true,
+      }) as APIPromise<Stream<AxonEventView>>;
+    };
+    return withStreamAutoReconnect(getStream, (item) => item.sequence);
   }
 }
 

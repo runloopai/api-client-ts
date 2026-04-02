@@ -9,7 +9,7 @@ import type {
   DevboxSnapshotAsyncStatusView,
   DiskSnapshotUpdateParams,
 } from '../resources/devboxes/disk-snapshots';
-import type { LongPollRequestOptions, PollingOptions } from '../lib/polling';
+import type { LongPollRequestOptions } from '../lib/polling';
 import { Devbox } from './devbox';
 
 /**
@@ -148,13 +148,11 @@ export class Snapshot {
   /**
    * Wait for the snapshot to be completed.
    *
-   * @param {Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxSnapshotAsyncStatusView>> }} [options] - Request options with optional polling configuration
+   * @param {LongPollRequestOptions<DevboxSnapshotAsyncStatusView>} [options] - Request options with optional polling configuration and `signal`
    * @returns {Promise<DevboxSnapshotAsyncStatusView>} Snapshot data
    */
   async awaitCompleted(
-    options?: Core.RequestOptions & {
-      polling?: Partial<PollingOptions<DevboxSnapshotAsyncStatusView>>;
-    },
+    options?: LongPollRequestOptions<DevboxSnapshotAsyncStatusView>,
   ): Promise<DevboxSnapshotAsyncStatusView> {
     return this.client.devboxes.diskSnapshots.awaitCompleted(this._id, options);
   }

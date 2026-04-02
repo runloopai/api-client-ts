@@ -51,7 +51,8 @@ export type { _Array as Array, _Record as Record };
 
 type PromiseOrValue<T> = T | Promise<T>;
 
-type APIResponseProps = {
+/** @internal Response metadata paired with each HTTP request; used by streaming helpers. */
+export type APIResponseProps = {
   response: Response;
   options: FinalRequestOptions;
   controller: AbortController;
@@ -130,6 +131,11 @@ export class APIPromise<T> extends Promise<T> {
     );
   }
 
+  /** @internal Same promise backing {@link asResponse}; includes the full request context. */
+  _getResponseProps(): Promise<APIResponseProps> {
+    return this.responsePromise;
+  }
+
   /**
    * Gets the raw `Response` instance instead of parsing the response
    * data.
@@ -186,6 +192,16 @@ export class APIPromise<T> extends Promise<T> {
 
   override finally(onfinally?: (() => void) | undefined | null): Promise<T> {
     return this.parse().finally(onfinally);
+  }
+}
+
+/**
+ * @internal Promise for a {@link Stream} built after the HTTP response is available
+ * (e.g. SSE with reconnect). Preserves {@link APIPromise} helpers like {@link APIPromise.asResponse}.
+ */
+export class StreamBackedAPIPromise<T> extends APIPromise<T> {
+  constructor(responseProps: Promise<APIResponseProps>, getData: () => Promise<T>) {
+    super(responseProps, () => getData());
   }
 }
 

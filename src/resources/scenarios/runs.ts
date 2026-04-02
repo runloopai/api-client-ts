@@ -6,7 +6,7 @@ import * as Core from '../../core';
 import * as ScenariosAPI from './scenarios';
 import { ScenarioRunViewsBenchmarkRunsCursorIDPage } from './scenarios';
 import { type BenchmarkRunsCursorIDPageParams } from '../../pagination';
-import { PollingOptions, poll } from '@runloop/api-client/lib/polling';
+import { LongPollRequestOptions, poll, resolveLongPollTimeoutMs } from '@runloop/api-client/lib/polling';
 import { RunloopError } from '../..';
 import { type Response } from '../../_shims/index';
 
@@ -82,13 +82,17 @@ export class Runs extends APIResource {
    */
   async awaitScored(
     id: string,
-    options?: Core.RequestOptions & { polling?: Partial<PollingOptions<ScenariosAPI.ScenarioRunView>> },
+    options?: LongPollRequestOptions<ScenariosAPI.ScenarioRunView>,
   ): Promise<ScenariosAPI.ScenarioRunView> {
+    const pollTimeoutMs = resolveLongPollTimeoutMs(options);
+    const { longPoll: _lp, polling, signal, ...requestOptions } = options ?? {};
     const finalResult = await poll(
-      () => this.retrieve(id, options),
-      () => this.retrieve(id, options),
+      () => this.retrieve(id, requestOptions),
+      () => this.retrieve(id, requestOptions),
       {
-        ...options?.polling,
+        ...polling,
+        signal,
+        ...(pollTimeoutMs !== undefined ? { timeoutMs: pollTimeoutMs } : {}),
         shouldStop: (result) => {
           return result.state !== 'scoring';
         },
@@ -111,10 +115,11 @@ export class Runs extends APIResource {
    */
   async scoreAndAwait(
     id: string,
-    options?: Core.RequestOptions & { polling?: Partial<PollingOptions<ScenariosAPI.ScenarioRunView>> },
+    options?: LongPollRequestOptions<ScenariosAPI.ScenarioRunView>,
   ): Promise<ScenariosAPI.ScenarioRunView> {
-    const run = await this.score(id, options);
-    return this.awaitScored(run.id, options);
+    const { longPoll, polling, signal, ...requestOptions } = options ?? {};
+    const run = await this.score(id, requestOptions);
+    return this.awaitScored(run.id, { ...requestOptions, longPoll, polling, signal });
   }
 
   /**
@@ -123,10 +128,11 @@ export class Runs extends APIResource {
    */
   async scoreAndComplete(
     id: string,
-    options?: Core.RequestOptions & { polling?: Partial<PollingOptions<ScenariosAPI.ScenarioRunView>> },
+    options?: LongPollRequestOptions<ScenariosAPI.ScenarioRunView>,
   ): Promise<ScenariosAPI.ScenarioRunView> {
-    const scoredRun = await this.scoreAndAwait(id, options);
-    return this.complete(scoredRun.id, options);
+    const { longPoll, polling, signal, ...requestOptions } = options ?? {};
+    const scoredRun = await this.scoreAndAwait(id, { ...requestOptions, longPoll, polling, signal });
+    return this.complete(scoredRun.id, requestOptions);
   }
 }
 

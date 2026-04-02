@@ -6,7 +6,7 @@ import * as Core from '../../core';
 import * as DevboxesAPI from './devboxes';
 import { DevboxSnapshotViewsDiskSnapshotsCursorIDPage } from './devboxes';
 import { type DiskSnapshotsCursorIDPageParams } from '../../pagination';
-import { poll, PollingOptions } from '../../lib/polling';
+import { LongPollRequestOptions, poll, resolveLongPollTimeoutMs } from '../../lib/polling';
 
 export class DiskSnapshots extends APIResource {
   /**
@@ -79,13 +79,17 @@ export class DiskSnapshots extends APIResource {
    */
   async awaitCompleted(
     id: string,
-    options?: Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxSnapshotAsyncStatusView>> },
+    options?: LongPollRequestOptions<DevboxSnapshotAsyncStatusView>,
   ): Promise<DevboxSnapshotAsyncStatusView> {
+    const pollTimeoutMs = resolveLongPollTimeoutMs(options);
+    const { longPoll: _lp, polling, signal, ...requestOptions } = options ?? {};
     const finalResult = await poll(
-      () => this.queryStatus(id, options),
-      () => this.queryStatus(id, options),
+      () => this.queryStatus(id, requestOptions),
+      () => this.queryStatus(id, requestOptions),
       {
-        ...options?.polling,
+        ...polling,
+        signal,
+        ...(pollTimeoutMs !== undefined ? { timeoutMs: pollTimeoutMs } : {}),
         shouldStop: (result) => {
           return result.status === 'complete' || result.status === 'error';
         },

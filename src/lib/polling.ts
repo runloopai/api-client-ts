@@ -10,6 +10,8 @@ export interface PollingOptions<T> {
   maxAttempts?: number;
   /** Optional timeout for the entire polling operation (in milliseconds) */
   timeoutMs?: number;
+  /** Optional AbortSignal to cancel polling and in-flight delays between attempts. */
+  signal?: AbortSignal | null | undefined;
   /**
    * Condition to check if polling should stop
    * Return true when the condition is met and polling should stop
@@ -196,9 +198,29 @@ export class LongPollAbortError extends Error {
 }
 
 /**
- * Delay execution for specified milliseconds
+ * Delay execution for specified milliseconds, aborting with {@link LongPollAbortError} when `signal` is aborted.
  */
-const delay = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms));
+function abortableDelay(
+  ms: number,
+  signal: AbortSignal | null | undefined,
+  lastResult: unknown,
+): Promise<void> {
+  return new Promise((resolve, reject) => {
+    if (signal?.aborted) {
+      reject(new LongPollAbortError('Polling aborted', lastResult));
+      return;
+    }
+    const timer = setTimeout(() => {
+      signal?.removeEventListener('abort', onAbort);
+      resolve();
+    }, ms);
+    const onAbort = () => {
+      clearTimeout(timer);
+      reject(new LongPollAbortError('Polling aborted', lastResult));
+    };
+    signal?.addEventListener('abort', onAbort, { once: true });
+  });
+}
 
 /**
  * Generic polling function that handles polling logic with configurable options
@@ -212,11 +234,23 @@ export async function poll<T>(
   pollingRequest: () => Promise<T>,
   options: PollingOptions<T> = {},
 ): Promise<T> {
-  const { initialDelayMs, pollingIntervalMs, maxAttempts, timeoutMs, shouldStop, onPollingAttempt, onError } =
-    {
-      ...DEFAULT_OPTIONS,
-      ...options,
-    };
+  const {
+    initialDelayMs,
+    pollingIntervalMs,
+    maxAttempts,
+    timeoutMs,
+    shouldStop,
+    onPollingAttempt,
+    onError,
+    signal,
+  } = {
+    ...DEFAULT_OPTIONS,
+    ...options,
+  };
+
+  if (signal?.aborted) {
+    throw new LongPollAbortError('Polling aborted', undefined);
+  }
 
   if (initialDelayMs !== undefined && initialDelayMs < 0) {
     throw new Error('initialDelayMs must be non-negative');
@@ -253,10 +287,35 @@ export async function poll<T>(
   const raceTimeout = <R>(promise: Promise<R>): Promise<R> =>
     timeoutPromise ? Promise.race([promise, timeoutPromise]) : promise;
 
+  const raceAbort = <R>(promise: Promise<R>): Promise<R> => {
+    if (!signal) return promise;
+    const abortSignal = signal;
+    if (abortSignal.aborted) {
+      return Promise.reject(new LongPollAbortError('Polling aborted', lastResult));
+    }
+    return new Promise((resolve, reject) => {
+      const onAbort = () => {
+        abortSignal.removeEventListener('abort', onAbort);
+        reject(new LongPollAbortError('Polling aborted', lastResult));
+      };
+      abortSignal.addEventListener('abort', onAbort);
+      promise.then(
+        (value) => {
+          abortSignal.removeEventListener('abort', onAbort);
+          resolve(value);
+        },
+        (err) => {
+          abortSignal.removeEventListener('abort', onAbort);
+          reject(err);
+        },
+      );
+    });
+  };
+
   try {
     let result: T;
     try {
-      result = await raceTimeout(initialRequest());
+      result = await raceAbort(raceTimeout(initialRequest()));
     } catch (error) {
       if (onError && error instanceof APIError) {
         result = onError(error);
@@ -275,7 +334,7 @@ export async function poll<T>(
       return result;
     }
 
-    await raceTimeout(delay(initialDelayMs!));
+    await raceAbort(raceTimeout(abortableDelay(initialDelayMs!, signal, lastResult)));
 
     let attempts = 0;
 
@@ -284,7 +343,7 @@ export async function poll<T>(
       ++attempts;
 
       try {
-        result = await raceTimeout(pollingRequest());
+        result = await raceAbort(raceTimeout(pollingRequest()));
       } catch (error) {
         if (onError && error instanceof APIError) {
           result = onError(error);
@@ -304,7 +363,7 @@ export async function poll<T>(
         throw new MaxAttemptsExceededError(`Polling exceeded maximum attempts (${maxAttempts})`, result);
       }
 
-      await raceTimeout(delay(pollingIntervalMs!));
+      await raceAbort(raceTimeout(abortableDelay(pollingIntervalMs!, signal, lastResult)));
     }
 
     // This should only be reachable if maxAttempts is defined
