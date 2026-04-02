@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.16.1 (2026-04-02)
+
+Full Changelog: [v1.16.0...v1.16.1](https://github.com/runloopai/api-client-ts/compare/v1.16.0...v1.16.1)
+
+### Bug Fixes
+
+* **streaming:** reconnect SSE on undici TimeoutError, not only HTTP 408 ([#769](https://github.com/runloopai/api-client-ts/issues/769)) ([624b53f](https://github.com/runloopai/api-client-ts/commit/624b53f83a0207ec4b8476347e575ff72b9a9c12))
+
 ## 1.16.0 (2026-04-02)
 
 Full Changelog: [v1.15.0...v1.16.0](https://github.com/runloopai/api-client-ts/compare/v1.15.0...v1.16.0)
