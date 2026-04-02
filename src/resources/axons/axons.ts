@@ -77,10 +77,16 @@ export class Axons extends APIResource {
   /**
    * [Beta] Subscribe to an axon event stream via server-sent events.
    */
-  subscribeSse(id: string, options?: Core.RequestOptions): APIPromise<Stream<AxonEventView>> {
-    return this._client.get(`/v1/axons/${id}/subscribe/sse`, { ...options, stream: true }) as APIPromise<
-      Stream<AxonEventView>
-    >;
+  subscribeSse(
+    id: string,
+    query: AxonSubscribeSseParams | undefined = {},
+    options?: Core.RequestOptions,
+  ): APIPromise<Stream<AxonEventView>> {
+    return this._client.get(`/v1/axons/${id}/subscribe/sse`, {
+      query,
+      ...options,
+      stream: true,
+    }) as APIPromise<Stream<AxonEventView>>;
   }
 }
 
@@ -239,6 +245,14 @@ export interface AxonPublishParams {
   source: string;
 }
 
+export interface AxonSubscribeSseParams {
+  /**
+   * Sequence number after which to start streaming. Events with sequence > this
+   * value are returned. If unset, replay from the beginning.
+   */
+  after_sequence?: number;
+}
+
 Axons.AxonViewsAxonsCursorIDPage = AxonViewsAxonsCursorIDPage;
 Axons.Sql = Sql;
 
@@ -253,6 +267,7 @@ export declare namespace Axons {
     AxonViewsAxonsCursorIDPage as AxonViewsAxonsCursorIDPage,
     type AxonListParams as AxonListParams,
     type AxonPublishParams as AxonPublishParams,
+    type AxonSubscribeSseParams as AxonSubscribeSseParams,
   };
 
   export {

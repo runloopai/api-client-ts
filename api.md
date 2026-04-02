@@ -94,7 +94,7 @@ Methods:
 - <code title="get /v1/axons/{id}">client.axons.<a href="./src/resources/axons/axons.ts">retrieve</a>(id) -> AxonView</code>
 - <code title="get /v1/axons">client.axons.<a href="./src/resources/axons/axons.ts">list</a>({ ...params }) -> AxonViewsAxonsCursorIDPage</code>
 - <code title="post /v1/axons/{id}/publish">client.axons.<a href="./src/resources/axons/axons.ts">publish</a>(id, { ...params }) -> PublishResultView</code>
-- <code title="get /v1/axons/{id}/subscribe/sse">client.axons.<a href="./src/resources/axons/axons.ts">subscribeSse</a>(id) -> AxonEventView</code>
+- <code title="get /v1/axons/{id}/subscribe/sse">client.axons.<a href="./src/resources/axons/axons.ts">subscribeSse</a>(id, { ...params }) -> AxonEventView</code>
 
 ## Sql
 
