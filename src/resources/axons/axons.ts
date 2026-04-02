@@ -80,7 +80,11 @@ export class Axons extends APIResource {
    * On idle timeout (408), reconnects with `after_sequence` derived from the last
    * received event (internal to {@link withStreamAutoReconnect}).
    */
-  subscribeSse(id: string, options?: Core.RequestOptions): APIPromise<Stream<AxonEventView>> {
+  subscribeSse(
+    id: string,
+    query: AxonSubscribeSseParams | undefined = {},
+    options?: Core.RequestOptions,
+  ): APIPromise<Stream<AxonEventView>> {
     const mergedOptions: Core.RequestOptions = {
       ...options,
       headers: {
@@ -103,7 +107,8 @@ export class Axons extends APIResource {
       return this._client.get(`/v1/axons/${id}/subscribe/sse`, {
         ...restMerged,
         ...(query ? { query } : {}),
-        stream: true,
+      stream: true,
+        query,
       }) as APIPromise<Stream<AxonEventView>>;
     };
     return withStreamAutoReconnect(getStream, (item) => item.sequence);
@@ -265,6 +270,14 @@ export interface AxonPublishParams {
   source: string;
 }
 
+export interface AxonSubscribeSseParams {
+  /**
+   * Sequence number after which to start streaming. Events with sequence > this
+   * value are returned. If unset, replay from the beginning.
+   */
+  after_sequence?: number;
+}
+
 Axons.AxonViewsAxonsCursorIDPage = AxonViewsAxonsCursorIDPage;
 Axons.Sql = Sql;
 
@@ -279,6 +292,7 @@ export declare namespace Axons {
     AxonViewsAxonsCursorIDPage as AxonViewsAxonsCursorIDPage,
     type AxonListParams as AxonListParams,
     type AxonPublishParams as AxonPublishParams,
+    type AxonSubscribeSseParams as AxonSubscribeSseParams,
   };
 
   export {

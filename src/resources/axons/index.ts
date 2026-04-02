@@ -11,6 +11,7 @@ export {
   type PublishResultView,
   type AxonListParams,
   type AxonPublishParams,
+  type AxonSubscribeSseParams,
 } from './axons';
 export {
   Sql,
