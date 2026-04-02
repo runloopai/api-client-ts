@@ -89,10 +89,7 @@ describe('Snapshot (New API)', () => {
       };
 
       const mockPage = {
-        [Symbol.asyncIterator]: async function* () {
-          yield snapshot1;
-          yield snapshot2;
-        },
+        getPaginatedItems: () => [snapshot1, snapshot2],
       };
 
       mockClient.devboxes.listDiskSnapshots.mockResolvedValue(mockPage as any);
@@ -107,9 +104,7 @@ describe('Snapshot (New API)', () => {
 
     it('should filter by devbox ID', async () => {
       const mockPage = {
-        [Symbol.asyncIterator]: async function* () {
-          yield mockSnapshotData;
-        },
+        getPaginatedItems: () => [mockSnapshotData],
       };
 
       mockClient.devboxes.listDiskSnapshots.mockResolvedValue(mockPage as any);
@@ -124,9 +119,7 @@ describe('Snapshot (New API)', () => {
 
     it('should return empty array when no snapshots found', async () => {
       const mockPage = {
-        [Symbol.asyncIterator]: async function* () {
-          // Empty iterator
-        },
+        getPaginatedItems: () => [],
       };
 
       mockClient.devboxes.listDiskSnapshots.mockResolvedValue(mockPage as any);

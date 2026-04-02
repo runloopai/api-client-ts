@@ -79,9 +79,7 @@ describe('AxonOps', () => {
   describe('list', () => {
     function mockPageResult(items: AxonView[]) {
       return {
-        [Symbol.asyncIterator]: async function* () {
-          yield* items;
-        },
+        getPaginatedItems: () => items,
       };
     }
 
