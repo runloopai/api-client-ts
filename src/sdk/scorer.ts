@@ -99,10 +99,10 @@ export class Scorer {
     params?: ScorerListParams,
     options?: Core.RequestOptions,
   ): Promise<Scorer[]> {
-    const scorers = await client.scenarios.scorers.list(params, options);
+    const page = await client.scenarios.scorers.list(params, options);
     const result: Scorer[] = [];
 
-    for await (const scorer of scorers) {
+    for (const scorer of page.getPaginatedItems()) {
       result.push(Scorer.fromId(client, scorer.id));
     }
 

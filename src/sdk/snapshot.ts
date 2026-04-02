@@ -86,10 +86,10 @@ export class Snapshot {
     params?: DevboxListDiskSnapshotsParams,
     options?: Core.RequestOptions,
   ): Promise<Snapshot[]> {
-    const snapshots = await client.devboxes.listDiskSnapshots(params, options);
+    const page = await client.devboxes.listDiskSnapshots(params, options);
     const result: Snapshot[] = [];
 
-    for await (const snapshot of snapshots) {
+    for (const snapshot of page.getPaginatedItems()) {
       result.push(new Snapshot(client, snapshot.id));
     }
 

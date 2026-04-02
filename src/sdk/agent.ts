@@ -116,10 +116,10 @@ export class Agent {
     params?: AgentListParams,
     options?: Core.RequestOptions,
   ): Promise<Agent[]> {
-    const agents = await client.agents.list(params, options);
+    const page = await client.agents.list(params, options);
     const result: Agent[] = [];
 
-    for await (const agent of agents) {
+    for (const agent of page.getPaginatedItems()) {
       result.push(new Agent(client, agent.id));
     }
 

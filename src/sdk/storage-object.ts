@@ -161,10 +161,10 @@ export class StorageObject {
     params?: ObjectListParams,
     options?: Core.RequestOptions,
   ): Promise<StorageObject[]> {
-    const objects = await client.objects.list(params, options);
+    const page = await client.objects.list(params, options);
     const result: StorageObject[] = [];
 
-    for await (const obj of objects) {
+    for (const obj of page.getPaginatedItems()) {
       result.push(new StorageObject(client, obj.id, null));
     }
 
