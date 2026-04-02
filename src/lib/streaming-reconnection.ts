@@ -1,6 +1,23 @@
 import { Stream } from '../streaming';
 import { APIPromise, StreamBackedAPIPromise, type APIResponseProps } from '../core';
 
+function isIdleTimeoutReconnectError(error: unknown): boolean {
+  const status =
+    typeof error === 'object' && error !== null && 'status' in error
+      ? (error as { status?: number }).status
+      : undefined;
+  if (status === 408) return true;
+  if (error instanceof Error && error.name === 'TimeoutError') return true;
+  if (
+    typeof DOMException !== 'undefined' &&
+    error instanceof DOMException &&
+    error.name === 'TimeoutError'
+  ) {
+    return true;
+  }
+  return false;
+}
+
 /**
  * Wraps a stream with automatic reconnection on timeout.
  * Returns an {@link APIPromise} so callers can use {@link APIPromise.asResponse} and
@@ -39,7 +56,7 @@ export function withStreamAutoReconnect<Item>(
               }
               return; // Stream completed normally
             } catch (error) {
-              if ((error as any)?.status === 408) {
+              if (isIdleTimeoutReconnectError(error)) {
                 currentStream = await streamCreator(lastOffset);
                 continue;
               }
