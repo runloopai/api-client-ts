@@ -147,6 +147,37 @@ describe('withStreamAutoReconnect', () => {
     expect(creatorCalls).toBe(2);
   });
 
+  test('resumes from the last delivered offset after undici-style TimeoutError on body stream', async () => {
+    const idleTimeout = new Error('Body Timeout Error');
+    idleTimeout.name = 'TimeoutError';
+
+    const factory = createStreamFactory(items, {
+      failures: [{ offset: 2, error: idleTimeout }],
+    });
+
+    const offsets: number[] = [];
+    let creatorCalls = 0;
+
+    const stream = await withStreamAutoReconnect<SampleItem>(
+      (offset) => {
+        const resumeOffset = offset ?? 0;
+        offsets.push(resumeOffset);
+        creatorCalls += 1;
+        return factory(resumeOffset);
+      },
+      (item) => item.offset,
+    );
+
+    const collected: SampleItem[] = [];
+    for await (const item of stream) {
+      collected.push(item);
+    }
+
+    expect(collected.map((item) => item.value)).toEqual(items.map((item) => item.value));
+    expect(offsets).toEqual([0, 2]);
+    expect(creatorCalls).toBe(2);
+  });
+
   test('retries a 408 that fires after the last chunk before the stream closes', async () => {
     const factory = createStreamFactory(items, {
       failures: [{ offset: 4, error: makeTimeoutError('after-end') }],
