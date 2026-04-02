@@ -5,9 +5,10 @@ import type {
   AxonView,
   AxonCreateParams,
   AxonPublishParams,
+  AxonSubscribeSseParams,
   PublishResultView,
   AxonEventView,
-} from '../resources/axons';
+} from '../resources/axons/axons';
 import type {
   SqlBatchParams,
   SqlBatchResultView,
@@ -178,10 +179,14 @@ export class Axon {
    * }
    * ```
    *
+   * @param {AxonSubscribeSseParams} [query] - Query parameters (e.g. after_sequence)
    * @param {Core.RequestOptions} [options] - Request options
    * @returns {Promise<Stream<AxonEventView>>} An async iterable stream of axon events
    */
-  async subscribeSse(options?: Core.RequestOptions): Promise<Stream<AxonEventView>> {
-    return this.client.axons.subscribeSse(this._id, options);
+  async subscribeSse(
+    query?: AxonSubscribeSseParams,
+    options?: Core.RequestOptions,
+  ): Promise<Stream<AxonEventView>> {
+    return this.client.axons.subscribeSse(this._id, query, options);
   }
 }
