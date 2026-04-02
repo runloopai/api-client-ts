@@ -82,9 +82,18 @@ export class Axons extends APIResource {
    */
   subscribeSse(
     id: string,
-    query: AxonSubscribeSseParams | undefined = {},
+    query?: AxonSubscribeSseParams,
+    options?: Core.RequestOptions,
+  ): APIPromise<Stream<AxonEventView>>;
+  subscribeSse(id: string, options?: Core.RequestOptions): APIPromise<Stream<AxonEventView>>;
+  subscribeSse(
+    id: string,
+    query: AxonSubscribeSseParams | Core.RequestOptions | undefined = {},
     options?: Core.RequestOptions,
   ): APIPromise<Stream<AxonEventView>> {
+    if (isRequestOptions(query)) {
+      return this.subscribeSse(id, {}, query);
+    }
     const mergedOptions: Core.RequestOptions = {
       ...options,
       headers: {
@@ -106,9 +115,8 @@ export class Axons extends APIResource {
         : undefined;
       return this._client.get(`/v1/axons/${id}/subscribe/sse`, {
         ...restMerged,
+        stream: true,
         ...(query ? { query } : {}),
-      stream: true,
-        query,
       }) as APIPromise<Stream<AxonEventView>>;
     };
     return withStreamAutoReconnect(getStream, (item) => item.sequence);
