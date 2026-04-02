@@ -200,7 +200,7 @@ describe('smoketest: object-oriented scenario', () => {
       async () => {
         const run = await scenario.run(
           { run_name: uniqueName('sdk-run-sync') },
-          { longPoll: { timeoutMs: SHORT_TIMEOUT } },
+          { polling: { timeoutMs: SHORT_TIMEOUT } },
         );
 
         expect(run).toBeInstanceOf(ScenarioRun);

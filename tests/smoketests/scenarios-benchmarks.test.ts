@@ -34,7 +34,7 @@ describe('smoketest: scenarios and benchmarks', () => {
       const run = await client.scenarios.startRunAndAwaitEnvReady(
         { scenario_id: scenarioId! },
         {
-          longPoll: { timeoutMs: 20 * 60 * 1000 },
+          polling: { timeoutMs: 20 * 60 * 1000 },
         },
       );
       expect(run.scenario_id).toBe(scenarioId);
