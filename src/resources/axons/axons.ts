@@ -82,7 +82,7 @@ export class Axons extends APIResource {
    */
   subscribeSse(
     id: string,
-    query: AxonSubscribeSseParams | undefined = {},
+    query?: AxonSubscribeSseParams,
     options?: Core.RequestOptions,
   ): APIPromise<Stream<AxonEventView>> {
     const mergedOptions: Core.RequestOptions = {
@@ -93,7 +93,7 @@ export class Axons extends APIResource {
       },
     };
     const { query: _ignoredOptionsQuery, ...restMerged } = mergedOptions;
-    const initialAfterSequence = query.after_sequence;
+    const initialAfterSequence = query?.after_sequence;
     const getStream: (afterSequence: number | undefined) => APIPromise<Stream<AxonEventView>> = (
       afterSequence,
     ) => {
