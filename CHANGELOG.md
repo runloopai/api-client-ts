@@ -1,5 +1,18 @@
 # Changelog
 
+## 1.16.0 (2026-04-02)
+
+Full Changelog: [v1.15.0...v1.16.0](https://github.com/runloopai/api-client-ts/compare/v1.15.0...v1.16.0)
+
+### Features
+
+* **benchmark-runs:** add state filter and multi-value benchmark_id support to listBenchmarkRuns ([#8480](https://github.com/runloopai/api-client-ts/issues/8480)) ([12c55bb](https://github.com/runloopai/api-client-ts/commit/12c55bb86eb4a16539e496131a075159c43fa85b))
+
+
+### Bug Fixes
+
+* Fix slow list endpoints for object oriented sdk ([#767](https://github.com/runloopai/api-client-ts/issues/767)) ([1f26406](https://github.com/runloopai/api-client-ts/commit/1f264066eb3a66e0e4705508c7ecb7c536b52600))
+
 ## 1.15.0 (2026-04-01)
 
 Full Changelog: [v1.14.1...v1.15.0](https://github.com/runloopai/api-client-ts/compare/v1.14.1...v1.15.0)
