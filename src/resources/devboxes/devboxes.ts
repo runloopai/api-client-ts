@@ -860,7 +860,7 @@ export interface DevboxView {
   /**
    * The failure reason if the Devbox failed, if the Devbox has a 'failure' status.
    */
-  failure_reason?: 'out_of_memory' | 'out_of_disk' | 'execution_failed' | null;
+  failure_reason?: 'out_of_memory' | 'out_of_disk' | 'execution_failed' | 'health_check_failed' | null;
 
   /**
    * Gateway specifications configured for this devbox. Map key is the environment
