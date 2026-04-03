@@ -4,20 +4,6 @@ import { APIResource } from '../../resource';
 import { isRequestOptions } from '../../core';
 import * as Core from '../../core';
 import * as Shared from '../shared';
-import * as BrowsersAPI from './browsers';
-import { BrowserCreateParams, BrowserView, Browsers } from './browsers';
-import * as ComputersAPI from './computers';
-import {
-  ComputerCreateParams,
-  ComputerKeyboardInteractionParams,
-  ComputerKeyboardInteractionResponse,
-  ComputerMouseInteractionParams,
-  ComputerMouseInteractionResponse,
-  ComputerScreenInteractionParams,
-  ComputerScreenInteractionResponse,
-  ComputerView,
-  Computers,
-} from './computers';
 import * as DiskSnapshotsAPI from './disk-snapshots';
 import {
   DevboxSnapshotAsyncStatusView,
@@ -61,8 +47,6 @@ const DEVBOX_BOOTING_STATES: DevboxStatus[] = ['provisioning', 'initializing'];
 
 export class Devboxes extends APIResource {
   diskSnapshots: DiskSnapshotsAPI.DiskSnapshots = new DiskSnapshotsAPI.DiskSnapshots(this._client);
-  browsers: BrowsersAPI.Browsers = new BrowsersAPI.Browsers(this._client);
-  computers: ComputersAPI.Computers = new ComputersAPI.Computers(this._client);
   logs: LogsAPI.Logs = new LogsAPI.Logs(this._client);
   executions: ExecutionsAPI.Executions = new ExecutionsAPI.Executions(this._client);
 
@@ -1495,8 +1479,6 @@ export interface DevboxWriteFileContentsParams {
 Devboxes.DevboxViewsDevboxesCursorIDPage = DevboxViewsDevboxesCursorIDPage;
 Devboxes.DevboxSnapshotViewsDiskSnapshotsCursorIDPage = DevboxSnapshotViewsDiskSnapshotsCursorIDPage;
 Devboxes.DiskSnapshots = DiskSnapshots;
-Devboxes.Browsers = Browsers;
-Devboxes.Computers = Computers;
 Devboxes.Logs = Logs;
 Devboxes.Executions = Executions;
 
@@ -1545,24 +1527,6 @@ export declare namespace Devboxes {
     type DiskSnapshotDeleteResponse as DiskSnapshotDeleteResponse,
     type DiskSnapshotUpdateParams as DiskSnapshotUpdateParams,
     type DiskSnapshotListParams as DiskSnapshotListParams,
-  };
-
-  export {
-    Browsers as Browsers,
-    type BrowserView as BrowserView,
-    type BrowserCreateParams as BrowserCreateParams,
-  };
-
-  export {
-    Computers as Computers,
-    type ComputerView as ComputerView,
-    type ComputerKeyboardInteractionResponse as ComputerKeyboardInteractionResponse,
-    type ComputerMouseInteractionResponse as ComputerMouseInteractionResponse,
-    type ComputerScreenInteractionResponse as ComputerScreenInteractionResponse,
-    type ComputerCreateParams as ComputerCreateParams,
-    type ComputerKeyboardInteractionParams as ComputerKeyboardInteractionParams,
-    type ComputerMouseInteractionParams as ComputerMouseInteractionParams,
-    type ComputerScreenInteractionParams as ComputerScreenInteractionParams,
   };
 
   export { Logs as Logs, type DevboxLogsListView as DevboxLogsListView, type LogListParams as LogListParams };

@@ -1,17 +1,5 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-export { Browsers, type BrowserView, type BrowserCreateParams } from './browsers';
-export {
-  Computers,
-  type ComputerView,
-  type ComputerKeyboardInteractionResponse,
-  type ComputerMouseInteractionResponse,
-  type ComputerScreenInteractionResponse,
-  type ComputerCreateParams,
-  type ComputerKeyboardInteractionParams,
-  type ComputerMouseInteractionParams,
-  type ComputerScreenInteractionParams,
-} from './computers';
 export {
   DevboxSnapshotViewsDiskSnapshotsCursorIDPage,
   DevboxViewsDevboxesCursorIDPage,
