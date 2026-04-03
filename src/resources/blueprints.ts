@@ -217,6 +217,8 @@ export class Blueprints extends APIResource {
   /**
    * Preview building a Blueprint with the specified configuration. You can take the
    * resulting Dockerfile and test out your build using any local docker tooling.
+   *
+   * @deprecated
    */
   preview(
     body: BlueprintPreviewParams,
