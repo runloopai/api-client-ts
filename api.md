@@ -202,34 +202,6 @@ Methods:
 - <code title="post /v1/devboxes/disk_snapshots/{id}/delete">client.devboxes.diskSnapshots.<a href="./src/resources/devboxes/disk-snapshots.ts">delete</a>(id) -> unknown</code>
 - <code title="get /v1/devboxes/disk_snapshots/{id}/status">client.devboxes.diskSnapshots.<a href="./src/resources/devboxes/disk-snapshots.ts">queryStatus</a>(id) -> DevboxSnapshotAsyncStatusView</code>
 
-## Browsers
-
-Types:
-
-- <code><a href="./src/resources/devboxes/browsers.ts">BrowserView</a></code>
-
-Methods:
-
-- <code title="post /v1/devboxes/browsers">client.devboxes.browsers.<a href="./src/resources/devboxes/browsers.ts">create</a>({ ...params }) -> BrowserView</code>
-- <code title="get /v1/devboxes/browsers/{id}">client.devboxes.browsers.<a href="./src/resources/devboxes/browsers.ts">retrieve</a>(id) -> BrowserView</code>
-
-## Computers
-
-Types:
-
-- <code><a href="./src/resources/devboxes/computers.ts">ComputerView</a></code>
-- <code><a href="./src/resources/devboxes/computers.ts">ComputerKeyboardInteractionResponse</a></code>
-- <code><a href="./src/resources/devboxes/computers.ts">ComputerMouseInteractionResponse</a></code>
-- <code><a href="./src/resources/devboxes/computers.ts">ComputerScreenInteractionResponse</a></code>
-
-Methods:
-
-- <code title="post /v1/devboxes/computers">client.devboxes.computers.<a href="./src/resources/devboxes/computers.ts">create</a>({ ...params }) -> ComputerView</code>
-- <code title="get /v1/devboxes/computers/{id}">client.devboxes.computers.<a href="./src/resources/devboxes/computers.ts">retrieve</a>(id) -> ComputerView</code>
-- <code title="post /v1/devboxes/computers/{id}/keyboard_interaction">client.devboxes.computers.<a href="./src/resources/devboxes/computers.ts">keyboardInteraction</a>(id, { ...params }) -> ComputerKeyboardInteractionResponse</code>
-- <code title="post /v1/devboxes/computers/{id}/mouse_interaction">client.devboxes.computers.<a href="./src/resources/devboxes/computers.ts">mouseInteraction</a>(id, { ...params }) -> ComputerMouseInteractionResponse</code>
-- <code title="post /v1/devboxes/computers/{id}/screen_interaction">client.devboxes.computers.<a href="./src/resources/devboxes/computers.ts">screenInteraction</a>(id, { ...params }) -> ComputerScreenInteractionResponse</code>
-
 ## Logs
 
 Types:
