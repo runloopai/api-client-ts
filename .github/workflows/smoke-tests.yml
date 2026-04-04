@@ -64,4 +64,4 @@ jobs:
         run: yarn check:examples-md
 
       - name: Run smoke tests
-        run: yarn test:smoke --color
+        run: yarn test:smoke --maxWorkers=400% --color
