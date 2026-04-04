@@ -105,12 +105,12 @@ describe('smoketest: object-oriented network policy', () => {
   });
 
   describe('network policy list and retrieval', () => {
-    test('list network policies', async () => {
+    test.concurrent('list network policies', async () => {
       const policies = await sdk.networkPolicy.list({ limit: 10 });
       expect(Array.isArray(policies)).toBe(true);
     });
 
-    test('get network policy by ID', async () => {
+    test.concurrent('get network policy by ID', async () => {
       // First create a network policy
       let policy: NetworkPolicy | undefined;
       try {
@@ -136,7 +136,7 @@ describe('smoketest: object-oriented network policy', () => {
   });
 
   describe('network policy egress configurations', () => {
-    test('create policy with allow_all=true', async () => {
+    test.concurrent('create policy with allow_all=true', async () => {
       let policy: NetworkPolicy | undefined;
       try {
         policy = await sdk.networkPolicy.create({
@@ -150,7 +150,7 @@ describe('smoketest: object-oriented network policy', () => {
       }
     });
 
-    test('create policy with allow_devbox_to_devbox=true', async () => {
+    test.concurrent('create policy with allow_devbox_to_devbox=true', async () => {
       let policy: NetworkPolicy | undefined;
       try {
         policy = await sdk.networkPolicy.create({
@@ -168,7 +168,7 @@ describe('smoketest: object-oriented network policy', () => {
       }
     });
 
-    test('create policy with multiple allowed hostnames', async () => {
+    test.concurrent('create policy with multiple allowed hostnames', async () => {
       let policy: NetworkPolicy | undefined;
       try {
         const hostnames = ['github.com', '*.npmjs.org', 'api.openai.com', '*.googleapis.com'];
@@ -188,7 +188,7 @@ describe('smoketest: object-oriented network policy', () => {
       }
     });
 
-    test('create policy with empty allowed_hostnames (DENY_ALL)', async () => {
+    test.concurrent('create policy with empty allowed_hostnames (DENY_ALL)', async () => {
       let policy: NetworkPolicy | undefined;
       try {
         policy = await sdk.networkPolicy.create({
@@ -204,7 +204,7 @@ describe('smoketest: object-oriented network policy', () => {
       }
     });
 
-    test('create policy with wildcard hostnames', async () => {
+    test.concurrent('create policy with wildcard hostnames', async () => {
       let policy: NetworkPolicy | undefined;
       try {
         // Wildcards are only allowed as the first label (e.g., *.example.com)

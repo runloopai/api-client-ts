@@ -5,7 +5,7 @@ const runloop = makeClientSDK();
 
 describe('smoketest: object-oriented agent', () => {
   describe('agent lifecycle', () => {
-    test(
+    test.concurrent(
       'create agent basic',
       async () => {
         const name = uniqueName('sdk-agent-test-basic');
@@ -37,7 +37,7 @@ describe('smoketest: object-oriented agent', () => {
       SHORT_TIMEOUT,
     );
 
-    test(
+    test.concurrent(
       'get agent info',
       async () => {
         const name = uniqueName('sdk-agent-test-info');
@@ -68,7 +68,7 @@ describe('smoketest: object-oriented agent', () => {
   });
 
   describe('agent listing', () => {
-    test(
+    test.concurrent(
       'list agents',
       async () => {
         const agents = await runloop.agent.list({ limit: 10 });
@@ -80,7 +80,7 @@ describe('smoketest: object-oriented agent', () => {
       SHORT_TIMEOUT,
     );
 
-    test(
+    test.concurrent(
       'get agent by ID',
       async () => {
         // Create an agent
@@ -110,7 +110,7 @@ describe('smoketest: object-oriented agent', () => {
       SHORT_TIMEOUT,
     );
 
-    test(
+    test.concurrent(
       'list multiple agents',
       async () => {
         const sourceConfig = {
@@ -159,7 +159,7 @@ describe('smoketest: object-oriented agent', () => {
   });
 
   describe('agent creation variations', () => {
-    test(
+    test.concurrent(
       'agent with source npm',
       async () => {
         const name = uniqueName('sdk-agent-test-npm');
@@ -188,7 +188,7 @@ describe('smoketest: object-oriented agent', () => {
       SHORT_TIMEOUT,
     );
 
-    test(
+    test.concurrent(
       'agent with source git',
       async () => {
         const name = uniqueName('sdk-agent-test-git');
@@ -220,7 +220,7 @@ describe('smoketest: object-oriented agent', () => {
   });
 
   describe('agent convenience methods', () => {
-    test(
+    test.concurrent(
       'createFromNpm',
       async () => {
         const name = uniqueName('sdk-agent-from-npm');
@@ -243,7 +243,7 @@ describe('smoketest: object-oriented agent', () => {
       SHORT_TIMEOUT,
     );
 
-    test(
+    test.concurrent(
       'createFromPip',
       async () => {
         const name = uniqueName('sdk-agent-from-pip');
@@ -266,7 +266,7 @@ describe('smoketest: object-oriented agent', () => {
       SHORT_TIMEOUT,
     );
 
-    test(
+    test.concurrent(
       'createFromGit',
       async () => {
         const name = uniqueName('sdk-agent-from-git');
@@ -290,7 +290,7 @@ describe('smoketest: object-oriented agent', () => {
       SHORT_TIMEOUT,
     );
 
-    test(
+    test.concurrent(
       'createFromObject with storage object',
       async () => {
         let storageObject: StorageObject | undefined;
@@ -332,7 +332,7 @@ describe('smoketest: object-oriented agent', () => {
   });
 
   describe('agent with devbox mounting', () => {
-    test(
+    test.concurrent(
       'mount agent from storage object into devbox',
       async () => {
         let storageObject: StorageObject | undefined;

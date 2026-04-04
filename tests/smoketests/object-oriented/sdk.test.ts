@@ -4,7 +4,7 @@ const sdk = makeClientSDK();
 
 describe('smoketest: object-oriented SDK', () => {
   describe('RunloopSDK initialization', () => {
-    test('should create SDK instance', () => {
+    test.concurrent('should create SDK instance', () => {
       expect(sdk).toBeDefined();
       expect(sdk.devbox).toBeDefined();
       expect(sdk.blueprint).toBeDefined();
@@ -16,7 +16,7 @@ describe('smoketest: object-oriented SDK', () => {
       expect(sdk.api).toBeDefined();
     });
 
-    test('should provide access to legacy API', () => {
+    test.concurrent('should provide access to legacy API', () => {
       expect(sdk.api).toBeDefined();
       expect(sdk.api.devboxes).toBeDefined();
       expect(sdk.api.blueprints).toBeDefined();

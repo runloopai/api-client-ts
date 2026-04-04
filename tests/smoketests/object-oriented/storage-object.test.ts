@@ -6,7 +6,7 @@ const sdk = makeClientSDK();
 
 describe('smoketest: object-oriented storage object', () => {
   describe('storage object lifecycle', () => {
-    test(
+    test.concurrent(
       'create storage object',
       async () => {
         let storageObject: StorageObject | undefined;
@@ -27,7 +27,7 @@ describe('smoketest: object-oriented storage object', () => {
       SHORT_TIMEOUT,
     );
 
-    test('get storage object info', async () => {
+    test.concurrent('get storage object info', async () => {
       let storageObject: StorageObject | undefined;
       try {
         storageObject = await sdk.storageObject.create({
@@ -47,7 +47,7 @@ describe('smoketest: object-oriented storage object', () => {
       }
     });
 
-    test('upload content to storage object', async () => {
+    test.concurrent('upload content to storage object', async () => {
       let storageObject: StorageObject | undefined;
       try {
         storageObject = await sdk.storageObject.create({
@@ -69,7 +69,7 @@ describe('smoketest: object-oriented storage object', () => {
       }
     });
 
-    test('get download URL', async () => {
+    test.concurrent('get download URL', async () => {
       let storageObject: StorageObject | undefined;
       try {
         storageObject = await sdk.storageObject.create({
@@ -91,7 +91,7 @@ describe('smoketest: object-oriented storage object', () => {
       }
     });
 
-    test('download content as text', async () => {
+    test.concurrent('download content as text', async () => {
       let storageObject: StorageObject | undefined;
       try {
         storageObject = await sdk.storageObject.create({
@@ -112,7 +112,7 @@ describe('smoketest: object-oriented storage object', () => {
       }
     });
 
-    test('download content as buffer', async () => {
+    test.concurrent('download content as buffer', async () => {
       let storageObject: StorageObject | undefined;
       try {
         storageObject = await sdk.storageObject.create({
@@ -134,7 +134,7 @@ describe('smoketest: object-oriented storage object', () => {
       }
     });
 
-    test('delete storage object', async () => {
+    test.concurrent('delete storage object', async () => {
       const storageObject = await sdk.storageObject.create({
         name: uniqueName('sdk-storage-object-delete'),
         content_type: 'text',
@@ -154,7 +154,7 @@ describe('smoketest: object-oriented storage object', () => {
   });
 
   describe('static upload methods', () => {
-    test('upload from text', async () => {
+    test.concurrent('upload from text', async () => {
       let uploaded: StorageObject | undefined;
       try {
         uploaded = await sdk.storageObject.uploadFromText(
@@ -175,7 +175,7 @@ describe('smoketest: object-oriented storage object', () => {
       }
     });
 
-    test('upload from buffer', async () => {
+    test.concurrent('upload from buffer', async () => {
       let uploaded: StorageObject | undefined;
       try {
         const buffer = Buffer.from('Hello from uploadFromBuffer!');
@@ -195,7 +195,7 @@ describe('smoketest: object-oriented storage object', () => {
       }
     });
 
-    test('upload from file', async () => {
+    test.concurrent('upload from file', async () => {
       const fs = require('fs/promises');
       const path = require('path');
       const os = require('os');
@@ -224,7 +224,7 @@ describe('smoketest: object-oriented storage object', () => {
     });
   });
 
-  test('upload from dir', async () => {
+  test.concurrent('upload from dir', async () => {
     const fs = require('fs/promises');
     const path = require('path');
     const os = require('os');
@@ -266,18 +266,18 @@ describe('smoketest: object-oriented storage object', () => {
   });
 
   describe('storage object list and retrieval', () => {
-    test('list storage objects via SDK', async () => {
+    test.concurrent('list storage objects via SDK', async () => {
       const objects = await sdk.storageObject.list({ limit: 10 });
       expect(Array.isArray(objects)).toBe(true);
     });
 
-    test('list storage objects via static method', async () => {
+    test.concurrent('list storage objects via static method', async () => {
       const { StorageObject } = await import('@runloop/api-client/sdk');
       const objects = await StorageObject.list(sdk.api, { limit: 5 });
       expect(Array.isArray(objects)).toBe(true);
     });
 
-    test('get storage object by ID', async () => {
+    test.concurrent('get storage object by ID', async () => {
       let storageObject: StorageObject | undefined;
       try {
         storageObject = await sdk.storageObject.create({
@@ -298,7 +298,7 @@ describe('smoketest: object-oriented storage object', () => {
   });
 
   describe('storage object mounting to devbox', () => {
-    test('mount storage object to devbox (explicit format)', async () => {
+    test.concurrent('mount storage object to devbox (explicit format)', async () => {
       let storageObject: StorageObject | undefined;
       let devbox: Devbox | undefined;
       try {
@@ -333,7 +333,7 @@ describe('smoketest: object-oriented storage object', () => {
       }
     });
 
-    test('mount storage object to devbox (inline SDK format)', async () => {
+    test.concurrent('mount storage object to devbox (inline SDK format)', async () => {
       let storageObject: StorageObject | undefined;
       let devbox: Devbox | undefined;
       try {
@@ -367,7 +367,7 @@ describe('smoketest: object-oriented storage object', () => {
       }
     });
 
-    test('access mounted storage object in devbox', async () => {
+    test.concurrent('access mounted storage object in devbox', async () => {
       // Create a storage object with content
       let storageObject: StorageObject | undefined;
       let devbox: Devbox | undefined;

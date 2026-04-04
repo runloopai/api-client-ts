@@ -107,13 +107,13 @@ describe('smoketest: object-oriented gateway config', () => {
   });
 
   describe('gateway config list and retrieval', () => {
-    test('list gateway configs', async () => {
+    test.concurrent('list gateway configs', async () => {
       const configs = await sdk.gatewayConfig.list({ limit: 10 });
       expect(Array.isArray(configs)).toBe(true);
       // Should include system-provided configs like 'anthropic' and 'openai'
     });
 
-    test('get gateway config by ID', async () => {
+    test.concurrent('get gateway config by ID', async () => {
       // First create a gateway config
       let gatewayConfig: GatewayConfig | undefined;
       try {
@@ -139,7 +139,7 @@ describe('smoketest: object-oriented gateway config', () => {
   });
 
   describe('gateway config auth mechanisms', () => {
-    test('create gateway config with bearer auth and verify roundtrip', async () => {
+    test.concurrent('create gateway config with bearer auth and verify roundtrip', async () => {
       let gatewayConfig: GatewayConfig | undefined;
       try {
         gatewayConfig = await sdk.gatewayConfig.create({
@@ -156,7 +156,7 @@ describe('smoketest: object-oriented gateway config', () => {
       }
     });
 
-    test('create gateway config with header auth and verify roundtrip', async () => {
+    test.concurrent('create gateway config with header auth and verify roundtrip', async () => {
       let gatewayConfig: GatewayConfig | undefined;
       try {
         gatewayConfig = await sdk.gatewayConfig.create({
@@ -174,7 +174,7 @@ describe('smoketest: object-oriented gateway config', () => {
       }
     });
 
-    test('create gateway config with Authorization header auth', async () => {
+    test.concurrent('create gateway config with Authorization header auth', async () => {
       let gatewayConfig: GatewayConfig | undefined;
       try {
         gatewayConfig = await sdk.gatewayConfig.create({
@@ -195,7 +195,7 @@ describe('smoketest: object-oriented gateway config', () => {
 
   // Test devbox creation with gateway config and secret
   (process.env['RUN_SMOKETESTS'] ? describe : describe.skip)('devbox with gateway config and secret', () => {
-    test(
+    test.concurrent(
       'create devbox with gateway spec and verify environment variables',
       async () => {
         let devbox: Devbox | undefined;
@@ -397,7 +397,7 @@ describe('smoketest: object-oriented gateway config', () => {
         }
       });
 
-      test('GET request - list devboxes', async () => {
+      test.concurrent('GET request - list devboxes', async () => {
         const { httpCode, responseBody } = await curlRequest('GET', '/v1/devboxes?limit=5');
 
         expect(httpCode).toBe(200);
@@ -406,7 +406,7 @@ describe('smoketest: object-oriented gateway config', () => {
         expect(Array.isArray(response.devboxes)).toBe(true);
       });
 
-      test('GET request - get specific resource', async () => {
+      test.concurrent('GET request - get specific resource', async () => {
         const { httpCode, responseBody } = await curlRequest('GET', `/v1/devboxes/${devbox!.id}`);
 
         expect(httpCode).toBe(200);
@@ -414,13 +414,13 @@ describe('smoketest: object-oriented gateway config', () => {
         expect(response.id).toBe(devbox!.id);
       });
 
-      test('GET request - error for non-existent resource', async () => {
+      test.concurrent('GET request - error for non-existent resource', async () => {
         const { httpCode } = await curlRequest('GET', '/v1/devboxes/dbx_nonexistent12345');
 
         expect(httpCode).toBe(400);
       });
 
-      test('POST request - create a secret', async () => {
+      test.concurrent('POST request - create a secret', async () => {
         const secretName = uniqueName('gateway-test-secret');
         const secretValue = 'test-value-from-gateway';
 
@@ -434,7 +434,7 @@ describe('smoketest: object-oriented gateway config', () => {
         expect(created.name).toBe(secretName);
       });
 
-      test('POST request with JSON body - create blueprint', async () => {
+      test.concurrent('POST request with JSON body - create blueprint', async () => {
         const blueprintName = uniqueName('gateway-test-blueprint');
 
         const createResult = await curlRequest('POST', '/v1/blueprints', {
@@ -450,7 +450,7 @@ describe('smoketest: object-oriented gateway config', () => {
         expect(created.name).toBe(blueprintName);
       });
 
-      test('GET request with query parameters', async () => {
+      test.concurrent('GET request with query parameters', async () => {
         const { httpCode, responseBody } = await curlRequest(
           'GET',
           '/v1/devboxes?limit=2&status=running',
@@ -465,7 +465,7 @@ describe('smoketest: object-oriented gateway config', () => {
         }
       });
 
-      test('custom headers are passed through', async () => {
+      test.concurrent('custom headers are passed through', async () => {
         const { httpCode, responseBody } = await curlRequest('GET', '/v1/devboxes?limit=1', {
           extraHeaders: ['X-Custom-Header: test-value', 'Accept: application/json'],
         });
@@ -475,7 +475,7 @@ describe('smoketest: object-oriented gateway config', () => {
         expect(response).toBeDefined();
       });
 
-      test('large response handling - list many devboxes', async () => {
+      test.concurrent('large response handling - list many devboxes', async () => {
         const { httpCode, responseBody } = await curlRequest('GET', '/v1/devboxes?limit=100');
 
         expect(httpCode).toBe(200);
@@ -484,7 +484,7 @@ describe('smoketest: object-oriented gateway config', () => {
         expect(Array.isArray(response.devboxes)).toBe(true);
       });
 
-      test('invalid JSON body returns error', async () => {
+      test.concurrent('invalid JSON body returns error', async () => {
         const { httpCode } = await curlRequest('POST', '/v1/secrets', {
           body: 'not valid json{{{',
           contentType: 'application/json',
@@ -494,7 +494,7 @@ describe('smoketest: object-oriented gateway config', () => {
         expect(httpCode).toBeLessThan(500);
       });
 
-      test('unauthorized request without token fails', async () => {
+      test.concurrent('unauthorized request without token fails', async () => {
         const result = await devbox!.cmd.exec(
           `curl -s -w "\\nHTTP_CODE:%{http_code}" "${gatewayUrl}/v1/devboxes?limit=1"`,
         );
@@ -506,7 +506,7 @@ describe('smoketest: object-oriented gateway config', () => {
         expect(httpCode).toBeGreaterThanOrEqual(400);
       });
 
-      test('streaming response - execute command with output', async () => {
+      test.concurrent('streaming response - execute command with output', async () => {
         const execResult = await devbox!.cmd.exec(`
           curl -s -w "\\nHTTP_CODE:%{http_code}" \\
             -X POST \\
@@ -528,7 +528,7 @@ describe('smoketest: object-oriented gateway config', () => {
         expect(response.stdout || response.output).toBeTruthy();
       });
 
-      test('multipart form data - upload file via upload_file endpoint', async () => {
+      test.concurrent('multipart form data - upload file via upload_file endpoint', async () => {
         const testFilePath = `gateway-multipart-test-${Date.now()}.txt`;
         const testFileContent = 'Hello from gateway multipart test!';
 
@@ -555,7 +555,7 @@ describe('smoketest: object-oriented gateway config', () => {
         expect(verifyContent).toContain('Hello from gateway multipart test');
       });
 
-      test('binary data - download file contents', async () => {
+      test.concurrent('binary data - download file contents', async () => {
         const testFileName = `/tmp/gateway-binary-test-${Date.now()}.txt`;
 
         await curlRequest('POST', `/v1/devboxes/${devbox!.id}/write_file`, {
@@ -580,7 +580,7 @@ describe('smoketest: object-oriented gateway config', () => {
         expect(responseBody).toContain('你好');
       });
 
-      test('large request body', async () => {
+      test.concurrent('large request body', async () => {
         const largeContent = 'x'.repeat(100 * 1024);
         const testFileName = `/tmp/gateway-large-body-${Date.now()}.txt`;
 
@@ -599,7 +599,7 @@ describe('smoketest: object-oriented gateway config', () => {
         expect(size).toBe(largeContent.length);
       });
 
-      test('special characters in URL path and query params', async () => {
+      test.concurrent('special characters in URL path and query params', async () => {
         const specialName = uniqueName('gateway-special-!@#');
 
         const createResult = await curlRequest('POST', '/v1/secrets', {
@@ -618,7 +618,7 @@ describe('smoketest: object-oriented gateway config', () => {
         expect(httpCode).toBeLessThan(500);
       });
 
-      test('concurrent requests', async () => {
+      test.concurrent('concurrent requests', async () => {
         const concurrentScript = `bash -c '
           for i in 1 2 3; do
             (curl -s -o /dev/null -w "%{http_code}\\n" \\
@@ -638,7 +638,7 @@ describe('smoketest: object-oriented gateway config', () => {
         }
       });
 
-      test('HEAD request', async () => {
+      test.concurrent('HEAD request', async () => {
         const result = await devbox!.cmd.exec(`
           curl -s -I -w "\\nHTTP_CODE:%{http_code}" \\
             -H "Authorization: Bearer ${gatewayToken}" \\
@@ -653,7 +653,7 @@ describe('smoketest: object-oriented gateway config', () => {
         expect([200, 405]).toContain(httpCode);
       });
 
-      test('request timeout handling', async () => {
+      test.concurrent('request timeout handling', async () => {
         const startTime = Date.now();
         const { httpCode } = await curlRequest(
           'POST',
@@ -670,7 +670,7 @@ describe('smoketest: object-oriented gateway config', () => {
         expect(elapsed).toBeLessThan(30000);
       });
 
-      test('empty/minimal response body handling', async () => {
+      test.concurrent('empty/minimal response body handling', async () => {
         // API requires limit > 0; use limit=1 for a minimal response body
         const { httpCode, responseBody } = await curlRequest('GET', '/v1/devboxes?limit=1');
 
@@ -679,7 +679,7 @@ describe('smoketest: object-oriented gateway config', () => {
         expect(response.devboxes).toBeDefined();
       });
 
-      test('response with various content types', async () => {
+      test.concurrent('response with various content types', async () => {
         const { httpCode } = await curlRequest('GET', '/v1/devboxes?limit=1', {
           extraHeaders: ['Accept: application/json'],
         });
@@ -687,7 +687,7 @@ describe('smoketest: object-oriented gateway config', () => {
         expect(httpCode).toBe(200);
       });
 
-      test('unicode in request and response', async () => {
+      test.concurrent('unicode in request and response', async () => {
         const unicodeContent = '你好世界 🌍 émojis and spëcial çharacters';
         const testFileName = `/tmp/gateway-unicode-${Date.now()}.txt`;
 
@@ -802,18 +802,18 @@ describe('smoketest: object-oriented gateway config', () => {
         }
       });
 
-      test('devbox with network policy and gateway can be created', async () => {
+      test.concurrent('devbox with network policy and gateway can be created', async () => {
         expect(devbox).toBeDefined();
         expect(devbox!.id).toBeTruthy();
       });
 
-      test('devbox has network policy applied', async () => {
+      test.concurrent('devbox has network policy applied', async () => {
         expect(devbox).toBeDefined();
         const info = await devbox!.getInfo();
         expect(info.launch_parameters.network_policy_id).toBe(networkPolicy!.id);
       });
 
-      test('devbox has gateway config applied', async () => {
+      test.concurrent('devbox has gateway config applied', async () => {
         expect(devbox).toBeDefined();
         const info = await devbox!.getInfo();
         expect(info.gateway_specs).toBeDefined();
@@ -821,21 +821,21 @@ describe('smoketest: object-oriented gateway config', () => {
         expect(info.gateway_specs?.['RUNLOOP']?.gateway_config_id).toBe(gatewayConfig!.id);
       });
 
-      test('gateway env vars are set correctly', async () => {
+      test.concurrent('gateway env vars are set correctly', async () => {
         expect(gatewayUrl).toBeTruthy();
         expect(gatewayUrl.startsWith('http')).toBe(true);
         expect(gatewayToken).toBeTruthy();
         expect(gatewayToken.startsWith('gws_')).toBe(true);
       });
 
-      test('network policy info is retrievable', async () => {
+      test.concurrent('network policy info is retrievable', async () => {
         expect(networkPolicy).toBeDefined();
         const info = await networkPolicy!.getInfo();
         expect(info.id).toBe(networkPolicy!.id);
         expect(info.egress.allow_all).toBe(true);
       });
 
-      test('gateway config info is retrievable', async () => {
+      test.concurrent('gateway config info is retrievable', async () => {
         expect(gatewayConfig).toBeDefined();
         const info = await gatewayConfig!.getInfo();
         expect(info.id).toBe(gatewayConfig!.id);
