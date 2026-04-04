@@ -53,7 +53,6 @@ jobs:
 
       - name: Run smoke tests with coverage
         id: tests
-        continue-on-error: true
         run: |
           set -o pipefail
           yarn test:objects-coverage 2>&1 | tee test-output.log
@@ -197,8 +196,3 @@ jobs:
               });
             }
 
-      - name: Fail if tests failed
-        if: steps.tests.outcome != 'success'
-        run: |
-          echo "Smoke tests failed. See PR comment for details."
-          exit 1
