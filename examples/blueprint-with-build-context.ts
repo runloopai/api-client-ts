@@ -70,7 +70,7 @@ export async function recipe(ctx: RecipeContext): Promise<RecipeOutput> {
       dockerfile: 'FROM ubuntu:22.04\nWORKDIR /app\nCOPY . .',
       build_context: storageObject,
     },
-    { polling: { timeoutMs: BLUEPRINT_POLL_TIMEOUT_MS } },
+    { longPoll: { timeoutMs: BLUEPRINT_POLL_TIMEOUT_MS } },
   );
   cleanup.add(`blueprint:${blueprint.id}`, () => sdk.blueprint.fromId(blueprint.id).delete());
 

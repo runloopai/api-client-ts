@@ -31,7 +31,7 @@ describe('smoketest: devbox snapshots', () => {
     }
   }, 30_000);
 
-  test('launch devbox from snapshot (deprecated polling path)', async () => {
+  test('launch devbox from snapshot', async () => {
     let devbox: DevboxView | undefined;
     try {
       devbox = await client.devboxes.createAndAwaitRunning(
@@ -40,7 +40,7 @@ describe('smoketest: devbox snapshots', () => {
           launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 }, // 5 minutes
         },
         {
-          polling: { timeoutMs: 20 * 60 * 1000 },
+          longPoll: { timeoutMs: 20 * 60 * 1000 },
         },
       );
       expect(devbox.snapshot_id).toBe(snapshotId);

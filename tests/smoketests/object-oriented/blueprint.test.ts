@@ -16,7 +16,7 @@ describe('smoketest: object-oriented blueprint', () => {
           dockerfile: 'FROM ubuntu:22.04\nRUN apt-get update && apt-get install -y curl',
           system_setup_commands: ['echo "Blueprint setup complete"'],
         },
-        { polling: { timeoutMs: 10 * 60 * 1000 } },
+        { longPoll: { timeoutMs: 10 * 60 * 1000 } },
       );
       blueprintId = blueprint.id;
     }, LONG_TIMEOUT);
@@ -144,7 +144,7 @@ WORKDIR /app
 COPY . .`,
               build_context: storageObject,
             },
-            { polling: { timeoutMs: 10 * 60 * 1000 } },
+            { longPoll: { timeoutMs: 10 * 60 * 1000 } },
           );
 
           expect(blueprint).toBeDefined();
@@ -226,7 +226,7 @@ WORKDIR /app
 COPY . .`,
               build_context_dir: contextDir,
             },
-            { polling: { timeoutMs: 10 * 60 * 1000 } },
+            { longPoll: { timeoutMs: 10 * 60 * 1000 } },
           );
 
           expect(blueprint).toBeDefined();
@@ -288,7 +288,7 @@ COPY . .`,
               name: uniqueName('sdk-blueprint-retrieve'),
               dockerfile: 'FROM ubuntu:22.04',
             },
-            { polling: { timeoutMs: 10 * 60 * 1000 } },
+            { longPoll: { timeoutMs: 10 * 60 * 1000 } },
           );
           expect(blueprint?.id).toBeTruthy();
 
@@ -326,7 +326,7 @@ COPY . .`,
               dockerfile: 'FROM ubuntu:22.04\nRUN apt-get update',
               network_policy_id: policy.id,
             },
-            { polling: { timeoutMs: 10 * 60 * 1000 } },
+            { longPoll: { timeoutMs: 10 * 60 * 1000 } },
           );
 
           expect(blueprint).toBeDefined();
@@ -371,7 +371,7 @@ COPY . .`,
                 network_policy_id: policy.id,
               },
             },
-            { polling: { timeoutMs: 10 * 60 * 1000 } },
+            { longPoll: { timeoutMs: 10 * 60 * 1000 } },
           );
 
           expect(blueprint).toBeDefined();

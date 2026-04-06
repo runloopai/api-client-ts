@@ -29,13 +29,13 @@ describe('smoketest: executions', () => {
     SHORT_TIMEOUT,
   );
 
-  test('execute async and await completion (deprecated polling path)', async () => {
+  test('execute async and await completion (long-poll path)', async () => {
     const started = await client.devboxes.executions.executeAsync(devboxId!, {
       command: 'echo hello && sleep 1',
     });
     execId = started.execution_id;
     const completed = await client.devboxes.executions.awaitCompleted(devboxId!, execId!, {
-      polling: { timeoutMs: 10 * 60 * 1000 },
+      longPoll: { timeoutMs: 10 * 60 * 1000 },
     });
     expect(completed.status).toBe('completed');
   });

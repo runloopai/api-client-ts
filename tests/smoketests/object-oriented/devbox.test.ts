@@ -441,13 +441,13 @@ describe('smoketest: object-oriented devbox', () => {
     test.concurrent(
       'create devbox from blueprint ID',
       async () => {
-        // First create a blueprint with extended polling timeout
+        // First create a blueprint with extended long-poll timeout
         const blueprint = await sdk.blueprint.create(
           {
             name: uniqueName('sdk-blueprint-for-devbox'),
             dockerfile: 'FROM ubuntu:22.04\nRUN apt-get update && apt-get install -y curl',
           },
-          { polling: { timeoutMs: 10 * 60 * 1000 } },
+          { longPoll: { timeoutMs: 10 * 60 * 1000 } },
         );
         expect(blueprint).toBeDefined();
 
@@ -473,14 +473,14 @@ describe('smoketest: object-oriented devbox', () => {
     test.concurrent(
       'create devbox from blueprint name',
       async () => {
-        // First create a blueprint with a specific name and extended polling timeout
+        // First create a blueprint with a specific name and extended long-poll timeout
         const blueprintName = uniqueName('sdk-blueprint-name-test');
         const blueprint = await sdk.blueprint.create(
           {
             name: blueprintName,
             dockerfile: 'FROM ubuntu:22.04\nRUN apt-get update && apt-get install -y wget',
           },
-          { polling: { timeoutMs: 10 * 60 * 1000 } },
+          { longPoll: { timeoutMs: 10 * 60 * 1000 } },
         );
         expect(blueprint).toBeDefined();
 

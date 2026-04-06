@@ -40,7 +40,7 @@ const client = makeClient();
         const run = new ScenarioRun(client, runView.id, runView.devbox_id);
 
         await run.awaitEnvReady({
-          polling: { maxAttempts: 120, pollingIntervalMs: 5_000, timeoutMs: 20 * 60 * 1000 },
+          longPoll: { timeoutMs: 20 * 60 * 1000 },
         });
 
         await run.score();
@@ -50,7 +50,7 @@ const client = makeClient();
 
         await expect(
           run.awaitScored({
-            polling: { pollingIntervalMs: 500, maxAttempts: 500, timeoutMs: 30 * 60 * 1000 },
+            longPoll: { timeoutMs: 30 * 60 * 1000 },
             signal: ac.signal,
           }),
         ).rejects.toThrow(LongPollAbortError);
@@ -83,7 +83,7 @@ const client = makeClient();
 
         await expect(
           client.scenarios.runs.awaitScored(runView.id, {
-            polling: { pollingIntervalMs: 500, maxAttempts: 500, timeoutMs: 30 * 60 * 1000 },
+            longPoll: { timeoutMs: 30 * 60 * 1000 },
             signal: ac.signal,
           }),
         ).rejects.toThrow(LongPollAbortError);

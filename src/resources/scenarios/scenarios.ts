@@ -23,7 +23,7 @@ import {
   ScenariosCursorIDPage,
   type ScenariosCursorIDPageParams,
 } from '../../pagination';
-import { PollingOptions } from '@runloop/api-client/lib/polling';
+import { LongPollRequestOptions } from '@runloop/api-client/lib/polling';
 import { DevboxView } from '../devboxes';
 
 export class Scenarios extends APIResource {
@@ -132,7 +132,7 @@ export class Scenarios extends APIResource {
    */
   async startRunAndAwaitEnvReady(
     body: ScenarioStartRunParams,
-    options?: Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxView>> },
+    options?: LongPollRequestOptions<DevboxView>,
   ): Promise<ScenarioRunView> {
     const run = await this.startRun(body, options);
     await this._client.devboxes.awaitRunning(run.devbox_id, options);

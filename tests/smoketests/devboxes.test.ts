@@ -40,7 +40,7 @@ describe('smoketest: devboxes', () => {
     );
 
     test.concurrent(
-      'create devbox with authenticated tunnel in create params (deprecated polling path)',
+      'create devbox with authenticated tunnel in create params',
       async () => {
         let devbox: DevboxView | undefined;
         try {
@@ -51,7 +51,7 @@ describe('smoketest: devboxes', () => {
               tunnel: { auth_mode: 'authenticated' },
             },
             {
-              polling: { timeoutMs: 20 * 60 * 1000 },
+              longPoll: { timeoutMs: 20 * 60 * 1000 },
             },
           );
 
@@ -177,14 +177,14 @@ describe('smoketest: devboxes', () => {
       SHORT_TIMEOUT,
     );
 
-    test('await running (createAndAwaitRunning, deprecated polling path)', async () => {
+    test('await running (createAndAwaitRunning)', async () => {
       const created = await client.devboxes.createAndAwaitRunning(
         {
           name: uniqueName('smoketest-devbox2'),
           launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 }, // 5 minutes
         },
         {
-          polling: { timeoutMs: 20 * 60 * 1000 },
+          longPoll: { timeoutMs: 20 * 60 * 1000 },
         },
       );
       expect(created.status).toBe('running');
@@ -230,7 +230,7 @@ describe('smoketest: devboxes', () => {
   );
 
   test.concurrent(
-    'createAndAwaitRunning timeout (deprecated polling path)',
+    'createAndAwaitRunning timeout',
     async () => {
       await expect(
         client.devboxes.createAndAwaitRunning(
@@ -239,7 +239,7 @@ describe('smoketest: devboxes', () => {
             launch_parameters: { launch_commands: ['sleep 70'], keep_alive_time_seconds: 30 },
           },
           {
-            polling: { timeoutMs: 100 },
+            longPoll: { timeoutMs: 100 },
           },
         ),
       ).rejects.toThrow();
