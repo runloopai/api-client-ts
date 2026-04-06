@@ -168,7 +168,7 @@ describe('smoketest: object-oriented network policy', () => {
       }
     });
 
-    test.concurrent('create policy with multiple allowed hostnames', async () => {
+    test('create policy with multiple allowed hostnames', async () => {
       let policy: NetworkPolicy | undefined;
       try {
         const hostnames = ['github.com', '*.npmjs.org', 'api.openai.com', '*.googleapis.com'];
