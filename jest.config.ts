@@ -35,7 +35,6 @@ const config: JestConfigWithTsJest = {
   ],
   // Add display name for smoke tests to make it clearer in output
   ...((runSmoketests || runBuiltPackageTest) && { displayName: 'Smoke Tests' }),
-  ...(runSmoketests && { maxWorkers: 50 }),
 };
 
 export default config;
