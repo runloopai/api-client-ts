@@ -618,7 +618,7 @@ describe('smoketest: object-oriented gateway config', () => {
         expect(httpCode).toBeLessThan(500);
       });
 
-      test.concurrent('concurrent requests', async () => {
+      test('concurrent requests', async () => {
         const concurrentScript = `bash -c '
           for i in 1 2 3; do
             (curl -s -o /dev/null -w "%{http_code}\\n" \\
