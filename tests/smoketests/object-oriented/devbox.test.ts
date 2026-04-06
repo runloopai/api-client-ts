@@ -773,7 +773,7 @@ describe('smoketest: object-oriented devbox', () => {
       expect(stdoutCombined).toBe(await result.stdout());
     });
 
-    test.concurrent('concurrent execAsync - multiple executions streaming simultaneously', async () => {
+    test('concurrent execAsync - multiple executions streaming simultaneously', async () => {
       const taskALogs: string[] = [];
       const taskBLogs: string[] = [];
       let taskACount = 0;
