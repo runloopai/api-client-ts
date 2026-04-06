@@ -807,10 +807,9 @@ export interface DevboxView {
   id: string;
 
   /**
-   * A list of capability groups this devbox has access to. This allows devboxes to
-   * be compatible with certain tools sets like computer usage APIs.
+   * A list of capability groups this devbox has access to.
    */
-  capabilities: Array<'unknown' | 'computer_usage' | 'browser_usage' | 'docker_in_docker'>;
+  capabilities: Array<'unknown' | 'docker_in_docker'>;
 
   /**
    * Creation time of the Devbox (Unix timestamp milliseconds).
