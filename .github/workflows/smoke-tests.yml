@@ -40,7 +40,6 @@ jobs:
         uses: runloopai/setup-node@main
         with:
           node-version: '20'
-          cache: yarn
 
       - name: Install dependencies
         run: yarn --frozen-lockfile
