@@ -6,7 +6,7 @@ import type {
   BlueprintBuildLogsListView,
 } from '../resources/blueprints';
 import type { DevboxCreateParams, DevboxView } from '../resources/devboxes/devboxes';
-import type { PollingOptions } from '../lib/polling';
+import type { LongPollRequestOptions } from '../lib/polling';
 import type { IgnoreMatcher } from '../lib/ignore-matcher';
 import { Devbox } from './devbox';
 import { StorageObject } from './storage-object';
@@ -80,15 +80,13 @@ export class Blueprint {
    *
    * @param {Runloop} client - The Runloop client instance
    * @param {CreateParams} params - Parameters for creating the blueprint
-   * @param {Core.RequestOptions & { polling?: Partial<PollingOptions<BlueprintView>> }} [options] - Request options with optional polling configuration
+   * @param {LongPollRequestOptions<BlueprintView>} [options] - Request options with optional long-poll configuration
    * @returns {Promise<Blueprint>} A {@link Blueprint} instance with completed build
    */
   static async create(
     client: Runloop,
     params: CreateParams,
-    options?: Core.RequestOptions & {
-      polling?: Partial<PollingOptions<BlueprintView>>;
-    },
+    options?: LongPollRequestOptions<BlueprintView>,
   ): Promise<Blueprint> {
     const { build_context, build_context_dir, ...other } = params as any;
     let rawParams: BlueprintCreateParams;
@@ -214,14 +212,12 @@ export class Blueprint {
    * @private
    *
    * @param {Omit<DevboxCreateParams, 'blueprint_id' | 'snapshot_id' | 'blueprint_name'>} [params] - Additional devbox creation parameters (optional)
-   * @param {Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxView>> }} [options] - Request options with optional polling configuration
+   * @param {LongPollRequestOptions<DevboxView>} [options] - Request options with optional long-poll configuration
    * @returns {Promise<Devbox>} A new {@link Devbox} instance created from this blueprint
    */
   async createDevbox(
     params?: Omit<DevboxCreateParams, 'blueprint_id' | 'snapshot_id' | 'blueprint_name'>,
-    options?: Core.RequestOptions & {
-      polling?: Partial<PollingOptions<DevboxView>>;
-    },
+    options?: LongPollRequestOptions<DevboxView>,
   ): Promise<Devbox> {
     const createParams: DevboxCreateParams = {
       ...params,

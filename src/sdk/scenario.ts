@@ -6,7 +6,7 @@ import type {
   ScenarioStartRunParams,
 } from '../resources/scenarios/scenarios';
 import type { DevboxView } from '../resources/devboxes/devboxes';
-import { PollingOptions } from '../lib/polling';
+import { LongPollRequestOptions } from '../lib/polling';
 import { ScenarioRun } from './scenario-run';
 
 /**
@@ -177,13 +177,10 @@ export class Scenario {
    * ```
    *
    * @param {ScenarioRunParams} [params] - Run parameters
-   * @param {Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxView>> }} [options] - Request options with optional polling config
+   * @param {LongPollRequestOptions<DevboxView>} [options] - Request options with optional long-poll config
    * @returns {Promise<ScenarioRun>} ScenarioRun instance with ready devbox
    */
-  async run(
-    params?: ScenarioRunParams,
-    options?: Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxView>> },
-  ): Promise<ScenarioRun> {
+  async run(params?: ScenarioRunParams, options?: LongPollRequestOptions<DevboxView>): Promise<ScenarioRun> {
     const runView = await this.client.scenarios.startRunAndAwaitEnvReady(
       { scenario_id: this._id, ...params },
       options,

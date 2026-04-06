@@ -49,7 +49,7 @@ export async function recipe(ctx: RecipeContext): Promise<RecipeOutput> {
       name: uniqueName('example-blueprint'),
       dockerfile: 'FROM ubuntu:22.04\nRUN echo "Hello from your blueprint"',
     },
-    { polling: { timeoutMs: BLUEPRINT_POLL_TIMEOUT_MS } },
+    { longPoll: { timeoutMs: BLUEPRINT_POLL_TIMEOUT_MS } },
   );
   cleanup.add(`blueprint:${blueprint.id}`, () => sdk.blueprint.fromId(blueprint.id).delete());
 

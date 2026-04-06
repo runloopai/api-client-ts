@@ -32,6 +32,10 @@ describe('smoketest: devbox snapshots', () => {
   }, 30_000);
 
   test('launch devbox from snapshot (deprecated polling path)', async () => {
+    const warnSpy = jest.spyOn(console, 'warn').mockImplementation((...args: unknown[]) => {
+      if (typeof args[0] === 'string' && args[0].includes('[runloop-api-client]')) return;
+      process.stderr.write(`console.warn: ${args.join(' ')}\n`);
+    });
     let devbox: DevboxView | undefined;
     try {
       devbox = await client.devboxes.createAndAwaitRunning(
@@ -45,6 +49,7 @@ describe('smoketest: devbox snapshots', () => {
       );
       expect(devbox.snapshot_id).toBe(snapshotId);
     } finally {
+      warnSpy.mockRestore();
       if (devbox) {
         await client.devboxes.shutdown(devbox.id);
       }

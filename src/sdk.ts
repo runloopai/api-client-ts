@@ -726,14 +726,12 @@ export class BlueprintOps {
   /**
    * Create a new blueprint.
    * @param {BlueprintCreateParams} params - Parameters for creating the blueprint.
-   * @param {Core.RequestOptions & { polling?: Partial<PollingOptions<RunloopAPI.Blueprints.BlueprintView>> }} [options] - Request options including polling configuration.
+   * @param {LongPollRequestOptions<RunloopAPI.Blueprints.BlueprintView>} [options] - Request options with optional long-poll configuration.
    * @returns {Promise<Blueprint>} A {@link Blueprint} instance.
    */
   async create(
     params: BlueprintCreateParams,
-    options?: Core.RequestOptions & {
-      polling?: Partial<PollingOptions<RunloopAPI.Blueprints.BlueprintView>>;
-    },
+    options?: LongPollRequestOptions<RunloopAPI.Blueprints.BlueprintView>,
   ): Promise<Blueprint> {
     return Blueprint.create(this.client, params, options);
   }
