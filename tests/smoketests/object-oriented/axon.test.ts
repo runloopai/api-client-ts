@@ -76,7 +76,7 @@ const sdk = makeClientSDK();
       expect(result2.sequence).toBeGreaterThan(result1.sequence);
     });
 
-    test.concurrent(
+    test(
       'SSE subscribe reconnects after idle (408) and resumes without duplicate sequences',
       async () => {
         const tag = 'reconnect-smoke';
