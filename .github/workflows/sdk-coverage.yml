@@ -55,7 +55,8 @@ jobs:
         id: tests
         run: |
           set -o pipefail
-          yarn test:objects-coverage 2>&1 | tee test-output.log
+          yarn test:objects-coverage --maxWorkers=800% --color 2>&1 | \
+            tee -i test-output.log
 
       - name: Upload coverage report
         uses: runloopai/upload-artifact@main
@@ -72,7 +73,7 @@ jobs:
           script: |
             const fs = require('fs');
             const testsPassed = '${{ steps.tests.outcome }}' === 'success';
-            const runUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
             const COMMENT_MARKER = '<!-- sdk-coverage-report -->';
             
             let lines = [COMMENT_MARKER];
