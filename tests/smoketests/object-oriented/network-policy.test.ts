@@ -204,7 +204,7 @@ describe('smoketest: object-oriented network policy', () => {
       }
     });
 
-    test.concurrent('create policy with wildcard hostnames', async () => {
+    test('create policy with wildcard hostnames', async () => {
       let policy: NetworkPolicy | undefined;
       try {
         // Wildcards are only allowed as the first label (e.g., *.example.com)
