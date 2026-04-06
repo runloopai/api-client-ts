@@ -7,7 +7,7 @@ describe('smoketest: examples', () => {
   for (const entry of exampleRegistry) {
     const hasRequiredEnv = entry.requiredEnv.every((name) => Boolean(process.env[name]));
     const runLiveExample = hasLiveFlag && hasRequiredEnv;
-    const itLive = runLiveExample ? test : test.skip;
+    const itLive = runLiveExample ? test.concurrent : test.concurrent.skip;
 
     itLive(
       `${entry.slug} example runs with successful checks and cleanup`,

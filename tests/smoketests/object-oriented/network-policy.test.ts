@@ -105,12 +105,12 @@ describe('smoketest: object-oriented network policy', () => {
   });
 
   describe('network policy list and retrieval', () => {
-    test('list network policies', async () => {
+    test.concurrent('list network policies', async () => {
       const policies = await sdk.networkPolicy.list({ limit: 10 });
       expect(Array.isArray(policies)).toBe(true);
     });
 
-    test('get network policy by ID', async () => {
+    test.concurrent('get network policy by ID', async () => {
       // First create a network policy
       let policy: NetworkPolicy | undefined;
       try {

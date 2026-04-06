@@ -8,7 +8,7 @@ describe('smoketest: devboxes', () => {
    * Test V2 tunnel functionality.
    */
   describe('devbox tunnels', () => {
-    test(
+    test.concurrent(
       'create devbox with tunnel in create params',
       async () => {
         let devbox: DevboxView | undefined;
@@ -39,7 +39,7 @@ describe('smoketest: devboxes', () => {
       SHORT_TIMEOUT,
     );
 
-    test(
+    test.concurrent(
       'create devbox with authenticated tunnel in create params (deprecated polling path)',
       async () => {
         let devbox: DevboxView | undefined;
@@ -71,7 +71,7 @@ describe('smoketest: devboxes', () => {
       SHORT_TIMEOUT,
     );
 
-    test(
+    test.concurrent(
       'create devbox then enable tunnel',
       async () => {
         let devbox: DevboxView | undefined;
@@ -110,7 +110,7 @@ describe('smoketest: devboxes', () => {
       SHORT_TIMEOUT,
     );
 
-    test(
+    test.concurrent(
       'create devbox then enable authenticated tunnel',
       async () => {
         let devbox: DevboxView | undefined;
@@ -158,7 +158,7 @@ describe('smoketest: devboxes', () => {
       }
     });
 
-    test(
+    test.concurrent(
       'create devbox',
       async () => {
         let devbox: DevboxView | undefined;
@@ -211,7 +211,7 @@ describe('smoketest: devboxes', () => {
     });
   });
 
-  test(
+  test.concurrent(
     'createAndAwaitRunning long set up',
     async () => {
       // createAndAwaitRunning should poll until devbox is running
@@ -229,7 +229,7 @@ describe('smoketest: devboxes', () => {
     SHORT_TIMEOUT * 4,
   );
 
-  test(
+  test.concurrent(
     'createAndAwaitRunning timeout (deprecated polling path)',
     async () => {
       await expect(

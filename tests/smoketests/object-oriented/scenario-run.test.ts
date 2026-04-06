@@ -179,7 +179,7 @@ describe('smoketest: object-oriented scenario-run', () => {
       }
     });
 
-    test(
+    test.concurrent(
       'cancel - cancel a running scenario',
       async () => {
         // Start a new run
@@ -221,7 +221,7 @@ describe('smoketest: object-oriented scenario-run', () => {
       }
     });
 
-    test(
+    test.concurrent(
       'score and awaitScored - score then wait separately',
       async () => {
         // Start a new run
@@ -272,7 +272,7 @@ describe('smoketest: object-oriented scenario-run', () => {
       }
     });
 
-    test(
+    test.concurrent(
       'scoreAndAwait - score and wait in one call',
       async () => {
         // Start a new run

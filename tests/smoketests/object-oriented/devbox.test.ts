@@ -98,7 +98,7 @@ describe('smoketest: object-oriented devbox', () => {
   });
 
   describe('devbox creation edge cases', () => {
-    test(
+    test.concurrent(
       'create devbox with empty mounts array',
       async () => {
         // This tests the transformSDKDevboxCreateParams branch for empty mounts
@@ -120,7 +120,7 @@ describe('smoketest: object-oriented devbox', () => {
       SHORT_TIMEOUT,
     );
 
-    test(
+    test.concurrent(
       'create devbox with network policy',
       async () => {
         let policy: NetworkPolicy | undefined;
@@ -161,13 +161,13 @@ describe('smoketest: object-oriented devbox', () => {
   });
 
   describe('devbox list and retrieval', () => {
-    test('list devboxes', async () => {
+    test.concurrent('list devboxes', async () => {
       const devboxes = await sdk.devbox.list({ limit: 10 });
       expect(Array.isArray(devboxes)).toBe(true);
       expect(devboxes.length).toBeGreaterThan(0);
     });
 
-    test('get devbox by ID', async () => {
+    test.concurrent('get devbox by ID', async () => {
       let devbox: Devbox | undefined;
       try {
         devbox = await sdk.devbox.create({
@@ -190,7 +190,7 @@ describe('smoketest: object-oriented devbox', () => {
   });
 
   describe('devbox suspend and resume', () => {
-    test('suspend and resume devbox', async () => {
+    test.concurrent('suspend and resume devbox', async () => {
       const devbox = await sdk.devbox.create({
         name: uniqueName('sdk-devbox-suspend'),
         launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 }, // 5 minutes
@@ -210,7 +210,7 @@ describe('smoketest: object-oriented devbox', () => {
       await devbox.shutdown();
     });
 
-    test('resumeAsync - resume without waiting', async () => {
+    test.concurrent('resumeAsync - resume without waiting', async () => {
       const devbox = await sdk.devbox.create({
         name: uniqueName('sdk-devbox-resume-async'),
         launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 }, // 5 minutes
@@ -234,7 +234,7 @@ describe('smoketest: object-oriented devbox', () => {
       await devbox.shutdown();
     });
 
-    test('keep alive', async () => {
+    test.concurrent('keep alive', async () => {
       const devbox = await sdk.devbox.create({
         name: uniqueName('sdk-devbox-keepalive'),
         launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 }, // 5 minutes
@@ -250,7 +250,7 @@ describe('smoketest: object-oriented devbox', () => {
   });
 
   describe('devbox networking', () => {
-    test('create SSH key', async () => {
+    test.concurrent('create SSH key', async () => {
       const devbox = await sdk.devbox.create({
         name: uniqueName('sdk-devbox-ssh'),
         launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 }, // 5 minutes
@@ -263,7 +263,7 @@ describe('smoketest: object-oriented devbox', () => {
       await devbox.shutdown();
     });
 
-    test('enable V2 tunnel (open)', async () => {
+    test.concurrent('enable V2 tunnel (open)', async () => {
       const devbox = await sdk.devbox.create({
         name: uniqueName('sdk-devbox-enable-tunnel'),
         launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 },
@@ -292,7 +292,7 @@ describe('smoketest: object-oriented devbox', () => {
       }
     });
 
-    test('enable V2 tunnel (authenticated)', async () => {
+    test.concurrent('enable V2 tunnel (authenticated)', async () => {
       const devbox = await sdk.devbox.create({
         name: uniqueName('sdk-devbox-enable-auth-tunnel'),
         launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 },
@@ -312,7 +312,7 @@ describe('smoketest: object-oriented devbox', () => {
       }
     });
 
-    test('enable V2 tunnel with default params', async () => {
+    test.concurrent('enable V2 tunnel with default params', async () => {
       const devbox = await sdk.devbox.create({
         name: uniqueName('sdk-devbox-enable-tunnel-default'),
         launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 },
@@ -330,7 +330,7 @@ describe('smoketest: object-oriented devbox', () => {
       }
     });
 
-    test('create devbox with tunnel in create params', async () => {
+    test.concurrent('create devbox with tunnel in create params', async () => {
       // Create devbox with tunnel configured at launch time
       const devbox = await sdk.devbox.create({
         name: uniqueName('sdk-devbox-tunnel-create'),
@@ -349,7 +349,7 @@ describe('smoketest: object-oriented devbox', () => {
       }
     });
 
-    test('create devbox with authenticated tunnel in create params', async () => {
+    test.concurrent('create devbox with authenticated tunnel in create params', async () => {
       // Create devbox with authenticated tunnel at launch time
       const devbox = await sdk.devbox.create({
         name: uniqueName('sdk-devbox-tunnel-auth-create'),
@@ -369,7 +369,7 @@ describe('smoketest: object-oriented devbox', () => {
       }
     });
 
-    test('getTunnel returns null when no tunnel enabled', async () => {
+    test.concurrent('getTunnel returns null when no tunnel enabled', async () => {
       const devbox = await sdk.devbox.create({
         name: uniqueName('sdk-devbox-get-tunnel-null'),
         launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 },
@@ -383,7 +383,7 @@ describe('smoketest: object-oriented devbox', () => {
       }
     });
 
-    test('getTunnel returns tunnel info after enabling', async () => {
+    test.concurrent('getTunnel returns tunnel info after enabling', async () => {
       const devbox = await sdk.devbox.create({
         name: uniqueName('sdk-devbox-get-tunnel'),
         launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 },
@@ -402,7 +402,7 @@ describe('smoketest: object-oriented devbox', () => {
       }
     });
 
-    test('getTunnelUrl constructs correct URL', async () => {
+    test.concurrent('getTunnelUrl constructs correct URL', async () => {
       const devbox = await sdk.devbox.create({
         name: uniqueName('sdk-devbox-get-tunnel-url'),
         launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 },
@@ -422,7 +422,7 @@ describe('smoketest: object-oriented devbox', () => {
       }
     });
 
-    test('getTunnelUrl throws RunloopError when no tunnel enabled', async () => {
+    test.concurrent('getTunnelUrl throws RunloopError when no tunnel enabled', async () => {
       const devbox = await sdk.devbox.create({
         name: uniqueName('sdk-devbox-get-tunnel-url-error'),
         launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 },
@@ -438,7 +438,7 @@ describe('smoketest: object-oriented devbox', () => {
   });
 
   describe('devbox creation from blueprint and snapshot', () => {
-    test(
+    test.concurrent(
       'create devbox from blueprint ID',
       async () => {
         // First create a blueprint with extended polling timeout
@@ -470,7 +470,7 @@ describe('smoketest: object-oriented devbox', () => {
       LONG_TIMEOUT,
     );
 
-    test(
+    test.concurrent(
       'create devbox from blueprint name',
       async () => {
         // First create a blueprint with a specific name and extended polling timeout
@@ -503,7 +503,7 @@ describe('smoketest: object-oriented devbox', () => {
       LONG_TIMEOUT,
     );
 
-    test('create devbox from snapshot', async () => {
+    test.concurrent('create devbox from snapshot', async () => {
       // First create a devbox
       const sourceDevbox = await sdk.devbox.create({
         name: uniqueName('sdk-devbox-for-snapshot'),
@@ -536,7 +536,7 @@ describe('smoketest: object-oriented devbox', () => {
       await snapshot.delete();
     });
 
-    test('snapshot disk async', async () => {
+    test.concurrent('snapshot disk async', async () => {
       const sourceDevbox = await sdk.devbox.create({
         name: uniqueName('sdk-devbox-for-async-snapshot'),
         launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 },
@@ -574,7 +574,7 @@ describe('smoketest: object-oriented devbox', () => {
       }
     });
 
-    test('exec with stdout callback', async () => {
+    test.concurrent('exec with stdout callback', async () => {
       const stdoutLines: string[] = [];
 
       const result = await devbox.cmd.exec('echo "line1" && echo "line2" && echo "line3"', {
@@ -594,7 +594,7 @@ describe('smoketest: object-oriented devbox', () => {
       expect(stdoutCombined).toBe(await result.stdout());
     });
 
-    test('exec with stderr callback', async () => {
+    test.concurrent('exec with stderr callback', async () => {
       const stderrLines: string[] = [];
 
       const result = await devbox.cmd.exec('echo "error1" >&2 && echo "error2" >&2', {
@@ -613,7 +613,7 @@ describe('smoketest: object-oriented devbox', () => {
       expect(stderrCombined).toBe(await result.stderr());
     });
 
-    test('exec with output callback (both stdout and stderr)', async () => {
+    test.concurrent('exec with output callback (both stdout and stderr)', async () => {
       const allLines: string[] = [];
 
       const result = await devbox.cmd.exec('echo "stdout1" && echo "stderr1" >&2 && echo "stdout2"', {
@@ -631,7 +631,7 @@ describe('smoketest: object-oriented devbox', () => {
       expect(combined).toContain('stdout2');
     });
 
-    test('exec with all three callbacks (stdout, stderr, output)', async () => {
+    test.concurrent('exec with all three callbacks (stdout, stderr, output)', async () => {
       const stdoutLines: string[] = [];
       const stderrLines: string[] = [];
       const outputLines: string[] = [];
@@ -661,7 +661,7 @@ describe('smoketest: object-oriented devbox', () => {
       expect(combined).toContain('err1');
     });
 
-    test('exec WITHOUT callbacks (preserve existing behavior)', async () => {
+    test.concurrent('exec WITHOUT callbacks (preserve existing behavior)', async () => {
       const result = await devbox.cmd.exec('echo "test output"');
 
       expect(result.success).toBe(true);
@@ -703,7 +703,7 @@ describe('smoketest: object-oriented devbox', () => {
       expect(stdoutCombined).toBe(await result.stdout());
     });
 
-    test('execAsync with stderr callback', async () => {
+    test.concurrent('execAsync with stderr callback', async () => {
       const stderrLines: string[] = [];
 
       const execution = await devbox.cmd.execAsync('echo "error output" >&2', {
@@ -722,7 +722,7 @@ describe('smoketest: object-oriented devbox', () => {
       expect(stderrCombined).toBe(await result.stderr());
     });
 
-    test('exec with command producing both stdout and stderr', async () => {
+    test.concurrent('exec with command producing both stdout and stderr', async () => {
       const stdoutLines: string[] = [];
       const stderrLines: string[] = [];
 
@@ -747,7 +747,7 @@ describe('smoketest: object-oriented devbox', () => {
       expect(stderrCombined).toBe(await result.stderr());
     });
 
-    test('exec with long output - verify all lines received', async () => {
+    test.concurrent('exec with long output - verify all lines received', async () => {
       const stdoutLines: string[] = [];
 
       const result = await devbox.cmd.exec('for i in {1..1000}; do echo "line $i"; done', {
@@ -856,7 +856,7 @@ describe('smoketest: object-oriented devbox', () => {
       }
     });
 
-    test('shell.exec - basic execution', async () => {
+    test.concurrent('shell.exec - basic execution', async () => {
       expect(devbox).toBeDefined();
       const shell = devbox.shell('test-shell-1');
       const result = await shell.exec('echo "Hello from named shell!"');
@@ -866,7 +866,7 @@ describe('smoketest: object-oriented devbox', () => {
       expect(output).toContain('Hello from named shell!');
     });
 
-    test('shell.exec - CWD persistence across commands', async () => {
+    test.concurrent('shell.exec - CWD persistence across commands', async () => {
       expect(devbox).toBeDefined();
       const shell = devbox.shell('test-shell-2');
 
@@ -889,7 +889,7 @@ describe('smoketest: object-oriented devbox', () => {
       expect(lsOutput).toContain('testfile.txt');
     });
 
-    test('shell.exec - environment variable persistence', async () => {
+    test.concurrent('shell.exec - environment variable persistence', async () => {
       expect(devbox).toBeDefined();
       const shell = devbox.shell('test-shell-3');
 
@@ -908,7 +908,7 @@ describe('smoketest: object-oriented devbox', () => {
       expect(bothOutput).toBe('test-value-123:another-value');
     });
 
-    test('shell.exec - combined CWD and environment persistence', async () => {
+    test.concurrent('shell.exec - combined CWD and environment persistence', async () => {
       expect(devbox).toBeDefined();
       const shell = devbox.shell('test-shell-4');
 
@@ -930,7 +930,7 @@ describe('smoketest: object-oriented devbox', () => {
       expect(lsResult.exitCode).toBe(0);
     });
 
-    test('shell.execAsync - basic async execution', async () => {
+    test.concurrent('shell.execAsync - basic async execution', async () => {
       expect(devbox).toBeDefined();
       const shell = devbox.shell('test-shell-5');
       const execution = await shell.execAsync('sleep 1 && echo "Async command completed"');
@@ -944,7 +944,7 @@ describe('smoketest: object-oriented devbox', () => {
       expect(output).toContain('Async command completed');
     });
 
-    test('shell.execAsync - stateful async execution', async () => {
+    test.concurrent('shell.execAsync - stateful async execution', async () => {
       expect(devbox).toBeDefined();
       const shell = devbox.shell('test-shell-6');
 
@@ -962,7 +962,7 @@ describe('smoketest: object-oriented devbox', () => {
       expect(output).toContain('VAR: async-value');
     });
 
-    test('shell.exec - sequential execution (queuing)', async () => {
+    test.concurrent('shell.exec - sequential execution (queuing)', async () => {
       expect(devbox).toBeDefined();
       const shell = devbox.shell('test-shell-7');
 
@@ -983,7 +983,7 @@ describe('smoketest: object-oriented devbox', () => {
       expect(output).toContain('done');
     });
 
-    test('shell.execAsync - sequential execution with queuing', async () => {
+    test.concurrent('shell.execAsync - sequential execution with queuing', async () => {
       expect(devbox).toBeDefined();
       const shell = devbox.shell('test-shell-8');
 
@@ -1010,7 +1010,7 @@ describe('smoketest: object-oriented devbox', () => {
       expect(await result3.stdout()).toContain('async-third');
     });
 
-    test('shell.exec - with streaming callbacks', async () => {
+    test.concurrent('shell.exec - with streaming callbacks', async () => {
       expect(devbox).toBeDefined();
       const shell = devbox.shell('test-shell-9');
       const stdoutLines: string[] = [];
@@ -1032,7 +1032,7 @@ describe('smoketest: object-oriented devbox', () => {
       expect(stdoutCombined).toBe(await result.stdout());
     });
 
-    test('shell.execAsync - with streaming callbacks', async () => {
+    test.concurrent('shell.execAsync - with streaming callbacks', async () => {
       expect(devbox).toBeDefined();
       const shell = devbox.shell('test-shell-10');
       const stdoutLines: string[] = [];
@@ -1054,7 +1054,7 @@ describe('smoketest: object-oriented devbox', () => {
       expect(stdoutCombined).toBe(await result.stdout());
     });
 
-    test('multiple named shells - independent state', async () => {
+    test.concurrent('multiple named shells - independent state', async () => {
       expect(devbox).toBeDefined();
       const shell1 = devbox.shell('independent-shell-1');
       const shell2 = devbox.shell('independent-shell-2');
@@ -1077,7 +1077,7 @@ describe('smoketest: object-oriented devbox', () => {
       expect(output2).toContain('/home');
     });
 
-    test('shell.exec - with stderr streaming callback', async () => {
+    test.concurrent('shell.exec - with stderr streaming callback', async () => {
       expect(devbox).toBeDefined();
       const shell = devbox.shell('test-shell-stderr');
       const stderrLines: string[] = [];
@@ -1097,7 +1097,7 @@ describe('smoketest: object-oriented devbox', () => {
       expect(stderrCombined).toBe(await result.stderr());
     });
 
-    test('shell.execAsync - with both stdout and stderr streaming callbacks', async () => {
+    test.concurrent('shell.execAsync - with both stdout and stderr streaming callbacks', async () => {
       expect(devbox).toBeDefined();
       const shell = devbox.shell('test-shell-both-streams');
       const stdoutLines: string[] = [];
@@ -1123,7 +1123,7 @@ describe('smoketest: object-oriented devbox', () => {
       expect(stderrCombined).toBe(await result.stderr());
     });
 
-    test('shell - auto-generated shell name', async () => {
+    test.concurrent('shell - auto-generated shell name', async () => {
       expect(devbox).toBeDefined();
       // Create shell without providing a name - should auto-generate UUID
       const shell = devbox.shell();
@@ -1152,7 +1152,7 @@ describe('smoketest: object-oriented devbox', () => {
       }
     });
 
-    test('logs - basic retrieval', async () => {
+    test.concurrent('logs - basic retrieval', async () => {
       expect(devbox).toBeDefined();
 
       // Fetch logs - verifies API returns valid response structure
@@ -1164,7 +1164,7 @@ describe('smoketest: object-oriented devbox', () => {
       expect(Array.isArray(logs.logs)).toBe(true);
     });
 
-    test('logs - with execution_id filter', async () => {
+    test.concurrent('logs - with execution_id filter', async () => {
       expect(devbox).toBeDefined();
 
       // Run a command and get its execution ID
@@ -1179,7 +1179,7 @@ describe('smoketest: object-oriented devbox', () => {
       expect(Array.isArray(logs.logs)).toBe(true);
     });
 
-    test('logs - with shell_name filter', async () => {
+    test.concurrent('logs - with shell_name filter', async () => {
       expect(devbox).toBeDefined();
 
       const shellName = 'test-logs-shell';

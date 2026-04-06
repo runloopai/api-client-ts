@@ -86,7 +86,7 @@ describe('smoketest: blueprints', () => {
   (process.env['RUN_SMOKETESTS'] ? describe : describe.skip)('blueprint secrets', () => {
     const secretsBlueprintName = uniqueName('bp-secrets');
 
-    test(
+    test.concurrent(
       'create blueprint with secret in Dockerfile and await build',
       async () => {
         let bpt: BlueprintView | undefined;

@@ -27,10 +27,6 @@ jobs:
   smoke-tests:
     runs-on: ubuntu-latest
     timeout-minutes: 60
-    strategy:
-      fail-fast: false
-      matrix:
-        shard: [1, 2, 3, 4]
     steps:
       - name: Checkout
         uses: runloopai/checkout@main
@@ -41,6 +37,7 @@ jobs:
         uses: runloopai/setup-node@main
         with:
           node-version: '20'
+          cache: yarn
 
       - name: Install dependencies
         run: yarn --frozen-lockfile
@@ -67,74 +64,5 @@ jobs:
       - name: Verify generated example artifacts
         run: yarn check:examples-md
 
-      - name: Run smoke tests (Shard ${{ matrix.shard }}/4)
-        id: tests
-        shell: python
-        run: |
-          from subprocess import Popen, PIPE
-          import sys
-
-          proc = Popen(["yarn", "test:smoke", "--shard=${{ matrix.shard }}/4", "--color"], stderr=PIPE)
-          zstd = Popen(["zstd", "-q", "-5", "-o", "smoke-tests-shard-${{ matrix.shard }}.zst"], stdin=PIPE)
-          tee = Popen(["tee", "-i", "/dev/stderr"], stdin=proc.stderr, stdout=zstd.stdin)
-          proc.stderr.close()
-          sys.exit(proc.wait())
-
-      - name: Upload test output
-        if: always()
-        uses: runloopai/upload-artifact@main
-        with:
-          path: smoke-tests-shard-${{ matrix.shard }}.zst
-          if-no-files-found: error
-          retention-days: 1
-          archive: false
-
-  smoke-tests-results:
-    runs-on: ubuntu-slim
-    needs: smoke-tests
-    if: always()
-    steps:
-      - name: Download all test output artifacts
-        uses: runloopai/download-artifact@main
-        with:
-          pattern: smoke-tests-shard-*.zst
-          path: all-output
-
-      - name: Decompress and display logs
-        run: |
-          # Decompress all files
-          zstd -q --rm -d all-output/*/*.zst
-
-          BOLD=$'\033[1m'
-          RESET=$'\033[22m'
-          # Extract and display failed tests from each shard
-          for output_file in all-output/*/*; do
-            shard_name=$(basename "$output_file")
-            # Check if this shard has failures
-            if grep -q "FAIL\|✕" "$output_file" 2>/dev/null; then
-              echo "$BOLD$shard_name had test failures$RESET"
-              # Filter output to show only failures:
-              # - Skip PASS suites entirely (from PASS to next FAIL or "Test Suites:")
-              # - Within FAIL suites, skip individual passing tests (✓) but show failures (● and ✕)
-              awk '
-                { line=$0; gsub(/\x1b\[[0-9;]*m/, "") }
-                /^[[:space:]]*PASS[[:space:]]/ { in_pass_suite=1; in_fail_suite=0; next }
-                /^[[:space:]]*FAIL[[:space:]]/ { in_pass_suite=0; in_fail_suite=1; print line; next }
-                /^Test Suites:/ { in_pass_suite=0; in_fail_suite=0; print line; next }
-                in_pass_suite { next }
-                in_fail_suite && /^[[:space:]]*✓/ { next }
-                in_fail_suite { print line; next }
-                { print line }
-              ' "$output_file"
-            fi
-          done
-
-          # Aggregate all output in a collapsed group
-          echo "::group::Full output from all shards"
-          for output_file in all-output/*/*; do
-            shard_name=$(basename "$output_file")
-            echo "$BOLD=== $shard_name ===$RESET"
-            cat "$output_file"
-            echo ""
-          done
-          echo "::endgroup::"
+      - name: Run smoke tests
+        run: yarn test:smoke --maxWorkers=800% --color

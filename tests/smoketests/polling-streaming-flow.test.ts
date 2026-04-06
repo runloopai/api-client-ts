@@ -30,7 +30,7 @@ const client = makeClient();
       scenarioId = scenario.id;
     }, SHORT_TIMEOUT);
 
-    test(
+    test.concurrent(
       'awaitScored respects AbortSignal (LongPollAbortError)',
       async () => {
         const runView = await client.scenarios.startRun({
@@ -64,7 +64,7 @@ const client = makeClient();
       SHORT_TIMEOUT,
     );
 
-    test(
+    test.concurrent(
       'scenarios.runs.awaitScored forwards signal to poll',
       async () => {
         const runView = await client.scenarios.startRun({
@@ -97,7 +97,7 @@ const client = makeClient();
       SHORT_TIMEOUT,
     );
 
-    test(
+    test.concurrent(
       'axon subscribeSse receives events after publish (reconnect wrapper)',
       async () => {
         const axon = await Axon.create(client);
@@ -120,7 +120,7 @@ const client = makeClient();
       SHORT_TIMEOUT,
     );
 
-    test(
+    test.concurrent(
       'execution streamStdoutUpdates yields output (SSE reconnect wrapper)',
       async () => {
         const devbox = await client.devboxes.createAndAwaitRunning(

@@ -100,12 +100,12 @@ describe('smoketest: object-oriented mcp config', () => {
   });
 
   describe('mcp config list and retrieval', () => {
-    test('list mcp configs', async () => {
+    test.concurrent('list mcp configs', async () => {
       const configs = await sdk.mcpConfig.list({ limit: 10 });
       expect(Array.isArray(configs)).toBe(true);
     });
 
-    test('get mcp config by ID', async () => {
+    test.concurrent('get mcp config by ID', async () => {
       let mcpConfig: McpConfig | undefined;
       try {
         mcpConfig = await sdk.mcpConfig.create({
@@ -128,7 +128,7 @@ describe('smoketest: object-oriented mcp config', () => {
   });
 
   describe('mcp config allowed_tools configurations', () => {
-    test('create config with wildcard all tools', async () => {
+    test.concurrent('create config with wildcard all tools', async () => {
       let mcpConfig: McpConfig | undefined;
       try {
         mcpConfig = await sdk.mcpConfig.create({
@@ -144,7 +144,7 @@ describe('smoketest: object-oriented mcp config', () => {
       }
     });
 
-    test('create config with specific tool patterns', async () => {
+    test.concurrent('create config with specific tool patterns', async () => {
       let mcpConfig: McpConfig | undefined;
       try {
         const tools = ['github.search_*', 'github.get_*', 'slack.post_message'];
@@ -163,7 +163,7 @@ describe('smoketest: object-oriented mcp config', () => {
       }
     });
 
-    test('create config with description', async () => {
+    test.concurrent('create config with description', async () => {
       let mcpConfig: McpConfig | undefined;
       try {
         mcpConfig = await sdk.mcpConfig.create({
@@ -179,7 +179,7 @@ describe('smoketest: object-oriented mcp config', () => {
       }
     });
 
-    test('create config without description', async () => {
+    test.concurrent('create config without description', async () => {
       let mcpConfig: McpConfig | undefined;
       try {
         mcpConfig = await sdk.mcpConfig.create({
@@ -468,14 +468,14 @@ describe('smoketest: object-oriented mcp config', () => {
         }
       });
 
-      test('environment variables are set', async () => {
+      test.concurrent('environment variables are set', async () => {
         expect(mcpUrl).toBeTruthy();
         expect(mcpUrl.startsWith('http')).toBe(true);
         expect(mcpUrl.endsWith('/mcp')).toBe(true);
         expect(mcpToken).toBeTruthy();
       });
 
-      test(
+      test.concurrent(
         'initialize MCP session',
         async () => {
           const initResponse = await mcpRequest({
@@ -511,7 +511,7 @@ describe('smoketest: object-oriented mcp config', () => {
         SHORT_TIMEOUT,
       );
 
-      test(
+      test.concurrent(
         'list tools from upstream MCP server',
         async () => {
           await initMcpSession();
@@ -553,7 +553,7 @@ describe('smoketest: object-oriented mcp config', () => {
         SHORT_TIMEOUT,
       );
 
-      test(
+      test.concurrent(
         'call tools via MCP tools/call (get_me + search_repositories)',
         async () => {
           await initMcpSession();
@@ -621,7 +621,7 @@ describe('smoketest: object-oriented mcp config', () => {
         MEDIUM_TIMEOUT,
       );
 
-      test(
+      test.concurrent(
         'MCP hub rejects requests without authentication',
         async () => {
           const bodyJson = JSON.stringify({
@@ -655,7 +655,7 @@ describe('smoketest: object-oriented mcp config', () => {
   // Devbox integration tests that verify MCP config wiring (env vars, by-name lookup).
   // These use fake endpoints -- they don't need a real upstream MCP server.
   (process.env['RUN_SMOKETESTS'] ? describe : describe.skip)('devbox with mcp config', () => {
-    test(
+    test.concurrent(
       'create devbox with mcp config by name and verify env vars',
       async () => {
         let devbox: Devbox | undefined;
@@ -720,7 +720,7 @@ describe('smoketest: object-oriented mcp config', () => {
       MEDIUM_TIMEOUT,
     );
 
-    test(
+    test.concurrent(
       'create devbox with mcp config and gateway config together',
       async () => {
         let devbox: Devbox | undefined;

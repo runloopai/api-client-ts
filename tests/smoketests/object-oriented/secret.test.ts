@@ -128,7 +128,7 @@ describe('smoketest: object-oriented secrets', () => {
       }
     });
 
-    test(
+    test.concurrent(
       'devbox can access injected secret as env var',
       async () => {
         const devbox = await sdk.devbox.create({

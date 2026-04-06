@@ -103,7 +103,7 @@ describe('smoketest: object-oriented blueprint', () => {
   });
 
   describe('blueprint build context with object storage and .dockerignore', () => {
-    test(
+    test.concurrent(
       'creates blueprint with COPY using object-based build context honoring .dockerignore',
       async () => {
         const fs = require('fs/promises');
@@ -196,7 +196,7 @@ COPY . .`,
       LONG_TIMEOUT,
     );
 
-    test(
+    test.concurrent(
       'creates blueprint with build_context_dir parameter (string path)',
       async () => {
         const fs = require('fs/promises');
@@ -272,12 +272,12 @@ COPY . .`,
   });
 
   describe('blueprint list and retrieval', () => {
-    test('list blueprints', async () => {
+    test.concurrent('list blueprints', async () => {
       const blueprints = await sdk.blueprint.list({ limit: 10 });
       expect(Array.isArray(blueprints)).toBe(true);
     });
 
-    test(
+    test.concurrent(
       'get blueprint by ID',
       async () => {
         // First create a blueprint
@@ -306,7 +306,7 @@ COPY . .`,
   });
 
   describe('blueprint with network policy', () => {
-    test(
+    test.concurrent(
       'create blueprint with network_policy_id for build',
       async () => {
         let policy: NetworkPolicy | undefined;
@@ -345,7 +345,7 @@ COPY . .`,
       LONG_TIMEOUT,
     );
 
-    test(
+    test.concurrent(
       'create blueprint with launch_parameters.network_policy_id',
       async () => {
         let policy: NetworkPolicy | undefined;

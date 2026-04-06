@@ -41,11 +41,11 @@ describe('smoketest: object-oriented scenario', () => {
       scenario = sdk.scenario.fromId(scenarioId!);
     });
 
-    test('id getter - returns scenario ID', () => {
+    test.concurrent('id getter - returns scenario ID', () => {
       expect(scenario.id).toBe(scenarioId);
     });
 
-    test(
+    test.concurrent(
       'getInfo - retrieves scenario details',
       async () => {
         const info = await scenario.getInfo();
@@ -58,7 +58,7 @@ describe('smoketest: object-oriented scenario', () => {
       SHORT_TIMEOUT,
     );
 
-    test(
+    test.concurrent(
       'update - updates scenario metadata',
       async () => {
         const updated = await scenario.update({
@@ -74,7 +74,7 @@ describe('smoketest: object-oriented scenario', () => {
   });
 
   describe('Scenario list', () => {
-    test(
+    test.concurrent(
       'list - returns scenarios via SDK',
       async () => {
         const scenarios = await sdk.scenario.list({ limit: 5 });
@@ -90,13 +90,13 @@ describe('smoketest: object-oriented scenario', () => {
   });
 
   describe('ScenarioBuilder', () => {
-    test('builder() returns a ScenarioBuilder instance', () => {
+    test.concurrent('builder() returns a ScenarioBuilder instance', () => {
       const builder = sdk.scenario.builder('test-builder');
       expect(builder).toBeInstanceOf(ScenarioBuilder);
       expect(builder.name).toBe('test-builder');
     });
 
-    test('build() produces valid params with all scorer types and normalizes weights', () => {
+    test.concurrent('build() produces valid params with all scorer types and normalizes weights', () => {
       const blueprint = sdk.blueprint.fromId('bp_fake');
 
       const params = sdk.scenario
@@ -130,7 +130,7 @@ describe('smoketest: object-oriented scenario', () => {
       expect(totalWeight).toBeCloseTo(1.0);
     });
 
-    test('build() with fromSnapshot sets snapshot_id', () => {
+    test.concurrent('build() with fromSnapshot sets snapshot_id', () => {
       const snapshot = sdk.snapshot.fromId('snap_fake');
       const params = sdk.scenario
         .builder('snap-test')
@@ -143,17 +143,17 @@ describe('smoketest: object-oriented scenario', () => {
       expect(params.environment_parameters?.blueprint_id).toBeNull();
     });
 
-    test('build() throws without problem statement', () => {
+    test.concurrent('build() throws without problem statement', () => {
       const builder = sdk.scenario.builder('test').addShellCommandScorer('s', { command: 'echo 1' });
       expect(() => builder.build()).toThrow('Problem statement is required');
     });
 
-    test('build() throws without scorers', () => {
+    test.concurrent('build() throws without scorers', () => {
       const builder = sdk.scenario.builder('test').withProblemStatement('test');
       expect(() => builder.build()).toThrow('At least one scorer is required');
     });
 
-    test(
+    test.concurrent(
       'push() creates scenario on platform',
       async () => {
         const scenario = await sdk.scenario

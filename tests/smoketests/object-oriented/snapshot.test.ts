@@ -130,12 +130,12 @@ describe('smoketest: object-oriented snapshot', () => {
   });
 
   describe('snapshot list and retrieval', () => {
-    test('list snapshots', async () => {
+    test.concurrent('list snapshots', async () => {
       const snapshots = await sdk.snapshot.list({ limit: 10 });
       expect(Array.isArray(snapshots)).toBe(true);
     });
 
-    test('list snapshots for specific devbox', async () => {
+    test.concurrent('list snapshots for specific devbox', async () => {
       // Create a devbox and snapshot
       let devbox: Devbox | undefined;
       let snapshot: Snapshot | undefined;
@@ -163,7 +163,7 @@ describe('smoketest: object-oriented snapshot', () => {
       }
     });
 
-    test('get snapshot by ID', async () => {
+    test.concurrent('get snapshot by ID', async () => {
       let devbox: Devbox | undefined;
       let snapshot: Snapshot | undefined;
       try {
