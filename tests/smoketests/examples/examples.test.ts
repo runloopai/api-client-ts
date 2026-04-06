@@ -24,7 +24,7 @@ describe('smoketest: examples', () => {
     );
   }
 
-  test.concurrent(
+  test(
     'mcp-github-tools example supports deterministic skip mode for missing credentials',
     async () => {
       const mcpExampleEntry = exampleRegistry.find((entry) => entry.slug === 'mcp-github-tools');
