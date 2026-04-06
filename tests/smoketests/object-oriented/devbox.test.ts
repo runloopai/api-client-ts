@@ -670,7 +670,7 @@ describe('smoketest: object-oriented devbox', () => {
       expect(stdout).toContain('test output');
     });
 
-    test.concurrent('execAsync with callbacks - real-time streaming', async () => {
+    test('execAsync with callbacks - real-time streaming', async () => {
       const stdoutLines: string[] = [];
       let receivedBeforeCompletion = false;
 
