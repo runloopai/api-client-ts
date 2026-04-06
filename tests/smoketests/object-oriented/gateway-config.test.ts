@@ -653,7 +653,7 @@ describe('smoketest: object-oriented gateway config', () => {
         expect([200, 405]).toContain(httpCode);
       });
 
-      test.concurrent('request timeout handling', async () => {
+      test('request timeout handling', async () => {
         const startTime = Date.now();
         const { httpCode } = await curlRequest(
           'POST',
