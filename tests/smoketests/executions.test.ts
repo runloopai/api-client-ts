@@ -29,15 +29,23 @@ describe('smoketest: executions', () => {
     SHORT_TIMEOUT,
   );
 
-  test('execute async and await completion (long-poll path)', async () => {
-    const started = await client.devboxes.executions.executeAsync(devboxId!, {
-      command: 'echo hello && sleep 1',
+  test('execute async and await completion (deprecated polling path)', async () => {
+    const warnSpy = jest.spyOn(console, 'warn').mockImplementation((...args: unknown[]) => {
+      if (typeof args[0] === 'string' && args[0].includes('[runloop-api-client]')) return;
+      process.stderr.write(`console.warn: ${args.join(' ')}\n`);
     });
-    execId = started.execution_id;
-    const completed = await client.devboxes.executions.awaitCompleted(devboxId!, execId!, {
-      longPoll: { timeoutMs: 10 * 60 * 1000 },
-    });
-    expect(completed.status).toBe('completed');
+    try {
+      const started = await client.devboxes.executions.executeAsync(devboxId!, {
+        command: 'echo hello && sleep 1',
+      });
+      execId = started.execution_id;
+      const completed = await client.devboxes.executions.awaitCompleted(devboxId!, execId!, {
+        polling: { timeoutMs: 10 * 60 * 1000 },
+      });
+      expect(completed.status).toBe('completed');
+    } finally {
+      warnSpy.mockRestore();
+    }
   });
 
   test('tail stdout logs', async () => {

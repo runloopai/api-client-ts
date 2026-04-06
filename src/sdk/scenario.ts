@@ -180,10 +180,7 @@ export class Scenario {
    * @param {LongPollRequestOptions<DevboxView>} [options] - Request options with optional long-poll config
    * @returns {Promise<ScenarioRun>} ScenarioRun instance with ready devbox
    */
-  async run(
-    params?: ScenarioRunParams,
-    options?: LongPollRequestOptions<DevboxView>,
-  ): Promise<ScenarioRun> {
+  async run(params?: ScenarioRunParams, options?: LongPollRequestOptions<DevboxView>): Promise<ScenarioRun> {
     const runView = await this.client.scenarios.startRunAndAwaitEnvReady(
       { scenario_id: this._id, ...params },
       options,

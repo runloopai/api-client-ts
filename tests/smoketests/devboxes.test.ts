@@ -40,8 +40,12 @@ describe('smoketest: devboxes', () => {
     );
 
     test.concurrent(
-      'create devbox with authenticated tunnel in create params',
+      'create devbox with authenticated tunnel in create params (deprecated polling path)',
       async () => {
+        const warnSpy = jest.spyOn(console, 'warn').mockImplementation((...args: unknown[]) => {
+          if (typeof args[0] === 'string' && args[0].includes('[runloop-api-client]')) return;
+          process.stderr.write(`console.warn: ${args.join(' ')}\n`);
+        });
         let devbox: DevboxView | undefined;
         try {
           devbox = await client.devboxes.createAndAwaitRunning(
@@ -51,7 +55,7 @@ describe('smoketest: devboxes', () => {
               tunnel: { auth_mode: 'authenticated' },
             },
             {
-              longPoll: { timeoutMs: 20 * 60 * 1000 },
+              polling: { timeoutMs: 20 * 60 * 1000 },
             },
           );
 
@@ -63,6 +67,7 @@ describe('smoketest: devboxes', () => {
           expect(devbox.tunnel?.auth_mode).toBe('authenticated');
           expect(devbox.tunnel?.auth_token).toBeTruthy();
         } finally {
+          warnSpy.mockRestore();
           if (devbox) {
             await client.devboxes.shutdown(devbox.id);
           }
@@ -177,18 +182,26 @@ describe('smoketest: devboxes', () => {
       SHORT_TIMEOUT,
     );
 
-    test('await running (createAndAwaitRunning)', async () => {
-      const created = await client.devboxes.createAndAwaitRunning(
-        {
-          name: uniqueName('smoketest-devbox2'),
-          launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 }, // 5 minutes
-        },
-        {
-          longPoll: { timeoutMs: 20 * 60 * 1000 },
-        },
-      );
-      expect(created.status).toBe('running');
-      devboxId = created.id;
+    test('await running (createAndAwaitRunning, deprecated polling path)', async () => {
+      const warnSpy = jest.spyOn(console, 'warn').mockImplementation((...args: unknown[]) => {
+          if (typeof args[0] === 'string' && args[0].includes('[runloop-api-client]')) return;
+          process.stderr.write(`console.warn: ${args.join(' ')}\n`);
+        });
+      try {
+        const created = await client.devboxes.createAndAwaitRunning(
+          {
+            name: uniqueName('smoketest-devbox2'),
+            launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 }, // 5 minutes
+          },
+          {
+            polling: { timeoutMs: 20 * 60 * 1000 },
+          },
+        );
+        expect(created.status).toBe('running');
+        devboxId = created.id;
+      } finally {
+        warnSpy.mockRestore();
+      }
     });
 
     test('list devboxes', async () => {
@@ -230,19 +243,27 @@ describe('smoketest: devboxes', () => {
   );
 
   test.concurrent(
-    'createAndAwaitRunning timeout',
+    'createAndAwaitRunning timeout (deprecated polling path)',
     async () => {
-      await expect(
-        client.devboxes.createAndAwaitRunning(
-          {
-            name: uniqueName('smoketest-devbox-await-running-timeout'),
-            launch_parameters: { launch_commands: ['sleep 70'], keep_alive_time_seconds: 30 },
-          },
-          {
-            longPoll: { timeoutMs: 100 },
-          },
-        ),
-      ).rejects.toThrow();
+      const warnSpy = jest.spyOn(console, 'warn').mockImplementation((...args: unknown[]) => {
+          if (typeof args[0] === 'string' && args[0].includes('[runloop-api-client]')) return;
+          process.stderr.write(`console.warn: ${args.join(' ')}\n`);
+        });
+      try {
+        await expect(
+          client.devboxes.createAndAwaitRunning(
+            {
+              name: uniqueName('smoketest-devbox-await-running-timeout'),
+              launch_parameters: { launch_commands: ['sleep 70'], keep_alive_time_seconds: 30 },
+            },
+            {
+              polling: { timeoutMs: 100 },
+            },
+          ),
+        ).rejects.toThrow();
+      } finally {
+        warnSpy.mockRestore();
+      }
     },
     SHORT_TIMEOUT * 4,
   );
