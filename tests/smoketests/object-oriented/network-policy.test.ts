@@ -188,7 +188,7 @@ describe('smoketest: object-oriented network policy', () => {
       }
     });
 
-    test.concurrent('create policy with empty allowed_hostnames (DENY_ALL)', async () => {
+    test('create policy with empty allowed_hostnames (DENY_ALL)', async () => {
       let policy: NetworkPolicy | undefined;
       try {
         policy = await sdk.networkPolicy.create({
