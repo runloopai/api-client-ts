@@ -150,7 +150,7 @@ describe('smoketest: object-oriented network policy', () => {
       }
     });
 
-    test.concurrent('create policy with allow_devbox_to_devbox=true', async () => {
+    test('create policy with allow_devbox_to_devbox=true', async () => {
       let policy: NetworkPolicy | undefined;
       try {
         policy = await sdk.networkPolicy.create({
