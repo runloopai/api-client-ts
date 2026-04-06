@@ -136,7 +136,7 @@ describe('smoketest: object-oriented network policy', () => {
   });
 
   describe('network policy egress configurations', () => {
-    test.concurrent('create policy with allow_all=true', async () => {
+    test('create policy with allow_all=true', async () => {
       let policy: NetworkPolicy | undefined;
       try {
         policy = await sdk.networkPolicy.create({
