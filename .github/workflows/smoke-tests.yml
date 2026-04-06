@@ -23,6 +23,9 @@ on:
           - dev
           - prod
 
+concurrency:
+  group: ${{ inputs.environment }}
+
 jobs:
   smoke-tests:
     runs-on: ubuntu-latest

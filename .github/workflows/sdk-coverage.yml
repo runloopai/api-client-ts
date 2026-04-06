@@ -16,6 +16,9 @@ on:
           - dev
           - prod
 
+concurrency:
+  group: ${{ github.event_name == 'pull_request' && 'dev' || inputs.environment }}
+
 jobs:
   smoke-and-coverage:
     runs-on: ubuntu-latest
