@@ -154,12 +154,14 @@ export interface BrokerMount {
   type: 'broker_mount';
 
   /**
-   * Binary to launch the agent (e.g., 'opencode'). Used by ACP broker.
+   * Binary to launch the agent (e.g., 'opencode'). Used by protocols that launch a
+   * subprocess (acp, claude_json, codex_app_server).
    */
   agent_binary?: string | null;
 
   /**
-   * Arguments to pass to the agent command (e.g., ['acp']). Used by ACP broker.
+   * Arguments to pass to the agent command (e.g., ['acp']). Used by protocols that
+   * launch a subprocess (acp, claude_json, codex_app_server).
    */
   launch_args?: Array<string> | null;
 
