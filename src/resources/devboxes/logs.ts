@@ -39,7 +39,7 @@ export namespace DevboxLogsListView {
     /**
      * The source of the log.
      */
-    source: 'setup_commands' | 'entrypoint' | 'exec' | 'files' | 'stats';
+    source: 'setup_commands' | 'entrypoint' | 'exec' | 'files' | 'stats' | 'kmsg';
 
     /**
      * Time of log (Unix timestamp milliseconds).
