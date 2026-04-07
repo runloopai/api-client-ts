@@ -17,7 +17,7 @@ on:
           - prod
 
 concurrency:
-  group: ${{ github.event_name == 'pull_request' && 'dev' || inputs.environment }}
+  group: api-client-ts-${{ github.event_name == 'pull_request' && 'dev' || inputs.environment }}
 
 jobs:
   smoke-and-coverage:

@@ -24,7 +24,7 @@ on:
           - prod
 
 concurrency:
-  group: ${{ inputs.environment }}
+  group: api-client-ts-${{ inputs.environment }}
 
 jobs:
   smoke-tests:
