@@ -174,7 +174,7 @@ export interface BrokerMount {
 export interface CodeMountParameters {
   /**
    * The name of the repo to mount. By default, code will be mounted at
-   * /home/user/{repo_name}s.
+   * /home/user/{repo_name}.
    */
   repo_name: string;
 
@@ -305,7 +305,7 @@ export namespace Mount {
   export interface CodeMount {
     /**
      * The name of the repo to mount. By default, code will be mounted at
-     * /home/user/{repo_name}s.
+     * /home/user/{repo_name}.
      */
     repo_name: string;
 
