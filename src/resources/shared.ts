@@ -1,5 +1,7 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
+import * as Shared from './shared';
+
 /**
  * Configuration for automatic Devbox behavior after idle time.
  *
@@ -216,7 +218,8 @@ export interface CodeMountParameters {
 export interface LaunchParameters {
   /**
    * Configure Devbox lifecycle based on idle activity. If after_idle is set, Devbox
-   * will ignore keep_alive_time_seconds.
+   * will ignore keep_alive_time_seconds. If both after_idle and lifecycle.after_idle
+   * are set, they must have the same value. Use lifecycle.after_idle instead.
    */
   after_idle?: AfterIdle | null;
 
@@ -258,6 +261,13 @@ export interface LaunchParameters {
   launch_commands?: Array<string> | null;
 
   /**
+   * Lifecycle configuration for idle and resume behavior. Configure idle policy via
+   * lifecycle.after_idle (if both this and the top-level after_idle are set, they
+   * must match) and resume triggers via lifecycle.resume_triggers.
+   */
+  lifecycle?: LaunchParameters.Lifecycle | null;
+
+  /**
    * (Optional) ID of the network policy to apply to Devboxes launched with these
    * parameters. When set on a Blueprint launch parameters, Devboxes created from it
    * will inherit this policy unless explicitly overridden.
@@ -296,6 +306,37 @@ export interface LaunchParameters {
 }
 
 export namespace LaunchParameters {
+  /**
+   * Lifecycle configuration for idle and resume behavior. Configure idle policy via
+   * lifecycle.after_idle (if both this and the top-level after_idle are set, they
+   * must match) and resume triggers via lifecycle.resume_triggers.
+   */
+  export interface Lifecycle {
+    /**
+     * Configure Devbox lifecycle based on idle activity. If both this and the
+     * top-level after_idle are set, they must have the same value. Prefer this field
+     * for new integrations.
+     */
+    after_idle?: Shared.AfterIdle | null;
+
+    /**
+     * Triggers that can resume a suspended Devbox.
+     */
+    resume_triggers?: Lifecycle.ResumeTriggers | null;
+  }
+
+  export namespace Lifecycle {
+    /**
+     * Triggers that can resume a suspended Devbox.
+     */
+    export interface ResumeTriggers {
+      /**
+       * When true, HTTP traffic to a suspended Devbox via tunnel will trigger a resume.
+       */
+      http?: boolean | null;
+    }
+  }
+
   /**
    * Specify the user for execution on Devbox. If not set, default `user` will be
    * used.
