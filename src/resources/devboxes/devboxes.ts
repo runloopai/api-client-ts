@@ -752,7 +752,7 @@ export interface DevboxView {
    * The shutdown reason if the Devbox shutdown, if the Devbox has a 'shutdown'
    * status.
    */
-  shutdown_reason?: 'api_shutdown' | 'keep_alive_timeout' | 'entrypoint_exit' | 'idle' | null;
+  shutdown_reason?: 'api_shutdown' | 'keep_alive_timeout' | 'entrypoint_exit' | 'idle' | 'ttl_expired' | null;
 
   /**
    * The Snapshot ID used in creation of the Devbox, if the devbox was created from a
