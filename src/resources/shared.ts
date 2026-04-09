@@ -191,6 +191,12 @@ export interface CodeMountParameters {
   token?: string | null;
 
   /**
+   * Optional git ref (branch, tag, or commit SHA) to checkout. Defaults to the
+   * repository default branch.
+   */
+  git_ref?: string | null;
+
+  /**
    * Installation command to install and setup repository.
    */
   install_command?: string | null;
@@ -361,6 +367,12 @@ export namespace Mount {
      * The authentication token necessary to pull repo.
      */
     token?: string | null;
+
+    /**
+     * Optional git ref (branch, tag, or commit SHA) to checkout. Defaults to the
+     * repository default branch.
+     */
+    git_ref?: string | null;
 
     /**
      * Installation command to install and setup repository.
