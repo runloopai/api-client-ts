@@ -1,5 +1,33 @@
 # Changelog
 
+## 1.18.0 (2026-04-09)
+
+Full Changelog: [v1.17.0...v1.18.0](https://github.com/runloopai/api-client-ts/compare/v1.17.0...v1.18.0)
+
+### Features
+
+* Add protocol, launch etc arguments to attach axon grpc, persist them in the db ([#8564](https://github.com/runloopai/api-client-ts/issues/8564)) ([76f0a17](https://github.com/runloopai/api-client-ts/commit/76f0a1764044e81f8a7484ea1217833e040a5d3d))
+* **api:** add lifecycle configuration to launch parameters ([#8606](https://github.com/runloopai/api-client-ts/issues/8606)) ([83e7cfa](https://github.com/runloopai/api-client-ts/commit/83e7cfa0eb34eecb85a106e1f62c7515b28a4796))
+* stream kernel messages (kmsg) to devbox logs ([#8588](https://github.com/runloopai/api-client-ts/issues/8588)) ([6350865](https://github.com/runloopai/api-client-ts/commit/63508655a22a511a518f578b7307cb9abe778af6))
+
+
+### Bug Fixes
+
+* **broker:** remove codex in favor of codex via acp ([#8602](https://github.com/runloopai/api-client-ts/issues/8602)) ([2b4f672](https://github.com/runloopai/api-client-ts/commit/2b4f6721930fe9ffa66bd146f382d5c5d13793cd))
+* propagate git ref to maverick for git-based agents ([#8608](https://github.com/runloopai/api-client-ts/issues/8608)) ([5ae92ae](https://github.com/runloopai/api-client-ts/commit/5ae92ae53fe7f0435eccce602c673cca758293dc))
+
+
+### Chores
+
+* Cleanup remaining junk left over from browser and computer use ([#8553](https://github.com/runloopai/api-client-ts/issues/8553)) ([3aae2ca](https://github.com/runloopai/api-client-ts/commit/3aae2cade2fb3cc6e5fa4b84fa4c249bbfc88265))
+* **internal:** codegen related update ([81db5f0](https://github.com/runloopai/api-client-ts/commit/81db5f05681c16696c9cd513c8aab7fcb6b467e5))
+* make smoketests faster via test.concurrent, no sharding, 800% workers ([#773](https://github.com/runloopai/api-client-ts/issues/773)) ([d5d7a29](https://github.com/runloopai/api-client-ts/commit/d5d7a29c881c6bbd6a8158a2785327ec6ab911e3))
+
+
+### Documentation
+
+* fix typo, fix repoc/git-based agent mounts ignoring custom mount paths ([#8537](https://github.com/runloopai/api-client-ts/issues/8537)) ([eedbc55](https://github.com/runloopai/api-client-ts/commit/eedbc55f6b1a40cb55614d64978c1ff4c43aa84b))
+
 ## 1.17.0 (2026-04-03)
 
 Full Changelog: [v1.16.2...v1.17.0](https://github.com/runloopai/api-client-ts/compare/v1.16.2...v1.17.0)

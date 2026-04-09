@@ -807,10 +807,9 @@ export interface DevboxView {
   id: string;
 
   /**
-   * A list of capability groups this devbox has access to. This allows devboxes to
-   * be compatible with certain tools sets like computer usage APIs.
+   * A list of capability groups this devbox has access to.
    */
-  capabilities: Array<'unknown' | 'computer_usage' | 'browser_usage' | 'docker_in_docker'>;
+  capabilities: Array<'unknown' | 'docker_in_docker'>;
 
   /**
    * Creation time of the Devbox (Unix timestamp milliseconds).
@@ -1203,7 +1202,9 @@ export namespace DevboxCreateParams {
 
     /**
      * When true, HTTP traffic to a suspended devbox will automatically trigger a
-     * resume. Defaults to false if not specified.
+     * resume. Defaults to false if not specified. Prefer
+     * lifecycle.resume_triggers.http on launch_parameters for new integrations. If
+     * both are set, lifecycle.resume_triggers.http takes precedence.
      */
     wake_on_http?: boolean | null;
   }
@@ -1264,7 +1265,9 @@ export interface DevboxEnableTunnelParams {
 
   /**
    * When true, HTTP traffic to a suspended devbox will automatically trigger a
-   * resume. Defaults to false if not specified.
+   * resume. Defaults to false if not specified. Prefer
+   * lifecycle.resume_triggers.http on launch_parameters for new integrations. If
+   * both are set, lifecycle.resume_triggers.http takes precedence.
    */
   wake_on_http?: boolean | null;
 }
