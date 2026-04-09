@@ -203,8 +203,8 @@ export interface CodeMountParameters {
   token?: string | null;
 
   /**
-   * Optional git ref (branch, tag, or commit SHA) to checkout. Defaults to the
-   * repository default branch.
+   * Optional git ref (branch or tag) to checkout. Defaults to the repository default
+   * branch.
    */
   git_ref?: string | null;
 
@@ -388,8 +388,8 @@ export namespace Mount {
     token?: string | null;
 
     /**
-     * Optional git ref (branch, tag, or commit SHA) to checkout. Defaults to the
-     * repository default branch.
+     * Optional git ref (branch or tag) to checkout. Defaults to the repository default
+     * branch.
      */
     git_ref?: string | null;
 
