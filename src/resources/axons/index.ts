@@ -13,6 +13,7 @@ export {
   type AxonPublishParams,
   type AxonSubscribeSseParams,
 } from './axons';
+export { Events, type AxonEventListView, type EventListParams } from './events';
 export {
   Sql,
   type SqlBatchParams,

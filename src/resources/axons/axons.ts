@@ -4,6 +4,8 @@ import { APIResource } from '../../resource';
 import { isRequestOptions } from '../../core';
 import { APIPromise } from '../../core';
 import * as Core from '../../core';
+import * as EventsAPI from './events';
+import { AxonEventListView, EventListParams, Events } from './events';
 import * as SqlAPI from './sql';
 import {
   Sql,
@@ -22,6 +24,7 @@ import { Stream } from '../../streaming';
 import { withStreamAutoReconnect } from '@runloop/api-client/lib/streaming-reconnection';
 
 export class Axons extends APIResource {
+  events: EventsAPI.Events = new EventsAPI.Events(this._client);
   sql: SqlAPI.Sql = new SqlAPI.Sql(this._client);
 
   /**
@@ -273,6 +276,7 @@ export interface AxonSubscribeSseParams {
 }
 
 Axons.AxonViewsAxonsCursorIDPage = AxonViewsAxonsCursorIDPage;
+Axons.Events = Events;
 Axons.Sql = Sql;
 
 export declare namespace Axons {
@@ -287,6 +291,12 @@ export declare namespace Axons {
     type AxonListParams as AxonListParams,
     type AxonPublishParams as AxonPublishParams,
     type AxonSubscribeSseParams as AxonSubscribeSseParams,
+  };
+
+  export {
+    Events as Events,
+    type AxonEventListView as AxonEventListView,
+    type EventListParams as EventListParams,
   };
 
   export {
