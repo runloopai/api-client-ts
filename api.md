@@ -379,3 +379,26 @@ Methods:
 - <code title="post /v1/mcp-configs/{id}">client.mcpConfigs.<a href="./src/resources/mcp-configs.ts">update</a>(id, { ...params }) -> McpConfigView</code>
 - <code title="get /v1/mcp-configs">client.mcpConfigs.<a href="./src/resources/mcp-configs.ts">list</a>({ ...params }) -> McpConfigViewsMcpConfigsCursorIDPage</code>
 - <code title="post /v1/mcp-configs/{id}/delete">client.mcpConfigs.<a href="./src/resources/mcp-configs.ts">delete</a>(id) -> McpConfigView</code>
+
+# Apikeys
+
+Types:
+
+- <code><a href="./src/resources/apikeys.ts">APIKeyCreatedView</a></code>
+- <code><a href="./src/resources/apikeys.ts">APIKeyCreateParameters</a></code>
+
+Methods:
+
+- <code title="post /v1/apikeys">client.apikeys.<a href="./src/resources/apikeys.ts">create</a>({ ...params }) -> APIKeyCreatedView</code>
+
+# RestrictedKeys
+
+Types:
+
+- <code><a href="./src/resources/restricted-keys.ts">RestrictedKeyCreatedView</a></code>
+- <code><a href="./src/resources/restricted-keys.ts">RestrictedKeyCreateParameters</a></code>
+- <code><a href="./src/resources/restricted-keys.ts">ScopeEntryView</a></code>
+
+Methods:
+
+- <code title="post /v1/restricted_keys">client.restrictedKeys.<a href="./src/resources/restricted-keys.ts">create</a>({ ...params }) -> RestrictedKeyCreatedView</code>
