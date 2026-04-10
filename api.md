@@ -96,6 +96,16 @@ Methods:
 - <code title="post /v1/axons/{id}/publish">client.axons.<a href="./src/resources/axons/axons.ts">publish</a>(id, { ...params }) -> PublishResultView</code>
 - <code title="get /v1/axons/{id}/subscribe/sse">client.axons.<a href="./src/resources/axons/axons.ts">subscribeSse</a>(id, { ...params }) -> AxonEventView</code>
 
+## Events
+
+Types:
+
+- <code><a href="./src/resources/axons/events.ts">AxonEventListView</a></code>
+
+Methods:
+
+- <code title="get /v1/axons/{id}/events">client.axons.events.<a href="./src/resources/axons/events.ts">list</a>(id, { ...params }) -> AxonEventListView</code>
+
 ## Sql
 
 Types:
