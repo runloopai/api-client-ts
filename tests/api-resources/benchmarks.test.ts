@@ -210,7 +210,7 @@ describe('resource benchmarks', () => {
           launch_commands: ['string'],
           lifecycle: {
             after_idle: { idle_time_seconds: 0, on_idle: 'shutdown' },
-            resume_triggers: { http: true },
+            resume_triggers: { axon_event: true, http: true },
           },
           network_policy_id: 'network_policy_id',
           required_services: ['string'],
