@@ -39,7 +39,10 @@ import * as API from './resources/index';
 import {
   AgentCreateParameters,
   AgentCreateParams,
+  AgentDeleteResponse,
+  AgentDevboxCountsView,
   AgentListParams,
+  AgentListPublicParams,
   AgentListView,
   AgentView,
   AgentViewsAgentsCursorIDPage,
@@ -577,11 +580,14 @@ export declare namespace Runloop {
   export {
     Agents as Agents,
     type AgentCreateParameters as AgentCreateParameters,
+    type AgentDevboxCountsView as AgentDevboxCountsView,
     type AgentListView as AgentListView,
     type AgentView as AgentView,
+    type AgentDeleteResponse as AgentDeleteResponse,
     AgentViewsAgentsCursorIDPage as AgentViewsAgentsCursorIDPage,
     type AgentCreateParams as AgentCreateParams,
     type AgentListParams as AgentListParams,
+    type AgentListPublicParams as AgentListPublicParams,
   };
 
   export {

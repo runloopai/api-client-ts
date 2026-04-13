@@ -68,14 +68,19 @@ Methods:
 Types:
 
 - <code><a href="./src/resources/agents.ts">AgentCreateParameters</a></code>
+- <code><a href="./src/resources/agents.ts">AgentDevboxCountsView</a></code>
 - <code><a href="./src/resources/agents.ts">AgentListView</a></code>
 - <code><a href="./src/resources/agents.ts">AgentView</a></code>
+- <code><a href="./src/resources/agents.ts">AgentDeleteResponse</a></code>
 
 Methods:
 
 - <code title="post /v1/agents">client.agents.<a href="./src/resources/agents.ts">create</a>({ ...params }) -> AgentView</code>
 - <code title="get /v1/agents/{id}">client.agents.<a href="./src/resources/agents.ts">retrieve</a>(id) -> AgentView</code>
 - <code title="get /v1/agents">client.agents.<a href="./src/resources/agents.ts">list</a>({ ...params }) -> AgentViewsAgentsCursorIDPage</code>
+- <code title="post /v1/agents/{id}/delete">client.agents.<a href="./src/resources/agents.ts">delete</a>(id) -> unknown</code>
+- <code title="get /v1/agents/devbox_counts">client.agents.<a href="./src/resources/agents.ts">devboxCounts</a>() -> AgentDevboxCountsView</code>
+- <code title="get /v1/agents/list_public">client.agents.<a href="./src/resources/agents.ts">listPublic</a>({ ...params }) -> AgentViewsAgentsCursorIDPage</code>
 
 # Axons
 
