@@ -5,11 +5,20 @@ export {
   AgentViewsAgentsCursorIDPage,
   Agents,
   type AgentCreateParameters,
+  type AgentDevboxCountsView,
   type AgentListView,
   type AgentView,
+  type AgentDeleteResponse,
   type AgentCreateParams,
   type AgentListParams,
+  type AgentListPublicParams,
 } from './agents';
+export {
+  Apikeys,
+  type APIKeyCreatedView,
+  type APIKeyCreateParameters,
+  type ApikeyCreateParams,
+} from './apikeys';
 export {
   AxonViewsAxonsCursorIDPage,
   Axons,
@@ -162,6 +171,13 @@ export {
   type ObjectDownloadParams,
   type ObjectListPublicParams,
 } from './objects';
+export {
+  RestrictedKeys,
+  type RestrictedKeyCreatedView,
+  type RestrictedKeyCreateParameters,
+  type ScopeEntryView,
+  type RestrictedKeyCreateParams,
+} from './restricted-keys';
 export {
   ScenarioRunViewsBenchmarkRunsCursorIDPage,
   ScenarioViewsScenariosCursorIDPage,

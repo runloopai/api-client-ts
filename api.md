@@ -68,14 +68,19 @@ Methods:
 Types:
 
 - <code><a href="./src/resources/agents.ts">AgentCreateParameters</a></code>
+- <code><a href="./src/resources/agents.ts">AgentDevboxCountsView</a></code>
 - <code><a href="./src/resources/agents.ts">AgentListView</a></code>
 - <code><a href="./src/resources/agents.ts">AgentView</a></code>
+- <code><a href="./src/resources/agents.ts">AgentDeleteResponse</a></code>
 
 Methods:
 
 - <code title="post /v1/agents">client.agents.<a href="./src/resources/agents.ts">create</a>({ ...params }) -> AgentView</code>
 - <code title="get /v1/agents/{id}">client.agents.<a href="./src/resources/agents.ts">retrieve</a>(id) -> AgentView</code>
 - <code title="get /v1/agents">client.agents.<a href="./src/resources/agents.ts">list</a>({ ...params }) -> AgentViewsAgentsCursorIDPage</code>
+- <code title="post /v1/agents/{id}/delete">client.agents.<a href="./src/resources/agents.ts">delete</a>(id) -> unknown</code>
+- <code title="get /v1/agents/devbox_counts">client.agents.<a href="./src/resources/agents.ts">devboxCounts</a>() -> AgentDevboxCountsView</code>
+- <code title="get /v1/agents/list_public">client.agents.<a href="./src/resources/agents.ts">listPublic</a>({ ...params }) -> AgentViewsAgentsCursorIDPage</code>
 
 # Axons
 
@@ -379,3 +384,26 @@ Methods:
 - <code title="post /v1/mcp-configs/{id}">client.mcpConfigs.<a href="./src/resources/mcp-configs.ts">update</a>(id, { ...params }) -> McpConfigView</code>
 - <code title="get /v1/mcp-configs">client.mcpConfigs.<a href="./src/resources/mcp-configs.ts">list</a>({ ...params }) -> McpConfigViewsMcpConfigsCursorIDPage</code>
 - <code title="post /v1/mcp-configs/{id}/delete">client.mcpConfigs.<a href="./src/resources/mcp-configs.ts">delete</a>(id) -> McpConfigView</code>
+
+# Apikeys
+
+Types:
+
+- <code><a href="./src/resources/apikeys.ts">APIKeyCreatedView</a></code>
+- <code><a href="./src/resources/apikeys.ts">APIKeyCreateParameters</a></code>
+
+Methods:
+
+- <code title="post /v1/apikeys">client.apikeys.<a href="./src/resources/apikeys.ts">create</a>({ ...params }) -> APIKeyCreatedView</code>
+
+# RestrictedKeys
+
+Types:
+
+- <code><a href="./src/resources/restricted-keys.ts">RestrictedKeyCreatedView</a></code>
+- <code><a href="./src/resources/restricted-keys.ts">RestrictedKeyCreateParameters</a></code>
+- <code><a href="./src/resources/restricted-keys.ts">ScopeEntryView</a></code>
+
+Methods:
+
+- <code title="post /v1/restricted_keys">client.restrictedKeys.<a href="./src/resources/restricted-keys.ts">create</a>({ ...params }) -> RestrictedKeyCreatedView</code>

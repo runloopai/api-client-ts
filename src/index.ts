@@ -39,12 +39,16 @@ import * as API from './resources/index';
 import {
   AgentCreateParameters,
   AgentCreateParams,
+  AgentDeleteResponse,
+  AgentDevboxCountsView,
   AgentListParams,
+  AgentListPublicParams,
   AgentListView,
   AgentView,
   AgentViewsAgentsCursorIDPage,
   Agents,
 } from './resources/agents';
+import { APIKeyCreateParameters, APIKeyCreatedView, ApikeyCreateParams, Apikeys } from './resources/apikeys';
 import {
   BenchmarkJobCreateParameters,
   BenchmarkJobCreateParams,
@@ -146,6 +150,13 @@ import {
   ObjectViewsObjectsCursorIDPage,
   Objects,
 } from './resources/objects';
+import {
+  RestrictedKeyCreateParameters,
+  RestrictedKeyCreateParams,
+  RestrictedKeyCreatedView,
+  RestrictedKeys,
+  ScopeEntryView,
+} from './resources/restricted-keys';
 import {
   SecretCreateParameters,
   SecretCreateParams,
@@ -369,6 +380,8 @@ export class Runloop extends Core.APIClient {
   networkPolicies: API.NetworkPolicies = new API.NetworkPolicies(this);
   gatewayConfigs: API.GatewayConfigs = new API.GatewayConfigs(this);
   mcpConfigs: API.McpConfigs = new API.McpConfigs(this);
+  apikeys: API.Apikeys = new API.Apikeys(this);
+  restrictedKeys: API.RestrictedKeys = new API.RestrictedKeys(this);
 
   /**
    * Check whether the base URL is set to its default.
@@ -438,6 +451,8 @@ Runloop.GatewayConfigs = GatewayConfigs;
 Runloop.GatewayConfigViewsGatewayConfigsCursorIDPage = GatewayConfigViewsGatewayConfigsCursorIDPage;
 Runloop.McpConfigs = McpConfigs;
 Runloop.McpConfigViewsMcpConfigsCursorIDPage = McpConfigViewsMcpConfigsCursorIDPage;
+Runloop.Apikeys = Apikeys;
+Runloop.RestrictedKeys = RestrictedKeys;
 
 export declare namespace Runloop {
   export type RequestOptions = Core.RequestOptions;
@@ -565,11 +580,14 @@ export declare namespace Runloop {
   export {
     Agents as Agents,
     type AgentCreateParameters as AgentCreateParameters,
+    type AgentDevboxCountsView as AgentDevboxCountsView,
     type AgentListView as AgentListView,
     type AgentView as AgentView,
+    type AgentDeleteResponse as AgentDeleteResponse,
     AgentViewsAgentsCursorIDPage as AgentViewsAgentsCursorIDPage,
     type AgentCreateParams as AgentCreateParams,
     type AgentListParams as AgentListParams,
+    type AgentListPublicParams as AgentListPublicParams,
   };
 
   export {
@@ -732,6 +750,21 @@ export declare namespace Runloop {
     type McpConfigUpdateParams as McpConfigUpdateParams,
     type McpConfigListParams as McpConfigListParams,
     type McpConfigDeleteParams as McpConfigDeleteParams,
+  };
+
+  export {
+    Apikeys as Apikeys,
+    type APIKeyCreatedView as APIKeyCreatedView,
+    type APIKeyCreateParameters as APIKeyCreateParameters,
+    type ApikeyCreateParams as ApikeyCreateParams,
+  };
+
+  export {
+    RestrictedKeys as RestrictedKeys,
+    type RestrictedKeyCreatedView as RestrictedKeyCreatedView,
+    type RestrictedKeyCreateParameters as RestrictedKeyCreateParameters,
+    type ScopeEntryView as ScopeEntryView,
+    type RestrictedKeyCreateParams as RestrictedKeyCreateParams,
   };
 
   export type AfterIdle = API.AfterIdle;
