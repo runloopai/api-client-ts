@@ -337,6 +337,11 @@ export namespace LaunchParameters {
      */
     export interface ResumeTriggers {
       /**
+       * When true, axon events targeting a suspended Devbox will trigger a resume.
+       */
+      axon_event?: boolean | null;
+
+      /**
        * When true, HTTP traffic to a suspended Devbox via tunnel will trigger a resume.
        */
       http?: boolean | null;
