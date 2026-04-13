@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.19.0 (2026-04-13)
+
+Full Changelog: [v1.18.1...v1.19.0](https://github.com/runloopai/api-client-ts/compare/v1.18.1...v1.19.0)
+
+### Features
+
+* Add wake on axon event as an API primitive ([#8681](https://github.com/runloopai/api-client-ts/issues/8681)) ([ec27047](https://github.com/runloopai/api-client-ts/commit/ec27047ddf21fff3690166c045ff5ab7831bd003))
+* Allow API keys to create API and restricted keys ([#8663](https://github.com/runloopai/api-client-ts/issues/8663)) ([5727999](https://github.com/runloopai/api-client-ts/commit/57279999228e9ecb0fb9803e04ba9552f4110411))
+
 ## 1.18.1 (2026-04-10)
 
 Full Changelog: [v1.18.0...v1.18.1](https://github.com/runloopai/api-client-ts/compare/v1.18.0...v1.18.1)
