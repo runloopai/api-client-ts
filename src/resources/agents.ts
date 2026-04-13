@@ -39,6 +39,43 @@ export class Agents extends APIResource {
     }
     return this._client.getAPIList('/v1/agents', AgentViewsAgentsCursorIDPage, { query, ...options });
   }
+
+  /**
+   * Delete an Agent by its unique identifier. The Agent will be permanently removed.
+   */
+  delete(id: string, options?: Core.RequestOptions): Core.APIPromise<unknown> {
+    return this._client.post(`/v1/agents/${id}/delete`, options);
+  }
+
+  /**
+   * Returns devbox counts grouped by agent name. This endpoint efficiently
+   * aggregates devbox counts for all agents in a single request, avoiding N+1 query
+   * patterns.
+   */
+  devboxCounts(options?: Core.RequestOptions): Core.APIPromise<AgentDevboxCountsView> {
+    return this._client.get('/v1/agents/devbox_counts', options);
+  }
+
+  /**
+   * List all public Agents with pagination support.
+   */
+  listPublic(
+    query?: AgentListPublicParams,
+    options?: Core.RequestOptions,
+  ): Core.PagePromise<AgentViewsAgentsCursorIDPage, AgentView>;
+  listPublic(options?: Core.RequestOptions): Core.PagePromise<AgentViewsAgentsCursorIDPage, AgentView>;
+  listPublic(
+    query: AgentListPublicParams | Core.RequestOptions = {},
+    options?: Core.RequestOptions,
+  ): Core.PagePromise<AgentViewsAgentsCursorIDPage, AgentView> {
+    if (isRequestOptions(query)) {
+      return this.listPublic({}, query);
+    }
+    return this._client.getAPIList('/v1/agents/list_public', AgentViewsAgentsCursorIDPage, {
+      query,
+      ...options,
+    });
+  }
 }
 
 export class AgentViewsAgentsCursorIDPage extends AgentsCursorIDPage<AgentView> {}
@@ -61,6 +98,23 @@ export interface AgentCreateParameters {
    * The source configuration for the Agent.
    */
   source?: Shared.AgentSource | null;
+}
+
+/**
+ * Devbox counts grouped by agent name. Used to efficiently fetch devbox counts for
+ * multiple agents in a single request.
+ */
+export interface AgentDevboxCountsView {
+  /**
+   * Map of agent name to devbox count. Each key is an agent name, and the value is
+   * the count of devboxes associated with that agent.
+   */
+  counts: { [key: string]: number };
+
+  /**
+   * Total count of devboxes across all agents in the result.
+   */
+  total_count: number;
 }
 
 /**
@@ -118,6 +172,8 @@ export interface AgentView {
   source?: Shared.AgentSource | null;
 }
 
+export type AgentDeleteResponse = unknown;
+
 export interface AgentCreateParams {
   /**
    * The name of the Agent.
@@ -163,15 +219,41 @@ export interface AgentListParams extends AgentsCursorIDPageParams {
   version?: string;
 }
 
+export interface AgentListPublicParams extends AgentsCursorIDPageParams {
+  /**
+   * If true (default), includes total_count in the response. Set to false to skip
+   * the count query for better performance on large datasets.
+   */
+  include_total_count?: boolean;
+
+  /**
+   * Filter agents by name (partial match supported).
+   */
+  name?: string;
+
+  /**
+   * Search by agent ID or name.
+   */
+  search?: string;
+
+  /**
+   * Filter by version. Use 'latest' to get the most recently created agent.
+   */
+  version?: string;
+}
+
 Agents.AgentViewsAgentsCursorIDPage = AgentViewsAgentsCursorIDPage;
 
 export declare namespace Agents {
   export {
     type AgentCreateParameters as AgentCreateParameters,
+    type AgentDevboxCountsView as AgentDevboxCountsView,
     type AgentListView as AgentListView,
     type AgentView as AgentView,
+    type AgentDeleteResponse as AgentDeleteResponse,
     AgentViewsAgentsCursorIDPage as AgentViewsAgentsCursorIDPage,
     type AgentCreateParams as AgentCreateParams,
     type AgentListParams as AgentListParams,
+    type AgentListPublicParams as AgentListPublicParams,
   };
 }

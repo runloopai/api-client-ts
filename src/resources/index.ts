@@ -5,10 +5,13 @@ export {
   AgentViewsAgentsCursorIDPage,
   Agents,
   type AgentCreateParameters,
+  type AgentDevboxCountsView,
   type AgentListView,
   type AgentView,
+  type AgentDeleteResponse,
   type AgentCreateParams,
   type AgentListParams,
+  type AgentListPublicParams,
 } from './agents';
 export {
   Apikeys,
