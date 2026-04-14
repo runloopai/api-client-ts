@@ -24,7 +24,7 @@ import type {
 } from './resources/devboxes/devboxes';
 import type { BlueprintListParams } from './resources/blueprints';
 import type { ObjectCreateParams, ObjectListParams } from './resources/objects';
-import type { AgentCreateParams, AgentListParams } from './resources/agents';
+import type { AgentCreateParams, AgentDevboxCountsView, AgentListParams, AgentListPublicParams } from './resources/agents';
 import type { AxonCreateParams, AxonListParams } from './resources/axons/axons';
 import type { ScorerCreateParams, ScorerListParams } from './resources/scenarios/scorers';
 import type { NetworkPolicyCreateParams, NetworkPolicyListParams } from './resources/network-policies';
@@ -1493,6 +1493,79 @@ export class AgentOps {
    */
   async list(params?: AgentListParams, options?: Core.RequestOptions): Promise<Agent[]> {
     return Agent.list(this.client, params, options);
+  }
+
+  /**
+   * List public agents with optional filters (paginated).
+   *
+   * @example
+   * List all public agents:
+   * ```typescript
+   * const runloop = new RunloopSDK();
+   * const agents = await runloop.agent.listPublic();
+   *
+   * for (const agent of agents) {
+   *   const info = await agent.getInfo();
+   *   console.log(`${info.name}: ${info.source?.type}`);
+   * }
+   * ```
+   *
+   * @param {AgentListPublicParams} [params] - Optional filter parameters.
+   * @param {Core.RequestOptions} [options] - Request options.
+   * @returns {Promise<Agent[]>} An array of {@link Agent} instances.
+   */
+  async listPublic(params?: AgentListPublicParams, options?: Core.RequestOptions): Promise<Agent[]> {
+    return Agent.listPublic(this.client, params, options);
+  }
+
+  /**
+   * Delete an agent. This action is irreversible.
+   *
+   * @example
+   * Delete by Agent instance:
+   * ```typescript
+   * const runloop = new RunloopSDK();
+   * const agent = runloop.agent.fromId('agt_1234567890');
+   * await runloop.agent.delete(agent);
+   * ```
+   *
+   * @example
+   * Delete by ID string:
+   * ```typescript
+   * const runloop = new RunloopSDK();
+   * await runloop.agent.delete('agt_1234567890');
+   * ```
+   *
+   * @param {Agent | string} agent - The agent to delete (Agent object or ID string).
+   * @param {Core.RequestOptions} [options] - Request options.
+   * @returns {Promise<void>} Resolves when the agent is deleted.
+   */
+  async delete(agent: Agent | string, options?: Core.RequestOptions): Promise<void> {
+    const target = agent instanceof Agent ? agent : this.fromId(agent);
+    return target.delete(options);
+  }
+
+  /**
+   * Get devbox counts grouped by agent name.
+   *
+   * Returns an aggregate view of how many devboxes are associated with each agent,
+   * avoiding N+1 query patterns.
+   *
+   * @example
+   * ```typescript
+   * const runloop = new RunloopSDK();
+   * const counts = await runloop.agent.getDevboxCounts();
+   * console.log(`Total devboxes: ${counts.total_count}`);
+   * for (const [name, count] of Object.entries(counts.counts)) {
+   *   console.log(`  ${name}: ${count}`);
+   * }
+   * ```
+   *
+   * @param {Core.RequestOptions} [options] - Request options.
+   * @returns {Promise<AgentDevboxCountsView>} Devbox counts grouped by agent name.
+   */
+  async getDevboxCounts(options?: Core.RequestOptions): Promise<AgentDevboxCountsView> {
+    return this.client.agents.devboxCounts(options);
   }
 }
 

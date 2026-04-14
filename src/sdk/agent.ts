@@ -1,6 +1,6 @@
 import { Runloop } from '../index';
 import type * as Core from '../core';
-import type { AgentCreateParams, AgentListParams, AgentView } from '../resources/agents';
+import type { AgentCreateParams, AgentListParams, AgentListPublicParams, AgentView } from '../resources/agents';
 
 /**
  * Object-oriented interface for working with Agents.
@@ -127,6 +127,40 @@ export class Agent {
   }
 
   /**
+   * List all public agents, optionally filtered by name or search query.
+   *
+   * @example
+   * ```typescript
+   * const runloop = new RunloopSDK();
+   * const publicAgents = await runloop.agent.listPublic();
+   *
+   * for (const agent of publicAgents) {
+   *   const info = await agent.getInfo();
+   *   console.log(`${info.name}: ${info.source?.type}`);
+   * }
+   * ```
+   *
+   * @param {Runloop} client - The Runloop client instance
+   * @param {AgentListPublicParams} [params] - Optional filter parameters
+   * @param {Core.RequestOptions} [options] - Request options
+   * @returns {Promise<Agent[]>} Array of {@link Agent} instances
+   */
+  static async listPublic(
+    client: Runloop,
+    params?: AgentListPublicParams,
+    options?: Core.RequestOptions,
+  ): Promise<Agent[]> {
+    const page = await client.agents.listPublic(params, options);
+    const result: Agent[] = [];
+
+    for (const agent of page.getPaginatedItems()) {
+      result.push(new Agent(client, agent.id));
+    }
+
+    return result;
+  }
+
+  /**
    * Get the agent ID.
    */
   get id(): string {
@@ -141,5 +175,24 @@ export class Agent {
    */
   async getInfo(options?: Core.RequestOptions): Promise<AgentView> {
     return await this.client.agents.retrieve(this._id, options);
+  }
+
+  /**
+   * Delete this agent. This action is irreversible.
+   *
+   * See the {@link AgentOps.delete} method for calling this
+   * @private
+   *
+   * @example
+   * ```typescript
+   * const agent = runloop.agent.fromId('agt_1234567890');
+   * await agent.delete();
+   * ```
+   *
+   * @param {Core.RequestOptions} [options] - Request options
+   * @returns {Promise<void>} Resolves when the agent is deleted
+   */
+  async delete(options?: Core.RequestOptions): Promise<void> {
+    await this.client.agents.delete(this._id, options);
   }
 }
