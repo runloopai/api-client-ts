@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.20.0 (2026-04-14)
+
+Full Changelog: [v1.19.0...v1.20.0](https://github.com/runloopai/api-client-ts/compare/v1.19.0...v1.20.0)
+
+### Features
+
+* add OO SDK support for new Agent API calls ([#780](https://github.com/runloopai/api-client-ts/issues/780)) ([cb107b1](https://github.com/runloopai/api-client-ts/commit/cb107b1b5b0a35b2670ae8cfb09092695e6575d7))
+* **axon:** add working directory / directory to launch agent ([#8689](https://github.com/runloopai/api-client-ts/issues/8689)) ([72a0357](https://github.com/runloopai/api-client-ts/commit/72a0357139ffee91b61cc0f176f5a8412a894bcd))
+
 ## 1.19.0 (2026-04-13)
 
 Full Changelog: [v1.18.1...v1.19.0](https://github.com/runloopai/api-client-ts/compare/v1.18.1...v1.19.0)
