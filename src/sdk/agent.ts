@@ -1,6 +1,11 @@
 import { Runloop } from '../index';
 import type * as Core from '../core';
-import type { AgentCreateParams, AgentListParams, AgentListPublicParams, AgentView } from '../resources/agents';
+import type {
+  AgentCreateParams,
+  AgentListParams,
+  AgentListPublicParams,
+  AgentView,
+} from '../resources/agents';
 
 /**
  * Object-oriented interface for working with Agents.

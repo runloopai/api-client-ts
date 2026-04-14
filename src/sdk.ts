@@ -24,7 +24,12 @@ import type {
 } from './resources/devboxes/devboxes';
 import type { BlueprintListParams } from './resources/blueprints';
 import type { ObjectCreateParams, ObjectListParams } from './resources/objects';
-import type { AgentCreateParams, AgentDevboxCountsView, AgentListParams, AgentListPublicParams } from './resources/agents';
+import type {
+  AgentCreateParams,
+  AgentDevboxCountsView,
+  AgentListParams,
+  AgentListPublicParams,
+} from './resources/agents';
 import type { AxonCreateParams, AxonListParams } from './resources/axons/axons';
 import type { ScorerCreateParams, ScorerListParams } from './resources/scenarios/scorers';
 import type { NetworkPolicyCreateParams, NetworkPolicyListParams } from './resources/network-policies';
