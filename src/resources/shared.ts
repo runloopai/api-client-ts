@@ -171,6 +171,12 @@ export interface BrokerMount {
    * The protocol used by the broker to deliver events to the agent.
    */
   protocol?: 'acp' | 'claude_json' | null;
+
+  /**
+   * Working directory in which to launch the agent binary. Defaults to the home
+   * directory if not specified.
+   */
+  working_directory?: string | null;
 }
 
 export interface CodeMountParameters {
