@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.20.1 (2026-04-18)
+
+Full Changelog: [v1.20.0...v1.20.1](https://github.com/runloopai/api-client-ts/compare/v1.20.0...v1.20.1)
+
+### Chores
+
+* **tests:** bump steady to v0.22.1 ([863667e](https://github.com/runloopai/api-client-ts/commit/863667e287670f14360b1f0e30b90b2e3a893f00))
+
 ## 1.20.0 (2026-04-14)
 
 Full Changelog: [v1.19.0...v1.20.0](https://github.com/runloopai/api-client-ts/compare/v1.19.0...v1.20.0)
