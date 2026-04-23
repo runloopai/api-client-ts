@@ -90,14 +90,16 @@ export interface AgentCreateParameters {
   name: string;
 
   /**
-   * The version of the Agent. Must be a semver string (e.g., '2.0.65') or a SHA.
-   */
-  version: string;
-
-  /**
    * The source configuration for the Agent.
    */
   source?: Shared.AgentSource | null;
+
+  /**
+   * Optional version identifier for the Agent. For npm/pip sources this is typically
+   * a semver string (e.g. '2.0.65'). For git sources it can be a branch or tag.
+   * Semantics are user-defined for object sources.
+   */
+  version?: string | null;
 }
 
 /**
@@ -162,14 +164,16 @@ export interface AgentView {
   name: string;
 
   /**
-   * The version of the Agent. A semver string (e.g., '2.0.65') or a SHA.
-   */
-  version: string;
-
-  /**
    * The source configuration for the Agent.
    */
   source?: Shared.AgentSource | null;
+
+  /**
+   * Optional version identifier for the Agent. For npm/pip sources this is typically
+   * a semver string (e.g. '2.0.65'). For git sources it can be a branch or tag.
+   * Omitted for object sources or when not provided.
+   */
+  version?: string | null;
 }
 
 export type AgentDeleteResponse = unknown;
@@ -181,14 +185,16 @@ export interface AgentCreateParams {
   name: string;
 
   /**
-   * The version of the Agent. Must be a semver string (e.g., '2.0.65') or a SHA.
-   */
-  version: string;
-
-  /**
    * The source configuration for the Agent.
    */
   source?: Shared.AgentSource | null;
+
+  /**
+   * Optional version identifier for the Agent. For npm/pip sources this is typically
+   * a semver string (e.g. '2.0.65'). For git sources it can be a branch or tag.
+   * Semantics are user-defined for object sources.
+   */
+  version?: string | null;
 }
 
 export interface AgentListParams extends AgentsCursorIDPageParams {
