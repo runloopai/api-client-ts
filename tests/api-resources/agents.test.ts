@@ -10,7 +10,7 @@ const client = new Runloop({
 
 describe('resource agents', () => {
   test('create: only required params', async () => {
-    const responsePromise = client.agents.create({ name: 'name', version: 'version' });
+    const responsePromise = client.agents.create({ name: 'name' });
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
     const response = await responsePromise;
@@ -23,7 +23,6 @@ describe('resource agents', () => {
   test('create: required and optional params', async () => {
     const response = await client.agents.create({
       name: 'name',
-      version: 'version',
       source: {
         type: 'type',
         git: {
@@ -43,6 +42,7 @@ describe('resource agents', () => {
           registry_url: 'registry_url',
         },
       },
+      version: 'version',
     });
   });
 
