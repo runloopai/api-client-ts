@@ -96,8 +96,12 @@ The SDK provides object-oriented interfaces for all major Runloop resources:
 - **[`runloop.snapshot`](https://runloopai.github.io/api-client-ts/stable/classes/sdk.SnapshotOps.html)** - Snapshot management (list disk snapshots)
 - **[`runloop.storageObject`](https://runloopai.github.io/api-client-ts/stable/classes/sdk.StorageObjectOps.html)** - Storage object management (upload, download, list objects)
 - **[`runloop.agent`](https://runloopai.github.io/api-client-ts/stable/classes/sdk.AgentOps.html)** - Agent management (create, list agents from npm/pip/git)
+- **[`runloop.axon`](https://runloopai.github.io/api-client-ts/stable/classes/sdk.AxonOps.html)** - [Beta] Axon management (create, publish events, subscribe via SSE)
 - **[`runloop.scenario`](https://runloopai.github.io/api-client-ts/stable/classes/sdk.ScenarioOps.html)** - Scenario management (list scenarios, start runs)
 - **[`runloop.scorer`](https://runloopai.github.io/api-client-ts/stable/classes/sdk.ScorerOps.html)** - Scorer management (create, list, update)
+- **[`runloop.networkPolicy`](https://runloopai.github.io/api-client-ts/stable/classes/sdk.NetworkPolicyOps.html)** - Network policy management (create, list, update egress rules)
+- **[`runloop.gatewayConfig`](https://runloopai.github.io/api-client-ts/stable/classes/sdk.GatewayConfigOps.html)** - Gateway config management (create, list API proxy configurations)
+- **[`runloop.mcpConfig`](https://runloopai.github.io/api-client-ts/stable/classes/sdk.McpConfigOps.html)** - MCP config management (create, list MCP server configurations)
 - **[`runloop.secret`](https://runloopai.github.io/api-client-ts/stable/classes/sdk.SecretOps.html)** - Secret management (create, update, list, delete encrypted key-value pairs)
 - **[`runloop.api`](https://runloopai.github.io/api-client-ts/stable/modules/types.html)** - Direct access to the REST API client
 
