@@ -9,7 +9,7 @@ export function makeClient(overrides: Partial<ConstructorParameters<typeof Runlo
     baseURL,
     bearerToken,
     timeout: 120_000,
-    maxRetries: 1,
+    maxRetries: 3,
     ...overrides,
   });
 }
@@ -19,7 +19,7 @@ export function makeClientSDK() {
     bearerToken: process.env['RUNLOOP_API_KEY'],
     baseURL: process.env['RUNLOOP_BASE_URL'],
     timeout: 120_000,
-    maxRetries: 1,
+    maxRetries: 3,
   });
 }
 
