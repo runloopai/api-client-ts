@@ -201,6 +201,11 @@ export interface ObjectView {
   delete_after_time_ms?: number | null;
 
   /**
+   * User defined metadata to attach to the Object for organization.
+   */
+  metadata?: { [key: string]: string } | null;
+
+  /**
    * The size of the Object content in bytes (null until uploaded).
    */
   size_bytes?: number | null;
