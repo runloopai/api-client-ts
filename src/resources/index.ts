@@ -97,6 +97,7 @@ export {
   type DevboxSnapshotListView,
   type DevboxSnapshotView,
   type DevboxView,
+  type PtyTunnelView,
   type TunnelView,
   type DevboxCreateSSHKeyResponse,
   type DevboxDeleteDiskSnapshotResponse,
@@ -171,6 +172,14 @@ export {
   type ObjectDownloadParams,
   type ObjectListPublicParams,
 } from './objects';
+export {
+  Pty,
+  type PtyConnectView,
+  type PtyControlParameters,
+  type PtyControlResultView,
+  type PtyConnectParams,
+  type PtyControlParams,
+} from './pty';
 export {
   RestrictedKeys,
   type RestrictedKeyCreatedView,
