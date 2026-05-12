@@ -250,7 +250,7 @@ Methods:
 Types:
 
 - <code><a href="./src/resources/pty.ts">PtyConnectView</a></code>
-- <code><a href="./src/resources/pty.ts">PtyControlParameters</a></code>
+- <code><a href="./src/resources/pty.ts">PtyControlParams</a></code>
 - <code><a href="./src/resources/pty.ts">PtyControlResultView</a></code>
 
 Methods:
