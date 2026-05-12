@@ -1,5 +1,33 @@
 # Changelog
 
+## 1.21.0 (2026-05-12)
+
+Full Changelog: [v1.20.0...v1.21.0](https://github.com/runloopai/api-client-ts/compare/v1.20.0...v1.21.0)
+
+### Features
+
+* make agent version optional in API ([#8858](https://github.com/runloopai/api-client-ts/issues/8858)) ([9676132](https://github.com/runloopai/api-client-ts/commit/9676132d3a4dd6ad458229a309349160832edd8a))
+* **metadata:** add object metadata viewing, discovery, and validation ([#9124](https://github.com/runloopai/api-client-ts/issues/9124)) ([204e2a9](https://github.com/runloopai/api-client-ts/commit/204e2a9c871c6ea895348a32f8b1ef734e2fc19b))
+* support setting headers via env ([7f226b0](https://github.com/runloopai/api-client-ts/commit/7f226b081e7a8b4221379fa4530a81887de124b7))
+
+
+### Bug Fixes
+
+* **test:** increase SDK maxRetries from 1 to 3 for smoketest resilience ([#786](https://github.com/runloopai/api-client-ts/issues/786)) ([c8b5448](https://github.com/runloopai/api-client-ts/commit/c8b5448bb00d7108deb50749969ee09d8bf511e8))
+* update openapi.stainless.yaml for PTY server methods ([#9218](https://github.com/runloopai/api-client-ts/issues/9218)) ([e72f504](https://github.com/runloopai/api-client-ts/commit/e72f5046b989fae45edadb6840c696d48900ec8d))
+
+
+### Chores
+
+* add get secret to stainless ([#7833](https://github.com/runloopai/api-client-ts/issues/7833)) ([3e8eee7](https://github.com/runloopai/api-client-ts/commit/3e8eee7a59d9bd6f08d2060bdeaf58bfb29d93b8))
+* **internal:** more robust bootstrap script ([c31aa86](https://github.com/runloopai/api-client-ts/commit/c31aa86ba3c30b13052b18a6e498e0be685cb0fa))
+* **tests:** bump steady to v0.22.1 ([620beac](https://github.com/runloopai/api-client-ts/commit/620beac7bde9bdf9ef84b4bd023f844be0b2c37f))
+
+
+### Documentation
+
+* add missing SDK operations to README ([#785](https://github.com/runloopai/api-client-ts/issues/785)) ([128b60b](https://github.com/runloopai/api-client-ts/commit/128b60b1b346a873083d1b238573e1af05e97008))
+
 ## 1.20.0 (2026-04-14)
 
 Full Changelog: [v1.19.0...v1.20.0](https://github.com/runloopai/api-client-ts/compare/v1.19.0...v1.20.0)
