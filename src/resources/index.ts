@@ -97,6 +97,7 @@ export {
   type DevboxSnapshotListView,
   type DevboxSnapshotView,
   type DevboxView,
+  type PtyTunnelView,
   type TunnelView,
   type DevboxCreateSSHKeyResponse,
   type DevboxDeleteDiskSnapshotResponse,
@@ -121,6 +122,14 @@ export {
   type DevboxWaitForCommandParams,
   type DevboxWriteFileContentsParams,
 } from './devboxes/devboxes';
+export {
+  Pty,
+  type PtyConnectView,
+  type PtyControlAction,
+  type PtyControlParams,
+  type PtyControlResultView,
+  type PtyConnectParams,
+} from './pty';
 export {
   GatewayConfigViewsGatewayConfigsCursorIDPage,
   GatewayConfigs,

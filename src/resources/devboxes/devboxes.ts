@@ -174,6 +174,13 @@ export class Devboxes extends APIResource {
   }
 
   /**
+   * Create an ephemeral PTY tunnel for a running Devbox.
+   */
+  createPtyTunnel(id: string, options?: Core.RequestOptions): Core.APIPromise<PtyTunnelView> {
+    return this._client.post(`/v1/devboxes/${id}/create_pty_tunnel`, options);
+  }
+
+  /**
    * Delete a previously taken disk snapshot of a Devbox.
    */
   deleteDiskSnapshot(id: string, options?: Core.RequestOptions): Core.APIPromise<unknown> {
@@ -1006,6 +1013,21 @@ export interface TunnelView {
    * 'authenticated'.
    */
   auth_token?: string | null;
+}
+
+/**
+ * An ephemeral PTY tunnel providing authenticated terminal access to a Devbox.
+ */
+export interface PtyTunnelView {
+  /**
+   * Bearer token for tunnel authentication. Always required for PTY tunnels.
+   */
+  auth_token: string;
+
+  /**
+   * The encrypted tunnel key used to construct the tunnel URL.
+   */
+  tunnel_key: string;
 }
 
 export interface DevboxCreateSSHKeyResponse {

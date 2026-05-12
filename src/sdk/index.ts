@@ -1,4 +1,14 @@
-export { Devbox, DevboxCmdOps, DevboxFileOps, DevboxNetOps, type ExecuteStreamingCallbacks } from './devbox';
+export {
+  Devbox,
+  DevboxCmdOps,
+  DevboxFileOps,
+  DevboxNetOps,
+  DevboxPtyOps,
+  DevboxPtyProcess,
+  DevboxPtySession,
+  PtyOutput,
+  type ExecuteStreamingCallbacks,
+} from './devbox';
 export { Blueprint } from './blueprint';
 export { Snapshot } from './snapshot';
 export { StorageObject } from './storage-object';

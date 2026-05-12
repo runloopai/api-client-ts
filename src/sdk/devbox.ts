@@ -22,11 +22,13 @@ import { LongPollRequestOptions, PollingOptions } from '../lib/polling';
 import { Snapshot } from './snapshot';
 import { Execution } from './execution';
 import { ExecutionResult } from './execution-result';
+import { DevboxPtyOps } from './pty';
 import { uuidv7 } from 'uuidv7';
 
 // Re-export Execution and ExecutionResult for Devbox namespace
 export { Execution } from './execution';
 export { ExecutionResult } from './execution-result';
+export { DevboxPtyOps, DevboxPtyProcess, DevboxPtySession, PtyOutput } from './pty';
 
 /**
  * Streaming callbacks for real-time log processing.
@@ -506,6 +508,7 @@ export class DevboxFileOps {
  * - {@link DevboxNetOps net} - Network operations
  * - {@link DevboxCmdOps cmd} - Command execution operations
  * - {@link DevboxFileOps file} - File operations
+ * - {@link DevboxPtyOps pty} - PTY terminal operations
  *
  * ## Quickstart
  *
@@ -538,12 +541,18 @@ export class Devbox {
    */
   public readonly file: DevboxFileOps;
 
+  /**
+   * PTY terminal operations on the devbox.
+   */
+  public readonly pty: DevboxPtyOps;
+
   private constructor(client: Runloop, id: string) {
     this.client = client;
     this._id = id;
     this.net = new DevboxNetOps(this.client, this._id);
     this.cmd = new DevboxCmdOps(this.client, this._id, this.startStreamingWithCallbacks.bind(this));
     this.file = new DevboxFileOps(this.client, this._id);
+    this.pty = new DevboxPtyOps(this.client, this._id);
   }
 
   /**
