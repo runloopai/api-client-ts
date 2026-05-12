@@ -111,7 +111,7 @@ export interface PtyConnectView {
   status?: string;
 }
 
-export interface PtyControlParameters {
+export interface PtyControlParams {
   action?: 'resize' | 'signal' | 'close';
 
   cols?: number;
@@ -133,14 +133,14 @@ export interface PtyConnectParams {
    * when omitted. Applied only if both cols and rows are provided; otherwise
    * ignored.
    */
-  cols?: string;
+  cols?: number;
 
   /**
    * Optional initial terminal height in character cells (1..=1000). Defaults to 24
    * when omitted. Applied only if both cols and rows are provided; otherwise
    * ignored.
    */
-  rows?: string;
+  rows?: number;
 }
 
 export interface PtyControlParams {
@@ -156,9 +156,8 @@ export interface PtyControlParams {
 export declare namespace Pty {
   export {
     type PtyConnectView as PtyConnectView,
-    type PtyControlParameters as PtyControlParameters,
+    type PtyControlParams as PtyControlParams,
     type PtyControlResultView as PtyControlResultView,
     type PtyConnectParams as PtyConnectParams,
-    type PtyControlParams as PtyControlParams,
   };
 }

@@ -154,7 +154,6 @@ import {
   Pty,
   PtyConnectParams,
   PtyConnectView,
-  PtyControlParameters,
   PtyControlParams,
   PtyControlResultView,
 } from './resources/pty';
@@ -682,10 +681,9 @@ export declare namespace Runloop {
   export {
     Pty as Pty,
     type PtyConnectView as PtyConnectView,
-    type PtyControlParameters as PtyControlParameters,
+    type PtyControlParams as PtyControlParams,
     type PtyControlResultView as PtyControlResultView,
     type PtyConnectParams as PtyConnectParams,
-    type PtyControlParams as PtyControlParams,
   };
 
   export {
