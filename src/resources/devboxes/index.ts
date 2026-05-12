@@ -14,6 +14,7 @@ export {
   type DevboxSnapshotListView,
   type DevboxSnapshotView,
   type DevboxView,
+  type PtyTunnelView,
   type TunnelView,
   type DevboxCreateSSHKeyResponse,
   type DevboxDeleteDiskSnapshotResponse,

@@ -151,6 +151,14 @@ import {
   Objects,
 } from './resources/objects';
 import {
+  Pty,
+  PtyConnectParams,
+  PtyConnectView,
+  PtyControlParameters,
+  PtyControlParams,
+  PtyControlResultView,
+} from './resources/pty';
+import {
   RestrictedKeyCreateParameters,
   RestrictedKeyCreateParams,
   RestrictedKeyCreatedView,
@@ -217,6 +225,7 @@ import {
   DevboxWaitForCommandParams,
   DevboxWriteFileContentsParams,
   Devboxes,
+  PtyTunnelView,
   TunnelView,
 } from './resources/devboxes/devboxes';
 import {
@@ -386,6 +395,7 @@ export class Runloop extends Core.APIClient {
   axons: API.Axons = new API.Axons(this);
   blueprints: API.Blueprints = new API.Blueprints(this);
   devboxes: API.Devboxes = new API.Devboxes(this);
+  pty: API.Pty = new API.Pty(this);
   scenarios: API.Scenarios = new API.Scenarios(this);
   objects: API.Objects = new API.Objects(this);
   secrets: API.Secrets = new API.Secrets(this);
@@ -452,6 +462,7 @@ Runloop.BlueprintViewsBlueprintsCursorIDPage = BlueprintViewsBlueprintsCursorIDP
 Runloop.Devboxes = Devboxes;
 Runloop.DevboxViewsDevboxesCursorIDPage = DevboxViewsDevboxesCursorIDPage;
 Runloop.DevboxSnapshotViewsDiskSnapshotsCursorIDPage = DevboxSnapshotViewsDiskSnapshotsCursorIDPage;
+Runloop.Pty = Pty;
 Runloop.Scenarios = Scenarios;
 Runloop.ScenarioViewsScenariosCursorIDPage = ScenarioViewsScenariosCursorIDPage;
 Runloop.Objects = Objects;
@@ -647,6 +658,7 @@ export declare namespace Runloop {
     type DevboxSnapshotListView as DevboxSnapshotListView,
     type DevboxSnapshotView as DevboxSnapshotView,
     type DevboxView as DevboxView,
+    type PtyTunnelView as PtyTunnelView,
     type TunnelView as TunnelView,
     type DevboxCreateSSHKeyResponse as DevboxCreateSSHKeyResponse,
     type DevboxDeleteDiskSnapshotResponse as DevboxDeleteDiskSnapshotResponse,
@@ -672,6 +684,15 @@ export declare namespace Runloop {
     type DevboxUploadFileParams as DevboxUploadFileParams,
     type DevboxWaitForCommandParams as DevboxWaitForCommandParams,
     type DevboxWriteFileContentsParams as DevboxWriteFileContentsParams,
+  };
+
+  export {
+    Pty as Pty,
+    type PtyConnectView as PtyConnectView,
+    type PtyControlParameters as PtyControlParameters,
+    type PtyControlResultView as PtyControlResultView,
+    type PtyConnectParams as PtyConnectParams,
+    type PtyControlParams as PtyControlParams,
   };
 
   export {

@@ -167,6 +167,16 @@ export class Devboxes extends APIResource {
   }
 
   /**
+   * Create an ephemeral authenticated tunnel for terminal access to a running
+   * Devbox. This tunnel is not persisted on the Devbox and is generated fresh on
+   * each request. The returned auth_token must be passed as a Bearer token in the
+   * Authorization header.
+   */
+  createPtyTunnel(id: string, options?: Core.RequestOptions): Core.APIPromise<PtyTunnelView> {
+    return this._client.post(`/v1/devboxes/${id}/create_pty_tunnel`, options);
+  }
+
+  /**
    * Create an SSH key for a Devbox to enable remote access.
    */
   createSSHKey(id: string, options?: Core.RequestOptions): Core.APIPromise<DevboxCreateSSHKeyResponse> {
@@ -965,6 +975,25 @@ export namespace DevboxView {
 }
 
 /**
+ * An ephemeral PTY tunnel providing authenticated terminal access to a Devbox.
+ * These tunnels are not stored on the Devbox and are generated fresh on each
+ * request. Usage: https://{port}-{tunnel_key}.tunnel.runloop.ai with
+ * Authorization: Bearer {auth_token}
+ */
+export interface PtyTunnelView {
+  /**
+   * Bearer token for tunnel authentication. Always required for PTY tunnels.
+   */
+  auth_token: string;
+
+  /**
+   * The encrypted tunnel key used to construct the tunnel URL. URL format:
+   * https://{port}-{tunnel_key}.tunnel.runloop.{domain}
+   */
+  tunnel_key: string;
+}
+
+/**
  * A V2 tunnel provides secure HTTP access to services running on a Devbox. Tunnels
  * allow external clients to reach web servers, APIs, or other HTTP services
  * running inside a Devbox without requiring direct network access. Each tunnel is
@@ -1497,6 +1526,7 @@ export declare namespace Devboxes {
     type DevboxSnapshotListView as DevboxSnapshotListView,
     type DevboxSnapshotView as DevboxSnapshotView,
     type DevboxView as DevboxView,
+    type PtyTunnelView as PtyTunnelView,
     type TunnelView as TunnelView,
     type DevboxCreateSSHKeyResponse as DevboxCreateSSHKeyResponse,
     type DevboxDeleteDiskSnapshotResponse as DevboxDeleteDiskSnapshotResponse,

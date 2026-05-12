@@ -173,6 +173,24 @@ describe('resource devboxes', () => {
     ).rejects.toThrow(Runloop.NotFoundError);
   });
 
+  test('createPtyTunnel', async () => {
+    const responsePromise = client.devboxes.createPtyTunnel('id');
+    const rawResponse = await responsePromise.asResponse();
+    expect(rawResponse).toBeInstanceOf(Response);
+    const response = await responsePromise;
+    expect(response).not.toBeInstanceOf(Response);
+    const dataAndResponse = await responsePromise.withResponse();
+    expect(dataAndResponse.data).toBe(response);
+    expect(dataAndResponse.response).toBe(rawResponse);
+  });
+
+  test('createPtyTunnel: request options instead of params are passed correctly', async () => {
+    // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
+    await expect(client.devboxes.createPtyTunnel('id', { path: '/_stainless_unknown_path' })).rejects.toThrow(
+      Runloop.NotFoundError,
+    );
+  });
+
   test('createSSHKey', async () => {
     const responsePromise = client.devboxes.createSSHKey('id');
     const rawResponse = await responsePromise.asResponse();
