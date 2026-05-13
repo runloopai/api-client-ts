@@ -14,7 +14,7 @@ export class Secrets extends APIResource {
   }
 
   /**
-   * Retrieve a Secret by name.
+   * Retrieve a Secret by name. The secret value is not included for security.
    */
   retrieve(name: string, options?: Core.RequestOptions): Core.APIPromise<SecretView> {
     return this._client.get(`/v1/secrets/${name}`, options);

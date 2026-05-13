@@ -168,6 +168,7 @@ Types:
 - <code><a href="./src/resources/devboxes/devboxes.ts">DevboxSnapshotListView</a></code>
 - <code><a href="./src/resources/devboxes/devboxes.ts">DevboxSnapshotView</a></code>
 - <code><a href="./src/resources/devboxes/devboxes.ts">DevboxView</a></code>
+- <code><a href="./src/resources/devboxes/devboxes.ts">PtyTunnelView</a></code>
 - <code><a href="./src/resources/devboxes/devboxes.ts">TunnelView</a></code>
 - <code><a href="./src/resources/devboxes/devboxes.ts">DevboxCreateSSHKeyResponse</a></code>
 - <code><a href="./src/resources/devboxes/devboxes.ts">DevboxDeleteDiskSnapshotResponse</a></code>
@@ -182,6 +183,7 @@ Methods:
 - <code title="get /v1/devboxes/{id}">client.devboxes.<a href="./src/resources/devboxes/devboxes.ts">retrieve</a>(id) -> DevboxView</code>
 - <code title="post /v1/devboxes/{id}">client.devboxes.<a href="./src/resources/devboxes/devboxes.ts">update</a>(id, { ...params }) -> DevboxView</code>
 - <code title="get /v1/devboxes">client.devboxes.<a href="./src/resources/devboxes/devboxes.ts">list</a>({ ...params }) -> DevboxViewsDevboxesCursorIDPage</code>
+- <code title="post /v1/devboxes/{id}/create_pty_tunnel">client.devboxes.<a href="./src/resources/devboxes/devboxes.ts">createPtyTunnel</a>(id) -> PtyTunnelView</code>
 - <code title="post /v1/devboxes/{id}/create_ssh_key">client.devboxes.<a href="./src/resources/devboxes/devboxes.ts">createSSHKey</a>(id) -> DevboxCreateSSHKeyResponse</code>
 - <code title="post /v1/devboxes/disk_snapshots/{id}/delete">client.devboxes.<a href="./src/resources/devboxes/devboxes.ts">deleteDiskSnapshot</a>(id) -> unknown</code>
 - <code title="post /v1/devboxes/{id}/download_file">client.devboxes.<a href="./src/resources/devboxes/devboxes.ts">downloadFile</a>(id, { ...params }) -> Response</code>
@@ -242,6 +244,19 @@ Methods:
 - <code title="post /v1/devboxes/{devbox_id}/executions/{execution_id}/send_std_in">client.devboxes.executions.<a href="./src/resources/devboxes/executions.ts">sendStdIn</a>(devboxId, executionId, { ...params }) -> DevboxSendStdInResult</code>
 - <code title="get /v1/devboxes/{devbox_id}/executions/{execution_id}/stream_stderr_updates">client.devboxes.executions.<a href="./src/resources/devboxes/executions.ts">streamStderrUpdates</a>(devboxId, executionId, { ...params }) -> ExecutionUpdateChunk</code>
 - <code title="get /v1/devboxes/{devbox_id}/executions/{execution_id}/stream_stdout_updates">client.devboxes.executions.<a href="./src/resources/devboxes/executions.ts">streamStdoutUpdates</a>(devboxId, executionId, { ...params }) -> ExecutionUpdateChunk</code>
+
+# Pty
+
+Types:
+
+- <code><a href="./src/resources/pty.ts">PtyConnectView</a></code>
+- <code><a href="./src/resources/pty.ts">PtyControlParameters</a></code>
+- <code><a href="./src/resources/pty.ts">PtyControlResultView</a></code>
+
+Methods:
+
+- <code title="get /pty/{session_name}">client.pty.<a href="./src/resources/pty.ts">connect</a>(sessionName, { ...params }) -> PtyConnectView</code>
+- <code title="post /pty/{session_name}/control">client.pty.<a href="./src/resources/pty.ts">control</a>(sessionName, { ...params }) -> PtyControlResultView</code>
 
 # Scenarios
 
@@ -330,6 +345,7 @@ Types:
 Methods:
 
 - <code title="post /v1/secrets">client.secrets.<a href="./src/resources/secrets.ts">create</a>({ ...params }) -> SecretView</code>
+- <code title="get /v1/secrets/{name}">client.secrets.<a href="./src/resources/secrets.ts">retrieve</a>(name) -> SecretView</code>
 - <code title="post /v1/secrets/{name}">client.secrets.<a href="./src/resources/secrets.ts">update</a>(name, { ...params }) -> SecretView</code>
 - <code title="get /v1/secrets">client.secrets.<a href="./src/resources/secrets.ts">list</a>({ ...params }) -> SecretListView</code>
 - <code title="post /v1/secrets/{name}/delete">client.secrets.<a href="./src/resources/secrets.ts">delete</a>(name) -> SecretView</code>
