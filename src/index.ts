@@ -804,8 +804,11 @@ export declare namespace Runloop {
   export type BrokerMount = API.BrokerMount;
   export type CodeMountParameters = API.CodeMountParameters;
   export type LaunchParameters = API.LaunchParameters;
+  export type LifecycleConfiguration = API.LifecycleConfiguration;
+  export type LifecycleHooks = API.LifecycleHooks;
   export type Mount = API.Mount;
   export type ObjectMount = API.ObjectMount;
+  export type ResumeTriggers = API.ResumeTriggers;
   export type RunProfile = API.RunProfile;
 }
 
