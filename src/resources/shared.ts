@@ -1,7 +1,5 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-import * as Shared from './shared';
-
 export interface AfterIdle {
   /**
    * After idle_time_seconds, on_idle action will be taken.
@@ -264,7 +262,7 @@ export interface LaunchParameters {
    * must match), resume triggers via lifecycle.resume_triggers, and optional
    * lifecycle hooks via lifecycle.lifecycle_hooks.
    */
-  lifecycle?: LaunchParameters.Lifecycle | null;
+  lifecycle?: LifecycleConfiguration | null;
 
   /**
    * (Optional) ID of the network policy to apply to Devboxes launched with these
@@ -306,69 +304,6 @@ export interface LaunchParameters {
 
 export namespace LaunchParameters {
   /**
-   * Lifecycle configuration for idle and resume behavior. Configure idle policy via
-   * lifecycle.after_idle (if both this and the top-level after_idle are set, they
-   * must match), resume triggers via lifecycle.resume_triggers, and optional
-   * lifecycle hooks via lifecycle.lifecycle_hooks.
-   */
-  export interface Lifecycle {
-    /**
-     * Configure Devbox lifecycle based on idle activity. If both this and the
-     * top-level after_idle are set, they must have the same value. Prefer this field
-     * for new integrations.
-     */
-    after_idle?: Shared.AfterIdle | null;
-
-    /**
-     * Optional lifecycle hooks. suspend_commands run through the suspend path before
-     * the Devbox suspends; see launch_commands for work on every startup.
-     */
-    lifecycle_hooks?: Lifecycle.LifecycleHooks | null;
-
-    /**
-     * Triggers that can resume a suspended Devbox.
-     */
-    resume_triggers?: Lifecycle.ResumeTriggers | null;
-  }
-
-  export namespace Lifecycle {
-    /**
-     * Optional lifecycle hooks. suspend_commands run through the suspend path before
-     * the Devbox suspends; see launch_commands for work on every startup.
-     */
-    export interface LifecycleHooks {
-      /**
-       * Commands to run through the suspend path before the Devbox suspends (e.g.
-       * cleanup, quiesce daemons).
-       */
-      suspend_commands?: Array<string> | null;
-
-      /**
-       * Deadline in milliseconds for broker drain and suspend_commands during suspend.
-       * Defaults to 30000 ms and may not exceed 60000 ms. If exceeded, suspend work is
-       * abandoned, the timeout is logged, and the Devbox still proceeds to suspend by
-       * shutting down vmagent and killing the VM.
-       */
-      suspend_deadline_ms?: number | null;
-    }
-
-    /**
-     * Triggers that can resume a suspended Devbox.
-     */
-    export interface ResumeTriggers {
-      /**
-       * When true, axon events targeting a suspended Devbox will trigger a resume.
-       */
-      axon_event?: boolean | null;
-
-      /**
-       * When true, HTTP traffic to a suspended Devbox via tunnel will trigger a resume.
-       */
-      http?: boolean | null;
-    }
-  }
-
-  /**
    * Specify the user for execution on Devbox. If not set, default `user` will be
    * used.
    */
@@ -383,6 +318,58 @@ export namespace LaunchParameters {
      */
     username: string;
   }
+}
+
+/**
+ * Lifecycle configuration for Devbox idle and resume behavior. Configure idle
+ * policy via after_idle, resume triggers via resume_triggers, and optional
+ * lifecycle hooks via lifecycle_hooks.
+ */
+export interface LifecycleConfiguration {
+  /**
+   * Configure Devbox lifecycle based on idle activity. If both this and the
+   * top-level after_idle are set, they must have the same value. Prefer this field
+   * for new integrations.
+   */
+  after_idle?: AfterIdle | null;
+
+  /**
+   * Optional lifecycle hooks. suspend_commands run through the suspend path before
+   * the Devbox suspends; see launch_commands for work on every startup.
+   */
+  lifecycle_hooks?: LifecycleHooks | null;
+
+  /**
+   * Triggers that can resume a suspended Devbox.
+   */
+  resume_triggers?: ResumeTriggers | null;
+}
+
+/**
+ * Lifecycle hooks for Devbox suspend. suspend_commands run sequentially as the
+ * configured Devbox user through the rage/vmagent suspend path before the Devbox
+ * suspends; failures are logged but do not block suspending. The
+ * suspend_deadline_ms budget defaults to 30000 ms, may not exceed 60000 ms, and
+ * covers broker drain plus suspend_commands. If the deadline is exceeded, suspend
+ * work is abandoned, the timeout is logged, and the Devbox still proceeds to
+ * suspend by shutting down vmagent and killing the VM. Resume hooks and resume
+ * deadline settings are persistence/internal only and hidden from the public API
+ * reference. launch_commands still run on every startup, including after resume.
+ */
+export interface LifecycleHooks {
+  /**
+   * Commands to run through the suspend path before the Devbox suspends (e.g.
+   * cleanup, quiesce daemons).
+   */
+  suspend_commands?: Array<string> | null;
+
+  /**
+   * Deadline in milliseconds for broker drain and suspend_commands during suspend.
+   * Defaults to 30000 ms and may not exceed 60000 ms. If exceeded, suspend work is
+   * abandoned, the timeout is logged, and the Devbox still proceeds to suspend by
+   * shutting down vmagent and killing the VM.
+   */
+  suspend_deadline_ms?: number | null;
 }
 
 export type Mount = ObjectMount | AgentMount | Mount.CodeMount | Mount.FileMount | BrokerMount;
@@ -447,6 +434,21 @@ export interface ObjectMount {
   object_path: string;
 
   type: 'object_mount';
+}
+
+/**
+ * Triggers that can resume a suspended Devbox.
+ */
+export interface ResumeTriggers {
+  /**
+   * When true, axon events targeting a suspended Devbox will trigger a resume.
+   */
+  axon_event?: boolean | null;
+
+  /**
+   * When true, HTTP traffic to a suspended Devbox via tunnel will trigger a resume.
+   */
+  http?: boolean | null;
 }
 
 export interface RunProfile {
