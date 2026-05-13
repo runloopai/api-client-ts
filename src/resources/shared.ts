@@ -275,7 +275,8 @@ export interface LaunchParameters {
   /**
    * Lifecycle configuration for idle and resume behavior. Configure idle policy via
    * lifecycle.after_idle (if both this and the top-level after_idle are set, they
-   * must match) and resume triggers via lifecycle.resume_triggers.
+   * must match), resume triggers via lifecycle.resume_triggers, and optional
+   * lifecycle hooks via lifecycle.lifecycle_hooks.
    */
   lifecycle?: LaunchParameters.Lifecycle | null;
 
@@ -321,7 +322,8 @@ export namespace LaunchParameters {
   /**
    * Lifecycle configuration for idle and resume behavior. Configure idle policy via
    * lifecycle.after_idle (if both this and the top-level after_idle are set, they
-   * must match) and resume triggers via lifecycle.resume_triggers.
+   * must match), resume triggers via lifecycle.resume_triggers, and optional
+   * lifecycle hooks via lifecycle.lifecycle_hooks.
    */
   export interface Lifecycle {
     /**
@@ -332,12 +334,38 @@ export namespace LaunchParameters {
     after_idle?: Shared.AfterIdle | null;
 
     /**
+     * Optional lifecycle hooks. suspend_commands run through the suspend path before
+     * the Devbox suspends; see launch_commands for work on every startup.
+     */
+    lifecycle_hooks?: Lifecycle.LifecycleHooks | null;
+
+    /**
      * Triggers that can resume a suspended Devbox.
      */
     resume_triggers?: Lifecycle.ResumeTriggers | null;
   }
 
   export namespace Lifecycle {
+    /**
+     * Optional lifecycle hooks. suspend_commands run through the suspend path before
+     * the Devbox suspends; see launch_commands for work on every startup.
+     */
+    export interface LifecycleHooks {
+      /**
+       * Commands to run through the suspend path before the Devbox suspends (e.g.
+       * cleanup, quiesce daemons).
+       */
+      suspend_commands?: Array<string> | null;
+
+      /**
+       * Deadline in milliseconds for broker drain and suspend_commands during suspend.
+       * Defaults to 30000 ms and may not exceed 60000 ms. If exceeded, suspend work is
+       * abandoned, the timeout is logged, and the Devbox still proceeds to suspend by
+       * shutting down vmagent and killing the VM.
+       */
+      suspend_deadline_ms?: number | null;
+    }
+
     /**
      * Triggers that can resume a suspended Devbox.
      */
