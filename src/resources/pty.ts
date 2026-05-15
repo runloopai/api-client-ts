@@ -16,22 +16,18 @@ export class Pty extends APIResource {
    * effect. The response returns a PtyConnectView containing connect_url (a
    * server-relative path to the WebSocket data plane), idle_ttl_seconds (how long
    * this session is retained after the last client disconnects), and the resulting
-   * cols/rows. The interactive byte stream itself is intentionally not modeled in
-   * OpenAPI; see the controller-level documentation for the WebSocket close-code
-   * conventions. The single-attach contract is enforced when a client opens the
-   * WebSocket data plane, not on this bootstrap call: bootstrap always succeeds for
-   * a valid session_name, even if another client is currently attached. Rejection of
-   * a second concurrent attach happens at WebSocket upgrade time. If the active
-   * client disconnects, the session is preserved for the idle TTL so a later connect
-   * using the same session_name resumes the same shell. After the TTL expires, after
-   * an explicit close control action, or after the underlying Devbox lifecycle
-   * replaces the PTY process (such as through suspend/resume), a later request with
-   * the same session_name creates a fresh PTY session without the previous shell
-   * state.
-   *
-   * Documentation note: this operation is published from mux strictly as an OpenAPI
-   * contract stub for the PTY service control plane. It is not evidence that mux
-   * itself serves the interactive PTY transport.
+   * cols/rows. The interactive terminal byte stream is exchanged over the WebSocket
+   * data plane and is not modeled in this OpenAPI contract; clients should connect
+   * to connect_url and exchange raw binary frames for terminal I/O. The
+   * single-attach contract is enforced when a client opens the WebSocket data plane,
+   * not on this bootstrap call: bootstrap always succeeds for a valid session_name,
+   * even if another client is currently attached. Rejection of a second concurrent
+   * attach happens at WebSocket upgrade time. If the active client disconnects, the
+   * session is preserved for the idle TTL so a later connect using the same
+   * session_name resumes the same shell. After the TTL expires, after an explicit
+   * close control action, or after the underlying Devbox lifecycle replaces the PTY
+   * process (such as through suspend/resume), a later request with the same
+   * session_name creates a fresh PTY session without the previous shell state.
    */
   connect(
     sessionName: string,
@@ -68,10 +64,6 @@ export class Pty extends APIResource {
    * (best-effort; ignored if the shell has already exited) and drops the session
    * from the server's session cache. A subsequent connect with the same session_name
    * will create a fresh PTY session.
-   *
-   * Documentation note: this operation is published from mux strictly as an OpenAPI
-   * contract stub for the PTY service control plane. It is not evidence that mux
-   * itself serves the interactive PTY transport.
    */
   control(
     sessionName: string,
