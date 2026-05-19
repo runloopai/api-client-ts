@@ -744,7 +744,7 @@ export interface DevboxView {
   /**
    * The type of initiator that created the Devbox.
    */
-  initiator_type?: 'unknown' | 'api' | 'scenario' | 'scoring_validation';
+  initiator_type?: 'unknown' | 'api' | 'scenario' | 'scoring_validation' | 'reflex';
 
   /**
    * [Beta] MCP specifications configured for this devbox. Map key is the environment
