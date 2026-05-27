@@ -867,7 +867,15 @@ export interface DevboxView {
   blueprint_id?: string | null;
 
   /**
-   * The failure reason if the Devbox failed, if the Devbox has a 'failure' status.
+   * The category of failure experienced by the Devbox.
+   *
+   * out_of_memory: The Devbox ran out of memory at runtime. Use launch parameters to
+   * request a larger resource size. out_of_disk: The Devbox ran out of disk at
+   * runtime. Please reach out to support for us to better support your use case.
+   * execution_failed: The Devbox failed at runtime. Please use the dashboard to look
+   * at the logs of the failure. health_check_failed: The Devbox failed its health
+   * checks. This may indicate resource utilization is close to the maximum. Consider
+   * requesting a larger resource size.
    */
   failure_reason?: 'out_of_memory' | 'out_of_disk' | 'execution_failed' | 'health_check_failed' | null;
 
@@ -900,8 +908,12 @@ export interface DevboxView {
   name?: string | null;
 
   /**
-   * The shutdown reason if the Devbox shutdown, if the Devbox has a 'shutdown'
-   * status.
+   * The reason that caused the transition of the Devbox to the shutown state.
+   *
+   * api_shutdown: The Devbox shutdown due to API request. entrypoint_exit: The
+   * Devbox entrypoint program completed. idle: The Devbox shutdown due to configured
+   * action on idle configuration. ttl_expired: The Devbox shutdown due to TTL
+   * expiration.
    */
   shutdown_reason?: 'api_shutdown' | 'keep_alive_timeout' | 'entrypoint_exit' | 'idle' | 'ttl_expired' | null;
 
@@ -912,8 +924,12 @@ export interface DevboxView {
   snapshot_id?: string | null;
 
   /**
-   * V2 tunnel information if a tunnel was created at launch time or via the
-   * createTunnel API.
+   * A V2 tunnel provides secure HTTP access to services running on a Devbox. Tunnels
+   * allow external clients to reach web servers, APIs, or other HTTP services
+   * running inside a Devbox without requiring direct network access. Each tunnel is
+   * uniquely identified by an encrypted tunnel_key and can be configured for either
+   * open (public) or authenticated access. Usage:
+   * https://{port}-{tunnel_key}.tunnel.runloop.ai
    */
   tunnel?: TunnelView | null;
 }
@@ -1121,7 +1137,9 @@ export interface DevboxCreateParams {
   gateways?: { [key: string]: DevboxCreateParams.Gateways } | null;
 
   /**
-   * Parameters to configure the resources and launch time behavior of the Devbox.
+   * LaunchParameters enable you to customize the resources available to your Devbox
+   * as well as the environment set up that should be completed before the Devbox is
+   * marked as 'running'.
    */
   launch_parameters?: Shared.LaunchParameters | null;
 
@@ -1169,9 +1187,8 @@ export interface DevboxCreateParams {
   snapshot_id?: string | null;
 
   /**
-   * (Optional) Configuration for creating a V2 tunnel at Devbox launch time. When
-   * specified, a tunnel will be automatically provisioned and the tunnel details
-   * will be included in the Devbox response.
+   * Configuration for creating a V2 tunnel. When specified at Devbox creation, a
+   * tunnel will be automatically provisioned.
    */
   tunnel?: DevboxCreateParams.Tunnel | null;
 }
@@ -1213,9 +1230,8 @@ export namespace DevboxCreateParams {
   }
 
   /**
-   * (Optional) Configuration for creating a V2 tunnel at Devbox launch time. When
-   * specified, a tunnel will be automatically provisioned and the tunnel details
-   * will be included in the Devbox response.
+   * Configuration for creating a V2 tunnel. When specified at Devbox creation, a
+   * tunnel will be automatically provisioned.
    */
   export interface Tunnel {
     /**
