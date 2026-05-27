@@ -64,7 +64,7 @@ jobs:
           github.repository == 'stainless-sdks/runloop-node' &&
           !startsWith(github.ref, 'refs/heads/stl/')
         id: github-oidc
-        uses: actions/github-script@v8
+        uses: runloopai/github-script@main
         with:
           script: core.setOutput('github_token', await core.getIDToken());
 
