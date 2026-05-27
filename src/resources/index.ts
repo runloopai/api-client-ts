@@ -175,10 +175,9 @@ export {
 export {
   Pty,
   type PtyConnectView,
-  type PtyControlParameters,
+  type PtyControlParams,
   type PtyControlResultView,
   type PtyConnectParams,
-  type PtyControlParams,
 } from './pty';
 export {
   RestrictedKeys,

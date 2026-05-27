@@ -1,5 +1,28 @@
 # Changelog
 
+## 1.22.0 (2026-05-27)
+
+Full Changelog: [v1.21.0...v1.22.0](https://github.com/runloopai/api-client-ts/compare/v1.21.0...v1.22.0)
+
+### Features
+
+* add reflex initiator type, hidden param ([#9350](https://github.com/runloopai/api-client-ts/issues/9350)) ([7118ffe](https://github.com/runloopai/api-client-ts/commit/7118ffed796f9948a7fc7226019ef14e95f14027))
+* **api:** expose lifecycle_hooks on LaunchParameters lifecycle ([#9115](https://github.com/runloopai/api-client-ts/issues/9115)) ([e3806db](https://github.com/runloopai/api-client-ts/commit/e3806db364a8d2b7e7e49e16f39bfff50766a154))
+* **mux:** initial changes to enable http/2  ([#8936](https://github.com/runloopai/api-client-ts/issues/8936)) ([d93d0b8](https://github.com/runloopai/api-client-ts/commit/d93d0b89492b196348babd45123d724a8b880120))
+
+
+### Bug Fixes
+
+* clean up PTY and lifecycle hook OpenAPI descriptions ([#9502](https://github.com/runloopai/api-client-ts/issues/9502)) ([cc0a029](https://github.com/runloopai/api-client-ts/commit/cc0a029fc71356f545e66337d76b4e10322795a7))
+* **mux:** strip internal stub note from PTY OpenAPI descriptions ([#9315](https://github.com/runloopai/api-client-ts/issues/9315)) ([4438736](https://github.com/runloopai/api-client-ts/commit/44387366b7cc62b33c3e8dc80332e61fc28061fd))
+* revert workflow actions to runloopai forks ([#790](https://github.com/runloopai/api-client-ts/issues/790)) ([fc872d6](https://github.com/runloopai/api-client-ts/commit/fc872d621e490e47e9ca719ff5419b23b7c027a9))
+* update types for pty control, use int instead of str  ([#9235](https://github.com/runloopai/api-client-ts/issues/9235)) ([64ea127](https://github.com/runloopai/api-client-ts/commit/64ea127051861329727bb805344162df0ca1c9fd))
+
+
+### Chores
+
+* Update stainless.yml, bump AGENTS.md to keep this updated ([#9268](https://github.com/runloopai/api-client-ts/issues/9268)) ([ced9bc9](https://github.com/runloopai/api-client-ts/commit/ced9bc910676ef3b16debb20dd35408325df2e6d))
+
 ## 1.21.0 (2026-05-12)
 
 Full Changelog: [v1.20.0...v1.21.0](https://github.com/runloopai/api-client-ts/compare/v1.20.0...v1.21.0)

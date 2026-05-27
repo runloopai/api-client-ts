@@ -8,8 +8,11 @@ Types:
 - <code><a href="./src/resources/shared.ts">BrokerMount</a></code>
 - <code><a href="./src/resources/shared.ts">CodeMountParameters</a></code>
 - <code><a href="./src/resources/shared.ts">LaunchParameters</a></code>
+- <code><a href="./src/resources/shared.ts">LifecycleConfiguration</a></code>
+- <code><a href="./src/resources/shared.ts">LifecycleHooks</a></code>
 - <code><a href="./src/resources/shared.ts">Mount</a></code>
 - <code><a href="./src/resources/shared.ts">ObjectMount</a></code>
+- <code><a href="./src/resources/shared.ts">ResumeTriggers</a></code>
 - <code><a href="./src/resources/shared.ts">RunProfile</a></code>
 
 # Benchmarks
@@ -250,7 +253,7 @@ Methods:
 Types:
 
 - <code><a href="./src/resources/pty.ts">PtyConnectView</a></code>
-- <code><a href="./src/resources/pty.ts">PtyControlParameters</a></code>
+- <code><a href="./src/resources/pty.ts">PtyControlParams</a></code>
 - <code><a href="./src/resources/pty.ts">PtyControlResultView</a></code>
 
 Methods:

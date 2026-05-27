@@ -97,8 +97,7 @@ export namespace BenchmarkJobCreateParameters {
     type: 'benchmark';
 
     /**
-     * Orchestrator configuration (optional overrides). If not provided, default values
-     * will be used.
+     * Orchestrator configuration for benchmark job execution
      */
     orchestrator_config?: BenchmarkDefinitionJobSpec.OrchestratorConfig | null;
   }
@@ -116,7 +115,7 @@ export namespace BenchmarkJobCreateParameters {
       type: 'job_agent';
 
       /**
-       * Environment configuration to use for this agent
+       * Environment configuration for an agent in a benchmark job
        */
       agent_environment?: AgentConfig.AgentEnvironment | null;
 
@@ -143,7 +142,7 @@ export namespace BenchmarkJobCreateParameters {
 
     export namespace AgentConfig {
       /**
-       * Environment configuration to use for this agent
+       * Environment configuration for an agent in a benchmark job
        */
       export interface AgentEnvironment {
         /**
@@ -160,8 +159,7 @@ export namespace BenchmarkJobCreateParameters {
     }
 
     /**
-     * Orchestrator configuration (optional overrides). If not provided, default values
-     * will be used.
+     * Orchestrator configuration for benchmark job execution
      */
     export interface OrchestratorConfig {
       /**
@@ -207,8 +205,7 @@ export namespace BenchmarkJobCreateParameters {
     type: 'scenarios';
 
     /**
-     * Orchestrator configuration (optional overrides). If not provided, default values
-     * will be used.
+     * Orchestrator configuration for benchmark job execution
      */
     orchestrator_config?: ScenarioDefinitionJobSpec.OrchestratorConfig | null;
   }
@@ -226,7 +223,7 @@ export namespace BenchmarkJobCreateParameters {
       type: 'job_agent';
 
       /**
-       * Environment configuration to use for this agent
+       * Environment configuration for an agent in a benchmark job
        */
       agent_environment?: AgentConfig.AgentEnvironment | null;
 
@@ -253,7 +250,7 @@ export namespace BenchmarkJobCreateParameters {
 
     export namespace AgentConfig {
       /**
-       * Environment configuration to use for this agent
+       * Environment configuration for an agent in a benchmark job
        */
       export interface AgentEnvironment {
         /**
@@ -270,8 +267,7 @@ export namespace BenchmarkJobCreateParameters {
     }
 
     /**
-     * Orchestrator configuration (optional overrides). If not provided, default values
-     * will be used.
+     * Orchestrator configuration for benchmark job execution
      */
     export interface OrchestratorConfig {
       /**
@@ -364,8 +360,7 @@ export interface BenchmarkJobView {
     | null;
 
   /**
-   * The resolved job specification. Contains scenarios, agents, and orchestrator
-   * config.
+   * Job specification describing scenarios and execution configuration
    */
   job_spec?: BenchmarkJobView.JobSpec | null;
 }
@@ -449,8 +444,7 @@ export namespace BenchmarkJobView {
       duration_ms?: number | null;
 
       /**
-       * Failure information if the scenario failed or timed out. Contains exception type
-       * and message.
+       * Information about why a scenario execution failed
        */
       failure_reason?: ScenarioOutcome.FailureReason | null;
 
@@ -469,8 +463,7 @@ export namespace BenchmarkJobView {
 
     export namespace ScenarioOutcome {
       /**
-       * Failure information if the scenario failed or timed out. Contains exception type
-       * and message.
+       * Information about why a scenario execution failed
        */
       export interface FailureReason {
         /**
@@ -543,7 +536,7 @@ export namespace BenchmarkJobView {
       type: 'job_agent';
 
       /**
-       * Environment configuration to use for this agent
+       * Environment configuration for an agent in a benchmark job
        */
       agent_environment?: JobAgentConfig.AgentEnvironment | null;
 
@@ -570,7 +563,7 @@ export namespace BenchmarkJobView {
 
     export namespace JobAgentConfig {
       /**
-       * Environment configuration to use for this agent
+       * Environment configuration for an agent in a benchmark job
        */
       export interface AgentEnvironment {
         /**
@@ -629,8 +622,7 @@ export namespace BenchmarkJobView {
   }
 
   /**
-   * The resolved job specification. Contains scenarios, agents, and orchestrator
-   * config.
+   * Job specification describing scenarios and execution configuration
    */
   export interface JobSpec {
     /**
@@ -644,7 +636,7 @@ export namespace BenchmarkJobView {
     scenario_ids: Array<string>;
 
     /**
-     * Orchestrator configuration
+     * Orchestrator configuration for benchmark job execution
      */
     orchestrator_config?: JobSpec.OrchestratorConfig | null;
   }
@@ -662,7 +654,7 @@ export namespace BenchmarkJobView {
       type: 'job_agent';
 
       /**
-       * Environment configuration to use for this agent
+       * Environment configuration for an agent in a benchmark job
        */
       agent_environment?: AgentConfig.AgentEnvironment | null;
 
@@ -689,7 +681,7 @@ export namespace BenchmarkJobView {
 
     export namespace AgentConfig {
       /**
-       * Environment configuration to use for this agent
+       * Environment configuration for an agent in a benchmark job
        */
       export interface AgentEnvironment {
         /**
@@ -706,7 +698,7 @@ export namespace BenchmarkJobView {
     }
 
     /**
-     * Orchestrator configuration
+     * Orchestrator configuration for benchmark job execution
      */
     export interface OrchestratorConfig {
       /**
@@ -785,8 +777,7 @@ export namespace BenchmarkJobCreateParams {
     type: 'benchmark';
 
     /**
-     * Orchestrator configuration (optional overrides). If not provided, default values
-     * will be used.
+     * Orchestrator configuration for benchmark job execution
      */
     orchestrator_config?: BenchmarkDefinitionJobSpec.OrchestratorConfig | null;
   }
@@ -804,7 +795,7 @@ export namespace BenchmarkJobCreateParams {
       type: 'job_agent';
 
       /**
-       * Environment configuration to use for this agent
+       * Environment configuration for an agent in a benchmark job
        */
       agent_environment?: AgentConfig.AgentEnvironment | null;
 
@@ -831,7 +822,7 @@ export namespace BenchmarkJobCreateParams {
 
     export namespace AgentConfig {
       /**
-       * Environment configuration to use for this agent
+       * Environment configuration for an agent in a benchmark job
        */
       export interface AgentEnvironment {
         /**
@@ -848,8 +839,7 @@ export namespace BenchmarkJobCreateParams {
     }
 
     /**
-     * Orchestrator configuration (optional overrides). If not provided, default values
-     * will be used.
+     * Orchestrator configuration for benchmark job execution
      */
     export interface OrchestratorConfig {
       /**
@@ -895,8 +885,7 @@ export namespace BenchmarkJobCreateParams {
     type: 'scenarios';
 
     /**
-     * Orchestrator configuration (optional overrides). If not provided, default values
-     * will be used.
+     * Orchestrator configuration for benchmark job execution
      */
     orchestrator_config?: ScenarioDefinitionJobSpec.OrchestratorConfig | null;
   }
@@ -914,7 +903,7 @@ export namespace BenchmarkJobCreateParams {
       type: 'job_agent';
 
       /**
-       * Environment configuration to use for this agent
+       * Environment configuration for an agent in a benchmark job
        */
       agent_environment?: AgentConfig.AgentEnvironment | null;
 
@@ -941,7 +930,7 @@ export namespace BenchmarkJobCreateParams {
 
     export namespace AgentConfig {
       /**
-       * Environment configuration to use for this agent
+       * Environment configuration for an agent in a benchmark job
        */
       export interface AgentEnvironment {
         /**
@@ -958,8 +947,7 @@ export namespace BenchmarkJobCreateParams {
     }
 
     /**
-     * Orchestrator configuration (optional overrides). If not provided, default values
-     * will be used.
+     * Orchestrator configuration for benchmark job execution
      */
     export interface OrchestratorConfig {
       /**
