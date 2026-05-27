@@ -90,7 +90,7 @@ export interface AgentCreateParameters {
   name: string;
 
   /**
-   * The source configuration for the Agent.
+   * Agent source configuration.
    */
   source?: Shared.AgentSource | null;
 
@@ -164,7 +164,7 @@ export interface AgentView {
   name: string;
 
   /**
-   * The source configuration for the Agent.
+   * Agent source configuration.
    */
   source?: Shared.AgentSource | null;
 
@@ -185,7 +185,7 @@ export interface AgentCreateParams {
   name: string;
 
   /**
-   * The source configuration for the Agent.
+   * Agent source configuration.
    */
   source?: Shared.AgentSource | null;
 

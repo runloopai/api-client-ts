@@ -150,7 +150,8 @@ export interface GatewayConfigListView {
  */
 export interface GatewayConfigUpdateParameters {
   /**
-   * New authentication mechanism for applying credentials to proxied requests.
+   * Defines how credentials are applied to HTTP requests when proxying through the
+   * gateway.
    */
   auth_mechanism?: GatewayConfigUpdateParameters.AuthMechanism | null;
 
@@ -172,7 +173,8 @@ export interface GatewayConfigUpdateParameters {
 
 export namespace GatewayConfigUpdateParameters {
   /**
-   * New authentication mechanism for applying credentials to proxied requests.
+   * Defines how credentials are applied to HTTP requests when proxying through the
+   * gateway.
    */
   export interface AuthMechanism {
     /**
@@ -291,7 +293,8 @@ export namespace GatewayConfigCreateParams {
 
 export interface GatewayConfigUpdateParams {
   /**
-   * New authentication mechanism for applying credentials to proxied requests.
+   * Defines how credentials are applied to HTTP requests when proxying through the
+   * gateway.
    */
   auth_mechanism?: GatewayConfigUpdateParams.AuthMechanism | null;
 
@@ -313,7 +316,8 @@ export interface GatewayConfigUpdateParams {
 
 export namespace GatewayConfigUpdateParams {
   /**
-   * New authentication mechanism for applying credentials to proxied requests.
+   * Defines how credentials are applied to HTTP requests when proxying through the
+   * gateway.
    */
   export interface AuthMechanism {
     /**
