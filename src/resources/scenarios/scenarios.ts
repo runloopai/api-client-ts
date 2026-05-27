@@ -189,7 +189,8 @@ export interface ScenarioCreateParameters {
   scoring_contract: ScoringContract;
 
   /**
-   * The Environment in which the Scenario will run.
+   * ScenarioEnvironmentParameters specify the environment in which a Scenario will
+   * be run.
    */
   environment_parameters?: ScenarioEnvironment | null;
 
@@ -240,7 +241,9 @@ export interface ScenarioEnvironment {
   blueprint_id?: string | null;
 
   /**
-   * Optional launch parameters to apply to the devbox environment at launch.
+   * LaunchParameters enable you to customize the resources available to your Devbox
+   * as well as the environment set up that should be completed before the Devbox is
+   * marked as 'running'.
    */
   launch_parameters?: Shared.LaunchParameters | null;
 
@@ -323,7 +326,8 @@ export interface ScenarioRunView {
   purpose?: string | null;
 
   /**
-   * The scoring result of the ScenarioRun.
+   * A ScoringContractResultView represents the result of running all scoring
+   * functions on a given input context.
    */
   scoring_contract_result?: ScoringContractResultView | null;
 
@@ -345,7 +349,8 @@ export interface ScenarioRunView {
  */
 export interface ScenarioUpdateParameters {
   /**
-   * The Environment in which the Scenario will run.
+   * ScenarioEnvironmentParameters specify the environment in which a Scenario will
+   * be run.
    */
   environment_parameters?: ScenarioEnvironment | null;
 
@@ -434,7 +439,8 @@ export interface ScenarioView {
   status: 'active' | 'archived';
 
   /**
-   * The Environment in which the Scenario is run.
+   * ScenarioEnvironmentParameters specify the environment in which a Scenario will
+   * be run.
    */
   environment?: ScenarioEnvironment | null;
 
@@ -735,7 +741,8 @@ export interface ScenarioCreateParams {
   scoring_contract: ScoringContract;
 
   /**
-   * The Environment in which the Scenario will run.
+   * ScenarioEnvironmentParameters specify the environment in which a Scenario will
+   * be run.
    */
   environment_parameters?: ScenarioEnvironment | null;
 
@@ -777,7 +784,8 @@ export interface ScenarioCreateParams {
 
 export interface ScenarioUpdateParams {
   /**
-   * The Environment in which the Scenario will run.
+   * ScenarioEnvironmentParameters specify the environment in which a Scenario will
+   * be run.
    */
   environment_parameters?: ScenarioEnvironment | null;
 

@@ -154,7 +154,6 @@ import {
   Pty,
   PtyConnectParams,
   PtyConnectView,
-  PtyControlParameters,
   PtyControlParams,
   PtyControlResultView,
 } from './resources/pty';
@@ -689,10 +688,9 @@ export declare namespace Runloop {
   export {
     Pty as Pty,
     type PtyConnectView as PtyConnectView,
-    type PtyControlParameters as PtyControlParameters,
+    type PtyControlParams as PtyControlParams,
     type PtyControlResultView as PtyControlResultView,
     type PtyConnectParams as PtyConnectParams,
-    type PtyControlParams as PtyControlParams,
   };
 
   export {
@@ -806,8 +804,11 @@ export declare namespace Runloop {
   export type BrokerMount = API.BrokerMount;
   export type CodeMountParameters = API.CodeMountParameters;
   export type LaunchParameters = API.LaunchParameters;
+  export type LifecycleConfiguration = API.LifecycleConfiguration;
+  export type LifecycleHooks = API.LifecycleHooks;
   export type Mount = API.Mount;
   export type ObjectMount = API.ObjectMount;
+  export type ResumeTriggers = API.ResumeTriggers;
   export type RunProfile = API.RunProfile;
 }
 

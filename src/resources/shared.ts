@@ -1,7 +1,5 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-import * as Shared from './shared';
-
 /**
  * Configuration for automatic Devbox behavior after idle time.
  *
@@ -57,29 +55,29 @@ export interface AgentSource {
   type: string;
 
   /**
-   * Git source configuration
+   * Git-based agent source configuration.
    */
   git?: AgentSource.Git | null;
 
   /**
-   * NPM source configuration
+   * NPM-based agent source configuration.
    */
   npm?: AgentSource.Npm | null;
 
   /**
-   * Object store source configuration
+   * Object store agent source configuration.
    */
   object?: AgentSource.Object | null;
 
   /**
-   * Pip source configuration
+   * Pip-based agent source configuration.
    */
   pip?: AgentSource.Pip | null;
 }
 
 export namespace AgentSource {
   /**
-   * Git source configuration
+   * Git-based agent source configuration.
    */
   export interface Git {
     /**
@@ -99,7 +97,7 @@ export namespace AgentSource {
   }
 
   /**
-   * NPM source configuration
+   * NPM-based agent source configuration.
    */
   export interface Npm {
     /**
@@ -119,7 +117,7 @@ export namespace AgentSource {
   }
 
   /**
-   * Object store source configuration
+   * Object store agent source configuration.
    */
   export interface Object {
     /**
@@ -134,7 +132,7 @@ export namespace AgentSource {
   }
 
   /**
-   * Pip source configuration
+   * Pip-based agent source configuration.
    */
   export interface Pip {
     /**
@@ -273,11 +271,11 @@ export interface LaunchParameters {
   launch_commands?: Array<string> | null;
 
   /**
-   * Lifecycle configuration for idle and resume behavior. Configure idle policy via
-   * lifecycle.after_idle (if both this and the top-level after_idle are set, they
-   * must match) and resume triggers via lifecycle.resume_triggers.
+   * Lifecycle configuration for Devbox idle and resume behavior. Configure idle
+   * policy via after_idle, resume triggers via resume_triggers, and optional
+   * lifecycle hooks via lifecycle_hooks.
    */
-  lifecycle?: LaunchParameters.Lifecycle | null;
+  lifecycle?: LifecycleConfiguration | null;
 
   /**
    * (Optional) ID of the network policy to apply to Devboxes launched with these
@@ -293,12 +291,16 @@ export interface LaunchParameters {
   required_services?: Array<string> | null;
 
   /**
-   * Preset Devbox resources (vCPU, RAM in GiB, ephemeral disk in GiB). If not set,
-   * SMALL is used. X_SMALL: 0.5 vCPU, 1 GiB RAM, 4 GiB disk. SMALL: 1 vCPU, 2 GiB
-   * RAM, 4 GiB disk. MEDIUM: 2 vCPU, 4 GiB RAM, 8 GiB disk. LARGE: 2 vCPU, 8 GiB
-   * RAM, 16 GiB disk. X_LARGE: 4 vCPU, 16 GiB RAM, 16 GiB disk. XX_LARGE: 8 vCPU, 32
-   * GiB RAM, 16 GiB disk. CUSTOM_SIZE: set custom_cpu_cores, custom_gb_memory, and
-   * optionally custom_disk_size.
+   * The size of the Devbox resources for Runloop to allocate.
+   *
+   * X_SMALL: 0.5 cpu x 1GiB memory x 4GiB disk SMALL: 1 cpu x 2GiB memory x 4GiB
+   * disk MEDIUM: 2 cpu x 4GiB memory x 8GiB disk LARGE: 2 cpu x 8GiB memory x 16GiB
+   * disk X_LARGE: 4 cpu x 16GiB memory x 16GiB disk XX_LARGE: 8 cpu x 32GiB memory x
+   * 16GiB disk CUSTOM_SIZE: To choose a custom size, set this enum and also the
+   * custom_cpu_cores, custom_gb_memory, and optionally custom_disk_size in launch
+   * parameters. CPU must be 0.5, 1, or a multiple of 2 (max 16). Memory must be 1 or
+   * a multiple of 2 (max 64GiB). Disk must be a multiple of 2 (min 2GiB, max 64GiB).
+   * The cpu:memory ratio must be between 1:2 and 1:8 inclusive.
    */
   resource_size_request?:
     | 'X_SMALL'
@@ -311,52 +313,14 @@ export interface LaunchParameters {
     | null;
 
   /**
-   * Specify the user for execution on Devbox. If not set, default `user` will be
-   * used.
+   * Configuration for the Linux user in the Devbox environment.
    */
   user_parameters?: LaunchParameters.UserParameters | null;
 }
 
 export namespace LaunchParameters {
   /**
-   * Lifecycle configuration for idle and resume behavior. Configure idle policy via
-   * lifecycle.after_idle (if both this and the top-level after_idle are set, they
-   * must match) and resume triggers via lifecycle.resume_triggers.
-   */
-  export interface Lifecycle {
-    /**
-     * Configure Devbox lifecycle based on idle activity. If both this and the
-     * top-level after_idle are set, they must have the same value. Prefer this field
-     * for new integrations.
-     */
-    after_idle?: Shared.AfterIdle | null;
-
-    /**
-     * Triggers that can resume a suspended Devbox.
-     */
-    resume_triggers?: Lifecycle.ResumeTriggers | null;
-  }
-
-  export namespace Lifecycle {
-    /**
-     * Triggers that can resume a suspended Devbox.
-     */
-    export interface ResumeTriggers {
-      /**
-       * When true, axon events targeting a suspended Devbox will trigger a resume.
-       */
-      axon_event?: boolean | null;
-
-      /**
-       * When true, HTTP traffic to a suspended Devbox via tunnel will trigger a resume.
-       */
-      http?: boolean | null;
-    }
-  }
-
-  /**
-   * Specify the user for execution on Devbox. If not set, default `user` will be
-   * used.
+   * Configuration for the Linux user in the Devbox environment.
    */
   export interface UserParameters {
     /**
@@ -369,6 +333,65 @@ export namespace LaunchParameters {
      */
     username: string;
   }
+}
+
+/**
+ * Lifecycle configuration for Devbox idle and resume behavior. Configure idle
+ * policy via after_idle, resume triggers via resume_triggers, and optional
+ * lifecycle hooks via lifecycle_hooks.
+ */
+export interface LifecycleConfiguration {
+  /**
+   * Configure Devbox lifecycle based on idle activity. If both this and the
+   * top-level after_idle are set, they must have the same value. Prefer this field
+   * for new integrations.
+   */
+  after_idle?: AfterIdle | null;
+
+  /**
+   * Lifecycle hooks for Devbox suspend. suspend_commands run sequentially as the
+   * configured Devbox user through the rage/vmagent suspend path before the Devbox
+   * suspends; failures are logged but do not block suspending. The
+   * suspend_deadline_ms budget defaults to 30000 ms, may not exceed 60000 ms, and
+   * covers broker drain plus suspend_commands. If the deadline is exceeded, suspend
+   * work is abandoned, the timeout is logged, and the Devbox still proceeds to
+   * suspend by shutting down vmagent and killing the VM. Resume hooks and resume
+   * deadline settings are persistence/internal only and hidden from the public API
+   * reference. launch_commands still run on every startup, including after resume.
+   */
+  lifecycle_hooks?: LifecycleHooks | null;
+
+  /**
+   * Triggers that can resume a suspended Devbox.
+   */
+  resume_triggers?: ResumeTriggers | null;
+}
+
+/**
+ * Lifecycle hooks for Devbox suspend. suspend_commands run sequentially as the
+ * configured Devbox user through the rage/vmagent suspend path before the Devbox
+ * suspends; failures are logged but do not block suspending. The
+ * suspend_deadline_ms budget defaults to 30000 ms, may not exceed 60000 ms, and
+ * covers broker drain plus suspend_commands. If the deadline is exceeded, suspend
+ * work is abandoned, the timeout is logged, and the Devbox still proceeds to
+ * suspend by shutting down vmagent and killing the VM. Resume hooks and resume
+ * deadline settings are persistence/internal only and hidden from the public API
+ * reference. launch_commands still run on every startup, including after resume.
+ */
+export interface LifecycleHooks {
+  /**
+   * Commands to run through the suspend path before the Devbox suspends (e.g.
+   * cleanup, quiesce daemons).
+   */
+  suspend_commands?: Array<string> | null;
+
+  /**
+   * Deadline in milliseconds for broker drain and suspend_commands during suspend.
+   * Defaults to 30000 ms and may not exceed 60000 ms. If exceeded, suspend work is
+   * abandoned, the timeout is logged, and the Devbox still proceeds to suspend by
+   * shutting down vmagent and killing the VM.
+   */
+  suspend_deadline_ms?: number | null;
 }
 
 /**
@@ -441,6 +464,21 @@ export interface ObjectMount {
 }
 
 /**
+ * Triggers that can resume a suspended Devbox.
+ */
+export interface ResumeTriggers {
+  /**
+   * When true, axon events targeting a suspended Devbox will trigger a resume.
+   */
+  axon_event?: boolean | null;
+
+  /**
+   * When true, HTTP traffic to a suspended Devbox via tunnel will trigger a resume.
+   */
+  http?: boolean | null;
+}
+
+/**
  * Configuration profile for scenario/benchmark runs.
  *
  * @category Shared Types
@@ -454,7 +492,9 @@ export interface RunProfile {
   envVars?: { [key: string]: string } | null;
 
   /**
-   * Additional runtime LaunchParameters to apply after the devbox starts.
+   * LaunchParameters enable you to customize the resources available to your Devbox
+   * as well as the environment set up that should be completed before the Devbox is
+   * marked as 'running'.
    */
   launchParameters?: LaunchParameters | null;
 

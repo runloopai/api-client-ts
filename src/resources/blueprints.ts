@@ -249,7 +249,9 @@ export interface BlueprintBuildFromInspectionParameters {
   file_mounts?: { [key: string]: string } | null;
 
   /**
-   * Parameters to configure your Devbox at launch time.
+   * LaunchParameters enable you to customize the resources available to your Devbox
+   * as well as the environment set up that should be completed before the Devbox is
+   * marked as 'running'.
    */
   launch_parameters?: Shared.LaunchParameters | null;
 
@@ -352,7 +354,9 @@ export interface BlueprintBuildParameters {
   file_mounts?: { [key: string]: string } | null;
 
   /**
-   * Parameters to configure your Devbox at launch time.
+   * LaunchParameters enable you to customize the resources available to your Devbox
+   * as well as the environment set up that should be completed before the Devbox is
+   * marked as 'running'.
    */
   launch_parameters?: Shared.LaunchParameters | null;
 
@@ -533,7 +537,12 @@ export interface BlueprintView {
   devbox_capabilities?: Array<'unknown' | 'docker_in_docker'> | null;
 
   /**
-   * The failure reason if the Blueprint build failed, if any.
+   * The cause of the failure of the Blueprint build.
+   *
+   * out_of_memory: The build has run out of memory. Contact support if this is
+   * unexpected. out_of_disk: The build has run out of disk. Contact support if this
+   * is unexpected. build_failed: The build has failed. Use the dashboard to look at
+   * Blueprint build logs for more info.
    */
   failure_reason?: 'out_of_memory' | 'out_of_disk' | 'build_failed' | null;
 
@@ -668,7 +677,9 @@ export interface BlueprintCreateParams {
   file_mounts?: { [key: string]: string } | null;
 
   /**
-   * Parameters to configure your Devbox at launch time.
+   * LaunchParameters enable you to customize the resources available to your Devbox
+   * as well as the environment set up that should be completed before the Devbox is
+   * marked as 'running'.
    */
   launch_parameters?: Shared.LaunchParameters | null;
 
@@ -808,7 +819,9 @@ export interface BlueprintCreateFromInspectionParams {
   file_mounts?: { [key: string]: string } | null;
 
   /**
-   * Parameters to configure your Devbox at launch time.
+   * LaunchParameters enable you to customize the resources available to your Devbox
+   * as well as the environment set up that should be completed before the Devbox is
+   * marked as 'running'.
    */
   launch_parameters?: Shared.LaunchParameters | null;
 
@@ -900,7 +913,9 @@ export interface BlueprintPreviewParams {
   file_mounts?: { [key: string]: string } | null;
 
   /**
-   * Parameters to configure your Devbox at launch time.
+   * LaunchParameters enable you to customize the resources available to your Devbox
+   * as well as the environment set up that should be completed before the Devbox is
+   * marked as 'running'.
    */
   launch_parameters?: Shared.LaunchParameters | null;
 
