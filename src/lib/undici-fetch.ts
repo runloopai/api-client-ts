@@ -348,7 +348,8 @@ async function undiciFallbackFetch(url: URL, init: any): Promise<any> {
     dispatcher: h1Dispatcher,
   });
 
-  const responseBody = statusMustNotHaveBody(result.statusCode) || init.method === 'HEAD' ? null : result.body;
+  const responseBody =
+    statusMustNotHaveBody(result.statusCode) || init.method === 'HEAD' ? null : result.body;
   if (responseBody === null) await result.body.dump();
 
   const response = new Response(responseBody, {
