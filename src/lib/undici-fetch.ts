@@ -1,34 +1,51 @@
 /**
- * A fetch-compatible adapter backed by undici's HTTP/2 support.
+ * A fetch-compatible adapter backed by undici's HTTP/2 support, using a bounded
+ * connection pool that multiplexes many concurrent requests over a few TLS sessions.
  *
- * undici is the same engine that powers Node's built-in global `fetch`.
- * Constructing an `Agent` with `allowH2: true` and passing it as the
- * per-request `dispatcher` makes requests negotiate HTTP/2 via ALPN, with
- * automatic fallback to HTTP/1.1 when the origin doesn't advertise h2. undici
- * returns a standard WHATWG `Response`, so the rest of core.ts — which only
+ * undici is the same engine that powers Node's built-in global `fetch`. An `Agent`
+ * with `allowH2: true` negotiates HTTP/2 via ALPN and transparently falls back to
+ * HTTP/1.1 when the origin doesn't advertise h2. Two options make it actually
+ * multiplex rather than open one connection per request:
+ *   - `connections` bounds the pool to a few TLS sessions per origin. Without it
+ *     undici opens a fresh connection for every concurrent request (a connection
+ *     storm) instead of reusing sessions.
+ *   - `pipelining` (undici default: 1) is the max concurrent streams undici runs
+ *     per session; it must be > 1 for H2 stream multiplexing to happen at all.
+ *
+ * undici returns a standard WHATWG `Response`, so the rest of core.ts — which only
  * touches standard Response members (`.status`, `.ok`, `.headers`, `.text()`,
- * `.json()`, `.body`, `.arrayBuffer()`, `.blob()`) — is unchanged.
+ * `.json()`, `.body`, `.arrayBuffer()`, `.blob()`) — is unchanged. undici is dual
+ * CJS/ESM and `require`-able from this `"type": "commonjs"` package, so there is no
+ * dynamic-import hack and no second HTTP stack.
  *
- * Unlike the previous got@14 approach, undici is dual CJS/ESM and `require`-able
- * from this `"type": "commonjs"` package, so there is no dynamic-import hack and
- * no second HTTP stack to keep in sync.
+ * Note: `pipelining > 1` also enables HTTP/1.1 request pipelining on the fallback
+ * path, so `http2: true` (opt-in) is intended for h2-capable origins. Requires
+ * undici >= 7.23.0 — multiplexed H2 assert-crashes on 6.x (undici PR #4845) — and
+ * therefore Node >= 20.18.1.
  *
- * This lives in src/lib/ (the Stainless custom-code dir) so it survives
- * regeneration; the only generated file touched is the one-line wiring change
- * in src/_shims/node-runtime.ts.
+ * Lives in src/lib/ (the Stainless custom-code dir) so it survives regeneration.
  */
 import { Agent, fetch as undiciFetchImpl } from 'undici';
 import { Readable } from 'node:stream';
 import { MultipartBody } from '../_shims/MultipartBody';
 import { type Fetch } from '../core';
 
-// One module-scoped dispatcher, reused across requests: this is the HTTP/2
-// transport, with keep-alive. `allowH2` negotiates h2 over TLS via ALPN and
-// transparently falls back to HTTP/1.1 when the origin doesn't offer h2.
+const KEEP_ALIVE_TIMEOUT_MS = 10 * 60 * 1000;
+// Bound the pool to a few TLS sessions per origin and multiplex many H2 streams
+// over each. 4 x 64 = 256 concurrent requests in flight before undici queues the rest.
+const H2_MAX_CONNECTIONS = 4;
+const H2_MAX_CONCURRENT_STREAMS = 64;
+
+// One module-scoped dispatcher, reused across requests: a bounded HTTP/2 pool with
+// keep-alive. `allowH2` negotiates h2 over TLS via ALPN and transparently falls back
+// to HTTP/1.1 when the origin doesn't offer h2; `connections`/`pipelining` make it
+// multiplex (see the file header).
 const h2Dispatcher = new Agent({
   allowH2: true,
-  keepAliveTimeout: 10 * 60 * 1000,
-  keepAliveMaxTimeout: 10 * 60 * 1000,
+  connections: H2_MAX_CONNECTIONS,
+  pipelining: H2_MAX_CONCURRENT_STREAMS,
+  keepAliveTimeout: KEEP_ALIVE_TIMEOUT_MS,
+  keepAliveMaxTimeout: KEEP_ALIVE_TIMEOUT_MS,
 });
 
 type NormalizedBody = { body: any; isStream: boolean };
@@ -36,7 +53,8 @@ type NormalizedBody = { body: any; isStream: boolean };
 // Map the body shapes core.ts produces (string | Buffer/ArrayBufferView |
 // Node Readable for multipart | null) onto a valid undici BodyInit. A Node
 // Readable must become a Web ReadableStream and requires `duplex: 'half'`.
-function normalizeBody(body: unknown): NormalizedBody {
+// Exported for unit tests. @internal
+export function normalizeBody(body: unknown): NormalizedBody {
   if (body == null) return { body: undefined, isStream: false };
   if (typeof body === 'string') return { body, isStream: false };
   if (Buffer.isBuffer(body)) return { body, isStream: false };

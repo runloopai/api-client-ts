@@ -26,7 +26,9 @@ jobs:
       - name: Set up Node
         uses: runloopai/setup-node@main
         with:
-          node-version: '18'
+          # undici 7 (the http2 transport dep) requires Node >= 20.18.1, so the
+          # lint job can no longer bootstrap on Node 18. See README Requirements.
+          node-version: '20'
 
       - name: Bootstrap
         run: ./scripts/bootstrap
