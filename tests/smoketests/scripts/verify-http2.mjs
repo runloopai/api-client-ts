@@ -32,7 +32,9 @@ if (!apiKey) {
 // keyed by name globally, so this catches the SDK's own undici regardless of
 // which module instance created the connection.
 const alpnSeen = [];
+let connectCount = 0;
 diagnostics_channel.subscribe('undici:client:connected', (msg) => {
+  connectCount++;
   const proto = msg?.socket?.alpnProtocol;
   if (proto) alpnSeen.push(proto);
 });
@@ -74,6 +76,23 @@ try {
   check(res != null, 'h1: GET devboxes.list resolved (node-fetch control)');
 } catch (e) {
   check(false, `h1: GET devboxes.list resolved (threw ${e?.constructor?.name}: ${e?.message})`);
+}
+
+// ── Pass D: HTTP/2 multiplexing — many concurrent requests reuse few connections ──
+// The whole point of the bounded H2 pool: N concurrent requests share a small number of
+// TLS sessions instead of one connection per request. Default config (pipelining=1) or the
+// pre-fix undici Agent would open ~N connections here.
+try {
+  const N = 25;
+  const before = connectCount;
+  const client = newClient({ http2: true });
+  const results = await Promise.allSettled(Array.from({ length: N }, () => client.devboxes.list({ limit: 1 })));
+  const ok = results.filter((r) => r.status === 'fulfilled').length;
+  const opened = connectCount - before;
+  check(ok === N, `h2: ${N} concurrent requests all resolved (${ok}/${N})`);
+  check(opened <= 4, `h2: ${N} concurrent requests multiplexed over <= 4 connections (opened ${opened})`);
+} catch (e) {
+  check(false, `h2: concurrent multiplexing pass threw ${e?.constructor?.name}: ${e?.message}`);
 }
 
 console.log(failures === 0 ? '\n✓ ALL HTTP/2 CHECKS PASSED' : `\n✗ ${failures} CHECK(S) FAILED`);
