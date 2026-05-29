@@ -33,9 +33,8 @@ import { type Fetch } from '../core';
 const KEEP_ALIVE_TIMEOUT_MS = 10 * 60 * 1000;
 // Bound the pool to a few TLS sessions per origin and multiplex many H2 streams
 // over each. 4 x 64 = 256 concurrent requests in flight before undici queues the rest.
-// Exported so tests can verify the shipped values actually multiplex. @internal
-export const H2_MAX_CONNECTIONS = 4;
-export const H2_MAX_CONCURRENT_STREAMS = 64;
+const H2_MAX_CONNECTIONS = 4;
+const H2_MAX_CONCURRENT_STREAMS = 64;
 
 // One module-scoped dispatcher, reused across requests: a bounded HTTP/2 pool with
 // keep-alive. `allowH2` negotiates h2 over TLS via ALPN and transparently falls back
@@ -98,12 +97,3 @@ export const undiciFetch: Fetch = async (url, init) => {
 };
 
 export default undiciFetch;
-
-/**
- * Test-only: close the module-scoped dispatcher so a test process can exit cleanly
- * after exercising the adapter. Not part of the public API.
- * @internal
- */
-export async function __closeDispatchersForTest(): Promise<void> {
-  await h2Dispatcher.close();
-}
