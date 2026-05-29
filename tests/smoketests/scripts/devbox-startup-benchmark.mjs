@@ -8,6 +8,7 @@
  */
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import diagnostics_channel from 'node:diagnostics_channel';
 import { createRequire } from 'node:module';
 import { performance } from 'node:perf_hooks';
 
@@ -29,7 +30,7 @@ const COMMAND_TIMEOUT_MS = 2 * 60 * 1000;
 const SHUTDOWN_TIMEOUT_MS = 2 * 60 * 1000;
 
 const apiKey = process.env.RUNLOOP_API_KEY;
-const baseURL = process.env.RUNLOOP_BASE_URL;
+const baseURL = "https://api.runloop.ai";
 const devboxCount = parsePositiveInteger(process.env.RUNLOOP_E2E_DEVBOX_COUNT, DEFAULT_DEVBOX_COUNT);
 const resultsPath = process.env.RUNLOOP_E2E_RESULTS_PATH ?? defaultResultsPath();
 
@@ -81,6 +82,7 @@ const hasWorkflowFailures = passResults.some((pass) => pass.workflowFailureCount
 process.exit(hasWorkflowFailures ? 1 : 0);
 
 async function runTransportPass(transport) {
+  const diagnostics = createUndiciConnectionDiagnostics();
   const client = new Runloop({
     bearerToken: apiKey,
     baseURL,
@@ -91,10 +93,17 @@ async function runTransportPass(transport) {
 
   console.log(`\nStarting ${transport.name} pass with ${devboxCount} concurrent devboxes`);
   const wallStart = performance.now();
-  const settled = await Promise.allSettled(
-    Array.from({ length: devboxCount }, (_, index) => runDevboxWorkflow(client, transport.name, index)),
-  );
-  const wallTimeMs = performance.now() - wallStart;
+  diagnostics.start();
+  let settled;
+  let wallTimeMs;
+  try {
+    settled = await Promise.allSettled(
+      Array.from({ length: devboxCount }, (_, index) => runDevboxWorkflow(client, transport.name, index)),
+    );
+    wallTimeMs = performance.now() - wallStart;
+  } finally {
+    diagnostics.stop();
+  }
 
   const records = settled.map((result, index) => {
     if (result.status === 'fulfilled') return result.value;
@@ -115,6 +124,7 @@ async function runTransportPass(transport) {
   const workflowFailureCount = records.filter((record) => record.error).length;
   const shutdownFailureCount = records.filter((record) => record.shutdownStatus === 'failed').length;
   const startupStats = summarizeDurations(records.map((record) => record.startupDurationMs));
+  const connectionDiagnostics = diagnostics.summary();
   const summary = {
     transport: transport.name,
     requested: devboxCount,
@@ -123,6 +133,7 @@ async function runTransportPass(transport) {
     shutdownFailureCount,
     startup: startupStats,
     wallTimeMs,
+    connectionDiagnostics,
   };
 
   printPassSummary(summary);
@@ -136,6 +147,7 @@ async function runTransportPass(transport) {
     shutdownFailureCount,
     startupStats,
     wallTimeMs,
+    connectionDiagnostics,
     summary,
     records,
   };
@@ -244,8 +256,27 @@ function printPassSummary(summary) {
       maxMs: round(summary.startup.max),
       avgMs: round(summary.startup.avg),
       wallTimeMs: round(summary.wallTimeMs),
+      undiciConnections: summary.connectionDiagnostics.connectionCount,
+      alpnH2: summary.connectionDiagnostics.alpnCounts.h2 ?? 0,
+      alpnHttp1: summary.connectionDiagnostics.alpnCounts['http/1.1'] ?? 0,
+      h2Fallbacks: summary.connectionDiagnostics.h2FallbackCount,
+      uniqueLocalPorts: summary.connectionDiagnostics.uniqueLocalPorts.length,
     },
   ]);
+
+  if (summary.connectionDiagnostics.connectionCount > 0) {
+    console.log(`${summary.transport} undici connection diagnostics`);
+    console.table([
+      {
+        connections: summary.connectionDiagnostics.connectionCount,
+        alpn: JSON.stringify(summary.connectionDiagnostics.alpnCounts),
+        h2: summary.connectionDiagnostics.h2ConnectionCount,
+        h1Fallbacks: summary.connectionDiagnostics.h2FallbackCount,
+        uniqueLocalPorts: summary.connectionDiagnostics.uniqueLocalPorts.length,
+        localPorts: summary.connectionDiagnostics.uniqueLocalPorts.join(', '),
+      },
+    ]);
+  }
 }
 
 function printComparison(results) {
@@ -317,6 +348,56 @@ function uniqueName(prefix) {
 function defaultResultsPath() {
   const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
   return path.join('tmp', `devbox-startup-benchmark-${timestamp}.json`);
+}
+
+function createUndiciConnectionDiagnostics() {
+  const events = [];
+  const onConnected = (message) => {
+    const socket = message?.socket;
+    const rawAlpn = socket?.alpnProtocol;
+    const alpnProtocol =
+      typeof rawAlpn === 'string' && rawAlpn.length > 0 ? rawAlpn
+      : rawAlpn === false ? 'http/1.1'
+      : 'unknown';
+
+    events.push({
+      alpnProtocol,
+      localPort: socket?.localPort ?? null,
+      remoteAddress: socket?.remoteAddress ?? null,
+      remotePort: socket?.remotePort ?? null,
+      encrypted: Boolean(socket?.encrypted),
+    });
+  };
+
+  return {
+    start() {
+      diagnostics_channel.subscribe('undici:client:connected', onConnected);
+    },
+    stop() {
+      diagnostics_channel.unsubscribe('undici:client:connected', onConnected);
+    },
+    summary() {
+      const alpnCounts = {};
+      const localPorts = new Set();
+      for (const event of events) {
+        alpnCounts[event.alpnProtocol] = (alpnCounts[event.alpnProtocol] ?? 0) + 1;
+        if (event.localPort != null) localPorts.add(event.localPort);
+      }
+
+      const h2ConnectionCount = alpnCounts.h2 ?? 0;
+      const http1ConnectionCount = alpnCounts['http/1.1'] ?? 0;
+
+      return {
+        connectionCount: events.length,
+        alpnCounts,
+        h2ConnectionCount,
+        http1ConnectionCount,
+        h2FallbackCount: events.length - h2ConnectionCount,
+        uniqueLocalPorts: [...localPorts].sort((a, b) => a - b),
+        events,
+      };
+    },
+  };
 }
 
 function serializeError(error) {
