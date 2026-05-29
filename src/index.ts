@@ -298,8 +298,14 @@ export interface ClientOptions {
    * web the platform `fetch` already speaks HTTP/2, so this is a no-op there.
    * Ignored when a custom `fetch` is provided.
    *
-   * Note: on the HTTP/2 path the `httpAgent` option is not used, since undici
-   * manages connections through its own dispatcher rather than a Node `http.Agent`.
+   * **Intended for HTTP/2-capable origins (such as the Runloop API).** When the
+   * origin does not negotiate h2, undici falls back to HTTP/1.1 with request
+   * pipelining enabled on the shared dispatcher; pipelining is unsafe against
+   * many HTTP/1.1 servers and proxies. Do not enable this flag if your traffic
+   * may be routed through a non-h2 intermediary.
+   *
+   * On the HTTP/2 path the `httpAgent` option is not used, since undici manages
+   * connections through its own dispatcher rather than a Node `http.Agent`.
    *
    * @default false
    */
@@ -354,6 +360,7 @@ export class Runloop extends Core.APIClient {
    * @param {number} [opts.timeout=30 seconds] - The maximum amount of time (in milliseconds) the client will wait for a response before timing out.
    * @param {number} [opts.httpAgent] - An HTTP agent used to manage HTTP(s) connections.
    * @param {Core.Fetch} [opts.fetch] - Specify a custom `fetch` function implementation.
+   * @param {boolean} [opts.http2=false] - Send requests over HTTP/2 (Node only; ignored when `fetch` is provided).
    * @param {number} [opts.maxRetries=5] - The maximum number of times the client will retry a request.
    * @param {Core.Headers} opts.defaultHeaders - Default headers to include with every request to the API.
    * @param {Core.DefaultQuery} opts.defaultQuery - Default query parameters to include with every request to the API.

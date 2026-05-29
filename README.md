@@ -355,7 +355,7 @@ await runloop.devboxes.create({...}, {
 });
 ```
 
-### HTTP/2 transport (experimental)
+### HTTP/2 transport
 
 On Node.js, the SDK can send requests over HTTP/2, which multiplexes many concurrent requests over a small number of TLS connections instead of opening a connection per request. Enable it with the `http2` option:
 

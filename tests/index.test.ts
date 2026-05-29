@@ -96,6 +96,29 @@ describe('instantiate client', () => {
     expect(response).toEqual({ url: 'http://localhost:5000/foo', custom: true });
   });
 
+  test('custom fetch wins over http2', async () => {
+    // When both `fetch` and `http2` are provided, the custom fetch must be used —
+    // the undici (h2) adapter should not run. Locks in src/index.ts:
+    //   fetch: options.fetch ?? (options.http2 ? http2Fetch : undefined)
+    const customFetch = jest.fn((url: RequestInfo) =>
+      Promise.resolve(
+        new Response(JSON.stringify({ url, custom: true }), {
+          headers: { 'Content-Type': 'application/json' },
+        }),
+      ),
+    );
+    const client = new Runloop({
+      baseURL: 'http://localhost:5000/',
+      bearerToken: 'My Bearer Token',
+      http2: true,
+      fetch: customFetch as any,
+    });
+
+    const response = await client.get('/foo');
+    expect(response).toEqual({ url: 'http://localhost:5000/foo', custom: true });
+    expect(customFetch).toHaveBeenCalledTimes(1);
+  });
+
   test('explicit global fetch', async () => {
     // make sure the global fetch type is assignable to our Fetch type
     const client = new Runloop({
