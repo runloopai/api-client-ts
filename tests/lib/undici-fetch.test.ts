@@ -42,14 +42,14 @@ describe('undiciFetch', () => {
             res.writeHead(200, { 'content-type': 'application/json' });
             res.end(JSON.stringify({ body }));
           });
+        });
 
-          server.listen(0, '127.0.0.1', () => {
-            const address = server.address();
-            if (address && typeof address === 'object') {
-              baseURL = `http://127.0.0.1:${address.port}`;
-            }
-            resolve();
-          });
+        server.listen(0, '127.0.0.1', () => {
+          const address = server.address();
+          if (address && typeof address === 'object') {
+            baseURL = `http://127.0.0.1:${address.port}`;
+          }
+          resolve();
         });
       }),
   );
@@ -106,6 +106,7 @@ describe('undiciFetch', () => {
     ['string', 'hello'],
     ['buffer', Buffer.from('hello')],
     ['array buffer', new TextEncoder().encode('hello').buffer],
+    ['data view', new DataView(new TextEncoder().encode('hello').buffer)],
     ['typed array', new Uint8Array(Buffer.from('hello'))],
     ['readable', Readable.from(['hello'])],
     ['multipart body', new MultipartBody(Readable.from(['hello']))],
