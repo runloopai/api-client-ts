@@ -1,6 +1,6 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-import { type Agent } from './_shims/index';
+import { type Agent, http2Fetch } from './_shims/index';
 import * as Core from './core';
 import * as Errors from './error';
 import * as Pagination from './pagination';
@@ -291,6 +291,21 @@ export interface ClientOptions {
   fetch?: Core.Fetch | undefined;
 
   /**
+   * Send requests over HTTP/2 (with automatic fallback to HTTP/1.1).
+   *
+   * In Node.js this swaps the default `node-fetch` transport for an undici-backed
+   * adapter (`Agent({ allowH2: true })`) that negotiates HTTP/2 via ALPN. On the
+   * web the platform `fetch` already speaks HTTP/2, so this is a no-op there.
+   * Ignored when a custom `fetch` is provided.
+   *
+   * Note: on the HTTP/2 path the `httpAgent` option is not used, since undici
+   * manages connections through its own dispatcher rather than a Node `http.Agent`.
+   *
+   * @default false
+   */
+  http2?: boolean | undefined;
+
+  /**
    * The maximum number of times that the client will retry a request in case of a
    * temporary failure, like a network error or a 5XX error from the server.
    *
@@ -366,7 +381,7 @@ export class Runloop extends Core.APIClient {
       timeout: options.timeout ?? 30000 /* 30 seconds */,
       httpAgent: options.httpAgent,
       maxRetries: options.maxRetries,
-      fetch: options.fetch,
+      fetch: options.fetch ?? (options.http2 ? http2Fetch : undefined),
     });
 
     const customHeadersEnv = Core.readEnv('RUNLOOP_CUSTOM_HEADERS');

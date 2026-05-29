@@ -14,6 +14,7 @@ import { type RequestOptions } from '../core';
 import { MultipartBody } from './MultipartBody';
 import { type Shims } from './registry';
 import { ReadableStream } from 'node:stream/web';
+import { undiciFetch } from '../lib/undici-fetch';
 
 type FileFromPathOptions = Omit<FilePropertyBag, 'lastModified'>;
 
@@ -66,6 +67,7 @@ export function getRuntime(): Shims {
   return {
     kind: 'node',
     fetch: nf.default,
+    http2Fetch: undiciFetch,
     Request: nf.Request,
     Response: nf.Response,
     Headers: nf.Headers,

@@ -35,6 +35,9 @@ export function getRuntime({ manuallyImported }: { manuallyImported?: boolean } 
   return {
     kind: 'web',
     fetch: _fetch,
+    // The platform `fetch` already negotiates HTTP/2 at the transport layer,
+    // so `{ http2: true }` is a no-op on the web — reuse the global fetch.
+    http2Fetch: _fetch,
     Request: _Request,
     Response: _Response,
     Headers: _Headers,

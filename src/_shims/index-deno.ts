@@ -9,6 +9,10 @@ const _fetch = fetch;
 type _fetch = typeof fetch;
 export { _fetch as fetch };
 
+// The platform `fetch` already negotiates HTTP/2 at the transport layer, so
+// `{ http2: true }` is a no-op on Deno — reuse the global fetch.
+export { _fetch as http2Fetch };
+
 const _Request = Request;
 type _Request = Request;
 export { _Request as Request };

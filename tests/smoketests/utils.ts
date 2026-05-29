@@ -1,6 +1,13 @@
 import { Runloop, RunloopSDK } from '@runloop/api-client';
 import { NetworkPolicy, GatewayConfig, McpConfig } from '@runloop/api-client/sdk';
 
+/**
+ * Run the smoke tests over HTTP/2 (the undici adapter) instead of the default
+ * node-fetch (HTTP/1.1) transport. Toggled by the SMOKE_HTTP2 env var so CI can
+ * run the same suite over both transports.
+ */
+export const useHttp2 = ['1', 'true'].includes((process.env['SMOKE_HTTP2'] ?? '').toLowerCase());
+
 export function makeClient(overrides: Partial<ConstructorParameters<typeof Runloop>[0]> = {}) {
   const baseURL = process.env['RUNLOOP_BASE_URL'];
   const bearerToken = process.env['RUNLOOP_API_KEY'];
@@ -10,6 +17,7 @@ export function makeClient(overrides: Partial<ConstructorParameters<typeof Runlo
     bearerToken,
     timeout: 120_000,
     maxRetries: 3,
+    http2: useHttp2,
     ...overrides,
   });
 }
@@ -20,6 +28,7 @@ export function makeClientSDK() {
     baseURL: process.env['RUNLOOP_BASE_URL'],
     timeout: 120_000,
     maxRetries: 3,
+    http2: useHttp2,
   });
 }
 

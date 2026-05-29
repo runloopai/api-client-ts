@@ -15,6 +15,14 @@ export type Agent = SelectType<manual.Agent, auto.Agent>;
 // @ts-ignore
 export const fetch: SelectType<typeof manual.fetch, typeof auto.fetch>;
 
+/**
+ * An HTTP/2-capable `fetch`, used when the client is constructed with
+ * `{ http2: true }`. In Node this is the undici adapter (`Agent({ allowH2: true })`);
+ * on the web it is the platform `fetch`, which already negotiates HTTP/2
+ * transparently.
+ */
+export const http2Fetch: any;
+
 // @ts-ignore
 export type Request = SelectType<manual.Request, auto.Request>;
 // @ts-ignore
