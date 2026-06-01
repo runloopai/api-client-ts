@@ -53,6 +53,16 @@ const h2Dispatcher = new Agent({
   pipelining: H2_MAX_CONCURRENT_STREAMS,
   keepAliveTimeout: KEEP_ALIVE_TIMEOUT_MS,
   keepAliveMaxTimeout: KEEP_ALIVE_TIMEOUT_MS,
+  // Disable undici's body/headers timeouts (both default to 300s) so this matches the
+  // node-fetch transport, which has no client-side body timeout. The SDK's own
+  // AbortController (core.ts `fetchWithTimeout`, governed by the `timeout` option) is
+  // the single source of truth. Without this, a long-lived stream idle for >300s — e.g.
+  // an SSE/exec stream behind `withStreamAutoReconnect` — would get an undici
+  // BodyTimeoutError that the reconnect predicate doesn't recognize, so it would throw
+  // instead of reconnect (as it does on node-fetch). A caller passing their own
+  // dispatcher owns this policy.
+  bodyTimeout: 0,
+  headersTimeout: 0,
 });
 
 type NormalizedBody = { body: any; isStream: boolean };
@@ -107,8 +117,8 @@ export function createUndiciFetch(dispatcher?: Dispatcher): Fetch {
     if (isStream) undiciInit.duplex = 'half';
 
     // undici returns a genuine WHATWG Response. The SDK is typed against the
-    // node-fetch Response, so cast through `any` (the prior got adapter did the
-    // same); at runtime core.ts only uses standard Response members.
+    // node-fetch Response, so cast through `any`; at runtime core.ts only touches
+    // standard Response members that both implementations support.
     return (await undiciFetchImpl(url as any, undiciInit)) as any;
   };
 }
