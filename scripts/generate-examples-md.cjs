@@ -27,10 +27,7 @@ function readExampleFiles() {
     .readdirSync(EXAMPLES_DIR)
     .filter(
       (file) =>
-        file.endsWith('.ts') &&
-        !file.startsWith('_') &&
-        file !== 'types.ts' &&
-        file !== 'registry.ts',
+        file.endsWith('.ts') && !file.startsWith('_') && file !== 'types.ts' && file !== 'registry.ts',
     )
     .sort();
 }
@@ -107,9 +104,7 @@ function ensureLlmsReferences(examples) {
   }
 
   if (referencedFiles.size === 0) {
-    throw new Error(
-      `${path.relative(ROOT, LLMS_FILE)}: expected at least one reference to examples/*.ts`,
-    );
+    throw new Error(`${path.relative(ROOT, LLMS_FILE)}: expected at least one reference to examples/*.ts`);
   }
 
   const generatedFiles = new Set(examples.map((example) => example.fileName));
@@ -125,6 +120,7 @@ function ensureLlmsReferences(examples) {
 function markdownForExample(example) {
   return [
     `<a id="${example.slug}"></a>`,
+    '',
     `## ${example.title}`,
     '',
     `**Use case:** ${example.use_case}`,
@@ -132,17 +128,21 @@ function markdownForExample(example) {
     `**Tags:** ${example.tags.map((tag) => `\`${tag}\``).join(', ')}`,
     '',
     '### Workflow',
+    '',
     ...example.workflow.map((step) => `- ${step}`),
     '',
     '### Prerequisites',
+    '',
     ...example.prerequisites.map((item) => `- \`${item}\``),
     '',
     '### Run',
+    '',
     '```sh',
     example.run,
     '```',
     '',
     '### Test',
+    '',
     '```sh',
     example.test,
     '```',
@@ -256,7 +256,9 @@ function main() {
   fs.writeFileSync(OUTPUT_FILE, markdown);
   fs.writeFileSync(OUTPUT_REGISTRY_FILE, registrySource);
   process.stdout.write(`Wrote ${path.relative(ROOT, OUTPUT_FILE)} from ${examples.length} example(s)\n`);
-  process.stdout.write(`Wrote ${path.relative(ROOT, OUTPUT_REGISTRY_FILE)} from ${examples.length} example(s)\n`);
+  process.stdout.write(
+    `Wrote ${path.relative(ROOT, OUTPUT_REGISTRY_FILE)} from ${examples.length} example(s)\n`,
+  );
 }
 
 main();

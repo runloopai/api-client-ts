@@ -138,7 +138,11 @@ const client = makeClient();
             longPoll: { timeoutMs: 10 * 60 * 1000 },
           });
 
-          const stream = await client.devboxes.executions.streamStdoutUpdates(devbox.id, started.execution_id, {});
+          const stream = await client.devboxes.executions.streamStdoutUpdates(
+            devbox.id,
+            started.execution_id,
+            {},
+          );
           let out = '';
           for await (const chunk of stream) {
             out += chunk.output;

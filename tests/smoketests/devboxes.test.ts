@@ -184,9 +184,9 @@ describe('smoketest: devboxes', () => {
 
     test('await running (createAndAwaitRunning, deprecated polling path)', async () => {
       const warnSpy = jest.spyOn(console, 'warn').mockImplementation((...args: unknown[]) => {
-          if (typeof args[0] === 'string' && args[0].includes('[runloop-api-client]')) return;
-          process.stderr.write(`console.warn: ${args.join(' ')}\n`);
-        });
+        if (typeof args[0] === 'string' && args[0].includes('[runloop-api-client]')) return;
+        process.stderr.write(`console.warn: ${args.join(' ')}\n`);
+      });
       try {
         const created = await client.devboxes.createAndAwaitRunning(
           {
@@ -246,9 +246,9 @@ describe('smoketest: devboxes', () => {
     'createAndAwaitRunning timeout (deprecated polling path)',
     async () => {
       const warnSpy = jest.spyOn(console, 'warn').mockImplementation((...args: unknown[]) => {
-          if (typeof args[0] === 'string' && args[0].includes('[runloop-api-client]')) return;
-          process.stderr.write(`console.warn: ${args.join(' ')}\n`);
-        });
+        if (typeof args[0] === 'string' && args[0].includes('[runloop-api-client]')) return;
+        process.stderr.write(`console.warn: ${args.join(' ')}\n`);
+      });
       try {
         await expect(
           client.devboxes.createAndAwaitRunning(

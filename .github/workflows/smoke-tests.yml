@@ -11,7 +11,7 @@ on:
         required: true
         type: string
       discriminator:
-        default: "true"
+        default: 'true'
         type: string
   workflow_dispatch:
     inputs:
