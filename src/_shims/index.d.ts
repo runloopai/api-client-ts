@@ -16,12 +16,13 @@ export type Agent = SelectType<manual.Agent, auto.Agent>;
 export const fetch: SelectType<typeof manual.fetch, typeof auto.fetch>;
 
 /**
- * An HTTP/2-capable `fetch`, used when the client is constructed with
- * `{ http2: true }`. In Node this is the undici adapter (`Agent({ allowH2: true })`);
- * on the web it is the platform `fetch`, which already negotiates HTTP/2
- * transparently.
+ * Build an HTTP/2-capable `fetch`, used when the client is constructed with
+ * `{ http2: ... }`. In Node this is the undici adapter (`Agent({ allowH2: true })`);
+ * the optional `dispatcher` lets the caller pass a configured undici `Dispatcher`
+ * (the `http2: <Dispatcher>` passthrough), defaulting to the SDK's bounded pool. On
+ * the web it returns the platform `fetch`, which already negotiates HTTP/2.
  */
-export const http2Fetch: any;
+export function makeHttp2Fetch(dispatcher?: any): typeof fetch;
 
 // @ts-ignore
 export type Request = SelectType<manual.Request, auto.Request>;

@@ -23,9 +23,15 @@
  * undici >= 7.23.0 — multiplexed H2 assert-crashes on 6.x (undici PR #4845) — and
  * therefore Node >= 20.18.1.
  *
+ * `createUndiciFetch(dispatcher?)` builds the adapter around a dispatcher: with no
+ * argument it uses the shared default pool below (what `http2: true` selects); a
+ * caller can instead pass their own configured undici `Dispatcher` (what
+ * `http2: <Dispatcher>` selects) for full control over the pool, exactly like the
+ * SDK's `httpAgent` escape hatch — the SDK does not manage its lifecycle.
+ *
  * Lives in src/lib/ (the Stainless custom-code dir) so it survives regeneration.
  */
-import { Agent, fetch as undiciFetchImpl } from 'undici';
+import { Agent, fetch as undiciFetchImpl, type Dispatcher } from 'undici';
 import { Readable } from 'node:stream';
 import { MultipartBody } from '../_shims/MultipartBody';
 import { type Fetch } from '../core';
@@ -36,10 +42,11 @@ const KEEP_ALIVE_TIMEOUT_MS = 10 * 60 * 1000;
 const H2_MAX_CONNECTIONS = 4;
 const H2_MAX_CONCURRENT_STREAMS = 64;
 
-// One module-scoped dispatcher, reused across requests: a bounded HTTP/2 pool with
-// keep-alive. `allowH2` negotiates h2 over TLS via ALPN and transparently falls back
-// to HTTP/1.1 when the origin doesn't offer h2; `connections`/`pipelining` make it
-// multiplex (see the file header).
+// One module-scoped default dispatcher, reused across requests: a bounded HTTP/2 pool
+// with keep-alive. `allowH2` negotiates h2 over TLS via ALPN and transparently falls
+// back to HTTP/1.1 when the origin doesn't offer h2; `connections`/`pipelining` make it
+// multiplex (see the file header). Used when the caller passes `http2: true` (no custom
+// dispatcher).
 const h2Dispatcher = new Agent({
   allowH2: true,
   connections: H2_MAX_CONNECTIONS,
@@ -71,29 +78,37 @@ export function normalizeBody(body: unknown): NormalizedBody {
   return { body: String(body), isStream: false };
 }
 
-export const undiciFetch: Fetch = async (url, init) => {
-  // core.ts injects a node-fetch-style `agent` in RequestInit; undici uses a
-  // `dispatcher` instead, so drop `agent`. Pull `signal` and `body` out to
-  // normalize them; pass everything else (method, headers, redirect, …) through.
-  const { agent: _ignoredAgent, body: rawBody, signal, ...rest } = (init ?? {}) as any;
+/**
+ * Build a fetch adapter bound to a dispatcher. `dispatcher` defaults to the shared
+ * bounded h2 pool above (the `http2: true` case); pass a configured undici
+ * `Dispatcher` to use it verbatim (the `http2: <Dispatcher>` passthrough case). The
+ * dispatcher is resolved once here, at client-construction time, then reused for
+ * every request — matching the "one module-scoped dispatcher" model.
+ */
+export function createUndiciFetch(dispatcher?: Dispatcher): Fetch {
+  const chosen = dispatcher ?? h2Dispatcher;
+  return async (url, init) => {
+    // core.ts injects a node-fetch-style `agent` in RequestInit; undici uses a
+    // `dispatcher` instead, so drop `agent`. Pull `signal` and `body` out to
+    // normalize them; pass everything else (method, headers, redirect, …) through.
+    const { agent: _ignoredAgent, body: rawBody, signal, ...rest } = (init ?? {}) as any;
 
-  const { body, isStream } = normalizeBody(rawBody);
+    const { body, isStream } = normalizeBody(rawBody);
 
-  const undiciInit: any = {
-    ...rest,
-    body,
-    // core.ts passes a standard web AbortSignal (from `new AbortController()`),
-    // which undici accepts directly.
-    signal: signal ?? undefined,
-    dispatcher: h2Dispatcher,
+    const undiciInit: any = {
+      ...rest,
+      body,
+      // core.ts passes a standard web AbortSignal (from `new AbortController()`),
+      // which undici accepts directly.
+      signal: signal ?? undefined,
+      dispatcher: chosen,
+    };
+    // A streamed request body requires the half-duplex hint or undici throws.
+    if (isStream) undiciInit.duplex = 'half';
+
+    // undici returns a genuine WHATWG Response. The SDK is typed against the
+    // node-fetch Response, so cast through `any` (the prior got adapter did the
+    // same); at runtime core.ts only uses standard Response members.
+    return (await undiciFetchImpl(url as any, undiciInit)) as any;
   };
-  // A streamed request body requires the half-duplex hint or undici throws.
-  if (isStream) undiciInit.duplex = 'half';
-
-  // undici returns a genuine WHATWG Response. The SDK is typed against the
-  // node-fetch Response, so cast through `any` (the prior got adapter did the
-  // same); at runtime core.ts only uses standard Response members.
-  return (await undiciFetchImpl(url as any, undiciInit)) as any;
-};
-
-export default undiciFetch;
+}

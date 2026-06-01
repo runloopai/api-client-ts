@@ -368,6 +368,19 @@ const runloop = new RunloopSDK({
 
 Requests are routed through an [undici](https://github.com/nodejs/undici) connection pool with HTTP/2 enabled, falling back to HTTP/1.1 for origins that don't negotiate h2 via ALPN. It is intended for HTTP/2-capable origins such as the Runloop API. This transport uses undici and therefore **requires Node.js >= 20.18.1** (see Requirements).
 
+`http2: true` uses a default bounded pool. To control the pool yourself — for example to raise the number of connections or multiplexed streams for a high-concurrency workload — pass a configured undici `Dispatcher` (such as an `Agent`) instead. The SDK uses it verbatim and does not manage its lifecycle, the same way it treats a custom `httpAgent`:
+
+<!-- prettier-ignore -->
+```ts
+import { Agent } from 'undici';
+
+const runloop = new RunloopSDK({
+  http2: new Agent({ allowH2: true, connections: 8, pipelining: 100 }),
+});
+```
+
+The `httpAgent` option does not apply to the HTTP/2 transport (undici has no Node `http.Agent` concept); set `http2` to a `Dispatcher` to tune connections. A one-time warning is emitted if both `http2` and `httpAgent` are provided.
+
 ## Semantic versioning
 
 This package generally follows [SemVer](https://semver.org/spec/v2.0.0.html) conventions, though certain backwards-incompatible changes may be released as minor versions:

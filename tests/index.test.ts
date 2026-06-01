@@ -4,6 +4,7 @@ import { Runloop } from '@runloop/api-client';
 import { APIUserAbortError } from '@runloop/api-client';
 import { Headers } from '@runloop/api-client/core';
 import defaultFetch, { Response, type RequestInit, type RequestInfo } from 'node-fetch';
+import { MockAgent } from 'undici';
 
 describe('instantiate client', () => {
   const env = process.env;
@@ -99,7 +100,7 @@ describe('instantiate client', () => {
   test('custom fetch wins over http2', async () => {
     // When both `fetch` and `http2` are provided, the custom fetch must be used —
     // the undici (h2) adapter should not run. Locks in src/index.ts:
-    //   fetch: options.fetch ?? (options.http2 ? http2Fetch : undefined)
+    //   fetch: options.fetch ?? (options.http2 ? makeHttp2Fetch(...) : undefined)
     const customFetch = jest.fn((url: RequestInfo) =>
       Promise.resolve(
         new Response(JSON.stringify({ url, custom: true }), {
@@ -117,6 +118,52 @@ describe('instantiate client', () => {
     const response = await client.get('/foo');
     expect(response).toEqual({ url: 'http://localhost:5000/foo', custom: true });
     expect(customFetch).toHaveBeenCalledTimes(1);
+  });
+
+  test('http2 passthrough routes requests through a user-supplied undici Dispatcher', async () => {
+    // Passing an undici Dispatcher as `http2` must thread it all the way to
+    // undici.fetch's `dispatcher` (client -> _shims/makeHttp2Fetch -> createUndiciFetch).
+    // A MockAgent is a real Dispatcher, so if the request is served by our intercept,
+    // the SDK provably used the dispatcher we passed (net connect is disabled).
+    const mockAgent = new MockAgent();
+    mockAgent.disableNetConnect();
+    mockAgent
+      .get('http://localhost:5000')
+      .intercept({ path: /^\/foo/, method: 'GET' })
+      .reply(200, { mocked: true }, { headers: { 'content-type': 'application/json' } });
+
+    const client = new Runloop({
+      baseURL: 'http://localhost:5000/',
+      bearerToken: 'My Bearer Token',
+      maxRetries: 0,
+      http2: mockAgent,
+    });
+
+    try {
+      const response = await client.get('/foo');
+      expect(response).toEqual({ mocked: true });
+    } finally {
+      await mockAgent.close();
+    }
+  });
+
+  test('warns once when http2 and httpAgent are combined', () => {
+    const warn = jest.spyOn(console, 'warn').mockImplementation(() => {});
+    try {
+      // http2 alone (or httpAgent alone) does not warn.
+      new Runloop({ baseURL: 'http://localhost:5000/', bearerToken: 'My Bearer Token', http2: true });
+      expect(warn).not.toHaveBeenCalled();
+
+      // Combining them warns — exactly once per process (module-scoped flag), so the
+      // second construction is silent.
+      const opts = { baseURL: 'http://localhost:5000/', bearerToken: 'My Bearer Token', httpAgent: {} as any };
+      new Runloop({ ...opts, http2: true });
+      new Runloop({ ...opts, http2: true });
+      expect(warn).toHaveBeenCalledTimes(1);
+      expect(String(warn.mock.calls[0]?.[0])).toContain('httpAgent');
+    } finally {
+      warn.mockRestore();
+    }
   });
 
   test('explicit global fetch', async () => {

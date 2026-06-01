@@ -5,7 +5,7 @@ import { MultipartBody } from '../../src/_shims/MultipartBody';
 // The adapter's only non-trivial logic: mapping the body shapes core.ts produces onto a valid
 // undici BodyInit. End-to-end behavior over both transports is covered by the smoke matrix
 // (http1/http2) and verify-http2.mjs; this just pins the shape-conversion rules.
-describe('undiciFetch / normalizeBody', () => {
+describe('undici-fetch / normalizeBody', () => {
   test('passes string / Buffer / typed array through unchanged (non-stream)', () => {
     expect(normalizeBody('hi')).toEqual({ body: 'hi', isStream: false });
     const buf = Buffer.from('b');
