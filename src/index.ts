@@ -36,6 +36,7 @@ import {
 } from './pagination';
 import * as Uploads from './uploads';
 import * as API from './resources/index';
+import { AccountView, Accounts } from './resources/accounts';
 import {
   AgentCreateParameters,
   AgentCreateParams,
@@ -380,6 +381,7 @@ export class Runloop extends Core.APIClient {
     this.bearerToken = bearerToken;
   }
 
+  accounts: API.Accounts = new API.Accounts(this);
   benchmarks: API.Benchmarks = new API.Benchmarks(this);
   benchmarkRuns: API.BenchmarkRuns = new API.BenchmarkRuns(this);
   benchmarkJobs: API.BenchmarkJobs = new API.BenchmarkJobs(this);
@@ -440,6 +442,7 @@ export class Runloop extends Core.APIClient {
   static fileFromPath = Uploads.fileFromPath;
 }
 
+Runloop.Accounts = Accounts;
 Runloop.Benchmarks = Benchmarks;
 Runloop.BenchmarkViewsBenchmarksCursorIDPage = BenchmarkViewsBenchmarksCursorIDPage;
 Runloop.BenchmarkRuns = BenchmarkRuns;
@@ -555,6 +558,8 @@ export declare namespace Runloop {
     type McpConfigsCursorIDPageParams as McpConfigsCursorIDPageParams,
     type McpConfigsCursorIDPageResponse as McpConfigsCursorIDPageResponse,
   };
+
+  export { Accounts as Accounts, type AccountView as AccountView };
 
   export {
     Benchmarks as Benchmarks,

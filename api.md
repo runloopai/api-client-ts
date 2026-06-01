@@ -15,6 +15,16 @@ Types:
 - <code><a href="./src/resources/shared.ts">ResumeTriggers</a></code>
 - <code><a href="./src/resources/shared.ts">RunProfile</a></code>
 
+# Accounts
+
+Types:
+
+- <code><a href="./src/resources/accounts.ts">AccountView</a></code>
+
+Methods:
+
+- <code title="get /v1/accounts/me">client.accounts.<a href="./src/resources/accounts.ts">me</a>() -> AccountView</code>
+
 # Benchmarks
 
 Types:
