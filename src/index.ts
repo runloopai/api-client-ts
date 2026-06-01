@@ -1,6 +1,6 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-import { type Agent } from './_shims/index';
+import { type Agent, makeHttp2Fetch } from './_shims/index';
 import * as Core from './core';
 import * as Errors from './error';
 import * as Pagination from './pagination';
@@ -292,6 +292,38 @@ export interface ClientOptions {
   fetch?: Core.Fetch | undefined;
 
   /**
+   * Send requests over HTTP/2 (with automatic fallback to HTTP/1.1).
+   *
+   * In Node.js this swaps the default `node-fetch` transport for an undici-backed
+   * adapter (`Agent({ allowH2: true })`) that negotiates HTTP/2 via ALPN. On the
+   * web the platform `fetch` already speaks HTTP/2, so this is a no-op there.
+   * Ignored when a custom `fetch` is provided.
+   *
+   * - `true` uses the SDK's default bounded HTTP/2 pool (a few TLS sessions, many
+   *   multiplexed streams each).
+   * - Pass a configured undici `Dispatcher` (e.g. `new Agent({ allowH2: true,
+   *   connections, pipelining })`) to control the pool yourself — the SDK uses it
+   *   verbatim and does not manage its lifecycle, exactly like `httpAgent`.
+   *
+   * **Intended for HTTP/2-capable origins (such as the Runloop API).** When the
+   * origin does not negotiate h2, undici falls back to HTTP/1.1 with request
+   * pipelining enabled on the shared dispatcher; pipelining is unsafe against
+   * many HTTP/1.1 servers and proxies. Do not enable this flag if your traffic
+   * may be routed through a non-h2 intermediary.
+   *
+   * On the HTTP/2 path the `httpAgent` option is not used, since undici manages
+   * connections through its own dispatcher rather than a Node `http.Agent` — to
+   * tune connections here, pass a `Dispatcher` as shown above. A one-time warning
+   * is emitted if both `http2` and `httpAgent` are set.
+   *
+   * @default false
+   */
+  // The `import('undici').Dispatcher` type is inlined (rather than a top-of-file
+  // import) to keep this manual addition to a generated file regen-friendly and to
+  // avoid pulling undici types onto the web/deno code paths; it is type-only/erased.
+  http2?: boolean | import('undici').Dispatcher | undefined;
+
+  /**
    * The maximum number of times that the client will retry a request in case of a
    * temporary failure, like a network error or a 5XX error from the server.
    *
@@ -327,6 +359,11 @@ export interface ClientOptions {
  * console.log(result.exitCode);
  * ```
  */
+// Emitted at most once per process when `http2` and `httpAgent` are combined (see
+// the constructor). Module-scoped flag mirrors the `fileFromPathWarned` pattern in
+// _shims/node-runtime.ts.
+let http2HttpAgentWarned = false;
+
 export class Runloop extends Core.APIClient {
   bearerToken: string;
 
@@ -340,6 +377,7 @@ export class Runloop extends Core.APIClient {
    * @param {number} [opts.timeout=30 seconds] - The maximum amount of time (in milliseconds) the client will wait for a response before timing out.
    * @param {number} [opts.httpAgent] - An HTTP agent used to manage HTTP(s) connections.
    * @param {Core.Fetch} [opts.fetch] - Specify a custom `fetch` function implementation.
+   * @param {boolean | import('undici').Dispatcher} [opts.http2=false] - Send requests over HTTP/2 (Node only; ignored when `fetch` is provided). `true` uses the default bounded pool; pass an undici `Dispatcher` to control the pool yourself.
    * @param {number} [opts.maxRetries=5] - The maximum number of times the client will retry a request.
    * @param {Core.Headers} opts.defaultHeaders - Default headers to include with every request to the API.
    * @param {Core.DefaultQuery} opts.defaultQuery - Default query parameters to include with every request to the API.
@@ -361,13 +399,30 @@ export class Runloop extends Core.APIClient {
       baseURL: baseURL || `https://api.runloop.ai`,
     };
 
+    // `httpAgent` (a Node `http.Agent`) does not apply to the HTTP/2 transport —
+    // undici manages its own dispatcher and has no `http.Agent` concept. Warn once
+    // instead of silently ignoring it. (Skipped when a custom `fetch` supersedes
+    // `http2` entirely.)
+    if (!options.fetch && options.http2 && options.httpAgent && !http2HttpAgentWarned) {
+      http2HttpAgentWarned = true;
+      console.warn(
+        '[runloop] `httpAgent` is ignored when `http2` is set: undici manages its own ' +
+          'dispatcher and has no Node http.Agent concept. To configure the HTTP/2 transport, ' +
+          'pass a configured undici Dispatcher as `http2` (e.g. `http2: new Agent({ connections, pipelining })`).',
+      );
+    }
+
     super({
       baseURL: options.baseURL!,
       baseURLOverridden: baseURL ? baseURL !== 'https://api.runloop.ai' : false,
       timeout: options.timeout ?? 30000 /* 30 seconds */,
       httpAgent: options.httpAgent,
       maxRetries: options.maxRetries,
-      fetch: options.fetch,
+      fetch:
+        options.fetch ??
+        (options.http2 ?
+          makeHttp2Fetch(typeof options.http2 === 'object' ? options.http2 : undefined)
+        : undefined),
     });
 
     const customHeadersEnv = Core.readEnv('RUNLOOP_CUSTOM_HEADERS');

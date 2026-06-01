@@ -6,6 +6,14 @@ import { type RequestOptions } from '../core';
 export interface Shims {
   kind: string;
   fetch: any;
+  /**
+   * Build an HTTP/2-capable `fetch`, used when the client is constructed with
+   * `{ http2: ... }`. In Node this is the undici adapter (`Agent({ allowH2: true })`);
+   * the optional `dispatcher` lets the caller pass a configured undici `Dispatcher`
+   * (the `http2: <Dispatcher>` passthrough), defaulting to the SDK's bounded pool. On
+   * the web the platform `fetch` already negotiates HTTP/2, so the argument is ignored.
+   */
+  makeHttp2Fetch: (dispatcher?: any) => any;
   Request: any;
   Response: any;
   Headers: any;
@@ -27,6 +35,7 @@ export interface Shims {
 export let auto = false;
 export let kind: Shims['kind'] | undefined = undefined;
 export let fetch: Shims['fetch'] | undefined = undefined;
+export let makeHttp2Fetch: Shims['makeHttp2Fetch'] | undefined = undefined;
 export let Request: Shims['Request'] | undefined = undefined;
 export let Response: Shims['Response'] | undefined = undefined;
 export let Headers: Shims['Headers'] | undefined = undefined;
@@ -53,6 +62,7 @@ export function setShims(shims: Shims, options: { auto: boolean } = { auto: fals
   auto = options.auto;
   kind = shims.kind;
   fetch = shims.fetch;
+  makeHttp2Fetch = shims.makeHttp2Fetch;
   Request = shims.Request;
   Response = shims.Response;
   Headers = shims.Headers;

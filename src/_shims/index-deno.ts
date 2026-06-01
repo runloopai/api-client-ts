@@ -9,6 +9,11 @@ const _fetch = fetch;
 type _fetch = typeof fetch;
 export { _fetch as fetch };
 
+// The platform `fetch` already negotiates HTTP/2 at the transport layer, so
+// `{ http2: ... }` is a no-op on Deno — reuse the global fetch and ignore any passed
+// dispatcher (undici dispatchers are a Node-only concept).
+export const makeHttp2Fetch = () => _fetch;
+
 const _Request = Request;
 type _Request = Request;
 export { _Request as Request };

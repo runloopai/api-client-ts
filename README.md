@@ -355,6 +355,32 @@ await runloop.devboxes.create({...}, {
 });
 ```
 
+### HTTP/2 transport
+
+On Node.js, the SDK can send requests over HTTP/2, which multiplexes many concurrent requests over a small number of TLS connections instead of opening a connection per request. Enable it with the `http2` option:
+
+<!-- prettier-ignore -->
+```ts
+const runloop = new RunloopSDK({
+  http2: true,
+});
+```
+
+Requests are routed through an [undici](https://github.com/nodejs/undici) connection pool with HTTP/2 enabled, falling back to HTTP/1.1 for origins that don't negotiate h2 via ALPN. It is intended for HTTP/2-capable origins such as the Runloop API. This transport uses undici and therefore **requires Node.js >= 20.18.1** (see Requirements).
+
+`http2: true` uses a default bounded pool. To control the pool yourself — for example to raise the number of connections or multiplexed streams for a high-concurrency workload — pass a configured undici `Dispatcher` (such as an `Agent`) instead. The SDK uses it verbatim and does not manage its lifecycle, the same way it treats a custom `httpAgent`:
+
+<!-- prettier-ignore -->
+```ts
+import { Agent } from 'undici';
+
+const runloop = new RunloopSDK({
+  http2: new Agent({ allowH2: true, connections: 8, pipelining: 100 }),
+});
+```
+
+The `httpAgent` option does not apply to the HTTP/2 transport (undici has no Node `http.Agent` concept); set `http2` to a `Dispatcher` to tune connections. A one-time warning is emitted if both `http2` and `httpAgent` are provided.
+
 ## Semantic versioning
 
 This package generally follows [SemVer](https://semver.org/spec/v2.0.0.html) conventions, though certain backwards-incompatible changes may be released as minor versions:
@@ -374,7 +400,7 @@ TypeScript >= 4.5 is supported.
 The following runtimes are supported:
 
 - Web browsers (Up-to-date Chrome, Firefox, Safari, Edge, and more)
-- Node.js 18 LTS or later ([non-EOL](https://endoflife.date/nodejs)) versions.
+- Node.js 20.18.1 LTS or later ([non-EOL](https://endoflife.date/nodejs)) versions. (Raised from 18 because the SDK now depends on undici 7 on Node; the HTTP/2 transport needs the undici >= 7.23.0 crash fix, and the package pins `^7.26.0`.)
 - Deno v1.28.0 or higher.
 - Bun 1.0 or later.
 - Cloudflare Workers.
