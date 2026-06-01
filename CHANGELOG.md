@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.22.1 (2026-06-01)
+
+Full Changelog: [v1.22.0...v1.22.1](https://github.com/runloopai/api-client-ts/compare/v1.22.0...v1.22.1)
+
+### Build System
+
+* **stainless:** map /v1/accounts/me to accounts.me in the SDK ([#9569](https://github.com/runloopai/api-client-ts/issues/9569)) ([1571dff](https://github.com/runloopai/api-client-ts/commit/1571dff77dca609acf7fbf7d37891ea2990e5fe1))
+
 ## 1.22.0 (2026-05-27)
 
 Full Changelog: [v1.21.0...v1.22.0](https://github.com/runloopai/api-client-ts/compare/v1.21.0...v1.22.0)
