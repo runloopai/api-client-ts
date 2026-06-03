@@ -103,8 +103,8 @@ export class Devboxes extends APIResource {
   /**
    * Create an ephemeral authenticated tunnel for terminal access to a running
    * Devbox. This tunnel is not persisted on the Devbox and is generated fresh on
-   * each request. The returned auth_token must be passed as a Bearer token in the
-   * Authorization header.
+   * each request. The returned auth_token should be passed as a Bearer token in the
+   * X-Runloop-Tunnel-Authorization header.
    */
   createPtyTunnel(id: string, options?: Core.RequestOptions): Core.APIPromise<PtyTunnelView> {
     return this._client.post(`/v1/devboxes/${id}/create_pty_tunnel`, options);
@@ -788,7 +788,8 @@ export interface DevboxView {
    * running inside a Devbox without requiring direct network access. Each tunnel is
    * uniquely identified by an encrypted tunnel_key and can be configured for either
    * open (public) or authenticated access. Usage:
-   * https://{port}-{tunnel_key}.tunnel.runloop.ai
+   * https://{port}-{tunnel_key}.tunnel.runloop.ai. Authenticated tunnels should pass
+   * auth_token as X-Runloop-Tunnel-Authorization: Bearer {auth_token}.
    */
   tunnel?: TunnelView | null;
 }
@@ -853,11 +854,12 @@ export namespace DevboxView {
  * An ephemeral PTY tunnel providing authenticated terminal access to a Devbox.
  * These tunnels are not stored on the Devbox and are generated fresh on each
  * request. Usage: https://{port}-{tunnel_key}.tunnel.runloop.ai with
- * Authorization: Bearer {auth_token}
+ * X-Runloop-Tunnel-Authorization: Bearer {auth_token}.
  */
 export interface PtyTunnelView {
   /**
-   * Bearer token for tunnel authentication. Always required for PTY tunnels.
+   * Bearer token for tunnel authentication. Always required for PTY tunnels. Pass as
+   * X-Runloop-Tunnel-Authorization: Bearer {auth_token}.
    */
   auth_token: string;
 
@@ -874,7 +876,8 @@ export interface PtyTunnelView {
  * running inside a Devbox without requiring direct network access. Each tunnel is
  * uniquely identified by an encrypted tunnel_key and can be configured for either
  * open (public) or authenticated access. Usage:
- * https://{port}-{tunnel_key}.tunnel.runloop.ai
+ * https://{port}-{tunnel_key}.tunnel.runloop.ai. Authenticated tunnels should pass
+ * auth_token as X-Runloop-Tunnel-Authorization: Bearer {auth_token}.
  */
 export interface TunnelView {
   /**
@@ -907,7 +910,7 @@ export interface TunnelView {
 
   /**
    * Bearer token for tunnel authentication. Only present when auth_mode is
-   * 'authenticated'.
+   * 'authenticated'. Pass as X-Runloop-Tunnel-Authorization: Bearer {auth_token}.
    */
   auth_token?: string | null;
 }
