@@ -166,7 +166,7 @@ describe('resource devboxes', () => {
           include_total_count: true,
           limit: 0,
           starting_after: 'starting_after',
-          status: 'provisioning',
+          status: 'scheduled',
         },
         { path: '/_stainless_unknown_path' },
       ),
