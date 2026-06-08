@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.23.0 (2026-06-05)
+
+Full Changelog: [v1.22.1...v1.23.0](https://github.com/runloopai/api-client-ts/compare/v1.22.1...v1.23.0)
+
+### Features
+
+* **devbox:** add SCHEDULED status to the data model ([#9654](https://github.com/runloopai/api-client-ts/issues/9654)) ([398e350](https://github.com/runloopai/api-client-ts/commit/398e350d12074fb6f3244b505df8a774922b114e))
+* opt-in HTTP/2 multiplexing transport via undici 7 (Node &gt;= 20.18.1) ([#791](https://github.com/runloopai/api-client-ts/issues/791)) ([4cafa17](https://github.com/runloopai/api-client-ts/commit/4cafa17b21d71eeaf8091784a8bf8e9fc40f786b))
+* **portal:** support tunnel authorization header ([#9597](https://github.com/runloopai/api-client-ts/issues/9597)) ([ed324c5](https://github.com/runloopai/api-client-ts/commit/ed324c59c596640896bda199fa2740ce53da06ac))
+
 ## 1.22.1 (2026-06-01)
 
 Full Changelog: [v1.22.0...v1.22.1](https://github.com/runloopai/api-client-ts/compare/v1.22.0...v1.22.1)
