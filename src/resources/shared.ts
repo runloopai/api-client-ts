@@ -271,6 +271,12 @@ export interface LaunchParameters {
   network_policy_id?: string | null;
 
   /**
+   * (Optional, Alpha) standard is default and flex is lazily provisioned and may be
+   * pre-empted. This is an alpha feature and its behavior may change without notice.
+   */
+  provisioning_tier?: 'standard' | 'flex' | null;
+
+  /**
    * A list of ContainerizedService names to be started when a Devbox is created. A
    * valid ContainerizedService must be specified in Blueprint to be started.
    */
