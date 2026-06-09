@@ -63,6 +63,7 @@ describe('resource devboxes', () => {
               resume_triggers: { axon_event: true, http: true },
             },
             network_policy_id: 'network_policy_id',
+            provisioning_tier: 'standard',
             required_services: ['string'],
             resource_size_request: 'X_SMALL',
             user_parameters: { uid: 0, username: 'username' },

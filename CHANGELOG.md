@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.23.1 (2026-06-09)
+
+Full Changelog: [v1.23.0...v1.23.1](https://github.com/runloopai/api-client-ts/compare/v1.23.0...v1.23.1)
+
+### Features
+
+* **devbox:** add provisioning_tier (flex) to LaunchParameters (alpha) ([#796](https://github.com/runloopai/api-client-ts/issues/796)) ([d7bdcb7](https://github.com/runloopai/api-client-ts/commit/d7bdcb7c028668b3f1c4ccb467f18324f7a0008a))
+* **devbox:** expose provisioning_tier=flex in API + SDKs (alpha) ([#9700](https://github.com/runloopai/api-client-ts/issues/9700)) ([c32c279](https://github.com/runloopai/api-client-ts/commit/c32c2799a219dafcb0c1aee6d03dc069c54cc884))
+
 ## 1.23.0 (2026-06-05)
 
 Full Changelog: [v1.22.1...v1.23.0](https://github.com/runloopai/api-client-ts/compare/v1.22.1...v1.23.0)
