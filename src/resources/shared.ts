@@ -285,8 +285,8 @@ export interface LaunchParameters {
   network_policy_id?: string | null;
 
   /**
-   * (Optional) standard is default and flex is lazily provisioned and may be
-   * pre-empted.
+   * (Alpha) standard is default and flex is lazily provisioned and may be pre-empted.
+   * This is an alpha feature and its behavior may change without notice.
    */
   provisioning_tier?: 'standard' | 'flex' | null;
 
