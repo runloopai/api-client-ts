@@ -38,6 +38,7 @@ function makeRequest(index: number): Promise<{ latencyMs: number; status: number
         res.on("end", () =>
           resolve({ latencyMs: performance.now() - start, status: res.statusCode! }),
         );
+        res.on("error", reject);
       },
     );
     req.on("error", reject);
