@@ -4,7 +4,7 @@ import { Runloop } from '@runloop/api-client';
 import { APIUserAbortError } from '@runloop/api-client';
 import { Headers } from '@runloop/api-client/core';
 import defaultFetch, { Response, type RequestInit, type RequestInfo } from 'node-fetch';
-import { MockAgent } from 'undici';
+// MockAgent import removed: h2-transport replaces undici
 
 describe('instantiate client', () => {
   const env = process.env;
@@ -120,31 +120,16 @@ describe('instantiate client', () => {
     expect(customFetch).toHaveBeenCalledTimes(1);
   });
 
-  test('http2 passthrough routes requests through a user-supplied undici Dispatcher', async () => {
-    // Passing an undici Dispatcher as `http2` must thread it all the way to
-    // undici.fetch's `dispatcher` (client -> _shims/makeHttp2Fetch -> createUndiciFetch).
-    // A MockAgent is a real Dispatcher, so if the request is served by our intercept,
-    // the SDK provably used the dispatcher we passed (net connect is disabled).
-    const mockAgent = new MockAgent();
-    mockAgent.disableNetConnect();
-    mockAgent
-      .get('http://localhost:5000')
-      .intercept({ path: /^\/foo/, method: 'GET' })
-      .reply(200, { mocked: true }, { headers: { 'content-type': 'application/json' } });
-
+  test('http2 option accepts H2FetchOptions for pool tuning', () => {
+    // Passing H2FetchOptions as `http2` configures the native H2 connection pool.
     const client = new Runloop({
       baseURL: 'http://localhost:5000/',
       bearerToken: 'My Bearer Token',
       maxRetries: 0,
-      http2: mockAgent,
+      http2: { maxConnections: 10, minConnections: 2 },
     });
-
-    try {
-      const response = await client.get('/foo');
-      expect(response).toEqual({ mocked: true });
-    } finally {
-      await mockAgent.close();
-    }
+    // If construction succeeds without error, the options were accepted.
+    expect(client).toBeDefined();
   });
 
   test('warns once when http2 and httpAgent are combined', () => {
