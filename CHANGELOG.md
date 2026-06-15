@@ -1,5 +1,19 @@
 # Changelog
 
+## 1.24.0 (2026-06-15)
+
+Full Changelog: [v1.23.1...v1.24.0](https://github.com/runloopai/api-client-ts/compare/v1.23.1...v1.24.0)
+
+### Features
+
+* add standalone HTTP/2 transport library ([#799](https://github.com/runloopai/api-client-ts/issues/799)) ([79f0e6f](https://github.com/runloopai/api-client-ts/commit/79f0e6f980f3b96bfaf86c018147ad382e8d77b6))
+* wire h2-transport into the SDK ([#800](https://github.com/runloopai/api-client-ts/issues/800)) ([8391579](https://github.com/runloopai/api-client-ts/commit/83915799fe1481cbae89e5e6b336ed2d03f7ecfb))
+
+
+### Performance Improvements
+
+* increase undici HTTP/2 pool from 4x64 to 20x128 streams ([#801](https://github.com/runloopai/api-client-ts/issues/801)) ([72f8014](https://github.com/runloopai/api-client-ts/commit/72f8014e6cd768e6f52b85b49b15e3662a8fb067))
+
 ## 1.23.1 (2026-06-09)
 
 Full Changelog: [v1.23.0...v1.23.1](https://github.com/runloopai/api-client-ts/compare/v1.23.0...v1.23.1)
