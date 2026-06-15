@@ -38,6 +38,11 @@ export type { H2PoolOptions as H2FetchOptions };
 
 export type H2Fetch = Fetch & {
   close: () => Promise<void>;
+  /**
+   * Pre-establish the minimum HTTP/2 sessions for the URL's origin.
+   * Path and query components are ignored.
+   */
+  warmUp: (originOrUrl: string | URL) => Promise<void>;
 };
 
 function normalizeBody(body: unknown): string | Buffer | null {
@@ -58,6 +63,16 @@ function normalizeBody(body: unknown): string | Buffer | null {
   if (ArrayBuffer.isView(body)) return Buffer.from(body.buffer, body.byteOffset, body.byteLength);
   if (body instanceof ArrayBuffer) return Buffer.from(body);
   return String(body);
+}
+
+function parseURL(url: unknown): URL {
+  if (typeof url === 'string') return new URL(url);
+  if (url instanceof URL) return url;
+
+  const requestUrl = (url as { url?: unknown })?.url;
+  if (typeof requestUrl === 'string') return new URL(requestUrl);
+
+  return new URL(String(url));
 }
 
 /**
@@ -88,7 +103,7 @@ export function createH2Fetch(options?: H2PoolOptions): H2Fetch {
       headers: rawHeaders,
     } = (init ?? {}) as any;
 
-    const parsed = typeof url === 'string' ? new URL(url) : new URL(url.toString());
+    const parsed = parseURL(url);
     const path = parsed.pathname + parsed.search;
     const body = normalizeBody(rawBody);
 
@@ -113,6 +128,11 @@ export function createH2Fetch(options?: H2PoolOptions): H2Fetch {
     const closeTasks = [...pools.values()].map((pool) => pool.close());
     pools.clear();
     await Promise.all(closeTasks);
+  };
+
+  h2Fetch.warmUp = async (originOrUrl) => {
+    const parsed = parseURL(originOrUrl);
+    await getPool(parsed.origin).warmUp();
   };
 
   return h2Fetch;

@@ -43,13 +43,19 @@ export class H2Pool {
     return this._opts.maxConnections ?? DEFAULT_MAX_CONNECTIONS;
   }
 
-  private async _initialize(): Promise<void> {
-    if (this._initialized) return;
+  private _initialize(): Promise<void> {
+    if (this._initialized) return Promise.resolve();
     if (this._initPromise) return this._initPromise;
 
-    this._initPromise = this._createInitialSessions();
-    await this._initPromise;
-    this._initialized = true;
+    this._initPromise = this._createInitialSessions()
+      .then(() => {
+        this._initialized = true;
+      })
+      .catch((err) => {
+        this._initPromise = null;
+        throw err;
+      });
+    return this._initPromise;
   }
 
   private async _createInitialSessions(): Promise<void> {
@@ -190,6 +196,18 @@ export class H2Pool {
 
     // Slow path: need to initialize or wait for capacity
     return this._enqueueRequest(path, method, headers, body, signal);
+  }
+
+  /**
+   * Establish the pool's minimum sessions before request traffic arrives.
+   *
+   * This performs the same initial connection work that the first request would
+   * trigger, without creating any request streams on the server. It is safe to
+   * call more than once.
+   */
+  warmUp(): Promise<void> {
+    if (this._closed) return Promise.reject(new Error('Pool is closed'));
+    return this._initialize();
   }
 
   private async _enqueueRequest(

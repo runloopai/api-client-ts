@@ -18,6 +18,13 @@ let keyPath: string;
 let certPath: string;
 const testTls = { rejectUnauthorized: false };
 
+interface TestServer {
+  port: number;
+  close: () => Promise<void>;
+  sessionCount: () => number;
+  streamCount: () => number;
+}
+
 beforeAll(() => {
   tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'h2-test-'));
   keyPath = path.join(tmpDir, 'key.pem');
@@ -34,14 +41,16 @@ afterAll(() => {
 
 function startTestServer(
   handler: (stream: http2.ServerHttp2Stream, headers: http2.IncomingHttpHeaders) => void,
-): Promise<{ port: number; close: () => Promise<void> }> {
+): Promise<TestServer> {
   return new Promise((resolve) => {
     const sessions = new Set<http2.ServerHttp2Session>();
+    let streamCount = 0;
     const server = http2.createSecureServer({
       key: fs.readFileSync(keyPath),
       cert: fs.readFileSync(certPath),
     });
     server.on('stream', (stream, headers) => {
+      streamCount++;
       stream.on('error', () => {});
       handler(stream, headers);
     });
@@ -54,6 +63,8 @@ function startTestServer(
       const port = (server.address() as any).port;
       resolve({
         port,
+        sessionCount: () => sessions.size,
+        streamCount: () => streamCount,
         close: () =>
           new Promise<void>((res) => {
             for (const session of sessions) session.close();
@@ -62,6 +73,14 @@ function startTestServer(
       });
     });
   });
+}
+
+async function waitForSessionCount(server: TestServer, expected: number): Promise<void> {
+  const deadline = Date.now() + 500;
+  while (Date.now() < deadline) {
+    if (server.sessionCount() === expected) return;
+    await new Promise((resolve) => setTimeout(resolve, 5));
+  }
 }
 
 function jsonHandler(stream: http2.ServerHttp2Stream, headers: http2.IncomingHttpHeaders) {
@@ -199,7 +218,7 @@ describe('H2Response', () => {
 // ---------------------------------------------------------------------------
 
 describe('H2Session', () => {
-  let server: { port: number; close: () => Promise<void> };
+  let server: TestServer;
 
   beforeAll(async () => {
     server = await startTestServer(jsonHandler);
@@ -272,7 +291,7 @@ describe('H2Session', () => {
 // ---------------------------------------------------------------------------
 
 describe('H2Pool', () => {
-  let server: { port: number; close: () => Promise<void> };
+  let server: TestServer;
 
   beforeAll(async () => {
     server = await startTestServer(jsonHandler);
@@ -294,6 +313,31 @@ describe('H2Pool', () => {
     expect(resp3.status).toBe(200);
     expect((await resp3.json()).path).toBe('/item/2');
     await pool.close();
+  });
+
+  test('warmUp opens the minimum sessions without sending request streams', async () => {
+    const warmServer = await startTestServer(jsonHandler);
+    const pool = new H2Pool(`https://localhost:${warmServer.port}`, {
+      minConnections: 3,
+      maxConnections: 3,
+      tlsOptions: testTls,
+    });
+
+    try {
+      await pool.warmUp();
+      await pool.warmUp();
+      await waitForSessionCount(warmServer, 3);
+
+      expect(warmServer.sessionCount()).toBe(3);
+      expect(warmServer.streamCount()).toBe(0);
+
+      const resp = await pool.request('/info', 'GET', {}, null);
+      expect(resp.status).toBe(200);
+      expect(warmServer.streamCount()).toBe(1);
+    } finally {
+      await pool.close();
+      await warmServer.close();
+    }
   });
 
   test('queues requests when all sessions are at capacity', async () => {
@@ -327,7 +371,7 @@ describe('H2Pool', () => {
 // ---------------------------------------------------------------------------
 
 describe('createH2Fetch', () => {
-  let server: { port: number; close: () => Promise<void> };
+  let server: TestServer;
 
   beforeAll(async () => {
     server = await startTestServer(jsonHandler);
@@ -344,6 +388,29 @@ describe('createH2Fetch', () => {
     expect(resp.status).toBe(200);
     const body = await resp.json();
     expect(body.path).toBe('/info');
+  });
+
+  test('warmUp prepares the origin pool without sending a request', async () => {
+    const warmServer = await startTestServer(jsonHandler);
+    const h2Fetch = createH2Fetch({ minConnections: 2, maxConnections: 2, tlsOptions: testTls });
+
+    try {
+      await h2Fetch.warmUp(`https://localhost:${warmServer.port}/ignored?query=1`);
+      await waitForSessionCount(warmServer, 2);
+
+      expect(warmServer.sessionCount()).toBe(2);
+      expect(warmServer.streamCount()).toBe(0);
+
+      const resp = (await h2Fetch(`https://localhost:${warmServer.port}/info`, {
+        method: 'GET',
+        headers: {},
+      })) as any;
+      expect(resp.status).toBe(200);
+      expect(warmServer.streamCount()).toBe(1);
+    } finally {
+      await h2Fetch.close();
+      await warmServer.close();
+    }
   });
 
   test('POST request sends body', async () => {
@@ -425,7 +492,7 @@ describe('createH2Fetch', () => {
 // ---------------------------------------------------------------------------
 
 describe('normalizeBody', () => {
-  let server: { port: number; close: () => Promise<void> };
+  let server: TestServer;
 
   beforeAll(async () => {
     server = await startTestServer(jsonHandler);
