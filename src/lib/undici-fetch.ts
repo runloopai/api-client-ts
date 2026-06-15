@@ -37,10 +37,12 @@ import { MultipartBody } from '../_shims/MultipartBody';
 import { type Fetch } from '../core';
 
 const KEEP_ALIVE_TIMEOUT_MS = 10 * 60 * 1000;
-// Bound the pool to a few TLS sessions per origin and multiplex many H2 streams
-// over each. 4 x 64 = 256 concurrent requests in flight before undici queues the rest.
-const H2_MAX_CONNECTIONS = 4;
-const H2_MAX_CONCURRENT_STREAMS = 64;
+// Bound the pool to several TLS sessions per origin and multiplex H2 streams over
+// each. The server typically advertises MAX_CONCURRENT_STREAMS=100-128; we use 128
+// per connection to match. 20 x 128 = 2560 concurrent requests in flight before
+// undici queues the rest.
+const H2_MAX_CONNECTIONS = 20;
+const H2_MAX_CONCURRENT_STREAMS = 128;
 
 // One module-scoped default dispatcher, reused across requests: a bounded HTTP/2 pool
 // with keep-alive. `allowH2` negotiates h2 over TLS via ALPN and transparently falls
