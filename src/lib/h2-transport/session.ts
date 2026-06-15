@@ -19,6 +19,8 @@ export interface H2SessionOptions {
 
 const DEFAULT_CONNECT_TIMEOUT = 30_000;
 
+const createAbortError = (): Error => Object.assign(new Error('Request aborted'), { name: 'AbortError' });
+
 export class H2Session {
   readonly origin: string;
 
@@ -65,12 +67,14 @@ export class H2Session {
 
       session.on('connect', () => {
         clearTimeout(timeout);
-        const serverMax = session.remoteSettings?.maxConcurrentStreams;
-        if (serverMax != null && !this._opts.maxConcurrentStreams) {
-          this._maxConcurrentStreams = serverMax;
-        }
         this._state = SessionState.READY;
         resolve();
+      });
+
+      session.on('remoteSettings', (settings) => {
+        if (settings.maxConcurrentStreams != null && !this._opts.maxConcurrentStreams) {
+          this._maxConcurrentStreams = settings.maxConcurrentStreams;
+        }
       });
 
       session.on('error', (err) => {
@@ -127,10 +131,11 @@ export class H2Session {
       this._activeStreams++;
 
       let settled = false;
+      let cleaned = false;
 
       const onAbort = () => {
-        if (!settled) {
-          stream.destroy(new Error('Request aborted'));
+        if (!cleaned) {
+          stream.destroy(createAbortError());
         }
       };
 
@@ -139,22 +144,26 @@ export class H2Session {
           stream.on('error', () => {});
           stream.destroy();
           this._activeStreams--;
-          reject(new Error('Request aborted'));
+          reject(createAbortError());
           return;
         }
         signal.addEventListener('abort', onAbort, { once: true });
       }
 
       const cleanup = () => {
+        if (cleaned) return;
+        cleaned = true;
         this._activeStreams--;
         if (signal) signal.removeEventListener('abort', onAbort);
         if (this._state === SessionState.DRAINING && this._activeStreams === 0) {
           this._close();
         }
-        if (this.available) {
-          this.onAvailable?.();
-        }
+        // Always notify the pool so it can route queued work to other sessions
+        // (or grow) when this session is draining/closed and can't take more.
+        this.onAvailable?.();
       };
+
+      stream.once('close', cleanup);
 
       stream.on('error', (err) => {
         if (!settled) {
@@ -206,8 +215,17 @@ export class H2Session {
     });
   }
 
-  close(): void {
-    this._close();
+  close(): Promise<void> {
+    const session = this._session;
+    if (!session || session.destroyed) {
+      this._close();
+      return Promise.resolve();
+    }
+
+    return new Promise((resolve) => {
+      session.once('close', resolve);
+      this._close();
+    });
   }
 
   private _close(): void {

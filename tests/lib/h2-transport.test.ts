@@ -36,6 +36,7 @@ function startTestServer(
   handler: (stream: http2.ServerHttp2Stream, headers: http2.IncomingHttpHeaders) => void,
 ): Promise<{ port: number; close: () => Promise<void> }> {
   return new Promise((resolve) => {
+    const sessions = new Set<http2.ServerHttp2Session>();
     const server = http2.createSecureServer({
       key: fs.readFileSync(keyPath),
       cert: fs.readFileSync(certPath),
@@ -44,7 +45,6 @@ function startTestServer(
       stream.on('error', () => {});
       handler(stream, headers);
     });
-    const sessions = new Set<http2.ServerHttp2Session>();
     server.on('session', (session) => {
       sessions.add(session);
       session.on('error', () => {});
@@ -56,8 +56,7 @@ function startTestServer(
         port,
         close: () =>
           new Promise<void>((res) => {
-            for (const session of sessions) session.destroy();
-            sessions.clear();
+            for (const session of sessions) session.close();
             server.close(() => res());
           }),
       });
@@ -463,5 +462,18 @@ describe('normalizeBody', () => {
     })) as any;
     const body = await resp.json();
     expect(body.echoed).toBe('buffer data');
+  });
+
+  test('Readable body is buffered', async () => {
+    const { Readable } = await import('node:stream');
+    const h2Fetch = createH2Fetch({ tlsOptions: testTls });
+    const stream = Readable.from([Buffer.from('chunk-1|'), Buffer.from('chunk-2')]);
+    const resp = (await h2Fetch(`https://localhost:${server.port}/echo`, {
+      method: 'POST',
+      headers: {},
+      body: stream,
+    })) as any;
+    const body = await resp.json();
+    expect(body.echoed).toBe('chunk-1|chunk-2');
   });
 });

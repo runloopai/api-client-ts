@@ -36,20 +36,27 @@ function checkNodeVersion(): void {
 
 export type { H2PoolOptions as H2FetchOptions };
 
-function normalizeBody(body: unknown): string | Buffer | null {
+export type H2Fetch = Fetch & {
+  close: () => Promise<void>;
+};
+
+async function bufferReadable(stream: Readable): Promise<Buffer> {
+  const chunks: Buffer[] = [];
+  for await (const chunk of stream) {
+    chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
+  }
+  return Buffer.concat(chunks);
+}
+
+async function normalizeBody(body: unknown): Promise<string | Buffer | null> {
   if (body == null) return null;
   if (typeof body === 'string') return body;
   if (Buffer.isBuffer(body)) return body;
   if (body instanceof MultipartBody) return normalizeBody((body as MultipartBody).body);
   if (body instanceof Readable) {
-    // Multipart bodies arrive as Node Readable. For H2, we need to buffer them
-    // since session.request() takes string | Buffer. The Readable is a
-    // FormDataEncoder stream with a known content-length, so buffering is safe.
-    // Streaming uploads could be added later if needed.
-    throw new Error(
-      'h2-transport: streaming request bodies (Readable) are not yet supported. ' +
-        'Use a string or Buffer body.',
-    );
+    // Multipart bodies arrive as a FormDataEncoder Readable with a known
+    // content-length. session.request() takes string | Buffer, so buffer here.
+    return bufferReadable(body);
   }
   if (ArrayBuffer.isView(body)) return Buffer.from(body.buffer, body.byteOffset, body.byteLength);
   if (body instanceof ArrayBuffer) return Buffer.from(body);
@@ -62,7 +69,7 @@ function normalizeBody(body: unknown): string | Buffer | null {
  * Compatible with the SDK's `makeHttp2Fetch` interface: called with no arguments
  * for `http2: true`, or with options for `http2: <H2FetchOptions>`.
  */
-export function createH2Fetch(options?: H2PoolOptions): Fetch {
+export function createH2Fetch(options?: H2PoolOptions): H2Fetch {
   checkNodeVersion();
   const pools = new Map<string, H2Pool>();
 
@@ -75,7 +82,7 @@ export function createH2Fetch(options?: H2PoolOptions): Fetch {
     return pool;
   }
 
-  return async (url, init) => {
+  const h2Fetch = (async (url, init) => {
     const {
       agent: _ignored, // node-fetch artifact injected by core.ts
       body: rawBody,
@@ -86,7 +93,7 @@ export function createH2Fetch(options?: H2PoolOptions): Fetch {
 
     const parsed = typeof url === 'string' ? new URL(url) : new URL(url.toString());
     const path = parsed.pathname + parsed.search;
-    const body = normalizeBody(rawBody);
+    const body = await normalizeBody(rawBody);
 
     const reqHeaders: Record<string, string> = {};
     if (rawHeaders) {
@@ -103,5 +110,13 @@ export function createH2Fetch(options?: H2PoolOptions): Fetch {
 
     const pool = getPool(parsed.origin);
     return pool.request(path, method.toUpperCase(), reqHeaders, body, signal) as any;
+  }) as H2Fetch;
+
+  h2Fetch.close = async () => {
+    const closeTasks = [...pools.values()].map((pool) => pool.close());
+    pools.clear();
+    await Promise.all(closeTasks);
   };
+
+  return h2Fetch;
 }

@@ -1,3 +1,4 @@
+import { Blob } from 'node:buffer';
 import { H2Headers } from './headers';
 
 /**
@@ -52,5 +53,10 @@ export class H2Response {
   async arrayBuffer(): Promise<ArrayBuffer> {
     const buf = await this._consumeBody();
     return buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength) as ArrayBuffer;
+  }
+
+  async blob(): Promise<Blob> {
+    const buf = await this._consumeBody();
+    return new Blob([buf], { type: this.headers.get('content-type') ?? undefined });
   }
 }

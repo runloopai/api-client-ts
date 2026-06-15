@@ -119,6 +119,7 @@ async function main() {
   console.log('PASS');
 
   console.log('\n=== All SSE tests PASSED ===');
+  await h2Fetch.close();
   close();
 
   // Cleanup

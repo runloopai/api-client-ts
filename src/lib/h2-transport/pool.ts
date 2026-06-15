@@ -8,6 +8,7 @@ export interface H2PoolOptions extends H2SessionOptions {
 
 const DEFAULT_MIN_CONNECTIONS = 4;
 const DEFAULT_MAX_CONNECTIONS = 20;
+const RETRYABLE_METHODS = new Set(['GET', 'HEAD', 'OPTIONS', 'PUT', 'DELETE']);
 
 interface QueuedRequest {
   path: string;
@@ -46,9 +47,16 @@ export class H2Pool {
     if (this._initialized) return;
     if (this._initPromise) return this._initPromise;
 
-    this._initPromise = this._createInitialSessions();
-    await this._initPromise;
-    this._initialized = true;
+    const attempt = this._createInitialSessions();
+    this._initPromise = attempt;
+    try {
+      await attempt;
+      this._initialized = true;
+    } catch (err) {
+      // Don't cache the failure — let subsequent requests retry initialization.
+      if (this._initPromise === attempt) this._initPromise = null;
+      throw err;
+    }
   }
 
   private async _createInitialSessions(): Promise<void> {
@@ -134,7 +142,7 @@ export class H2Pool {
     try {
       return await session.request(path, method, headers, body, signal);
     } catch (err: any) {
-      if (session.state !== SessionState.READY) {
+      if (session.state !== SessionState.READY && RETRYABLE_METHODS.has(method)) {
         // Session went away (GOAWAY, etc). Re-enter the pool for a retry.
         return this._enqueueRequest(path, method, headers, body, signal);
       }
@@ -217,14 +225,14 @@ export class H2Pool {
 
   async close(): Promise<void> {
     this._closed = true;
-    for (const s of this._sessions) {
-      s.close();
-    }
+    const sessions = [...this._sessions];
     this._sessions.length = 0;
 
     for (const req of this._queue) {
       req.reject(new Error('Pool is closed'));
     }
     this._queue.length = 0;
+
+    await Promise.all(sessions.map((s) => s.close()));
   }
 }
