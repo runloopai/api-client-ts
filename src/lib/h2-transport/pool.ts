@@ -95,8 +95,10 @@ export class H2Pool {
       const session = this._findAvailable();
       if (!session) break;
       const req = this._queue.shift()!;
-      this._dispatchToSession(session, req.path, req.method, req.headers, req.body, req.signal)
-        .then(req.resolve, req.reject);
+      this._dispatchToSession(session, req.path, req.method, req.headers, req.body, req.signal).then(
+        req.resolve,
+        req.reject,
+      );
     }
 
     if (this._queue.length > 0 && !this._growing) {

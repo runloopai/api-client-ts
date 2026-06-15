@@ -44,12 +44,22 @@ function startTestServer(
       stream.on('error', () => {});
       handler(stream, headers);
     });
-    server.on('session', (session) => { session.on('error', () => {}); });
+    const sessions = new Set<http2.ServerHttp2Session>();
+    server.on('session', (session) => {
+      sessions.add(session);
+      session.on('error', () => {});
+      session.on('close', () => sessions.delete(session));
+    });
     server.listen(0, () => {
       const port = (server.address() as any).port;
       resolve({
         port,
-        close: () => new Promise<void>((res) => server.close(() => res())),
+        close: () =>
+          new Promise<void>((res) => {
+            for (const session of sessions) session.destroy();
+            sessions.clear();
+            server.close(() => res());
+          }),
       });
     });
   });

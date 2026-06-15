@@ -58,7 +58,9 @@ export class H2Session {
       this._session = session;
 
       const timeout = setTimeout(() => {
-        session.destroy(new Error(`H2 connect timeout after ${this._opts.connectTimeout ?? DEFAULT_CONNECT_TIMEOUT}ms`));
+        session.destroy(
+          new Error(`H2 connect timeout after ${this._opts.connectTimeout ?? DEFAULT_CONNECT_TIMEOUT}ms`),
+        );
       }, this._opts.connectTimeout ?? DEFAULT_CONNECT_TIMEOUT);
 
       session.on('connect', () => {

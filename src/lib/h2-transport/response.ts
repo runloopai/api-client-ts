@@ -14,12 +14,7 @@ export class H2Response {
   private _bodyConsumed = false;
   private _bodyBytes: Buffer | null = null;
 
-  constructor(
-    status: number,
-    headers: H2Headers,
-    body: ReadableStream<Uint8Array>,
-    url: string,
-  ) {
+  constructor(status: number, headers: H2Headers, body: ReadableStream<Uint8Array>, url: string) {
     this.status = status;
     this.ok = status >= 200 && status < 300;
     this.url = url;
