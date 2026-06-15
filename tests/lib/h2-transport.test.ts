@@ -36,6 +36,7 @@ function startTestServer(
   handler: (stream: http2.ServerHttp2Stream, headers: http2.IncomingHttpHeaders) => void,
 ): Promise<{ port: number; close: () => Promise<void> }> {
   return new Promise((resolve) => {
+    const sessions = new Set<http2.ServerHttp2Session>();
     const server = http2.createSecureServer({
       key: fs.readFileSync(keyPath),
       cert: fs.readFileSync(certPath),
@@ -44,12 +45,20 @@ function startTestServer(
       stream.on('error', () => {});
       handler(stream, headers);
     });
-    server.on('session', (session) => { session.on('error', () => {}); });
+    server.on('session', (session) => {
+      sessions.add(session);
+      session.on('error', () => {});
+      session.on('close', () => sessions.delete(session));
+    });
     server.listen(0, () => {
       const port = (server.address() as any).port;
       resolve({
         port,
-        close: () => new Promise<void>((res) => server.close(() => res())),
+        close: () =>
+          new Promise<void>((res) => {
+            for (const session of sessions) session.close();
+            server.close(() => res());
+          }),
       });
     });
   });

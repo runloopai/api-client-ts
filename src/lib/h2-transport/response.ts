@@ -1,3 +1,4 @@
+import { Blob } from 'node:buffer';
 import { H2Headers } from './headers';
 
 /**
@@ -14,12 +15,7 @@ export class H2Response {
   private _bodyConsumed = false;
   private _bodyBytes: Buffer | null = null;
 
-  constructor(
-    status: number,
-    headers: H2Headers,
-    body: ReadableStream<Uint8Array>,
-    url: string,
-  ) {
+  constructor(status: number, headers: H2Headers, body: ReadableStream<Uint8Array>, url: string) {
     this.status = status;
     this.ok = status >= 200 && status < 300;
     this.url = url;
@@ -57,5 +53,10 @@ export class H2Response {
   async arrayBuffer(): Promise<ArrayBuffer> {
     const buf = await this._consumeBody();
     return buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength) as ArrayBuffer;
+  }
+
+  async blob(): Promise<Blob> {
+    const buf = await this._consumeBody();
+    return new Blob([buf], { type: this.headers.get('content-type') ?? undefined });
   }
 }

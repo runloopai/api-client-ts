@@ -36,6 +36,10 @@ function checkNodeVersion(): void {
 
 export type { H2PoolOptions as H2FetchOptions };
 
+export type H2Fetch = Fetch & {
+  close: () => Promise<void>;
+};
+
 function normalizeBody(body: unknown): string | Buffer | null {
   if (body == null) return null;
   if (typeof body === 'string') return body;
@@ -62,7 +66,7 @@ function normalizeBody(body: unknown): string | Buffer | null {
  * Compatible with the SDK's `makeHttp2Fetch` interface: called with no arguments
  * for `http2: true`, or with options for `http2: <H2FetchOptions>`.
  */
-export function createH2Fetch(options?: H2PoolOptions): Fetch {
+export function createH2Fetch(options?: H2PoolOptions): H2Fetch {
   checkNodeVersion();
   const pools = new Map<string, H2Pool>();
 
@@ -75,7 +79,7 @@ export function createH2Fetch(options?: H2PoolOptions): Fetch {
     return pool;
   }
 
-  return async (url, init) => {
+  const h2Fetch = (async (url, init) => {
     const {
       agent: _ignored, // node-fetch artifact injected by core.ts
       body: rawBody,
@@ -103,5 +107,13 @@ export function createH2Fetch(options?: H2PoolOptions): Fetch {
 
     const pool = getPool(parsed.origin);
     return pool.request(path, method.toUpperCase(), reqHeaders, body, signal) as any;
+  }) as H2Fetch;
+
+  h2Fetch.close = async () => {
+    const closeTasks = [...pools.values()].map((pool) => pool.close());
+    pools.clear();
+    await Promise.all(closeTasks);
   };
+
+  return h2Fetch;
 }
