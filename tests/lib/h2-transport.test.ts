@@ -463,4 +463,17 @@ describe('normalizeBody', () => {
     const body = await resp.json();
     expect(body.echoed).toBe('buffer data');
   });
+
+  test('Readable body is buffered', async () => {
+    const { Readable } = await import('node:stream');
+    const h2Fetch = createH2Fetch({ tlsOptions: testTls });
+    const stream = Readable.from([Buffer.from('chunk-1|'), Buffer.from('chunk-2')]);
+    const resp = (await h2Fetch(`https://localhost:${server.port}/echo`, {
+      method: 'POST',
+      headers: {},
+      body: stream,
+    })) as any;
+    const body = await resp.json();
+    expect(body.echoed).toBe('chunk-1|chunk-2');
+  });
 });

@@ -158,9 +158,9 @@ export class H2Session {
         if (this._state === SessionState.DRAINING && this._activeStreams === 0) {
           this._close();
         }
-        if (this.available) {
-          this.onAvailable?.();
-        }
+        // Always notify the pool so it can route queued work to other sessions
+        // (or grow) when this session is draining/closed and can't take more.
+        this.onAvailable?.();
       };
 
       stream.once('close', cleanup);

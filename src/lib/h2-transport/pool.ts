@@ -47,9 +47,16 @@ export class H2Pool {
     if (this._initialized) return;
     if (this._initPromise) return this._initPromise;
 
-    this._initPromise = this._createInitialSessions();
-    await this._initPromise;
-    this._initialized = true;
+    const attempt = this._createInitialSessions();
+    this._initPromise = attempt;
+    try {
+      await attempt;
+      this._initialized = true;
+    } catch (err) {
+      // Don't cache the failure — let subsequent requests retry initialization.
+      if (this._initPromise === attempt) this._initPromise = null;
+      throw err;
+    }
   }
 
   private async _createInitialSessions(): Promise<void> {

@@ -40,20 +40,23 @@ export type H2Fetch = Fetch & {
   close: () => Promise<void>;
 };
 
-function normalizeBody(body: unknown): string | Buffer | null {
+async function bufferReadable(stream: Readable): Promise<Buffer> {
+  const chunks: Buffer[] = [];
+  for await (const chunk of stream) {
+    chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
+  }
+  return Buffer.concat(chunks);
+}
+
+async function normalizeBody(body: unknown): Promise<string | Buffer | null> {
   if (body == null) return null;
   if (typeof body === 'string') return body;
   if (Buffer.isBuffer(body)) return body;
   if (body instanceof MultipartBody) return normalizeBody((body as MultipartBody).body);
   if (body instanceof Readable) {
-    // Multipart bodies arrive as Node Readable. For H2, we need to buffer them
-    // since session.request() takes string | Buffer. The Readable is a
-    // FormDataEncoder stream with a known content-length, so buffering is safe.
-    // Streaming uploads could be added later if needed.
-    throw new Error(
-      'h2-transport: streaming request bodies (Readable) are not yet supported. ' +
-        'Use a string or Buffer body.',
-    );
+    // Multipart bodies arrive as a FormDataEncoder Readable with a known
+    // content-length. session.request() takes string | Buffer, so buffer here.
+    return bufferReadable(body);
   }
   if (ArrayBuffer.isView(body)) return Buffer.from(body.buffer, body.byteOffset, body.byteLength);
   if (body instanceof ArrayBuffer) return Buffer.from(body);
@@ -90,7 +93,7 @@ export function createH2Fetch(options?: H2PoolOptions): H2Fetch {
 
     const parsed = typeof url === 'string' ? new URL(url) : new URL(url.toString());
     const path = parsed.pathname + parsed.search;
-    const body = normalizeBody(rawBody);
+    const body = await normalizeBody(rawBody);
 
     const reqHeaders: Record<string, string> = {};
     if (rawHeaders) {
