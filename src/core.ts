@@ -211,6 +211,7 @@ export abstract class APIClient {
   maxRetries: number;
   timeout: number;
   httpAgent: Agent | undefined;
+  httpAgentMaxSockets: number;
 
   private fetch: Fetch;
   protected idempotencyHeader?: string;
@@ -221,6 +222,7 @@ export abstract class APIClient {
     maxRetries = 5,
     timeout = 30000, // 30 seconds
     httpAgent,
+    httpAgentMaxSockets = 256,
     fetch: overriddenFetch,
   }: {
     baseURL: string;
@@ -228,13 +230,15 @@ export abstract class APIClient {
     maxRetries?: number | undefined;
     timeout: number | undefined;
     httpAgent: Agent | undefined;
+    httpAgentMaxSockets?: number | undefined;
     fetch: Fetch | undefined;
   }) {
     this.baseURL = baseURL;
     this.#baseURLOverridden = baseURLOverridden;
-    this.maxRetries = validatePositiveInteger('maxRetries', maxRetries);
+    this.maxRetries = validateNonNegativeInteger('maxRetries', maxRetries);
     this.timeout = validatePositiveInteger('timeout', timeout);
     this.httpAgent = httpAgent;
+    this.httpAgentMaxSockets = validatePositiveInteger('httpAgentMaxSockets', httpAgentMaxSockets);
 
     this.fetch = overriddenFetch ?? fetch;
   }
@@ -354,7 +358,7 @@ export abstract class APIClient {
     const url = this.buildURL(path!, query, defaultBaseURL);
     if ('timeout' in options) validatePositiveInteger('timeout', options.timeout);
     options.timeout = options.timeout ?? this.timeout;
-    const httpAgent = options.httpAgent ?? this.httpAgent ?? getDefaultAgent(url);
+    const httpAgent = options.httpAgent ?? this.httpAgent ?? getDefaultAgent(url, this.httpAgentMaxSockets);
     const minAgentTimeout = options.timeout + 1000;
     if (
       typeof (httpAgent as any)?.options?.timeout === 'number' &&
@@ -1055,8 +1059,18 @@ const validatePositiveInteger = (name: string, n: unknown): number => {
   if (typeof n !== 'number' || !Number.isInteger(n)) {
     throw new RunloopError(`${name} must be an integer`);
   }
-  if (n < 0) {
+  if (n <= 0) {
     throw new RunloopError(`${name} must be a positive integer`);
+  }
+  return n;
+};
+
+const validateNonNegativeInteger = (name: string, n: unknown): number => {
+  if (typeof n !== 'number' || !Number.isInteger(n)) {
+    throw new RunloopError(`${name} must be an integer`);
+  }
+  if (n < 0) {
+    throw new RunloopError(`${name} must be a non-negative integer`);
   }
   return n;
 };

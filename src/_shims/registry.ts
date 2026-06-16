@@ -25,7 +25,7 @@ export interface Shims {
     form: Shims['FormData'],
     opts: RequestOptions<T>,
   ) => Promise<RequestOptions<T>>;
-  getDefaultAgent: (url: string) => any;
+  getDefaultAgent: (url: string, httpAgentMaxSockets?: number) => any;
   fileFromPath:
     | ((path: string, filename?: string, options?: {}) => Promise<Shims['File']>)
     | ((path: string, options?: {}) => Promise<Shims['File']>);

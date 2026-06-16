@@ -19,6 +19,7 @@ import { createH2Fetch } from '../lib/h2-transport';
 type FileFromPathOptions = Omit<FilePropertyBag, 'lastModified'>;
 
 let fileFromPathWarned = false;
+const DEFAULT_HTTP_AGENT_MAX_SOCKETS = 256;
 
 /**
  * @deprecated use fs.createReadStream('./my/file.txt') instead
@@ -39,20 +40,26 @@ async function fileFromPath(path: string, ...args: any[]): Promise<File> {
   return await _fileFromPath(path, ...args);
 }
 
-const defaultHttpAgent: Agent = new KeepAliveAgent({
-  keepAlive: true,
-  timeout: 10 * 60 * 1000,
-  maxSockets: Infinity,
-  maxFreeSockets: 2048,
-  freeSocketTimeout: 30_000,
-});
-const defaultHttpsAgent: Agent = new KeepAliveAgent.HttpsAgent({
-  keepAlive: true,
-  timeout: 10 * 60 * 1000,
-  maxSockets: Infinity,
-  maxFreeSockets: 2048,
-  freeSocketTimeout: 30_000,
-});
+const defaultHttpAgents = new Map<number, Agent>();
+const defaultHttpsAgents = new Map<number, Agent>();
+
+function getOrCreateDefaultAgent(url: string, httpAgentMaxSockets = DEFAULT_HTTP_AGENT_MAX_SOCKETS): Agent {
+  const isHttps = url.startsWith('https');
+  const cache = isHttps ? defaultHttpsAgents : defaultHttpAgents;
+  const cached = cache.get(httpAgentMaxSockets);
+  if (cached) return cached;
+
+  const options = {
+    keepAlive: true,
+    timeout: 10 * 60 * 1000,
+    maxSockets: httpAgentMaxSockets,
+    maxFreeSockets: httpAgentMaxSockets,
+    freeSocketTimeout: 30_000,
+  };
+  const agent: Agent = isHttps ? new KeepAliveAgent.HttpsAgent(options) : new KeepAliveAgent(options);
+  cache.set(httpAgentMaxSockets, agent);
+  return agent;
+}
 
 async function getMultipartRequestOptions<T = Record<string, unknown>>(
   form: fd.FormData,
@@ -88,7 +95,7 @@ export function getRuntime(): Shims {
     File: fd.File,
     ReadableStream,
     getMultipartRequestOptions,
-    getDefaultAgent: (url: string): Agent => (url.startsWith('https') ? defaultHttpsAgent : defaultHttpAgent),
+    getDefaultAgent: getOrCreateDefaultAgent,
     fileFromPath,
     isFsReadStream: (value: any): value is FsReadStream => value instanceof FsReadStream,
   };

@@ -284,6 +284,16 @@ export interface ClientOptions {
   httpAgent?: Agent | undefined;
 
   /**
+   * Maximum active and free sockets for the SDK-created default Node.js HTTP(S) agents.
+   *
+   * This only applies when `httpAgent` is not provided. Custom `httpAgent` instances own
+   * their full socket policy.
+   *
+   * @default 256
+   */
+  httpAgentMaxSockets?: number | undefined;
+
+  /**
    * Specify a custom `fetch` function implementation.
    *
    * If not provided, we use `node-fetch` on Node.js and otherwise expect that `fetch` is
@@ -358,6 +368,7 @@ export class Runloop extends Core.APIClient {
    * @param {string} [opts.baseURL=process.env['RUNLOOP_BASE_URL'] ?? https://api.runloop.ai] - Override the default base URL for the API.
    * @param {number} [opts.timeout=30 seconds] - The maximum amount of time (in milliseconds) the client will wait for a response before timing out.
    * @param {number} [opts.httpAgent] - An HTTP agent used to manage HTTP(s) connections.
+   * @param {number} [opts.httpAgentMaxSockets=256] - Maximum sockets for SDK-created default HTTP(S) agents.
    * @param {Core.Fetch} [opts.fetch] - Specify a custom `fetch` function implementation.
    * @param {boolean | H2FetchOptions} [opts.http2=false] - Send requests over HTTP/2 (Node only; ignored when `fetch` is provided). `true` uses the default bounded pool; pass H2FetchOptions to tune.
    * @param {number} [opts.maxRetries=5] - The maximum number of times the client will retry a request.
@@ -397,6 +408,7 @@ export class Runloop extends Core.APIClient {
       baseURLOverridden: baseURL ? baseURL !== 'https://api.runloop.ai' : false,
       timeout: options.timeout ?? 30000 /* 30 seconds */,
       httpAgent: options.httpAgent,
+      httpAgentMaxSockets: options.httpAgentMaxSockets,
       maxRetries: options.maxRetries,
       fetch:
         options.fetch ??

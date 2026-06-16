@@ -340,6 +340,15 @@ This is intended for debugging purposes only and may change in the future withou
 
 By default, this library uses a stable agent for all http/https requests to reuse TCP connections, eliminating many TCP & TLS handshakes and shaving around 100ms off most requests.
 
+The SDK-created default agents cap both active and free sockets at 256 per protocol. Set `httpAgentMaxSockets` to tune that cap for the default agents only:
+
+<!-- prettier-ignore -->
+```ts
+const runloop = new RunloopSDK({
+  httpAgentMaxSockets: 512,
+});
+```
+
 If you would like to disable or customize this behavior, for example to use the API behind a proxy, you can pass an `httpAgent` which is used for all requests (be they http or https), for example:
 
 <!-- prettier-ignore -->
@@ -354,6 +363,8 @@ await runloop.devboxes.create({...}, {
   httpAgent: new http.Agent({ keepAlive: false }),
 });
 ```
+
+When `httpAgent` is provided, `httpAgentMaxSockets` is ignored because the custom agent owns its socket policy.
 
 ### HTTP/2 transport
 

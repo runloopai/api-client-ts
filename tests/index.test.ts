@@ -151,6 +151,60 @@ describe('instantiate client', () => {
     }
   });
 
+  describe('httpAgentMaxSockets', () => {
+    test('bounds SDK-created default agents to 256 sockets', async () => {
+      const client = new Runloop({
+        baseURL: 'http://localhost:5000/',
+        bearerToken: 'My Bearer Token',
+      });
+
+      const { req } = await client.buildRequest({ path: '/foo', method: 'get' });
+      const agent = (req as any).agent;
+
+      expect(agent.maxSockets).toEqual(256);
+      expect(agent.maxFreeSockets).toEqual(256);
+    });
+
+    test('uses httpAgentMaxSockets for SDK-created default agents', async () => {
+      const client = new Runloop({
+        baseURL: 'https://localhost:5000/',
+        bearerToken: 'My Bearer Token',
+        httpAgentMaxSockets: 512,
+      });
+
+      const { req } = await client.buildRequest({ path: '/foo', method: 'get' });
+      const agent = (req as any).agent;
+
+      expect(agent.maxSockets).toEqual(512);
+      expect(agent.maxFreeSockets).toEqual(512);
+    });
+
+    test('custom httpAgent wins over httpAgentMaxSockets', async () => {
+      const httpAgent = { options: { timeout: 10 * 60 * 1000 } } as any;
+      const client = new Runloop({
+        baseURL: 'http://localhost:5000/',
+        bearerToken: 'My Bearer Token',
+        httpAgent,
+        httpAgentMaxSockets: 512,
+      });
+
+      const { req } = await client.buildRequest({ path: '/foo', method: 'get' });
+
+      expect((req as any).agent).toBe(httpAgent);
+    });
+
+    test('rejects non-positive httpAgentMaxSockets', () => {
+      expect(
+        () =>
+          new Runloop({
+            baseURL: 'http://localhost:5000/',
+            bearerToken: 'My Bearer Token',
+            httpAgentMaxSockets: 0,
+          }),
+      ).toThrow('httpAgentMaxSockets must be a positive integer');
+    });
+  });
+
   test('explicit global fetch', async () => {
     // make sure the global fetch type is assignable to our Fetch type
     const client = new Runloop({

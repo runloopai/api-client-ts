@@ -96,7 +96,7 @@ export function getRuntime({ manuallyImported }: { manuallyImported?: boolean } 
       ...opts,
       body: new MultipartBody(form) as any,
     }),
-    getDefaultAgent: (url: string) => undefined,
+    getDefaultAgent: (_url: string, _httpAgentMaxSockets?: number) => undefined,
     fileFromPath: () => {
       throw new Error(
         'The `fileFromPath` function is only supported in Node. See the README for more details: https://www.github.com/runloopai/api-client-ts#file-uploads',

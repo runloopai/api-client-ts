@@ -79,7 +79,7 @@ export async function getMultipartRequestOptions<T = Record<string, unknown>>(
   };
 }
 
-export function getDefaultAgent(url: string) {
+export function getDefaultAgent(_url: string, _httpAgentMaxSockets?: number) {
   return undefined;
 }
 export function fileFromPath() {

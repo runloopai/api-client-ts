@@ -79,7 +79,7 @@ export function getMultipartRequestOptions<T = Record<string, unknown>>(
   opts: RequestOptions<T>,
 ): Promise<RequestOptions<T>>;
 
-export function getDefaultAgent(url: string): any;
+export function getDefaultAgent(url: string, httpAgentMaxSockets?: number): any;
 
 // @ts-ignore
 export type FileFromPathOptions = SelectType<manual.FileFromPathOptions, auto.FileFromPathOptions>;
