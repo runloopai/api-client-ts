@@ -1,4 +1,11 @@
-import { SHORT_TIMEOUT, LONG_TIMEOUT, uniqueName, makeClientSDK, cleanUpPolicy } from '../utils';
+import {
+  SHORT_TIMEOUT,
+  LONG_TIMEOUT,
+  uniqueName,
+  makeClientSDK,
+  cleanUpPolicy,
+  createBlueprintWithRetry,
+} from '../utils';
 import { Blueprint, Devbox, NetworkPolicy, StorageObject } from '@runloop/api-client/sdk';
 
 const sdk = makeClientSDK();
@@ -10,7 +17,8 @@ describe('smoketest: object-oriented blueprint', () => {
 
     // Create blueprint in beforeAll to avoid test order dependency
     beforeAll(async () => {
-      blueprint = await sdk.blueprint.create(
+      blueprint = await createBlueprintWithRetry(
+        sdk,
         {
           name: uniqueName('sdk-blueprint'),
           dockerfile: 'FROM ubuntu:22.04\nRUN apt-get update && apt-get install -y curl',
@@ -136,7 +144,8 @@ describe('smoketest: object-oriented blueprint', () => {
           });
 
           // Create blueprint that uses the uploaded object as build context
-          blueprint = await sdk.blueprint.create(
+          blueprint = await createBlueprintWithRetry(
+            sdk,
             {
               name: uniqueName('sdk-blueprint-context'),
               dockerfile: `FROM ubuntu:22.04
@@ -218,7 +227,8 @@ COPY . .`,
           if (!contextDir) {
             throw new Error('Context directory not created');
           }
-          blueprint = await sdk.blueprint.create(
+          blueprint = await createBlueprintWithRetry(
+            sdk,
             {
               name: uniqueName('sdk-blueprint-context-dir'),
               dockerfile: `FROM ubuntu:22.04
@@ -283,7 +293,8 @@ COPY . .`,
         // First create a blueprint
         let blueprint: Blueprint | undefined;
         try {
-          blueprint = await sdk.blueprint.create(
+          blueprint = await createBlueprintWithRetry(
+            sdk,
             {
               name: uniqueName('sdk-blueprint-retrieve'),
               dockerfile: 'FROM ubuntu:22.04',
@@ -320,7 +331,8 @@ COPY . .`,
           expect(policy.id).toBeTruthy();
 
           // Create blueprint with network_policy_id at top level (for build)
-          blueprint = await sdk.blueprint.create(
+          blueprint = await createBlueprintWithRetry(
+            sdk,
             {
               name: uniqueName('sdk-blueprint-with-build-policy'),
               dockerfile: 'FROM ubuntu:22.04\nRUN apt-get update',
@@ -361,7 +373,8 @@ COPY . .`,
           expect(policy.id).toBeTruthy();
 
           // Create blueprint with launch_parameters including network_policy_id
-          blueprint = await sdk.blueprint.create(
+          blueprint = await createBlueprintWithRetry(
+            sdk,
             {
               name: uniqueName('sdk-blueprint-with-launch-policy'),
               dockerfile: 'FROM ubuntu:22.04',
