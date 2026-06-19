@@ -181,10 +181,20 @@ export class H2Session {
         const responseBody = new ReadableStream<Uint8Array>({
           start(controller) {
             stream.on('data', (chunk: Buffer) => {
-              controller.enqueue(chunk);
+              try {
+                controller.enqueue(chunk);
+              } catch {
+                // ReadableStream was cancelled while data was still in flight
+                // (consumer broke out of a for-await loop). Stop the h2 stream.
+                stream.destroy();
+              }
             });
             stream.on('end', () => {
-              controller.close();
+              try {
+                controller.close();
+              } catch {
+                // Already closed/cancelled — ignore
+              }
               cleanup();
             });
             stream.on('error', (err) => {
