@@ -85,16 +85,22 @@ async function main() {
   const totalMs = Number(process.hrtime.bigint() - t0) / 1e6;
 
   latencies.sort((a, b) => a - b);
-  console.log(JSON.stringify({
-    N,
-    failures,
-    totalMs: Math.round(totalMs),
-    rps: Math.round((N / totalMs) * 1000),
-    p50_us: Math.round(percentile(latencies, 50)),
-    p95_us: Math.round(percentile(latencies, 95)),
-    p99_us: Math.round(percentile(latencies, 99)),
-    max_us: Math.round(latencies[latencies.length - 1] ?? 0),
-  }, null, 2));
+  console.log(
+    JSON.stringify(
+      {
+        N,
+        failures,
+        totalMs: Math.round(totalMs),
+        rps: Math.round((N / totalMs) * 1000),
+        p50_us: Math.round(percentile(latencies, 50)),
+        p95_us: Math.round(percentile(latencies, 95)),
+        p99_us: Math.round(percentile(latencies, 99)),
+        max_us: Math.round(latencies[latencies.length - 1] ?? 0),
+      },
+      null,
+      2,
+    ),
+  );
 
   await fetch.close();
   server.close();

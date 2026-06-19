@@ -111,16 +111,22 @@ async function main() {
   const final = samples[samples.length - 1]?.heap ?? 0;
   const heapGrowthMB = (final - warmup) / (1024 * 1024);
 
-  console.log(JSON.stringify({
-    durationSec,
-    completed,
-    failed,
-    rps: Math.round(completed / durationSec),
-    heapWarmupMB: Math.round(warmup / (1024 * 1024)),
-    heapFinalMB: Math.round(final / (1024 * 1024)),
-    heapGrowthMB: Math.round(heapGrowthMB),
-    samples,
-  }, null, 2));
+  console.log(
+    JSON.stringify(
+      {
+        durationSec,
+        completed,
+        failed,
+        rps: Math.round(completed / durationSec),
+        heapWarmupMB: Math.round(warmup / (1024 * 1024)),
+        heapFinalMB: Math.round(final / (1024 * 1024)),
+        heapGrowthMB: Math.round(heapGrowthMB),
+        samples,
+      },
+      null,
+      2,
+    ),
+  );
 
   if (heapGrowthMB > 50) {
     console.error(`HEAP GREW BY ${heapGrowthMB.toFixed(1)}MB — possible leak`);

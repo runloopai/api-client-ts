@@ -85,7 +85,10 @@ async function main() {
   });
 
   const end = Date.now() + durationSec * 1000;
-  let getOk = 0, getFail = 0, postOk = 0, postFail = 0;
+  let getOk = 0,
+    getFail = 0,
+    postOk = 0,
+    postFail = 0;
 
   async function get() {
     try {
@@ -98,7 +101,10 @@ async function main() {
   }
   async function post() {
     try {
-      const r = (await fetch(`https://localhost:${server.port}/x`, { method: 'POST', body: 'b' } as any)) as any;
+      const r = (await fetch(`https://localhost:${server.port}/x`, {
+        method: 'POST',
+        body: 'b',
+      } as any)) as any;
       await r.text();
       postOk++;
     } catch {
@@ -107,10 +113,7 @@ async function main() {
   }
 
   while (Date.now() < end) {
-    await Promise.all([
-      ...Array.from({ length: 10 }, get),
-      ...Array.from({ length: 5 }, post),
-    ]);
+    await Promise.all([...Array.from({ length: 10 }, get), ...Array.from({ length: 5 }, post)]);
   }
 
   await fetch.close();
@@ -119,11 +122,20 @@ async function main() {
   const getRate = getOk / (getOk + getFail);
   const postClean = postFail === 0 || postOk > 0;
 
-  console.log(JSON.stringify({
-    getOk, getFail, getSuccessRate: Number(getRate.toFixed(3)),
-    postOk, postFail,
-    durationSec,
-  }, null, 2));
+  console.log(
+    JSON.stringify(
+      {
+        getOk,
+        getFail,
+        getSuccessRate: Number(getRate.toFixed(3)),
+        postOk,
+        postFail,
+        durationSec,
+      },
+      null,
+      2,
+    ),
+  );
 
   if (getRate < 0.5) {
     console.error('GET success rate too low');

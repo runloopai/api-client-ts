@@ -100,10 +100,16 @@ async function main() {
   await fetch.close();
   server.close();
 
-  console.log(JSON.stringify({
-    note: 'pool never shrinks today; peak == final is expected',
-    samples: observations.length,
-  }, null, 2));
+  console.log(
+    JSON.stringify(
+      {
+        note: 'pool never shrinks today; peak == final is expected',
+        samples: observations.length,
+      },
+      null,
+      2,
+    ),
+  );
 }
 
 main().catch((err) => {
