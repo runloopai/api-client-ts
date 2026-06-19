@@ -12,8 +12,7 @@ export class H2Response {
   readonly headers: H2Headers;
   readonly body: ReadableStream<Uint8Array>;
 
-  private _bodyConsumed = false;
-  private _bodyBytes: Buffer | null = null;
+  private _bodyPromise: Promise<Buffer> | null = null;
 
   constructor(status: number, headers: H2Headers, body: ReadableStream<Uint8Array>, url: string) {
     this.status = status;
@@ -23,21 +22,23 @@ export class H2Response {
     this.body = body;
   }
 
-  private async _consumeBody(): Promise<Buffer> {
-    if (this._bodyBytes !== null) return this._bodyBytes;
-    if (this._bodyConsumed) throw new Error('Body already consumed');
-    this._bodyConsumed = true;
-
-    const chunks: Buffer[] = [];
-    const reader = this.body.getReader();
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      chunks.push(Buffer.isBuffer(value) ? value : Buffer.from(value));
-    }
-    reader.releaseLock();
-    this._bodyBytes = Buffer.concat(chunks);
-    return this._bodyBytes;
+  private _consumeBody(): Promise<Buffer> {
+    if (this._bodyPromise) return this._bodyPromise;
+    this._bodyPromise = (async () => {
+      const chunks: Buffer[] = [];
+      const reader = this.body.getReader();
+      try {
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          chunks.push(Buffer.isBuffer(value) ? value : Buffer.from(value));
+        }
+      } finally {
+        reader.releaseLock();
+      }
+      return Buffer.concat(chunks);
+    })();
+    return this._bodyPromise;
   }
 
   async text(): Promise<string> {
@@ -52,6 +53,12 @@ export class H2Response {
 
   async arrayBuffer(): Promise<ArrayBuffer> {
     const buf = await this._consumeBody();
+    // Buffer.concat() always returns a fresh buffer with byteOffset=0 whose
+    // backing ArrayBuffer is exactly buf.byteLength bytes — no copy needed.
+    // Cast is safe: Node.js Buffers are always backed by a regular ArrayBuffer.
+    if (buf.byteOffset === 0 && buf.byteLength === buf.buffer.byteLength) {
+      return buf.buffer as ArrayBuffer;
+    }
     return buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength) as ArrayBuffer;
   }
 

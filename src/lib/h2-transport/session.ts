@@ -19,6 +19,11 @@ export interface H2SessionOptions {
 
 const DEFAULT_CONNECT_TIMEOUT = 30_000;
 
+// HTTP/2 default flow-control window is 64 KB per stream. At a typical RTT of
+// ~60 ms that caps throughput at ~1 MB/s. Set a much larger window so large
+// downloads aren't bottlenecked by round-trip-limited WINDOW_UPDATE cycles.
+const DEFAULT_INITIAL_WINDOW_SIZE = 16 * 1024 * 1024; // 16 MB
+
 const createAbortError = (): Error => Object.assign(new Error('Request aborted'), { name: 'AbortError' });
 
 export class H2Session {
@@ -56,7 +61,10 @@ export class H2Session {
     if (this._connectPromise) return this._connectPromise;
 
     this._connectPromise = new Promise<void>((resolve, reject) => {
-      const session = http2.connect(this.origin, this._opts.tlsOptions);
+      const session = http2.connect(this.origin, {
+        ...this._opts.tlsOptions,
+        settings: { initialWindowSize: DEFAULT_INITIAL_WINDOW_SIZE },
+      });
       this._session = session;
 
       const timeout = setTimeout(() => {
@@ -68,6 +76,9 @@ export class H2Session {
       session.on('connect', () => {
         clearTimeout(timeout);
         this._state = SessionState.READY;
+        // Enlarge the session-level flow-control window so the server can push
+        // large responses without stalling on WINDOW_UPDATE round trips.
+        session.setLocalWindowSize(DEFAULT_INITIAL_WINDOW_SIZE);
         resolve();
       });
 
@@ -181,10 +192,20 @@ export class H2Session {
         const responseBody = new ReadableStream<Uint8Array>({
           start(controller) {
             stream.on('data', (chunk: Buffer) => {
-              controller.enqueue(chunk);
+              try {
+                controller.enqueue(chunk);
+              } catch {
+                // ReadableStream was cancelled while data was still in flight
+                // (consumer broke out of a for-await loop). Stop the h2 stream.
+                stream.destroy();
+              }
             });
             stream.on('end', () => {
-              controller.close();
+              try {
+                controller.close();
+              } catch {
+                // Already closed/cancelled — ignore
+              }
               cleanup();
             });
             stream.on('error', (err) => {
