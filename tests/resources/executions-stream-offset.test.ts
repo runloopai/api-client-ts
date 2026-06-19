@@ -4,10 +4,7 @@ import { Executions, type ExecutionUpdateChunk } from '../../src/resources/devbo
 import { Stream } from '../../src/streaming';
 import type { Runloop } from '../../src/index';
 
-function sseChunkStreamPromise(
-  sseBody: string,
-  path: string,
-): APIPromise<Stream<ExecutionUpdateChunk>> {
+function sseChunkStreamPromise(sseBody: string, path: string): APIPromise<Stream<ExecutionUpdateChunk>> {
   const controller = new AbortController();
   const stream = Stream.fromSSEResponse(
     new Response(sseBody, { headers: { 'content-type': 'text/event-stream' } }) as any,
@@ -54,11 +51,7 @@ describe('Executions stream offset with reconnect', () => {
           pull(c) {
             pullCount += 1;
             if (pullCount === 1) {
-              c.enqueue(
-                encoder.encode(
-                  `data: ${JSON.stringify({ output: 'a', offset: 60 })}\n\n`,
-                ),
-              );
+              c.enqueue(encoder.encode(`data: ${JSON.stringify({ output: 'a', offset: 60 })}\n\n`));
             } else {
               c.error(timeout);
             }

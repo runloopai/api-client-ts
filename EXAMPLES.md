@@ -16,6 +16,7 @@ Runnable examples live in [`examples/`](./examples).
 - [Secrets with Devbox and Agent Gateway](#secrets-with-devbox)
 
 <a id="blueprint-with-build-context"></a>
+
 ## Blueprint with Build Context
 
 **Use case:** Create a blueprint using the object store to provide docker build context files, then verify files are copied into the image.
@@ -23,6 +24,7 @@ Runnable examples live in [`examples/`](./examples).
 **Tags:** `blueprint`, `object-store`, `build-context`, `devbox`, `cleanup`
 
 ### Workflow
+
 - Create a temporary directory with sample application files
 - Upload the directory to object storage as build context
 - Create a blueprint with a Dockerfile that copies the context files
@@ -31,14 +33,17 @@ Runnable examples live in [`examples/`](./examples).
 - Shutdown devbox and delete blueprint and storage object
 
 ### Prerequisites
+
 - `RUNLOOP_API_KEY`
 
 ### Run
+
 ```sh
 yarn tsn -T examples/blueprint-with-build-context.ts
 ```
 
 ### Test
+
 ```sh
 yarn test:examples
 ```
@@ -46,6 +51,7 @@ yarn test:examples
 **Source:** [`examples/blueprint-with-build-context.ts`](./examples/blueprint-with-build-context.ts)
 
 <a id="devbox-from-blueprint-lifecycle"></a>
+
 ## Devbox From Blueprint (Run Command, Shutdown)
 
 **Use case:** Create a devbox from a blueprint, run a command, fetch logs, validate output, and cleanly tear everything down.
@@ -53,6 +59,7 @@ yarn test:examples
 **Tags:** `devbox`, `blueprint`, `commands`, `logs`, `cleanup`
 
 ### Workflow
+
 - Create a blueprint
 - Fetch blueprint build logs
 - Create a devbox from the blueprint
@@ -62,14 +69,17 @@ yarn test:examples
 - Shutdown devbox and delete blueprint
 
 ### Prerequisites
+
 - `RUNLOOP_API_KEY`
 
 ### Run
+
 ```sh
 yarn tsn -T examples/devbox-from-blueprint-lifecycle.ts
 ```
 
 ### Test
+
 ```sh
 yarn test:examples
 ```
@@ -77,6 +87,7 @@ yarn test:examples
 **Source:** [`examples/devbox-from-blueprint-lifecycle.ts`](./examples/devbox-from-blueprint-lifecycle.ts)
 
 <a id="devbox-mounts"></a>
+
 ## Devbox Mounts (Agent, Code, Object)
 
 **Use case:** Launch a devbox that combines an agent mount for Claude Code, a code mount for the Runloop CLI repo, and an object mount for startup files.
@@ -84,6 +95,7 @@ yarn test:examples
 **Tags:** `devbox`, `mounts`, `agent`, `code`, `object`, `claude-code`, `agent-gateway`, `ttl`
 
 ### Workflow
+
 - Create or reuse an agent by name
 - Create a secret for an agent and route it through agent gateway
 - Upload a temporary directory as a storage object with a TTL
@@ -93,15 +105,18 @@ yarn test:examples
 - Shutdown the devbox and delete the temporary secret and object
 
 ### Prerequisites
+
 - `RUNLOOP_API_KEY`
 - `ANTHROPIC_API_KEY`
 
 ### Run
+
 ```sh
 ANTHROPIC_API_KEY=sk-ant-xxx yarn tsn -T examples/devbox-mounts.ts
 ```
 
 ### Test
+
 ```sh
 yarn test:examples
 ```
@@ -109,6 +124,7 @@ yarn test:examples
 **Source:** [`examples/devbox-mounts.ts`](./examples/devbox-mounts.ts)
 
 <a id="devbox-snapshots"></a>
+
 ## Devbox Snapshots (Suspend, Resume, Restore, Delete)
 
 **Use case:** Upload a file to a devbox, preserve it across suspend and resume, create a disk snapshot, restore multiple devboxes from that snapshot, mutate each copy independently, and delete the snapshot when finished.
@@ -116,6 +132,7 @@ yarn test:examples
 **Tags:** `devbox`, `snapshot`, `suspend`, `resume`, `files`, `cleanup`
 
 ### Workflow
+
 - Create a source devbox
 - Upload a file and mutate it into a shared baseline
 - Suspend and resume the source devbox
@@ -125,14 +142,17 @@ yarn test:examples
 - Shutdown the devboxes and delete the snapshot
 
 ### Prerequisites
+
 - `RUNLOOP_API_KEY`
 
 ### Run
+
 ```sh
 yarn tsn -T examples/devbox-snapshots.ts
 ```
 
 ### Test
+
 ```sh
 yarn test:examples
 ```
@@ -140,6 +160,7 @@ yarn test:examples
 **Source:** [`examples/devbox-snapshots.ts`](./examples/devbox-snapshots.ts)
 
 <a id="devbox-tunnel"></a>
+
 ## Devbox Tunnel (HTTP Server Access)
 
 **Use case:** Create a devbox with a tunnel, start an HTTP server, and access the server from the local machine through the tunnel.
@@ -147,6 +168,7 @@ yarn test:examples
 **Tags:** `devbox`, `tunnel`, `networking`, `http`
 
 ### Workflow
+
 - Create a devbox with a tunnel
 - Start an HTTP server inside the devbox
 - Read the tunnel details from the devbox
@@ -155,14 +177,17 @@ yarn test:examples
 - Shutdown the devbox
 
 ### Prerequisites
+
 - `RUNLOOP_API_KEY`
 
 ### Run
+
 ```sh
 yarn tsn -T examples/devbox-tunnel.ts
 ```
 
 ### Test
+
 ```sh
 yarn test:examples
 ```
@@ -170,6 +195,7 @@ yarn test:examples
 **Source:** [`examples/devbox-tunnel.ts`](./examples/devbox-tunnel.ts)
 
 <a id="mcp-github-tools"></a>
+
 ## MCP Hub + Claude Code + GitHub
 
 **Use case:** Connect Claude Code running in a devbox to GitHub tools through MCP Hub without exposing raw GitHub credentials to the devbox.
@@ -177,6 +203,7 @@ yarn test:examples
 **Tags:** `mcp`, `devbox`, `github`, `commands`, `cleanup`
 
 ### Workflow
+
 - Create an MCP config for GitHub
 - Store GitHub token as a Runloop secret
 - Launch a devbox with MCP Hub wiring
@@ -185,16 +212,19 @@ yarn test:examples
 - Shutdown devbox and clean up cloud resources
 
 ### Prerequisites
+
 - `RUNLOOP_API_KEY`
 - `GITHUB_TOKEN (GitHub PAT with repo scope)`
 - `ANTHROPIC_API_KEY`
 
 ### Run
+
 ```sh
 GITHUB_TOKEN=ghp_xxx ANTHROPIC_API_KEY=sk-ant-xxx yarn tsn -T examples/mcp-github-tools.ts
 ```
 
 ### Test
+
 ```sh
 yarn test:examples
 ```
@@ -202,6 +232,7 @@ yarn test:examples
 **Source:** [`examples/mcp-github-tools.ts`](./examples/mcp-github-tools.ts)
 
 <a id="secrets-with-devbox"></a>
+
 ## Secrets with Devbox and Agent Gateway
 
 **Use case:** Use a normal secret for sensitive app data in the devbox and agent gateway for upstream API credentials that should never be exposed to the agent.
@@ -209,6 +240,7 @@ yarn test:examples
 **Tags:** `secrets`, `devbox`, `agent-gateway`, `credentials`, `environment-variables`, `cleanup`
 
 ### Workflow
+
 - Create a secret for application data that should be available inside the devbox
 - Create a separate secret for an upstream API credential
 - Create an agent gateway config for an upstream API
@@ -217,14 +249,17 @@ yarn test:examples
 - Shutdown the devbox and delete the gateway config and both secrets
 
 ### Prerequisites
+
 - `RUNLOOP_API_KEY`
 
 ### Run
+
 ```sh
 yarn tsn -T examples/secrets-with-devbox.ts
 ```
 
 ### Test
+
 ```sh
 yarn test:examples
 ```

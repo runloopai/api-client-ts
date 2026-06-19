@@ -162,11 +162,7 @@ describe('Axon', () => {
 
         const stream = await axon.subscribeSse();
 
-        expect(mockClient.axons.subscribeSse).toHaveBeenCalledWith(
-          'axn_123456789',
-          undefined,
-          undefined,
-        );
+        expect(mockClient.axons.subscribeSse).toHaveBeenCalledWith('axn_123456789', undefined, undefined);
         expect(stream).toBe(mockStream);
       });
 
@@ -176,11 +172,9 @@ describe('Axon', () => {
 
         await axon.subscribeSse(undefined, { timeout: 60000 });
 
-        expect(mockClient.axons.subscribeSse).toHaveBeenCalledWith(
-          'axn_123456789',
-          undefined,
-          { timeout: 60000 },
-        );
+        expect(mockClient.axons.subscribeSse).toHaveBeenCalledWith('axn_123456789', undefined, {
+          timeout: 60000,
+        });
       });
     });
 
