@@ -103,18 +103,14 @@ async function main() {
       const remoteHash = remoteHashes[fname];
 
       if (buf.length !== expectedSize) {
-        console.error(
-          `  ✗ File ${n}: size mismatch — expected ${expectedSize}, got ${buf.length}`,
-        );
+        console.error(`  ✗ File ${n}: size mismatch — expected ${expectedSize}, got ${buf.length}`);
         allOk = false;
         continue;
       }
 
       const localHash = md5(buf);
       if (localHash !== remoteHash) {
-        console.error(
-          `  ✗ File ${n}: md5 mismatch — remote=${remoteHash} local=${localHash} DATA CORRUPTED`,
-        );
+        console.error(`  ✗ File ${n}: md5 mismatch — remote=${remoteHash} local=${localHash} DATA CORRUPTED`);
         allOk = false;
       } else {
         console.log(`  ✓ File ${n}: ${FILE_SIZE_MB} MB, md5 OK`);

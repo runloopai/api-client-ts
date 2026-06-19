@@ -83,10 +83,8 @@ async function testLargeExecStdout(devboxId: string) {
 
     if (result.status !== 'completed') throw new Error(`status=${result.status}`);
     const stdout = result.stdout ?? '';
-    if (stdout.length < 900_000)
-      throw new Error(`stdout too short: ${stdout.length} bytes (expected ~1 MB)`);
-    if (/\s/.test(stdout.trim()))
-      throw new Error('stdout contains unexpected whitespace (base64 wrap bug?)');
+    if (stdout.length < 900_000) throw new Error(`stdout too short: ${stdout.length} bytes (expected ~1 MB)`);
+    if (/\s/.test(stdout.trim())) throw new Error('stdout contains unexpected whitespace (base64 wrap bug?)');
 
     pass(name, `${(stdout.length / 1024).toFixed(0)} KB received`);
   } catch (err) {
@@ -144,8 +142,7 @@ async function testExecLargeStderr(devboxId: string) {
 
     if (result.status !== 'completed') throw new Error(`status=${result.status}`);
     const stderr = result.stderr ?? '';
-    if (stderr.length < 900_000)
-      throw new Error(`stderr too short: ${stderr.length} bytes (expected ~1 MB)`);
+    if (stderr.length < 900_000) throw new Error(`stderr too short: ${stderr.length} bytes (expected ~1 MB)`);
 
     pass(name, `${(stderr.length / 1024).toFixed(0)} KB received on stderr`);
   } catch (err) {
@@ -202,11 +199,8 @@ async function testLargeReadFileContents(devboxId: string) {
     });
 
     if (content.length !== expectedSize)
-      throw new Error(
-        `length mismatch: server=${expectedSize}, received=${content.length}`,
-      );
-    if (md5(content) !== remoteHash)
-      throw new Error(`md5 mismatch: remote=${remoteHash} — DATA CORRUPTED`);
+      throw new Error(`length mismatch: server=${expectedSize}, received=${content.length}`);
+    if (md5(content) !== remoteHash) throw new Error(`md5 mismatch: remote=${remoteHash} — DATA CORRUPTED`);
 
     pass(name, `${(content.length / 1024 / 1024).toFixed(1)} MB received, md5 verified`);
   } catch (err) {
@@ -308,13 +302,10 @@ async function testConcurrentLargeDownloads(devboxId: string) {
       const fileName = `loadtest-concurrent-${i}.dat`;
       const expectedHash = remoteHashes[fileName];
       if (!expectedHash) throw new Error(`no hash for ${fileName}`);
-      if (buf.length !== 5 * 1024 * 1024)
-        throw new Error(`file ${i}: size mismatch (got ${buf.length})`);
+      if (buf.length !== 5 * 1024 * 1024) throw new Error(`file ${i}: size mismatch (got ${buf.length})`);
       const localHash = md5(buf);
       if (localHash !== expectedHash)
-        throw new Error(
-          `file ${i}: md5 mismatch remote=${expectedHash} local=${localHash} — DATA CORRUPTED`,
-        );
+        throw new Error(`file ${i}: md5 mismatch remote=${expectedHash} local=${localHash} — DATA CORRUPTED`);
     }
 
     pass(name, `5 × 5 MB downloaded and verified`);
@@ -341,11 +332,9 @@ async function testSseStreamingLargeOutput(devboxId: string) {
     }
 
     const lines = received.trim().split('\n');
-    if (lines.length !== 10000)
-      throw new Error(`expected 10000 lines via SSE, got ${lines.length}`);
+    if (lines.length !== 10000) throw new Error(`expected 10000 lines via SSE, got ${lines.length}`);
     if (lines[0] !== '1') throw new Error(`first SSE line wrong: ${JSON.stringify(lines[0])}`);
-    if (lines[9999] !== '10000')
-      throw new Error(`last SSE line wrong: ${JSON.stringify(lines[9999])}`);
+    if (lines[9999] !== '10000') throw new Error(`last SSE line wrong: ${JSON.stringify(lines[9999])}`);
 
     pass(name, `${lines.length} lines streamed via SSE`);
   } catch (err) {
@@ -371,11 +360,7 @@ async function testSseEarlyCancel(devboxId: string) {
       longPoll: { timeoutMs: 30_000 },
     });
 
-    const stream = await client.devboxes.executions.streamStdoutUpdates(
-      devboxId,
-      started.execution_id,
-      {},
-    );
+    const stream = await client.devboxes.executions.streamStdoutUpdates(devboxId, started.execution_id, {});
 
     // Break after the very first event — cancels the ReadableStream immediately
     // while the h2 session still has a large backlog of DATA frames buffered.

@@ -43,11 +43,7 @@ async function main() {
     });
 
     // Stream stdout but break immediately after the first event
-    const stream = await client.devboxes.executions.streamStdoutUpdates(
-      devbox.id,
-      exec.execution_id,
-      {},
-    );
+    const stream = await client.devboxes.executions.streamStdoutUpdates(devbox.id, exec.execution_id, {});
     let count = 0;
     for await (const _chunk of stream) {
       count++;
