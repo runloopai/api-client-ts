@@ -14,6 +14,25 @@ duration. Not part of `npm test`; run on demand.
 | `h2-chaos.ts` | Server randomly drops sockets / RSTs / GOAWAYs / delays. Asserts ≥50 % GET success. |
 | `h2load.sh` | Wraps `nghttp2`'s `h2load` against a long-running test server. |
 | `sse-test.ts` | Pre-existing manual SSE round-trip. |
+| `push-to-loki.ts` | Runs all four timed tests and pushes results to Loki for Grafana. |
+
+## Automated daily runs
+
+The `.github/workflows/h2-loadtest.yml` workflow fires at 06:00 UTC every day.
+It connects to the dev Tailscale network and runs `push-to-loki.ts`, which
+executes each script with CI-appropriate durations (multiplex N=1000,
+chaos 30 s, leak 120 s) and posts one structured JSON log line per test to
+Loki under `{job="h2-loadtest", test="<name>"}`.
+
+Results are visible in the **H2 Transport Load Tests** Grafana dashboard on
+dev-grafana. Each panel uses `last_over_time(...[1d])` to produce one data
+point per daily run, so regressions show up as step changes on the trend lines.
+
+To push results from a local run (requires Tailscale + access to dev-loki):
+
+```sh
+LOKI_URL=https://dev-loki npx tsx loadtest/push-to-loki.ts
+```
 
 ## Run
 
