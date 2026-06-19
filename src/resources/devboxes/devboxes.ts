@@ -1028,11 +1028,6 @@ export interface DevboxCreateParams {
   name?: string | null;
 
   /**
-   * Repository connection id the devbox should source its base image from.
-   */
-  repo_connection_id?: string | null;
-
-  /**
    * (Optional) Map of environment variable names to secret names. The secret values
    * will be securely injected as environment variables in the Devbox. Example:
    * {"DB_PASS": "DATABASE_PASSWORD"} sets environment variable 'DB_PASS' to the

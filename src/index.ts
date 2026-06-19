@@ -84,11 +84,9 @@ import {
   StartBenchmarkRunParameters,
 } from './resources/benchmarks';
 import {
-  BlueprintBuildFromInspectionParameters,
   BlueprintBuildLog,
   BlueprintBuildLogsListView,
   BlueprintBuildParameters,
-  BlueprintCreateFromInspectionParams,
   BlueprintCreateParams,
   BlueprintDeleteResponse,
   BlueprintListParams,
@@ -99,7 +97,6 @@ import {
   BlueprintView,
   BlueprintViewsBlueprintsCursorIDPage,
   Blueprints,
-  InspectionSource,
 } from './resources/blueprints';
 import {
   GatewayConfigCreateParameters,
@@ -626,19 +623,16 @@ export declare namespace Runloop {
 
   export {
     Blueprints as Blueprints,
-    type BlueprintBuildFromInspectionParameters as BlueprintBuildFromInspectionParameters,
     type BlueprintBuildLog as BlueprintBuildLog,
     type BlueprintBuildLogsListView as BlueprintBuildLogsListView,
     type BlueprintBuildParameters as BlueprintBuildParameters,
     type BlueprintListView as BlueprintListView,
     type BlueprintPreviewView as BlueprintPreviewView,
     type BlueprintView as BlueprintView,
-    type InspectionSource as InspectionSource,
     type BlueprintDeleteResponse as BlueprintDeleteResponse,
     BlueprintViewsBlueprintsCursorIDPage as BlueprintViewsBlueprintsCursorIDPage,
     type BlueprintCreateParams as BlueprintCreateParams,
     type BlueprintListParams as BlueprintListParams,
-    type BlueprintCreateFromInspectionParams as BlueprintCreateFromInspectionParams,
     type BlueprintListPublicParams as BlueprintListPublicParams,
     type BlueprintPreviewParams as BlueprintPreviewParams,
   };
