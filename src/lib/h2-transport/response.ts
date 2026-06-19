@@ -55,10 +55,11 @@ export class H2Response {
     const buf = await this._consumeBody();
     // Buffer.concat() always returns a fresh buffer with byteOffset=0 whose
     // backing ArrayBuffer is exactly buf.byteLength bytes — no copy needed.
+    // Cast is safe: Node.js Buffers are always backed by a regular ArrayBuffer.
     if (buf.byteOffset === 0 && buf.byteLength === buf.buffer.byteLength) {
-      return buf.buffer;
+      return buf.buffer as ArrayBuffer;
     }
-    return buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength);
+    return buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength) as ArrayBuffer;
   }
 
   async blob(): Promise<Blob> {
