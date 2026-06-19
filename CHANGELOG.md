@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.24.1 (2026-06-19)
+
+Full Changelog: [v1.24.0...v1.24.1](https://github.com/runloopai/api-client-ts/compare/v1.24.0...v1.24.1)
+
+### Bug Fixes
+
+* **h2-transport:** guard enqueue after cancel; deduplicate body reads; avoid arrayBuffer copy ([#808](https://github.com/runloopai/api-client-ts/issues/808)) ([316d558](https://github.com/runloopai/api-client-ts/commit/316d55838629edc4ed534886d36e66de214917d4))
+
 ## 1.24.0 (2026-06-15)
 
 Full Changelog: [v1.23.1...v1.24.0](https://github.com/runloopai/api-client-ts/compare/v1.23.1...v1.24.0)
