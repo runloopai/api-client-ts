@@ -170,21 +170,6 @@ export class Blueprints extends APIResource {
   }
 
   /**
-   * Starts build of custom defined container Blueprint using a RepositoryConnection
-   * Inspection as a source container specification.
-   */
-  createFromInspection(
-    body: BlueprintCreateFromInspectionParams,
-    options?: Core.RequestOptions,
-  ): Core.APIPromise<BlueprintView> {
-    const errors = validateFileMounts(body?.file_mounts);
-    if (errors.length > 0) {
-      throw new Error(errors.join('; '));
-    }
-    return this._client.post('/v1/blueprints/create_from_inspection', { body, ...options });
-  }
-
-  /**
    * List all public Blueprints that are available to all users.
    */
   listPublic(
@@ -229,55 +214,6 @@ export class Blueprints extends APIResource {
 }
 
 export class BlueprintViewsBlueprintsCursorIDPage extends BlueprintsCursorIDPage<BlueprintView> {}
-
-export interface BlueprintBuildFromInspectionParameters {
-  /**
-   * (Optional) Use a RepositoryInspection a source of a Blueprint build. The
-   * Dockerfile will be automatically created based on the RepositoryInspection
-   * contents.
-   */
-  inspection_source: InspectionSource;
-
-  /**
-   * Name of the Blueprint.
-   */
-  name: string;
-
-  /**
-   * (Optional) Map of paths and file contents to write before setup.
-   */
-  file_mounts?: { [key: string]: string } | null;
-
-  /**
-   * LaunchParameters enable you to customize the resources available to your Devbox
-   * as well as the environment set up that should be completed before the Devbox is
-   * marked as 'running'.
-   */
-  launch_parameters?: Shared.LaunchParameters | null;
-
-  /**
-   * (Optional) User defined metadata for the Blueprint.
-   */
-  metadata?: { [key: string]: string } | null;
-
-  /**
-   * (Optional) ID of the network policy to apply during blueprint build. This
-   * restricts network access during the build process.
-   */
-  network_policy_id?: string | null;
-
-  /**
-   * (Optional) Map of mount IDs/environment variable names to secret names. Secrets
-   * can be used as environment variables in system_setup_commands. Example:
-   * {"GITHUB_TOKEN": "gh_secret"} makes 'gh_secret' available as GITHUB_TOKEN.
-   */
-  secrets?: { [key: string]: string } | null;
-
-  /**
-   * A list of commands to run to set up your system.
-   */
-  system_setup_commands?: Array<string> | null;
-}
 
 export interface BlueprintBuildLog {
   /**
@@ -609,21 +545,6 @@ export namespace BlueprintView {
   }
 }
 
-/**
- * Use a RepositoryInspection a source of a Blueprint build.
- */
-export interface InspectionSource {
-  /**
-   * The ID of a repository inspection.
-   */
-  inspection_id: string;
-
-  /**
-   * GitHub authentication token for accessing private repositories.
-   */
-  github_auth_token?: string | null;
-}
-
 export type BlueprintDeleteResponse = unknown;
 
 /**
@@ -800,55 +721,6 @@ export interface BlueprintListParams extends BlueprintsCursorIDPageParams {
   status?: string;
 }
 
-export interface BlueprintCreateFromInspectionParams {
-  /**
-   * (Optional) Use a RepositoryInspection a source of a Blueprint build. The
-   * Dockerfile will be automatically created based on the RepositoryInspection
-   * contents.
-   */
-  inspection_source: InspectionSource;
-
-  /**
-   * Name of the Blueprint.
-   */
-  name: string;
-
-  /**
-   * (Optional) Map of paths and file contents to write before setup.
-   */
-  file_mounts?: { [key: string]: string } | null;
-
-  /**
-   * LaunchParameters enable you to customize the resources available to your Devbox
-   * as well as the environment set up that should be completed before the Devbox is
-   * marked as 'running'.
-   */
-  launch_parameters?: Shared.LaunchParameters | null;
-
-  /**
-   * (Optional) User defined metadata for the Blueprint.
-   */
-  metadata?: { [key: string]: string } | null;
-
-  /**
-   * (Optional) ID of the network policy to apply during blueprint build. This
-   * restricts network access during the build process.
-   */
-  network_policy_id?: string | null;
-
-  /**
-   * (Optional) Map of mount IDs/environment variable names to secret names. Secrets
-   * can be used as environment variables in system_setup_commands. Example:
-   * {"GITHUB_TOKEN": "gh_secret"} makes 'gh_secret' available as GITHUB_TOKEN.
-   */
-  secrets?: { [key: string]: string } | null;
-
-  /**
-   * A list of commands to run to set up your system.
-   */
-  system_setup_commands?: Array<string> | null;
-}
-
 export interface BlueprintListPublicParams extends BlueprintsCursorIDPageParams {
   /**
    * If true (default), includes total_count in the response. Set to false to skip
@@ -1022,19 +894,16 @@ Blueprints.BlueprintViewsBlueprintsCursorIDPage = BlueprintViewsBlueprintsCursor
 
 export declare namespace Blueprints {
   export {
-    type BlueprintBuildFromInspectionParameters as BlueprintBuildFromInspectionParameters,
     type BlueprintBuildLog as BlueprintBuildLog,
     type BlueprintBuildLogsListView as BlueprintBuildLogsListView,
     type BlueprintBuildParameters as BlueprintBuildParameters,
     type BlueprintListView as BlueprintListView,
     type BlueprintPreviewView as BlueprintPreviewView,
     type BlueprintView as BlueprintView,
-    type InspectionSource as InspectionSource,
     type BlueprintDeleteResponse as BlueprintDeleteResponse,
     BlueprintViewsBlueprintsCursorIDPage as BlueprintViewsBlueprintsCursorIDPage,
     type BlueprintCreateParams as BlueprintCreateParams,
     type BlueprintListParams as BlueprintListParams,
-    type BlueprintCreateFromInspectionParams as BlueprintCreateFromInspectionParams,
     type BlueprintListPublicParams as BlueprintListPublicParams,
     type BlueprintPreviewParams as BlueprintPreviewParams,
   };
