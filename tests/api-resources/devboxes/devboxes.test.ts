@@ -78,7 +78,6 @@ describe('resource devboxes', () => {
             },
           ],
           name: 'name',
-          repo_connection_id: 'repo_connection_id',
           secrets: { foo: 'string' },
           snapshot_id: 'snapshot_id',
           tunnel: {
