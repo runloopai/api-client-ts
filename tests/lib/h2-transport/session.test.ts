@@ -2,6 +2,36 @@ import { H2Session, SessionState } from '../../../src/lib/h2-transport/session';
 import { cleanupCerts, testTls } from './helpers/certs';
 import { startBlackholeServer, startTestServer, defaultHandler, TestServer } from './helpers/testServer';
 
+async function waitFor(predicate: () => boolean, timeoutMs = 1000, stepMs = 5): Promise<boolean> {
+  const deadline = Date.now() + timeoutMs;
+  while (Date.now() < deadline) {
+    if (predicate()) return true;
+    await new Promise((r) => setTimeout(r, stepMs));
+  }
+  return predicate();
+}
+
+/**
+ * Wraps an AbortSignal to instrument `addEventListener`/`removeEventListener`
+ * for `'abort'`. Tests can assert that `activeAbortListeners() === 0` after
+ * cleanup to prove the request layer balances add/remove.
+ */
+function instrumentedAbortSignal(): { signal: AbortSignal; abort: () => void; activeAbortListeners: () => number } {
+  const ac = new AbortController();
+  let count = 0;
+  const realAdd = ac.signal.addEventListener.bind(ac.signal);
+  const realRemove = ac.signal.removeEventListener.bind(ac.signal);
+  (ac.signal as any).addEventListener = (type: string, listener: any, options?: any) => {
+    if (type === 'abort') count++;
+    return realAdd(type, listener, options);
+  };
+  (ac.signal as any).removeEventListener = (type: string, listener: any, options?: any) => {
+    if (type === 'abort') count--;
+    return realRemove(type, listener, options);
+  };
+  return { signal: ac.signal, abort: () => ac.abort(), activeAbortListeners: () => count };
+}
+
 describe('H2Session', () => {
   let server: TestServer;
 
@@ -38,7 +68,7 @@ describe('H2Session', () => {
       tlsOptions: testTls,
     });
     await expect(s.connect()).rejects.toThrow(/timeout/i);
-    blackhole.close();
+    await blackhole.close();
   });
 
   test('GET returns JSON', async () => {
@@ -113,10 +143,9 @@ describe('H2Session', () => {
     try {
       const s = new H2Session(constrained.origin, { tlsOptions: testTls });
       await s.connect();
-      // Wait for the remoteSettings event to fire after connect
-      await new Promise((r) => setTimeout(r, 50));
-      // _maxConcurrentStreams is private; read it via the test seam
-      expect((s as any)._maxConcurrentStreams).toBe(3);
+      // Poll for remoteSettings to be observed rather than sleeping a fixed amount.
+      const adopted = await waitFor(() => (s as any)._maxConcurrentStreams === 3, 2000);
+      expect(adopted).toBe(true);
       await s.close();
     } finally {
       await constrained.close();
@@ -128,8 +157,9 @@ describe('H2Session', () => {
     try {
       const s = new H2Session(constrained.origin, { maxConcurrentStreams: 5, tlsOptions: testTls });
       await s.connect();
-      await new Promise((r) => setTimeout(r, 50));
-      // The opt should win — _maxConcurrentStreams stays at 5
+      // Drive a round-trip request so we know the SETTINGS frame has been
+      // processed by the time we read _maxConcurrentStreams.
+      await (await s.request('/info', 'GET', {}, null)).text();
       expect((s as any)._maxConcurrentStreams).toBe(5);
       await s.close();
     } finally {
@@ -181,11 +211,25 @@ describe('H2Session', () => {
   test('abort signal listener is removed on success (no listener leak)', async () => {
     const s = new H2Session(server.origin, { tlsOptions: testTls });
     await s.connect();
-    const ac = new AbortController();
-    const r = await s.request('/info', 'GET', {}, null, ac.signal);
+    const ai = instrumentedAbortSignal();
+    const r = await s.request('/info', 'GET', {}, null, ai.signal);
     await r.text();
-    await new Promise((r) => setImmediate(r));
-    expect(() => ac.abort()).not.toThrow();
+    // Listener cleanup happens in stream.once('close', cleanup), so wait until
+    // the count actually goes to zero rather than racing on a single tick.
+    const settled = await waitFor(() => ai.activeAbortListeners() === 0, 500);
+    expect(settled).toBe(true);
+    await s.close();
+  });
+
+  test('abort signal listener is removed after mid-flight abort', async () => {
+    const s = new H2Session(server.origin, { tlsOptions: testTls });
+    await s.connect();
+    const ai = instrumentedAbortSignal();
+    const p = s.request('/slow?ms=5000', 'GET', {}, null, ai.signal);
+    setTimeout(ai.abort, 30);
+    await expect(p).rejects.toThrow();
+    const settled = await waitFor(() => ai.activeAbortListeners() === 0, 500);
+    expect(settled).toBe(true);
     await s.close();
   });
 

@@ -180,8 +180,9 @@ describe('h2-transport regression suite', () => {
       // around the settings race is a known sharp edge (see testing.md §9).
       const s = new H2Session(small.origin, { tlsOptions: testTls });
       await s.connect();
-      await new Promise((r) => setTimeout(r, 50)); // let remoteSettings land
-      expect((s as any)._maxConcurrentStreams).toBe(2);
+      // Poll for remoteSettings to land rather than relying on a fixed delay.
+      const adopted = await waitFor(() => (s as any)._maxConcurrentStreams === 2, 2000);
+      expect(adopted).toBe(true);
       await s.close();
     } finally {
       await small.close();

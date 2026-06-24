@@ -22,13 +22,21 @@ LOG="$(mktemp)"
 PORT=""
 
 cleanup() {
-  if [[ -n "${SERVER_PID:-}" ]]; then kill "$SERVER_PID" 2>/dev/null || true; fi
+  if [[ -n "${SERVER_PGID:-}" ]]; then
+    # Kill the entire process group so npx + the spawned node process both die.
+    kill -TERM -- "-${SERVER_PGID}" 2>/dev/null || true
+    sleep 0.2
+    kill -KILL -- "-${SERVER_PGID}" 2>/dev/null || true
+  fi
   rm -f "$LOG"
 }
-trap cleanup EXIT
+trap cleanup EXIT INT TERM
 
-( cd "$ROOT" && npx tsx loadtest/h2-multiplex-server.ts ) > "$LOG" 2>&1 &
-SERVER_PID=$!
+# Run the server in its own process group via setsid so we can signal the whole
+# group on cleanup. exec replaces the subshell so the PID we capture *is* setsid.
+setsid bash -c "cd \"$ROOT\" && exec npx tsx loadtest/h2-multiplex-server.ts" \
+  > "$LOG" 2>&1 &
+SERVER_PGID=$!
 
 for _ in $(seq 1 50); do
   if grep -q "listening on port" "$LOG" 2>/dev/null; then
@@ -45,4 +53,5 @@ if [[ -z "$PORT" ]]; then
 fi
 
 echo "h2load against https://localhost:$PORT/  (N=$N, C=$C, M=$M)"
-h2load -n "$N" -c "$C" -m "$M" "https://localhost:$PORT/"
+# -k: skip TLS verification (server uses an ephemeral self-signed cert)
+h2load -k -n "$N" -c "$C" -m "$M" "https://localhost:$PORT/"

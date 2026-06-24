@@ -5,7 +5,7 @@
  * Run: `npx tsx loadtest/h2-leak.ts [durationSeconds=600]`
  */
 import http2 from 'node:http2';
-import { execSync } from 'node:child_process';
+import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -17,8 +17,11 @@ function makeCerts() {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'h2-leak-'));
   const key = path.join(tmp, 'key.pem');
   const cert = path.join(tmp, 'cert.pem');
-  execSync(
-    `openssl req -x509 -newkey rsa:2048 -keyout ${key} -out ${cert} -days 1 -nodes -subj "/CN=localhost" 2>/dev/null`,
+  execFileSync(
+    'openssl',
+    ['req', '-x509', '-newkey', 'rsa:2048', '-keyout', key, '-out', cert,
+      '-days', '1', '-nodes', '-subj', '/CN=localhost'],
+    { stdio: ['ignore', 'ignore', 'ignore'] },
   );
   return { key: fs.readFileSync(key), cert: fs.readFileSync(cert), tmp };
 }

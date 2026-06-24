@@ -108,26 +108,29 @@ describe('integration through createH2Fetch', () => {
 
   test('concurrent requests to two origins do not cross-talk', async () => {
     const other = await startTestServer(defaultHandler);
+    const fetch = createH2Fetch({ tlsOptions: testTls });
     try {
-      const fetch = createH2Fetch({ tlsOptions: testTls });
       const [a, b] = await Promise.all([
         fetch(`${server.origin}/info`, { method: 'GET' } as any),
         fetch(`${other.origin}/info`, { method: 'GET' } as any),
       ]);
       expect((a as any).url.startsWith(server.origin)).toBe(true);
       expect((b as any).url.startsWith(other.origin)).toBe(true);
-      await fetch.close();
     } finally {
+      await fetch.close();
       await other.close();
     }
   });
 
   test('AbortSignal propagates end-to-end through createH2Fetch', async () => {
     const fetch = createH2Fetch({ tlsOptions: testTls });
-    const ac = new AbortController();
-    const p = fetch(`${server.origin}/slow?ms=5000`, { method: 'GET', signal: ac.signal } as any);
-    setTimeout(() => ac.abort(), 30);
-    await expect(p).rejects.toThrow();
-    await fetch.close();
+    try {
+      const ac = new AbortController();
+      const p = fetch(`${server.origin}/slow?ms=5000`, { method: 'GET', signal: ac.signal } as any);
+      setTimeout(() => ac.abort(), 30);
+      await expect(p).rejects.toThrow();
+    } finally {
+      await fetch.close();
+    }
   });
 });

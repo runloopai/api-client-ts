@@ -61,12 +61,31 @@ export function startTestServer(handler: StreamHandler, opts: ServerOptions = {}
         goawayAll: () =>
           new Promise<void>((res) => {
             if (sessions.size === 0) return res();
-            let remaining = sessions.size;
-            for (const session of sessions) {
-              session.once('close', () => {
-                if (--remaining === 0) res();
-              });
-              session.goaway();
+            const snapshot = [...sessions];
+            let remaining = snapshot.length;
+            const done = () => {
+              if (--remaining <= 0) {
+                clearTimeout(fallback);
+                res();
+              }
+            };
+            // Fallback: if a peer doesn't close within 1s, destroy sessions.
+            // GOAWAY does not obligate the peer to close promptly, so without
+            // this the promise could hang indefinitely.
+            const fallback = setTimeout(() => {
+              for (const s of snapshot) {
+                try {
+                  s.destroy();
+                } catch {}
+              }
+            }, 1000);
+            for (const session of snapshot) {
+              session.once('close', done);
+              try {
+                session.goaway();
+              } catch {
+                done();
+              }
             }
           }),
       });
@@ -78,7 +97,7 @@ export function startTestServer(handler: StreamHandler, opts: ServerOptions = {}
  * A raw TCP listener that accepts connections and never speaks HTTP/2.
  * Used to drive H2Session connect-timeout coverage.
  */
-export function startBlackholeServer(): Promise<{ port: number; close: () => void }> {
+export function startBlackholeServer(): Promise<{ port: number; close: () => Promise<void> }> {
   return new Promise((resolve) => {
     const sockets = new Set<net.Socket>();
     const server = net.createServer((s) => {
@@ -89,10 +108,11 @@ export function startBlackholeServer(): Promise<{ port: number; close: () => voi
       const port = (server.address() as any).port;
       resolve({
         port,
-        close: () => {
-          for (const s of sockets) s.destroy();
-          server.close();
-        },
+        close: () =>
+          new Promise<void>((res) => {
+            for (const s of sockets) s.destroy();
+            server.close(() => res());
+          }),
       });
     });
   });

@@ -8,7 +8,7 @@
  * Run: `npx tsx loadtest/h2-multiplex.ts [N=1000]`
  */
 import http2 from 'node:http2';
-import { execSync } from 'node:child_process';
+import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -20,8 +20,11 @@ function makeCerts() {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'h2-mux-'));
   const key = path.join(tmp, 'key.pem');
   const cert = path.join(tmp, 'cert.pem');
-  execSync(
-    `openssl req -x509 -newkey rsa:2048 -keyout ${key} -out ${cert} -days 1 -nodes -subj "/CN=localhost" 2>/dev/null`,
+  execFileSync(
+    'openssl',
+    ['req', '-x509', '-newkey', 'rsa:2048', '-keyout', key, '-out', cert,
+      '-days', '1', '-nodes', '-subj', '/CN=localhost'],
+    { stdio: ['ignore', 'ignore', 'ignore'] },
   );
   return { key: fs.readFileSync(key), cert: fs.readFileSync(cert), tmp };
 }
@@ -85,13 +88,16 @@ async function main() {
   const totalMs = Number(process.hrtime.bigint() - t0) / 1e6;
 
   latencies.sort((a, b) => a - b);
+  const successful = latencies.length;
   console.log(
     JSON.stringify(
       {
         N,
+        successful,
         failures,
         totalMs: Math.round(totalMs),
-        rps: Math.round((N / totalMs) * 1000),
+        attemptedRps: Math.round((N / totalMs) * 1000),
+        effectiveRps: Math.round((successful / totalMs) * 1000),
         p50_us: Math.round(percentile(latencies, 50)),
         p95_us: Math.round(percentile(latencies, 95)),
         p99_us: Math.round(percentile(latencies, 99)),
