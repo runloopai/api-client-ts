@@ -21,10 +21,19 @@ export function ensureCerts(): { key: Buffer; cert: Buffer } {
   execFileSync(
     'openssl',
     [
-      'req', '-x509', '-newkey', 'rsa:2048',
-      '-keyout', keyPath, '-out', certPath,
-      '-days', '1', '-nodes',
-      '-subj', '/CN=localhost',
+      'req',
+      '-x509',
+      '-newkey',
+      'rsa:2048',
+      '-keyout',
+      keyPath,
+      '-out',
+      certPath,
+      '-days',
+      '1',
+      '-nodes',
+      '-subj',
+      '/CN=localhost',
     ],
     { stdio: ['ignore', 'ignore', 'ignore'] },
   );

@@ -71,9 +71,7 @@ describe('H2Pool', () => {
       tlsOptions: testTls,
     });
     await pool.request('/warm', 'GET', {}, null);
-    await Promise.all(
-      Array.from({ length: 9 }, (_, i) => pool.request(`/grow/${i}`, 'GET', {}, null)),
-    );
+    await Promise.all(Array.from({ length: 9 }, (_, i) => pool.request(`/grow/${i}`, 'GET', {}, null)));
     expect((pool as any)._sessions.length).toBeGreaterThan(1);
     expect((pool as any)._sessions.length).toBeLessThanOrEqual(3);
     await pool.close();

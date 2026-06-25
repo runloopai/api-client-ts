@@ -19,8 +19,21 @@ function makeCerts() {
   const cert = path.join(tmp, 'cert.pem');
   execFileSync(
     'openssl',
-    ['req', '-x509', '-newkey', 'rsa:2048', '-keyout', key, '-out', cert,
-      '-days', '1', '-nodes', '-subj', '/CN=localhost'],
+    [
+      'req',
+      '-x509',
+      '-newkey',
+      'rsa:2048',
+      '-keyout',
+      key,
+      '-out',
+      cert,
+      '-days',
+      '1',
+      '-nodes',
+      '-subj',
+      '/CN=localhost',
+    ],
     { stdio: ['ignore', 'ignore', 'ignore'] },
   );
   return { key: fs.readFileSync(key), cert: fs.readFileSync(cert), tmp };

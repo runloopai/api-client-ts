@@ -10,7 +10,12 @@ function makeResponse(data: string | Buffer, status = 200, contentType = 'applic
       controller.close();
     },
   });
-  return new H2Response(status, new H2Headers({ 'content-type': contentType }), body, 'https://test/path?q=1');
+  return new H2Response(
+    status,
+    new H2Headers({ 'content-type': contentType }),
+    body,
+    'https://test/path?q=1',
+  );
 }
 
 describe('H2Response', () => {

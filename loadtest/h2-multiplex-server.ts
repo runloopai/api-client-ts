@@ -13,8 +13,21 @@ const keyPath = path.join(tmp, 'key.pem');
 const certPath = path.join(tmp, 'cert.pem');
 execFileSync(
   'openssl',
-  ['req', '-x509', '-newkey', 'rsa:2048', '-keyout', keyPath, '-out', certPath,
-    '-days', '1', '-nodes', '-subj', '/CN=localhost'],
+  [
+    'req',
+    '-x509',
+    '-newkey',
+    'rsa:2048',
+    '-keyout',
+    keyPath,
+    '-out',
+    certPath,
+    '-days',
+    '1',
+    '-nodes',
+    '-subj',
+    '/CN=localhost',
+  ],
   { stdio: ['ignore', 'ignore', 'ignore'] },
 );
 const payload = Buffer.from(JSON.stringify({ ok: true, data: 'x'.repeat(1000) }));

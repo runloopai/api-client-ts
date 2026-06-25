@@ -2,10 +2,7 @@ import http2 from 'node:http2';
 import net from 'node:net';
 import { ensureCerts } from './certs';
 
-export type StreamHandler = (
-  stream: http2.ServerHttp2Stream,
-  headers: http2.IncomingHttpHeaders,
-) => void;
+export type StreamHandler = (stream: http2.ServerHttp2Stream, headers: http2.IncomingHttpHeaders) => void;
 
 export interface TestServer {
   port: number;

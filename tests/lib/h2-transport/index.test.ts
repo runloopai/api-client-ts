@@ -30,7 +30,7 @@ describe('createH2Fetch', () => {
     const fetch = createH2Fetch({ tlsOptions: testTls });
     const r = (await fetch(`${server.origin}/headers`, {
       method: 'GET',
-      headers: { 'X-Mixed-Case': 'yes', 'Accept': 'application/json' },
+      headers: { 'X-Mixed-Case': 'yes', Accept: 'application/json' },
     })) as any;
     const echoed = await r.json();
     expect(echoed['x-mixed-case']).toBe('yes');

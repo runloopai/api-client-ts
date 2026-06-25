@@ -16,7 +16,11 @@ async function waitFor(predicate: () => boolean, timeoutMs = 1000, stepMs = 5): 
  * for `'abort'`. Tests can assert that `activeAbortListeners() === 0` after
  * cleanup to prove the request layer balances add/remove.
  */
-function instrumentedAbortSignal(): { signal: AbortSignal; abort: () => void; activeAbortListeners: () => number } {
+function instrumentedAbortSignal(): {
+  signal: AbortSignal;
+  abort: () => void;
+  activeAbortListeners: () => number;
+} {
   const ac = new AbortController();
   let count = 0;
   const realAdd = ac.signal.addEventListener.bind(ac.signal);
