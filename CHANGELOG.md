@@ -1,5 +1,18 @@
 # Changelog
 
+## 1.24.2 (2026-06-25)
+
+Full Changelog: [v1.24.1...v1.24.2](https://github.com/runloopai/api-client-ts/compare/v1.24.1...v1.24.2)
+
+### Bug Fixes
+
+* **blueprints:** remove create_from_inspection endpoint ([d02410b](https://github.com/runloopai/api-client-ts/commit/d02410bc1f2e3e6ff870901f48a1b42f753897ea))
+
+
+### Documentation
+
+* add agent PR guidance ([#813](https://github.com/runloopai/api-client-ts/issues/813)) ([be107b9](https://github.com/runloopai/api-client-ts/commit/be107b90195bdb1552afcfb1819812b07124a4d0))
+
 ## 1.24.1 (2026-06-19)
 
 Full Changelog: [v1.24.0...v1.24.1](https://github.com/runloopai/api-client-ts/compare/v1.24.0...v1.24.1)
