@@ -146,14 +146,12 @@ Methods:
 
 Types:
 
-- <code><a href="./src/resources/blueprints.ts">BlueprintBuildFromInspectionParameters</a></code>
 - <code><a href="./src/resources/blueprints.ts">BlueprintBuildLog</a></code>
 - <code><a href="./src/resources/blueprints.ts">BlueprintBuildLogsListView</a></code>
 - <code><a href="./src/resources/blueprints.ts">BlueprintBuildParameters</a></code>
 - <code><a href="./src/resources/blueprints.ts">BlueprintListView</a></code>
 - <code><a href="./src/resources/blueprints.ts">BlueprintPreviewView</a></code>
 - <code><a href="./src/resources/blueprints.ts">BlueprintView</a></code>
-- <code><a href="./src/resources/blueprints.ts">InspectionSource</a></code>
 - <code><a href="./src/resources/blueprints.ts">BlueprintDeleteResponse</a></code>
 
 Methods:
@@ -162,7 +160,6 @@ Methods:
 - <code title="get /v1/blueprints/{id}">client.blueprints.<a href="./src/resources/blueprints.ts">retrieve</a>(id) -> BlueprintView</code>
 - <code title="get /v1/blueprints">client.blueprints.<a href="./src/resources/blueprints.ts">list</a>({ ...params }) -> BlueprintViewsBlueprintsCursorIDPage</code>
 - <code title="post /v1/blueprints/{id}/delete">client.blueprints.<a href="./src/resources/blueprints.ts">delete</a>(id) -> unknown</code>
-- <code title="post /v1/blueprints/create_from_inspection">client.blueprints.<a href="./src/resources/blueprints.ts">createFromInspection</a>({ ...params }) -> BlueprintView</code>
 - <code title="get /v1/blueprints/list_public">client.blueprints.<a href="./src/resources/blueprints.ts">listPublic</a>({ ...params }) -> BlueprintViewsBlueprintsCursorIDPage</code>
 - <code title="get /v1/blueprints/{id}/logs">client.blueprints.<a href="./src/resources/blueprints.ts">logs</a>(id) -> BlueprintBuildLogsListView</code>
 - <code title="post /v1/blueprints/preview">client.blueprints.<a href="./src/resources/blueprints.ts">preview</a>({ ...params }) -> BlueprintPreviewView</code>
