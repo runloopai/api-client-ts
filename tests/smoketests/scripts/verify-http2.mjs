@@ -1,12 +1,12 @@
 /**
- * Plain-node verification harness for the HTTP/2 (undici) transport.
+ * Plain-node verification harness for the HTTP/2 (node:http2) transport.
  *
  * Runs OUTSIDE jest against the BUILT package — which is exactly how real
  * clients consume the SDK, and the only place a `"type": "commonjs"` interop
  * regression would surface. It proves three things a green smoke run cannot:
  *
- *   1. h2 is actually NEGOTIATED (not a silent HTTP/1.1 fallback) — asserted by
- *      reading the TLS socket's ALPN protocol via undici's diagnostics channel.
+ *   1. h2 is actually NEGOTIATED — asserted by reading the TLS socket's ALPN
+ *      protocol on every `http2.connect` session the SDK opens.
  *   2. A success response body parses (exercises Response.json()).
  *   3. A non-2xx response REJECTS with a readable error and does NOT crash the
  *      process — the exact failure mode of the old got adapter on a 401.
@@ -14,8 +14,25 @@
  * Usage: RUNLOOP_API_KEY=... [RUNLOOP_BASE_URL=...] node tests/smoketests/scripts/verify-http2.mjs
  * Exit code 0 = all checks passed, 1 = a check failed, 2 = misconfigured.
  */
-import diagnostics_channel from 'node:diagnostics_channel';
+import http2 from 'node:http2';
 import { createRequire } from 'node:module';
+
+// Capture the negotiated ALPN protocol for every H2 session the transport opens.
+// `node:http2` is a singleton module shared between this ESM harness and the CJS
+// dist bundle, so wrapping `connect` here instruments the SDK's own sessions.
+// Must be installed BEFORE the SDK is required.
+const alpnSeen = [];
+let connectCount = 0;
+const realConnect = http2.connect;
+http2.connect = function (...args) {
+  connectCount++;
+  const session = realConnect.apply(this, args);
+  session.on('connect', () => {
+    const proto = session.socket?.alpnProtocol;
+    if (proto) alpnSeen.push(proto);
+  });
+  return session;
+};
 
 const require = createRequire(import.meta.url);
 const distPath = new URL('../../../dist/index.js', import.meta.url).pathname;
@@ -27,17 +44,6 @@ if (!apiKey) {
   console.error('RUNLOOP_API_KEY is required');
   process.exit(2);
 }
-
-// Capture the negotiated ALPN protocol for every undici connection. Channels are
-// keyed by name globally, so this catches the SDK's own undici regardless of
-// which module instance created the connection.
-const alpnSeen = [];
-let connectCount = 0;
-diagnostics_channel.subscribe('undici:client:connected', (msg) => {
-  connectCount++;
-  const proto = msg?.socket?.alpnProtocol;
-  if (proto) alpnSeen.push(proto);
-});
 
 let failures = 0;
 const check = (cond, label) => {
@@ -80,8 +86,9 @@ try {
 
 // ── Pass D: HTTP/2 multiplexing — many concurrent requests reuse few connections ──
 // The whole point of the bounded H2 pool: N concurrent requests share a small number of
-// TLS sessions instead of one connection per request. Default config (pipelining=1) or the
-// pre-fix undici Agent would open ~N connections here.
+// TLS sessions instead of one connection per request. The pool eagerly opens
+// minConnections (4) sessions and only scales beyond that under stream saturation,
+// so a fresh client serving 25 concurrent requests should open exactly 4.
 try {
   const N = 25;
   const before = connectCount;
