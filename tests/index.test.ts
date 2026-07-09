@@ -99,8 +99,8 @@ describe('instantiate client', () => {
 
   test('custom fetch wins over http2', async () => {
     // When both `fetch` and `http2` are provided, the custom fetch must be used —
-    // the undici (h2) adapter should not run. Locks in src/index.ts:
-    //   fetch: options.fetch ?? (options.http2 ? makeHttp2Fetch(...) : undefined)
+    // the h2 adapter should not run. Locks in src/index.ts:
+    //   fetch: options.fetch ?? (useHttp2 ? makeHttp2Fetch(...) : undefined)
     const customFetch = jest.fn((url: RequestInfo) =>
       Promise.resolve(
         new Response(JSON.stringify({ url, custom: true }), {
@@ -135,17 +135,58 @@ describe('instantiate client', () => {
   test('warns once when http2 and httpAgent are combined', () => {
     const warn = jest.spyOn(console, 'warn').mockImplementation(() => {});
     try {
-      // http2 alone (or httpAgent alone) does not warn.
+      // Explicit http2 alone does not warn.
       new Runloop({ baseURL: 'http://localhost:5000/', bearerToken: 'My Bearer Token', http2: true });
       expect(warn).not.toHaveBeenCalled();
 
       // Combining them warns — exactly once per process (module-scoped flag), so the
       // second construction is silent.
-      const opts = { baseURL: 'http://localhost:5000/', bearerToken: 'My Bearer Token', httpAgent: {} as any };
+      const opts = {
+        baseURL: 'http://localhost:5000/',
+        bearerToken: 'My Bearer Token',
+        httpAgent: {} as any,
+      };
       new Runloop({ ...opts, http2: true });
       new Runloop({ ...opts, http2: true });
       expect(warn).toHaveBeenCalledTimes(1);
       expect(String(warn.mock.calls[0]?.[0])).toContain('httpAgent');
+    } finally {
+      warn.mockRestore();
+    }
+  });
+
+  test('httpAgent without explicit http2 stays on HTTP/1.1 and warns once', () => {
+    // HTTP/2 is the default, but a bare `httpAgent` keeps the client on HTTP/1.1 so
+    // existing agents keep working. The fallback warns once (module-scoped flag).
+    const warn = jest.spyOn(console, 'warn').mockImplementation(() => {});
+    try {
+      const opts = {
+        baseURL: 'http://localhost:5000/',
+        bearerToken: 'My Bearer Token',
+        httpAgent: {} as any,
+      };
+      new Runloop(opts);
+      new Runloop(opts);
+      expect(warn).toHaveBeenCalledTimes(1);
+      expect(String(warn.mock.calls[0]?.[0])).toContain('HTTP/1.1');
+    } finally {
+      warn.mockRestore();
+    }
+  });
+
+  test('http2: false opts out of the default HTTP/2 transport without warning', () => {
+    // Explicit opt-out is silent even alongside an httpAgent — the user has chosen
+    // HTTP/1.1 deliberately.
+    const warn = jest.spyOn(console, 'warn').mockImplementation(() => {});
+    try {
+      const client = new Runloop({
+        baseURL: 'http://localhost:5000/',
+        bearerToken: 'My Bearer Token',
+        httpAgent: {} as any,
+        http2: false,
+      });
+      expect(client).toBeDefined();
+      expect(warn).not.toHaveBeenCalled();
     } finally {
       warn.mockRestore();
     }

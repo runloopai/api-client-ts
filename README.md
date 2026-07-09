@@ -357,29 +357,27 @@ await runloop.devboxes.create({...}, {
 
 ### HTTP/2 transport
 
-On Node.js, the SDK can send requests over HTTP/2, which multiplexes many concurrent requests over a small number of TLS connections instead of opening a connection per request. Enable it with the `http2` option:
+On Node.js, the SDK sends requests over HTTP/2 **by default**, multiplexing many concurrent requests over a small number of TLS connections instead of opening a connection per request. The transport is built on Node's native `node:http2` and manages a bounded pool of persistent H2 sessions per origin, auto-scaling with load. On the web, Deno, and other runtimes the platform `fetch` already speaks HTTP/2, so this option is a no-op there.
+
+To tune the pool — for example to raise the number of connections for a high-concurrency workload — pass options as `http2`:
 
 <!-- prettier-ignore -->
 ```ts
 const runloop = new RunloopSDK({
-  http2: true,
+  http2: { maxConnections: 20 },
 });
 ```
 
-Requests are routed through an [undici](https://github.com/nodejs/undici) connection pool with HTTP/2 enabled, falling back to HTTP/1.1 for origins that don't negotiate h2 via ALPN. It is intended for HTTP/2-capable origins such as the Runloop API. This transport uses undici and therefore **requires Node.js >= 20.18.1** (see Requirements).
-
-`http2: true` uses a default bounded pool. To control the pool yourself — for example to raise the number of connections or multiplexed streams for a high-concurrency workload — pass a configured undici `Dispatcher` (such as an `Agent`) instead. The SDK uses it verbatim and does not manage its lifecycle, the same way it treats a custom `httpAgent`:
+To opt out and use the HTTP/1.1 `node-fetch` transport, set `http2: false`:
 
 <!-- prettier-ignore -->
 ```ts
-import { Agent } from 'undici';
-
 const runloop = new RunloopSDK({
-  http2: new Agent({ allowH2: true, connections: 8, pipelining: 100 }),
+  http2: false,
 });
 ```
 
-The `httpAgent` option does not apply to the HTTP/2 transport (undici has no Node `http.Agent` concept); set `http2` to a `Dispatcher` to tune connections. A one-time warning is emitted if both `http2` and `httpAgent` are provided.
+The `httpAgent` option only applies to the HTTP/1.1 transport — the H2 pool manages its own connections. Passing an `httpAgent` without an explicit `http2` value keeps the client on HTTP/1.1 (with a one-time warning); pass `http2: false` to select HTTP/1.1 explicitly and silence the warning. A custom `fetch` always takes precedence over `http2`.
 
 ## Semantic versioning
 
