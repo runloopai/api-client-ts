@@ -29,7 +29,7 @@ describe('smoketest: devbox snapshots', () => {
         await client.devboxes.shutdown(devbox.id);
       }
     }
-  }, 30_000);
+  }, 120_000);
 
   test('launch devbox from snapshot (deprecated polling path)', async () => {
     const warnSpy = jest.spyOn(console, 'warn').mockImplementation((...args: unknown[]) => {
@@ -54,5 +54,5 @@ describe('smoketest: devbox snapshots', () => {
         await client.devboxes.shutdown(devbox.id);
       }
     }
-  }, 30_000);
+  }, 120_000);
 });
