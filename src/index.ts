@@ -1,6 +1,7 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-import { type Agent, makeHttp2Fetch } from './_shims/index';
+import { type Agent } from './_shims/index';
+import { resolveHttp2Fetch } from './lib/http2-transport';
 import * as Core from './core';
 import * as Errors from './error';
 import * as Pagination from './pagination';
@@ -347,16 +348,6 @@ export interface ClientOptions {
  * console.log(result.exitCode);
  * ```
  */
-// Emitted at most once per process each (see the constructor). Module-scoped flags
-// mirror the `fileFromPathWarned` pattern in _shims/node-runtime.ts.
-//
-// `http2HttpAgentWarned`   — user explicitly set `http2` *and* `httpAgent`; the agent
-//                            is ignored on the H2 path.
-// `http2DefaultAgentWarned`— user set `httpAgent` without an explicit `http2` value, so
-//                            the client stays on HTTP/1.1 rather than the H2 default.
-let http2HttpAgentWarned = false;
-let http2DefaultAgentWarned = false;
-
 export class Runloop extends Core.APIClient {
   bearerToken: string;
 
@@ -392,56 +383,15 @@ export class Runloop extends Core.APIClient {
       baseURL: baseURL || `https://api.runloop.ai`,
     };
 
-    // Resolve the transport. HTTP/2 is the default on Node; a user-supplied
-    // `fetch` always wins, `http2: false` opts out, and a bare `httpAgent`
-    // (no explicit `http2`) keeps the client on HTTP/1.1 so existing agents
-    // keep working. `httpAgent` never applies to the H2 path — it manages its
-    // own persistent connections.
-    let useHttp2: boolean;
-    if (options.fetch) {
-      // Custom fetch owns the transport entirely.
-      useHttp2 = false;
-    } else if (options.http2 === false) {
-      useHttp2 = false;
-    } else if (options.http2) {
-      // Explicit opt-in (`true` or H2FetchOptions).
-      useHttp2 = true;
-      if (options.httpAgent && !http2HttpAgentWarned) {
-        http2HttpAgentWarned = true;
-        console.warn(
-          '[runloop] `httpAgent` is ignored when `http2` is set: the HTTP/2 transport manages ' +
-            'its own connections. To tune the H2 pool, pass options as `http2` ' +
-            '(e.g. `http2: { maxConnections: 20 }`).',
-        );
-      }
-    } else if (options.httpAgent) {
-      // Default would be H2, but a `httpAgent` was provided — respect it and
-      // stay on HTTP/1.1, warning once so the fallback isn't silent.
-      useHttp2 = false;
-      if (!http2DefaultAgentWarned) {
-        http2DefaultAgentWarned = true;
-        console.warn(
-          '[runloop] HTTP/2 is the default transport, but `httpAgent` is set, so this client ' +
-            'uses HTTP/1.1. Remove `httpAgent` to use HTTP/2, or pass `http2: false` to select ' +
-            'HTTP/1.1 explicitly and silence this warning.',
-        );
-      }
-    } else {
-      // New default: HTTP/2.
-      useHttp2 = true;
-    }
-
     super({
       baseURL: options.baseURL!,
       baseURLOverridden: baseURL ? baseURL !== 'https://api.runloop.ai' : false,
       timeout: options.timeout ?? 30000 /* 30 seconds */,
       httpAgent: options.httpAgent,
       maxRetries: options.maxRetries,
-      fetch:
-        options.fetch ??
-        (useHttp2 ?
-          makeHttp2Fetch(typeof options.http2 === 'object' ? options.http2 : undefined)
-        : undefined),
+      // HTTP/2 is the default transport on Node; a custom `fetch` always wins.
+      // See `resolveHttp2Fetch` for the `http2` / `httpAgent` resolution.
+      fetch: options.fetch ?? resolveHttp2Fetch(options),
     });
 
     const customHeadersEnv = Core.readEnv('RUNLOOP_CUSTOM_HEADERS');
