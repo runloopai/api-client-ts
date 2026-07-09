@@ -79,6 +79,10 @@ export class H2Session {
         // Enlarge the session-level flow-control window so the server can push
         // large responses without stalling on WINDOW_UPDATE round trips.
         session.setLocalWindowSize(DEFAULT_INITIAL_WINDOW_SIZE);
+        // An idle pooled session must not keep the process alive; each in-flight
+        // request re-refs the socket (see `request`) and it is unref'd again once
+        // the stream count returns to zero.
+        session.unref();
         resolve();
       });
 
@@ -140,6 +144,9 @@ export class H2Session {
 
       const stream = this._session!.request(h2Headers);
       this._activeStreams++;
+      // Keep the process alive while this request is outstanding; idle sessions
+      // are unref'd (see `connect` and `cleanup`).
+      this._session!.ref();
 
       let settled = false;
       let cleaned = false;
@@ -155,6 +162,7 @@ export class H2Session {
           stream.on('error', () => {});
           stream.destroy();
           this._activeStreams--;
+          if (this._activeStreams === 0) this._session?.unref();
           reject(createAbortError());
           return;
         }
@@ -165,6 +173,7 @@ export class H2Session {
         if (cleaned) return;
         cleaned = true;
         this._activeStreams--;
+        if (this._activeStreams === 0) this._session?.unref();
         if (signal) signal.removeEventListener('abort', onAbort);
         if (this._state === SessionState.DRAINING && this._activeStreams === 0) {
           this._close();

@@ -1,3 +1,4 @@
+import { Readable } from 'node:stream';
 import { createH2Fetch } from '../../../src/lib/h2-transport/index';
 import { cleanupCerts, testTls } from './helpers/certs';
 import { defaultHandler, startTestServer, TestServer } from './helpers/testServer';
@@ -35,7 +36,9 @@ describe('integration through createH2Fetch', () => {
     } as any)) as any;
     expect(r.headers.get('content-type')).toBe('text/event-stream');
 
-    const reader = r.body.getReader();
+    // `Response.body` is a node-fetch Node `Readable`; wrap it as a web stream
+    // to exercise incremental `getReader()` consumption.
+    const reader = Readable.toWeb(r.body).getReader();
     const decoder = new TextDecoder();
     let buf = '';
     while (true) {
