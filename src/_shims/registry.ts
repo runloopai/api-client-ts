@@ -8,12 +8,12 @@ export interface Shims {
   fetch: any;
   /**
    * Build an HTTP/2-capable `fetch`, used when the client is constructed with
-   * `{ http2: ... }`. In Node this is the undici adapter (`Agent({ allowH2: true })`);
-   * the optional `dispatcher` lets the caller pass a configured undici `Dispatcher`
-   * (the `http2: <Dispatcher>` passthrough), defaulting to the SDK's bounded pool. On
-   * the web the platform `fetch` already negotiates HTTP/2, so the argument is ignored.
+   * `{ http2: ... }`. On Node this is the native `node:http2` transport; the
+   * optional `options` tune its connection pool (the `http2: <H2FetchOptions>`
+   * passthrough), defaulting to the SDK's shared bounded pool. On the web the
+   * platform `fetch` already negotiates HTTP/2, so the argument is ignored.
    */
-  makeHttp2Fetch: (dispatcher?: any) => any;
+  makeHttp2Fetch: (options?: any) => any;
   Request: any;
   Response: any;
   Headers: any;

@@ -1,10 +1,10 @@
 /**
  * A high-performance HTTP/2 fetch adapter built on Node's native `node:http2`.
  *
- * Replaces undici for HTTP/2 transport. Manages a pool of persistent H2 sessions
- * per origin, multiplexing requests as concurrent streams. Each session handles up
- * to the server-advertised MAX_CONCURRENT_STREAMS; the pool auto-scales between
- * minConnections and maxConnections as load requires.
+ * Manages a pool of persistent H2 sessions per origin, multiplexing requests as
+ * concurrent streams. Each session handles up to the server-advertised
+ * MAX_CONCURRENT_STREAMS; the pool auto-scales between minConnections and
+ * maxConnections as load requires.
  *
  * Usage:
  *   const fetch = createH2Fetch({ maxConnections: 20 });

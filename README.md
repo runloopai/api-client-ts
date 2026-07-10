@@ -398,7 +398,7 @@ TypeScript >= 4.5 is supported.
 The following runtimes are supported:
 
 - Web browsers (Up-to-date Chrome, Firefox, Safari, Edge, and more)
-- Node.js 20.18.1 LTS or later ([non-EOL](https://endoflife.date/nodejs)) versions. (Raised from 18 because the SDK now depends on undici 7 on Node; the HTTP/2 transport needs the undici >= 7.23.0 crash fix, and the package pins `^7.26.0`.)
+- Node.js 20.18.1 LTS or later ([non-EOL](https://endoflife.date/nodejs)) versions.
 - Deno v1.28.0 or higher.
 - Bun 1.0 or later.
 - Cloudflare Workers.

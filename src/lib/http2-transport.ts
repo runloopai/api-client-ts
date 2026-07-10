@@ -3,11 +3,15 @@ import { type Fetch } from '../core';
 import type { H2FetchOptions } from './h2-transport';
 
 /**
- * Transport-selection logic for the client. Kept out of the generated
- * `src/index.ts` so the generated file only holds a one-line call-site hook.
+ * Transport-selection logic for the client, kept out of the generated
+ * `src/index.ts` (which holds only a one-line call-site hook).
  *
- * HTTP/2 is the default on Node. The web/Deno shims make {@link makeHttp2Fetch}
- * a no-op that returns the platform `fetch`, so this is effectively Node-only.
+ * This selection matters only on Node.js. There the SDK's default transport is
+ * `node-fetch`, which speaks HTTP/1.1, so using HTTP/2 means swapping in the
+ * dedicated `node:http2` transport that {@link makeHttp2Fetch} builds. On
+ * browsers, Deno, and Bun the platform `fetch` already negotiates HTTP/2, so the
+ * shim's {@link makeHttp2Fetch} simply returns that platform `fetch` and this
+ * whole resolution is effectively a no-op.
  */
 
 // A single HTTP/2 transport shared by every client that uses the default pool,

@@ -361,7 +361,7 @@ export class Runloop extends Core.APIClient {
    * @param {number} [opts.timeout=30 seconds] - The maximum amount of time (in milliseconds) the client will wait for a response before timing out.
    * @param {number} [opts.httpAgent] - An HTTP agent used to manage HTTP(s) connections.
    * @param {Core.Fetch} [opts.fetch] - Specify a custom `fetch` function implementation.
-   * @param {boolean | H2FetchOptions} [opts.http2=true] - Send requests over HTTP/2 (Node only; ignored when `fetch` is provided). Enabled by default; pass `false` to use HTTP/1.1, or H2FetchOptions to tune the pool.
+   * @param {boolean | H2FetchOptions} [opts.http2=true] - Send requests over HTTP/2. Enabled by default on Node.js; pass `false` to use HTTP/1.1, or H2FetchOptions to tune the pool. Has no effect on browsers/Deno/Bun (their platform `fetch` already uses HTTP/2) or when a custom `fetch` is provided.
    * @param {number} [opts.maxRetries=5] - The maximum number of times the client will retry a request.
    * @param {Core.Headers} opts.defaultHeaders - Default headers to include with every request to the API.
    * @param {Core.DefaultQuery} opts.defaultQuery - Default query parameters to include with every request to the API.
