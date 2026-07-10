@@ -1,0 +1,14 @@
+{
+  "name": "runloop-loadtest",
+  "private": true,
+  "scripts": {
+    "test": "tsx loadtest.ts"
+  },
+  "dependencies": {
+    "tsx": "^4.0.0",
+    "undici": "^7.26.0"
+  },
+  "devDependencies": {
+    "@types/node": "^25.9.3"
+  }
+}
