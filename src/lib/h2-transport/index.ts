@@ -1,10 +1,10 @@
 /**
  * A high-performance HTTP/2 fetch adapter built on Node's native `node:http2`.
  *
- * Replaces undici for HTTP/2 transport. Manages a pool of persistent H2 sessions
- * per origin, multiplexing requests as concurrent streams. Each session handles up
- * to the server-advertised MAX_CONCURRENT_STREAMS; the pool auto-scales between
- * minConnections and maxConnections as load requires.
+ * Manages a pool of persistent H2 sessions per origin, multiplexing requests as
+ * concurrent streams. Each session handles up to the server-advertised
+ * MAX_CONCURRENT_STREAMS; the pool auto-scales between minConnections and
+ * maxConnections as load requires.
  *
  * Usage:
  *   const fetch = createH2Fetch({ maxConnections: 20 });
@@ -17,8 +17,15 @@
 
 import { Readable } from 'node:stream';
 import { H2Pool, type H2PoolOptions } from './pool';
+import type { H2Response } from './response';
 import { MultipartBody } from '../../_shims/MultipartBody';
+import { Response } from 'node-fetch';
 import { type Fetch } from '../../core';
+
+// Statuses that must not carry a body per the Fetch spec; node-fetch's Response
+// rejects a non-null body for these. (101 is an HTTP/1.1 upgrade status and can't
+// occur over HTTP/2, so it's omitted.)
+const NULL_BODY_STATUSES = new Set([204, 205, 304]);
 
 const MIN_NODE_MAJOR = 18;
 
@@ -61,6 +68,25 @@ async function normalizeBody(body: unknown): Promise<string | Buffer | null> {
   if (ArrayBuffer.isView(body)) return Buffer.from(body.buffer, body.byteOffset, body.byteLength);
   if (body instanceof ArrayBuffer) return Buffer.from(body);
   return String(body);
+}
+
+/**
+ * Adapt an internal {@link H2Response} to a standard node-fetch `Response`, so
+ * callers get the same type the default (HTTP/1.1) transport returns — including
+ * `instanceof Response`. Body streaming is preserved: the H2 body is a web
+ * `ReadableStream`, which node-fetch consumes as a Node `Readable`.
+ */
+function toFetchResponse(h2: H2Response): Response {
+  const headers: Record<string, string> = {};
+  for (const [key, value] of h2.headers.entries()) headers[key] = value;
+
+  const body = NULL_BODY_STATUSES.has(h2.status) ? null : Readable.fromWeb(h2.body as any);
+  const response = new Response(body as any, { status: h2.status, headers });
+
+  // node-fetch derives `url` from the request internals it never saw; expose the
+  // real request URL (`Response.url` is a prototype getter, shadowed here).
+  Object.defineProperty(response, 'url', { value: h2.url, writable: true, configurable: true });
+  return response;
 }
 
 /**
@@ -109,7 +135,8 @@ export function createH2Fetch(options?: H2PoolOptions): H2Fetch {
     }
 
     const pool = getPool(parsed.origin);
-    return pool.request(path, method.toUpperCase(), reqHeaders, body, signal) as any;
+    const h2resp = await pool.request(path, method.toUpperCase(), reqHeaders, body, signal);
+    return toFetchResponse(h2resp) as any;
   }) as H2Fetch;
 
   h2Fetch.close = async () => {

@@ -357,29 +357,27 @@ await runloop.devboxes.create({...}, {
 
 ### HTTP/2 transport
 
-On Node.js, the SDK can send requests over HTTP/2, which multiplexes many concurrent requests over a small number of TLS connections instead of opening a connection per request. Enable it with the `http2` option:
+On Node.js, the SDK sends requests over HTTP/2 **by default**, multiplexing many concurrent requests over a small number of TLS connections instead of opening a connection per request. The transport is built on Node's native `node:http2` and manages a bounded pool of persistent H2 sessions per origin, auto-scaling with load. On the web, Deno, and other runtimes the platform `fetch` already speaks HTTP/2, so this option is a no-op there.
+
+To tune the pool — for example to raise the number of connections for a high-concurrency workload — pass options as `http2`:
 
 <!-- prettier-ignore -->
 ```ts
 const runloop = new RunloopSDK({
-  http2: true,
+  http2: { maxConnections: 20 },
 });
 ```
 
-Requests are routed through an [undici](https://github.com/nodejs/undici) connection pool with HTTP/2 enabled, falling back to HTTP/1.1 for origins that don't negotiate h2 via ALPN. It is intended for HTTP/2-capable origins such as the Runloop API. This transport uses undici and therefore **requires Node.js >= 20.18.1** (see Requirements).
-
-`http2: true` uses a default bounded pool. To control the pool yourself — for example to raise the number of connections or multiplexed streams for a high-concurrency workload — pass a configured undici `Dispatcher` (such as an `Agent`) instead. The SDK uses it verbatim and does not manage its lifecycle, the same way it treats a custom `httpAgent`:
+To opt out and use the HTTP/1.1 `node-fetch` transport, set `http2: false`:
 
 <!-- prettier-ignore -->
 ```ts
-import { Agent } from 'undici';
-
 const runloop = new RunloopSDK({
-  http2: new Agent({ allowH2: true, connections: 8, pipelining: 100 }),
+  http2: false,
 });
 ```
 
-The `httpAgent` option does not apply to the HTTP/2 transport (undici has no Node `http.Agent` concept); set `http2` to a `Dispatcher` to tune connections. A one-time warning is emitted if both `http2` and `httpAgent` are provided.
+The `httpAgent` option only applies to the HTTP/1.1 transport. A Node `http.Agent` configures HTTP/1.1 socket pooling (keep-alive, max sockets), which has no equivalent under HTTP/2 — the H2 transport multiplexes over its own managed connections — so `httpAgent` has no effect there. To tune HTTP/2 connection behavior, use `http2: { … }` instead. To keep an existing `httpAgent` working, passing one without an explicit `http2` value keeps the client on HTTP/1.1 (with a one-time warning); pass `http2: false` to select HTTP/1.1 explicitly and silence the warning. If both `httpAgent` and `http2` are set, `httpAgent` is ignored (also warned once). A custom `fetch` always takes precedence over `http2`.
 
 ## Semantic versioning
 
@@ -400,7 +398,7 @@ TypeScript >= 4.5 is supported.
 The following runtimes are supported:
 
 - Web browsers (Up-to-date Chrome, Firefox, Safari, Edge, and more)
-- Node.js 20.18.1 LTS or later ([non-EOL](https://endoflife.date/nodejs)) versions. (Raised from 18 because the SDK now depends on undici 7 on Node; the HTTP/2 transport needs the undici >= 7.23.0 crash fix, and the package pins `^7.26.0`.)
+- Node.js 20.18.1 LTS or later ([non-EOL](https://endoflife.date/nodejs)) versions.
 - Deno v1.28.0 or higher.
 - Bun 1.0 or later.
 - Cloudflare Workers.

@@ -1,6 +1,7 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-import { type Agent, makeHttp2Fetch } from './_shims/index';
+import { type Agent } from './_shims/index';
+import { resolveHttp2Fetch } from './lib/http2-transport';
 import * as Core from './core';
 import * as Errors from './error';
 import * as Pagination from './pagination';
@@ -294,14 +295,20 @@ export interface ClientOptions {
   /**
    * Send requests over HTTP/2 using native `node:http2` connection pools.
    *
-   * - `true` uses the SDK's default bounded HTTP/2 pool.
+   * HTTP/2 is the default transport on Node.js: it multiplexes many concurrent
+   * requests over a small number of TLS connections instead of opening one
+   * connection per request.
+   *
+   * - `true` / omitted uses the SDK's default bounded HTTP/2 pool.
    * - Pass `H2FetchOptions` to tune pool size, timeouts, etc.
+   * - `false` opts out and uses the HTTP/1.1 `node-fetch` transport.
    *
    * On the HTTP/2 path the `httpAgent` option is not used — the H2 transport
-   * manages its own persistent connections. A one-time warning is emitted if
-   * both `http2` and `httpAgent` are set.
+   * manages its own persistent connections. Passing an `httpAgent` without an
+   * explicit `http2` value keeps the client on HTTP/1.1 (with a one-time
+   * warning); pass `http2: false` to opt out silently.
    *
-   * @default false
+   * @default true
    */
   http2?: boolean | import('./lib/h2-transport').H2FetchOptions | undefined;
 
@@ -341,11 +348,6 @@ export interface ClientOptions {
  * console.log(result.exitCode);
  * ```
  */
-// Emitted at most once per process when `http2` and `httpAgent` are combined (see
-// the constructor). Module-scoped flag mirrors the `fileFromPathWarned` pattern in
-// _shims/node-runtime.ts.
-let http2HttpAgentWarned = false;
-
 export class Runloop extends Core.APIClient {
   bearerToken: string;
 
@@ -359,7 +361,7 @@ export class Runloop extends Core.APIClient {
    * @param {number} [opts.timeout=30 seconds] - The maximum amount of time (in milliseconds) the client will wait for a response before timing out.
    * @param {number} [opts.httpAgent] - An HTTP agent used to manage HTTP(s) connections.
    * @param {Core.Fetch} [opts.fetch] - Specify a custom `fetch` function implementation.
-   * @param {boolean | H2FetchOptions} [opts.http2=false] - Send requests over HTTP/2 (Node only; ignored when `fetch` is provided). `true` uses the default bounded pool; pass H2FetchOptions to tune.
+   * @param {boolean | H2FetchOptions} [opts.http2=true] - Send requests over HTTP/2. Enabled by default on Node.js; pass `false` to use HTTP/1.1, or H2FetchOptions to tune the pool. Has no effect on browsers/Deno/Bun (their platform `fetch` already uses HTTP/2) or when a custom `fetch` is provided.
    * @param {number} [opts.maxRetries=5] - The maximum number of times the client will retry a request.
    * @param {Core.Headers} opts.defaultHeaders - Default headers to include with every request to the API.
    * @param {Core.DefaultQuery} opts.defaultQuery - Default query parameters to include with every request to the API.
@@ -381,28 +383,15 @@ export class Runloop extends Core.APIClient {
       baseURL: baseURL || `https://api.runloop.ai`,
     };
 
-    // `httpAgent` does not apply to the HTTP/2 transport — it manages its own
-    // persistent connections. Warn once instead of silently ignoring.
-    if (!options.fetch && options.http2 && options.httpAgent && !http2HttpAgentWarned) {
-      http2HttpAgentWarned = true;
-      console.warn(
-        '[runloop] `httpAgent` is ignored when `http2` is set: the HTTP/2 transport manages ' +
-          'its own connections. To tune the H2 pool, pass options as `http2` ' +
-          '(e.g. `http2: { maxConnections: 20 }`).',
-      );
-    }
-
     super({
       baseURL: options.baseURL!,
       baseURLOverridden: baseURL ? baseURL !== 'https://api.runloop.ai' : false,
       timeout: options.timeout ?? 30000 /* 30 seconds */,
       httpAgent: options.httpAgent,
       maxRetries: options.maxRetries,
-      fetch:
-        options.fetch ??
-        (options.http2 ?
-          makeHttp2Fetch(typeof options.http2 === 'object' ? options.http2 : undefined)
-        : undefined),
+      // HTTP/2 is the default transport on Node; a custom `fetch` always wins.
+      // See `resolveHttp2Fetch` for the `http2` / `httpAgent` resolution.
+      fetch: options.fetch ?? resolveHttp2Fetch(options),
     });
 
     const customHeadersEnv = Core.readEnv('RUNLOOP_CUSTOM_HEADERS');
