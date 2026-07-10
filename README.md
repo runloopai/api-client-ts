@@ -377,7 +377,7 @@ const runloop = new RunloopSDK({
 });
 ```
 
-The `httpAgent` option only applies to the HTTP/1.1 transport — the H2 pool manages its own connections. Passing an `httpAgent` without an explicit `http2` value keeps the client on HTTP/1.1 (with a one-time warning); pass `http2: false` to select HTTP/1.1 explicitly and silence the warning. A custom `fetch` always takes precedence over `http2`.
+The `httpAgent` option only applies to the HTTP/1.1 transport. A Node `http.Agent` configures HTTP/1.1 socket pooling (keep-alive, max sockets), which has no equivalent under HTTP/2 — the H2 transport multiplexes over its own managed connections — so `httpAgent` has no effect there. To tune HTTP/2 connection behavior, use `http2: { … }` instead. To keep an existing `httpAgent` working, passing one without an explicit `http2` value keeps the client on HTTP/1.1 (with a one-time warning); pass `http2: false` to select HTTP/1.1 explicitly and silence the warning. If both `httpAgent` and `http2` are set, `httpAgent` is ignored (also warned once). A custom `fetch` always takes precedence over `http2`.
 
 ## Semantic versioning
 

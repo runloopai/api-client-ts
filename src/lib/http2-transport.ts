@@ -64,6 +64,11 @@ export interface Http2TransportOptions {
  * - `http2: H2FetchOptions` → a dedicated HTTP/2 pool tuned with those options.
  * - a bare `httpAgent` (no explicit `http2`) → HTTP/1.1, so existing agents keep
  *   working; warns once since it overrides the HTTP/2 default.
+ *
+ * `httpAgent` never applies to the HTTP/2 path: a Node `http.Agent` configures
+ * HTTP/1.1 socket pooling, which has no equivalent in HTTP/2's multiplexed model
+ * (its knobs live on `H2FetchOptions`). So the H2 branches ignore it, warning
+ * once, rather than pretending to honor it.
  */
 export function resolveHttp2Fetch(options: Http2TransportOptions): Fetch | undefined {
   if (options.http2 === false) return undefined;
