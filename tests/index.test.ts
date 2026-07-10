@@ -100,7 +100,7 @@ describe('instantiate client', () => {
   test('custom fetch wins over http2', async () => {
     // When both `fetch` and `http2` are provided, the custom fetch must be used —
     // the h2 adapter should not run. Locks in src/index.ts:
-    //   fetch: options.fetch ?? (useHttp2 ? makeHttp2Fetch(...) : undefined)
+    //   fetch: options.fetch ?? resolveHttp2Fetch(options)
     const customFetch = jest.fn((url: RequestInfo) =>
       Promise.resolve(
         new Response(JSON.stringify({ url, custom: true }), {

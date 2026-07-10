@@ -23,8 +23,9 @@ import { Response } from 'node-fetch';
 import { type Fetch } from '../../core';
 
 // Statuses that must not carry a body per the Fetch spec; node-fetch's Response
-// rejects a non-null body for these.
-const NULL_BODY_STATUSES = new Set([101, 204, 205, 304]);
+// rejects a non-null body for these. (101 is an HTTP/1.1 upgrade status and can't
+// occur over HTTP/2, so it's omitted.)
+const NULL_BODY_STATUSES = new Set([204, 205, 304]);
 
 const MIN_NODE_MAJOR = 18;
 
@@ -84,7 +85,7 @@ function toFetchResponse(h2: H2Response): Response {
 
   // node-fetch derives `url` from the request internals it never saw; expose the
   // real request URL (`Response.url` is a prototype getter, shadowed here).
-  Object.defineProperty(response, 'url', { value: h2.url, configurable: true });
+  Object.defineProperty(response, 'url', { value: h2.url, writable: true, configurable: true });
   return response;
 }
 
