@@ -1,5 +1,30 @@
 # Changelog
 
+## 1.25.0 (2026-07-10)
+
+Full Changelog: [v1.24.1...v1.25.0](https://github.com/runloopai/api-client-ts/compare/v1.24.1...v1.25.0)
+
+### Features
+
+* add HTTP/2 load testing infrastructure ([#798](https://github.com/runloopai/api-client-ts/issues/798)) ([ea7cc09](https://github.com/runloopai/api-client-ts/commit/ea7cc095d728c91166b84068e3ec8710fdc74e51))
+* default to HTTP/2 transport on Node ([#815](https://github.com/runloopai/api-client-ts/issues/815)) ([35dd305](https://github.com/runloopai/api-client-ts/commit/35dd305ff6b59ed7d617ac1bf99a657d054e317c))
+
+
+### Bug Fixes
+
+* **blueprints:** remove create_from_inspection endpoint ([e84b5c1](https://github.com/runloopai/api-client-ts/commit/e84b5c1a02ecf0ad07c1d41add61b14432fc4bef))
+* **smoketests:** instrument node:http2 in verify-http2.mjs, not undici ([#814](https://github.com/runloopai/api-client-ts/issues/814)) ([6ceb236](https://github.com/runloopai/api-client-ts/commit/6ceb236965305eb160788a74f365607d0ab56c5d))
+
+
+### Chores
+
+* **deps:** remove dead undici HTTP/2 adapter and dependency ([#817](https://github.com/runloopai/api-client-ts/issues/817)) ([9792541](https://github.com/runloopai/api-client-ts/commit/979254137ff02d1abea72d2d05544aee97c656b6))
+
+
+### Documentation
+
+* add agent PR guidance ([#813](https://github.com/runloopai/api-client-ts/issues/813)) ([be107b9](https://github.com/runloopai/api-client-ts/commit/be107b90195bdb1552afcfb1819812b07124a4d0))
+
 ## 1.24.1 (2026-06-19)
 
 Full Changelog: [v1.24.0...v1.24.1](https://github.com/runloopai/api-client-ts/compare/v1.24.0...v1.24.1)
