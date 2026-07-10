@@ -18,9 +18,17 @@ const body = JSON.stringify({
   launch_parameters: { resource_size_request: 'SMALL', keep_alive_time_seconds: 300 },
 });
 
-function makeRequest(index: number): Promise<{ latencyMs: number; status: number }> {
+function makeRequest(index: number): Promise<{ latencyMs: number; status: number | null }> {
   const start = performance.now();
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
+    // Settle exactly once. A request/response error or a mid-stream abort resolves
+    // with status=null (a failure) rather than hanging or rejecting the whole batch.
+    let settled = false;
+    const done = (status: number | null) => {
+      if (settled) return;
+      settled = true;
+      resolve({ latencyMs: performance.now() - start, status });
+    };
     const url = new URL('/v1/devboxes', BASE_URL);
     const req = https.request(
       url,
@@ -35,11 +43,12 @@ function makeRequest(index: number): Promise<{ latencyMs: number; status: number
       },
       (res) => {
         res.resume();
-        res.on('end', () => resolve({ latencyMs: performance.now() - start, status: res.statusCode! }));
-        res.on('error', reject);
+        res.on('end', () => done(res.statusCode ?? null));
+        res.on('aborted', () => done(null));
+        res.on('error', () => done(null));
       },
     );
-    req.on('error', reject);
+    req.on('error', () => done(null));
     req.end(body);
   });
 }
@@ -57,20 +66,23 @@ async function main() {
   const wallMs = performance.now() - wallStart;
 
   const latencies = results.map((r) => r.latencyMs).sort((a, b) => a - b);
-  const statusCounts = new Map<number, number>();
+  const statusCounts = new Map<string, number>();
   for (const r of results) {
-    statusCounts.set(r.status, (statusCounts.get(r.status) ?? 0) + 1);
+    const key = r.status != null ? String(r.status) : 'network_error';
+    statusCounts.set(key, (statusCounts.get(key) ?? 0) + 1);
   }
 
   console.log(`\nWall clock:  ${(wallMs / 1000).toFixed(2)}s`);
   console.log(`Throughput:  ${(REQUEST_COUNT / (wallMs / 1000)).toFixed(1)} req/s`);
-  console.log(`\nLatency (ms):`);
-  console.log(`  min: ${latencies[0].toFixed(1)}`);
-  console.log(`  p50: ${percentile(latencies, 50).toFixed(1)}`);
-  console.log(`  p90: ${percentile(latencies, 90).toFixed(1)}`);
-  console.log(`  p95: ${percentile(latencies, 95).toFixed(1)}`);
-  console.log(`  p99: ${percentile(latencies, 99).toFixed(1)}`);
-  console.log(`  max: ${latencies[latencies.length - 1].toFixed(1)}`);
+  if (latencies.length > 0) {
+    console.log(`\nLatency (ms):`);
+    console.log(`  min: ${latencies[0].toFixed(1)}`);
+    console.log(`  p50: ${percentile(latencies, 50).toFixed(1)}`);
+    console.log(`  p90: ${percentile(latencies, 90).toFixed(1)}`);
+    console.log(`  p95: ${percentile(latencies, 95).toFixed(1)}`);
+    console.log(`  p99: ${percentile(latencies, 99).toFixed(1)}`);
+    console.log(`  max: ${latencies[latencies.length - 1].toFixed(1)}`);
+  }
   console.log(`\nStatus codes:`);
   for (const [s, c] of [...statusCounts.entries()].sort()) console.log(`  ${s}: ${c}`);
 }

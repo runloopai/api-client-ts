@@ -46,6 +46,11 @@ function sendRequest(client: http2.ClientHttp2Session): Promise<{ latencyMs: num
 }
 
 async function main() {
+  if (!Number.isInteger(NUM_CONNECTIONS) || NUM_CONNECTIONS < 1) {
+    console.error(`NUM_CONNECTIONS must be a positive integer (got "${process.env.NUM_CONNECTIONS}")`);
+    process.exit(1);
+  }
+
   console.log(`HTTP/2 test: ${REQUEST_COUNT} requests, ${NUM_CONNECTIONS} connections to ${BASE_URL}`);
 
   const url = new URL(BASE_URL);
@@ -89,13 +94,15 @@ async function main() {
   console.log(`Connections: ${NUM_CONNECTIONS}`);
   console.log(`Wall clock:  ${(wallMs / 1000).toFixed(2)}s`);
   console.log(`Throughput:  ${(REQUEST_COUNT / (wallMs / 1000)).toFixed(1)} req/s`);
-  console.log(`\nLatency (ms):`);
-  console.log(`  min: ${latencies[0].toFixed(1)}`);
-  console.log(`  p50: ${percentile(latencies, 50).toFixed(1)}`);
-  console.log(`  p90: ${percentile(latencies, 90).toFixed(1)}`);
-  console.log(`  p95: ${percentile(latencies, 95).toFixed(1)}`);
-  console.log(`  p99: ${percentile(latencies, 99).toFixed(1)}`);
-  console.log(`  max: ${latencies[latencies.length - 1].toFixed(1)}`);
+  if (latencies.length > 0) {
+    console.log(`\nLatency (ms):`);
+    console.log(`  min: ${latencies[0].toFixed(1)}`);
+    console.log(`  p50: ${percentile(latencies, 50).toFixed(1)}`);
+    console.log(`  p90: ${percentile(latencies, 90).toFixed(1)}`);
+    console.log(`  p95: ${percentile(latencies, 95).toFixed(1)}`);
+    console.log(`  p99: ${percentile(latencies, 99).toFixed(1)}`);
+    console.log(`  max: ${latencies[latencies.length - 1].toFixed(1)}`);
+  }
   console.log(`\nStatus codes:`);
   for (const [s, c] of [...statusCounts.entries()].sort()) console.log(`  ${s}: ${c}`);
 }

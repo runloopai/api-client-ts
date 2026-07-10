@@ -44,20 +44,27 @@ async function main() {
 
   const wallStart = performance.now();
 
+  // Collect per-request results (never reject): one transient network error must
+  // not fail-fast the whole batch and discard every other completed measurement.
   const promises = Array.from({ length: REQUEST_COUNT }, async () => {
     const start = performance.now();
-    const res = await fetch(`${BASE_URL}/v1/devboxes`, {
-      method: 'POST',
-      headers: {
-        'content-type': 'application/json',
-        authorization: `Bearer ${API_KEY}`,
-      },
-      body,
-      dispatcher,
-    } as any);
-    await res.text();
-    completed++;
-    return { latencyMs: performance.now() - start, status: res.status };
+    try {
+      const res = await fetch(`${BASE_URL}/v1/devboxes`, {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+          authorization: `Bearer ${API_KEY}`,
+        },
+        body,
+        dispatcher,
+      } as any);
+      await res.text();
+      return { latencyMs: performance.now() - start, status: res.status as number | null };
+    } catch {
+      return { latencyMs: performance.now() - start, status: null as number | null };
+    } finally {
+      completed++;
+    }
   });
 
   const results = await Promise.all(promises);
@@ -67,22 +74,25 @@ async function main() {
   await dispatcher.close();
 
   const latencies = results.map((r) => r.latencyMs).sort((a, b) => a - b);
-  const statusCounts = new Map<number, number>();
+  const statusCounts = new Map<string, number>();
   for (const r of results) {
-    statusCounts.set(r.status, (statusCounts.get(r.status) ?? 0) + 1);
+    const key = r.status != null ? String(r.status) : 'network_error';
+    statusCounts.set(key, (statusCounts.get(key) ?? 0) + 1);
   }
 
   console.log(`\n=== undici Direct Results ===`);
   console.log(`Requests:    ${REQUEST_COUNT}`);
   console.log(`Wall clock:  ${(wallMs / 1000).toFixed(2)}s`);
   console.log(`Throughput:  ${(REQUEST_COUNT / (wallMs / 1000)).toFixed(1)} req/s`);
-  console.log(`\nLatency (ms):`);
-  console.log(`  min: ${latencies[0].toFixed(1)}`);
-  console.log(`  p50: ${percentile(latencies, 50).toFixed(1)}`);
-  console.log(`  p90: ${percentile(latencies, 90).toFixed(1)}`);
-  console.log(`  p95: ${percentile(latencies, 95).toFixed(1)}`);
-  console.log(`  p99: ${percentile(latencies, 99).toFixed(1)}`);
-  console.log(`  max: ${latencies[latencies.length - 1].toFixed(1)}`);
+  if (latencies.length > 0) {
+    console.log(`\nLatency (ms):`);
+    console.log(`  min: ${latencies[0].toFixed(1)}`);
+    console.log(`  p50: ${percentile(latencies, 50).toFixed(1)}`);
+    console.log(`  p90: ${percentile(latencies, 90).toFixed(1)}`);
+    console.log(`  p95: ${percentile(latencies, 95).toFixed(1)}`);
+    console.log(`  p99: ${percentile(latencies, 99).toFixed(1)}`);
+    console.log(`  max: ${latencies[latencies.length - 1].toFixed(1)}`);
+  }
   console.log(`\nStatus codes:`);
   for (const [s, c] of [...statusCounts.entries()].sort()) console.log(`  ${s}: ${c}`);
 }

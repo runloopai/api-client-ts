@@ -83,14 +83,16 @@ function printMetrics(results: RequestResult[], wallClockMs: number): void {
   console.log(`Wall clock:      ${(wallClockMs / 1000).toFixed(2)}s`);
   console.log(`Throughput:      ${(results.length / (wallClockMs / 1000)).toFixed(1)} req/s`);
   console.log('');
-  console.log('Latency (ms):');
-  console.log(`  min:           ${latencies[0].toFixed(1)}`);
-  console.log(`  p50:           ${percentile(latencies, 50).toFixed(1)}`);
-  console.log(`  p90:           ${percentile(latencies, 90).toFixed(1)}`);
-  console.log(`  p95:           ${percentile(latencies, 95).toFixed(1)}`);
-  console.log(`  p99:           ${percentile(latencies, 99).toFixed(1)}`);
-  console.log(`  max:           ${latencies[latencies.length - 1].toFixed(1)}`);
-  console.log('');
+  if (latencies.length > 0) {
+    console.log('Latency (ms):');
+    console.log(`  min:           ${latencies[0].toFixed(1)}`);
+    console.log(`  p50:           ${percentile(latencies, 50).toFixed(1)}`);
+    console.log(`  p90:           ${percentile(latencies, 90).toFixed(1)}`);
+    console.log(`  p95:           ${percentile(latencies, 95).toFixed(1)}`);
+    console.log(`  p99:           ${percentile(latencies, 99).toFixed(1)}`);
+    console.log(`  max:           ${latencies[latencies.length - 1].toFixed(1)}`);
+    console.log('');
+  }
   console.log('Status codes:');
   for (const [status, count] of [...statusCounts.entries()].sort()) {
     console.log(`  ${status}: ${count}`);
