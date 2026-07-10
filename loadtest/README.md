@@ -6,15 +6,47 @@ duration. Not part of `npm test`; run on demand.
 
 ## Scripts
 
-| Script | Purpose |
-|---|---|
-| `h2-multiplex.ts` | Fire N concurrent requests, report throughput + p50/p95/p99. |
-| `h2-pool-growth.ts` | Ramp 1 → 50 → 200 → 50 → 1 concurrent. Observe pool size over time. |
-| `h2-leak.ts` | Soak at 50 r/s. Sample heap + FD count. Periodic GOAWAY injection. |
-| `h2-chaos.ts` | Server randomly drops sockets / RSTs / GOAWAYs / delays. Asserts ≥50 % GET success. |
-| `h2load.sh` | Wraps `nghttp2`'s `h2load` against a long-running test server. |
-| `sse-test.ts` | Pre-existing manual SSE round-trip. |
-| `push-to-loki.ts` | Runs all four timed tests and pushes results to Loki for Grafana. |
+| Script              | Purpose                                                                             |
+| ------------------- | ----------------------------------------------------------------------------------- |
+| `h2-multiplex.ts`   | Fire N concurrent requests, report throughput + p50/p95/p99.                        |
+| `h2-pool-growth.ts` | Ramp 1 → 50 → 200 → 50 → 1 concurrent. Observe pool size over time.                 |
+| `h2-leak.ts`        | Soak at 50 r/s. Sample heap + FD count. Periodic GOAWAY injection.                  |
+| `h2-chaos.ts`       | Server randomly drops sockets / RSTs / GOAWAYs / delays. Asserts ≥50 % GET success. |
+| `h2load.sh`         | Wraps `nghttp2`'s `h2load` against a long-running test server.                      |
+| `sse-test.ts`       | Pre-existing manual SSE round-trip.                                                 |
+| `push-to-loki.ts`   | Runs all four timed tests and pushes results to Loki for Grafana.                   |
+
+## End-to-end transport comparison (real API)
+
+Unlike the in-process scripts above, these hit a real Runloop API (`RUNLOOP_API_KEY`,
+optional `RUNLOOP_BASE_URL`). They send a burst of `devboxes.create` calls against a
+**deliberately nonexistent blueprint** (`bp_nonexistent_loadtest_00000`), so every
+request fails fast server-side (HTTP `400`) and **no devboxes are created** — isolating
+client + server _request handling_ from provisioning.
+
+| Script                                                       | Transport under test                                                                                                                                                                                   |
+| ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `loadtest.ts`                                                | The **SDK** itself. `USE_HTTP2=0` → HTTP/1.1 (`node-fetch`); default / `USE_HTTP2=1` → HTTP/2 (native `node:http2`). Imports `../src/sdk.ts`, so it always runs against the SDK code in this checkout. |
+| `undici-test.ts`, `undici-single-conn.ts`, `undici-debug.ts` | Raw [undici](https://github.com/nodejs/undici) HTTP/2 pool, bypassing the SDK.                                                                                                                         |
+| `h2-test.ts`, `h2-single-conn.ts`                            | Raw `node:http2`, bypassing the SDK.                                                                                                                                                                   |
+| `raw-fetch-test.ts`                                          | Raw `node:https` (HTTP/1.1 keep-alive agent).                                                                                                                                                          |
+| `alpn-check.ts`                                              | Confirms the origin negotiates `h2` via TLS ALPN.                                                                                                                                                      |
+
+The raw-transport probes compare undici's HTTP/2 multiplexing against `node:http2`
+(and HTTP/1.1) directly — the comparison that motivated building the SDK's own
+`node:http2` transport. They're kept so that comparison stays reproducible.
+
+```sh
+# SDK: HTTP/2 (default) vs HTTP/1.1, 2000-request burst
+source ~/env && REQUEST_COUNT=2000 npx tsx loadtest/loadtest.ts                 # HTTP/2
+source ~/env && REQUEST_COUNT=2000 USE_HTTP2=0 npx tsx loadtest/loadtest.ts     # HTTP/1.1
+
+# Raw undici vs node:http2 comparison (undici comes from loadtest/package.json)
+cd loadtest && npm install && source ~/env && npx tsx undici-test.ts
+```
+
+HTTP/1.1 opens a socket per in-flight request; for large bursts raise the file-descriptor
+limit (`ulimit -n 65536`) or keep `REQUEST_COUNT` under it.
 
 ## Automated daily runs
 

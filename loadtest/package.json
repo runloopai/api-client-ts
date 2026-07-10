@@ -1,12 +1,10 @@
 {
   "name": "runloop-loadtest",
   "private": true,
-  "type": "module",
   "scripts": {
     "test": "tsx loadtest.ts"
   },
   "dependencies": {
-    "@runloop/api-client": "file:..",
     "tsx": "^4.0.0",
     "undici": "^7.26.0"
   },
