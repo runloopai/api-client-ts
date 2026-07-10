@@ -1,16 +1,16 @@
-import http2 from "node:http2";
+import http2 from 'node:http2';
 
-const REQUEST_COUNT = parseInt(process.env.REQUEST_COUNT ?? "10000", 10);
-const NUM_CONNECTIONS = parseInt(process.env.NUM_CONNECTIONS ?? "10", 10);
-const BASE_URL = process.env.RUNLOOP_BASE_URL ?? "https://api.runloop.pro";
+const REQUEST_COUNT = parseInt(process.env.REQUEST_COUNT ?? '10000', 10);
+const NUM_CONNECTIONS = parseInt(process.env.NUM_CONNECTIONS ?? '10', 10);
+const BASE_URL = process.env.RUNLOOP_BASE_URL ?? 'https://api.runloop.pro';
 const API_KEY = process.env.RUNLOOP_API_KEY!;
 
 const body = JSON.stringify({
-  blueprint_id: "bp_nonexistent_loadtest_00000",
-  name: "loadtest-h2-0",
-  environment_variables: { TEST_VAR_1: "value_one", TEST_VAR_2: "value_two" },
-  metadata: { test_run: "h2", index: "0" },
-  launch_parameters: { resource_size_request: "SMALL", keep_alive_time_seconds: 300 },
+  blueprint_id: 'bp_nonexistent_loadtest_00000',
+  name: 'loadtest-h2-0',
+  environment_variables: { TEST_VAR_1: 'value_one', TEST_VAR_2: 'value_two' },
+  metadata: { test_run: 'h2', index: '0' },
+  launch_parameters: { resource_size_request: 'SMALL', keep_alive_time_seconds: 300 },
 });
 
 function percentile(sorted: number[], p: number): number {
@@ -21,44 +21,38 @@ function percentile(sorted: number[], p: number): number {
 function connectH2(origin: string): Promise<http2.ClientHttp2Session> {
   return new Promise((resolve, reject) => {
     const client = http2.connect(origin);
-    client.on("connect", () => resolve(client));
-    client.on("error", reject);
+    client.on('connect', () => resolve(client));
+    client.on('error', reject);
   });
 }
 
-function sendRequest(
-  client: http2.ClientHttp2Session,
-): Promise<{ latencyMs: number; status: number }> {
+function sendRequest(client: http2.ClientHttp2Session): Promise<{ latencyMs: number; status: number }> {
   return new Promise((resolve, reject) => {
     const start = performance.now();
     const req = client.request({
-      ":method": "POST",
-      ":path": "/v1/devboxes",
-      "content-type": "application/json",
+      ':method': 'POST',
+      ':path': '/v1/devboxes',
+      'content-type': 'application/json',
       authorization: `Bearer ${API_KEY}`,
     });
-    req.on("response", (headers) => {
-      const status = headers[":status"] as number;
-      req.on("data", () => {});
-      req.on("end", () => resolve({ latencyMs: performance.now() - start, status }));
+    req.on('response', (headers) => {
+      const status = headers[':status'] as number;
+      req.on('data', () => {});
+      req.on('end', () => resolve({ latencyMs: performance.now() - start, status }));
     });
-    req.on("error", reject);
+    req.on('error', reject);
     req.end(body);
   });
 }
 
 async function main() {
-  console.log(
-    `HTTP/2 test: ${REQUEST_COUNT} requests, ${NUM_CONNECTIONS} connections to ${BASE_URL}`,
-  );
+  console.log(`HTTP/2 test: ${REQUEST_COUNT} requests, ${NUM_CONNECTIONS} connections to ${BASE_URL}`);
 
   const url = new URL(BASE_URL);
-  const clients = await Promise.all(
-    Array.from({ length: NUM_CONNECTIONS }, () => connectH2(url.origin)),
-  );
+  const clients = await Promise.all(Array.from({ length: NUM_CONNECTIONS }, () => connectH2(url.origin)));
 
   const maxStreams = clients[0].remoteSettings?.maxConcurrentStreams;
-  console.log(`Server MAX_CONCURRENT_STREAMS: ${maxStreams ?? "unknown"}`);
+  console.log(`Server MAX_CONCURRENT_STREAMS: ${maxStreams ?? 'unknown'}`);
   console.log(`${NUM_CONNECTIONS} connections established\n`);
 
   let completed = 0;

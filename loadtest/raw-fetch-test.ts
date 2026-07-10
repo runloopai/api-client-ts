@@ -1,7 +1,7 @@
-import https from "node:https";
+import https from 'node:https';
 
-const REQUEST_COUNT = parseInt(process.env.REQUEST_COUNT ?? "10000", 10);
-const BASE_URL = process.env.RUNLOOP_BASE_URL ?? "https://api.runloop.pro";
+const REQUEST_COUNT = parseInt(process.env.REQUEST_COUNT ?? '10000', 10);
+const BASE_URL = process.env.RUNLOOP_BASE_URL ?? 'https://api.runloop.pro';
 const API_KEY = process.env.RUNLOOP_API_KEY!;
 
 const agent = new https.Agent({
@@ -11,37 +11,35 @@ const agent = new https.Agent({
 });
 
 const body = JSON.stringify({
-  blueprint_id: "bp_nonexistent_loadtest_00000",
-  name: "loadtest-raw-0",
-  environment_variables: { TEST_VAR_1: "value_one", TEST_VAR_2: "value_two" },
-  metadata: { test_run: "raw", index: "0" },
-  launch_parameters: { resource_size_request: "SMALL", keep_alive_time_seconds: 300 },
+  blueprint_id: 'bp_nonexistent_loadtest_00000',
+  name: 'loadtest-raw-0',
+  environment_variables: { TEST_VAR_1: 'value_one', TEST_VAR_2: 'value_two' },
+  metadata: { test_run: 'raw', index: '0' },
+  launch_parameters: { resource_size_request: 'SMALL', keep_alive_time_seconds: 300 },
 });
 
 function makeRequest(index: number): Promise<{ latencyMs: number; status: number }> {
   const start = performance.now();
   return new Promise((resolve, reject) => {
-    const url = new URL("/v1/devboxes", BASE_URL);
+    const url = new URL('/v1/devboxes', BASE_URL);
     const req = https.request(
       url,
       {
-        method: "POST",
+        method: 'POST',
         agent,
         headers: {
-          "content-type": "application/json",
+          'content-type': 'application/json',
           authorization: `Bearer ${API_KEY}`,
-          "content-length": Buffer.byteLength(body).toString(),
+          'content-length': Buffer.byteLength(body).toString(),
         },
       },
       (res) => {
         res.resume();
-        res.on("end", () =>
-          resolve({ latencyMs: performance.now() - start, status: res.statusCode! }),
-        );
-        res.on("error", reject);
+        res.on('end', () => resolve({ latencyMs: performance.now() - start, status: res.statusCode! }));
+        res.on('error', reject);
       },
     );
-    req.on("error", reject);
+    req.on('error', reject);
     req.end(body);
   });
 }
@@ -55,9 +53,7 @@ async function main() {
   console.log(`Raw node:https test: ${REQUEST_COUNT} concurrent requests to ${BASE_URL}`);
 
   const wallStart = performance.now();
-  const results = await Promise.all(
-    Array.from({ length: REQUEST_COUNT }, (_, i) => makeRequest(i)),
-  );
+  const results = await Promise.all(Array.from({ length: REQUEST_COUNT }, (_, i) => makeRequest(i)));
   const wallMs = performance.now() - wallStart;
 
   const latencies = results.map((r) => r.latencyMs).sort((a, b) => a - b);

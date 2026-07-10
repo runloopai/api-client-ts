@@ -1,17 +1,17 @@
-import { Agent, fetch } from "undici";
+import { Agent, fetch } from 'undici';
 
-const BASE_URL = process.env.RUNLOOP_BASE_URL ?? "https://api.runloop.pro";
+const BASE_URL = process.env.RUNLOOP_BASE_URL ?? 'https://api.runloop.pro';
 const API_KEY = process.env.RUNLOOP_API_KEY!;
 
 const body = JSON.stringify({
-  blueprint_id: "bp_nonexistent_loadtest_00000",
-  name: "loadtest-debug-0",
-  environment_variables: { TEST_VAR_1: "value_one" },
-  launch_parameters: { resource_size_request: "SMALL" },
+  blueprint_id: 'bp_nonexistent_loadtest_00000',
+  name: 'loadtest-debug-0',
+  environment_variables: { TEST_VAR_1: 'value_one' },
+  launch_parameters: { resource_size_request: 'SMALL' },
 });
 
 async function main() {
-  console.log("=== undici HTTP/2 debug ===\n");
+  console.log('=== undici HTTP/2 debug ===\n');
 
   const dispatcher = new Agent({
     allowH2: true,
@@ -24,31 +24,31 @@ async function main() {
 
   // Single request to inspect protocol
   const res = await fetch(`${BASE_URL}/v1/devboxes`, {
-    method: "POST",
+    method: 'POST',
     headers: {
-      "content-type": "application/json",
+      'content-type': 'application/json',
       authorization: `Bearer ${API_KEY}`,
     },
     body,
     dispatcher,
   } as any);
 
-  console.log("Status:", res.status);
-  console.log("HTTP version:", res.headers.get("x-http-version") ?? "(not reported)");
-  console.log("\nResponse headers:");
+  console.log('Status:', res.status);
+  console.log('HTTP version:', res.headers.get('x-http-version') ?? '(not reported)');
+  console.log('\nResponse headers:');
   for (const [k, v] of res.headers) {
     console.log(`  ${k}: ${v}`);
   }
   await res.text();
 
   // Quick 20-request burst to verify concurrency
-  console.log("\n--- 20-request burst (2 connections, pipelining=10) ---");
+  console.log('\n--- 20-request burst (2 connections, pipelining=10) ---');
   const wallStart = performance.now();
   const promises = Array.from({ length: 20 }, async () => {
     const start = performance.now();
     const r = await fetch(`${BASE_URL}/v1/devboxes`, {
-      method: "POST",
-      headers: { "content-type": "application/json", authorization: `Bearer ${API_KEY}` },
+      method: 'POST',
+      headers: { 'content-type': 'application/json', authorization: `Bearer ${API_KEY}` },
       body,
       dispatcher,
     } as any);

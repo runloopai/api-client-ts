@@ -1,17 +1,17 @@
-import { Agent, fetch } from "undici";
+import { Agent, fetch } from 'undici';
 
-const REQUEST_COUNT = parseInt(process.env.REQUEST_COUNT ?? "10000", 10);
-const NUM_CONNECTIONS = parseInt(process.env.NUM_CONNECTIONS ?? "20", 10);
-const PIPELINING = parseInt(process.env.PIPELINING ?? "128", 10);
-const BASE_URL = process.env.RUNLOOP_BASE_URL ?? "https://api.runloop.pro";
+const REQUEST_COUNT = parseInt(process.env.REQUEST_COUNT ?? '10000', 10);
+const NUM_CONNECTIONS = parseInt(process.env.NUM_CONNECTIONS ?? '20', 10);
+const PIPELINING = parseInt(process.env.PIPELINING ?? '128', 10);
+const BASE_URL = process.env.RUNLOOP_BASE_URL ?? 'https://api.runloop.pro';
 const API_KEY = process.env.RUNLOOP_API_KEY!;
 
 const body = JSON.stringify({
-  blueprint_id: "bp_nonexistent_loadtest_00000",
-  name: "loadtest-undici-0",
-  environment_variables: { TEST_VAR_1: "value_one", TEST_VAR_2: "value_two" },
-  metadata: { test_run: "undici", index: "0" },
-  launch_parameters: { resource_size_request: "SMALL", keep_alive_time_seconds: 300 },
+  blueprint_id: 'bp_nonexistent_loadtest_00000',
+  name: 'loadtest-undici-0',
+  environment_variables: { TEST_VAR_1: 'value_one', TEST_VAR_2: 'value_two' },
+  metadata: { test_run: 'undici', index: '0' },
+  launch_parameters: { resource_size_request: 'SMALL', keep_alive_time_seconds: 300 },
 });
 
 function percentile(sorted: number[], p: number): number {
@@ -47,9 +47,9 @@ async function main() {
   const promises = Array.from({ length: REQUEST_COUNT }, async () => {
     const start = performance.now();
     const res = await fetch(`${BASE_URL}/v1/devboxes`, {
-      method: "POST",
+      method: 'POST',
       headers: {
-        "content-type": "application/json",
+        'content-type': 'application/json',
         authorization: `Bearer ${API_KEY}`,
       },
       body,
