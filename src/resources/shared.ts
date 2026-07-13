@@ -155,20 +155,20 @@ export interface BrokerMount {
 
   /**
    * Binary to launch the agent (e.g., 'opencode'). Used by protocols that launch a
-   * subprocess (acp, claude_json).
+   * subprocess (acp, claude_json, codex_json).
    */
   agent_binary?: string | null;
 
   /**
    * Arguments to pass to the agent command (e.g., ['acp']). Used by protocols that
-   * launch a subprocess (acp, claude_json).
+   * launch a subprocess (acp, claude_json, codex_json).
    */
   launch_args?: Array<string> | null;
 
   /**
    * The protocol used by the broker to deliver events to the agent.
    */
-  protocol?: 'acp' | 'claude_json' | null;
+  protocol?: 'acp' | 'claude_json' | 'codex_json' | null;
 
   /**
    * Working directory in which to launch the agent binary. Defaults to the home
