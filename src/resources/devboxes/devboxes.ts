@@ -852,6 +852,7 @@ export interface DevboxView {
    */
   status:
     | 'scheduled'
+    | 'queued'
     | 'provisioning'
     | 'initializing'
     | 'running'
@@ -941,8 +942,9 @@ export namespace DevboxView {
     /**
      * The status of the Devbox.
      *
-     * scheduled: The Devbox is scheduled to run but infrastructure allocation has not
-     * started yet. provisioning: Runloop is allocating and booting the necessary
+     * scheduled: Deprecated. The Devbox is waiting for infrastructure allocation to
+     * start. Use queued. queued: The Devbox is waiting for infrastructure allocation
+     * to start. provisioning: Runloop is allocating and booting the necessary
      * infrastructure resources. initializing: Runloop defined boot scripts are running
      * to enable the environment for interaction. running: The Devbox is ready for
      * interaction. suspending: The Devbox disk is being snapshotted as part of
@@ -954,6 +956,7 @@ export namespace DevboxView {
      */
     status?:
       | 'scheduled'
+      | 'queued'
       | 'provisioning'
       | 'initializing'
       | 'running'
@@ -1280,6 +1283,7 @@ export interface DevboxListParams extends DevboxesCursorIDPageParams {
    */
   status?:
     | 'scheduled'
+    | 'queued'
     | 'provisioning'
     | 'initializing'
     | 'running'
