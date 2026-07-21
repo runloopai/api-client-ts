@@ -54,6 +54,7 @@ describe('resource benchmarkRuns', () => {
           include_total_count: true,
           limit: 0,
           name: 'name',
+          search: 'search',
           starting_after: 'starting_after',
           state: 'state',
         },
@@ -124,6 +125,7 @@ describe('resource benchmarkRuns', () => {
         {
           include_total_count: true,
           limit: 0,
+          search: 'search',
           starting_after: 'starting_after',
           state: 'running',
         },

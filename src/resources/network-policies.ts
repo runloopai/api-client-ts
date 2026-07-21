@@ -355,6 +355,11 @@ export interface NetworkPolicyListParams extends NetworkPoliciesCursorIDPagePara
    * Filter by name (partial match supported).
    */
   name?: string;
+
+  /**
+   * Search by network policy ID or name.
+   */
+  search?: string;
 }
 
 export interface NetworkPolicyDeleteParams {}
