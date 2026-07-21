@@ -178,6 +178,11 @@ export interface BenchmarkRunListParams extends BenchmarkRunsCursorIDPageParams 
   name?: string;
 
   /**
+   * Search by benchmark run ID or name.
+   */
+  search?: string;
+
+  /**
    * Filter by state
    */
   state?: string;
@@ -189,6 +194,11 @@ export interface BenchmarkRunListScenarioRunsParams extends BenchmarkRunsCursorI
    * the count query for better performance on large datasets.
    */
   include_total_count?: boolean;
+
+  /**
+   * Search by scenario run ID or name.
+   */
+  search?: string;
 
   /**
    * Filter by Scenario Run state

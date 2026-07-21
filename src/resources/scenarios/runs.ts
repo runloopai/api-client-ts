@@ -98,6 +98,11 @@ export interface RunListParams extends BenchmarkRunsCursorIDPageParams {
   scenario_id?: string;
 
   /**
+   * Search by scenario run ID or name.
+   */
+  search?: string;
+
+  /**
    * Filter by state
    */
   state?: string;
