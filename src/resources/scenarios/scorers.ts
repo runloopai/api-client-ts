@@ -169,6 +169,11 @@ export interface ScorerListParams extends ScenarioScorersCursorIDPageParams {
    * the count query for better performance on large datasets.
    */
   include_total_count?: boolean;
+
+  /**
+   * Search by scenario scorer ID or type.
+   */
+  search?: string;
 }
 
 Scorers.ScorerListResponsesScenarioScorersCursorIDPage = ScorerListResponsesScenarioScorersCursorIDPage;

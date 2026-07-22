@@ -1,5 +1,22 @@
 # Changelog
 
+## 1.26.0 (2026-07-22)
+
+Full Changelog: [v1.25.0...v1.26.0](https://github.com/runloopai/api-client-ts/compare/v1.25.0...v1.26.0)
+
+### Features
+
+* **api:** add codex broker mount protocol and axon attach enum value ([#10186](https://github.com/runloopai/api-client-ts/issues/10186)) ([113c92b](https://github.com/runloopai/api-client-ts/commit/113c92b26df3a3f1846583afa1558da3bb3a1f22))
+* **devbox:** rename scheduled -&gt; queued ([#10217](https://github.com/runloopai/api-client-ts/issues/10217)) ([6b3e488](https://github.com/runloopai/api-client-ts/commit/6b3e4881fb713efe154a12c3a79b1e905b7e1925))
+* **mux:** expose CIDR egress rules on the network policy API ([#10269](https://github.com/runloopai/api-client-ts/issues/10269)) ([ec9fef0](https://github.com/runloopai/api-client-ts/commit/ec9fef0d1424671cc377fc0456e62461036c37ac))
+* **network:** add allow_runloop_mirrors egress flag to network policies ([#10350](https://github.com/runloopai/api-client-ts/issues/10350)) ([45d2036](https://github.com/runloopai/api-client-ts/commit/45d20369b986e19e696dccbd551aec78a40039aa))
+* **stlc:** configurable CI runner and private-production-repo support in workflow templates ([9e8ca6e](https://github.com/runloopai/api-client-ts/commit/9e8ca6e3d68602fdbfe738f926bb962ae536ebd7))
+
+
+### Bug Fixes
+
+* **mux:** uniform id/name search across list endpoints, close cross-tenant IDOR ([#10267](https://github.com/runloopai/api-client-ts/issues/10267)) ([70e6a27](https://github.com/runloopai/api-client-ts/commit/70e6a27a76ddd29494cf69b881702e3a9ad112d7))
+
 ## 1.25.0 (2026-07-10)
 
 Full Changelog: [v1.24.1...v1.25.0](https://github.com/runloopai/api-client-ts/compare/v1.24.1...v1.25.0)

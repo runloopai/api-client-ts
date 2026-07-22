@@ -348,6 +348,11 @@ export interface GatewayConfigListParams extends GatewayConfigsCursorIDPageParam
    * Filter by name (partial match supported).
    */
   name?: string;
+
+  /**
+   * Search by gateway config ID or name.
+   */
+  search?: string;
 }
 
 export interface GatewayConfigDeleteParams {}

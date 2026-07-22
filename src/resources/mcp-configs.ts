@@ -254,6 +254,11 @@ export interface McpConfigListParams extends McpConfigsCursorIDPageParams {
    * Filter by name (prefix match supported).
    */
   name?: string;
+
+  /**
+   * Search by MCP config ID or name.
+   */
+  search?: string;
 }
 
 export interface McpConfigDeleteParams {}

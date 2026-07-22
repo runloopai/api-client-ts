@@ -427,6 +427,11 @@ export interface BenchmarkListParams extends BenchmarksCursorIDPageParams {
    * Filter by name
    */
   name?: string;
+
+  /**
+   * Search by benchmark ID or name.
+   */
+  search?: string;
 }
 
 export interface BenchmarkDefinitionsParams {
@@ -447,6 +452,16 @@ export interface BenchmarkListPublicParams extends BenchmarksCursorIDPageParams 
    * the count query for better performance on large datasets.
    */
   include_total_count?: boolean;
+
+  /**
+   * Filter by name
+   */
+  name?: string;
+
+  /**
+   * Search by benchmark ID or name.
+   */
+  search?: string;
 }
 
 export interface BenchmarkStartRunParams {

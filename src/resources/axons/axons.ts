@@ -243,6 +243,11 @@ export interface AxonListParams extends AxonsCursorIDPageParams {
    * Filter by axon name (prefix match supported).
    */
   name?: string;
+
+  /**
+   * Search by axon ID or name.
+   */
+  search?: string;
 }
 
 export interface AxonPublishParams {
