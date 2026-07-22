@@ -147,10 +147,12 @@ export {
 export {
   NetworkPolicyViewsNetworkPoliciesCursorIDPage,
   NetworkPolicies,
+  type AllowedCidr,
   type NetworkPolicyCreateParameters,
   type NetworkPolicyListView,
   type NetworkPolicyUpdateParameters,
   type NetworkPolicyView,
+  type PortRule,
   type NetworkPolicyCreateParams,
   type NetworkPolicyUpdateParams,
   type NetworkPolicyListParams,

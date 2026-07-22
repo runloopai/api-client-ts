@@ -27,6 +27,18 @@ describe('resource networkPolicies', () => {
       allow_all: true,
       allow_devbox_to_devbox: true,
       allow_mcp_gateway: true,
+      allowed_cidrs: [
+        {
+          cidr: 'cidr',
+          ports: [
+            {
+              port: 0,
+              end_port: 0,
+              protocol: 'TCP',
+            },
+          ],
+        },
+      ],
       allowed_hostnames: ['string'],
       description: 'description',
     });
@@ -78,6 +90,18 @@ describe('resource networkPolicies', () => {
           allow_all: true,
           allow_devbox_to_devbox: true,
           allow_mcp_gateway: true,
+          allowed_cidrs: [
+            {
+              cidr: 'cidr',
+              ports: [
+                {
+                  port: 0,
+                  end_port: 0,
+                  protocol: 'TCP',
+                },
+              ],
+            },
+          ],
           allowed_hostnames: ['string'],
           description: 'description',
           name: 'name',
