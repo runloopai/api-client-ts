@@ -123,6 +123,7 @@ import {
   McpConfigs,
 } from './resources/mcp-configs';
 import {
+  AllowedCidr,
   NetworkPolicies,
   NetworkPolicyCreateParameters,
   NetworkPolicyCreateParams,
@@ -133,6 +134,7 @@ import {
   NetworkPolicyUpdateParams,
   NetworkPolicyView,
   NetworkPolicyViewsNetworkPoliciesCursorIDPage,
+  PortRule,
 } from './resources/network-policies';
 import {
   ObjectCompleteParams,
@@ -738,10 +740,12 @@ export declare namespace Runloop {
 
   export {
     NetworkPolicies as NetworkPolicies,
+    type AllowedCidr as AllowedCidr,
     type NetworkPolicyCreateParameters as NetworkPolicyCreateParameters,
     type NetworkPolicyListView as NetworkPolicyListView,
     type NetworkPolicyUpdateParameters as NetworkPolicyUpdateParameters,
     type NetworkPolicyView as NetworkPolicyView,
+    type PortRule as PortRule,
     NetworkPolicyViewsNetworkPoliciesCursorIDPage as NetworkPolicyViewsNetworkPoliciesCursorIDPage,
     type NetworkPolicyCreateParams as NetworkPolicyCreateParams,
     type NetworkPolicyUpdateParams as NetworkPolicyUpdateParams,

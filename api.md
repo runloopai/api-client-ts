@@ -364,10 +364,12 @@ Methods:
 
 Types:
 
+- <code><a href="./src/resources/network-policies.ts">AllowedCidr</a></code>
 - <code><a href="./src/resources/network-policies.ts">NetworkPolicyCreateParameters</a></code>
 - <code><a href="./src/resources/network-policies.ts">NetworkPolicyListView</a></code>
 - <code><a href="./src/resources/network-policies.ts">NetworkPolicyUpdateParameters</a></code>
 - <code><a href="./src/resources/network-policies.ts">NetworkPolicyView</a></code>
+- <code><a href="./src/resources/network-policies.ts">PortRule</a></code>
 
 Methods:
 

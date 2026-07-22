@@ -3,6 +3,7 @@
 import { APIResource } from '../resource';
 import { isRequestOptions } from '../core';
 import * as Core from '../core';
+import * as NetworkPoliciesAPI from './network-policies';
 import { NetworkPoliciesCursorIDPage, type NetworkPoliciesCursorIDPageParams } from '../pagination';
 
 export class NetworkPolicies extends APIResource {
@@ -79,6 +80,22 @@ export class NetworkPolicies extends APIResource {
 export class NetworkPolicyViewsNetworkPoliciesCursorIDPage extends NetworkPoliciesCursorIDPage<NetworkPolicyView> {}
 
 /**
+ * A CIDR-based egress allow rule with optional port restrictions.
+ */
+export interface AllowedCidr {
+  /**
+   * IPv4 CIDR block in canonical form (host bits zero), e.g. '10.12.0.0/16'.
+   */
+  cidr: string;
+
+  /**
+   * (Optional) Ports allowed for this CIDR. Empty or omitted means all ports and
+   * protocols.
+   */
+  ports?: Array<PortRule> | null;
+}
+
+/**
  * Parameters required to create a new NetworkPolicy.
  */
 export interface NetworkPolicyCreateParameters {
@@ -112,6 +129,13 @@ export interface NetworkPolicyCreateParameters {
    * Defaults to false.
    */
   allow_mcp_gateway?: boolean | null;
+
+  /**
+   * (Optional) IPv4 CIDR-based allow list with optional port restrictions, additive
+   * with allowed_hostnames. Example: [{'cidr': '10.12.0.0/16', 'ports': [{'port':
+   * 443}]}].
+   */
+  allowed_cidrs?: Array<AllowedCidr> | null;
 
   /**
    * (Optional) DNS-based allow list with wildcard support. Examples: ['github.com',
@@ -168,6 +192,12 @@ export interface NetworkPolicyUpdateParameters {
    * If true, allows devbox egress to the MCP hub.
    */
   allow_mcp_gateway?: boolean | null;
+
+  /**
+   * Updated IPv4 CIDR-based allow list with optional port restrictions, additive
+   * with allowed_hostnames.
+   */
+  allowed_cidrs?: Array<AllowedCidr> | null;
 
   /**
    * Updated DNS-based allow list with wildcard support. Examples: ['github.com',
@@ -249,12 +279,38 @@ export namespace NetworkPolicyView {
     allow_mcp_gateway: boolean;
 
     /**
+     * CIDR-based allow list with optional port restrictions, additive with
+     * allowed_hostnames.
+     */
+    allowed_cidrs: Array<NetworkPoliciesAPI.AllowedCidr>;
+
+    /**
      * DNS-based allow list with wildcard support. Examples: ['github.com',
      * '*.npmjs.org', 'api.openai.com']. Empty list with allow_all=false means no
      * network access (DENY_ALL behavior).
      */
     allowed_hostnames: Array<string>;
   }
+}
+
+/**
+ * A port or port range allowed for a CIDR egress rule.
+ */
+export interface PortRule {
+  /**
+   * The allowed port (1-65535), or the start of a port range.
+   */
+  port: number;
+
+  /**
+   * (Optional) Inclusive end of the port range (port-65535). Omit for a single port.
+   */
+  end_port?: number | null;
+
+  /**
+   * L4 protocol for a port rule.
+   */
+  protocol?: 'TCP' | 'UDP' | null;
 }
 
 export interface NetworkPolicyCreateParams {
@@ -290,6 +346,13 @@ export interface NetworkPolicyCreateParams {
   allow_mcp_gateway?: boolean | null;
 
   /**
+   * (Optional) IPv4 CIDR-based allow list with optional port restrictions, additive
+   * with allowed_hostnames. Example: [{'cidr': '10.12.0.0/16', 'ports': [{'port':
+   * 443}]}].
+   */
+  allowed_cidrs?: Array<AllowedCidr> | null;
+
+  /**
    * (Optional) DNS-based allow list with wildcard support. Examples: ['github.com',
    * '*.npmjs.org'].
    */
@@ -321,6 +384,12 @@ export interface NetworkPolicyUpdateParams {
    * If true, allows devbox egress to the MCP hub.
    */
   allow_mcp_gateway?: boolean | null;
+
+  /**
+   * Updated IPv4 CIDR-based allow list with optional port restrictions, additive
+   * with allowed_hostnames.
+   */
+  allowed_cidrs?: Array<AllowedCidr> | null;
 
   /**
    * Updated DNS-based allow list with wildcard support. Examples: ['github.com',
@@ -368,10 +437,12 @@ NetworkPolicies.NetworkPolicyViewsNetworkPoliciesCursorIDPage = NetworkPolicyVie
 
 export declare namespace NetworkPolicies {
   export {
+    type AllowedCidr as AllowedCidr,
     type NetworkPolicyCreateParameters as NetworkPolicyCreateParameters,
     type NetworkPolicyListView as NetworkPolicyListView,
     type NetworkPolicyUpdateParameters as NetworkPolicyUpdateParameters,
     type NetworkPolicyView as NetworkPolicyView,
+    type PortRule as PortRule,
     NetworkPolicyViewsNetworkPoliciesCursorIDPage as NetworkPolicyViewsNetworkPoliciesCursorIDPage,
     type NetworkPolicyCreateParams as NetworkPolicyCreateParams,
     type NetworkPolicyUpdateParams as NetworkPolicyUpdateParams,
