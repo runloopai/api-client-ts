@@ -27,6 +27,7 @@ describe('resource networkPolicies', () => {
       allow_all: true,
       allow_devbox_to_devbox: true,
       allow_mcp_gateway: true,
+      allow_runloop_mirrors: true,
       allowed_cidrs: [
         {
           cidr: 'cidr',
@@ -90,6 +91,7 @@ describe('resource networkPolicies', () => {
           allow_all: true,
           allow_devbox_to_devbox: true,
           allow_mcp_gateway: true,
+          allow_runloop_mirrors: true,
           allowed_cidrs: [
             {
               cidr: 'cidr',

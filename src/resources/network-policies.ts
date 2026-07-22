@@ -131,6 +131,12 @@ export interface NetworkPolicyCreateParameters {
   allow_mcp_gateway?: boolean | null;
 
   /**
+   * (Optional) If true, allows devbox egress to Runloop's package/image registry
+   * mirrors. Defaults to false. Implicitly allowed when allow_all is true.
+   */
+  allow_runloop_mirrors?: boolean | null;
+
+  /**
    * (Optional) IPv4 CIDR-based allow list with optional port restrictions, additive
    * with allowed_hostnames. Example: [{'cidr': '10.12.0.0/16', 'ports': [{'port':
    * 443}]}].
@@ -192,6 +198,12 @@ export interface NetworkPolicyUpdateParameters {
    * If true, allows devbox egress to the MCP hub.
    */
   allow_mcp_gateway?: boolean | null;
+
+  /**
+   * If true, allows devbox egress to Runloop's package/image registry mirrors.
+   * Implicitly allowed when allow_all is true.
+   */
+  allow_runloop_mirrors?: boolean | null;
 
   /**
    * Updated IPv4 CIDR-based allow list with optional port restrictions, additive
@@ -279,6 +291,12 @@ export namespace NetworkPolicyView {
     allow_mcp_gateway: boolean;
 
     /**
+     * If true, allows devbox egress to Runloop's package/image registry mirrors.
+     * Implicitly allowed when allow_all is true.
+     */
+    allow_runloop_mirrors: boolean;
+
+    /**
      * CIDR-based allow list with optional port restrictions, additive with
      * allowed_hostnames.
      */
@@ -346,6 +364,12 @@ export interface NetworkPolicyCreateParams {
   allow_mcp_gateway?: boolean | null;
 
   /**
+   * (Optional) If true, allows devbox egress to Runloop's package/image registry
+   * mirrors. Defaults to false. Implicitly allowed when allow_all is true.
+   */
+  allow_runloop_mirrors?: boolean | null;
+
+  /**
    * (Optional) IPv4 CIDR-based allow list with optional port restrictions, additive
    * with allowed_hostnames. Example: [{'cidr': '10.12.0.0/16', 'ports': [{'port':
    * 443}]}].
@@ -384,6 +408,12 @@ export interface NetworkPolicyUpdateParams {
    * If true, allows devbox egress to the MCP hub.
    */
   allow_mcp_gateway?: boolean | null;
+
+  /**
+   * If true, allows devbox egress to Runloop's package/image registry mirrors.
+   * Implicitly allowed when allow_all is true.
+   */
+  allow_runloop_mirrors?: boolean | null;
 
   /**
    * Updated IPv4 CIDR-based allow list with optional port restrictions, additive
