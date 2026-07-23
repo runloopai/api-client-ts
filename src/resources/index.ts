@@ -103,6 +103,7 @@ export {
   type DevboxReadFileContentsResponse,
   type DevboxRemoveTunnelResponse,
   type DevboxUploadFileResponse,
+  type DevboxWatchEvictionsResponse,
   type DevboxCreateParams,
   type DevboxUpdateParams,
   type DevboxListParams,

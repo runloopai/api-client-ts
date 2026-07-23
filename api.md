@@ -186,6 +186,7 @@ Types:
 - <code><a href="./src/resources/devboxes/devboxes.ts">DevboxReadFileContentsResponse</a></code>
 - <code><a href="./src/resources/devboxes/devboxes.ts">DevboxRemoveTunnelResponse</a></code>
 - <code><a href="./src/resources/devboxes/devboxes.ts">DevboxUploadFileResponse</a></code>
+- <code><a href="./src/resources/devboxes/devboxes.ts">DevboxWatchEvictionsResponse</a></code>
 
 Methods:
 
@@ -213,6 +214,7 @@ Methods:
 - <code title="post /v1/devboxes/{id}/suspend">client.devboxes.<a href="./src/resources/devboxes/devboxes.ts">suspend</a>(id) -> DevboxView</code>
 - <code title="post /v1/devboxes/{id}/upload_file">client.devboxes.<a href="./src/resources/devboxes/devboxes.ts">uploadFile</a>(id, { ...params }) -> unknown</code>
 - <code title="post /v1/devboxes/{devbox_id}/executions/{execution_id}/wait_for_status">client.devboxes.<a href="./src/resources/devboxes/devboxes.ts">waitForCommand</a>(devboxId, executionId, { ...params }) -> DevboxAsyncExecutionDetailView</code>
+- <code title="get /v1/devboxes/watch_evictions">client.devboxes.<a href="./src/resources/devboxes/devboxes.ts">watchEvictions</a>() -> DevboxWatchEvictionsResponse</code>
 - <code title="post /v1/devboxes/{id}/write_file_contents">client.devboxes.<a href="./src/resources/devboxes/devboxes.ts">writeFileContents</a>(id, { ...params }) -> DevboxExecutionDetailView</code>
 
 ## DiskSnapshots
