@@ -1036,20 +1036,21 @@ export class Devbox {
    *
    * The first `onEvict` across any devbox on this client opens a single account-wide
    * notification stream; it closes automatically once every registered devbox has been
-   * notified. The callback runs at most once and receives the eviction event (with its
-   * `eviction_deadline_ms`) — use it to run cleanup before the devbox is suspended.
+   * notified. The callback runs at most once and is invoked as
+   * `callback(devbox, evictionDeadlineMs)` — this devbox and the Unix millisecond
+   * deadline by which it will be suspended. Use it to run cleanup before suspend.
    *
-   * @param {EvictionCallback} callback - Invoked with the eviction event for this devbox.
+   * @param {EvictionCallback} callback - Invoked with this devbox and its eviction deadline (ms).
    *
    * @example
    * ```typescript
-   * devbox.onEvict((event) => {
-   *   console.log(`devbox will be suspended at ${event.eviction_deadline_ms}`);
+   * devbox.onEvict((devbox, evictionDeadlineMs) => {
+   *   console.log(`${devbox.id} will be suspended at ${evictionDeadlineMs}`);
    * });
    * ```
    */
   onEvict(callback: EvictionCallback): void {
-    getEvictionMonitor(this.client).register(this._id, callback);
+    getEvictionMonitor(this.client).register(this, callback);
   }
 
   /**

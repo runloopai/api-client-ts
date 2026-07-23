@@ -1,15 +1,15 @@
 import { Runloop } from '../index';
 import { Stream } from '../streaming';
-// Assumed Stainless-generated SSE event type for `watchEvictions`; carries
-// `devbox_id` and `eviction_deadline_ms`. Reconcile the import once the generated
-// code lands.
-import type { DevboxEvictionEvent } from '../resources/devboxes/devboxes';
+import type { DevboxEvictionEventView } from '../resources/devboxes/devboxes';
+import type { Devbox } from './devbox';
 
 /**
- * Invoked once with the eviction event for the devbox it was registered for.
- * The event carries `devbox_id` and `eviction_deadline_ms`.
+ * Invoked once when the devbox it was registered for has a pending eviction.
+ *
+ * @param devbox - The devbox with a pending eviction.
+ * @param evictionDeadlineMs - Unix timestamp (ms) by which the devbox will be suspended.
  */
-export type EvictionCallback = (event: DevboxEvictionEvent) => void;
+export type EvictionCallback = (devbox: Devbox, evictionDeadlineMs: number) => void;
 
 /**
  * Fans account-wide eviction notifications out to per-devbox callbacks.
@@ -28,15 +28,15 @@ export type EvictionCallback = (event: DevboxEvictionEvent) => void;
  *   callback fires at most once even if the server repeats the notification.
  */
 export class EvictionMonitor {
-  private callbacks = new Map<string, EvictionCallback>();
-  private stream: Stream<DevboxEvictionEvent> | null = null;
+  private entries = new Map<string, { devbox: Devbox; callback: EvictionCallback }>();
+  private stream: Stream<DevboxEvictionEventView> | null = null;
   private running = false;
 
   constructor(private client: Runloop) {}
 
-  /** Add `devboxId` to the interest set, opening the stream if idle. */
-  register(devboxId: string, callback: EvictionCallback): void {
-    this.callbacks.set(devboxId, callback);
+  /** Add `devbox` to the interest set, opening the stream if idle. */
+  register(devbox: Devbox, callback: EvictionCallback): void {
+    this.entries.set(devbox.id, { devbox, callback });
     if (!this.running) {
       this.running = true;
       void this.run();
@@ -45,15 +45,15 @@ export class EvictionMonitor {
 
   /** Drop `devboxId`; close the stream if it was the last interested devbox. */
   unregister(devboxId: string): void {
-    this.callbacks.delete(devboxId);
-    if (this.callbacks.size === 0) {
+    this.entries.delete(devboxId);
+    if (this.entries.size === 0) {
       this.close();
     }
   }
 
   /** Clear all interest and tear down the stream. */
   close(): void {
-    this.callbacks.clear();
+    this.entries.clear();
     this.stream?.controller.abort();
     this.stream = null;
     this.running = false;
@@ -65,7 +65,7 @@ export class EvictionMonitor {
       this.stream = stream;
       for await (const event of stream) {
         this.dispatch(event);
-        if (this.callbacks.size === 0) break;
+        if (this.entries.size === 0) break;
       }
     } catch (error) {
       // Aborting the stream on close surfaces as an AbortError; that is expected.
@@ -78,14 +78,14 @@ export class EvictionMonitor {
     }
   }
 
-  private dispatch(event: DevboxEvictionEvent): void {
-    const callback = this.callbacks.get(event.devbox_id);
-    if (!callback) return;
+  private dispatch(event: DevboxEvictionEventView): void {
+    const entry = this.entries.get(event.devbox_id);
+    if (!entry) return;
     // Remove before signaling so a duplicate notification for the same devbox is
     // discarded and the callback fires at most once.
-    this.callbacks.delete(event.devbox_id);
+    this.entries.delete(event.devbox_id);
     try {
-      callback(event);
+      entry.callback(entry.devbox, event.eviction_deadline_ms);
     } catch (error) {
       console.error(`Error in eviction callback for devbox ${event.devbox_id}:`, error);
     }
