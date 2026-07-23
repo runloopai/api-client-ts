@@ -415,6 +415,17 @@ export class Devboxes extends APIResource {
   }
 
   /**
+   * Subscribe, via server-sent events, to pending infrastructure evictions for every
+   * Devbox in the account. On connect the stream emits one event per Devbox that
+   * currently has a pending eviction, then one event as each further eviction is
+   * scheduled. Best-effort and advisory: a Devbox stays running until its deadline,
+   * and delivery is not guaranteed.
+   */
+  watchEvictions(options?: Core.RequestOptions): Core.APIPromise<DevboxWatchEvictionsResponse> {
+    return this._client.get('/v1/devboxes/watch_evictions', options);
+  }
+
+  /**
    * Write UTF-8 string contents to a file at path on the Devbox. Note for large
    * files (larger than 100MB), the upload_file endpoint must be used.
    */
@@ -953,6 +964,19 @@ export type DevboxRemoveTunnelResponse = unknown;
 
 export type DevboxUploadFileResponse = unknown;
 
+export interface DevboxWatchEvictionsResponse {
+  /**
+   * The ID of the Devbox with a pending eviction.
+   */
+  devbox_id: string;
+
+  /**
+   * Unix timestamp (milliseconds) after which the Devbox will be suspended. Advisory
+   * and best-effort.
+   */
+  eviction_deadline_ms: number;
+}
+
 export interface DevboxCreateParams {
   /**
    * Blueprint ID to use for the Devbox. If none set, the Devbox will be created with
@@ -1405,6 +1429,7 @@ export declare namespace Devboxes {
     type DevboxReadFileContentsResponse as DevboxReadFileContentsResponse,
     type DevboxRemoveTunnelResponse as DevboxRemoveTunnelResponse,
     type DevboxUploadFileResponse as DevboxUploadFileResponse,
+    type DevboxWatchEvictionsResponse as DevboxWatchEvictionsResponse,
     DevboxViewsDevboxesCursorIDPage as DevboxViewsDevboxesCursorIDPage,
     DevboxSnapshotViewsDiskSnapshotsCursorIDPage as DevboxSnapshotViewsDiskSnapshotsCursorIDPage,
     type DevboxCreateParams as DevboxCreateParams,

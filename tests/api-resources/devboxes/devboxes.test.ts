@@ -595,6 +595,24 @@ describe('resource devboxes', () => {
     });
   });
 
+  test('watchEvictions', async () => {
+    const responsePromise = client.devboxes.watchEvictions();
+    const rawResponse = await responsePromise.asResponse();
+    expect(rawResponse).toBeInstanceOf(Response);
+    const response = await responsePromise;
+    expect(response).not.toBeInstanceOf(Response);
+    const dataAndResponse = await responsePromise.withResponse();
+    expect(dataAndResponse.data).toBe(response);
+    expect(dataAndResponse.response).toBe(rawResponse);
+  });
+
+  test('watchEvictions: request options instead of params are passed correctly', async () => {
+    // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
+    await expect(client.devboxes.watchEvictions({ path: '/_stainless_unknown_path' })).rejects.toThrow(
+      Runloop.NotFoundError,
+    );
+  });
+
   test('writeFileContents: only required params', async () => {
     const responsePromise = client.devboxes.writeFileContents('id', {
       contents: 'contents',
