@@ -60,17 +60,38 @@ export class EvictionMonitor {
   }
 
   private async run(): Promise<void> {
+    // The server force-closes the stream on purpose (leader change / slow consumer) and a
+    // long-lived HTTP/2 stream can drop; the client is expected to reconnect and re-read the
+    // snapshot, which re-delivers anything missed. So reconnect (with backoff) until no devbox is
+    // still interested.
+    const INITIAL_BACKOFF_MS = 500;
+    const MAX_BACKOFF_MS = 30_000;
+    let backoff = INITIAL_BACKOFF_MS;
     try {
-      const stream = await this.client.devboxes.watchEvictions();
-      this.stream = stream;
-      for await (const event of stream) {
-        this.dispatch(event);
-        if (this.entries.size === 0) break;
-      }
-    } catch (error) {
-      // Aborting the stream on close surfaces as an AbortError; that is expected.
-      if (!(error instanceof Error && error.name === 'AbortError')) {
-        console.error('Error in eviction monitor stream:', error);
+      while (this.entries.size > 0) {
+        try {
+          // Force the SSE Accept header: the endpoint only streams for text/event-stream; the
+          // generated client's default (application/json) gets an empty text/plain response, so the
+          // feed would silently deliver nothing.
+          const stream = await this.client.devboxes.watchEvictions({
+            headers: { Accept: 'text/event-stream' },
+          });
+          this.stream = stream;
+          for await (const event of stream) {
+            this.dispatch(event);
+            if (this.entries.size === 0) return;
+          }
+          // Clean end: reset backoff and reconnect if still interested.
+          backoff = INITIAL_BACKOFF_MS;
+        } catch (error) {
+          // Aborting the stream on close surfaces as an AbortError; that is an intentional teardown.
+          if (error instanceof Error && error.name === 'AbortError') return;
+          if (this.entries.size === 0) return;
+          // Otherwise a routine disconnect — fall through to backoff + reconnect.
+        }
+        if (this.entries.size === 0) return;
+        await new Promise((resolve) => setTimeout(resolve, backoff));
+        backoff = Math.min(backoff * 2, MAX_BACKOFF_MS);
       }
     } finally {
       this.stream = null;
