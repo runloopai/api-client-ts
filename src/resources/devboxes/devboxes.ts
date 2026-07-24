@@ -548,7 +548,7 @@ export class Devboxes extends APIResource {
    * and delivery is not guaranteed.
    */
   watchEvictions(options?: Core.RequestOptions): APIPromise<Stream<DevboxEvictionEventView>> {
-    return this._client.get('/v1/devboxes/watch_evictions', { ...options, stream: true }) as APIPromise<
+    return this._client.get('/v1/devboxes/evictions/watch', { ...options, stream: true }) as APIPromise<
       Stream<DevboxEvictionEventView>
     >;
   }
