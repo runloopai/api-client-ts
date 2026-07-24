@@ -5,6 +5,7 @@ export {
   DevboxViewsDevboxesCursorIDPage,
   Devboxes,
   type DevboxAsyncExecutionDetailView,
+  type DevboxEvictionEventView,
   type DevboxExecutionDetailView,
   type DevboxKillExecutionRequest,
   type DevboxListView,

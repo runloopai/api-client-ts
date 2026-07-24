@@ -23,7 +23,8 @@ export class NetworkPolicies extends APIResource {
   }
 
   /**
-   * Update an existing NetworkPolicy. All fields are optional.
+   * Update an existing NetworkPolicy. All fields are optional - null fields preserve
+   * existing values, provided fields replace entirely.
    */
   update(
     id: string,
