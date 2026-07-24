@@ -22,6 +22,7 @@ import { LongPollRequestOptions, PollingOptions } from '../lib/polling';
 import { Snapshot } from './snapshot';
 import { Execution } from './execution';
 import { ExecutionResult } from './execution-result';
+import { EvictionCallback, getEvictionMonitor } from './eviction';
 import { uuidv7 } from 'uuidv7';
 
 // Re-export Execution and ExecutionResult for Devbox namespace
@@ -1028,6 +1029,35 @@ export class Devbox {
    */
   async keepAlive(options?: Core.RequestOptions): Promise<DevboxKeepAliveResponse> {
     return this.client.devboxes.keepAlive(this._id, options);
+  }
+
+  /**
+   * Register a callback fired once if this devbox gets a pending infrastructure eviction.
+   *
+   * The first `onEvict` across any devbox on this client opens a single account-wide
+   * notification stream; it closes automatically once every registered devbox has been
+   * notified. The callback runs at most once and is invoked as
+   * `callback(devbox, evictionDeadlineMs)` — this devbox and the Unix millisecond
+   * deadline by which it will be suspended. Use it to run cleanup before suspend.
+   *
+   * @param {EvictionCallback} callback - Invoked with this devbox and its eviction deadline (ms).
+   *
+   * @example
+   * ```typescript
+   * devbox.onEvict((devbox, evictionDeadlineMs) => {
+   *   console.log(`${devbox.id} will be suspended at ${evictionDeadlineMs}`);
+   * });
+   * ```
+   */
+  onEvict(callback: EvictionCallback): void {
+    getEvictionMonitor(this.client).register(this, callback);
+  }
+
+  /**
+   * Withdraw this devbox's eviction interest registered via {@link onEvict}.
+   */
+  cancelOnEvict(): void {
+    getEvictionMonitor(this.client).unregister(this._id);
   }
 }
 
