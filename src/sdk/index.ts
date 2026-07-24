@@ -1,4 +1,5 @@
 export { Devbox, DevboxCmdOps, DevboxFileOps, DevboxNetOps, type ExecuteStreamingCallbacks } from './devbox';
+export { EvictionMonitor, getEvictionMonitor, type EvictionCallback } from './eviction';
 export { Blueprint } from './blueprint';
 export { Snapshot } from './snapshot';
 export { StorageObject } from './storage-object';
