@@ -2,6 +2,7 @@
 
 import { APIResource } from '../../resource';
 import { isRequestOptions } from '../../core';
+import { APIPromise } from '../../core';
 import * as Core from '../../core';
 import * as Shared from '../shared';
 import * as DiskSnapshotsAPI from './disk-snapshots';
@@ -32,6 +33,7 @@ import {
   DiskSnapshotsCursorIDPage,
   type DiskSnapshotsCursorIDPageParams,
 } from '../../pagination';
+import { Stream } from '../../streaming';
 import { type Response } from '../../_shims/index';
 import {
   longPollUntil,
@@ -545,8 +547,10 @@ export class Devboxes extends APIResource {
    * scheduled. Best-effort and advisory: a Devbox stays running until its deadline,
    * and delivery is not guaranteed.
    */
-  watchEvictions(options?: Core.RequestOptions): Core.APIPromise<DevboxWatchEvictionsResponse> {
-    return this._client.get('/v1/devboxes/watch_evictions', options);
+  watchEvictions(options?: Core.RequestOptions): APIPromise<Stream<DevboxEvictionEventView>> {
+    return this._client.get('/v1/devboxes/watch_evictions', { ...options, stream: true }) as APIPromise<
+      Stream<DevboxEvictionEventView>
+    >;
   }
 
   /**
@@ -628,6 +632,19 @@ export interface DevboxAsyncExecutionDetailView {
    * Indicates whether the stdout was truncated due to size limits.
    */
   stdout_truncated?: boolean | null;
+}
+
+export interface DevboxEvictionEventView {
+  /**
+   * The ID of the Devbox with a pending eviction.
+   */
+  devbox_id: string;
+
+  /**
+   * Unix timestamp (milliseconds) after which the Devbox will be suspended. Advisory
+   * and best-effort.
+   */
+  eviction_deadline_ms: number;
 }
 
 export interface DevboxExecutionDetailView {
@@ -1105,19 +1122,6 @@ export type DevboxRemoveTunnelResponse = unknown;
 
 export type DevboxUploadFileResponse = unknown;
 
-export interface DevboxWatchEvictionsResponse {
-  /**
-   * The ID of the Devbox with a pending eviction.
-   */
-  devbox_id: string;
-
-  /**
-   * Unix timestamp (milliseconds) after which the Devbox will be suspended. Advisory
-   * and best-effort.
-   */
-  eviction_deadline_ms: number;
-}
-
 /**
  * Parameters for creating a new Devbox.
  *
@@ -1563,6 +1567,7 @@ Devboxes.Executions = Executions;
 export declare namespace Devboxes {
   export {
     type DevboxAsyncExecutionDetailView as DevboxAsyncExecutionDetailView,
+    type DevboxEvictionEventView as DevboxEvictionEventView,
     type DevboxExecutionDetailView as DevboxExecutionDetailView,
     type DevboxKillExecutionRequest as DevboxKillExecutionRequest,
     type DevboxListView as DevboxListView,
@@ -1580,7 +1585,6 @@ export declare namespace Devboxes {
     type DevboxReadFileContentsResponse as DevboxReadFileContentsResponse,
     type DevboxRemoveTunnelResponse as DevboxRemoveTunnelResponse,
     type DevboxUploadFileResponse as DevboxUploadFileResponse,
-    type DevboxWatchEvictionsResponse as DevboxWatchEvictionsResponse,
     DevboxViewsDevboxesCursorIDPage as DevboxViewsDevboxesCursorIDPage,
     DevboxSnapshotViewsDiskSnapshotsCursorIDPage as DevboxSnapshotViewsDiskSnapshotsCursorIDPage,
     type DevboxCreateParams as DevboxCreateParams,
