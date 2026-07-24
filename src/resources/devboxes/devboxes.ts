@@ -2,6 +2,7 @@
 
 import { APIResource } from '../../resource';
 import { isRequestOptions } from '../../core';
+import { APIPromise } from '../../core';
 import * as Core from '../../core';
 import * as Shared from '../shared';
 import * as DiskSnapshotsAPI from './disk-snapshots';
@@ -32,6 +33,7 @@ import {
   DiskSnapshotsCursorIDPage,
   type DiskSnapshotsCursorIDPageParams,
 } from '../../pagination';
+import { Stream } from '../../streaming';
 import { type Response } from '../../_shims/index';
 import {
   longPollUntil,
@@ -539,6 +541,19 @@ export class Devboxes extends APIResource {
   }
 
   /**
+   * Subscribe, via server-sent events, to pending infrastructure evictions for every
+   * Devbox in the account. On connect the stream emits one event per Devbox that
+   * currently has a pending eviction, then one event as each further eviction is
+   * scheduled. Best-effort and advisory: a Devbox stays running until its deadline,
+   * and delivery is not guaranteed.
+   */
+  watchEvictions(options?: Core.RequestOptions): APIPromise<Stream<DevboxEvictionEventView>> {
+    return this._client.get('/v1/devboxes/evictions/watch', { ...options, stream: true }) as APIPromise<
+      Stream<DevboxEvictionEventView>
+    >;
+  }
+
+  /**
    * Write UTF-8 string contents to a file at path on the Devbox. Note for large
    * files (larger than 100MB), the upload_file endpoint must be used.
    */
@@ -617,6 +632,19 @@ export interface DevboxAsyncExecutionDetailView {
    * Indicates whether the stdout was truncated due to size limits.
    */
   stdout_truncated?: boolean | null;
+}
+
+export interface DevboxEvictionEventView {
+  /**
+   * The ID of the Devbox with a pending eviction.
+   */
+  devbox_id: string;
+
+  /**
+   * Unix timestamp (milliseconds) after which the Devbox will be suspended. Advisory
+   * and best-effort.
+   */
+  eviction_deadline_ms: number;
 }
 
 export interface DevboxExecutionDetailView {
@@ -1539,6 +1567,7 @@ Devboxes.Executions = Executions;
 export declare namespace Devboxes {
   export {
     type DevboxAsyncExecutionDetailView as DevboxAsyncExecutionDetailView,
+    type DevboxEvictionEventView as DevboxEvictionEventView,
     type DevboxExecutionDetailView as DevboxExecutionDetailView,
     type DevboxKillExecutionRequest as DevboxKillExecutionRequest,
     type DevboxListView as DevboxListView,

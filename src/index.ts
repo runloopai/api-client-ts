@@ -196,6 +196,7 @@ import {
   DevboxDeleteDiskSnapshotResponse,
   DevboxDownloadFileParams,
   DevboxEnableTunnelParams,
+  DevboxEvictionEventView,
   DevboxExecuteAsyncParams,
   DevboxExecuteParams,
   DevboxExecuteSyncParams,
@@ -673,6 +674,7 @@ export declare namespace Runloop {
   export {
     Devboxes as Devboxes,
     type DevboxAsyncExecutionDetailView as DevboxAsyncExecutionDetailView,
+    type DevboxEvictionEventView as DevboxEvictionEventView,
     type DevboxExecutionDetailView as DevboxExecutionDetailView,
     type DevboxKillExecutionRequest as DevboxKillExecutionRequest,
     type DevboxListView as DevboxListView,
