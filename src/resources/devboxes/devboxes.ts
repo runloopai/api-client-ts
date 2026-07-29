@@ -42,11 +42,12 @@ export class Devboxes extends APIResource {
   executions: ExecutionsAPI.Executions = new ExecutionsAPI.Executions(this._client);
 
   /**
-   * Create a Devbox and begin the boot process. The Devbox will initially launch in
-   * the 'provisioning' state while Runloop allocates the necessary infrastructure.
-   * It will transition to the 'initializing' state while the booted Devbox runs any
-   * Runloop or user defined set up scripts. Finally, the Devbox will transition to
-   * the 'running' state when it is ready for use.
+   * Create a Devbox and begin the boot process. Standard Devboxes initially report
+   * the 'provisioning' state. FLEX Devboxes initially report the 'queued' state
+   * while waiting for infrastructure allocation, then transition to 'provisioning'
+   * once assigned to a node. The Devbox transitions to 'initializing' while the
+   * booted Devbox runs Runloop or user-defined setup scripts, then to 'running' when
+   * it is ready for use.
    */
   create(body?: DevboxCreateParams, options?: Core.RequestOptions): Core.APIPromise<DevboxView>;
   create(options?: Core.RequestOptions): Core.APIPromise<DevboxView>;
