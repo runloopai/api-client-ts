@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.28.0 (2026-07-29)
+
+Full Changelog: [v1.27.0...v1.28.0](https://github.com/runloopai/api-client-ts/compare/v1.27.0...v1.28.0)
+
+### Features
+
+* **devbox:** queue devboxes until node assignment ([#10320](https://github.com/runloopai/api-client-ts/issues/10320)) ([a1d9b21](https://github.com/runloopai/api-client-ts/commit/a1d9b2196b5f9a5ff6446712c851d1e8acefe36e))
+
 ## 1.27.0 (2026-07-24)
 
 Full Changelog: [v1.26.0...v1.27.0](https://github.com/runloopai/api-client-ts/compare/v1.26.0...v1.27.0)
