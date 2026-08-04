@@ -55,6 +55,7 @@ describe('resource runs', () => {
           limit: 0,
           name: 'name',
           scenario_id: 'scenario_id',
+          search: 'search',
           starting_after: 'starting_after',
           state: 'state',
         },

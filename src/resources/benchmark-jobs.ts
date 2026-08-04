@@ -994,6 +994,11 @@ export interface BenchmarkJobListParams {
   name?: string;
 
   /**
+   * Search by benchmark job ID or name.
+   */
+  search?: string;
+
+  /**
    * Load the next page of data starting after the item with the given ID.
    */
   starting_after?: string;

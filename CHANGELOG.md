@@ -1,5 +1,74 @@
 # Changelog
 
+## 1.28.0 (2026-07-29)
+
+Full Changelog: [v1.27.0...v1.28.0](https://github.com/runloopai/api-client-ts/compare/v1.27.0...v1.28.0)
+
+### Features
+
+* **devbox:** queue devboxes until node assignment ([#10320](https://github.com/runloopai/api-client-ts/issues/10320)) ([a1d9b21](https://github.com/runloopai/api-client-ts/commit/a1d9b2196b5f9a5ff6446712c851d1e8acefe36e))
+
+## 1.27.0 (2026-07-24)
+
+Full Changelog: [v1.26.0...v1.27.0](https://github.com/runloopai/api-client-ts/compare/v1.26.0...v1.27.0)
+
+### Features
+
+* **mux:** wait_for_eviction endpoint for flex eviction notifications ([#10325](https://github.com/runloopai/api-client-ts/issues/10325)) ([429f2b1](https://github.com/runloopai/api-client-ts/commit/429f2b1ea76284ab6006e6e819457dfeddaaf5c9))
+
+
+### Bug Fixes
+
+* **mux:** field-level merge on network policy egress updates ([#10338](https://github.com/runloopai/api-client-ts/issues/10338)) ([835c772](https://github.com/runloopai/api-client-ts/commit/835c7720715b525a371c06745dc93aac249b01ee))
+* **mux:** move eviction-watch SSE route off the /{id} slot ([#10409](https://github.com/runloopai/api-client-ts/issues/10409)) ([80d82cf](https://github.com/runloopai/api-client-ts/commit/80d82cf7798ce423dff86876ff89bd752f80d0f0))
+
+
+### Chores
+
+* **stainless:** generate watch_evictions as an SSE stream ([#10404](https://github.com/runloopai/api-client-ts/issues/10404)) ([043ebbc](https://github.com/runloopai/api-client-ts/commit/043ebbc407067c3d7d620b9a00fa1937dd3bcb3b))
+
+## 1.26.0 (2026-07-22)
+
+Full Changelog: [v1.25.0...v1.26.0](https://github.com/runloopai/api-client-ts/compare/v1.25.0...v1.26.0)
+
+### Features
+
+* **api:** add codex broker mount protocol and axon attach enum value ([#10186](https://github.com/runloopai/api-client-ts/issues/10186)) ([113c92b](https://github.com/runloopai/api-client-ts/commit/113c92b26df3a3f1846583afa1558da3bb3a1f22))
+* **devbox:** rename scheduled -&gt; queued ([#10217](https://github.com/runloopai/api-client-ts/issues/10217)) ([6b3e488](https://github.com/runloopai/api-client-ts/commit/6b3e4881fb713efe154a12c3a79b1e905b7e1925))
+* **mux:** expose CIDR egress rules on the network policy API ([#10269](https://github.com/runloopai/api-client-ts/issues/10269)) ([ec9fef0](https://github.com/runloopai/api-client-ts/commit/ec9fef0d1424671cc377fc0456e62461036c37ac))
+* **network:** add allow_runloop_mirrors egress flag to network policies ([#10350](https://github.com/runloopai/api-client-ts/issues/10350)) ([45d2036](https://github.com/runloopai/api-client-ts/commit/45d20369b986e19e696dccbd551aec78a40039aa))
+* **stlc:** configurable CI runner and private-production-repo support in workflow templates ([9e8ca6e](https://github.com/runloopai/api-client-ts/commit/9e8ca6e3d68602fdbfe738f926bb962ae536ebd7))
+
+
+### Bug Fixes
+
+* **mux:** uniform id/name search across list endpoints, close cross-tenant IDOR ([#10267](https://github.com/runloopai/api-client-ts/issues/10267)) ([70e6a27](https://github.com/runloopai/api-client-ts/commit/70e6a27a76ddd29494cf69b881702e3a9ad112d7))
+
+## 1.25.0 (2026-07-10)
+
+Full Changelog: [v1.24.1...v1.25.0](https://github.com/runloopai/api-client-ts/compare/v1.24.1...v1.25.0)
+
+### Features
+
+* add HTTP/2 load testing infrastructure ([#798](https://github.com/runloopai/api-client-ts/issues/798)) ([ea7cc09](https://github.com/runloopai/api-client-ts/commit/ea7cc095d728c91166b84068e3ec8710fdc74e51))
+* default to HTTP/2 transport on Node ([#815](https://github.com/runloopai/api-client-ts/issues/815)) ([35dd305](https://github.com/runloopai/api-client-ts/commit/35dd305ff6b59ed7d617ac1bf99a657d054e317c))
+
+
+### Bug Fixes
+
+* **blueprints:** remove create_from_inspection endpoint ([e84b5c1](https://github.com/runloopai/api-client-ts/commit/e84b5c1a02ecf0ad07c1d41add61b14432fc4bef))
+* **smoketests:** instrument node:http2 in verify-http2.mjs, not undici ([#814](https://github.com/runloopai/api-client-ts/issues/814)) ([6ceb236](https://github.com/runloopai/api-client-ts/commit/6ceb236965305eb160788a74f365607d0ab56c5d))
+
+
+### Chores
+
+* **deps:** remove dead undici HTTP/2 adapter and dependency ([#817](https://github.com/runloopai/api-client-ts/issues/817)) ([9792541](https://github.com/runloopai/api-client-ts/commit/979254137ff02d1abea72d2d05544aee97c656b6))
+
+
+### Documentation
+
+* add agent PR guidance ([#813](https://github.com/runloopai/api-client-ts/issues/813)) ([be107b9](https://github.com/runloopai/api-client-ts/commit/be107b90195bdb1552afcfb1819812b07124a4d0))
+
 ## 1.24.1 (2026-06-19)
 
 Full Changelog: [v1.24.0...v1.24.1](https://github.com/runloopai/api-client-ts/compare/v1.24.0...v1.24.1)

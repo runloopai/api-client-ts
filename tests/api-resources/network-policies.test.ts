@@ -27,6 +27,19 @@ describe('resource networkPolicies', () => {
       allow_all: true,
       allow_devbox_to_devbox: true,
       allow_mcp_gateway: true,
+      allow_runloop_mirrors: true,
+      allowed_cidrs: [
+        {
+          cidr: 'cidr',
+          ports: [
+            {
+              port: 0,
+              end_port: 0,
+              protocol: 'TCP',
+            },
+          ],
+        },
+      ],
       allowed_hostnames: ['string'],
       description: 'description',
     });
@@ -78,6 +91,19 @@ describe('resource networkPolicies', () => {
           allow_all: true,
           allow_devbox_to_devbox: true,
           allow_mcp_gateway: true,
+          allow_runloop_mirrors: true,
+          allowed_cidrs: [
+            {
+              cidr: 'cidr',
+              ports: [
+                {
+                  port: 0,
+                  end_port: 0,
+                  protocol: 'TCP',
+                },
+              ],
+            },
+          ],
           allowed_hostnames: ['string'],
           description: 'description',
           name: 'name',
@@ -114,6 +140,7 @@ describe('resource networkPolicies', () => {
           include_total_count: true,
           limit: 0,
           name: 'name',
+          search: 'search',
           starting_after: 'starting_after',
         },
         { path: '/_stainless_unknown_path' },

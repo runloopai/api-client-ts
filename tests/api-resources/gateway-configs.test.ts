@@ -112,6 +112,7 @@ describe('resource gatewayConfigs', () => {
           include_total_count: true,
           limit: 0,
           name: 'name',
+          search: 'search',
           starting_after: 'starting_after',
         },
         { path: '/_stainless_unknown_path' },
