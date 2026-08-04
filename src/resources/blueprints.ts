@@ -126,7 +126,7 @@ export class Blueprints extends APIResource {
         signal,
         ...(pollTimeoutMs !== undefined ? { timeoutMs: pollTimeoutMs } : {}),
         shouldStop: (result) => {
-          return !['queued', 'provisioning', 'building'].includes(result.status);
+          return !['queued', 'provisioning', 'building', 'awaiting_upload'].includes(result.status);
         },
       },
     );
@@ -491,7 +491,7 @@ export interface BlueprintView {
   /**
    * The status of the Blueprint build.
    */
-  status: 'queued' | 'provisioning' | 'building' | 'failed' | 'build_complete';
+  status: 'queued' | 'provisioning' | 'building' | 'awaiting_upload' | 'failed' | 'build_complete';
 
   /**
    * The ID of the base Blueprint.
@@ -758,7 +758,7 @@ export interface BlueprintListParams extends BlueprintsCursorIDPageParams {
   name?: string;
 
   /**
-   * Filter by build status (queued, provisioning, building, failed, build_complete)
+   * Filter by build status (queued, provisioning, building, awaiting_upload, failed, build_complete)
    */
   status?: string;
 }
@@ -776,7 +776,7 @@ export interface BlueprintListPublicParams extends BlueprintsCursorIDPageParams 
   name?: string;
 
   /**
-   * Filter by build status (queued, provisioning, building, failed, build_complete)
+   * Filter by build status (queued, provisioning, building, awaiting_upload, failed, build_complete)
    */
   status?: string;
 }
