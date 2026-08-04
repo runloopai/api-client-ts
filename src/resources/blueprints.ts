@@ -89,6 +89,19 @@ export class Blueprints extends APIResource {
   }
 
   /**
+   * Create a private Blueprint awaiting its image to be pushed out-of-band via
+   * docker push. Bypasses the build pipeline entirely: no Dockerfile is composed
+   * and no image is built. The Blueprint stays in the 'awaiting_upload' step until
+   * the push completes.
+   */
+  register(
+    body: BlueprintRegisterParams,
+    options?: Core.RequestOptions,
+  ): Core.APIPromise<BlueprintUploadView> {
+    return this._client.post('/v1/blueprints/register', { body, ...options });
+  }
+
+  /**
    * Get the details of a previously created Blueprint including the build status.
    */
   retrieve(id: string, options?: Core.RequestOptions): Core.APIPromise<BlueprintView> {
@@ -411,6 +424,35 @@ export interface BlueprintPreviewView {
    * The Dockerfile contents that will built.
    */
   dockerfile: string;
+}
+
+export interface BlueprintUploadParameters {
+  /**
+   * Name of the Blueprint.
+   */
+  name: string;
+
+  /**
+   * Parameters to configure your Devbox at launch time.
+   */
+  launch_parameters?: Shared.LaunchParameters | null;
+
+  /**
+   * (Optional) User defined metadata for the Blueprint.
+   */
+  metadata?: { [key: string]: string } | null;
+}
+
+export interface BlueprintUploadView {
+  /**
+   * The created Blueprint, awaiting its image upload.
+   */
+  blueprint: BlueprintView;
+
+  /**
+   * The reference to push the image to, e.g. via docker push.
+   */
+  push_reference: string;
 }
 
 /**
@@ -826,6 +868,23 @@ export interface BlueprintPreviewParams {
   system_setup_commands?: Array<string> | null;
 }
 
+export interface BlueprintRegisterParams {
+  /**
+   * Name of the Blueprint.
+   */
+  name: string;
+
+  /**
+   * Parameters to configure your Devbox at launch time.
+   */
+  launch_parameters?: Shared.LaunchParameters | null;
+
+  /**
+   * (Optional) User defined metadata for the Blueprint.
+   */
+  metadata?: { [key: string]: string } | null;
+}
+
 export namespace BlueprintPreviewParams {
   /**
    * A build context backed by an Object.
@@ -899,6 +958,8 @@ export declare namespace Blueprints {
     type BlueprintBuildParameters as BlueprintBuildParameters,
     type BlueprintListView as BlueprintListView,
     type BlueprintPreviewView as BlueprintPreviewView,
+    type BlueprintUploadParameters as BlueprintUploadParameters,
+    type BlueprintUploadView as BlueprintUploadView,
     type BlueprintView as BlueprintView,
     type BlueprintDeleteResponse as BlueprintDeleteResponse,
     BlueprintViewsBlueprintsCursorIDPage as BlueprintViewsBlueprintsCursorIDPage,
@@ -906,5 +967,6 @@ export declare namespace Blueprints {
     type BlueprintListParams as BlueprintListParams,
     type BlueprintListPublicParams as BlueprintListPublicParams,
     type BlueprintPreviewParams as BlueprintPreviewParams,
+    type BlueprintRegisterParams as BlueprintRegisterParams,
   };
 }

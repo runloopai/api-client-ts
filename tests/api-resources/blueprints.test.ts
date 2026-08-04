@@ -9,6 +9,23 @@ const client = new Runloop({
 });
 
 describe('resource blueprints', () => {
+  test('register: only required params', async () => {
+    const responsePromise = client.blueprints.register({ name: 'name' });
+    const rawResponse = await responsePromise.asResponse();
+    expect(rawResponse).toBeInstanceOf(Response);
+    const response = await responsePromise;
+    expect(response).not.toBeInstanceOf(Response);
+    expect(response.push_reference).toBeDefined();
+  });
+
+  test('register: required and optional params', async () => {
+    await client.blueprints.register({
+      name: 'name',
+      launch_parameters: { architecture: 'x86_64' },
+      metadata: { source: 'upload' },
+    });
+  });
+
   test('create: only required params', async () => {
     const responsePromise = client.blueprints.create({ name: 'name' });
     const rawResponse = await responsePromise.asResponse();
