@@ -1,5 +1,4 @@
-import { BlueprintView } from '@runloop/api-client/resources/blueprints';
-import { makeClient, SHORT_TIMEOUT, uniqueName } from './utils';
+import { cleanUpBlueprintsByName, LONG_TIMEOUT, makeClient, MEDIUM_TIMEOUT, uniqueName } from './utils';
 import { DevboxView } from '@runloop/api-client/resources/devboxes';
 
 const client = makeClient();
@@ -13,7 +12,7 @@ describe('smoketest: blueprints', () => {
     let blueprintName = uniqueName('bp');
 
     afterAll(async () => {
-      await client.blueprints.delete(blueprintId!);
+      await cleanUpBlueprintsByName(client, blueprintName);
     });
 
     test(
@@ -24,13 +23,13 @@ describe('smoketest: blueprints', () => {
             name: blueprintName,
           },
           {
-            longPoll: { timeoutMs: 30 * 60 * 1000 },
+            longPoll: { timeoutMs: MEDIUM_TIMEOUT },
           },
         );
         expect(created.status).toBe('build_complete');
         blueprintId = created.id;
       },
-      SHORT_TIMEOUT,
+      LONG_TIMEOUT,
     );
 
     test(
@@ -44,7 +43,7 @@ describe('smoketest: blueprints', () => {
               launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 }, // 5 minutes
             },
             {
-              longPoll: { timeoutMs: 20 * 60 * 1000 },
+              longPoll: { timeoutMs: MEDIUM_TIMEOUT },
             },
           );
           expect(devbox.blueprint_id).toBe(blueprintId);
@@ -54,7 +53,7 @@ describe('smoketest: blueprints', () => {
           }
         }
       },
-      SHORT_TIMEOUT,
+      LONG_TIMEOUT,
     );
 
     test(
@@ -68,7 +67,7 @@ describe('smoketest: blueprints', () => {
               launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 }, // 5 minutes
             },
             {
-              longPoll: { timeoutMs: 20 * 60 * 1000 },
+              longPoll: { timeoutMs: MEDIUM_TIMEOUT },
             },
           );
           expect(devbox.blueprint_id).toBeTruthy();
@@ -78,7 +77,7 @@ describe('smoketest: blueprints', () => {
           }
         }
       },
-      SHORT_TIMEOUT,
+      LONG_TIMEOUT,
     );
   });
 
@@ -89,9 +88,8 @@ describe('smoketest: blueprints', () => {
     test.concurrent(
       'create blueprint with secret in Dockerfile and await build',
       async () => {
-        let bpt: BlueprintView | undefined;
         try {
-          bpt = await client.blueprints.createAndAwaitBuildCompleted(
+          const bpt = await client.blueprints.createAndAwaitBuildCompleted(
             {
               name: secretsBlueprintName,
               dockerfile:
@@ -101,19 +99,17 @@ describe('smoketest: blueprints', () => {
               },
             },
             {
-              longPoll: { timeoutMs: 30 * 60 * 1000 },
+              longPoll: { timeoutMs: MEDIUM_TIMEOUT },
             },
           );
 
           expect(bpt.status).toBe('build_complete');
           expect(bpt.parameters.secrets?.['GITHUB_TOKEN']).toBe('GITHUB_TOKEN_FOR_SMOKETESTS');
         } finally {
-          if (bpt) {
-            await client.blueprints.delete(bpt.id);
-          }
+          await cleanUpBlueprintsByName(client, secretsBlueprintName);
         }
       },
-      SHORT_TIMEOUT,
+      LONG_TIMEOUT,
     );
   });
 });

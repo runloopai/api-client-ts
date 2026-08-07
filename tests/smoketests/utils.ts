@@ -40,6 +40,22 @@ export const MEDIUM_TIMEOUT = 300_000;
 export const LONG_TIMEOUT = 600_000;
 
 /**
+ * Helper to clean up every blueprint with the given name, ignoring errors if
+ * already deleted. Looks blueprints up by name rather than taking an ID so that
+ * cleanup still runs when a create-and-await call timed out before returning one.
+ */
+export async function cleanUpBlueprintsByName(client: Runloop, name: string): Promise<void> {
+  try {
+    const page = await client.blueprints.list({ name });
+    for (const blueprint of page.blueprints) {
+      await client.blueprints.delete(blueprint.id);
+    }
+  } catch {
+    // Already deleted or never created, ignore
+  }
+}
+
+/**
  * Helper to clean up a network policy, ignoring errors if already deleted.
  */
 export async function cleanUpPolicy(policy: NetworkPolicy | undefined): Promise<void> {
