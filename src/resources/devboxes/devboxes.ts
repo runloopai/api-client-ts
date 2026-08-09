@@ -969,6 +969,11 @@ export interface DevboxView {
 export namespace DevboxView {
   export interface StateTransition {
     /**
+     * The failure that caused this state transition, if applicable.
+     */
+    failure_reason?: string | null;
+
+    /**
      * The status of the Devbox.
      *
      * scheduled: Deprecated. The Devbox is waiting for infrastructure allocation to
