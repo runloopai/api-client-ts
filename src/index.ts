@@ -178,6 +178,7 @@ import {
 } from './resources/secrets';
 import {
   AxonCreateParams,
+  AxonDeleteResponse,
   AxonEventView,
   AxonListParams,
   AxonListView,
@@ -649,6 +650,7 @@ export declare namespace Runloop {
     type AxonView as AxonView,
     type PublishParams as PublishParams,
     type PublishResultView as PublishResultView,
+    type AxonDeleteResponse as AxonDeleteResponse,
     AxonViewsAxonsCursorIDPage as AxonViewsAxonsCursorIDPage,
     type AxonListParams as AxonListParams,
     type AxonPublishParams as AxonPublishParams,
