@@ -67,6 +67,13 @@ export class Axons extends APIResource {
   }
 
   /**
+   * [Beta] Mark an axon deleted.
+   */
+  delete(id: string, options?: Core.RequestOptions): Core.APIPromise<unknown> {
+    return this._client.delete(`/v1/axons/${id}`, options);
+  }
+
+  /**
    * [Beta] Publish an event to a specified axon.
    */
   publish(
@@ -201,6 +208,8 @@ export interface PublishResultView {
   timestamp_ms: number;
 }
 
+export type AxonDeleteResponse = unknown;
+
 export interface AxonCreateParams {
   /**
    * (Optional) Name for the axon.
@@ -273,6 +282,7 @@ export declare namespace Axons {
     type AxonView as AxonView,
     type PublishParams as PublishParams,
     type PublishResultView as PublishResultView,
+    type AxonDeleteResponse as AxonDeleteResponse,
     AxonViewsAxonsCursorIDPage as AxonViewsAxonsCursorIDPage,
     type AxonListParams as AxonListParams,
     type AxonPublishParams as AxonPublishParams,

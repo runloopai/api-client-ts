@@ -9,6 +9,7 @@ export {
   type AxonView,
   type PublishParams,
   type PublishResultView,
+  type AxonDeleteResponse,
   type AxonListParams,
   type AxonPublishParams,
   type AxonSubscribeSseParams,
