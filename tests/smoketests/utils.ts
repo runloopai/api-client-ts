@@ -26,9 +26,12 @@ function makeTestAgent(baseURL: string | undefined, http2: boolean | object): Ag
 // Object coverage runs files in parallel Jest workers. Give each worker owned
 // HTTP/1.1 agents so teardown does not wait for the SDK's process-wide 30s
 // keep-alive pool (which previously forced Jest to kill a worker).
-afterAll(() => {
+afterAll(async () => {
   for (const agent of testAgents) agent.destroy();
   testAgents.clear();
+  // agent.destroy() closes sockets asynchronously. Give their close callbacks
+  // one event-loop turn to run before Jest decides whether the worker leaked.
+  await new Promise<void>((resolve) => setImmediate(resolve));
 });
 
 export function makeClient(overrides: Partial<ConstructorParameters<typeof Runloop>[0]> = {}) {

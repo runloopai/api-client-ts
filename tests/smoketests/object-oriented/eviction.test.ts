@@ -102,4 +102,24 @@ const tick = (ms = 20) => new Promise((resolve) => setTimeout(resolve, ms));
     await tick();
     expect(callback).not.toHaveBeenCalled();
   });
+
+  test('cancelOnEvict clears a pending reconnect timer', async () => {
+    jest.useFakeTimers();
+    try {
+      const watchEvictions = jest.fn(async () => streamOf([]));
+      const devbox = Devbox.fromId(fakeClient(watchEvictions), 'dbx_backoff');
+
+      devbox.onEvict(jest.fn());
+      await Promise.resolve();
+      await Promise.resolve();
+      expect(watchEvictions).toHaveBeenCalledTimes(1);
+      expect(jest.getTimerCount()).toBe(1);
+
+      devbox.cancelOnEvict();
+      expect(jest.getTimerCount()).toBe(0);
+      await Promise.resolve();
+    } finally {
+      jest.useRealTimers();
+    }
+  });
 });

@@ -31,6 +31,8 @@ export class EvictionMonitor {
   private entries = new Map<string, { devbox: Devbox; callback: EvictionCallback }>();
   private stream: Stream<DevboxEvictionEventView> | null = null;
   private running = false;
+  private generation = 0;
+  private cancelBackoff: (() => void) | null = null;
 
   constructor(private client: Runloop) {}
 
@@ -39,7 +41,8 @@ export class EvictionMonitor {
     this.entries.set(devbox.id, { devbox, callback });
     if (!this.running) {
       this.running = true;
-      void this.run();
+      const generation = ++this.generation;
+      void this.run(generation);
     }
   }
 
@@ -56,10 +59,30 @@ export class EvictionMonitor {
     this.entries.clear();
     this.stream?.controller.abort();
     this.stream = null;
+    // A disconnect may have put the monitor in its reconnect delay. Wake that
+    // delay immediately so it neither keeps a test worker/process alive nor
+    // reconnects after the final registration has been removed.
+    this.cancelBackoff?.();
     this.running = false;
+    this.generation++;
   }
 
-  private async run(): Promise<void> {
+  private waitForRetry(ms: number): Promise<void> {
+    return new Promise((resolve) => {
+      let timer: ReturnType<typeof setTimeout> | undefined;
+      const finish = () => {
+        if (!timer) return;
+        clearTimeout(timer);
+        timer = undefined;
+        if (this.cancelBackoff === finish) this.cancelBackoff = null;
+        resolve();
+      };
+      timer = setTimeout(finish, ms);
+      this.cancelBackoff = finish;
+    });
+  }
+
+  private async run(generation: number): Promise<void> {
     // The server force-closes the stream on purpose (leader change / slow consumer) and a
     // long-lived HTTP/2 stream can drop; the client is expected to reconnect and re-read the
     // snapshot, which re-delivers anything missed. So reconnect (with backoff) until no devbox is
@@ -68,7 +91,7 @@ export class EvictionMonitor {
     const MAX_BACKOFF_MS = 30_000;
     let backoff = INITIAL_BACKOFF_MS;
     try {
-      while (this.entries.size > 0) {
+      while (generation === this.generation && this.entries.size > 0) {
         try {
           // Force the SSE Accept header: the endpoint only streams for text/event-stream; the
           // generated client's default (application/json) gets an empty text/plain response, so the
@@ -76,6 +99,10 @@ export class EvictionMonitor {
           const stream = await this.client.devboxes.watchEvictions({
             headers: { Accept: 'text/event-stream' },
           });
+          if (generation !== this.generation) {
+            stream.controller.abort();
+            return;
+          }
           this.stream = stream;
           for await (const event of stream) {
             this.dispatch(event);
@@ -90,12 +117,14 @@ export class EvictionMonitor {
           // Otherwise a routine disconnect — fall through to backoff + reconnect.
         }
         if (this.entries.size === 0) return;
-        await new Promise((resolve) => setTimeout(resolve, backoff));
+        await this.waitForRetry(backoff);
         backoff = Math.min(backoff * 2, MAX_BACKOFF_MS);
       }
     } finally {
-      this.stream = null;
-      this.running = false;
+      if (generation === this.generation) {
+        this.stream = null;
+        this.running = false;
+      }
     }
   }
 

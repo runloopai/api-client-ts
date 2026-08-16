@@ -1,4 +1,5 @@
 import { Devbox } from '../../../src/sdk/devbox';
+import { InternalServerError } from '../../../src/error';
 import { Response } from 'node-fetch';
 
 describe('object-oriented tunnel readiness', () => {
@@ -53,5 +54,32 @@ describe('object-oriented tunnel readiness', () => {
 
     await expect(devbox.awaitTunnelReady(3000, { path: '/ready' })).resolves.toBe(response);
     expect(ready).toHaveBeenCalledWith(3000, { path: '/ready' });
+  });
+
+  test('tunnel_unavailable is terminal in the object-oriented helper', async () => {
+    const unavailable = InternalServerError.generate(
+      503,
+      { error: 'tunnel_unavailable', retryable: true },
+      undefined,
+      { 'x-should-retry': 'true' },
+    );
+    const asResponse = jest.fn().mockRejectedValue(unavailable);
+    const client: any = {
+      baseURL: 'https://api.runloop.ai',
+      devboxes: {
+        retrieve: jest.fn().mockResolvedValue({
+          tunnel: { tunnel_key: 'tunnel-key', auth_mode: 'open', auth_token: null },
+        }),
+      },
+      get: jest.fn().mockReturnValue({ asResponse }),
+    };
+    const devbox = Devbox.fromId(client, 'dbx');
+
+    await expect(
+      devbox.awaitTunnelReady(8080, { path: '/health', timeoutMs: 1_000, retryIntervalMs: 0 }),
+    ).rejects.toBe(unavailable);
+    expect(client.get).toHaveBeenCalledTimes(1);
+    expect(asResponse).toHaveBeenCalledTimes(1);
+    expect(unavailable.attempts).toBe(1);
   });
 });
