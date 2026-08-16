@@ -329,6 +329,10 @@ export class H2Session {
 
     return new Promise((resolve) => {
       session.once('close', resolve);
+      if (this._state === SessionState.CONNECTING) {
+        session.destroy(new Error('H2 session closed while connecting'));
+        return;
+      }
       this._close();
     });
   }

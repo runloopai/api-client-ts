@@ -139,21 +139,22 @@ describe('H2Pool', () => {
   });
 
   test('closes a session that finishes connecting after pool shutdown', async () => {
-    let finishConnect!: () => void;
+    let failConnect!: (error: Error) => void;
     const connect = jest.spyOn(H2Session.prototype, 'connect').mockImplementation(
       () =>
-        new Promise<void>((resolve) => {
-          finishConnect = resolve;
+        new Promise<void>((_resolve, reject) => {
+          failConnect = reject;
         }),
     );
-    const close = jest.spyOn(H2Session.prototype, 'close').mockResolvedValue();
+    const close = jest.spyOn(H2Session.prototype, 'close').mockImplementation(async () => {
+      failConnect(new Error('closed while connecting'));
+    });
     try {
       const pool = new H2Pool(server.origin, { minConnections: 1 });
       const request = (pool as any)._enqueueRequest('/late', 'GET', {}, null, undefined, false);
 
       await Promise.resolve();
       await pool.close();
-      finishConnect();
       await expect(request).rejects.toThrow(/closed/);
       expect(close).toHaveBeenCalledTimes(1);
       expect((pool as any)._sessions).toHaveLength(0);

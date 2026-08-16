@@ -75,6 +75,27 @@ describe('H2Session', () => {
     await blackhole.close();
   });
 
+  test('close interrupts an in-progress connection within a bounded deadline', async () => {
+    const blackhole = await startBlackholeServer();
+    const s = new H2Session(`https://localhost:${blackhole.port}`, {
+      connectTimeout: 30_000,
+      tlsOptions: testTls,
+    });
+    const connecting = s.connect();
+    const connectionResult = connecting.catch((error) => error);
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    try {
+      const deadline = new Promise<never>((_resolve, reject) => {
+        timer = setTimeout(() => reject(new Error('session close did not settle within 1 second')), 1_000);
+      });
+      await expect(Promise.race([s.close(), deadline])).resolves.toBeUndefined();
+      await expect(connectionResult).resolves.toThrow(/closed while connecting/);
+    } finally {
+      if (timer) clearTimeout(timer);
+      await blackhole.close();
+    }
+  });
+
   test('GET returns JSON', async () => {
     const s = new H2Session(server.origin, { tlsOptions: testTls });
     await s.connect();

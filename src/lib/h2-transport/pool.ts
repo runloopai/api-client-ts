@@ -25,6 +25,7 @@ export class H2Pool {
   private readonly _origin: string;
   private readonly _opts: H2PoolOptions;
   private readonly _sessions: H2Session[] = [];
+  private readonly _connectingSessions = new Set<H2Session>();
   private readonly _queue: QueuedRequest[] = [];
   private _initialized = false;
   private _initPromise: Promise<void> | null = null;
@@ -74,7 +75,9 @@ export class H2Pool {
   }
 
   private async _addSession(): Promise<H2Session> {
+    if (this._closed) throw new Error('Pool is closed');
     const session = new H2Session(this._origin, this._opts);
+    this._connectingSessions.add(session);
 
     session.onAvailable = () => this._drainQueue();
 
@@ -87,7 +90,11 @@ export class H2Pool {
       }
     };
 
-    await session.connect();
+    try {
+      await session.connect();
+    } finally {
+      this._connectingSessions.delete(session);
+    }
     if (this._closed) {
       await session.close();
       throw new Error('Pool is closed');
@@ -248,7 +255,7 @@ export class H2Pool {
 
   async close(): Promise<void> {
     this._closed = true;
-    const sessions = [...this._sessions];
+    const sessions = [...new Set([...this._sessions, ...this._connectingSessions])];
     this._sessions.length = 0;
 
     for (const req of this._queue) {
