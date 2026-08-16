@@ -88,6 +88,10 @@ export class H2Pool {
     };
 
     await session.connect();
+    if (this._closed) {
+      await session.close();
+      throw new Error('Pool is closed');
+    }
     this._sessions.push(session);
     return session;
   }

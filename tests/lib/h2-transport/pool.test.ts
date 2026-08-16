@@ -1,5 +1,5 @@
 import { H2Pool } from '../../../src/lib/h2-transport/pool';
-import { H2GoawayError, SessionState } from '../../../src/lib/h2-transport/session';
+import { H2GoawayError, H2Session, SessionState } from '../../../src/lib/h2-transport/session';
 import { cleanupCerts, testTls } from './helpers/certs';
 import { defaultHandler, startTestServer, TestServer } from './helpers/testServer';
 
@@ -136,6 +136,31 @@ describe('H2Pool', () => {
       /closed/,
     );
     expect((pool as any)._queue).toHaveLength(0);
+  });
+
+  test('closes a session that finishes connecting after pool shutdown', async () => {
+    let finishConnect!: () => void;
+    const connect = jest.spyOn(H2Session.prototype, 'connect').mockImplementation(
+      () =>
+        new Promise<void>((resolve) => {
+          finishConnect = resolve;
+        }),
+    );
+    const close = jest.spyOn(H2Session.prototype, 'close').mockResolvedValue();
+    try {
+      const pool = new H2Pool(server.origin, { minConnections: 1 });
+      const request = (pool as any)._enqueueRequest('/late', 'GET', {}, null, undefined, false);
+
+      await Promise.resolve();
+      await pool.close();
+      finishConnect();
+      await expect(request).rejects.toThrow(/closed/);
+      expect(close).toHaveBeenCalledTimes(1);
+      expect((pool as any)._sessions).toHaveLength(0);
+    } finally {
+      connect.mockRestore();
+      close.mockRestore();
+    }
   });
 
   test('retries a safe stream that GOAWAY proves was not processed', async () => {
