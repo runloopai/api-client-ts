@@ -1,5 +1,7 @@
 import { Runloop, RunloopSDK } from '@runloop/api-client';
 import { NetworkPolicy, GatewayConfig, McpConfig } from '@runloop/api-client/sdk';
+import KeepAliveAgent from 'agentkeepalive';
+import type { Agent } from 'node:http';
 
 /**
  * Run the smoke tests over HTTP/2 (the undici adapter) instead of the default
@@ -8,17 +10,40 @@ import { NetworkPolicy, GatewayConfig, McpConfig } from '@runloop/api-client/sdk
  */
 export const useHttp2 = ['1', 'true'].includes((process.env['SMOKE_HTTP2'] ?? '').toLowerCase());
 
+const testAgents = new Set<Agent>();
+
+function makeTestAgent(baseURL: string | undefined, http2: boolean | object): Agent | undefined {
+  if (http2) return undefined;
+  const options = { keepAlive: true, freeSocketTimeout: 4_000 };
+  const agent =
+    (baseURL ?? 'https://api.runloop.ai').startsWith('https:') ?
+      new KeepAliveAgent.HttpsAgent(options)
+    : new KeepAliveAgent(options);
+  testAgents.add(agent);
+  return agent;
+}
+
+// Object coverage runs files in parallel Jest workers. Give each worker owned
+// HTTP/1.1 agents so teardown does not wait for the SDK's process-wide 30s
+// keep-alive pool (which previously forced Jest to kill a worker).
+afterAll(() => {
+  for (const agent of testAgents) agent.destroy();
+  testAgents.clear();
+});
+
 export function makeClient(overrides: Partial<ConstructorParameters<typeof Runloop>[0]> = {}) {
   const baseURL = process.env['RUNLOOP_BASE_URL'];
   const bearerToken = process.env['RUNLOOP_API_KEY'];
+  const http2 = overrides.http2 ?? useHttp2;
 
   return new Runloop({
     baseURL,
     bearerToken,
     timeout: 120_000,
     maxRetries: 3,
-    http2: useHttp2,
+    http2,
     ...overrides,
+    httpAgent: overrides.httpAgent ?? makeTestAgent(baseURL, http2),
   });
 }
 
@@ -29,6 +54,7 @@ export function makeClientSDK() {
     timeout: 120_000,
     maxRetries: 3,
     http2: useHttp2,
+    httpAgent: makeTestAgent(process.env['RUNLOOP_BASE_URL'], useHttp2),
   });
 }
 

@@ -1,4 +1,4 @@
-import { H2Session, SessionState, type H2SessionOptions } from './session';
+import { H2GoawayError, H2Session, SessionState, type H2SessionOptions } from './session';
 import type { H2Response } from './response';
 
 export interface H2PoolOptions extends H2SessionOptions {
@@ -153,7 +153,7 @@ export class H2Pool {
         allowGoawayRetry &&
         session.state !== SessionState.READY &&
         RETRYABLE_METHODS.has(method) &&
-        err?.code !== 'ERR_HTTP2_GOAWAY_SESSION'
+        (!(err instanceof H2GoawayError) || err.unprocessed)
       ) {
         // Session went away (GOAWAY, etc). Re-enter the pool for a retry.
         return this._enqueueRequest(path, method, headers, body, signal, false);

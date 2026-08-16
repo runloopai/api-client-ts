@@ -1,4 +1,5 @@
 import { H2Pool } from '../../../src/lib/h2-transport/pool';
+import { H2GoawayError, SessionState } from '../../../src/lib/h2-transport/session';
 import { cleanupCerts, testTls } from './helpers/certs';
 import { defaultHandler, startTestServer, TestServer } from './helpers/testServer';
 
@@ -126,5 +127,34 @@ describe('H2Pool', () => {
   test('close() before initialize() is safe', async () => {
     const pool = new H2Pool(server.origin, { tlsOptions: testTls });
     await expect(pool.close()).resolves.toBeUndefined();
+  });
+
+  test('retries a safe stream that GOAWAY proves was not processed', async () => {
+    const pool = new H2Pool(server.origin);
+    const retry = jest
+      .spyOn(pool as any, '_enqueueRequest')
+      .mockResolvedValue({ status: 200, retried: true });
+    const session = {
+      state: SessionState.DRAINING,
+      request: jest.fn().mockRejectedValue(new H2GoawayError(0, 1, undefined, true)),
+    };
+
+    await expect((pool as any)._dispatchToSession(session, '/safe', 'GET', {}, null)).resolves.toMatchObject({
+      retried: true,
+    });
+    expect(retry).toHaveBeenCalledWith('/safe', 'GET', {}, null, undefined, false);
+  });
+
+  test('does not retry an accepted stream terminated by idle GOAWAY', async () => {
+    const pool = new H2Pool(server.origin);
+    const cause = new H2GoawayError(0, 1, Buffer.from('idle_timeout'), false);
+    const retry = jest.spyOn(pool as any, '_enqueueRequest');
+    const session = {
+      state: SessionState.DRAINING,
+      request: jest.fn().mockRejectedValue(cause),
+    };
+
+    await expect((pool as any)._dispatchToSession(session, '/idle', 'GET', {}, null)).rejects.toBe(cause);
+    expect(retry).not.toHaveBeenCalled();
   });
 });

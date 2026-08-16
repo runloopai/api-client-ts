@@ -147,17 +147,30 @@ export class DevboxNetOps {
   }
 
   /**
-   * Wait until an enabled tunnel is accepting requests. Only explicit tunnel
-   * readiness/connect failures are retried, within a bounded deadline.
+   * Wait until an enabled tunnel is accepting requests. Only
+   * `tunnel_service_not_ready` is retried, within a bounded deadline.
    */
   async awaitTunnelReady(port: number, options: TunnelReadinessOptions = {}): Promise<Core.Response> {
-    const info = await this.client.devboxes.retrieve(this.devboxId, { maxRetries: 0 });
+    const timeoutMs = options.timeoutMs ?? 30_000;
+    if (timeoutMs <= 0) throw new RangeError('timeoutMs must be positive');
+    const path = options.path ?? '/';
+    if (!path.startsWith('/') || path.startsWith('//')) {
+      throw new RangeError('path must be an absolute tunnel path beginning with a single `/`');
+    }
+
+    const deadline = Date.now() + timeoutMs;
+    const info = await this.client.devboxes.retrieve(this.devboxId, {
+      maxRetries: 0,
+      timeout: timeoutMs,
+      signal: options.signal,
+    });
     if (!info.tunnel) {
       throw new RunloopError('No tunnel has been enabled for this devbox. Call net.enableTunnel() first.');
     }
     const apiHost = new URL(this.client.baseURL).hostname;
     const baseDomain = apiHost.startsWith('api.') ? apiHost.slice(4) : apiHost;
-    const url = `https://${port}-${info.tunnel.tunnel_key}.tunnel.${baseDomain}`;
+    const url = `https://${port}-${info.tunnel.tunnel_key}.tunnel.${baseDomain}${path}`;
+    const remainingMs = Math.max(1, deadline - Date.now());
     return awaitTunnelServiceReady(
       (remainingMs) =>
         this.client
@@ -170,7 +183,7 @@ export class DevboxNetOps {
             },
           })
           .asResponse(),
-      options,
+      { ...options, timeoutMs: remainingMs },
     );
   }
 }

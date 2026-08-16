@@ -41,6 +41,7 @@ describe('HTTP/2 idle timeout GOAWAY', () => {
         code: 'ERR_HTTP2_GOAWAY_SESSION',
         errorCode: 0,
         lastStreamID: 1,
+        unprocessed: false,
       });
       expect(Buffer.from(error.cause.opaqueData).toString()).toBe('idle_timeout');
       expect(server.streamCount()).toBe(1);

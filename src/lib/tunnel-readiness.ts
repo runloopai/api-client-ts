@@ -1,23 +1,18 @@
-import { APIConnectionError, APIError } from '../error';
+import { APIError } from '../error';
 
 export interface TunnelReadinessOptions {
   /** Overall bounded deadline in milliseconds. Defaults to 30 seconds. */
   timeoutMs?: number;
   /** Delay used when the server does not provide Retry-After. Defaults to 250ms. */
   retryIntervalMs?: number;
+  /** Health endpoint requested through the established tunnel. Defaults to `/`. */
+  path?: string;
   signal?: AbortSignal;
 }
 
-const READINESS_CODES = new Set([
-  'tunnel_service_not_ready',
-  'tunnel_backend_connect_timeout',
-  'tunnel_unavailable',
-]);
-
 function canRetryReadiness(error: unknown): error is APIError {
   if (!(error instanceof APIError) || error.retryable === false) return false;
-  if (error instanceof APIConnectionError) return error.phase === 'connect';
-  return READINESS_CODES.has(error.code ?? '') && error.phase !== 'response_read';
+  return error.code === 'tunnel_service_not_ready';
 }
 
 function delay(ms: number, signal?: AbortSignal): Promise<void> {
@@ -63,7 +58,7 @@ export async function awaitTunnelServiceReady<T>(
       }
       const remaining = deadline - Date.now();
       const requestedDelay = error.retryAfter === undefined ? retryIntervalMs : error.retryAfter * 1000;
-      if (remaining <= 0 || requestedDelay >= remaining) {
+      if (remaining <= 0 || requestedDelay >= remaining || attempts >= 1000) {
         Object.defineProperty(error, 'attempts', { value: attempts, configurable: true });
         throw error;
       }

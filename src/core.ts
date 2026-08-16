@@ -20,7 +20,13 @@ init();
 
 export { type Response };
 import { BlobLike, isBlobLike, isMultipartBody } from './uploads';
-import { isTransportError, normalizeTransportError, SDKRequestTimeoutError } from './lib/error-normalization';
+import {
+  isTransportError,
+  normalizeResponseError,
+  normalizeTransportError,
+  type RunloopErrorDetails,
+  SDKRequestTimeoutError,
+} from './lib/error-normalization';
 export {
   maybeMultipartFormRequestOptions,
   multipartFormRequestOptions,
@@ -503,6 +509,7 @@ export abstract class APIClient {
       throw new APIUserAbortError();
     }
 
+    const attemptStartedAt = Date.now();
     const controller = new AbortController();
     const response = await this.fetchWithTimeout(url, req, timeout, controller).catch(castToError);
     const attempts = maxRetries - retriesRemaining + 1;
@@ -523,7 +530,11 @@ export abstract class APIClient {
     if (!response.ok) {
       let errText: string;
       try {
-        errText = await response.text();
+        errText = await this.readErrorResponseText(
+          response,
+          Math.max(1, timeout - (Date.now() - attemptStartedAt)),
+          controller,
+        );
       } catch (error) {
         const cause = castToError(error);
         if (!isTransportError(cause)) throw error;
@@ -531,11 +542,9 @@ export abstract class APIClient {
       }
       const errJSON = safeJSON(errText);
       const errMessage = errJSON ? undefined : errText;
-      const responseCode =
-        responseHeaders['x-runloop-error-code'] ||
-        (errJSON && typeof (errJSON as any).error === 'string' ? (errJSON as any).error : undefined);
+      const details = normalizeResponseError(errJSON, responseHeaders, attempts);
 
-      if (retriesRemaining && this.shouldRetry(response, options, responseCode)) {
+      if (retriesRemaining && this.shouldRetry(response, options, details)) {
         const retryMessage = `retrying, ${retriesRemaining} attempts remaining`;
         debug(`response (error; ${retryMessage})`, response.status, url, responseHeaders);
         return this.retryRequest(options, retriesRemaining, responseHeaders);
@@ -623,6 +632,35 @@ export abstract class APIClient {
     );
   }
 
+  private async readErrorResponseText(
+    response: Response,
+    timeoutMs: number,
+    controller: AbortController,
+  ): Promise<string> {
+    let deadlineExpired = false;
+    let timeout: ReturnType<typeof setTimeout>;
+    const deadline = new Promise<never>((_, reject) => {
+      timeout = setTimeout(() => {
+        deadlineExpired = true;
+        controller.abort();
+        reject(
+          new SDKRequestTimeoutError(
+            Object.assign(new Error('Response body read timed out.'), { name: 'AbortError' }),
+          ),
+        );
+      }, timeoutMs);
+    });
+    try {
+      return await Promise.race([response.text(), deadline]);
+    } catch (error) {
+      const cause = castToError(error);
+      if (cause instanceof SDKRequestTimeoutError) throw cause;
+      throw deadlineExpired ? new SDKRequestTimeoutError(cause) : cause;
+    } finally {
+      clearTimeout(timeout!);
+    }
+  }
+
   private isRetrySafe(options: FinalRequestOptions): boolean {
     if (isMultipartBody(options.body)) return false;
     const path = options.path ?? '';
@@ -637,14 +675,21 @@ export abstract class APIClient {
     return code === 'request_timeout' || code === 'connection_timeout' || phase === 'connect';
   }
 
-  private shouldRetry(response: Response, options: FinalRequestOptions, code?: string): boolean {
+  private shouldRetry(
+    response: Response,
+    options: FinalRequestOptions,
+    details: RunloopErrorDetails,
+  ): boolean {
     if (!this.isRetrySafe(options)) return false;
+    if (details.code === 'tunnel_unavailable') return false;
     // Note this is not a standard header.
     const shouldRetryHeader = response.headers.get('x-should-retry');
 
     // If the server explicitly says whether or not to retry, obey.
     if (shouldRetryHeader === 'true') return true;
     if (shouldRetryHeader === 'false') return false;
+    if (details.retryable === false) return false;
+    if (details.retryable === true) return true;
 
     // Retry on request timeouts.
     if (response.status === 408) return true;
@@ -661,7 +706,7 @@ export abstract class APIClient {
         'upload_request_body_idle_timeout',
         'tunnel_backend_idle_timeout',
         'tunnel_backend_connection_reset',
-      ].includes(code ?? '');
+      ].includes(details.code ?? '');
     }
 
     return false;

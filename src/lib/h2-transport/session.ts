@@ -34,6 +34,7 @@ export class H2GoawayError extends Error {
     readonly errorCode: number,
     readonly lastStreamID: number,
     readonly opaqueData?: Uint8Array,
+    readonly unprocessed = false,
   ) {
     const debug = opaqueData ? Buffer.from(opaqueData).toString('utf8') : '';
     super(`HTTP/2 GOAWAY (error code ${errorCode}, last stream ${lastStreamID})${debug ? `: ${debug}` : ''}`);
@@ -175,6 +176,7 @@ export class H2Session {
 
       let settled = false;
       let cleaned = false;
+      let goawayCause: H2GoawayError | undefined;
 
       const onAbort = () => {
         if (!cleaned) {
@@ -209,19 +211,30 @@ export class H2Session {
         this.onAvailable?.();
       };
 
-      stream.once('close', cleanup);
+      stream.once('close', () => {
+        if (!settled) {
+          settled = true;
+          reject(
+            goawayCause ??
+              Object.assign(new Error('HTTP/2 stream closed before response headers.'), {
+                code: 'ERR_HTTP2_STREAM_ERROR',
+              }),
+          );
+        }
+        cleanup();
+      });
 
       const onGoaway = (errorCode: number, lastStreamID: number, opaqueData?: Buffer) => {
         // A stream above lastStreamID was not processed by the peer. Preserve all
         // GOAWAY metadata instead of replacing it with node:http2's generic error.
-        const idleTimeout = opaqueData?.includes(Buffer.from('idle_timeout')) ?? false;
-        if (!settled && (idleTimeout || (typeof stream.id === 'number' && stream.id > lastStreamID))) {
+        const unprocessed = typeof stream.id === 'number' && stream.id > lastStreamID;
+        goawayCause = new H2GoawayError(errorCode, lastStreamID, opaqueData, unprocessed);
+        if (!settled && unprocessed) {
           settled = true;
-          const cause = new H2GoawayError(errorCode, lastStreamID, opaqueData);
           cleanup();
           stream.on('error', () => {});
           stream.destroy();
-          reject(cause);
+          reject(goawayCause);
         }
       };
       this._goawayHandlers.add(onGoaway);
@@ -230,7 +243,7 @@ export class H2Session {
         if (!settled) {
           settled = true;
           cleanup();
-          reject(err);
+          reject(goawayCause ?? err);
         }
       });
 

@@ -6,6 +6,7 @@ import {
 } from '@runloop/api-client';
 import { Response, type RequestInfo, type RequestInit } from 'node-fetch';
 import { awaitTunnelServiceReady } from '../src/lib/tunnel-readiness';
+import { PassThrough } from 'node:stream';
 
 describe('stable Runloop error details', () => {
   test.each([
@@ -171,10 +172,31 @@ describe('stable Runloop error details', () => {
     expect(error.attempts).toBe(1);
   });
 
+  test('tunnel_unavailable remains terminal even when retry headers disagree', async () => {
+    const fetch = jest.fn(() =>
+      Promise.resolve(
+        new Response(JSON.stringify({ error: 'tunnel_unavailable', retryable: true }), {
+          status: 503,
+          headers: { 'content-type': 'application/json', 'x-should-retry': 'true' },
+        }),
+      ),
+    );
+    const client = new Runloop({
+      bearerToken: 'test',
+      baseURL: 'https://example.invalid',
+      maxRetries: 2,
+      fetch: fetch as any,
+    });
+
+    const error: any = await client.get('/v1/tunnel').catch((value) => value);
+    expect(fetch).toHaveBeenCalledTimes(1);
+    expect(error).toMatchObject({ code: 'tunnel_unavailable', attempts: 1 });
+  });
+
   test('does not blindly retry a response-idle failure', async () => {
     const fetch = jest.fn(() =>
       Promise.resolve(
-        new Response(JSON.stringify({ error: 'tunnel_backend_idle_timeout', retryable: false }), {
+        new Response(JSON.stringify({ code: 'tunnel_backend_idle_timeout', retryable: false }), {
           status: 503,
           headers: { 'content-type': 'application/json' },
         }),
@@ -192,6 +214,28 @@ describe('stable Runloop error details', () => {
     expect(error).toMatchObject({ code: 'tunnel_backend_idle_timeout', attempts: 1 });
   });
 
+  test('bounds error response body reads with the request deadline', async () => {
+    const body = new PassThrough();
+    const client = new Runloop({
+      bearerToken: 'test',
+      baseURL: 'https://example.invalid',
+      maxRetries: 0,
+      timeout: 20,
+      fetch: (() =>
+        Promise.resolve(
+          new Response(body, { status: 503, headers: { 'content-type': 'application/json' } }),
+        )) as any,
+    });
+
+    try {
+      const error: any = await client.get('/v1/stalled-error').catch((value) => value);
+      expect(error).toBeInstanceOf(APIConnectionTimeoutError);
+      expect(error).toMatchObject({ code: 'request_timeout', attempts: 1 });
+    } finally {
+      body.destroy();
+    }
+  });
+
   test('tunnel readiness helper retries only the explicit readiness failure', async () => {
     const notReady = InternalServerError.generate(
       503,
@@ -205,5 +249,21 @@ describe('stable Runloop error details', () => {
       'ready',
     );
     expect(request).toHaveBeenCalledTimes(2);
+  });
+
+  test('tunnel_unavailable is terminal for tunnel readiness', async () => {
+    const unavailable = InternalServerError.generate(
+      503,
+      { error: 'tunnel_unavailable', retryable: true, phase: 'tunnel_readiness' },
+      undefined,
+      {},
+    );
+    const request = jest.fn().mockRejectedValue(unavailable);
+
+    await expect(awaitTunnelServiceReady(request, { timeoutMs: 1_000, retryIntervalMs: 0 })).rejects.toBe(
+      unavailable,
+    );
+    expect(request).toHaveBeenCalledTimes(1);
+    expect(unavailable.attempts).toBe(1);
   });
 });
