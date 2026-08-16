@@ -842,6 +842,8 @@ export declare namespace Runloop {
 }
 
 export { type LongPollRequestOptions, LongPollAbortError, PollingTimeoutError } from './lib/polling';
+export { type TunnelReadinessOptions } from './lib/tunnel-readiness';
+export { type RunloopErrorDetails } from './lib/error-normalization';
 export { toFile, fileFromPath } from './uploads';
 export {
   RunloopError,

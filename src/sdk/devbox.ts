@@ -24,6 +24,7 @@ import { Execution } from './execution';
 import { ExecutionResult } from './execution-result';
 import { EvictionCallback, getEvictionMonitor } from './eviction';
 import { uuidv7 } from 'uuidv7';
+import { awaitTunnelServiceReady, type TunnelReadinessOptions } from '../lib/tunnel-readiness';
 
 // Re-export Execution and ExecutionResult for Devbox namespace
 export { Execution } from './execution';
@@ -143,6 +144,34 @@ export class DevboxNetOps {
    */
   async removeTunnel(options?: Core.RequestOptions) {
     return this.client.devboxes.removeTunnel(this.devboxId, options);
+  }
+
+  /**
+   * Wait until an enabled tunnel is accepting requests. Only explicit tunnel
+   * readiness/connect failures are retried, within a bounded deadline.
+   */
+  async awaitTunnelReady(port: number, options: TunnelReadinessOptions = {}): Promise<Core.Response> {
+    const info = await this.client.devboxes.retrieve(this.devboxId, { maxRetries: 0 });
+    if (!info.tunnel) {
+      throw new RunloopError('No tunnel has been enabled for this devbox. Call net.enableTunnel() first.');
+    }
+    const apiHost = new URL(this.client.baseURL).hostname;
+    const baseDomain = apiHost.startsWith('api.') ? apiHost.slice(4) : apiHost;
+    const url = `https://${port}-${info.tunnel.tunnel_key}.tunnel.${baseDomain}`;
+    return awaitTunnelServiceReady(
+      (remainingMs) =>
+        this.client
+          .get(url, {
+            maxRetries: 0,
+            timeout: remainingMs,
+            signal: options.signal,
+            headers: {
+              authorization: info.tunnel?.auth_token ? `Bearer ${info.tunnel.auth_token}` : null,
+            },
+          })
+          .asResponse(),
+      options,
+    );
   }
 }
 
@@ -842,6 +871,11 @@ export class Devbox {
     const apiHost = new URL(this.client.baseURL).hostname;
     const baseDomain = apiHost.startsWith('api.') ? apiHost.slice(4) : apiHost;
     return `https://${port}-${tunnel.tunnel_key}.tunnel.${baseDomain}`;
+  }
+
+  /** Wait until the tunnel service for a port is ready. */
+  async awaitTunnelReady(port: number, options?: TunnelReadinessOptions): Promise<Core.Response> {
+    return this.net.awaitTunnelReady(port, options);
   }
 
   /**

@@ -16,6 +16,7 @@ interface QueuedRequest {
   headers: Record<string, string>;
   body: string | Buffer | null;
   signal: AbortSignal | null | undefined;
+  allowGoawayRetry: boolean;
   resolve: (response: H2Response) => void;
   reject: (error: Error) => void;
 }
@@ -103,10 +104,15 @@ export class H2Pool {
       const session = this._findAvailable();
       if (!session) break;
       const req = this._queue.shift()!;
-      this._dispatchToSession(session, req.path, req.method, req.headers, req.body, req.signal).then(
-        req.resolve,
-        req.reject,
-      );
+      this._dispatchToSession(
+        session,
+        req.path,
+        req.method,
+        req.headers,
+        req.body,
+        req.signal,
+        req.allowGoawayRetry,
+      ).then(req.resolve, req.reject);
     }
 
     if (this._queue.length > 0 && !this._growing) {
@@ -138,13 +144,19 @@ export class H2Pool {
     headers: Record<string, string>,
     body: string | Buffer | null,
     signal?: AbortSignal | null,
+    allowGoawayRetry = true,
   ): Promise<H2Response> {
     try {
       return await session.request(path, method, headers, body, signal);
     } catch (err: any) {
-      if (session.state !== SessionState.READY && RETRYABLE_METHODS.has(method)) {
+      if (
+        allowGoawayRetry &&
+        session.state !== SessionState.READY &&
+        RETRYABLE_METHODS.has(method) &&
+        err?.code !== 'ERR_HTTP2_GOAWAY_SESSION'
+      ) {
         // Session went away (GOAWAY, etc). Re-enter the pool for a retry.
-        return this._enqueueRequest(path, method, headers, body, signal);
+        return this._enqueueRequest(path, method, headers, body, signal, false);
       }
       throw err;
     }
@@ -205,17 +217,18 @@ export class H2Pool {
     headers: Record<string, string>,
     body: string | Buffer | null,
     signal?: AbortSignal | null,
+    allowGoawayRetry = true,
   ): Promise<H2Response> {
     await this._initialize();
 
     // After init, try the fast path before queuing
     const session = this._findAvailable();
     if (session) {
-      return this._dispatchToSession(session, path, method, headers, body, signal);
+      return this._dispatchToSession(session, path, method, headers, body, signal, allowGoawayRetry);
     }
 
     return new Promise<H2Response>((resolve, reject) => {
-      this._queue.push({ path, method, headers, body, signal, resolve, reject });
+      this._queue.push({ path, method, headers, body, signal, allowGoawayRetry, resolve, reject });
 
       if (!this._growing && this._sessions.length < this._maxConnections) {
         this._growPool();

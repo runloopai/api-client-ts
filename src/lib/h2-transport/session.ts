@@ -26,6 +26,21 @@ const DEFAULT_INITIAL_WINDOW_SIZE = 16 * 1024 * 1024; // 16 MB
 
 const createAbortError = (): Error => Object.assign(new Error('Request aborted'), { name: 'AbortError' });
 
+/** Cause retained when a peer ends an HTTP/2 session with GOAWAY. */
+export class H2GoawayError extends Error {
+  readonly code = 'ERR_HTTP2_GOAWAY_SESSION';
+
+  constructor(
+    readonly errorCode: number,
+    readonly lastStreamID: number,
+    readonly opaqueData?: Uint8Array,
+  ) {
+    const debug = opaqueData ? Buffer.from(opaqueData).toString('utf8') : '';
+    super(`HTTP/2 GOAWAY (error code ${errorCode}, last stream ${lastStreamID})${debug ? `: ${debug}` : ''}`);
+    this.name = 'H2GoawayError';
+  }
+}
+
 export class H2Session {
   readonly origin: string;
 
@@ -35,6 +50,9 @@ export class H2Session {
   private _session: http2.ClientHttp2Session | null = null;
   private _connectPromise: Promise<void> | null = null;
   private readonly _opts: H2SessionOptions;
+  private readonly _goawayHandlers = new Set<
+    (errorCode: number, lastStreamID: number, opaqueData?: Buffer) => void
+  >();
 
   /** Called by the pool when a stream slot frees up. */
   onAvailable: (() => void) | null = null;
@@ -69,7 +87,10 @@ export class H2Session {
 
       const timeout = setTimeout(() => {
         session.destroy(
-          new Error(`H2 connect timeout after ${this._opts.connectTimeout ?? DEFAULT_CONNECT_TIMEOUT}ms`),
+          Object.assign(
+            new Error(`H2 connect timeout after ${this._opts.connectTimeout ?? DEFAULT_CONNECT_TIMEOUT}ms`),
+            { code: 'UND_ERR_CONNECT_TIMEOUT' },
+          ),
         );
       }, this._opts.connectTimeout ?? DEFAULT_CONNECT_TIMEOUT);
 
@@ -103,8 +124,11 @@ export class H2Session {
         }
       });
 
-      session.on('goaway', () => {
+      session.on('goaway', (errorCode, lastStreamID, opaqueData) => {
         this._state = SessionState.DRAINING;
+        for (const handler of [...this._goawayHandlers]) {
+          handler(errorCode, lastStreamID, opaqueData);
+        }
         if (this._activeStreams === 0) {
           this._close();
         }
@@ -175,6 +199,7 @@ export class H2Session {
         this._activeStreams--;
         if (this._activeStreams === 0) this._session?.unref();
         if (signal) signal.removeEventListener('abort', onAbort);
+        this._goawayHandlers.delete(onGoaway);
         if (this._state === SessionState.DRAINING && this._activeStreams === 0) {
           this._close();
         }
@@ -184,6 +209,21 @@ export class H2Session {
       };
 
       stream.once('close', cleanup);
+
+      const onGoaway = (errorCode: number, lastStreamID: number, opaqueData?: Buffer) => {
+        // A stream above lastStreamID was not processed by the peer. Preserve all
+        // GOAWAY metadata instead of replacing it with node:http2's generic error.
+        const idleTimeout = opaqueData?.includes(Buffer.from('idle_timeout')) ?? false;
+        if (!settled && (idleTimeout || (typeof stream.id === 'number' && stream.id > lastStreamID))) {
+          settled = true;
+          const cause = new H2GoawayError(errorCode, lastStreamID, opaqueData);
+          cleanup();
+          stream.on('error', () => {});
+          stream.destroy();
+          reject(cause);
+        }
+      };
+      this._goawayHandlers.add(onGoaway);
 
       stream.on('error', (err) => {
         if (!settled) {

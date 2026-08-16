@@ -1,12 +1,6 @@
 import { VERSION } from './version';
 import { Stream } from './streaming';
-import {
-  RunloopError,
-  APIError,
-  APIConnectionError,
-  APIConnectionTimeoutError,
-  APIUserAbortError,
-} from './error';
+import { RunloopError, APIError, APIConnectionError, APIUserAbortError } from './error';
 import { stringifyQuery } from './internal/utils/query';
 import {
   kind as shimsKind,
@@ -26,6 +20,7 @@ init();
 
 export { type Response };
 import { BlobLike, isBlobLike, isMultipartBody } from './uploads';
+import { isTransportError, normalizeTransportError, SDKRequestTimeoutError } from './lib/error-normalization';
 export {
   maybeMultipartFormRequestOptions,
   multipartFormRequestOptions,
@@ -56,54 +51,62 @@ export type APIResponseProps = {
   response: Response;
   options: FinalRequestOptions;
   controller: AbortController;
+  attempts?: number;
 };
 
 async function defaultParseResponse<T>(props: APIResponseProps): Promise<T> {
   const { response } = props;
-  if (props.options.stream) {
-    debug('response', response.status, response.url, response.headers, response.body);
+  try {
+    if (props.options.stream) {
+      debug('response', response.status, response.url, response.headers, response.body);
 
-    // Note: there is an invariant here that isn't represented in the type system
-    // that if you set `stream: true` the response type must also be `Stream<T>`
+      // Note: there is an invariant here that isn't represented in the type system
+      // that if you set `stream: true` the response type must also be `Stream<T>`
 
-    if (props.options.__streamClass) {
-      return props.options.__streamClass.fromSSEResponse(response, props.controller) as any;
+      if (props.options.__streamClass) {
+        return props.options.__streamClass.fromSSEResponse(response, props.controller) as any;
+      }
+
+      return Stream.fromSSEResponse(response, props.controller) as any;
     }
 
-    return Stream.fromSSEResponse(response, props.controller) as any;
-  }
-
-  // fetch refuses to read the body when the status code is 204.
-  if (response.status === 204) {
-    return null as T;
-  }
-
-  if (props.options.__binaryResponse) {
-    return response as unknown as T;
-  }
-
-  const contentType = response.headers.get('content-type');
-  const mediaType = contentType?.split(';')[0]?.trim();
-  const isJSON = mediaType?.includes('application/json') || mediaType?.endsWith('+json');
-  if (isJSON) {
-    const contentLength = response.headers.get('content-length');
-    if (contentLength === '0') {
-      // if there is no content we can't do anything
-      return undefined as T;
+    // fetch refuses to read the body when the status code is 204.
+    if (response.status === 204) {
+      return null as T;
     }
 
-    const json = await response.json();
+    if (props.options.__binaryResponse) {
+      return response as unknown as T;
+    }
 
-    debug('response', response.status, response.url, response.headers, json);
+    const contentType = response.headers.get('content-type');
+    const mediaType = contentType?.split(';')[0]?.trim();
+    const isJSON = mediaType?.includes('application/json') || mediaType?.endsWith('+json');
+    if (isJSON) {
+      const contentLength = response.headers.get('content-length');
+      if (contentLength === '0') {
+        // if there is no content we can't do anything
+        return undefined as T;
+      }
 
-    return json as T;
+      const json = await response.json();
+
+      debug('response', response.status, response.url, response.headers, json);
+
+      return json as T;
+    }
+
+    const text = await response.text();
+    debug('response', response.status, response.url, response.headers, text);
+
+    // TODO handle blob, arraybuffer, other content types, etc.
+    return text as unknown as T;
+  } catch (error) {
+    if (error instanceof APIError) throw error;
+    const cause = castToError(error);
+    if (!isTransportError(cause)) throw error;
+    throw APIConnectionError.fromCause(cause, props.attempts ?? 1);
   }
-
-  const text = await response.text();
-  debug('response', response.status, response.url, response.headers, text);
-
-  // TODO handle blob, arraybuffer, other content types, etc.
-  return text as unknown as T;
 }
 
 /**
@@ -464,8 +467,9 @@ export abstract class APIClient {
     error: Object | undefined,
     message: string | undefined,
     headers: Headers | undefined,
+    attempts = 1,
   ): APIError {
-    return APIError.generate(status, error, message, headers);
+    return APIError.generate(status, error, message, headers, attempts);
   }
 
   request<Req, Rsp>(
@@ -501,41 +505,51 @@ export abstract class APIClient {
 
     const controller = new AbortController();
     const response = await this.fetchWithTimeout(url, req, timeout, controller).catch(castToError);
+    const attempts = maxRetries - retriesRemaining + 1;
 
     if (response instanceof Error) {
       if (options.signal?.aborted) {
         throw new APIUserAbortError();
       }
-      if (retriesRemaining) {
+      const normalized = normalizeTransportError(response, attempts);
+      if (retriesRemaining && this.shouldRetryTransport(options, normalized.code, normalized.phase)) {
         return this.retryRequest(options, retriesRemaining);
       }
-      if (response.name === 'AbortError') {
-        throw new APIConnectionTimeoutError();
-      }
-      throw new APIConnectionError({ cause: response });
+      throw APIConnectionError.fromCause(response, attempts);
     }
 
     const responseHeaders = createResponseHeaders(response.headers);
 
     if (!response.ok) {
-      if (retriesRemaining && this.shouldRetry(response)) {
+      let errText: string;
+      try {
+        errText = await response.text();
+      } catch (error) {
+        const cause = castToError(error);
+        if (!isTransportError(cause)) throw error;
+        throw APIConnectionError.fromCause(cause, attempts);
+      }
+      const errJSON = safeJSON(errText);
+      const errMessage = errJSON ? undefined : errText;
+      const responseCode =
+        responseHeaders['x-runloop-error-code'] ||
+        (errJSON && typeof (errJSON as any).error === 'string' ? (errJSON as any).error : undefined);
+
+      if (retriesRemaining && this.shouldRetry(response, options, responseCode)) {
         const retryMessage = `retrying, ${retriesRemaining} attempts remaining`;
         debug(`response (error; ${retryMessage})`, response.status, url, responseHeaders);
         return this.retryRequest(options, retriesRemaining, responseHeaders);
       }
 
-      const errText = await response.text().catch((e) => castToError(e).message);
-      const errJSON = safeJSON(errText);
-      const errMessage = errJSON ? undefined : errText;
       const retryMessage = retriesRemaining ? `(error; no more retries left)` : `(error; not retryable)`;
 
       debug(`response (error; ${retryMessage})`, response.status, url, responseHeaders, errMessage);
 
-      const err = this.makeStatusError(response.status, errJSON, errMessage, responseHeaders);
+      const err = this.makeStatusError(response.status, errJSON, errMessage, responseHeaders, attempts);
       throw err;
     }
 
-    return { response, options, controller };
+    return { response, options, controller, attempts };
   }
 
   requestAPIList<Item = unknown, PageClass extends AbstractPage<Item> = AbstractPage<Item>>(
@@ -579,7 +593,11 @@ export abstract class APIClient {
     const { signal, ...options } = init || {};
     if (signal) signal.addEventListener('abort', () => controller.abort());
 
-    const timeout = setTimeout(() => controller.abort(), ms);
+    let deadlineExpired = false;
+    const timeout = setTimeout(() => {
+      deadlineExpired = true;
+      controller.abort();
+    }, ms);
 
     const fetchOptions = {
       signal: controller.signal as any,
@@ -593,13 +611,34 @@ export abstract class APIClient {
 
     return (
       // use undefined this binding; fetch errors if bound to something else in browser/cloudflare
-      this.fetch.call(undefined, url, fetchOptions).finally(() => {
-        clearTimeout(timeout);
-      })
+      this.fetch
+        .call(undefined, url, fetchOptions)
+        .catch((error) => {
+          const cause = castToError(error);
+          throw deadlineExpired ? new SDKRequestTimeoutError(cause) : cause;
+        })
+        .finally(() => {
+          clearTimeout(timeout);
+        })
     );
   }
 
-  private shouldRetry(response: Response): boolean {
+  private isRetrySafe(options: FinalRequestOptions): boolean {
+    if (isMultipartBody(options.body)) return false;
+    const path = options.path ?? '';
+    // Execution requests can reach the server before a transport failure is observed.
+    if (/\/(execute|execute_async|wait_for_status)(?:\/|$)/.test(path)) return false;
+    if (['get', 'head', 'options', 'put', 'delete'].includes(options.method)) return true;
+    return Boolean(options.idempotencyKey);
+  }
+
+  private shouldRetryTransport(options: FinalRequestOptions, code?: string, phase?: string): boolean {
+    if (!this.isRetrySafe(options)) return false;
+    return code === 'request_timeout' || code === 'connection_timeout' || phase === 'connect';
+  }
+
+  private shouldRetry(response: Response, options: FinalRequestOptions, code?: string): boolean {
+    if (!this.isRetrySafe(options)) return false;
     // Note this is not a standard header.
     const shouldRetryHeader = response.headers.get('x-should-retry');
 
@@ -617,7 +656,13 @@ export abstract class APIClient {
     if (response.status === 429) return true;
 
     // Retry internal errors.
-    if (response.status >= 500) return true;
+    if (response.status >= 500) {
+      return ![
+        'upload_request_body_idle_timeout',
+        'tunnel_backend_idle_timeout',
+        'tunnel_backend_connection_reset',
+      ].includes(code ?? '');
+    }
 
     return false;
   }

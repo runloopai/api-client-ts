@@ -42,6 +42,7 @@ function checkNodeVersion(): void {
 }
 
 export type { H2PoolOptions as H2FetchOptions };
+export { H2GoawayError } from './session';
 
 export type H2Fetch = Fetch & {
   close: () => Promise<void>;

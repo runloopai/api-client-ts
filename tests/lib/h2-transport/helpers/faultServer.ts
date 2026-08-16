@@ -4,6 +4,8 @@ import { ensureCerts } from './certs';
 export interface FaultPlan {
   /** Send GOAWAY to the session as soon as the Nth stream opens. */
   goawayOnStream?: number;
+  /** Send GOAWAY with idle_timeout debug data before response headers. */
+  idleTimeoutGoawayBeforeHeadersOnStream?: number;
   /** RST_STREAM with the given code for the first N streams. */
   rstFirstNStreams?: { count: number; code: number };
   /** Delay headers by this many ms. */
@@ -55,6 +57,12 @@ export function startFaultServer(): Promise<FaultServer> {
         stream.respond({ ':status': 200, 'content-type': 'text/plain' });
         stream.end('ok-then-goaway');
         stream.session?.goaway();
+        return;
+      }
+
+      if (plan.idleTimeoutGoawayBeforeHeadersOnStream === n) {
+        stream.session?.goaway(http2.constants.NGHTTP2_NO_ERROR, 0, Buffer.from('idle_timeout'));
+        stream.close(http2.constants.NGHTTP2_CANCEL);
         return;
       }
 
