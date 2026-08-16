@@ -1,6 +1,7 @@
 import { Runloop, APIConnectionError } from '@runloop/api-client';
 import { createH2Fetch } from '../../../src/lib/h2-transport';
 import { H2GoawayError } from '../../../src/lib/h2-transport/session';
+import { H2Session } from '../../../src/lib/h2-transport/session';
 import { cleanupCerts, testTls } from './helpers/certs';
 import { startFaultServer, type FaultServer } from './helpers/faultServer';
 
@@ -46,5 +47,18 @@ describe('HTTP/2 idle timeout GOAWAY', () => {
     } finally {
       await h2Fetch.close();
     }
+  });
+
+  test('closes a draining session exactly once', async () => {
+    server.setPlan({ idleTimeoutGoawayBeforeHeadersOnStream: 1 });
+    const session = new H2Session(server.origin, { tlsOptions: testTls });
+    const onClose = jest.fn();
+    session.onClose = onClose;
+    await session.connect();
+
+    await expect(session.request('/idle', 'GET', {}, null)).rejects.toBeInstanceOf(H2GoawayError);
+    await new Promise((resolve) => setImmediate(resolve));
+    expect(onClose).toHaveBeenCalledTimes(1);
+    await session.close();
   });
 });

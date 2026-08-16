@@ -126,11 +126,12 @@ export class H2Session {
 
       session.on('goaway', (errorCode, lastStreamID, opaqueData) => {
         this._state = SessionState.DRAINING;
-        for (const handler of [...this._goawayHandlers]) {
-          handler(errorCode, lastStreamID, opaqueData);
-        }
         if (this._activeStreams === 0) {
           this._close();
+          return;
+        }
+        for (const handler of [...this._goawayHandlers]) {
+          handler(errorCode, lastStreamID, opaqueData);
         }
       });
 
