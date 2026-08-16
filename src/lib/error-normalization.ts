@@ -47,7 +47,11 @@ export function isTransportError(error: Error): boolean {
   ) {
     return true;
   }
-  if (chain.some((item) => item.name === 'AbortError' || item.name === 'TypeError')) return true;
+  // Native fetch commonly rejects with a top-level TypeError, but its transport
+  // cause carries one of the codes above. Treating every TypeError as transport
+  // would also mask ordinary response parser failures (for example, reading an
+  // already-consumed body), so require transport-specific evidence instead.
+  if (chain.some((item) => item.name === 'AbortError')) return true;
   return chain.some((item) => /http\/2|protocol error/i.test(item.message));
 }
 

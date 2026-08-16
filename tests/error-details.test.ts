@@ -241,7 +241,9 @@ describe('stable Runloop error details', () => {
     const fetch = jest
       .fn()
       .mockResolvedValueOnce(new Response(stalled, { status: 503 }))
-      .mockResolvedValueOnce(new Response(JSON.stringify({ ok: true }), { headers: { 'content-type': 'application/json' } }));
+      .mockResolvedValueOnce(
+        new Response(JSON.stringify({ ok: true }), { headers: { 'content-type': 'application/json' } }),
+      );
     const client = new Runloop({
       bearerToken: 'test',
       baseURL: 'https://example.invalid',
@@ -260,6 +262,20 @@ describe('stable Runloop error details', () => {
 
   test('does not mask coded response parser failures as transport errors', async () => {
     const parserError = Object.assign(new Error('custom parser failed'), { code: 'APP_PARSE_ERROR' });
+    const response = new Response('{}', { headers: { 'content-type': 'application/json' } });
+    response.json = jest.fn().mockRejectedValue(parserError);
+    const client = new Runloop({
+      bearerToken: 'test',
+      baseURL: 'https://example.invalid',
+      maxRetries: 0,
+      fetch: jest.fn().mockResolvedValue(response) as any,
+    });
+
+    await expect(client.get('/v1/custom-parser')).rejects.toBe(parserError);
+  });
+
+  test('does not mask uncoded TypeErrors from response parsers as transport errors', async () => {
+    const parserError = new TypeError('response body has already been consumed');
     const response = new Response('{}', { headers: { 'content-type': 'application/json' } });
     response.json = jest.fn().mockRejectedValue(parserError);
     const client = new Runloop({
