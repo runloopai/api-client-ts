@@ -54,18 +54,6 @@ afterAll(async () => {
   testAgents.clear();
   await Promise.all(closed);
   globalThis.fetch = originalGlobalFetch;
-  if (process.env['CI']) {
-    const handles = (process as any)
-      ._getActiveHandles()
-      .map((handle: object) => handle.constructor?.name ?? 'unknown');
-    console.warn(
-      `[smoke teardown] ${expect.getState().testPath}: handles=${handles.join(',')} resources=${(
-        process as any
-      )
-        .getActiveResourcesInfo()
-        .join(',')}`,
-    );
-  }
 });
 
 export function makeClient(overrides: Partial<ConstructorParameters<typeof Runloop>[0]> = {}) {

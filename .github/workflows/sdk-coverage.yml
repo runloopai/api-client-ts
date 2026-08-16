@@ -58,7 +58,7 @@ jobs:
         id: tests
         run: |
           set -o pipefail
-          yarn test:objects-coverage --maxWorkers=800% --color 2>&1 | \
+          yarn test:objects-coverage --color 2>&1 | \
             tee -i test-output.log
 
       - name: Upload coverage report
@@ -199,4 +199,3 @@ jobs:
                 body: comment
               });
             }
-
