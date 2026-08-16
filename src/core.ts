@@ -388,6 +388,7 @@ export abstract class APIClient {
       ...(body && { body: body as any }),
       headers: reqHeaders,
       ...(httpAgent && { agent: httpAgent }),
+      ...(options.redirect && { redirect: options.redirect }),
       // @ts-ignore node-fetch uses a custom AbortSignal type that is
       // not compatible with standard web types
       signal: options.signal ?? null,
@@ -922,6 +923,8 @@ export type RequestOptions<
   httpAgent?: Agent;
   signal?: AbortSignal | undefined | null;
   idempotencyKey?: string;
+  /** Fetch redirect handling for this request. */
+  redirect?: 'error' | 'follow' | 'manual';
 
   __binaryRequest?: boolean | undefined;
   __binaryResponse?: boolean | undefined;
@@ -945,6 +948,7 @@ const requestOptionsKeys: KeysEnum<RequestOptions> = {
   httpAgent: true,
   signal: true,
   idempotencyKey: true,
+  redirect: true,
 
   __binaryRequest: true,
   __binaryResponse: true,

@@ -178,6 +178,9 @@ export class DevboxNetOps {
             maxRetries: 0,
             timeout: remainingMs,
             signal: options.signal,
+            // Never forward a tunnel credential (or the client's API bearer)
+            // to a Location chosen by the tunneled service.
+            redirect: 'error',
             headers: {
               authorization: info.tunnel?.auth_token ? `Bearer ${info.tunnel.auth_token}` : null,
             },

