@@ -35,6 +35,17 @@ describe('createH2Fetch', () => {
     const echoed = await r.json();
     expect(echoed['x-mixed-case']).toBe('yes');
     expect(echoed['accept']).toBe('application/json');
+    expect(echoed['host']).toBe(new URL(server.origin).host);
+    await fetch.close();
+  });
+
+  test('derives Host from the request URL instead of caller headers', async () => {
+    const fetch = createH2Fetch({ tlsOptions: testTls });
+    const r = (await fetch(`${server.origin}/headers`, {
+      method: 'GET',
+      headers: { host: 'attacker.invalid' },
+    })) as any;
+    expect((await r.json()).host).toBe(new URL(server.origin).host);
     await fetch.close();
   });
 

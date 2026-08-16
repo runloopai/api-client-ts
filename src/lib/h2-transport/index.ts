@@ -153,6 +153,10 @@ export function createH2Fetch(options?: H2PoolOptions): H2Fetch {
         }
       }
     }
+    // Unlike HTTP/1 fetch implementations, node:http2 does not expose an
+    // ordinary Host header to every downstream adapter from :authority. Send
+    // it explicitly for gateways/backends that validate the HTTP header map.
+    reqHeaders['host'] = parsed.host;
 
     const pool = getPool(parsed.origin);
     const h2resp = await pool.request(path, method.toUpperCase(), reqHeaders, body, signal);
