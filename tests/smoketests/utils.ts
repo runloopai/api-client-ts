@@ -2,6 +2,8 @@ import { Runloop, RunloopSDK } from '@runloop/api-client';
 import { NetworkPolicy, GatewayConfig, McpConfig } from '@runloop/api-client/sdk';
 import KeepAliveAgent from 'agentkeepalive';
 import type { Agent } from 'node:http';
+import type { Socket } from 'node:net';
+import nodeFetch from 'node-fetch';
 
 /**
  * Run the smoke tests over HTTP/2 (the undici adapter) instead of the default
@@ -11,6 +13,13 @@ import type { Agent } from 'node:http';
 export const useHttp2 = ['1', 'true'].includes((process.env['SMOKE_HTTP2'] ?? '').toLowerCase());
 
 const testAgents = new Set<Agent>();
+const originalGlobalFetch = globalThis.fetch;
+
+// Storage-object helpers intentionally use the platform fetch for presigned
+// uploads. Node's built-in fetch keeps its process-wide Undici dispatcher alive
+// beyond a Jest suite, so use the SDK's non-pooling node-fetch implementation in
+// smoke workers and restore the platform function during teardown.
+globalThis.fetch = nodeFetch as unknown as typeof globalThis.fetch;
 
 function makeTestAgent(baseURL: string | undefined, http2: boolean | object): Agent | undefined {
   if (http2) return undefined;
@@ -27,11 +36,24 @@ function makeTestAgent(baseURL: string | undefined, http2: boolean | object): Ag
 // HTTP/1.1 agents so teardown does not wait for the SDK's process-wide 30s
 // keep-alive pool (which previously forced Jest to kill a worker).
 afterAll(async () => {
+  const sockets = new Set<Socket>();
+  for (const agent of testAgents) {
+    for (const group of [...Object.values(agent.sockets), ...Object.values(agent.freeSockets)]) {
+      for (const socket of group ?? []) sockets.add(socket);
+    }
+  }
+  const closed = [...sockets]
+    .filter((socket) => !socket.destroyed)
+    .map(
+      (socket) =>
+        new Promise<void>((resolve) => {
+          socket.once('close', resolve);
+        }),
+    );
   for (const agent of testAgents) agent.destroy();
   testAgents.clear();
-  // agent.destroy() closes sockets asynchronously. Give their close callbacks
-  // one event-loop turn to run before Jest decides whether the worker leaked.
-  await new Promise<void>((resolve) => setImmediate(resolve));
+  await Promise.all(closed);
+  globalThis.fetch = originalGlobalFetch;
 });
 
 export function makeClient(overrides: Partial<ConstructorParameters<typeof Runloop>[0]> = {}) {
