@@ -177,6 +177,7 @@ export class H2Session {
       let settled = false;
       let cleaned = false;
       let goawayCause: H2GoawayError | undefined;
+      let responseController: ReadableStreamDefaultController<Uint8Array> | undefined;
 
       const onAbort = () => {
         if (!cleaned) {
@@ -220,6 +221,17 @@ export class H2Session {
                 code: 'ERR_HTTP2_STREAM_ERROR',
               }),
           );
+        } else if (!cleaned) {
+          try {
+            responseController?.error(
+              goawayCause ??
+                Object.assign(new Error('HTTP/2 stream closed before the response body completed.'), {
+                  code: 'ERR_HTTP2_STREAM_ERROR',
+                }),
+            );
+          } catch {
+            // The response body may already have been closed/cancelled.
+          }
         }
         cleanup();
       });
@@ -251,10 +263,15 @@ export class H2Session {
         settled = true;
         const status = responseHeaders[':status'] as number;
         const h2headers = new H2Headers(responseHeaders);
+        const contentLength = Number(responseHeaders['content-length']);
+        const expectedBodyBytes = Number.isFinite(contentLength) ? contentLength : undefined;
+        let receivedBodyBytes = 0;
 
         const responseBody = new ReadableStream<Uint8Array>({
           start(controller) {
+            responseController = controller;
             stream.on('data', (chunk: Buffer) => {
+              receivedBodyBytes += chunk.byteLength;
               try {
                 controller.enqueue(chunk);
               } catch {
@@ -265,7 +282,11 @@ export class H2Session {
             });
             stream.on('end', () => {
               try {
-                controller.close();
+                if (goawayCause && expectedBodyBytes !== undefined && receivedBodyBytes < expectedBodyBytes) {
+                  controller.error(goawayCause);
+                } else {
+                  controller.close();
+                }
               } catch {
                 // Already closed/cancelled — ignore
               }
@@ -273,7 +294,7 @@ export class H2Session {
             });
             stream.on('error', (err) => {
               try {
-                controller.error(err);
+                controller.error(goawayCause ?? err);
               } catch {
                 // controller may already be closed
               }

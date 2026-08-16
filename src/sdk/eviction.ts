@@ -116,7 +116,7 @@ export class EvictionMonitor {
           if (this.entries.size === 0) return;
           // Otherwise a routine disconnect — fall through to backoff + reconnect.
         }
-        if (this.entries.size === 0) return;
+        if (generation !== this.generation || this.entries.size === 0) return;
         await this.waitForRetry(backoff);
         backoff = Math.min(backoff * 2, MAX_BACKOFF_MS);
       }

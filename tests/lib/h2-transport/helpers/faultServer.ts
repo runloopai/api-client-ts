@@ -6,6 +6,8 @@ export interface FaultPlan {
   goawayOnStream?: number;
   /** Send GOAWAY with idle_timeout debug data before response headers. */
   idleTimeoutGoawayBeforeHeadersOnStream?: number;
+  /** Send GOAWAY with idle_timeout debug data after partial response data. */
+  idleTimeoutGoawayDuringBodyOnStream?: number;
   /** RST_STREAM with the given code for the first N streams. */
   rstFirstNStreams?: { count: number; code: number };
   /** Delay headers by this many ms. */
@@ -63,6 +65,20 @@ export function startFaultServer(): Promise<FaultServer> {
       if (plan.idleTimeoutGoawayBeforeHeadersOnStream === n) {
         stream.session?.goaway(http2.constants.NGHTTP2_NO_ERROR, 0, Buffer.from('idle_timeout'));
         stream.close(http2.constants.NGHTTP2_CANCEL);
+        return;
+      }
+
+      if (plan.idleTimeoutGoawayDuringBodyOnStream === n) {
+        stream.respond({ ':status': 200, 'content-type': 'application/json', 'content-length': '100' });
+        stream.write('{"partial":');
+        setImmediate(() => {
+          stream.session?.goaway(
+            http2.constants.NGHTTP2_NO_ERROR,
+            stream.id ?? 0,
+            Buffer.from('idle_timeout'),
+          );
+          stream.close(http2.constants.NGHTTP2_INTERNAL_ERROR);
+        });
         return;
       }
 

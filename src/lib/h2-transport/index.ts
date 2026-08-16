@@ -82,7 +82,25 @@ function toFetchResponse(h2: H2Response): Response {
   for (const [key, value] of h2.headers.entries()) headers[key] = value;
 
   const body = NULL_BODY_STATUSES.has(h2.status) ? null : Readable.fromWeb(h2.body as any);
+  let bodyError: Error | undefined;
+  body?.once('error', (error) => {
+    bodyError = error;
+  });
   const response = new Response(body as any, { status: h2.status, headers });
+
+  // node-fetch wraps stream failures in a new FetchError and drops the
+  // original exception. Restore it for SDK parsing so GOAWAY metadata and
+  // other low-level transport details remain available as APIError.cause.
+  for (const method of ['json', 'text'] as const) {
+    const consume = response[method].bind(response);
+    (response as any)[method] = async () => {
+      try {
+        return await consume();
+      } catch (error) {
+        throw bodyError ?? error;
+      }
+    };
+  }
 
   // node-fetch derives `url` from the request internals it never saw; expose the
   // real request URL (`Response.url` is a prototype getter, shadowed here).

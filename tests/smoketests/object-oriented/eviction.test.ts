@@ -122,4 +122,28 @@ const tick = (ms = 20) => new Promise((resolve) => setTimeout(resolve, ms));
       jest.useRealTimers();
     }
   });
+
+  test('cancel and re-register does not leave a stale reconnect timer', async () => {
+    jest.useFakeTimers();
+    try {
+      const firstStream = blockingStream();
+      const secondStream = blockingStream();
+      const watchEvictions = jest.fn().mockResolvedValueOnce(firstStream).mockResolvedValueOnce(secondStream);
+      const devbox = Devbox.fromId(fakeClient(watchEvictions), 'dbx_reregister');
+
+      devbox.onEvict(jest.fn());
+      await Promise.resolve();
+      devbox.cancelOnEvict();
+      devbox.onEvict(jest.fn());
+      await Promise.resolve();
+      await Promise.resolve();
+
+      expect(watchEvictions).toHaveBeenCalledTimes(2);
+      expect(jest.getTimerCount()).toBe(0);
+      devbox.cancelOnEvict();
+      await Promise.resolve();
+    } finally {
+      jest.useRealTimers();
+    }
+  });
 });
