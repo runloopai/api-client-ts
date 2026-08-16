@@ -81,6 +81,21 @@ describe('HTTP/2 idle timeout GOAWAY', () => {
     }
   });
 
+  test('retains GOAWAY metadata for binary response consumers', async () => {
+    server.setPlan({ idleTimeoutGoawayDuringBodyOnStream: 1 });
+    const h2Fetch = createH2Fetch({ minConnections: 1, maxConnections: 1, tlsOptions: testTls });
+
+    try {
+      const response = await h2Fetch(`${server.origin}/idle-binary`, { method: 'GET' });
+      const error: any = await response.arrayBuffer().catch((value) => value);
+      expect(error).toBeInstanceOf(H2GoawayError);
+      expect(error).toMatchObject({ code: 'ERR_HTTP2_GOAWAY_SESSION', unprocessed: false });
+      expect(Buffer.from(error.opaqueData).toString()).toBe('idle_timeout');
+    } finally {
+      await h2Fetch.close();
+    }
+  });
+
   test('closes a draining session exactly once', async () => {
     server.setPlan({ idleTimeoutGoawayBeforeHeadersOnStream: 1 });
     const session = new H2Session(server.origin, { tlsOptions: testTls });

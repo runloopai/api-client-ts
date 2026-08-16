@@ -219,7 +219,9 @@ export class H2Pool {
     signal?: AbortSignal | null,
     allowGoawayRetry = true,
   ): Promise<H2Response> {
+    if (this._closed) throw new Error('Pool is closed');
     await this._initialize();
+    if (this._closed) throw new Error('Pool is closed');
 
     // After init, try the fast path before queuing
     const session = this._findAvailable();
@@ -228,6 +230,10 @@ export class H2Pool {
     }
 
     return new Promise<H2Response>((resolve, reject) => {
+      if (this._closed) {
+        reject(new Error('Pool is closed'));
+        return;
+      }
       this._queue.push({ path, method, headers, body, signal, allowGoawayRetry, resolve, reject });
 
       if (!this._growing && this._sessions.length < this._maxConnections) {

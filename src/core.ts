@@ -539,6 +539,10 @@ export abstract class APIClient {
       } catch (error) {
         const cause = castToError(error);
         if (!isTransportError(cause)) throw error;
+        const normalized = normalizeTransportError(cause, attempts);
+        if (retriesRemaining && this.shouldRetryTransport(options, normalized.code, normalized.phase)) {
+          return this.retryRequest(options, retriesRemaining);
+        }
         throw APIConnectionError.fromCause(cause, attempts);
       }
       const errJSON = safeJSON(errText);
@@ -923,8 +927,8 @@ export type RequestOptions<
   httpAgent?: Agent;
   signal?: AbortSignal | undefined | null;
   idempotencyKey?: string;
-  /** Fetch redirect handling for this request. */
-  redirect?: 'error' | 'follow' | 'manual';
+  /** Reject redirect responses instead of forwarding request credentials. */
+  redirect?: 'error';
 
   __binaryRequest?: boolean | undefined;
   __binaryResponse?: boolean | undefined;

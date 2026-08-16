@@ -37,7 +37,16 @@ function errorChain(error: Error): ErrorLike[] {
 /** Whether an error originated in a fetch/HTTP transport rather than response parsing or user code. */
 export function isTransportError(error: Error): boolean {
   const chain = errorChain(error);
-  if (chain.some((item) => typeof item.code === 'string')) return true;
+  if (
+    chain.some(
+      (item) =>
+        typeof item.code === 'string' &&
+        (/^(?:UND_ERR_|ERR_HTTP2_)/.test(item.code) ||
+          /^(?:ECONN|ENET|EHOST|EPIPE|ETIMEDOUT|EPROTO|ESOCKET|EAI_)/.test(item.code)),
+    )
+  ) {
+    return true;
+  }
   if (chain.some((item) => item.name === 'AbortError' || item.name === 'TypeError')) return true;
   return chain.some((item) => /http\/2|protocol error/i.test(item.message));
 }

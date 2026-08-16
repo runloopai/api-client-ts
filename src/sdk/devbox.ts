@@ -182,7 +182,10 @@ export class DevboxNetOps {
             // to a Location chosen by the tunneled service.
             redirect: 'error',
             headers: {
-              authorization: info.tunnel?.auth_token ? `Bearer ${info.tunnel.auth_token}` : null,
+              // Remove the API bearer and use the tunnel-specific credential header.
+              authorization: null,
+              'x-runloop-tunnel-authorization':
+                info.tunnel?.auth_token ? `Bearer ${info.tunnel.auth_token}` : null,
             },
           })
           .asResponse(),

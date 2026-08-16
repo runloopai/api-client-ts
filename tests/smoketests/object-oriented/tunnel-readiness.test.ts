@@ -42,18 +42,28 @@ describe('object-oriented tunnel readiness', () => {
         maxRetries: 0,
         signal,
         redirect: 'error',
-        headers: { authorization: 'Bearer tunnel-token' },
+        headers: {
+          authorization: null,
+          'x-runloop-tunnel-authorization': 'Bearer tunnel-token',
+        },
       }),
     );
     expect(asResponse).toHaveBeenCalledTimes(1);
   });
 
   test('does not send API or tunnel credentials to a cross-origin redirect', async () => {
-    const calls: Array<{ url: string; authorization: string | null; redirect: string | undefined }> = [];
+    const calls: Array<{
+      url: string;
+      authorization: string | null;
+      tunnelAuthorization: string | null;
+      redirect: string | undefined;
+    }> = [];
     const fetch = jest.fn(async (request: RequestInfo, init?: RequestInit): Promise<Response> => {
       const url = request.toString();
-      const authorization = new Headers(init?.headers).get('authorization');
-      calls.push({ url, authorization, redirect: init?.redirect });
+      const headers = new Headers(init?.headers);
+      const authorization = headers.get('authorization');
+      const tunnelAuthorization = headers.get('x-runloop-tunnel-authorization');
+      calls.push({ url, authorization, tunnelAuthorization, redirect: init?.redirect });
 
       if (url === 'https://api.runloop.ai/v1/devboxes/dbx') {
         return new Response(
@@ -92,16 +102,20 @@ describe('object-oriented tunnel readiness', () => {
       {
         url: 'https://api.runloop.ai/v1/devboxes/dbx',
         authorization: 'Bearer api-bearer',
+        tunnelAuthorization: null,
         redirect: undefined,
       },
       {
         url: 'https://8080-tunnel-key.tunnel.runloop.ai/health',
-        authorization: 'Bearer tunnel-token',
+        authorization: null,
+        tunnelAuthorization: 'Bearer tunnel-token',
         redirect: 'error',
       },
     ]);
     expect(calls.some((call) => call.url === 'https://attacker.invalid/collect')).toBe(false);
-    expect(calls[1]?.authorization).not.toBe('Bearer api-bearer');
+    expect(calls[1]).not.toEqual(
+      expect.objectContaining({ authorization: 'Bearer api-bearer', tunnelAuthorization: null }),
+    );
   });
 
   test('Devbox helper delegates to its network operations', async () => {

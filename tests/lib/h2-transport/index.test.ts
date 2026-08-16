@@ -151,6 +151,22 @@ describe('createH2Fetch', () => {
     await fetch.close();
   });
 
+  test('rejects redirect responses when redirect mode is error', async () => {
+    const redirectServer = await startTestServer((stream) => {
+      stream.respond({ ':status': 302, location: 'https://attacker.invalid/collect' });
+      stream.end();
+    });
+    const fetch = createH2Fetch({ tlsOptions: testTls });
+    try {
+      await expect(fetch(`${redirectServer.origin}/redirect`, { redirect: 'error' })).rejects.toThrow(
+        /Redirect response/,
+      );
+    } finally {
+      await fetch.close();
+      await redirectServer.close();
+    }
+  });
+
   test('throws on Node < 18', () => {
     const real = process.versions.node;
     Object.defineProperty(process.versions, 'node', { value: '16.20.0', configurable: true });

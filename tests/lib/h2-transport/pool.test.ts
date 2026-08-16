@@ -129,6 +129,15 @@ describe('H2Pool', () => {
     await expect(pool.close()).resolves.toBeUndefined();
   });
 
+  test('does not enqueue a retry after the pool is closed', async () => {
+    const pool = new H2Pool(server.origin, { minConnections: 1, tlsOptions: testTls });
+    await pool.close();
+    await expect((pool as any)._enqueueRequest('/late', 'GET', {}, null, undefined, false)).rejects.toThrow(
+      /closed/,
+    );
+    expect((pool as any)._queue).toHaveLength(0);
+  });
+
   test('retries a safe stream that GOAWAY proves was not processed', async () => {
     const pool = new H2Pool(server.origin);
     const retry = jest

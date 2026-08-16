@@ -91,8 +91,9 @@ function toFetchResponse(h2: H2Response): Response {
   // node-fetch wraps stream failures in a new FetchError and drops the
   // original exception. Restore it for SDK parsing so GOAWAY metadata and
   // other low-level transport details remain available as APIError.cause.
-  for (const method of ['json', 'text'] as const) {
-    const consume = response[method].bind(response);
+  for (const method of ['arrayBuffer', 'blob', 'buffer', 'json', 'text'] as const) {
+    const consume = (response as any)[method]?.bind(response);
+    if (!consume) continue;
     (response as any)[method] = async () => {
       try {
         return await consume();
@@ -134,6 +135,7 @@ export function createH2Fetch(options?: H2PoolOptions): H2Fetch {
       signal,
       method = 'GET',
       headers: rawHeaders,
+      redirect,
     } = (init ?? {}) as any;
 
     const parsed = typeof url === 'string' ? new URL(url) : new URL(url.toString());
@@ -155,6 +157,10 @@ export function createH2Fetch(options?: H2PoolOptions): H2Fetch {
 
     const pool = getPool(parsed.origin);
     const h2resp = await pool.request(path, method.toUpperCase(), reqHeaders, body, signal);
+    if (redirect === 'error' && h2resp.status >= 300 && h2resp.status < 400) {
+      await h2resp.body.cancel();
+      throw new TypeError(`Redirect response (${h2resp.status}) is not allowed`);
+    }
     return toFetchResponse(h2resp) as any;
   }) as H2Fetch;
 
