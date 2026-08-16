@@ -178,9 +178,9 @@ export class DevboxNetOps {
             maxRetries: 0,
             timeout: remainingMs,
             signal: options.signal,
-            // Never forward a tunnel credential (or the client's API bearer)
-            // to a Location chosen by the tunneled service.
-            redirect: 'error',
+            // Surface redirects as terminal API errors without forwarding a
+            // tunnel credential to a Location chosen by the tunneled service.
+            redirect: 'manual',
             headers: {
               // Remove the API bearer and use the tunnel-specific credential header.
               authorization: null,

@@ -1,5 +1,5 @@
 import { Devbox } from '../../../src/sdk/devbox';
-import { InternalServerError } from '../../../src/error';
+import { APIError, InternalServerError } from '../../../src/error';
 import { Runloop } from '../../../src';
 import { Headers, Response, type RequestInfo, type RequestInit } from 'node-fetch';
 
@@ -41,7 +41,7 @@ describe('object-oriented tunnel readiness', () => {
       expect.objectContaining({
         maxRetries: 0,
         signal,
-        redirect: 'error',
+        redirect: 'manual',
         headers: {
           authorization: null,
           'x-runloop-tunnel-authorization': 'Bearer tunnel-token',
@@ -79,8 +79,11 @@ describe('object-oriented tunnel readiness', () => {
         );
       }
       if (url === 'https://8080-tunnel-key.tunnel.runloop.ai/health') {
-        if (init?.redirect === 'error') {
-          throw new TypeError('Redirect mode is set to error');
+        if (init?.redirect === 'manual') {
+          return new Response(undefined, {
+            status: 302,
+            headers: { location: 'https://attacker.invalid/collect' },
+          });
         }
         return fetch('https://attacker.invalid/collect', init);
       }
@@ -94,9 +97,12 @@ describe('object-oriented tunnel readiness', () => {
     });
     const devbox = Devbox.fromId(client, 'dbx');
 
-    await expect(
-      devbox.awaitTunnelReady(8080, { path: '/health', timeoutMs: 1_000 }),
-    ).rejects.toBeDefined();
+    const error = await devbox
+      .awaitTunnelReady(8080, { path: '/health', timeoutMs: 1_000 })
+      .catch((value) => value);
+
+    expect(error).toBeInstanceOf(APIError);
+    expect(error).toMatchObject({ status: 302, attempts: 1 });
 
     expect(calls).toEqual([
       {
@@ -109,9 +115,10 @@ describe('object-oriented tunnel readiness', () => {
         url: 'https://8080-tunnel-key.tunnel.runloop.ai/health',
         authorization: null,
         tunnelAuthorization: 'Bearer tunnel-token',
-        redirect: 'error',
+        redirect: 'manual',
       },
     ]);
+    expect(calls.filter((call) => call.url.includes('.tunnel.runloop.ai/health'))).toHaveLength(1);
     expect(calls.some((call) => call.url === 'https://attacker.invalid/collect')).toBe(false);
     expect(calls[1]).not.toEqual(
       expect.objectContaining({ authorization: 'Bearer api-bearer', tunnelAuthorization: null }),

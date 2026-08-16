@@ -927,8 +927,8 @@ export type RequestOptions<
   httpAgent?: Agent;
   signal?: AbortSignal | undefined | null;
   idempotencyKey?: string;
-  /** Reject redirect responses instead of forwarding request credentials. */
-  redirect?: 'error';
+  /** Return redirect responses without following their Location. */
+  redirect?: 'manual';
 
   __binaryRequest?: boolean | undefined;
   __binaryResponse?: boolean | undefined;

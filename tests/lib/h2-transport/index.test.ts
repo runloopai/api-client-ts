@@ -151,16 +151,16 @@ describe('createH2Fetch', () => {
     await fetch.close();
   });
 
-  test('rejects redirect responses when redirect mode is error', async () => {
+  test('returns redirect responses when redirect mode is manual', async () => {
     const redirectServer = await startTestServer((stream) => {
       stream.respond({ ':status': 302, location: 'https://attacker.invalid/collect' });
       stream.end();
     });
     const fetch = createH2Fetch({ tlsOptions: testTls });
     try {
-      await expect(fetch(`${redirectServer.origin}/redirect`, { redirect: 'error' })).rejects.toThrow(
-        /Redirect response/,
-      );
+      const response = await fetch(`${redirectServer.origin}/redirect`, { redirect: 'manual' });
+      expect(response.status).toBe(302);
+      expect(response.headers.get('location')).toBe('https://attacker.invalid/collect');
     } finally {
       await fetch.close();
       await redirectServer.close();
