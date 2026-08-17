@@ -1,8 +1,10 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 import { Runloop, toFile } from '@runloop/api-client';
+import type { DevboxView } from '../../../src/resources/devboxes/devboxes';
 import { Response } from 'node-fetch';
 import { APIError } from '../../../src/error';
+import { PollingTimeoutError } from '../../../src/lib/polling';
 
 const client = new Runloop({
   bearerToken: 'My Bearer Token',
@@ -743,6 +745,34 @@ describe('resource devboxes', () => {
     expect(mockPost).toHaveBeenCalledWith('/v1/devboxes', { body: {} });
 
     mockPost.mockRestore();
+  });
+
+  test('createAndAwaitRunning: shuts down the devbox and rethrows when waiting times out', async () => {
+    const devbox = { id: 'new-devbox-id', status: 'provisioning' } as DevboxView;
+    const timeout = new PollingTimeoutError('Timed out', devbox);
+    jest.spyOn(client.devboxes, 'create').mockResolvedValueOnce(devbox);
+    jest.spyOn(client.devboxes, 'awaitRunning').mockRejectedValueOnce(timeout);
+    const shutdown = jest.spyOn(client.devboxes, 'shutdown').mockResolvedValueOnce(devbox);
+
+    await expect(client.devboxes.createAndAwaitRunning()).rejects.toBe(timeout);
+
+    expect(shutdown).toHaveBeenCalledWith('new-devbox-id');
+    jest.restoreAllMocks();
+  });
+
+  test('createAndAwaitRunning: returns the devbox without shutting it down when configured', async () => {
+    const devbox = { id: 'new-devbox-id', status: 'provisioning' } as DevboxView;
+    const timeout = new PollingTimeoutError('Timed out', devbox);
+    jest.spyOn(client.devboxes, 'create').mockResolvedValueOnce(devbox);
+    jest.spyOn(client.devboxes, 'awaitRunning').mockRejectedValueOnce(timeout);
+    const shutdown = jest.spyOn(client.devboxes, 'shutdown');
+
+    await expect(
+      client.devboxes.createAndAwaitRunning(undefined, { shutdownOnTimeout: false }),
+    ).resolves.toBe(devbox);
+
+    expect(shutdown).not.toHaveBeenCalled();
+    jest.restoreAllMocks();
   });
 
   test('executeAndAwaitCompletion: passes last_n to waitForCommand when execute is not completed', async () => {

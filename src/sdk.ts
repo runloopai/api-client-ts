@@ -19,8 +19,8 @@ import { Secret } from './sdk/secret';
 import type {
   DevboxCreateParams,
   DevboxListParams,
-  DevboxView,
   DevboxListDiskSnapshotsParams,
+  CreateAndAwaitRunningOptions,
 } from './resources/devboxes/devboxes';
 import type { BlueprintListParams } from './resources/blueprints';
 import type { ObjectCreateParams, ObjectListParams } from './resources/objects';
@@ -581,13 +581,10 @@ export class DevboxOps {
    * ```
    *
    * @param {SDKDevboxCreateParams} [params] - Parameters for creating the devbox, with SDK mount syntax support.
-   * @param {LongPollRequestOptions<DevboxView>} [options] - Request options with optional long-poll configuration.
+   * @param {CreateAndAwaitRunningOptions} [options] - Request options with optional long-poll and timeout cleanup configuration.
    * @returns {Promise<Devbox>} A {@link Devbox} instance.
    */
-  async create(
-    params?: SDKDevboxCreateParams,
-    options?: LongPollRequestOptions<DevboxView>,
-  ): Promise<Devbox> {
+  async create(params?: SDKDevboxCreateParams, options?: CreateAndAwaitRunningOptions): Promise<Devbox> {
     const transformedParams = transformSDKDevboxCreateParams(params);
     return Devbox.create(this.client, transformedParams, options);
   }
@@ -596,13 +593,13 @@ export class DevboxOps {
    * Create a new devbox from a blueprint ID.
    * @param {string} blueprintId - The ID of the blueprint to use.
    * @param {Omit<DevboxCreateParams, 'blueprint_id' | 'snapshot_id' | 'blueprint_name'>} [params] - Additional parameters for creating the devbox (excluding blueprint_id, snapshot_id, and blueprint_name).
-   * @param {LongPollRequestOptions<DevboxView>} [options] - Request options with optional long-poll configuration.
+   * @param {CreateAndAwaitRunningOptions} [options] - Request options with optional long-poll and timeout cleanup configuration.
    * @returns {Promise<Devbox>} A {@link Devbox} instance.
    */
   async createFromBlueprintId(
     blueprintId: string,
     params?: Omit<DevboxCreateParams, 'blueprint_id' | 'snapshot_id' | 'blueprint_name'>,
-    options?: LongPollRequestOptions<DevboxView>,
+    options?: CreateAndAwaitRunningOptions,
   ): Promise<Devbox> {
     return Devbox.createFromBlueprintId(this.client, blueprintId, params, options);
   }
@@ -611,13 +608,13 @@ export class DevboxOps {
    * Create a new devbox from a blueprint name.
    * @param {string} blueprintName - The name of the blueprint to use.
    * @param {Omit<DevboxCreateParams, 'blueprint_id' | 'snapshot_id' | 'blueprint_name'>} [params] - Additional parameters for creating the devbox (excluding blueprint_id, snapshot_id, and blueprint_name).
-   * @param {LongPollRequestOptions<DevboxView>} [options] - Request options with optional long-poll configuration.
+   * @param {CreateAndAwaitRunningOptions} [options] - Request options with optional long-poll and timeout cleanup configuration.
    * @returns {Promise<Devbox>} A {@link Devbox} instance.
    */
   async createFromBlueprintName(
     blueprintName: string,
     params?: Omit<DevboxCreateParams, 'blueprint_id' | 'snapshot_id' | 'blueprint_name'>,
-    options?: LongPollRequestOptions<DevboxView>,
+    options?: CreateAndAwaitRunningOptions,
   ): Promise<Devbox> {
     return Devbox.createFromBlueprintName(this.client, blueprintName, params, options);
   }
@@ -636,13 +633,13 @@ export class DevboxOps {
    *
    * @param {string} snapshotId - The ID of the snapshot to use.
    * @param {Omit<DevboxCreateParams, 'snapshot_id' | 'blueprint_id' | 'blueprint_name'>} [params] - Additional parameters for creating the devbox (excluding snapshot_id, blueprint_id, and blueprint_name).
-   * @param {LongPollRequestOptions<DevboxView>} [options] - Request options with optional long-poll configuration.
+   * @param {CreateAndAwaitRunningOptions} [options] - Request options with optional long-poll and timeout cleanup configuration.
    * @returns {Promise<Devbox>} A {@link Devbox} instance.
    */
   async createFromSnapshot(
     snapshotId: string,
     params?: Omit<DevboxCreateParams, 'snapshot_id' | 'blueprint_id' | 'blueprint_name'>,
-    options?: LongPollRequestOptions<DevboxView>,
+    options?: CreateAndAwaitRunningOptions,
   ): Promise<Devbox> {
     return Devbox.createFromSnapshot(this.client, snapshotId, params, options);
   }
