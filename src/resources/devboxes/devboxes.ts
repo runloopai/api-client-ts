@@ -135,8 +135,8 @@ export class Devboxes extends APIResource {
     return this.awaitRunning(devbox.id, { ...requestOptions, longPoll, polling });
   }
   /**
-   * Updates a devbox by doing a complete update the existing name,metadata fields.
-   * It does not patch partial values.
+   * Updates the specified Devbox fields. Omitted fields are left unchanged. An empty
+   * name clears the name, and an empty metadata map clears the metadata.
    */
   update(id: string, body?: DevboxUpdateParams, options?: Core.RequestOptions): Core.APIPromise<DevboxView>;
   update(id: string, options?: Core.RequestOptions): Core.APIPromise<DevboxView>;
@@ -1295,12 +1295,14 @@ export namespace DevboxCreateParams {
 
 export interface DevboxUpdateParams {
   /**
-   * User defined metadata to attach to the devbox for organization.
+   * User defined metadata to replace the Devbox metadata. Omit to leave unchanged or
+   * set to an empty map to clear it.
    */
   metadata?: { [key: string]: string } | null;
 
   /**
-   * (Optional) A user specified name to give the Devbox.
+   * A user specified name to give the Devbox. Omit to leave unchanged or set to an
+   * empty string to clear it.
    */
   name?: string | null;
 }
