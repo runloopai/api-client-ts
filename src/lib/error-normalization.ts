@@ -50,7 +50,7 @@ export function isTransportError(error: Error): boolean {
   // Browser fetch implementations can report response-body network failures as
   // a bare TypeError. Callers that know the TypeError came from parser misuse
   // must exclude that case before using this transport-level predicate.
-  if (chain.some((item) => item.name === 'AbortError' || item.name === 'TypeError')) return true;
+  if (chain.some((item) => item.name === 'AbortError') || error.name === 'TypeError') return true;
   return chain.some((item) => /http\/2|protocol error/i.test(item.message));
 }
 

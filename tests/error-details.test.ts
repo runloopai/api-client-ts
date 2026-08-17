@@ -288,6 +288,41 @@ describe('stable Runloop error details', () => {
     await expect(client.get('/v1/custom-parser')).rejects.toBe(parserError);
   });
 
+  test('does not mask parser errors whose cause is a TypeError', async () => {
+    const parserError = Object.assign(new Error('custom parser failed'), {
+      cause: new TypeError('invalid parser input'),
+    });
+    const response = new Response('{}', { headers: { 'content-type': 'application/json' } });
+    response.json = jest.fn().mockRejectedValue(parserError);
+    const client = new Runloop({
+      bearerToken: 'test',
+      baseURL: 'https://example.invalid',
+      maxRetries: 0,
+      fetch: jest.fn().mockResolvedValue(response) as any,
+    });
+
+    await expect(client.get('/v1/custom-parser')).rejects.toBe(parserError);
+  });
+
+  test('does not mask TypeErrors caused by locked response bodies', async () => {
+    const parserError = new TypeError('response body is locked');
+    class LockedResponse extends Response {
+      override json(): Promise<never> {
+        return Promise.reject(parserError);
+      }
+    }
+    const response = new LockedResponse('{}', { headers: { 'content-type': 'application/json' } });
+    Object.defineProperty(response.body, 'locked', { value: true });
+    const client = new Runloop({
+      bearerToken: 'test',
+      baseURL: 'https://example.invalid',
+      maxRetries: 0,
+      fetch: jest.fn().mockResolvedValue(response) as any,
+    });
+
+    await expect(client.get('/v1/locked-body')).rejects.toBe(parserError);
+  });
+
   test('normalizes bare TypeErrors from native response body readers', async () => {
     const transportError = new TypeError('network connection lost while reading the response body');
     class NetworkFailureResponse extends Response {
