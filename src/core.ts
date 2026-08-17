@@ -62,6 +62,8 @@ export type APIResponseProps = {
 
 async function defaultParseResponse<T>(props: APIResponseProps): Promise<T> {
   const { response } = props;
+  let responseReader: 'json' | 'text' | undefined;
+  let bodyUsedBeforeRead = false;
   try {
     if (props.options.stream) {
       debug('response', response.status, response.url, response.headers, response.body);
@@ -95,6 +97,8 @@ async function defaultParseResponse<T>(props: APIResponseProps): Promise<T> {
         return undefined as T;
       }
 
+      responseReader = 'json';
+      bodyUsedBeforeRead = response.bodyUsed;
       const json = await response.json();
 
       debug('response', response.status, response.url, response.headers, json);
@@ -102,6 +106,8 @@ async function defaultParseResponse<T>(props: APIResponseProps): Promise<T> {
       return json as T;
     }
 
+    responseReader = 'text';
+    bodyUsedBeforeRead = response.bodyUsed;
     const text = await response.text();
     debug('response', response.status, response.url, response.headers, text);
 
@@ -110,6 +116,13 @@ async function defaultParseResponse<T>(props: APIResponseProps): Promise<T> {
   } catch (error) {
     if (error instanceof APIError) throw error;
     const cause = castToError(error);
+    if (
+      cause.name === 'TypeError' &&
+      responseReader &&
+      (bodyUsedBeforeRead || Object.prototype.hasOwnProperty.call(response, responseReader))
+    ) {
+      throw error;
+    }
     if (!isTransportError(cause)) throw error;
     throw APIConnectionError.fromCause(cause, props.attempts ?? 1);
   }
@@ -642,6 +655,8 @@ export abstract class APIClient {
     timeoutMs: number,
     controller: AbortController,
   ): Promise<string> {
+    const bodyUsedBeforeRead = response.bodyUsed;
+    const hasCustomTextReader = Object.prototype.hasOwnProperty.call(response, 'text');
     let deadlineExpired = false;
     let timeout: ReturnType<typeof setTimeout>;
     const deadline = new Promise<never>((_, reject) => {
@@ -660,6 +675,7 @@ export abstract class APIClient {
     } catch (error) {
       const cause = castToError(error);
       if (cause instanceof SDKRequestTimeoutError) throw cause;
+      if (cause.name === 'TypeError' && (bodyUsedBeforeRead || hasCustomTextReader)) throw error;
       throw deadlineExpired ? new SDKRequestTimeoutError(cause) : cause;
     } finally {
       clearTimeout(timeout!);

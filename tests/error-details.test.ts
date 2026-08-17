@@ -288,6 +288,28 @@ describe('stable Runloop error details', () => {
     await expect(client.get('/v1/custom-parser')).rejects.toBe(parserError);
   });
 
+  test('normalizes bare TypeErrors from native response body readers', async () => {
+    const transportError = new TypeError('network connection lost while reading the response body');
+    class NetworkFailureResponse extends Response {
+      override json(): Promise<never> {
+        return Promise.reject(transportError);
+      }
+    }
+    const response = new NetworkFailureResponse('{}', {
+      headers: { 'content-type': 'application/json' },
+    });
+    const client = new Runloop({
+      bearerToken: 'test',
+      baseURL: 'https://example.invalid',
+      maxRetries: 0,
+      fetch: jest.fn().mockResolvedValue(response) as any,
+    });
+
+    const error: any = await client.get('/v1/body-failure').catch((value) => value);
+    expect(error).toBeInstanceOf(APIConnectionError);
+    expect(error).toMatchObject({ code: 'connection_error', phase: 'transport', cause: transportError });
+  });
+
   test('tunnel readiness helper retries only the explicit readiness failure', async () => {
     const notReady = InternalServerError.generate(
       503,
