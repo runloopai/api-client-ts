@@ -88,7 +88,7 @@ export interface GatewayConfigCreateParameters {
    * How credentials should be applied to proxied requests. Specify the type
    * ('header', 'bearer') and optional key field.
    */
-  auth_mechanism: GatewayConfigCreateParameters.AuthMechanism;
+  auth_mechanism: Shared.AuthMechanism;
 
   /**
    * The target endpoint URL (e.g., 'https://api.anthropic.com').
@@ -111,25 +111,6 @@ export interface GatewayConfigCreateParameters {
    * Optional description for this gateway configuration.
    */
   description?: string | null;
-}
-
-export namespace GatewayConfigCreateParameters {
-  /**
-   * How credentials should be applied to proxied requests. Specify the type
-   * ('header', 'bearer') and optional key field.
-   */
-  export interface AuthMechanism {
-    /**
-     * The type of authentication mechanism: 'header', 'bearer', or 'basic'. For
-     * 'basic', store the secret as plain 'user:pass'; the gateway base64-encodes it.
-     */
-    type: string;
-
-    /**
-     * Only valid for 'header' type: the header name (e.g., 'x-api-key').
-     */
-    key?: string | null;
-  }
 }
 
 /**
@@ -158,10 +139,10 @@ export interface GatewayConfigListView {
  */
 export interface GatewayConfigUpdateParameters {
   /**
-   * Defines how credentials are applied to HTTP requests when proxying through the
-   * gateway.
+   * Defines how the primary credential is applied to requests proxied to the
+   * upstream.
    */
-  auth_mechanism?: GatewayConfigUpdateParameters.AuthMechanism | null;
+  auth_mechanism?: Shared.AuthMechanism | null;
 
   /**
    * New list of additional headers. Replaces the existing list entirely; use an
@@ -185,25 +166,6 @@ export interface GatewayConfigUpdateParameters {
   name?: string | null;
 }
 
-export namespace GatewayConfigUpdateParameters {
-  /**
-   * Defines how credentials are applied to HTTP requests when proxying through the
-   * gateway.
-   */
-  export interface AuthMechanism {
-    /**
-     * The type of authentication mechanism: 'header', 'bearer', or 'basic'. For
-     * 'basic', store the secret as plain 'user:pass'; the gateway base64-encodes it.
-     */
-    type: string;
-
-    /**
-     * Only valid for 'header' type: the header name (e.g., 'x-api-key').
-     */
-    key?: string | null;
-  }
-}
-
 /**
  * A GatewayConfig defines a configuration for proxying API requests through the
  * agent gateway. It specifies the target endpoint and how credentials should be
@@ -218,7 +180,7 @@ export interface GatewayConfigView {
   /**
    * How credentials should be applied to proxied requests.
    */
-  auth_mechanism: GatewayConfigView.AuthMechanism;
+  auth_mechanism: Shared.AuthMechanism;
 
   /**
    * Creation time of the GatewayConfig (Unix timestamp in milliseconds).
@@ -254,30 +216,12 @@ export interface GatewayConfigView {
   description?: string | null;
 }
 
-export namespace GatewayConfigView {
-  /**
-   * How credentials should be applied to proxied requests.
-   */
-  export interface AuthMechanism {
-    /**
-     * The type of authentication mechanism: 'header', 'bearer', or 'basic'. For
-     * 'basic', store the secret as plain 'user:pass'; the gateway base64-encodes it.
-     */
-    type: string;
-
-    /**
-     * Only valid for 'header' type: the header name (e.g., 'x-api-key').
-     */
-    key?: string | null;
-  }
-}
-
 export interface GatewayConfigCreateParams {
   /**
    * How credentials should be applied to proxied requests. Specify the type
    * ('header', 'bearer') and optional key field.
    */
-  auth_mechanism: GatewayConfigCreateParams.AuthMechanism;
+  auth_mechanism: Shared.AuthMechanism;
 
   /**
    * The target endpoint URL (e.g., 'https://api.anthropic.com').
@@ -302,31 +246,12 @@ export interface GatewayConfigCreateParams {
   description?: string | null;
 }
 
-export namespace GatewayConfigCreateParams {
-  /**
-   * How credentials should be applied to proxied requests. Specify the type
-   * ('header', 'bearer') and optional key field.
-   */
-  export interface AuthMechanism {
-    /**
-     * The type of authentication mechanism: 'header', 'bearer', or 'basic'. For
-     * 'basic', store the secret as plain 'user:pass'; the gateway base64-encodes it.
-     */
-    type: string;
-
-    /**
-     * Only valid for 'header' type: the header name (e.g., 'x-api-key').
-     */
-    key?: string | null;
-  }
-}
-
 export interface GatewayConfigUpdateParams {
   /**
-   * Defines how credentials are applied to HTTP requests when proxying through the
-   * gateway.
+   * Defines how the primary credential is applied to requests proxied to the
+   * upstream.
    */
-  auth_mechanism?: GatewayConfigUpdateParams.AuthMechanism | null;
+  auth_mechanism?: Shared.AuthMechanism | null;
 
   /**
    * New list of additional headers. Replaces the existing list entirely; use an
@@ -348,25 +273,6 @@ export interface GatewayConfigUpdateParams {
    * New name for the GatewayConfig. Must be unique within your account.
    */
   name?: string | null;
-}
-
-export namespace GatewayConfigUpdateParams {
-  /**
-   * Defines how credentials are applied to HTTP requests when proxying through the
-   * gateway.
-   */
-  export interface AuthMechanism {
-    /**
-     * The type of authentication mechanism: 'header', 'bearer', or 'basic'. For
-     * 'basic', store the secret as plain 'user:pass'; the gateway base64-encodes it.
-     */
-    type: string;
-
-    /**
-     * Only valid for 'header' type: the header name (e.g., 'x-api-key').
-     */
-    key?: string | null;
-  }
 }
 
 export interface GatewayConfigListParams extends GatewayConfigsCursorIDPageParams {
