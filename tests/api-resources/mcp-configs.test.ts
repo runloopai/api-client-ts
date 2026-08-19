@@ -29,6 +29,7 @@ describe('resource mcpConfigs', () => {
       allowed_tools: ['string'],
       endpoint: 'endpoint',
       name: 'name',
+      auth_mechanism: { type: 'type', key: 'key' },
       custom_headers: [
         {
           name: 'name',
@@ -83,6 +84,7 @@ describe('resource mcpConfigs', () => {
         'id',
         {
           allowed_tools: ['string'],
+          auth_mechanism: { type: 'type', key: 'key' },
           custom_headers: [
             {
               name: 'name',

@@ -801,6 +801,7 @@ export declare namespace Runloop {
   export type AfterIdle = API.AfterIdle;
   export type AgentMount = API.AgentMount;
   export type AgentSource = API.AgentSource;
+  export type AuthMechanism = API.AuthMechanism;
   export type BrokerMount = API.BrokerMount;
   export type CodeMountParameters = API.CodeMountParameters;
   export type CustomHeader = API.CustomHeader;

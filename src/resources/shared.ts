@@ -145,6 +145,23 @@ export namespace AgentSource {
   }
 }
 
+/**
+ * Defines how the primary credential is applied to requests proxied to the
+ * upstream.
+ */
+export interface AuthMechanism {
+  /**
+   * The type of authentication mechanism: 'header', 'bearer', or 'basic'. For
+   * 'basic', store the secret as plain 'user:pass'; the proxy base64-encodes it.
+   */
+  type: string;
+
+  /**
+   * Only valid for 'header' type: the header name (e.g., 'x-api-key').
+   */
+  key?: string | null;
+}
+
 export interface BrokerMount {
   /**
    * The ID of the axon event stream to mount onto the Devbox.
