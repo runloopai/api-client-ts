@@ -3,6 +3,7 @@
 import { APIResource } from '../resource';
 import { isRequestOptions } from '../core';
 import * as Core from '../core';
+import * as Shared from './shared';
 import { GatewayConfigsCursorIDPage, type GatewayConfigsCursorIDPageParams } from '../pagination';
 
 export class GatewayConfigs extends APIResource {
@@ -101,6 +102,12 @@ export interface GatewayConfigCreateParameters {
   name: string;
 
   /**
+   * Additional headers applied to proxied requests after the auth mechanism. At most
+   * 8 entries.
+   */
+  custom_headers?: Array<Shared.CustomHeader> | null;
+
+  /**
    * Optional description for this gateway configuration.
    */
   description?: string | null;
@@ -155,6 +162,12 @@ export interface GatewayConfigUpdateParameters {
    * gateway.
    */
   auth_mechanism?: GatewayConfigUpdateParameters.AuthMechanism | null;
+
+  /**
+   * New list of additional headers. Replaces the existing list entirely; use an
+   * empty list to clear all custom headers. At most 8 entries.
+   */
+  custom_headers?: Array<Shared.CustomHeader> | null;
 
   /**
    * New description for this gateway configuration.
@@ -229,6 +242,13 @@ export interface GatewayConfigView {
   account_id?: string | null;
 
   /**
+   * Additional headers applied to proxied requests after the auth mechanism.
+   * Secret-backed entries reference the secret by 'sec\_' id; values are never
+   * returned.
+   */
+  custom_headers?: Array<Shared.CustomHeader> | null;
+
+  /**
    * Optional description for this gateway configuration.
    */
   description?: string | null;
@@ -271,6 +291,12 @@ export interface GatewayConfigCreateParams {
   name: string;
 
   /**
+   * Additional headers applied to proxied requests after the auth mechanism. At most
+   * 8 entries.
+   */
+  custom_headers?: Array<Shared.CustomHeader> | null;
+
+  /**
    * Optional description for this gateway configuration.
    */
   description?: string | null;
@@ -301,6 +327,12 @@ export interface GatewayConfigUpdateParams {
    * gateway.
    */
   auth_mechanism?: GatewayConfigUpdateParams.AuthMechanism | null;
+
+  /**
+   * New list of additional headers. Replaces the existing list entirely; use an
+   * empty list to clear all custom headers. At most 8 entries.
+   */
+  custom_headers?: Array<Shared.CustomHeader> | null;
 
   /**
    * New description for this gateway configuration.

@@ -29,6 +29,13 @@ describe('resource gatewayConfigs', () => {
       auth_mechanism: { type: 'type', key: 'key' },
       endpoint: 'endpoint',
       name: 'name',
+      custom_headers: [
+        {
+          name: 'name',
+          secret: 'secret',
+          value: 'value',
+        },
+      ],
       description: 'description',
     });
   });
@@ -76,6 +83,13 @@ describe('resource gatewayConfigs', () => {
         'id',
         {
           auth_mechanism: { type: 'type', key: 'key' },
+          custom_headers: [
+            {
+              name: 'name',
+              secret: 'secret',
+              value: 'value',
+            },
+          ],
           description: 'description',
           endpoint: 'endpoint',
           name: 'name',
