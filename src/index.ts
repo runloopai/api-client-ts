@@ -834,6 +834,7 @@ export declare namespace Runloop {
   export type AgentSource = API.AgentSource;
   export type BrokerMount = API.BrokerMount;
   export type CodeMountParameters = API.CodeMountParameters;
+  export type CustomHeader = API.CustomHeader;
   export type LaunchParameters = API.LaunchParameters;
   export type LifecycleConfiguration = API.LifecycleConfiguration;
   export type LifecycleHooks = API.LifecycleHooks;

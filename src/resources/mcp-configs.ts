@@ -3,6 +3,7 @@
 import { APIResource } from '../resource';
 import { isRequestOptions } from '../core';
 import * as Core from '../core';
+import * as Shared from './shared';
 import { McpConfigsCursorIDPage, type McpConfigsCursorIDPageParams } from '../pagination';
 
 export class McpConfigs extends APIResource {
@@ -100,6 +101,12 @@ export interface McpConfigCreateParameters {
   name: string;
 
   /**
+   * Additional headers applied to upstream requests after the credential. At most 8
+   * entries.
+   */
+  custom_headers?: Array<Shared.CustomHeader> | null;
+
+  /**
    * Optional description for this MCP configuration.
    */
   description?: string | null;
@@ -135,6 +142,12 @@ export interface McpConfigUpdateParameters {
    * tools, ['github.search_*'] for specific patterns.
    */
   allowed_tools?: Array<string> | null;
+
+  /**
+   * New list of additional headers. Replaces the existing list entirely; use an
+   * empty list to clear all custom headers. At most 8 entries.
+   */
+  custom_headers?: Array<Shared.CustomHeader> | null;
 
   /**
    * New description for this MCP configuration.
@@ -185,6 +198,13 @@ export interface McpConfigView {
   name: string;
 
   /**
+   * Additional headers applied to upstream requests after the credential.
+   * Secret-backed entries reference the secret by 'sec\_' id; values are never
+   * returned.
+   */
+  custom_headers?: Array<Shared.CustomHeader> | null;
+
+  /**
    * Optional description for this MCP configuration.
    */
   description?: string | null;
@@ -210,6 +230,12 @@ export interface McpConfigCreateParams {
   name: string;
 
   /**
+   * Additional headers applied to upstream requests after the credential. At most 8
+   * entries.
+   */
+  custom_headers?: Array<Shared.CustomHeader> | null;
+
+  /**
    * Optional description for this MCP configuration.
    */
   description?: string | null;
@@ -221,6 +247,12 @@ export interface McpConfigUpdateParams {
    * tools, ['github.search_*'] for specific patterns.
    */
   allowed_tools?: Array<string> | null;
+
+  /**
+   * New list of additional headers. Replaces the existing list entirely; use an
+   * empty list to clear all custom headers. At most 8 entries.
+   */
+  custom_headers?: Array<Shared.CustomHeader> | null;
 
   /**
    * New description for this MCP configuration.

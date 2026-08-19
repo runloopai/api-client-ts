@@ -219,6 +219,30 @@ export interface CodeMountParameters {
 }
 
 /**
+ * An additional header applied to upstream requests alongside the primary
+ * credential. The value comes from an account secret or a literal string; exactly
+ * one of 'secret' and 'value' must be set.
+ */
+export interface CustomHeader {
+  /**
+   * The header name (e.g., 'DD-APPLICATION-KEY').
+   */
+  name: string;
+
+  /**
+   * Account secret providing the header value. Accepts a secret name or 'sec*' id on
+   * writes; reads always return the 'sec*' id.
+   */
+  secret?: string | null;
+
+  /**
+   * Literal header value. Stored in plaintext and returned by reads - use 'secret'
+   * for credentials or other sensitive values.
+   */
+  value?: string | null;
+}
+
+/**
  * LaunchParameters enable you to customize the resources available to your Devbox
  * as well as the environment set up that should be completed before the Devbox is
  * marked as 'running'.

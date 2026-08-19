@@ -7,6 +7,7 @@ Types:
 - <code><a href="./src/resources/shared.ts">AgentSource</a></code>
 - <code><a href="./src/resources/shared.ts">BrokerMount</a></code>
 - <code><a href="./src/resources/shared.ts">CodeMountParameters</a></code>
+- <code><a href="./src/resources/shared.ts">CustomHeader</a></code>
 - <code><a href="./src/resources/shared.ts">LaunchParameters</a></code>
 - <code><a href="./src/resources/shared.ts">LifecycleConfiguration</a></code>
 - <code><a href="./src/resources/shared.ts">LifecycleHooks</a></code>

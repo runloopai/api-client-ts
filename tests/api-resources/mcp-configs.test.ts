@@ -29,6 +29,13 @@ describe('resource mcpConfigs', () => {
       allowed_tools: ['string'],
       endpoint: 'endpoint',
       name: 'name',
+      custom_headers: [
+        {
+          name: 'name',
+          secret: 'secret',
+          value: 'value',
+        },
+      ],
       description: 'description',
     });
   });
@@ -76,6 +83,13 @@ describe('resource mcpConfigs', () => {
         'id',
         {
           allowed_tools: ['string'],
+          custom_headers: [
+            {
+              name: 'name',
+              secret: 'secret',
+              value: 'value',
+            },
+          ],
           description: 'description',
           endpoint: 'endpoint',
           name: 'name',
