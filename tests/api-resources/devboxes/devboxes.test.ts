@@ -716,7 +716,7 @@ describe('resource devboxes', () => {
     expect(mockPost).toHaveBeenCalledTimes(2);
 
     // Check create call
-    expect(mockPost).toHaveBeenNthCalledWith(1, '/v1/devboxes', {
+    expect(mockPost).toHaveBeenNthCalledWith(1, '/v1/devboxes/create_and_await_running', {
       body: { name: 'test-devbox' },
     });
 
@@ -731,16 +731,28 @@ describe('resource devboxes', () => {
     mockPost.mockRestore();
   });
 
+  test('createAndAwaitRunning: returns an optimistic running response without polling', async () => {
+    const mockPost = jest.spyOn(client.devboxes['_client'], 'post');
+    mockPost.mockResolvedValueOnce({ id: 'new-devbox-id', status: 'running' });
+
+    const result = await client.devboxes.createAndAwaitRunning({ name: 'test-devbox' });
+
+    expect(result).toEqual({ id: 'new-devbox-id', status: 'running' });
+    expect(mockPost).toHaveBeenCalledTimes(1);
+    expect(mockPost).toHaveBeenCalledWith('/v1/devboxes/create_and_await_running', {
+      body: { name: 'test-devbox' },
+    });
+  });
+
   test('createAndAwaitRunning: handles creation failure', async () => {
     const mockPost = jest.spyOn(client.devboxes['_client'], 'post');
 
-    const createError = new Error('Creation failed');
-    mockPost.mockRejectedValueOnce(createError);
+    const createError = new APIError(400, undefined, 'Creation failed', {});
+    mockPost.mockRejectedValue(createError);
 
     await expect(client.devboxes.createAndAwaitRunning()).rejects.toThrow('Creation failed');
 
-    expect(mockPost).toHaveBeenCalledTimes(1);
-    expect(mockPost).toHaveBeenCalledWith('/v1/devboxes', { body: {} });
+    expect(mockPost).toHaveBeenCalledWith('/v1/devboxes/create_and_await_running', { body: {} });
 
     mockPost.mockRestore();
   });

@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.30.0 (2026-08-20)
+
+Full Changelog: [v1.29.0...v1.30.0](https://github.com/runloopai/api-client-ts/compare/v1.29.0...v1.30.0)
+
+### Features
+
+* **devboxes:** use optimistic create endpoint ([#825](https://github.com/runloopai/api-client-ts/issues/825)) ([07c0ca0](https://github.com/runloopai/api-client-ts/commit/07c0ca079a3ed09d2350d320323b616e471d0b03))
+
 ## 1.29.0 (2026-08-20)
 
 Full Changelog: [v1.28.0...v1.29.0](https://github.com/runloopai/api-client-ts/compare/v1.28.0...v1.29.0)
