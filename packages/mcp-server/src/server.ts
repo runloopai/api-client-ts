@@ -16,7 +16,7 @@ export const newMcpServer = async (stainlessApiKey: string | undefined) =>
   new McpServer(
     {
       name: 'runloop_api_client_api',
-      version: '1.28.0',
+      version: '1.29.0',
     },
     {
       instructions: await getInstructions(stainlessApiKey),

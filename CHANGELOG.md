@@ -1,5 +1,26 @@
 # Changelog
 
+## 1.29.0 (2026-08-20)
+
+Full Changelog: [v1.28.0...v1.29.0](https://github.com/runloopai/api-client-ts/compare/v1.28.0...v1.29.0)
+
+### Features
+
+* **axon:** add registry delete endpoint ([#10769](https://github.com/runloopai/api-client-ts/issues/10769)) ([e82b606](https://github.com/runloopai/api-client-ts/commit/e82b606f189f91751fb636a2b8878daea69a74af))
+* **broker:** plumb Pi protocol selection ([#10256](https://github.com/runloopai/api-client-ts/issues/10256)) ([84893cc](https://github.com/runloopai/api-client-ts/commit/84893cc2ca7e97176bb24c917b1fcd08c1cc2fd5))
+* **config:** custom_headers on McpConfig/GatewayConfig — persistence, REST, validation, provisioner, OpenAPI ([#11096](https://github.com/runloopai/api-client-ts/issues/11096)) ([378d2df](https://github.com/runloopai/api-client-ts/commit/378d2df40b5580bf09e9b394e75f5c5763418be6))
+* **converter:** add Helm chart, container image, and enable in dev ([#10405](https://github.com/runloopai/api-client-ts/issues/10405)) ([3d08f4d](https://github.com/runloopai/api-client-ts/commit/3d08f4d5771cb771101fb479d5bb8d72b62a2092))
+* **devbox:** recover resume provisioning failures ([#10597](https://github.com/runloopai/api-client-ts/issues/10597)) ([b85737e](https://github.com/runloopai/api-client-ts/commit/b85737ef21a61dd4ed6c0f4c669cc313346e3af4))
+* **gateway:** first-class BASIC auth mechanism ([#11063](https://github.com/runloopai/api-client-ts/issues/11063)) ([6ad0047](https://github.com/runloopai/api-client-ts/commit/6ad00478d8c7853bcb173ea1579d0e1da8825dd3))
+* **mcp:** configurable auth_mechanism on McpConfig, shared shape with gateway ([#11113](https://github.com/runloopai/api-client-ts/issues/11113)) ([d81080b](https://github.com/runloopai/api-client-ts/commit/d81080bcce7704b498f7242a4738eb767bcb5dd5))
+
+
+### Bug Fixes
+
+* **devbox:** make Devbox update API patch-like ([#10582](https://github.com/runloopai/api-client-ts/issues/10582)) ([e99087b](https://github.com/runloopai/api-client-ts/commit/e99087b1a297230510180d041e8da895d993c552))
+* **gateway:** reject keyless HEADER auth_mechanism at admission and in looper ([#11120](https://github.com/runloopai/api-client-ts/issues/11120)) ([9277e11](https://github.com/runloopai/api-client-ts/commit/9277e118b9fcd85cd05106390be0a98ed4f3a8c8))
+* **mcp:** remove stale createFromInspection metadata ([#811](https://github.com/runloopai/api-client-ts/issues/811)) ([0842f40](https://github.com/runloopai/api-client-ts/commit/0842f402cc4a7ddc73d89e4643c3a5984e1bdb4a))
+
 ## 1.28.0 (2026-07-29)
 
 Full Changelog: [v1.27.0...v1.28.0](https://github.com/runloopai/api-client-ts/compare/v1.27.0...v1.28.0)
