@@ -149,12 +149,6 @@ export const sdkMethods: SdkMethod[] = [
     httpPath: '/v1/blueprints/{id}/delete',
   },
   {
-    clientCallName: 'client.blueprints.createFromInspection',
-    fullyQualifiedName: 'blueprints.createFromInspection',
-    httpMethod: 'post',
-    httpPath: '/v1/blueprints/create_from_inspection',
-  },
-  {
     clientCallName: 'client.blueprints.listPublic',
     fullyQualifiedName: 'blueprints.listPublic',
     httpMethod: 'get',

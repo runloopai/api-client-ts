@@ -124,7 +124,6 @@ const fuse = new Fuse(
     'client.agents.list',
     'client.agents.retrieve',
     'client.blueprints.create',
-    'client.blueprints.createFromInspection',
     'client.blueprints.delete',
     'client.blueprints.list',
     'client.blueprints.listPublic',

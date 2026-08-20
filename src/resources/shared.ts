@@ -152,6 +152,24 @@ export namespace AgentSource {
   }
 }
 
+/**
+ * Defines how the primary credential is applied to requests proxied to the
+ * upstream.
+ */
+export interface AuthMechanism {
+  /**
+   * The type of authentication mechanism: 'header', 'bearer', or 'basic'. For
+   * 'basic', store the secret as plain 'user:pass'; the proxy base64-encodes it.
+   */
+  type: string;
+
+  /**
+   * The header name (e.g., 'x-api-key'). Required for 'header' type; invalid for
+   * other types.
+   */
+  key?: string | null;
+}
+
 export interface BrokerMount {
   /**
    * The ID of the axon event stream to mount onto the Devbox.
@@ -162,20 +180,20 @@ export interface BrokerMount {
 
   /**
    * Binary to launch the agent (e.g., 'opencode'). Used by protocols that launch a
-   * subprocess (acp, claude_json, codex_json).
+   * subprocess (acp, claude_json, codex_json, pi_json).
    */
   agent_binary?: string | null;
 
   /**
    * Arguments to pass to the agent command (e.g., ['acp']). Used by protocols that
-   * launch a subprocess (acp, claude_json, codex_json).
+   * launch a subprocess (acp, claude_json, codex_json, pi_json).
    */
   launch_args?: Array<string> | null;
 
   /**
    * The protocol used by the broker to deliver events to the agent.
    */
-  protocol?: 'acp' | 'claude_json' | 'codex_json' | null;
+  protocol?: 'acp' | 'claude_json' | 'codex_json' | 'pi_json' | null;
 
   /**
    * Working directory in which to launch the agent binary. Defaults to the home
@@ -216,6 +234,30 @@ export interface CodeMountParameters {
    * Installation command to install and setup repository.
    */
   install_command?: string | null;
+}
+
+/**
+ * An additional header applied to upstream requests alongside the primary
+ * credential. The value comes from an account secret or a literal string; exactly
+ * one of 'secret' and 'value' must be set.
+ */
+export interface CustomHeader {
+  /**
+   * The header name (e.g., 'DD-APPLICATION-KEY').
+   */
+  name: string;
+
+  /**
+   * Account secret providing the header value. Accepts a secret name or 'sec*' id on
+   * writes; reads always return the 'sec*' id.
+   */
+  secret?: string | null;
+
+  /**
+   * Literal header value. Stored in plaintext and returned by reads - use 'secret'
+   * for credentials or other sensitive values.
+   */
+  value?: string | null;
 }
 
 /**

@@ -3,6 +3,7 @@
 import { APIResource } from '../resource';
 import { isRequestOptions } from '../core';
 import * as Core from '../core';
+import * as Shared from './shared';
 import { McpConfigsCursorIDPage, type McpConfigsCursorIDPageParams } from '../pagination';
 
 export class McpConfigs extends APIResource {
@@ -100,6 +101,18 @@ export interface McpConfigCreateParameters {
   name: string;
 
   /**
+   * Defines how the primary credential is applied to requests proxied to the
+   * upstream.
+   */
+  auth_mechanism?: Shared.AuthMechanism | null;
+
+  /**
+   * Additional headers applied to upstream requests after the credential. At most 8
+   * entries.
+   */
+  custom_headers?: Array<Shared.CustomHeader> | null;
+
+  /**
    * Optional description for this MCP configuration.
    */
   description?: string | null;
@@ -137,6 +150,18 @@ export interface McpConfigUpdateParameters {
   allowed_tools?: Array<string> | null;
 
   /**
+   * Defines how the primary credential is applied to requests proxied to the
+   * upstream.
+   */
+  auth_mechanism?: Shared.AuthMechanism | null;
+
+  /**
+   * New list of additional headers. Replaces the existing list entirely; use an
+   * empty list to clear all custom headers. At most 8 entries.
+   */
+  custom_headers?: Array<Shared.CustomHeader> | null;
+
+  /**
    * New description for this MCP configuration.
    */
   description?: string | null;
@@ -170,6 +195,11 @@ export interface McpConfigView {
   allowed_tools: Array<string>;
 
   /**
+   * How the primary credential is applied to upstream requests.
+   */
+  auth_mechanism: Shared.AuthMechanism;
+
+  /**
    * Creation time of the McpConfig (Unix timestamp in milliseconds).
    */
   create_time_ms: number;
@@ -183,6 +213,13 @@ export interface McpConfigView {
    * The human-readable name of the McpConfig. Unique per account.
    */
   name: string;
+
+  /**
+   * Additional headers applied to upstream requests after the credential.
+   * Secret-backed entries reference the secret by 'sec\_' id; values are never
+   * returned.
+   */
+  custom_headers?: Array<Shared.CustomHeader> | null;
 
   /**
    * Optional description for this MCP configuration.
@@ -210,6 +247,18 @@ export interface McpConfigCreateParams {
   name: string;
 
   /**
+   * Defines how the primary credential is applied to requests proxied to the
+   * upstream.
+   */
+  auth_mechanism?: Shared.AuthMechanism | null;
+
+  /**
+   * Additional headers applied to upstream requests after the credential. At most 8
+   * entries.
+   */
+  custom_headers?: Array<Shared.CustomHeader> | null;
+
+  /**
    * Optional description for this MCP configuration.
    */
   description?: string | null;
@@ -221,6 +270,18 @@ export interface McpConfigUpdateParams {
    * tools, ['github.search_*'] for specific patterns.
    */
   allowed_tools?: Array<string> | null;
+
+  /**
+   * Defines how the primary credential is applied to requests proxied to the
+   * upstream.
+   */
+  auth_mechanism?: Shared.AuthMechanism | null;
+
+  /**
+   * New list of additional headers. Replaces the existing list entirely; use an
+   * empty list to clear all custom headers. At most 8 entries.
+   */
+  custom_headers?: Array<Shared.CustomHeader> | null;
 
   /**
    * New description for this MCP configuration.

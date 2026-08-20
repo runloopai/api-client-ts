@@ -178,6 +178,7 @@ import {
 } from './resources/secrets';
 import {
   AxonCreateParams,
+  AxonDeleteResponse,
   AxonEventView,
   AxonListParams,
   AxonListView,
@@ -649,6 +650,7 @@ export declare namespace Runloop {
     type AxonView as AxonView,
     type PublishParams as PublishParams,
     type PublishResultView as PublishResultView,
+    type AxonDeleteResponse as AxonDeleteResponse,
     AxonViewsAxonsCursorIDPage as AxonViewsAxonsCursorIDPage,
     type AxonListParams as AxonListParams,
     type AxonPublishParams as AxonPublishParams,
@@ -830,8 +832,10 @@ export declare namespace Runloop {
   export type AfterIdle = API.AfterIdle;
   export type AgentMount = API.AgentMount;
   export type AgentSource = API.AgentSource;
+  export type AuthMechanism = API.AuthMechanism;
   export type BrokerMount = API.BrokerMount;
   export type CodeMountParameters = API.CodeMountParameters;
+  export type CustomHeader = API.CustomHeader;
   export type LaunchParameters = API.LaunchParameters;
   export type LifecycleConfiguration = API.LifecycleConfiguration;
   export type LifecycleHooks = API.LifecycleHooks;
