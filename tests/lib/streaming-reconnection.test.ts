@@ -415,13 +415,10 @@ describe('withStreamAutoReconnect', () => {
       controller: new AbortController(),
     } as unknown as APIResponseProps;
 
-    const p = new StreamBackedAPIPromise(
-      Promise.resolve(props),
-      () => {
-        dataStarted = true;
-        return Promise.resolve(new Stream(async function* () {}, props.controller));
-      },
-    );
+    const p = new StreamBackedAPIPromise(Promise.resolve(props), () => {
+      dataStarted = true;
+      return Promise.resolve(new Stream(async function* () {}, props.controller));
+    });
 
     expect(dataStarted).toBe(false);
     await p.asResponse();

@@ -1,8 +1,5 @@
 import { Scorer } from '../../src/sdk/scorer';
-import type {
-  ScorerRetrieveResponse,
-  ScorerUpdateResponse,
-} from '../../src/resources/scenarios/scorers';
+import type { ScorerRetrieveResponse, ScorerUpdateResponse } from '../../src/resources/scenarios/scorers';
 
 // Mock the Runloop client
 jest.mock('../../src/index');
@@ -28,7 +25,6 @@ describe('Scorer', () => {
       type: 'my_custom_scorer',
       bash_script: 'echo "1.0"',
     };
-
   });
 
   describe('fromId', () => {
@@ -187,6 +183,5 @@ describe('Scorer', () => {
         'Update failed',
       );
     });
-
   });
 });

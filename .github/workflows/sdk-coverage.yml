@@ -78,9 +78,9 @@ jobs:
             const testsPassed = '${{ steps.tests.outcome }}' === 'success';
             const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
             const COMMENT_MARKER = '<!-- sdk-coverage-report -->';
-            
+
             let lines = [COMMENT_MARKER];
-            
+
             if (!testsPassed) {
               let failedTests = [];
               try {
@@ -173,17 +173,17 @@ jobs:
                 lines.push(`[📋 View workflow run](${runUrl})`);
               }
             }
-            
+
             const comment = lines.join('\n');
-            
+
             const { data: comments } = await github.rest.issues.listComments({
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: context.issue.number
             });
-            
+
             const existingComment = comments.find(c => c.body.includes(COMMENT_MARKER));
-            
+
             if (existingComment) {
               await github.rest.issues.updateComment({
                 owner: context.repo.owner,
@@ -199,4 +199,3 @@ jobs:
                 body: comment
               });
             }
-
