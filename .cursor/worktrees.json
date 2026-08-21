@@ -1,0 +1,5 @@
+{
+  "setup-worktree": [
+    "./scripts/setup_worktree.py \"$ROOT_WORKTREE_PATH\" -s '/node_modules' -s '.cursor/rules'"
+  ]
+}

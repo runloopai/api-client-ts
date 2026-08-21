@@ -16,3 +16,17 @@ coverage-objects
 object-coverage-report.json
 docs
 docs-md
+
+.claude/
+!.claude/skills
+!.claude/settings.json
+.rules/
+.clinerules/
+.cursor/rules/
+.windsurf/rules/
+.roo/rules*/
+.github/copilot-instructions.md
+AGENT.md
+AGENTS.override.md
+CLAUDE.local.md
+README.pochi.md

@@ -1,0 +1,10 @@
+{
+  "hooks": {
+    "post_setup_worktree": [
+      {
+        "command": "./scripts/setup_worktree.py \"$ROOT_WORKSPACE_PATH\" -s '/node_modules' -s '.windsurf/rules'",
+        "show_output": true
+      }
+    ]
+  }
+}

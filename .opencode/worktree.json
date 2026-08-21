@@ -1,0 +1,5 @@
+{
+  "sync": {
+    "symlinkDirs": ["node_modules"]
+  }
+}
