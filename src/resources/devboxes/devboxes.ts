@@ -38,6 +38,7 @@ import { type Response } from '../../_shims/index';
 import {
   longPollUntil,
   LongPollRequestOptions,
+  PollingTimeoutError,
   resolveLongPollTimeoutMs,
 } from '@runloop/api-client/lib/polling';
 import { awaitDevboxState } from '@runloop/api-client/lib/devbox-state';
@@ -46,6 +47,11 @@ import { uuidv7 } from 'uuidv7';
 
 type DevboxStatus = DevboxView['status'];
 const DEVBOX_BOOTING_STATES: DevboxStatus[] = ['provisioning', 'initializing'];
+
+export type CreateAndAwaitRunningOptions = LongPollRequestOptions<DevboxView> & {
+  /** Shutdown the created devbox when waiting for it to run times out. Defaults to true. */
+  shutdownOnTimeout?: boolean;
+};
 
 export class Devboxes extends APIResource {
   diskSnapshots: DiskSnapshotsAPI.DiskSnapshots = new DiskSnapshotsAPI.DiskSnapshots(this._client);
@@ -124,15 +130,22 @@ export class Devboxes extends APIResource {
    * This is a convenience method that combines create() and awaitDevboxRunning().
    *
    * @param body - DevboxCreateParams
-   * @param options - request options with optional long-poll configuration.
+   * @param options - request options with optional long-poll and timeout cleanup configuration.
    */
   async createAndAwaitRunning(
     body?: DevboxCreateParams,
-    options?: LongPollRequestOptions<DevboxView>,
+    options?: CreateAndAwaitRunningOptions,
   ): Promise<DevboxView> {
-    const { longPoll, polling, ...requestOptions } = options ?? {};
+    const { longPoll, polling, shutdownOnTimeout = true, ...requestOptions } = options ?? {};
     const devbox = await this.create(body, requestOptions);
-    return this.awaitRunning(devbox.id, { ...requestOptions, longPoll, polling });
+    try {
+      return await this.awaitRunning(devbox.id, { ...requestOptions, longPoll, polling });
+    } catch (error) {
+      if (!(error instanceof PollingTimeoutError)) throw error;
+      if (!shutdownOnTimeout) return devbox;
+      await this.shutdown(devbox.id);
+      throw error;
+    }
   }
   /**
    * Updates the specified Devbox fields. Omitted fields are left unchanged. An empty

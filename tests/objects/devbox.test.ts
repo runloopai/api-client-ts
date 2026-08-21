@@ -86,11 +86,11 @@ describe('Devbox (New API)', () => {
     it('should pass options to the API client', async () => {
       mockClient.devboxes.createAndAwaitRunning.mockResolvedValue(mockDevboxData);
 
-      await Devbox.create(mockClient, { name: 'test-devbox' }, { polling: { maxAttempts: 10 } });
+      await Devbox.create(mockClient, { name: 'test-devbox' }, { shutdownOnTimeout: false });
 
       expect(mockClient.devboxes.createAndAwaitRunning).toHaveBeenCalledWith(
         { name: 'test-devbox' },
-        { polling: { maxAttempts: 10 } },
+        { shutdownOnTimeout: false },
       );
     });
   });
