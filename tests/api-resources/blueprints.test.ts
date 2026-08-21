@@ -1,14 +1,76 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 import { Runloop } from '@runloop/api-client';
-import { Response } from 'node-fetch';
+import { Response, type RequestInfo, type RequestInit } from 'node-fetch';
 
 const client = new Runloop({
   bearerToken: 'My Bearer Token',
   baseURL: process.env['TEST_API_BASE_URL'] ?? 'http://127.0.0.1:4010',
 });
 
+const createRegisterClient = () => {
+  const fetch = jest.fn(
+    async (_url: RequestInfo, _init?: RequestInit) =>
+      new Response(
+        JSON.stringify({
+          blueprint: {
+            id: 'bpt_123',
+            name: 'name',
+            status: 'awaiting_upload',
+            state: 'created',
+            create_time_ms: 0,
+            parameters: { name: 'name' },
+          },
+          push_reference: 'converter.runloop.ai/blueprints:bpt_123',
+        }),
+        { headers: { 'Content-Type': 'application/json' } },
+      ),
+  );
+
+  return {
+    client: new Runloop({
+      bearerToken: 'My Bearer Token',
+      baseURL: 'http://localhost:5000',
+      fetch,
+    }),
+    fetch,
+  };
+};
+
 describe('resource blueprints', () => {
+  test('register: only required params', async () => {
+    const { client, fetch } = createRegisterClient();
+    const responsePromise = client.blueprints.register({ name: 'name' });
+    const rawResponse = await responsePromise.asResponse();
+    expect(rawResponse).toBeInstanceOf(Response);
+    const response = await responsePromise;
+    expect(response).not.toBeInstanceOf(Response);
+    expect(response.push_reference).toBe('converter.runloop.ai/blueprints:bpt_123');
+    expect(fetch).toHaveBeenCalledWith(
+      'http://localhost:5000/v1/blueprints/register',
+      expect.objectContaining({ method: 'POST' }),
+    );
+    expect(JSON.parse(fetch.mock.calls[0]![1]!.body as string)).toEqual({ name: 'name' });
+  });
+
+  test('register: required and optional params', async () => {
+    const { client, fetch } = createRegisterClient();
+    await client.blueprints.register({
+      name: 'name',
+      launch_parameters: { architecture: 'x86_64' },
+      metadata: { source: 'upload' },
+    });
+    expect(fetch).toHaveBeenCalledWith(
+      'http://localhost:5000/v1/blueprints/register',
+      expect.objectContaining({ method: 'POST' }),
+    );
+    expect(JSON.parse(fetch.mock.calls[0]![1]!.body as string)).toEqual({
+      name: 'name',
+      launch_parameters: { architecture: 'x86_64' },
+      metadata: { source: 'upload' },
+    });
+  });
+
   test('create: only required params', async () => {
     const responsePromise = client.blueprints.create({ name: 'name' });
     const rawResponse = await responsePromise.asResponse();

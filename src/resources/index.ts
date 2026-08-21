@@ -75,12 +75,15 @@ export {
   type BlueprintBuildParameters,
   type BlueprintListView,
   type BlueprintPreviewView,
+  type BlueprintUploadParameters,
+  type BlueprintUploadView,
   type BlueprintView,
   type BlueprintDeleteResponse,
   type BlueprintCreateParams,
   type BlueprintListParams,
   type BlueprintListPublicParams,
   type BlueprintPreviewParams,
+  type BlueprintRegisterParams,
 } from './blueprints';
 export {
   DevboxSnapshotViewsDiskSnapshotsCursorIDPage,
