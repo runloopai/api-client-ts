@@ -131,7 +131,13 @@ export class Devboxes extends APIResource {
     options?: LongPollRequestOptions<DevboxView>,
   ): Promise<DevboxView> {
     const { longPoll, polling, ...requestOptions } = options ?? {};
-    const devbox = await this.create(body, requestOptions);
+    const devbox = (await this._client.post('/v1/devboxes/create_and_await_running', {
+      body: body ?? {},
+      ...requestOptions,
+    })) as DevboxView;
+    if (devbox.status === 'running') {
+      return devbox;
+    }
     return this.awaitRunning(devbox.id, { ...requestOptions, longPoll, polling });
   }
   /**
