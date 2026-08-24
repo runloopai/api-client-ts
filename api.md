@@ -183,6 +183,7 @@ Types:
 - <code><a href="./src/resources/devboxes/devboxes.ts">DevboxSnapshotListView</a></code>
 - <code><a href="./src/resources/devboxes/devboxes.ts">DevboxSnapshotView</a></code>
 - <code><a href="./src/resources/devboxes/devboxes.ts">DevboxView</a></code>
+- <code><a href="./src/resources/devboxes/devboxes.ts">GatewayTokenView</a></code>
 - <code><a href="./src/resources/devboxes/devboxes.ts">McpTokenView</a></code>
 - <code><a href="./src/resources/devboxes/devboxes.ts">PtyTunnelView</a></code>
 - <code><a href="./src/resources/devboxes/devboxes.ts">TunnelView</a></code>
@@ -199,6 +200,7 @@ Methods:
 - <code title="get /v1/devboxes/{id}">client.devboxes.<a href="./src/resources/devboxes/devboxes.ts">retrieve</a>(id) -> DevboxView</code>
 - <code title="post /v1/devboxes/{id}">client.devboxes.<a href="./src/resources/devboxes/devboxes.ts">update</a>(id, { ...params }) -> DevboxView</code>
 - <code title="get /v1/devboxes">client.devboxes.<a href="./src/resources/devboxes/devboxes.ts">list</a>({ ...params }) -> DevboxViewsDevboxesCursorIDPage</code>
+- <code title="post /v1/devboxes/{id}/create_gateway_token">client.devboxes.<a href="./src/resources/devboxes/devboxes.ts">createGatewayToken</a>(id, { ...params }) -> GatewayTokenView</code>
 - <code title="post /v1/devboxes/{id}/create_mcp_token">client.devboxes.<a href="./src/resources/devboxes/devboxes.ts">createMcpToken</a>(id, { ...params }) -> McpTokenView</code>
 - <code title="post /v1/devboxes/{id}/create_pty_tunnel">client.devboxes.<a href="./src/resources/devboxes/devboxes.ts">createPtyTunnel</a>(id) -> PtyTunnelView</code>
 - <code title="post /v1/devboxes/{id}/create_ssh_key">client.devboxes.<a href="./src/resources/devboxes/devboxes.ts">createSSHKey</a>(id) -> DevboxCreateSSHKeyResponse</code>

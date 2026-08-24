@@ -173,6 +173,24 @@ describe('resource devboxes', () => {
     ).rejects.toThrow(Runloop.NotFoundError);
   });
 
+  test('createGatewayToken: only required params', async () => {
+    const responsePromise = client.devboxes.createGatewayToken('id', {
+      gateway: 'gateway',
+      secret: 'secret',
+    });
+    const rawResponse = await responsePromise.asResponse();
+    expect(rawResponse).toBeInstanceOf(Response);
+    const response = await responsePromise;
+    expect(response).not.toBeInstanceOf(Response);
+    const dataAndResponse = await responsePromise.withResponse();
+    expect(dataAndResponse.data).toBe(response);
+    expect(dataAndResponse.response).toBe(rawResponse);
+  });
+
+  test('createGatewayToken: required and optional params', async () => {
+    const response = await client.devboxes.createGatewayToken('id', { gateway: 'gateway', secret: 'secret' });
+  });
+
   test('createMcpToken: only required params', async () => {
     const responsePromise = client.devboxes.createMcpToken('id', {
       mcp_config: 'mcp_config',

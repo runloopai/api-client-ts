@@ -104,6 +104,24 @@ export class Devboxes extends APIResource {
   }
 
   /**
+   * Mint a token that lets a running Devbox call an external API through the Runloop
+   * agent gateway, using the credential in the supplied secret. The gateway applies
+   * the credential to proxied requests, so the real API key is never exposed to the
+   * Devbox.
+   *
+   * The token is bound to this Devbox and is only accepted for requests that
+   * originate from it. Nothing is stored on the Devbox: the token is returned to the
+   * caller and is not re-issued when the Devbox is resumed.
+   */
+  createGatewayToken(
+    id: string,
+    body: DevboxCreateGatewayTokenParams,
+    options?: Core.RequestOptions,
+  ): Core.APIPromise<GatewayTokenView> {
+    return this._client.post(`/v1/devboxes/${id}/create_gateway_token`, { body, ...options });
+  }
+
+  /**
    * [Beta] Mint a token that lets a running Devbox reach an upstream MCP (Model
    * Context Protocol) server through the Runloop MCP hub, using the credential in
    * the supplied secret. Tool access is limited to the MCP config's allowed_tools,
@@ -908,6 +926,40 @@ export namespace DevboxView {
   }
 }
 
+export interface GatewayTokenView {
+  /**
+   * The token to send to the gateway as a Bearer token in the Authorization header.
+   * Only accepted for requests originating from the bound Devbox.
+   */
+  token: string;
+
+  /**
+   * How the gateway applies the credential to proxied requests.
+   */
+  auth_mechanism: Shared.AuthMechanism;
+
+  /**
+   * The Devbox the token is bound to.
+   */
+  devbox_id: string;
+
+  /**
+   * The target API endpoint the gateway proxies to.
+   */
+  endpoint: string;
+
+  /**
+   * The ID of the gateway config the token proxies through.
+   */
+  gateway_config_id: string;
+
+  /**
+   * The gateway URL to send requests to. Matches the value of the
+   * &#123;prefix&#125;\_URL environment variable inside the Devbox.
+   */
+  url: string;
+}
+
 export interface McpTokenView {
   /**
    * The token to send to the MCP hub as a Bearer token in the Authorization header.
@@ -1236,6 +1288,18 @@ export interface DevboxListParams extends DevboxesCursorIDPageParams {
     | 'shutdown';
 }
 
+export interface DevboxCreateGatewayTokenParams {
+  /**
+   * The gateway config to use. Can be a gateway config ID (gwc_xxx) or name.
+   */
+  gateway: string;
+
+  /**
+   * The secret containing the credential. Can be a secret ID or name.
+   */
+  secret: string;
+}
+
 export interface DevboxCreateMcpTokenParams {
   /**
    * The MCP config to use. Can be an MCP config ID (mcp_xxx) or name.
@@ -1498,6 +1562,7 @@ export declare namespace Devboxes {
     type DevboxSnapshotListView as DevboxSnapshotListView,
     type DevboxSnapshotView as DevboxSnapshotView,
     type DevboxView as DevboxView,
+    type GatewayTokenView as GatewayTokenView,
     type McpTokenView as McpTokenView,
     type PtyTunnelView as PtyTunnelView,
     type TunnelView as TunnelView,
@@ -1512,6 +1577,7 @@ export declare namespace Devboxes {
     type DevboxCreateParams as DevboxCreateParams,
     type DevboxUpdateParams as DevboxUpdateParams,
     type DevboxListParams as DevboxListParams,
+    type DevboxCreateGatewayTokenParams as DevboxCreateGatewayTokenParams,
     type DevboxCreateMcpTokenParams as DevboxCreateMcpTokenParams,
     type DevboxDownloadFileParams as DevboxDownloadFileParams,
     type DevboxEnableTunnelParams as DevboxEnableTunnelParams,
