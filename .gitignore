@@ -16,3 +16,7 @@ coverage-objects
 object-coverage-report.json
 docs
 docs-md
+
+# MCP server build artifacts
+dist-bundle
+*.mcpb
