@@ -176,6 +176,24 @@ export class Devboxes extends APIResource {
   }
 
   /**
+   * [Beta] Mint a token that lets a running Devbox reach an upstream MCP (Model
+   * Context Protocol) server through the Runloop MCP hub, using the credential in
+   * the supplied secret. Tool access is limited to the MCP config's allowed_tools,
+   * and the credential itself is never exposed to the Devbox.
+   *
+   * The token is bound to this Devbox and is only accepted for requests that
+   * originate from it. Nothing is stored on the Devbox: the token is returned to the
+   * caller and is not re-issued when the Devbox is resumed.
+   */
+  createMcpToken(
+    id: string,
+    body: DevboxCreateMcpTokenParams,
+    options?: Core.RequestOptions,
+  ): Core.APIPromise<McpTokenView> {
+    return this._client.post(`/v1/devboxes/${id}/create_mcp_token`, { body, ...options });
+  }
+
+  /**
    * Create an ephemeral authenticated tunnel for terminal access to a running
    * Devbox. This tunnel is not persisted on the Devbox and is generated fresh on
    * each request. The returned auth_token should be passed as a Bearer token in the
@@ -1037,6 +1055,40 @@ export namespace DevboxView {
   }
 }
 
+export interface McpTokenView {
+  /**
+   * The token to send to the MCP hub as a Bearer token in the Authorization header.
+   * Only accepted for requests originating from the bound Devbox.
+   */
+  token: string;
+
+  /**
+   * Glob patterns for the tools the token permits.
+   */
+  allowed_tools: Array<string>;
+
+  /**
+   * The Devbox the token is bound to.
+   */
+  devbox_id: string;
+
+  /**
+   * The upstream MCP server endpoint the hub proxies to.
+   */
+  endpoint: string;
+
+  /**
+   * The ID of the MCP config the token grants access to.
+   */
+  mcp_config_id: string;
+
+  /**
+   * The MCP hub URL the token authenticates against. Matches the RL_MCP_URL
+   * environment variable inside the Devbox.
+   */
+  url: string;
+}
+
 /**
  * An ephemeral PTY tunnel providing authenticated terminal access to a Devbox.
  * These tunnels are not stored on the Devbox and are generated fresh on each
@@ -1336,6 +1388,18 @@ export interface DevboxListParams extends DevboxesCursorIDPageParams {
     | 'shutdown';
 }
 
+export interface DevboxCreateMcpTokenParams {
+  /**
+   * The MCP config to use. Can be an MCP config ID (mcp_xxx) or name.
+   */
+  mcp_config: string;
+
+  /**
+   * The secret containing the MCP server credential. Can be a secret ID or name.
+   */
+  secret: string;
+}
+
 export interface DevboxDownloadFileParams {
   /**
    * The path on the Devbox filesystem to read the file from. Path is relative to
@@ -1591,6 +1655,7 @@ export declare namespace Devboxes {
     type DevboxSnapshotListView as DevboxSnapshotListView,
     type DevboxSnapshotView as DevboxSnapshotView,
     type DevboxView as DevboxView,
+    type McpTokenView as McpTokenView,
     type PtyTunnelView as PtyTunnelView,
     type TunnelView as TunnelView,
     type DevboxCreateSSHKeyResponse as DevboxCreateSSHKeyResponse,
@@ -1604,6 +1669,7 @@ export declare namespace Devboxes {
     type DevboxCreateParams as DevboxCreateParams,
     type DevboxUpdateParams as DevboxUpdateParams,
     type DevboxListParams as DevboxListParams,
+    type DevboxCreateMcpTokenParams as DevboxCreateMcpTokenParams,
     type DevboxDownloadFileParams as DevboxDownloadFileParams,
     type DevboxEnableTunnelParams as DevboxEnableTunnelParams,
     type DevboxExecuteParams as DevboxExecuteParams,
