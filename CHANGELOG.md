@@ -1,5 +1,19 @@
 # Changelog
 
+## 1.31.0 (2026-08-24)
+
+Full Changelog: [v1.30.0...v1.31.0](https://github.com/runloopai/api-client-ts/compare/v1.30.0...v1.31.0)
+
+### Features
+
+* **mux:** mint agent gateway tokens for running devboxes ([#10872](https://github.com/runloopai/api-client-ts/issues/10872)) ([24a8966](https://github.com/runloopai/api-client-ts/commit/24a8966fbc2b2c6ca6d6aca026d145d2ccfe838d))
+* **mux:** mint MCP tokens for running devboxes ([#10871](https://github.com/runloopai/api-client-ts/issues/10871)) ([8b67294](https://github.com/runloopai/api-client-ts/commit/8b67294ed3ee7448fa9225d9f5b86362f106a5fa))
+
+
+### Chores
+
+* configure new SDK language ([f14ee14](https://github.com/runloopai/api-client-ts/commit/f14ee148150ad2b07a25a711bf4f684cfef69db5))
+
 ## 1.30.0 (2026-08-23)
 
 Full Changelog: [v1.29.0...v1.30.0](https://github.com/runloopai/api-client-ts/compare/v1.29.0...v1.30.0)
