@@ -16,3 +16,5 @@ coverage-objects
 object-coverage-report.json
 docs
 docs-md
+dist-bundle
+*.mcpb

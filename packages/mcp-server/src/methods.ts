@@ -11,6 +11,12 @@ export type SdkMethod = {
 
 export const sdkMethods: SdkMethod[] = [
   {
+    clientCallName: 'client.accounts.me',
+    fullyQualifiedName: 'accounts.me',
+    httpMethod: 'get',
+    httpPath: '/v1/accounts/me',
+  },
+  {
     clientCallName: 'client.benchmarks.create',
     fullyQualifiedName: 'benchmarks.create',
     httpMethod: 'post',
@@ -125,6 +131,78 @@ export const sdkMethods: SdkMethod[] = [
     httpPath: '/v1/agents',
   },
   {
+    clientCallName: 'client.agents.delete',
+    fullyQualifiedName: 'agents.delete',
+    httpMethod: 'post',
+    httpPath: '/v1/agents/{id}/delete',
+  },
+  {
+    clientCallName: 'client.agents.devboxCounts',
+    fullyQualifiedName: 'agents.devboxCounts',
+    httpMethod: 'get',
+    httpPath: '/v1/agents/devbox_counts',
+  },
+  {
+    clientCallName: 'client.agents.listPublic',
+    fullyQualifiedName: 'agents.listPublic',
+    httpMethod: 'get',
+    httpPath: '/v1/agents/list_public',
+  },
+  {
+    clientCallName: 'client.axons.create',
+    fullyQualifiedName: 'axons.create',
+    httpMethod: 'post',
+    httpPath: '/v1/axons',
+  },
+  {
+    clientCallName: 'client.axons.retrieve',
+    fullyQualifiedName: 'axons.retrieve',
+    httpMethod: 'get',
+    httpPath: '/v1/axons/{id}',
+  },
+  {
+    clientCallName: 'client.axons.list',
+    fullyQualifiedName: 'axons.list',
+    httpMethod: 'get',
+    httpPath: '/v1/axons',
+  },
+  {
+    clientCallName: 'client.axons.delete',
+    fullyQualifiedName: 'axons.delete',
+    httpMethod: 'delete',
+    httpPath: '/v1/axons/{id}',
+  },
+  {
+    clientCallName: 'client.axons.publish',
+    fullyQualifiedName: 'axons.publish',
+    httpMethod: 'post',
+    httpPath: '/v1/axons/{id}/publish',
+  },
+  {
+    clientCallName: 'client.axons.subscribeSse',
+    fullyQualifiedName: 'axons.subscribeSse',
+    httpMethod: 'get',
+    httpPath: '/v1/axons/{id}/subscribe/sse',
+  },
+  {
+    clientCallName: 'client.axons.events.list',
+    fullyQualifiedName: 'axons.events.list',
+    httpMethod: 'get',
+    httpPath: '/v1/axons/{id}/events',
+  },
+  {
+    clientCallName: 'client.axons.sql.batch',
+    fullyQualifiedName: 'axons.sql.batch',
+    httpMethod: 'post',
+    httpPath: '/v1/axons/{id}/sql/batch',
+  },
+  {
+    clientCallName: 'client.axons.sql.query',
+    fullyQualifiedName: 'axons.sql.query',
+    httpMethod: 'post',
+    httpPath: '/v1/axons/{id}/sql/query',
+  },
+  {
     clientCallName: 'client.blueprints.create',
     fullyQualifiedName: 'blueprints.create',
     httpMethod: 'post',
@@ -191,16 +269,28 @@ export const sdkMethods: SdkMethod[] = [
     httpPath: '/v1/devboxes',
   },
   {
+    clientCallName: 'client.devboxes.createGatewayToken',
+    fullyQualifiedName: 'devboxes.createGatewayToken',
+    httpMethod: 'post',
+    httpPath: '/v1/devboxes/{id}/create_gateway_token',
+  },
+  {
+    clientCallName: 'client.devboxes.createMcpToken',
+    fullyQualifiedName: 'devboxes.createMcpToken',
+    httpMethod: 'post',
+    httpPath: '/v1/devboxes/{id}/create_mcp_token',
+  },
+  {
+    clientCallName: 'client.devboxes.createPtyTunnel',
+    fullyQualifiedName: 'devboxes.createPtyTunnel',
+    httpMethod: 'post',
+    httpPath: '/v1/devboxes/{id}/create_pty_tunnel',
+  },
+  {
     clientCallName: 'client.devboxes.createSSHKey',
     fullyQualifiedName: 'devboxes.createSSHKey',
     httpMethod: 'post',
     httpPath: '/v1/devboxes/{id}/create_ssh_key',
-  },
-  {
-    clientCallName: 'client.devboxes.createTunnel',
-    fullyQualifiedName: 'devboxes.createTunnel',
-    httpMethod: 'post',
-    httpPath: '/v1/devboxes/{id}/create_tunnel',
   },
   {
     clientCallName: 'client.devboxes.deleteDiskSnapshot',
@@ -311,6 +401,12 @@ export const sdkMethods: SdkMethod[] = [
     httpPath: '/v1/devboxes/{devbox_id}/executions/{execution_id}/wait_for_status',
   },
   {
+    clientCallName: 'client.devboxes.watchEvictions',
+    fullyQualifiedName: 'devboxes.watchEvictions',
+    httpMethod: 'get',
+    httpPath: '/v1/devboxes/evictions/watch',
+  },
+  {
     clientCallName: 'client.devboxes.writeFileContents',
     fullyQualifiedName: 'devboxes.writeFileContents',
     httpMethod: 'post',
@@ -339,48 +435,6 @@ export const sdkMethods: SdkMethod[] = [
     fullyQualifiedName: 'devboxes.diskSnapshots.queryStatus',
     httpMethod: 'get',
     httpPath: '/v1/devboxes/disk_snapshots/{id}/status',
-  },
-  {
-    clientCallName: 'client.devboxes.browsers.create',
-    fullyQualifiedName: 'devboxes.browsers.create',
-    httpMethod: 'post',
-    httpPath: '/v1/devboxes/browsers',
-  },
-  {
-    clientCallName: 'client.devboxes.browsers.retrieve',
-    fullyQualifiedName: 'devboxes.browsers.retrieve',
-    httpMethod: 'get',
-    httpPath: '/v1/devboxes/browsers/{id}',
-  },
-  {
-    clientCallName: 'client.devboxes.computers.create',
-    fullyQualifiedName: 'devboxes.computers.create',
-    httpMethod: 'post',
-    httpPath: '/v1/devboxes/computers',
-  },
-  {
-    clientCallName: 'client.devboxes.computers.retrieve',
-    fullyQualifiedName: 'devboxes.computers.retrieve',
-    httpMethod: 'get',
-    httpPath: '/v1/devboxes/computers/{id}',
-  },
-  {
-    clientCallName: 'client.devboxes.computers.keyboardInteraction',
-    fullyQualifiedName: 'devboxes.computers.keyboardInteraction',
-    httpMethod: 'post',
-    httpPath: '/v1/devboxes/computers/{id}/keyboard_interaction',
-  },
-  {
-    clientCallName: 'client.devboxes.computers.mouseInteraction',
-    fullyQualifiedName: 'devboxes.computers.mouseInteraction',
-    httpMethod: 'post',
-    httpPath: '/v1/devboxes/computers/{id}/mouse_interaction',
-  },
-  {
-    clientCallName: 'client.devboxes.computers.screenInteraction',
-    fullyQualifiedName: 'devboxes.computers.screenInteraction',
-    httpMethod: 'post',
-    httpPath: '/v1/devboxes/computers/{id}/screen_interaction',
   },
   {
     clientCallName: 'client.devboxes.logs.list',
@@ -429,6 +483,18 @@ export const sdkMethods: SdkMethod[] = [
     fullyQualifiedName: 'devboxes.executions.streamStdoutUpdates',
     httpMethod: 'get',
     httpPath: '/v1/devboxes/{devbox_id}/executions/{execution_id}/stream_stdout_updates',
+  },
+  {
+    clientCallName: 'client.pty.connect',
+    fullyQualifiedName: 'pty.connect',
+    httpMethod: 'get',
+    httpPath: '/pty/{session_name}',
+  },
+  {
+    clientCallName: 'client.pty.control',
+    fullyQualifiedName: 'pty.control',
+    httpMethod: 'post',
+    httpPath: '/pty/{session_name}/control',
   },
   {
     clientCallName: 'client.scenarios.create',
@@ -575,58 +641,16 @@ export const sdkMethods: SdkMethod[] = [
     httpPath: '/v1/objects/list_public',
   },
   {
-    clientCallName: 'client.repositories.create',
-    fullyQualifiedName: 'repositories.create',
-    httpMethod: 'post',
-    httpPath: '/v1/repositories',
-  },
-  {
-    clientCallName: 'client.repositories.retrieve',
-    fullyQualifiedName: 'repositories.retrieve',
-    httpMethod: 'get',
-    httpPath: '/v1/repositories/{id}',
-  },
-  {
-    clientCallName: 'client.repositories.list',
-    fullyQualifiedName: 'repositories.list',
-    httpMethod: 'get',
-    httpPath: '/v1/repositories',
-  },
-  {
-    clientCallName: 'client.repositories.delete',
-    fullyQualifiedName: 'repositories.delete',
-    httpMethod: 'post',
-    httpPath: '/v1/repositories/{id}/delete',
-  },
-  {
-    clientCallName: 'client.repositories.inspect',
-    fullyQualifiedName: 'repositories.inspect',
-    httpMethod: 'post',
-    httpPath: '/v1/repositories/{id}/inspect',
-  },
-  {
-    clientCallName: 'client.repositories.listInspections',
-    fullyQualifiedName: 'repositories.listInspections',
-    httpMethod: 'get',
-    httpPath: '/v1/repositories/{id}/inspections',
-  },
-  {
-    clientCallName: 'client.repositories.refresh',
-    fullyQualifiedName: 'repositories.refresh',
-    httpMethod: 'post',
-    httpPath: '/v1/repositories/{id}/refresh',
-  },
-  {
-    clientCallName: 'client.repositories.retrieveInspection',
-    fullyQualifiedName: 'repositories.retrieveInspection',
-    httpMethod: 'get',
-    httpPath: '/v1/repositories/inspections/{id}',
-  },
-  {
     clientCallName: 'client.secrets.create',
     fullyQualifiedName: 'secrets.create',
     httpMethod: 'post',
     httpPath: '/v1/secrets',
+  },
+  {
+    clientCallName: 'client.secrets.retrieve',
+    fullyQualifiedName: 'secrets.retrieve',
+    httpMethod: 'get',
+    httpPath: '/v1/secrets/{name}',
   },
   {
     clientCallName: 'client.secrets.update',
@@ -735,6 +759,18 @@ export const sdkMethods: SdkMethod[] = [
     fullyQualifiedName: 'mcpConfigs.delete',
     httpMethod: 'post',
     httpPath: '/v1/mcp-configs/{id}/delete',
+  },
+  {
+    clientCallName: 'client.apikeys.create',
+    fullyQualifiedName: 'apikeys.create',
+    httpMethod: 'post',
+    httpPath: '/v1/apikeys',
+  },
+  {
+    clientCallName: 'client.restrictedKeys.create',
+    fullyQualifiedName: 'restrictedKeys.create',
+    httpMethod: 'post',
+    httpPath: '/v1/restricted_keys',
   },
 ];
 

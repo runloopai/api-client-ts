@@ -1,7 +1,8 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-import { readEnv } from './util';
+import fs from 'fs/promises';
 import { getLogger } from './logger';
+import { readEnv } from './util';
 
 const INSTRUCTIONS_CACHE_TTL_MS = 15 * 60 * 1000; // 15 minutes
 
@@ -12,33 +13,50 @@ interface InstructionsCacheEntry {
 
 const instructionsCache = new Map<string, InstructionsCacheEntry>();
 
-// Periodically evict stale entries so the cache doesn't grow unboundedly.
-const _cacheCleanupInterval = setInterval(() => {
+export async function getInstructions({
+  stainlessApiKey,
+  customInstructionsPath,
+}: {
+  stainlessApiKey?: string | undefined;
+  customInstructionsPath?: string | undefined;
+}): Promise<string> {
   const now = Date.now();
+  const cacheKey = customInstructionsPath ?? stainlessApiKey ?? '';
+  const cached = instructionsCache.get(cacheKey);
+
+  if (cached && now - cached.fetchedAt <= INSTRUCTIONS_CACHE_TTL_MS) {
+    return cached.fetchedInstructions;
+  }
+
+  // Evict stale entries so the cache doesn't grow unboundedly.
   for (const [key, entry] of instructionsCache) {
     if (now - entry.fetchedAt > INSTRUCTIONS_CACHE_TTL_MS) {
       instructionsCache.delete(key);
     }
   }
-}, INSTRUCTIONS_CACHE_TTL_MS);
 
-// Don't keep the process alive just for cleanup.
-_cacheCleanupInterval.unref();
+  let fetchedInstructions: string;
 
-export async function getInstructions(stainlessApiKey: string | undefined): Promise<string> {
-  const cacheKey = stainlessApiKey ?? '';
-  const cached = instructionsCache.get(cacheKey);
-
-  if (cached && Date.now() - cached.fetchedAt <= INSTRUCTIONS_CACHE_TTL_MS) {
-    return cached.fetchedInstructions;
+  if (customInstructionsPath) {
+    fetchedInstructions = await fetchLatestInstructionsFromFile(customInstructionsPath);
+  } else {
+    fetchedInstructions = await fetchLatestInstructionsFromApi(stainlessApiKey);
   }
 
-  const fetchedInstructions = await fetchLatestInstructions(stainlessApiKey);
-  instructionsCache.set(cacheKey, { fetchedInstructions, fetchedAt: Date.now() });
+  instructionsCache.set(cacheKey, { fetchedInstructions, fetchedAt: now });
   return fetchedInstructions;
 }
 
-async function fetchLatestInstructions(stainlessApiKey: string | undefined): Promise<string> {
+async function fetchLatestInstructionsFromFile(path: string): Promise<string> {
+  try {
+    return await fs.readFile(path, 'utf-8');
+  } catch (error) {
+    getLogger().error({ error, path }, 'Error fetching instructions from file');
+    throw error;
+  }
+}
+
+async function fetchLatestInstructionsFromApi(stainlessApiKey: string | undefined): Promise<string> {
   // Setting the stainless API key is optional, but may be required
   // to authenticate requests to the Stainless API.
   const response = await fetch(

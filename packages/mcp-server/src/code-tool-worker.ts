@@ -7,6 +7,10 @@ import ts from 'typescript';
 import { WorkerOutput } from './code-tool-types';
 import { Runloop, ClientOptions } from '@runloop/api-client';
 
+async function tseval(code: string) {
+  return import('data:application/typescript;charset=utf-8;base64,' + Buffer.from(code).toString('base64'));
+}
+
 function getRunFunctionSource(code: string): {
   type: 'declaration' | 'expression';
   client: string | undefined;
@@ -104,6 +108,7 @@ function getTSDiagnostics(code: string): string[] {
 
 const fuse = new Fuse(
   [
+    'client.accounts.me',
     'client.benchmarks.create',
     'client.benchmarks.definitions',
     'client.benchmarks.list',
@@ -121,8 +126,20 @@ const fuse = new Fuse(
     'client.benchmarkJobs.list',
     'client.benchmarkJobs.retrieve',
     'client.agents.create',
+    'client.agents.delete',
+    'client.agents.devboxCounts',
     'client.agents.list',
+    'client.agents.listPublic',
     'client.agents.retrieve',
+    'client.axons.create',
+    'client.axons.delete',
+    'client.axons.list',
+    'client.axons.publish',
+    'client.axons.retrieve',
+    'client.axons.subscribeSse',
+    'client.axons.events.list',
+    'client.axons.sql.batch',
+    'client.axons.sql.query',
     'client.blueprints.create',
     'client.blueprints.delete',
     'client.blueprints.list',
@@ -131,8 +148,10 @@ const fuse = new Fuse(
     'client.blueprints.preview',
     'client.blueprints.retrieve',
     'client.devboxes.create',
+    'client.devboxes.createGatewayToken',
+    'client.devboxes.createMcpToken',
+    'client.devboxes.createPtyTunnel',
     'client.devboxes.createSSHKey',
-    'client.devboxes.createTunnel',
     'client.devboxes.deleteDiskSnapshot',
     'client.devboxes.downloadFile',
     'client.devboxes.enableTunnel',
@@ -154,18 +173,12 @@ const fuse = new Fuse(
     'client.devboxes.update',
     'client.devboxes.uploadFile',
     'client.devboxes.waitForCommand',
+    'client.devboxes.watchEvictions',
     'client.devboxes.writeFileContents',
     'client.devboxes.diskSnapshots.delete',
     'client.devboxes.diskSnapshots.list',
     'client.devboxes.diskSnapshots.queryStatus',
     'client.devboxes.diskSnapshots.update',
-    'client.devboxes.browsers.create',
-    'client.devboxes.browsers.retrieve',
-    'client.devboxes.computers.create',
-    'client.devboxes.computers.keyboardInteraction',
-    'client.devboxes.computers.mouseInteraction',
-    'client.devboxes.computers.retrieve',
-    'client.devboxes.computers.screenInteraction',
     'client.devboxes.logs.list',
     'client.devboxes.executions.executeAsync',
     'client.devboxes.executions.executeSync',
@@ -174,6 +187,8 @@ const fuse = new Fuse(
     'client.devboxes.executions.sendStdIn',
     'client.devboxes.executions.streamStderrUpdates',
     'client.devboxes.executions.streamStdoutUpdates',
+    'client.pty.connect',
+    'client.pty.control',
     'client.scenarios.archive',
     'client.scenarios.create',
     'client.scenarios.list',
@@ -198,17 +213,10 @@ const fuse = new Fuse(
     'client.objects.list',
     'client.objects.listPublic',
     'client.objects.retrieve',
-    'client.repositories.create',
-    'client.repositories.delete',
-    'client.repositories.inspect',
-    'client.repositories.list',
-    'client.repositories.listInspections',
-    'client.repositories.refresh',
-    'client.repositories.retrieve',
-    'client.repositories.retrieveInspection',
     'client.secrets.create',
     'client.secrets.delete',
     'client.secrets.list',
+    'client.secrets.retrieve',
     'client.secrets.update',
     'client.networkPolicies.create',
     'client.networkPolicies.delete',
@@ -225,6 +233,8 @@ const fuse = new Fuse(
     'client.mcpConfigs.list',
     'client.mcpConfigs.retrieve',
     'client.mcpConfigs.update',
+    'client.apikeys.create',
+    'client.restrictedKeys.create',
   ],
   { threshold: 1, shouldSort: true },
 );
@@ -301,7 +311,8 @@ function makeSdkProxy<T extends object>(obj: T, { path, isBelievedBad = false }:
 
 function parseError(code: string, error: unknown): string | undefined {
   if (!(error instanceof Error)) return;
-  const message = error.name ? `${error.name}: ${error.message}` : error.message;
+  const cause = error.cause instanceof Error ? `: ${error.cause.message}` : '';
+  const message = error.name ? `${error.name}: ${error.message}${cause}` : `${error.message}${cause}`;
   try {
     // Deno uses V8; the first "<anonymous>:LINE:COLUMN" is the top of stack.
     const lineNumber = error.stack?.match(/<anonymous>:([0-9]+):[0-9]+/)?.[1];
@@ -357,7 +368,9 @@ const fetch = async (req: Request): Promise<Response> => {
 
   const log_lines: string[] = [];
   const err_lines: string[] = [];
-  const console = {
+  const originalConsole = globalThis.console;
+  globalThis.console = {
+    ...originalConsole,
     log: (...args: unknown[]) => {
       log_lines.push(util.format(...args));
     },
@@ -367,7 +380,7 @@ const fetch = async (req: Request): Promise<Response> => {
   };
   try {
     let run_ = async (client: any) => {};
-    eval(`${code}\nrun_ = run;`);
+    run_ = (await tseval(`${code}\nexport default run;`)).default;
     const result = await run_(makeSdkProxy(client, { path: ['client'] }));
     return Response.json({
       is_error: false,
@@ -385,6 +398,8 @@ const fetch = async (req: Request): Promise<Response> => {
       } satisfies WorkerOutput,
       { status: 400, statusText: 'Code execution error' },
     );
+  } finally {
+    globalThis.console = originalConsole;
   }
 };
 
