@@ -192,6 +192,8 @@ import {
 } from './resources/axons/axons';
 import {
   DevboxAsyncExecutionDetailView,
+  DevboxCreateGatewayTokenParams,
+  DevboxCreateMcpTokenParams,
   DevboxCreateParams,
   DevboxCreateSSHKeyResponse,
   DevboxDeleteDiskSnapshotResponse,
@@ -227,6 +229,8 @@ import {
   DevboxWaitForCommandParams,
   DevboxWriteFileContentsParams,
   Devboxes,
+  GatewayTokenView,
+  McpTokenView,
   PtyTunnelView,
   TunnelView,
 } from './resources/devboxes/devboxes';
@@ -686,6 +690,8 @@ export declare namespace Runloop {
     type DevboxSnapshotListView as DevboxSnapshotListView,
     type DevboxSnapshotView as DevboxSnapshotView,
     type DevboxView as DevboxView,
+    type GatewayTokenView as GatewayTokenView,
+    type McpTokenView as McpTokenView,
     type PtyTunnelView as PtyTunnelView,
     type TunnelView as TunnelView,
     type DevboxCreateSSHKeyResponse as DevboxCreateSSHKeyResponse,
@@ -699,6 +705,8 @@ export declare namespace Runloop {
     type DevboxCreateParams as DevboxCreateParams,
     type DevboxUpdateParams as DevboxUpdateParams,
     type DevboxListParams as DevboxListParams,
+    type DevboxCreateGatewayTokenParams as DevboxCreateGatewayTokenParams,
+    type DevboxCreateMcpTokenParams as DevboxCreateMcpTokenParams,
     type DevboxDownloadFileParams as DevboxDownloadFileParams,
     type DevboxEnableTunnelParams as DevboxEnableTunnelParams,
     type DevboxExecuteParams as DevboxExecuteParams,
