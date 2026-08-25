@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.31.1 (2026-08-25)
+
+Full Changelog: [v1.31.0...v1.31.1](https://github.com/runloopai/api-client-ts/compare/v1.31.0...v1.31.1)
+
+### Bug Fixes
+
+* **docs:** publish documentation only on releases ([#831](https://github.com/runloopai/api-client-ts/issues/831)) ([3f27c88](https://github.com/runloopai/api-client-ts/commit/3f27c88f6a2058ad37adfaad8b38c237250621a8))
+
 ## [1.31.0](https://github.com/runloopai/api-client-ts/compare/v1.30.0...v1.31.0) (2026-08-25)
 
 
