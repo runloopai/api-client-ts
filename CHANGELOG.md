@@ -1,5 +1,26 @@
 # Changelog
 
+## [1.31.0](https://github.com/runloopai/api-client-ts/compare/v1.30.0...v1.31.0) (2026-08-25)
+
+
+### Features
+
+* initial stlc build ([02f992d](https://github.com/runloopai/api-client-ts/commit/02f992dc3ba48c15d1d31b83a33af1eacd75eb0c))
+* **mux:** mint agent gateway tokens for running devboxes ([#10872](https://github.com/runloopai/api-client-ts/issues/10872)) ([2c814e0](https://github.com/runloopai/api-client-ts/commit/2c814e0ebd9403f759c7d89dd51d543584c9af39))
+* **mux:** mint MCP tokens for running devboxes ([#10871](https://github.com/runloopai/api-client-ts/issues/10871)) ([1b38fde](https://github.com/runloopai/api-client-ts/commit/1b38fdebe72cfd309fe6c21459b69a9f49b6be5a))
+
+
+### Bug Fixes
+
+* **ci:** gate publish-docs to production and tolerate an empty docs diff ([43fa787](https://github.com/runloopai/api-client-ts/commit/43fa787ec9e66686f018d88f8cae31abf44c2f8d))
+* **release:** use stable versioning instead of prerelease ([6bc5b36](https://github.com/runloopai/api-client-ts/commit/6bc5b3666b7953346487c4450dd97b60d1a5d9ac))
+* **test:** install deps against the integrated manifest before jest ([89a9fc9](https://github.com/runloopai/api-client-ts/commit/89a9fc938780b8ed390ee39c1860a078c8d4cb81))
+
+
+### Chores
+
+* ignore mcp bundle artifacts ([6364ec1](https://github.com/runloopai/api-client-ts/commit/6364ec12f834b1166fc1119c11cecdda29775b45))
+
 ## 1.30.0 (2026-08-23)
 
 Full Changelog: [v1.29.0...v1.30.0](https://github.com/runloopai/api-client-ts/compare/v1.29.0...v1.30.0)
