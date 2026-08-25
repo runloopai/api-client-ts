@@ -4,6 +4,18 @@ set -e
 
 cd "$(dirname "$0")/.."
 
+# CUSTOM CODE: stlc runs ./scripts/bootstrap *before* it applies custom-code
+# patches, so node_modules can be installed from the generated package.json and
+# miss dependencies that custom code adds (tar, uuidv7, zod). Re-install against
+# the integrated manifest. Frozen so a test run can never mutate yarn.lock, and
+# --check-files because yarn trusts node_modules/.yarn-integrity and will
+# otherwise report "Already up-to-date" over a tree that is missing packages.
+if command -v yarn >/dev/null 2>&1; then
+  yarn install --frozen-lockfile --check-files --silent
+else
+  npm ci --silent
+fi
+
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[0;33m'
