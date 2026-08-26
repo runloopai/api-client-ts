@@ -38,6 +38,7 @@ jobs:
         uses: actions/checkout@v6
         with:
           fetch-depth: 0
+          persist-credentials: false
 
       - name: Fetch production main
         env:
@@ -70,6 +71,8 @@ jobs:
 
       - name: Sync production to staging (fast-forward)
         if: steps.diff.outputs.behind == 'true'
+        env:
+          PRODUCTION_REPO_TOKEN: ${{ secrets.PRODUCTION_REPO_TOKEN }}
         run: |
           # Refuse unless staging is an ancestor of production: otherwise the
           # trunks have forked and a fast-forward would be unsafe.
@@ -77,6 +80,12 @@ jobs:
             echo "::error title=Back-sync blocked::staging main is not an ancestor of production/main."
             exit 1
           fi
+          if [ -z "${PRODUCTION_REPO_TOKEN:-}" ]; then
+            echo "::error title=Back-sync blocked::PRODUCTION_REPO_TOKEN is required to update staging main."
+            exit 1
+          fi
+          git remote set-url origin \
+            "https://x-access-token:${PRODUCTION_REPO_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
           git push origin production/main:refs/heads/main
           echo "Fast-forwarded staging/main to production/main."
 
