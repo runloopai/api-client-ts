@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.31.1 (2026-08-27)
+
+Full Changelog: [v1.31.0...v1.31.1](https://github.com/runloopai/api-client-ts/compare/v1.31.0...v1.31.1)
+
+### Bug Fixes
+
+* **ci:** authenticate SDK back-sync pushes ([#1](https://github.com/runloopai/api-client-ts/issues/1)) ([1731eb2](https://github.com/runloopai/api-client-ts/commit/1731eb2b14c1a4a56b01ca579c62636cc0e31cac))
+* **docs:** publish documentation only on releases ([#831](https://github.com/runloopai/api-client-ts/issues/831)) ([3f27c88](https://github.com/runloopai/api-client-ts/commit/3f27c88f6a2058ad37adfaad8b38c237250621a8))
+
 ## [1.31.0](https://github.com/runloopai/api-client-ts/compare/v1.30.0...v1.31.0) (2026-08-25)
 
 
