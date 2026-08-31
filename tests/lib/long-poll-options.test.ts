@@ -1,9 +1,15 @@
-import { PollingTimeoutError, resolveLongPollTimeoutMs, _resetDeprecationWarning } from '../../src/lib/polling';
+import {
+  PollingTimeoutError,
+  resolveLongPollTimeoutMs,
+  _resetDeprecationWarning,
+} from '../../src/lib/polling';
 import { awaitDevboxState, DevboxStateWaitOptions } from '../../src/lib/devbox-state';
 
 type MockDevbox = { status: string; id: string };
 
-function makeOptions(overrides: Partial<DevboxStateWaitOptions<MockDevbox>> = {}): DevboxStateWaitOptions<MockDevbox> {
+function makeOptions(
+  overrides: Partial<DevboxStateWaitOptions<MockDevbox>> = {},
+): DevboxStateWaitOptions<MockDevbox> {
   return {
     client: overrides.client ?? { post: jest.fn() },
     devboxId: 'dbx-123',
@@ -60,27 +66,32 @@ describe('LongPollRequestOptions resolution', () => {
 
   describe('end-to-end via awaitDevboxState', () => {
     function slowTransition(): jest.Mock {
-      return jest.fn().mockImplementation(
-        () => new Promise((resolve) => setTimeout(() => resolve({ status: 'provisioning', id: 'dbx-123' }), 100)),
-      );
+      return jest
+        .fn()
+        .mockImplementation(
+          () =>
+            new Promise((resolve) =>
+              setTimeout(() => resolve({ status: 'provisioning', id: 'dbx-123' }), 100),
+            ),
+        );
     }
 
     test('times out via longPoll.timeoutMs path', async () => {
       const post = slowTransition();
       const timeoutMs = resolveTimeoutMs({ longPoll: { timeoutMs: 150 } });
 
-      await expect(
-        awaitDevboxState(makeOptions({ client: { post }, timeoutMs })),
-      ).rejects.toThrow(PollingTimeoutError);
+      await expect(awaitDevboxState(makeOptions({ client: { post }, timeoutMs }))).rejects.toThrow(
+        PollingTimeoutError,
+      );
     });
 
     test('times out via deprecated polling.timeoutMs path', async () => {
       const post = slowTransition();
       const timeoutMs = resolveTimeoutMs({ polling: { timeoutMs: 150 } });
 
-      await expect(
-        awaitDevboxState(makeOptions({ client: { post }, timeoutMs })),
-      ).rejects.toThrow(PollingTimeoutError);
+      await expect(awaitDevboxState(makeOptions({ client: { post }, timeoutMs }))).rejects.toThrow(
+        PollingTimeoutError,
+      );
     });
 
     test('longPoll.timeoutMs wins over polling.timeoutMs (generous longPoll, tiny polling)', async () => {
@@ -145,9 +156,7 @@ describe('resolveLongPollTimeoutMs deprecation warnings', () => {
   test('warns when ignored polling fields are present', () => {
     resolveLongPollTimeoutMs({ polling: { maxAttempts: 5 } } as any);
     expect(warnSpy).toHaveBeenCalledTimes(1);
-    expect(warnSpy).toHaveBeenCalledWith(
-      expect.stringContaining('maxAttempts'),
-    );
+    expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('maxAttempts'));
   });
 
   test('lists all ignored fields in a single warning', () => {
@@ -170,9 +179,7 @@ describe('resolveLongPollTimeoutMs deprecation warnings', () => {
   test('warns about deprecated polling.timeoutMs when longPoll is absent', () => {
     resolveLongPollTimeoutMs({ polling: { timeoutMs: 3000 } });
     expect(warnSpy).toHaveBeenCalledTimes(1);
-    expect(warnSpy).toHaveBeenCalledWith(
-      expect.stringContaining('deprecated'),
-    );
+    expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('deprecated'));
   });
 
   test('does not warn when only longPoll is used', () => {
@@ -189,7 +196,9 @@ describe('resolveLongPollTimeoutMs deprecation warnings', () => {
   test('still returns the correct timeoutMs', () => {
     expect(resolveLongPollTimeoutMs({ polling: { maxAttempts: 5, timeoutMs: 3000 } } as any)).toBe(3000);
     _resetDeprecationWarning();
-    expect(resolveLongPollTimeoutMs({ longPoll: { timeoutMs: 7000 }, polling: { timeoutMs: 1000 } })).toBe(7000);
+    expect(resolveLongPollTimeoutMs({ longPoll: { timeoutMs: 7000 }, polling: { timeoutMs: 1000 } })).toBe(
+      7000,
+    );
     _resetDeprecationWarning();
     expect(resolveLongPollTimeoutMs(undefined)).toBeUndefined();
   });
