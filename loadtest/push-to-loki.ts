@@ -8,6 +8,10 @@
  *
  * LOKI_URL must be the Loki gateway base URL (no trailing slash, no path).
  * Optionally set LOKI_USER and LOKI_PASSWORD for basic auth.
+ *
+ * Shipping metrics is best-effort: this entrypoint exists to detect HTTP/2
+ * regressions, so a Loki push failure is reported loudly but does not fail the
+ * run. Only a failing load test sets a non-zero exit code.
  */
 import { execFileSync } from 'node:child_process';
 import path from 'node:path';
@@ -16,10 +20,6 @@ import { fileURLToPath } from 'node:url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const LOKI_URL = process.env['LOKI_URL'];
-if (!LOKI_URL) {
-  console.error('LOKI_URL is required');
-  process.exit(1);
-}
 
 const LOKI_USER = process.env['LOKI_USER'] ?? '';
 const LOKI_PASSWORD = process.env['LOKI_PASSWORD'] ?? '';
@@ -93,13 +93,29 @@ async function main() {
     }
   }
 
-  for (const { test, result } of results) {
-    try {
-      await pushToLoki(test, result);
-    } catch (err) {
-      console.error(`push failed for ${test}:`, err);
-      process.exitCode = 1;
+  // Metrics shipping is best-effort and deliberately does NOT affect the exit
+  // code — an unreachable Loki must not mask (or manufacture) an H2 regression.
+  let unshipped = 0;
+  if (!LOKI_URL) {
+    unshipped = results.length;
+    console.error('LOKI_URL is not set — skipping Loki push');
+  } else {
+    for (const { test, result } of results) {
+      try {
+        await pushToLoki(test, result);
+      } catch (err) {
+        unshipped++;
+        console.error(`push failed for ${test}:`, err);
+      }
     }
+  }
+
+  if (unshipped > 0) {
+    console.error(
+      `\nWARNING: results NOT shipped to Loki — ${unshipped}/${results.length} test result(s) were dropped ` +
+        `(LOKI_URL=${LOKI_URL ?? '<unset>'}). No trend data was recorded for this run. This does not fail the ` +
+        `job, but the Loki destination is broken and needs to be fixed or removed.`,
+    );
   }
 
   console.log('\nsummary:');
