@@ -1,19 +1,16 @@
-# Runloop Node API Library
+# Runloop TypeScript SDK
 
 [![NPM version](https://img.shields.io/npm/v/@runloop/api-client.svg)](https://npmjs.org/package/@runloop/api-client) ![npm bundle size](https://img.shields.io/bundlephobia/minzip/@runloop/api-client)
 
-This library provides convenient access to the Runloop SDK & REST API from server-side TypeScript or JavaScript.
+Official TypeScript SDK for [Runloop](https://docs.runloop.ai) — secure microVM sandboxes (**devboxes**) where AI agents run code, edit files, and expose ports.
 
-The **RunloopSDK** is the recommended, modern way to interact with the Runloop API. It provides high-level object-oriented interfaces for common operations while maintaining full access to the underlying REST API through the `.api` property.
+Why teams pick Runloop:
 
-## MCP Server
-
-Use the Runloop MCP Server to enable AI assistants to interact with this API, allowing them to explore endpoints, make test requests, and use documentation to help integrate this SDK into your application.
-
-[![Add to Cursor](https://cursor.com/deeplink/mcp-install-dark.svg)](https://cursor.com/en-US/install-mcp?name=%40runloop%2Fapi-client-mcp&config=eyJjb21tYW5kIjoibnB4IiwiYXJncyI6WyIteSIsIkBydW5sb29wL2FwaS1jbGllbnQtbWNwIl0sImVudiI6eyJSVU5MT09QX0FQSV9LRVkiOiJNeSBCZWFyZXIgVG9rZW4ifX0)
-[![Install in VS Code](https://img.shields.io/badge/_-Add_to_VS_Code-blue?style=for-the-badge&logo=data:image/svg%2bxml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGZpbGw9Im5vbmUiIHZpZXdCb3g9IjAgMCA0MCA0MCI+PHBhdGggZmlsbD0iI0VFRSIgZmlsbC1ydWxlPSJldmVub2RkIiBkPSJNMzAuMjM1IDM5Ljg4NGEyLjQ5MSAyLjQ5MSAwIDAgMS0xLjc4MS0uNzNMMTIuNyAyNC43OGwtMy40NiAyLjYyNC0zLjQwNiAyLjU4MmExLjY2NSAxLjY2NSAwIDAgMS0xLjA4Mi4zMzggMS42NjQgMS42NjQgMCAwIDEtMS4wNDYtLjQzMWwtMi4yLTJhMS42NjYgMS42NjYgMCAwIDEgMC0yLjQ2M0w3LjQ1OCAyMCA0LjY3IDE3LjQ1MyAxLjUwNyAxNC41N2ExLjY2NSAxLjY2NSAwIDAgMSAwLTIuNDYzbDIuMi0yYTEuNjY1IDEuNjY1IDAgMCAxIDIuMTMtLjA5N2w2Ljg2MyA1LjIwOUwyOC40NTIuODQ0YTIuNDg4IDIuNDg4IDAgMCAxIDEuODQxLS43MjljLjM1MS4wMDkuNjk5LjA5MSAxLjAxOS4yNDVsOC4yMzYgMy45NjFhMi41IDIuNSAwIDAgMSAxLjQxNSAyLjI1M3YuMDk5LS4wNDVWMzMuMzd2LS4wNDUuMDk1YTIuNTAxIDIuNTAxIDAgMCAxLTEuNDE2IDIuMjU3bC04LjIzNSAzLjk2MWEyLjQ5MiAyLjQ5MiAwIDAgMS0xLjA3Ny4yNDZabS43MTYtMjguOTQ3LTExLjk0OCA5LjA2MiAxMS45NTIgOS4wNjUtLjAwNC0xOC4xMjdaIi8+PC9zdmc+)](https://vscode.stainless.com/mcp/%7B%22name%22%3A%22%40runloop%2Fapi-client-mcp%22%2C%22command%22%3A%22npx%22%2C%22args%22%3A%5B%22-y%22%2C%22%40runloop%2Fapi-client-mcp%22%5D%2C%22env%22%3A%7B%22RUNLOOP_API_KEY%22%3A%22My%20Bearer%20Token%22%7D%7D)
-
-> Note: You may need to set environment variables in your MCP client.
+- **Sandboxes that live as long as your agent does.** Devboxes run for hours or days, and `suspend()` / `resume()` keeps the whole machine state between sessions.
+- **A real machine, not just a code runner.** Full filesystem, shell, background processes, and public URLs for ports.
+- **Fast repeat starts.** Blueprints and disk snapshots boot pre-built environments instead of reinstalling dependencies.
+- **Built for production.** SOC 2 compliant, with bring-your-own-cloud deployment on AWS, GCP, and Azure.
+- **Evaluation built in.** Scenarios, scorers, and benchmarks let you measure agent performance on the same platform you run it on.
 
 ## Installation
 
@@ -23,7 +20,7 @@ npm install @runloop/api-client
 
 ## Quickstart
 
-Here's a complete example that demonstrates the core SDK functionality:
+`RunloopSDK` is the recommended way to use the API. It gives you high-level objects for common operations, and the full REST API stays available on `.api`.
 
 ```typescript
 import { RunloopSDK } from '@runloop/api-client';
@@ -57,6 +54,15 @@ console.log('Devbox logs:', logs.logs);
 
 await devbox.shutdown();
 ```
+
+## MCP Server
+
+Use the Runloop MCP Server to enable AI assistants to interact with this API, allowing them to explore endpoints, make test requests, and use documentation to help integrate this SDK into your application.
+
+[![Add to Cursor](https://cursor.com/deeplink/mcp-install-dark.svg)](https://cursor.com/en-US/install-mcp?name=%40runloop%2Fapi-client-mcp&config=eyJjb21tYW5kIjoibnB4IiwiYXJncyI6WyIteSIsIkBydW5sb29wL2FwaS1jbGllbnQtbWNwIl0sImVudiI6eyJSVU5MT09QX0FQSV9LRVkiOiJNeSBCZWFyZXIgVG9rZW4ifX0)
+[![Install in VS Code](https://img.shields.io/badge/_-Add_to_VS_Code-blue?style=for-the-badge&logo=data:image/svg%2bxml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGZpbGw9Im5vbmUiIHZpZXdCb3g9IjAgMCA0MCA0MCI+PHBhdGggZmlsbD0iI0VFRSIgZmlsbC1ydWxlPSJldmVub2RkIiBkPSJNMzAuMjM1IDM5Ljg4NGEyLjQ5MSAyLjQ5MSAwIDAgMS0xLjc4MS0uNzNMMTIuNyAyNC43OGwtMy40NiAyLjYyNC0zLjQwNiAyLjU4MmExLjY2NSAxLjY2NSAwIDAgMS0xLjA4Mi4zMzggMS42NjQgMS42NjQgMCAwIDEtMS4wNDYtLjQzMWwtMi4yLTJhMS42NjYgMS42NjYgMCAwIDEgMC0yLjQ2M0w3LjQ1OCAyMCA0LjY3IDE3LjQ1MyAxLjUwNyAxNC41N2ExLjY2NSAxLjY2NSAwIDAgMSAwLTIuNDYzbDIuMi0yYTEuNjY1IDEuNjY1IDAgMCAxIDIuMTMtLjA5N2w2Ljg2MyA1LjIwOUwyOC40NTIuODQ0YTIuNDg4IDIuNDg4IDAgMCAxIDEuODQxLS43MjljLjM1MS4wMDkuNjk5LjA5MSAxLjAxOS4yNDVsOC4yMzYgMy45NjFhMi41IDIuNSAwIDAgMSAxLjQxNSAyLjI1M3YuMDk5LS4wNDVWMzMuMzd2LS4wNDUuMDk1YTIuNTAxIDIuNTAxIDAgMCAxLTEuNDE2IDIuMjU3bC04LjIzNSAzLjk2MWEyLjQ5MiAyLjQ5MiAwIDAgMS0xLjA3Ny4yNDZabS43MTYtMjguOTQ3LTExLjk0OCA5LjA2MiAxMS45NTIgOS4wNjUtLjAwNC0xOC4xMjdaIi8+PC9zdmc+)](https://vscode.stainless.com/mcp/%7B%22name%22%3A%22%40runloop%2Fapi-client-mcp%22%2C%22command%22%3A%22npx%22%2C%22args%22%3A%5B%22-y%22%2C%22%40runloop%2Fapi-client-mcp%22%5D%2C%22env%22%3A%7B%22RUNLOOP_API_KEY%22%3A%22My%20Bearer%20Token%22%7D%7D)
+
+> Note: You may need to set environment variables in your MCP client.
 
 ## Examples
 

@@ -1,7 +1,22 @@
 {
   "name": "@runloop/api-client",
   "version": "1.31.0",
-  "description": "The official TypeScript library for the Runloop API",
+  "description": "Official TypeScript SDK for Runloop — secure microVM sandboxes (devboxes) where AI agents run code, edit files, and expose ports.",
+  "keywords": [
+    "runloop",
+    "sandbox",
+    "devbox",
+    "microvm",
+    "code-execution",
+    "code-interpreter",
+    "ai-agents",
+    "agent-runtime",
+    "agent-infrastructure",
+    "llm",
+    "typescript"
+  ],
+  "homepage": "https://docs.runloop.ai",
+  "bugs": "https://github.com/runloopai/api-client-ts/issues",
   "author": "Runloop <support@runloop.ai>",
   "types": "dist/sdk.d.ts",
   "main": "dist/sdk.js",
