@@ -84,6 +84,8 @@ describe('resource axons', () => {
           id: 'id',
           include_total_count: true,
           limit: 0,
+          'metadata[key]': 'metadata[key]',
+          'metadata[key][in]': 'metadata[key][in]',
           name: 'name',
           search: 'search',
           starting_after: 'starting_after',

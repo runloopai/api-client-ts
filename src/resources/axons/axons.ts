@@ -264,6 +264,17 @@ export interface AxonListParams extends AxonsCursorIDPageParams {
   include_total_count?: boolean;
 
   /**
+   * Filter axons by metadata key-value pair. Can be used multiple times for
+   * different keys.
+   */
+  'metadata[key]'?: string;
+
+  /**
+   * Filter axons by metadata key with multiple possible values (OR condition).
+   */
+  'metadata[key][in]'?: string;
+
+  /**
    * Filter by axon name (prefix match supported).
    */
   name?: string;
