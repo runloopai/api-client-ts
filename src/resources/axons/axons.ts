@@ -50,6 +50,23 @@ export class Axons extends APIResource {
   }
 
   /**
+   * [Beta] Updates the specified axon fields. Omitted fields are left unchanged. An
+   * empty metadata map clears the metadata.
+   */
+  update(id: string, body?: AxonUpdateParams, options?: Core.RequestOptions): Core.APIPromise<AxonView>;
+  update(id: string, options?: Core.RequestOptions): Core.APIPromise<AxonView>;
+  update(
+    id: string,
+    body: AxonUpdateParams | Core.RequestOptions = {},
+    options?: Core.RequestOptions,
+  ): Core.APIPromise<AxonView> {
+    if (isRequestOptions(body)) {
+      return this.update(id, {}, body);
+    }
+    return this._client.post(`/v1/axons/${id}`, { body, ...options });
+  }
+
+  /**
    * [Beta] List all active axons.
    */
   list(
@@ -181,6 +198,14 @@ export interface AxonListView {
   total_count?: number | null;
 }
 
+export interface AxonUpdateParams {
+  /**
+   * User defined metadata to replace the axon metadata. Omit or set to null to leave
+   * unchanged, or set to an empty map to clear it.
+   */
+  metadata?: { [key: string]: string } | null;
+}
+
 export interface AxonView {
   /**
    * The axon identifier.
@@ -249,6 +274,14 @@ export interface AxonCreateParams {
    * (Optional) Name for the axon.
    */
   name?: string | null;
+}
+
+export interface AxonUpdateParams {
+  /**
+   * User defined metadata to replace the axon metadata. Omit or set to null to leave
+   * unchanged, or set to an empty map to clear it.
+   */
+  metadata?: { [key: string]: string } | null;
 }
 
 export interface AxonListParams extends AxonsCursorIDPageParams {
@@ -324,6 +357,7 @@ export declare namespace Axons {
     type AxonCreateParams as AxonCreateParams,
     type AxonEventView as AxonEventView,
     type AxonListView as AxonListView,
+    type AxonUpdateParams as AxonUpdateParams,
     type AxonView as AxonView,
     type PublishParams as PublishParams,
     type PublishResultView as PublishResultView,

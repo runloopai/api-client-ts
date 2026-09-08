@@ -6,6 +6,7 @@ export {
   type AxonCreateParams,
   type AxonEventView,
   type AxonListView,
+  type AxonUpdateParams,
   type AxonView,
   type PublishParams,
   type PublishResultView,
