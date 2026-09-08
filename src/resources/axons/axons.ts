@@ -123,6 +123,11 @@ export class AxonViewsAxonsCursorIDPage extends AxonsCursorIDPage<AxonView> {}
 
 export interface AxonCreateParams {
   /**
+   * User defined metadata to attach to the axon for organization.
+   */
+  metadata?: { [key: string]: string } | null;
+
+  /**
    * (Optional) Name for the axon.
    */
   name?: string | null;
@@ -188,6 +193,11 @@ export interface AxonView {
   created_at_ms: number;
 
   /**
+   * The user defined axon metadata.
+   */
+  metadata: { [key: string]: string };
+
+  /**
    * The name of the axon.
    */
   name?: string | null;
@@ -230,6 +240,11 @@ export interface PublishResultView {
 export type AxonDeleteResponse = unknown;
 
 export interface AxonCreateParams {
+  /**
+   * User defined metadata to attach to the axon for organization.
+   */
+  metadata?: { [key: string]: string } | null;
+
   /**
    * (Optional) Name for the axon.
    */

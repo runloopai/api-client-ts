@@ -29,9 +29,15 @@ describe('resource axons', () => {
 
   test('create: request options and params are passed correctly', async () => {
     // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
-    await expect(client.axons.create({ name: 'name' }, { path: '/_stainless_unknown_path' })).rejects.toThrow(
-      Runloop.NotFoundError,
-    );
+    await expect(
+      client.axons.create(
+        {
+          metadata: { foo: 'string' },
+          name: 'name',
+        },
+        { path: '/_stainless_unknown_path' },
+      ),
+    ).rejects.toThrow(Runloop.NotFoundError);
   });
 
   test('retrieve', async () => {
