@@ -258,7 +258,8 @@ export class Devboxes extends APIResource {
    * URL-based access to the Devbox without exposing internal IDs. The tunnel URL
    * format is: https://&#123;port&#125;-&#123;tunnel_key&#125;.tunnel.runloop.ai
    *
-   * Each Devbox can have one tunnel.
+   * Each Devbox can have one tunnel. If tunnel config is omitted, or auth_mode is
+   * omitted, the tunnel defaults to open (public hostname, no bearer token).
    */
   enableTunnel(
     id: string,
@@ -1383,7 +1384,8 @@ export namespace DevboxCreateParams {
    */
   export interface Tunnel {
     /**
-     * Authentication mode for the tunnel. Defaults to 'public' if not specified.
+     * Authentication mode for the tunnel. Defaults to open if omitted: the hostname is
+     * a public capability and does not require a tunnel bearer token.
      */
     auth_mode?: 'open' | 'authenticated' | null;
 
@@ -1474,7 +1476,8 @@ export interface DevboxDownloadFileParams {
 
 export interface DevboxEnableTunnelParams {
   /**
-   * Authentication mode for the tunnel. Defaults to 'public' if not specified.
+   * Authentication mode for the tunnel. Defaults to open if omitted: the hostname is
+   * a public capability and does not require a tunnel bearer token.
    */
   auth_mode?: 'open' | 'authenticated' | null;
 
