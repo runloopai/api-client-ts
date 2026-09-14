@@ -211,7 +211,13 @@ export interface ObjectView {
   size_bytes?: number | null;
 
   /**
-   * Presigned URL for uploading content to S3 (only present on create).
+   * HTTP headers required when uploading to upload_url (only present when needed on
+   * create).
+   */
+  upload_headers?: { [key: string]: string } | null;
+
+  /**
+   * Presigned URL for uploading content with HTTP PUT (only present on create).
    */
   upload_url?: string | null;
 }
