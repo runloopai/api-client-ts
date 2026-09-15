@@ -24,7 +24,7 @@
 
 - Always use `RunloopSDK` as the entry point (not legacy `Runloop` default export)
 - Prefer SDK methods (`sdk.devbox`, `sdk.blueprint`, etc.) for object-oriented patterns and convenience
-- For resources without SDK coverage (e.g., benchmarks), use `sdk.api.*` as a fallback
+- For resources without SDK coverage, use `sdk.api.*` as a fallback
 - Use `sdk.devbox.create()` to create devboxes; they auto-await readiness
 - Use `devbox.suspend()` plus `devbox.awaitSuspended()` when you want to park a devbox and preserve its disk state, then use `devbox.resume()` to bring the same devbox back to `running`
 - Use `devbox.snapshotDisk()` to capture a reusable disk baseline and `snapshot.createDevbox()` or `sdk.devbox.createFromSnapshot(snapshot.id, ...)` to branch multiple devboxes from that same state
