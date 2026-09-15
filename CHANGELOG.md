@@ -1,5 +1,22 @@
 # Changelog
 
+## [1.33.0](https://github.com/runloopai/api-client-ts/compare/v1.32.0...v1.33.0) (2026-09-15)
+
+
+### Features
+
+* implement Azure storage, runtime secrets, and service lifecycle coverage ([ef585e2](https://github.com/runloopai/api-client-ts/commit/ef585e2cc531b8171792694ef1aff128013e0a53))
+
+
+### Bug Fixes
+
+* **api:** allow CUSTOM_SIZE with 0.5 CPU cores ([154a25b](https://github.com/runloopai/api-client-ts/commit/154a25b7ff55e3370629f0f0d1cafff2b85df3bd))
+
+
+### Chores
+
+* **security:** Improve security docs and tighten JWT audience ([3770acb](https://github.com/runloopai/api-client-ts/commit/3770acb20ed21b4eb0cd6981e0c65ce6a1a6dbab))
+
 ## [1.32.0](https://github.com/runloopai/api-client-ts/compare/v1.31.0...v1.32.0) (2026-09-08)
 
 
