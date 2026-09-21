@@ -82,4 +82,6 @@ jobs:
       - name: Run smoke tests with open-handle diagnostics
         # Jest reports allocation stacks for handles preventing clean shutdown.
         # Detection runs serially; the job timeout bounds a leaked-handle hang.
+        # TODO: Restore --maxWorkers=800% and remove serial open-handle diagnostics
+        # once the shutdown paths have been diagnosed.
         run: yarn test:smoke --runInBand --detectOpenHandles --color
