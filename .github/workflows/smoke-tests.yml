@@ -11,7 +11,7 @@ on:
         required: true
         type: string
       discriminator:
-        default: "true"
+        default: 'true'
         type: string
   workflow_dispatch:
     inputs:
@@ -79,5 +79,9 @@ jobs:
         if: matrix.transport == 'http2'
         run: node tests/smoketests/scripts/verify-http2.mjs
 
-      - name: Run smoke tests
-        run: yarn test:smoke --maxWorkers=800% --color
+      - name: Run smoke tests with open-handle diagnostics
+        # Jest reports allocation stacks for handles preventing clean shutdown.
+        # Detection runs serially; the job timeout bounds a leaked-handle hang.
+        # TODO: Restore --maxWorkers=800% and remove serial open-handle diagnostics
+        # once the shutdown paths have been diagnosed.
+        run: yarn test:smoke --runInBand --detectOpenHandles --color
