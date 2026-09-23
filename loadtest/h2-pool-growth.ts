@@ -81,8 +81,14 @@ async function main() {
   const observations: Array<{ t: number; concurrency: number; sessions: number }> = [];
   const t0 = Date.now();
   let inFlight = 0;
-  const stages: Record<string, { peakSessions: number; peakConcurrency: number }> = {};
+  const stages: Record<
+    string,
+    { peakSessions: number; peakConcurrency: number; requestsOk: number; requestsFailed: number }
+  > = {};
   let currentStage = '';
+  // Request failures (e.g. NGHTTP2_REFUSED_STREAM when the pool can't grow fast
+  // enough) are data, not a reason to kill the process — count them by code.
+  const failureCodes: Record<string, number> = {};
 
   const sessionsNow = () => (pool as any)._sessions.length as number;
 
@@ -99,22 +105,31 @@ async function main() {
 
   async function burst(name: string, target: number, durationMs: number): Promise<void> {
     currentStage = name;
-    stages[name] = { peakSessions: 0, peakConcurrency: 0 };
+    const stage = { peakSessions: 0, peakConcurrency: 0, requestsOk: 0, requestsFailed: 0 };
+    stages[name] = stage;
     const end = Date.now() + durationMs;
-    const ongoing = new Set<Promise<unknown>>();
+    const ongoing = new Set<Promise<void>>();
     while (Date.now() < end) {
       while (ongoing.size < target && Date.now() < end) {
         inFlight++;
+        // Never rejects: a failed request is recorded and swallowed here, so it
+        // can neither escape as an unhandled rejection nor be silently drained
+        // out of `ongoing` before the drain below awaits it.
         const p = (async () => {
           try {
             const r = await pool.request('/x', 'GET', {}, null);
             await r.text();
+            stage.requestsOk++;
+          } catch (err) {
+            stage.requestsFailed++;
+            const code = String((err as { code?: unknown })?.code ?? (err as Error)?.message ?? err);
+            failureCodes[code] = (failureCodes[code] ?? 0) + 1;
           } finally {
             inFlight--;
           }
         })();
         ongoing.add(p);
-        p.finally(() => ongoing.delete(p));
+        void p.then(() => ongoing.delete(p));
       }
       await new Promise((r) => setTimeout(r, 10));
     }
@@ -134,11 +149,15 @@ async function main() {
   await pool.close();
   server.close();
 
+  const stageList = Object.values(stages);
   const result = {
     stages,
     peakSessionsOverall: Math.max(...observations.map((o) => o.sessions)),
     finalSessions,
     samples: observations.length,
+    requestsOk: stageList.reduce((n, s) => n + s.requestsOk, 0),
+    requestsFailed: stageList.reduce((n, s) => n + s.requestsFailed, 0),
+    failureCodes,
   };
   console.log(JSON.stringify(result, null, 2));
 
