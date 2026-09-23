@@ -1,5 +1,32 @@
 # Changelog
 
+## [1.32.0](https://github.com/runloopai/api-client-ts/compare/v1.31.0...v1.32.0) (2026-09-08)
+
+
+### Features
+
+* **axon:** accept user metadata at creation ([63bfae3](https://github.com/runloopai/api-client-ts/commit/63bfae3a77496afd13a2f939d7697d8e77280c90))
+* **axon:** add axon metadata update endpoint ([2f4ff90](https://github.com/runloopai/api-client-ts/commit/2f4ff90491ec8e23ec910790e093eedb895d3951))
+* **axon:** filter axon lists by metadata and add metadata discovery endpoints ([d364680](https://github.com/runloopai/api-client-ts/commit/d364680a8a1d843a83b898adfa6e6e8df8876b7c))
+* **stlc:** automate SDK generation ([e931bce](https://github.com/runloopai/api-client-ts/commit/e931bcebddfda3eb790d0b0fcda1886fee9e4875))
+
+
+### Bug Fixes
+
+* **ci:** authenticate SDK back-sync pushes ([#1](https://github.com/runloopai/api-client-ts/issues/1)) ([1731eb2](https://github.com/runloopai/api-client-ts/commit/1731eb2b14c1a4a56b01ca579c62636cc0e31cac))
+* **docs:** publish documentation only on releases ([#831](https://github.com/runloopai/api-client-ts/issues/831)) ([3f27c88](https://github.com/runloopai/api-client-ts/commit/3f27c88f6a2058ad37adfaad8b38c237250621a8))
+
+
+### Chores
+
+* **stlc:** run Promote SDKs on a daily schedule ([d3e88a1](https://github.com/runloopai/api-client-ts/commit/d3e88a1a7e57699813fb23f227d3ee429643efa1))
+* **stlc:** run Promote SDKs on a daily schedule ([3256610](https://github.com/runloopai/api-client-ts/commit/325661011a65c26d86707673b5270cd647cad870))
+
+
+### Documentation
+
+* **readme:** lead with what Runloop is and add package keywords ([#836](https://github.com/runloopai/api-client-ts/issues/836)) ([51a7eab](https://github.com/runloopai/api-client-ts/commit/51a7eabb0cd607d74e79bf24e72c172aaa2985cd))
+
 ## [1.31.0](https://github.com/runloopai/api-client-ts/compare/v1.30.0...v1.31.0) (2026-08-25)
 
 

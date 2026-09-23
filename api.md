@@ -104,6 +104,7 @@ Types:
 - <code><a href="./src/resources/axons/axons.ts">AxonCreateParams</a></code>
 - <code><a href="./src/resources/axons/axons.ts">AxonEventView</a></code>
 - <code><a href="./src/resources/axons/axons.ts">AxonListView</a></code>
+- <code><a href="./src/resources/axons/axons.ts">AxonUpdateParams</a></code>
 - <code><a href="./src/resources/axons/axons.ts">AxonView</a></code>
 - <code><a href="./src/resources/axons/axons.ts">PublishParams</a></code>
 - <code><a href="./src/resources/axons/axons.ts">PublishResultView</a></code>
@@ -113,6 +114,7 @@ Methods:
 
 - <code title="post /v1/axons">client.axons.<a href="./src/resources/axons/axons.ts">create</a>({ ...params }) -> AxonView</code>
 - <code title="get /v1/axons/{id}">client.axons.<a href="./src/resources/axons/axons.ts">retrieve</a>(id) -> AxonView</code>
+- <code title="post /v1/axons/{id}">client.axons.<a href="./src/resources/axons/axons.ts">update</a>(id, { ...params }) -> AxonView</code>
 - <code title="get /v1/axons">client.axons.<a href="./src/resources/axons/axons.ts">list</a>({ ...params }) -> AxonViewsAxonsCursorIDPage</code>
 - <code title="delete /v1/axons/{id}">client.axons.<a href="./src/resources/axons/axons.ts">delete</a>(id) -> unknown</code>
 - <code title="post /v1/axons/{id}/publish">client.axons.<a href="./src/resources/axons/axons.ts">publish</a>(id, { ...params }) -> PublishResultView</code>

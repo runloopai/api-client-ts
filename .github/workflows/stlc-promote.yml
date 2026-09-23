@@ -2,9 +2,15 @@ name: Promote SDKs
 
 # Promote staging to production by fast-forwarding production main up to staging,
 # preserving SHAs so the trunks stay identical and linear (nothing to heal on the
-# next stlc build). Manual dispatch by design: a maintainer promotes the accumulated
-# batch to cut a release; release-please then opens its version PR on production.
+# next stlc build). This is a git-only reconciliation, not a release: release-please
+# owns the actual version bump/publish gate on production. Runs daily so unpromoted
+# staging content can't sit long enough to fork against an independent production
+# push; workflow_dispatch remains for an eager promote. The fast-forward-only guard
+# below makes every run a safe no-op when there's nothing to promote.
 on:
+  schedule:
+    # 8am PT (15:00 UTC); shifts to 7am during PST since GitHub cron doesn't track DST.
+    - cron: '0 15 * * *'
   workflow_dispatch: {}
 
 permissions:
@@ -18,6 +24,9 @@ jobs:
     # Optional gate: add required reviewers to this environment to approve each
     # promote. With none it only scopes secrets and adds no gate. Remove if unused.
     environment: production
+    concurrency:
+      group: stlc-promote
+      cancel-in-progress: true
     env:
       PRODUCTION_REPO: runloopai/api-client-ts
       GH_TOKEN: ${{ secrets.PRODUCTION_REPO_TOKEN }}

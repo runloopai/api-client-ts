@@ -50,6 +50,23 @@ export class Axons extends APIResource {
   }
 
   /**
+   * [Beta] Updates the specified axon fields. Omitted fields are left unchanged. An
+   * empty metadata map clears the metadata.
+   */
+  update(id: string, body?: AxonUpdateParams, options?: Core.RequestOptions): Core.APIPromise<AxonView>;
+  update(id: string, options?: Core.RequestOptions): Core.APIPromise<AxonView>;
+  update(
+    id: string,
+    body: AxonUpdateParams | Core.RequestOptions = {},
+    options?: Core.RequestOptions,
+  ): Core.APIPromise<AxonView> {
+    if (isRequestOptions(body)) {
+      return this.update(id, {}, body);
+    }
+    return this._client.post(`/v1/axons/${id}`, { body, ...options });
+  }
+
+  /**
    * [Beta] List all active axons.
    */
   list(
@@ -123,6 +140,11 @@ export class AxonViewsAxonsCursorIDPage extends AxonsCursorIDPage<AxonView> {}
 
 export interface AxonCreateParams {
   /**
+   * User defined metadata to attach to the axon for organization.
+   */
+  metadata?: { [key: string]: string } | null;
+
+  /**
    * (Optional) Name for the axon.
    */
   name?: string | null;
@@ -176,6 +198,14 @@ export interface AxonListView {
   total_count?: number | null;
 }
 
+export interface AxonUpdateParams {
+  /**
+   * User defined metadata to replace the axon metadata. Omit or set to null to leave
+   * unchanged, or set to an empty map to clear it.
+   */
+  metadata?: { [key: string]: string } | null;
+}
+
 export interface AxonView {
   /**
    * The axon identifier.
@@ -186,6 +216,11 @@ export interface AxonView {
    * Creation time in milliseconds since epoch.
    */
   created_at_ms: number;
+
+  /**
+   * The user defined axon metadata.
+   */
+  metadata: { [key: string]: string };
 
   /**
    * The name of the axon.
@@ -231,9 +266,22 @@ export type AxonDeleteResponse = unknown;
 
 export interface AxonCreateParams {
   /**
+   * User defined metadata to attach to the axon for organization.
+   */
+  metadata?: { [key: string]: string } | null;
+
+  /**
    * (Optional) Name for the axon.
    */
   name?: string | null;
+}
+
+export interface AxonUpdateParams {
+  /**
+   * User defined metadata to replace the axon metadata. Omit or set to null to leave
+   * unchanged, or set to an empty map to clear it.
+   */
+  metadata?: { [key: string]: string } | null;
 }
 
 export interface AxonListParams extends AxonsCursorIDPageParams {
@@ -247,6 +295,17 @@ export interface AxonListParams extends AxonsCursorIDPageParams {
    * the count query for better performance on large datasets.
    */
   include_total_count?: boolean;
+
+  /**
+   * Filter axons by metadata key-value pair. Can be used multiple times for
+   * different keys.
+   */
+  'metadata[key]'?: string;
+
+  /**
+   * Filter axons by metadata key with multiple possible values (OR condition).
+   */
+  'metadata[key][in]'?: string;
 
   /**
    * Filter by axon name (prefix match supported).
@@ -298,6 +357,7 @@ export declare namespace Axons {
     type AxonCreateParams as AxonCreateParams,
     type AxonEventView as AxonEventView,
     type AxonListView as AxonListView,
+    type AxonUpdateParams as AxonUpdateParams,
     type AxonView as AxonView,
     type PublishParams as PublishParams,
     type PublishResultView as PublishResultView,

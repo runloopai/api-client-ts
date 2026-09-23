@@ -29,9 +29,15 @@ describe('resource axons', () => {
 
   test('create: request options and params are passed correctly', async () => {
     // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
-    await expect(client.axons.create({ name: 'name' }, { path: '/_stainless_unknown_path' })).rejects.toThrow(
-      Runloop.NotFoundError,
-    );
+    await expect(
+      client.axons.create(
+        {
+          metadata: { foo: 'string' },
+          name: 'name',
+        },
+        { path: '/_stainless_unknown_path' },
+      ),
+    ).rejects.toThrow(Runloop.NotFoundError);
   });
 
   test('retrieve', async () => {
@@ -50,6 +56,31 @@ describe('resource axons', () => {
     await expect(client.axons.retrieve('id', { path: '/_stainless_unknown_path' })).rejects.toThrow(
       Runloop.NotFoundError,
     );
+  });
+
+  test('update', async () => {
+    const responsePromise = client.axons.update('id');
+    const rawResponse = await responsePromise.asResponse();
+    expect(rawResponse).toBeInstanceOf(Response);
+    const response = await responsePromise;
+    expect(response).not.toBeInstanceOf(Response);
+    const dataAndResponse = await responsePromise.withResponse();
+    expect(dataAndResponse.data).toBe(response);
+    expect(dataAndResponse.response).toBe(rawResponse);
+  });
+
+  test('update: request options instead of params are passed correctly', async () => {
+    // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
+    await expect(client.axons.update('id', { path: '/_stainless_unknown_path' })).rejects.toThrow(
+      Runloop.NotFoundError,
+    );
+  });
+
+  test('update: request options and params are passed correctly', async () => {
+    // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
+    await expect(
+      client.axons.update('id', { metadata: { foo: 'string' } }, { path: '/_stainless_unknown_path' }),
+    ).rejects.toThrow(Runloop.NotFoundError);
   });
 
   test('list', async () => {
@@ -78,6 +109,8 @@ describe('resource axons', () => {
           id: 'id',
           include_total_count: true,
           limit: 0,
+          'metadata[key]': 'metadata[key]',
+          'metadata[key][in]': 'metadata[key][in]',
           name: 'name',
           search: 'search',
           starting_after: 'starting_after',
