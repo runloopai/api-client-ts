@@ -1,0 +1,103 @@
+name: Publish Typedoc to GitHub Pages
+on:
+  workflow_dispatch:
+  workflow_call:
+  release:
+    types: [published]
+permissions:
+  contents: write # allows the 'Commit' step without tokens
+
+jobs:
+  get_history: # create an artifact from the existing documentation builds
+    runs-on: ubuntu-latest
+    if: github.repository == 'runloopai/api-client-ts'
+    steps:
+      - name: get the gh-pages repo
+        uses: runloopai/checkout@main
+        with:
+          ref: gh-pages
+
+      - name: tar the existing docs
+        run: |
+          mkdir -p ./docs
+          tar -cvf documentation.tar ./docs
+
+      - name: create a document artifact
+        uses: runloopai/upload-artifact@main
+        with:
+          name: documentation
+          path: documentation.tar
+
+  build: # builds the distribution and then the documentation
+    needs: get_history
+    runs-on: ubuntu-latest
+    if: github.repository == 'runloopai/api-client-ts'
+    steps:
+      - name: Checkout src
+        uses: runloopai/checkout@main
+
+      - run: mkdir -p ./docs
+      - name: Download the existing documents artifact
+        uses: runloopai/download-artifact@main
+        with:
+          name: documentation
+      - run: tar -xf documentation.tar
+      - name: Remove any legacy nested docs trees
+        run: |
+          if [ -d ./docs/docs ]; then
+            echo "Removing legacy nested docs content from prior malformed extraction"
+            rm -rf ./docs/docs
+          fi
+
+      - name: Build
+        uses: runloopai/setup-node@main
+        with:
+          node-version: 22.x
+          cache: 'yarn'
+      - run: yarn install --frozen-lockfile
+      - run: yarn build # set up 'build' script in your package.json
+
+      - name: Build documents
+        run: yarn docs #set up 'docs' build script in your package.json
+
+      - name: tar the new docs
+        run: tar -cvf newdocumentation.tar ./docs
+
+      - name: create a new document artifact
+        uses: runloopai/upload-artifact@main
+        with:
+          name: newdocumentation
+          path: newdocumentation.tar
+
+  commit: # commit the old and new merged documents to gh-pages/docs
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.repository == 'runloopai/api-client-ts'
+    steps:
+      - name: checkout the gh-pages repo
+        uses: runloopai/checkout@main
+        with:
+          ref: gh-pages
+
+      - run: mkdir -p ./docs
+      - name: Download the new documents artifact
+        uses: runloopai/download-artifact@main
+        with:
+          name: newdocumentation
+      - run: tar -xf newdocumentation.tar
+      - run: rm newdocumentation.tar
+
+      - name: commit
+        run: |
+          git config --global user.email "username@users.noreply.github.com"
+          git config --global user.name "Continuous Integration"
+          git add .
+          # The push-triggered run commits the docs first; a later release-triggered
+          # run for the same commit then has nothing to add, and a bare `git commit`
+          # exits 1. Treat an empty diff as success.
+          if git diff --staged --quiet; then
+            echo "Documentation is already up to date; nothing to commit."
+          else
+            git commit -m "CI updated the documentation"
+            git push
+          fi

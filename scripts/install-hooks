@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+set -e
+
+cd "$(dirname "$0")/.."
+
+echo "==> Installing git hooks..."
+
+mkdir -p .git/hooks
+
+cat > .git/hooks/pre-push << 'EOF'
+#!/usr/bin/env bash
+set -e
+cd "$(git rev-parse --show-toplevel)"
+
+echo "==> Running lint checks..."
+./scripts/lint
+
+echo "==> Checking EXAMPLES.md is up to date..."
+yarn check:examples-md
+
+echo "==> All checks passed!"
+EOF
+
+chmod +x .git/hooks/pre-push
+
+echo "==> Git hooks installed successfully!"

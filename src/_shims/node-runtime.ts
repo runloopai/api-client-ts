@@ -14,6 +14,7 @@ import { type RequestOptions } from '../core';
 import { MultipartBody } from './MultipartBody';
 import { type Shims } from './registry';
 import { ReadableStream } from 'node:stream/web';
+import { createH2Fetch } from '../lib/h2-transport';
 
 type FileFromPathOptions = Omit<FilePropertyBag, 'lastModified'>;
 
@@ -38,8 +39,20 @@ async function fileFromPath(path: string, ...args: any[]): Promise<File> {
   return await _fileFromPath(path, ...args);
 }
 
-const defaultHttpAgent: Agent = new KeepAliveAgent({ keepAlive: true, timeout: 10 * 60 * 1000 });
-const defaultHttpsAgent: Agent = new KeepAliveAgent.HttpsAgent({ keepAlive: true, timeout: 10 * 60 * 1000 });
+const defaultHttpAgent: Agent = new KeepAliveAgent({
+  keepAlive: true,
+  timeout: 10 * 60 * 1000,
+  maxSockets: Infinity,
+  maxFreeSockets: 2048,
+  freeSocketTimeout: 30_000,
+});
+const defaultHttpsAgent: Agent = new KeepAliveAgent.HttpsAgent({
+  keepAlive: true,
+  timeout: 10 * 60 * 1000,
+  maxSockets: Infinity,
+  maxFreeSockets: 2048,
+  freeSocketTimeout: 30_000,
+});
 
 async function getMultipartRequestOptions<T = Record<string, unknown>>(
   form: fd.FormData,
@@ -66,6 +79,7 @@ export function getRuntime(): Shims {
   return {
     kind: 'node',
     fetch: nf.default,
+    makeHttp2Fetch: createH2Fetch,
     Request: nf.Request,
     Response: nf.Response,
     Headers: nf.Headers,

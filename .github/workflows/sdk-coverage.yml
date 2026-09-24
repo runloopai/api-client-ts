@@ -1,0 +1,202 @@
+name: SDK Smoke Tests & Coverage Check
+
+on:
+  pull_request:
+    paths:
+      - 'src/sdk.ts'
+      - 'src/sdk/**'
+      - 'tests/smoketests/object-oriented/**'
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Target environment'
+        type: choice
+        default: dev
+        options:
+          - dev
+          - prod
+
+concurrency:
+  group: api-client-ts-${{ github.event_name == 'pull_request' && 'dev' || inputs.environment }}
+
+jobs:
+  smoke-and-coverage:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - name: Checkout
+        uses: runloopai/checkout@main
+
+      - name: Setup Node
+        uses: runloopai/setup-node@main
+        with:
+          node-version: '20'
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: yarn --frozen-lockfile
+
+      - name: Build
+        run: yarn build
+
+      - name: Configure environment
+        env:
+          DEV_KEY: ${{ secrets.RUNLOOP_SMOKETEST_DEV_API_KEY }}
+          PROD_KEY: ${{ secrets.RUNLOOP_SMOKETEST_PROD_API_KEY }}
+        run: |
+          if [ "${{ github.event.inputs.environment }}" = "prod" ]; then
+            echo "RUNLOOP_API_KEY=${PROD_KEY}" >> $GITHUB_ENV
+            echo "RUNLOOP_BASE_URL=https://api.runloop.ai" >> $GITHUB_ENV
+          else
+            echo "RUNLOOP_API_KEY=${DEV_KEY}" >> $GITHUB_ENV
+            echo "RUNLOOP_BASE_URL=https://api.runloop.pro" >> $GITHUB_ENV
+          fi
+          echo "DEBUG=false" >> $GITHUB_ENV
+          echo "RUN_SMOKETESTS=1" >> $GITHUB_ENV
+
+      - name: Run smoke tests with coverage
+        id: tests
+        run: |
+          set -o pipefail
+          yarn test:objects-coverage --maxWorkers=800% --color 2>&1 | \
+            tee -i test-output.log
+
+      - name: Upload coverage report
+        uses: runloopai/upload-artifact@main
+        if: always()
+        with:
+          name: coverage-report
+          path: coverage-objects/
+          retention-days: 30
+
+      - name: Comment results on PR
+        if: always() && github.event_name == 'pull_request'
+        uses: runloopai/github-script@main
+        with:
+          script: |
+            const fs = require('fs');
+            const testsPassed = '${{ steps.tests.outcome }}' === 'success';
+            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            const COMMENT_MARKER = '<!-- sdk-coverage-report -->';
+            
+            let lines = [COMMENT_MARKER];
+            
+            if (!testsPassed) {
+              let failedTests = [];
+              try {
+                const testOutput = fs.readFileSync('test-output.log', 'utf8');
+                const failedMatches = testOutput.match(/● (.+?)(?:\n|$)/g);
+                if (failedMatches) {
+                  failedTests = failedMatches
+                    .map(m => m.replace('● ', '').trim())
+                    .filter(t => t.length > 0)
+                    .slice(0, 10);
+                }
+              } catch (e) {}
+              
+              lines.push('## ❌ Object Smoke Tests Failed');
+              lines.push('');
+              lines.push('### Test Results');
+              lines.push('❌ Some smoke tests failed');
+              if (failedTests.length > 0) {
+                lines.push('');
+                lines.push('**Failed Tests:**');
+                failedTests.forEach(t => lines.push(`- ${t}`));
+              }
+              lines.push('');
+              lines.push('**Please fix the failing tests before checking coverage.**');
+              lines.push('');
+              lines.push(`[📋 View full test logs](${runUrl})`);
+            } else {
+              let coverageSummary = null;
+              try {
+                coverageSummary = JSON.parse(fs.readFileSync('coverage-objects/coverage-summary.json', 'utf8'));
+              } catch (e) {}
+              
+              if (!coverageSummary) {
+                lines.push('## ⚠️ Coverage Data Missing');
+                lines.push('');
+                lines.push('### Test Results');
+                lines.push('✅ All smoke tests passed');
+                lines.push('');
+                lines.push('### Coverage Results');
+                lines.push('⚠️ Coverage data could not be read');
+                lines.push('');
+                lines.push(`[📋 View workflow logs](${runUrl})`);
+              } else {
+                const total = coverageSummary.total;
+                const funcs = total.functions.pct;
+                const lns = total.lines.pct;
+                const branches = total.branches.pct;
+                const stmts = total.statements.pct;
+                const coveragePassed = funcs === 100;
+                const statusEmoji = coveragePassed ? '✅' : '⚠️';
+                
+                lines.push(`## ${statusEmoji} Object Smoke Tests & Coverage Report`);
+                lines.push('');
+                lines.push('### Test Results');
+                lines.push('✅ All smoke tests passed');
+                lines.push('');
+                lines.push('### Coverage Results');
+                lines.push('| Metric | Coverage | Required | Status |');
+                lines.push('|--------|----------|----------|--------|');
+                lines.push(`| **Functions** | **${funcs}%** | **100%** | ${coveragePassed ? '✅' : '❌'} |`);
+                lines.push(`| Lines | ${lns}% | - | ℹ️ |`);
+                lines.push(`| Branches | ${branches}% | - | ℹ️ |`);
+                lines.push(`| Statements | ${stmts}% | - | ℹ️ |`);
+                lines.push('');
+                lines.push('**Coverage Requirement:** 100% function coverage (all public methods must be called in smoke tests)');
+                lines.push('');
+                lines.push(coveragePassed 
+                  ? '✅ All tests passed and all object methods are covered!' 
+                  : '⚠️ Some object methods are not covered in smoke tests. Please add tests that call all public methods.');
+                lines.push('');
+                lines.push('<details>');
+                lines.push('<summary>View detailed coverage report</summary>');
+                lines.push('');
+                lines.push('| File | Functions | Lines | Branches |');
+                lines.push('|------|-----------|-------|----------|');
+                
+                for (const [filePath, data] of Object.entries(coverageSummary)) {
+                  if (filePath === 'total') continue;
+                  const shortPath = filePath.replace(/^.*?src\//, 'src/');
+                  const funcPct = data.functions.pct;
+                  const linesPct = data.lines.pct;
+                  const branchesPct = data.branches.pct;
+                  const funcStatus = funcPct === 100 ? '✅' : '❌';
+                  lines.push(`| ${shortPath} | ${funcStatus} ${funcPct}% | ${linesPct}% | ${branchesPct}% |`);
+                }
+                
+                lines.push('');
+                lines.push('</details>');
+                lines.push('');
+                lines.push(`[📋 View workflow run](${runUrl})`);
+              }
+            }
+            
+            const comment = lines.join('\n');
+            
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number
+            });
+            
+            const existingComment = comments.find(c => c.body.includes(COMMENT_MARKER));
+            
+            if (existingComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existingComment.id,
+                body: comment
+              });
+            } else {
+              await github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: comment
+              });
+            }
+

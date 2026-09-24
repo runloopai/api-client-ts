@@ -1,10 +1,15 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 import { type Agent } from './_shims/index';
+import { resolveHttp2Fetch } from './lib/http2-transport';
 import * as Core from './core';
 import * as Errors from './error';
 import * as Pagination from './pagination';
 import {
+  type AgentsCursorIDPageParams,
+  AgentsCursorIDPageResponse,
+  type AxonsCursorIDPageParams,
+  AxonsCursorIDPageResponse,
   type BenchmarkRunsCursorIDPageParams,
   BenchmarkRunsCursorIDPageResponse,
   type BenchmarksCursorIDPageParams,
@@ -15,10 +20,14 @@ import {
   DevboxesCursorIDPageResponse,
   type DiskSnapshotsCursorIDPageParams,
   DiskSnapshotsCursorIDPageResponse,
+  type GatewayConfigsCursorIDPageParams,
+  GatewayConfigsCursorIDPageResponse,
+  type McpConfigsCursorIDPageParams,
+  McpConfigsCursorIDPageResponse,
+  type NetworkPoliciesCursorIDPageParams,
+  NetworkPoliciesCursorIDPageResponse,
   type ObjectsCursorIDPageParams,
   ObjectsCursorIDPageResponse,
-  type RepositoriesCursorIDPageParams,
-  RepositoriesCursorIDPageResponse,
   type ScenarioRunsCursorIDPageParams,
   ScenarioRunsCursorIDPageResponse,
   type ScenarioScorersCursorIDPageParams,
@@ -28,12 +37,57 @@ import {
 } from './pagination';
 import * as Uploads from './uploads';
 import * as API from './resources/index';
+import { AccountView, Accounts } from './resources/accounts';
 import {
-  BlueprintBuildFromInspectionParameters,
+  AgentCreateParameters,
+  AgentCreateParams,
+  AgentDeleteResponse,
+  AgentDevboxCountsView,
+  AgentListParams,
+  AgentListPublicParams,
+  AgentListView,
+  AgentView,
+  AgentViewsAgentsCursorIDPage,
+  Agents,
+} from './resources/agents';
+import { APIKeyCreateParameters, APIKeyCreatedView, ApikeyCreateParams, Apikeys } from './resources/apikeys';
+import {
+  BenchmarkJobCreateParameters,
+  BenchmarkJobCreateParams,
+  BenchmarkJobListParams,
+  BenchmarkJobListView,
+  BenchmarkJobView,
+  BenchmarkJobs,
+} from './resources/benchmark-jobs';
+import {
+  BenchmarkRunListParams,
+  BenchmarkRunListScenarioRunsParams,
+  BenchmarkRunListView,
+  BenchmarkRunView,
+  BenchmarkRunViewsBenchmarkRunsCursorIDPage,
+  BenchmarkRuns,
+} from './resources/benchmark-runs';
+import {
+  BenchmarkCreateParameters,
+  BenchmarkCreateParams,
+  BenchmarkDefinitionsParams,
+  BenchmarkListParams,
+  BenchmarkListPublicParams,
+  BenchmarkScenarioUpdateParameters,
+  BenchmarkStartRunParams,
+  BenchmarkUpdateParameters,
+  BenchmarkUpdateParams,
+  BenchmarkUpdateScenariosParams,
+  BenchmarkView,
+  BenchmarkViewsBenchmarksCursorIDPage,
+  Benchmarks,
+  ScenarioDefinitionListView,
+  StartBenchmarkRunParameters,
+} from './resources/benchmarks';
+import {
   BlueprintBuildLog,
   BlueprintBuildLogsListView,
   BlueprintBuildParameters,
-  BlueprintCreateFromInspectionParams,
   BlueprintCreateParams,
   BlueprintDeleteResponse,
   BlueprintListParams,
@@ -44,8 +98,45 @@ import {
   BlueprintView,
   BlueprintViewsBlueprintsCursorIDPage,
   Blueprints,
-  InspectionSource,
 } from './resources/blueprints';
+import {
+  GatewayConfigCreateParameters,
+  GatewayConfigCreateParams,
+  GatewayConfigDeleteParams,
+  GatewayConfigListParams,
+  GatewayConfigListView,
+  GatewayConfigUpdateParameters,
+  GatewayConfigUpdateParams,
+  GatewayConfigView,
+  GatewayConfigViewsGatewayConfigsCursorIDPage,
+  GatewayConfigs,
+} from './resources/gateway-configs';
+import {
+  McpConfigCreateParameters,
+  McpConfigCreateParams,
+  McpConfigDeleteParams,
+  McpConfigListParams,
+  McpConfigListView,
+  McpConfigUpdateParameters,
+  McpConfigUpdateParams,
+  McpConfigView,
+  McpConfigViewsMcpConfigsCursorIDPage,
+  McpConfigs,
+} from './resources/mcp-configs';
+import {
+  AllowedCidr,
+  NetworkPolicies,
+  NetworkPolicyCreateParameters,
+  NetworkPolicyCreateParams,
+  NetworkPolicyDeleteParams,
+  NetworkPolicyListParams,
+  NetworkPolicyListView,
+  NetworkPolicyUpdateParameters,
+  NetworkPolicyUpdateParams,
+  NetworkPolicyView,
+  NetworkPolicyViewsNetworkPoliciesCursorIDPage,
+  PortRule,
+} from './resources/network-policies';
 import {
   ObjectCompleteParams,
   ObjectCreateParameters,
@@ -61,21 +152,19 @@ import {
   Objects,
 } from './resources/objects';
 import {
-  Repositories,
-  RepositoryConnectionListView,
-  RepositoryConnectionView,
-  RepositoryConnectionViewsRepositoriesCursorIDPage,
-  RepositoryCreateParams,
-  RepositoryDeleteParams,
-  RepositoryDeleteResponse,
-  RepositoryInspectParams,
-  RepositoryInspectionDetails,
-  RepositoryInspectionListView,
-  RepositoryListParams,
-  RepositoryManifestView,
-  RepositoryRefreshParams,
-  RepositoryRefreshResponse,
-} from './resources/repositories';
+  Pty,
+  PtyConnectParams,
+  PtyConnectView,
+  PtyControlParams,
+  PtyControlResultView,
+} from './resources/pty';
+import {
+  RestrictedKeyCreateParameters,
+  RestrictedKeyCreateParams,
+  RestrictedKeyCreatedView,
+  RestrictedKeys,
+  ScopeEntryView,
+} from './resources/restricted-keys';
 import {
   SecretCreateParameters,
   SecretCreateParams,
@@ -88,28 +177,29 @@ import {
   Secrets,
 } from './resources/secrets';
 import {
-  BenchmarkCreateParameters,
-  BenchmarkCreateParams,
-  BenchmarkDefinitionsParams,
-  BenchmarkListParams,
-  BenchmarkListPublicParams,
-  BenchmarkRunListView,
-  BenchmarkRunView,
-  BenchmarkStartRunParams,
-  BenchmarkUpdateParams,
-  BenchmarkView,
-  BenchmarkViewsBenchmarksCursorIDPage,
-  Benchmarks,
-  ScenarioDefinitionListView,
-  StartBenchmarkRunParameters,
-} from './resources/benchmarks/benchmarks';
+  AxonCreateParams,
+  AxonDeleteResponse,
+  AxonEventView,
+  AxonListParams,
+  AxonListView,
+  AxonPublishParams,
+  AxonSubscribeSseParams,
+  AxonView,
+  AxonViewsAxonsCursorIDPage,
+  Axons,
+  PublishParams,
+  PublishResultView,
+} from './resources/axons/axons';
 import {
   DevboxAsyncExecutionDetailView,
+  DevboxCreateGatewayTokenParams,
+  DevboxCreateMcpTokenParams,
   DevboxCreateParams,
   DevboxCreateSSHKeyResponse,
-  DevboxCreateTunnelParams,
   DevboxDeleteDiskSnapshotResponse,
   DevboxDownloadFileParams,
+  DevboxEnableTunnelParams,
+  DevboxEvictionEventView,
   DevboxExecuteAsyncParams,
   DevboxExecuteParams,
   DevboxExecuteSyncParams,
@@ -121,16 +211,16 @@ import {
   DevboxListView,
   DevboxReadFileContentsParams,
   DevboxReadFileContentsResponse,
-  DevboxRemoveTunnelParams,
   DevboxRemoveTunnelResponse,
+  DevboxResourceUsageView,
   DevboxSendStdInRequest,
   DevboxSendStdInResult,
+  DevboxShutdownParams,
   DevboxSnapshotDiskAsyncParams,
   DevboxSnapshotDiskParams,
   DevboxSnapshotListView,
   DevboxSnapshotView,
   DevboxSnapshotViewsDiskSnapshotsCursorIDPage,
-  DevboxTunnelView,
   DevboxUpdateParams,
   DevboxUploadFileParams,
   DevboxUploadFileResponse,
@@ -139,6 +229,10 @@ import {
   DevboxWaitForCommandParams,
   DevboxWriteFileContentsParams,
   Devboxes,
+  GatewayTokenView,
+  McpTokenView,
+  PtyTunnelView,
+  TunnelView,
 } from './resources/devboxes/devboxes';
 import {
   InputContext,
@@ -184,7 +278,6 @@ export interface ClientOptions {
    * Note that request timeouts are retried by default, so in a worst-case scenario you may wait
    * much longer than this timeout before the promise succeeds or fails.
    *
-   * @unit milliseconds
    */
   timeout?: number | undefined;
 
@@ -203,6 +296,26 @@ export interface ClientOptions {
    * defined globally.
    */
   fetch?: Core.Fetch | undefined;
+
+  /**
+   * Send requests over HTTP/2 using native `node:http2` connection pools.
+   *
+   * HTTP/2 is the default transport on Node.js: it multiplexes many concurrent
+   * requests over a small number of TLS connections instead of opening one
+   * connection per request.
+   *
+   * - `true` / omitted uses the SDK's default bounded HTTP/2 pool.
+   * - Pass `H2FetchOptions` to tune pool size, timeouts, etc.
+   * - `false` opts out and uses the HTTP/1.1 `node-fetch` transport.
+   *
+   * On the HTTP/2 path the `httpAgent` option is not used — the H2 transport
+   * manages its own persistent connections. Passing an `httpAgent` without an
+   * explicit `http2` value keeps the client on HTTP/1.1 (with a one-time
+   * warning); pass `http2: false` to opt out silently.
+   *
+   * @default true
+   */
+  http2?: boolean | import('./lib/h2-transport').H2FetchOptions | undefined;
 
   /**
    * The maximum number of times that the client will retry a request in case of a
@@ -230,7 +343,15 @@ export interface ClientOptions {
 }
 
 /**
- * API Client for interfacing with the Runloop API.
+ * API Client for interfacing with the Runloop API. This is the runloop api client. Use the new {@link RunloopSDK} instead like this:
+ * @example
+ * ```typescript
+ * import { RunloopSDK } from '@runloop/api-client';
+ * const runloop = new RunloopSDK();
+ * const devbox = await runloop.devbox.create();
+ * const result = await devbox.cmd.exec('echo "Hello, World!"');
+ * console.log(result.exitCode);
+ * ```
  */
 export class Runloop extends Core.APIClient {
   bearerToken: string;
@@ -245,6 +366,7 @@ export class Runloop extends Core.APIClient {
    * @param {number} [opts.timeout=30 seconds] - The maximum amount of time (in milliseconds) the client will wait for a response before timing out.
    * @param {number} [opts.httpAgent] - An HTTP agent used to manage HTTP(s) connections.
    * @param {Core.Fetch} [opts.fetch] - Specify a custom `fetch` function implementation.
+   * @param {boolean | H2FetchOptions} [opts.http2=true] - Send requests over HTTP/2. Enabled by default on Node.js; pass `false` to use HTTP/1.1, or H2FetchOptions to tune the pool. Has no effect on browsers/Deno/Bun (their platform `fetch` already uses HTTP/2) or when a custom `fetch` is provided.
    * @param {number} [opts.maxRetries=5] - The maximum number of times the client will retry a request.
    * @param {Core.Headers} opts.defaultHeaders - Default headers to include with every request to the API.
    * @param {Core.DefaultQuery} opts.defaultQuery - Default query parameters to include with every request to the API.
@@ -272,8 +394,22 @@ export class Runloop extends Core.APIClient {
       timeout: options.timeout ?? 30000 /* 30 seconds */,
       httpAgent: options.httpAgent,
       maxRetries: options.maxRetries,
-      fetch: options.fetch,
+      // HTTP/2 is the default transport on Node; a custom `fetch` always wins.
+      // See `resolveHttp2Fetch` for the `http2` / `httpAgent` resolution.
+      fetch: options.fetch ?? resolveHttp2Fetch(options),
     });
+
+    const customHeadersEnv = Core.readEnv('RUNLOOP_CUSTOM_HEADERS');
+    if (customHeadersEnv) {
+      const parsed: Record<string, string> = {};
+      for (const line of customHeadersEnv.split('\n')) {
+        const colon = line.indexOf(':');
+        if (colon >= 0) {
+          parsed[line.substring(0, colon).trim()] = line.substring(colon + 1).trim();
+        }
+      }
+      options.defaultHeaders = { ...parsed, ...options.defaultHeaders };
+    }
 
     this._options = options;
     this.idempotencyHeader = 'x-request-id';
@@ -281,13 +417,23 @@ export class Runloop extends Core.APIClient {
     this.bearerToken = bearerToken;
   }
 
+  accounts: API.Accounts = new API.Accounts(this);
   benchmarks: API.Benchmarks = new API.Benchmarks(this);
+  benchmarkRuns: API.BenchmarkRuns = new API.BenchmarkRuns(this);
+  benchmarkJobs: API.BenchmarkJobs = new API.BenchmarkJobs(this);
+  agents: API.Agents = new API.Agents(this);
+  axons: API.Axons = new API.Axons(this);
   blueprints: API.Blueprints = new API.Blueprints(this);
   devboxes: API.Devboxes = new API.Devboxes(this);
+  pty: API.Pty = new API.Pty(this);
   scenarios: API.Scenarios = new API.Scenarios(this);
   objects: API.Objects = new API.Objects(this);
-  repositories: API.Repositories = new API.Repositories(this);
   secrets: API.Secrets = new API.Secrets(this);
+  networkPolicies: API.NetworkPolicies = new API.NetworkPolicies(this);
+  gatewayConfigs: API.GatewayConfigs = new API.GatewayConfigs(this);
+  mcpConfigs: API.McpConfigs = new API.McpConfigs(this);
+  apikeys: API.Apikeys = new API.Apikeys(this);
+  restrictedKeys: API.RestrictedKeys = new API.RestrictedKeys(this);
 
   /**
    * Check whether the base URL is set to its default.
@@ -332,20 +478,35 @@ export class Runloop extends Core.APIClient {
   static fileFromPath = Uploads.fileFromPath;
 }
 
+Runloop.Accounts = Accounts;
 Runloop.Benchmarks = Benchmarks;
 Runloop.BenchmarkViewsBenchmarksCursorIDPage = BenchmarkViewsBenchmarksCursorIDPage;
+Runloop.BenchmarkRuns = BenchmarkRuns;
+Runloop.BenchmarkRunViewsBenchmarkRunsCursorIDPage = BenchmarkRunViewsBenchmarkRunsCursorIDPage;
+Runloop.BenchmarkJobs = BenchmarkJobs;
+Runloop.Agents = Agents;
+Runloop.AgentViewsAgentsCursorIDPage = AgentViewsAgentsCursorIDPage;
+Runloop.Axons = Axons;
+Runloop.AxonViewsAxonsCursorIDPage = AxonViewsAxonsCursorIDPage;
 Runloop.Blueprints = Blueprints;
 Runloop.BlueprintViewsBlueprintsCursorIDPage = BlueprintViewsBlueprintsCursorIDPage;
 Runloop.Devboxes = Devboxes;
 Runloop.DevboxViewsDevboxesCursorIDPage = DevboxViewsDevboxesCursorIDPage;
 Runloop.DevboxSnapshotViewsDiskSnapshotsCursorIDPage = DevboxSnapshotViewsDiskSnapshotsCursorIDPage;
+Runloop.Pty = Pty;
 Runloop.Scenarios = Scenarios;
 Runloop.ScenarioViewsScenariosCursorIDPage = ScenarioViewsScenariosCursorIDPage;
 Runloop.Objects = Objects;
 Runloop.ObjectViewsObjectsCursorIDPage = ObjectViewsObjectsCursorIDPage;
-Runloop.Repositories = Repositories;
-Runloop.RepositoryConnectionViewsRepositoriesCursorIDPage = RepositoryConnectionViewsRepositoriesCursorIDPage;
 Runloop.Secrets = Secrets;
+Runloop.NetworkPolicies = NetworkPolicies;
+Runloop.NetworkPolicyViewsNetworkPoliciesCursorIDPage = NetworkPolicyViewsNetworkPoliciesCursorIDPage;
+Runloop.GatewayConfigs = GatewayConfigs;
+Runloop.GatewayConfigViewsGatewayConfigsCursorIDPage = GatewayConfigViewsGatewayConfigsCursorIDPage;
+Runloop.McpConfigs = McpConfigs;
+Runloop.McpConfigViewsMcpConfigsCursorIDPage = McpConfigViewsMcpConfigsCursorIDPage;
+Runloop.Apikeys = Apikeys;
+Runloop.RestrictedKeys = RestrictedKeys;
 
 export declare namespace Runloop {
   export type RequestOptions = Core.RequestOptions;
@@ -362,12 +523,6 @@ export declare namespace Runloop {
     type DevboxesCursorIDPageResponse as DevboxesCursorIDPageResponse,
   };
 
-  export import RepositoriesCursorIDPage = Pagination.RepositoriesCursorIDPage;
-  export {
-    type RepositoriesCursorIDPageParams as RepositoriesCursorIDPageParams,
-    type RepositoriesCursorIDPageResponse as RepositoriesCursorIDPageResponse,
-  };
-
   export import DiskSnapshotsCursorIDPage = Pagination.DiskSnapshotsCursorIDPage;
   export {
     type DiskSnapshotsCursorIDPageParams as DiskSnapshotsCursorIDPageParams,
@@ -378,6 +533,18 @@ export declare namespace Runloop {
   export {
     type BenchmarksCursorIDPageParams as BenchmarksCursorIDPageParams,
     type BenchmarksCursorIDPageResponse as BenchmarksCursorIDPageResponse,
+  };
+
+  export import AgentsCursorIDPage = Pagination.AgentsCursorIDPage;
+  export {
+    type AgentsCursorIDPageParams as AgentsCursorIDPageParams,
+    type AgentsCursorIDPageResponse as AgentsCursorIDPageResponse,
+  };
+
+  export import AxonsCursorIDPage = Pagination.AxonsCursorIDPage;
+  export {
+    type AxonsCursorIDPageParams as AxonsCursorIDPageParams,
+    type AxonsCursorIDPageResponse as AxonsCursorIDPageResponse,
   };
 
   export import BenchmarkRunsCursorIDPage = Pagination.BenchmarkRunsCursorIDPage;
@@ -410,11 +577,31 @@ export declare namespace Runloop {
     type ObjectsCursorIDPageResponse as ObjectsCursorIDPageResponse,
   };
 
+  export import NetworkPoliciesCursorIDPage = Pagination.NetworkPoliciesCursorIDPage;
+  export {
+    type NetworkPoliciesCursorIDPageParams as NetworkPoliciesCursorIDPageParams,
+    type NetworkPoliciesCursorIDPageResponse as NetworkPoliciesCursorIDPageResponse,
+  };
+
+  export import GatewayConfigsCursorIDPage = Pagination.GatewayConfigsCursorIDPage;
+  export {
+    type GatewayConfigsCursorIDPageParams as GatewayConfigsCursorIDPageParams,
+    type GatewayConfigsCursorIDPageResponse as GatewayConfigsCursorIDPageResponse,
+  };
+
+  export import McpConfigsCursorIDPage = Pagination.McpConfigsCursorIDPage;
+  export {
+    type McpConfigsCursorIDPageParams as McpConfigsCursorIDPageParams,
+    type McpConfigsCursorIDPageResponse as McpConfigsCursorIDPageResponse,
+  };
+
+  export { Accounts as Accounts, type AccountView as AccountView };
+
   export {
     Benchmarks as Benchmarks,
     type BenchmarkCreateParameters as BenchmarkCreateParameters,
-    type BenchmarkRunListView as BenchmarkRunListView,
-    type BenchmarkRunView as BenchmarkRunView,
+    type BenchmarkScenarioUpdateParameters as BenchmarkScenarioUpdateParameters,
+    type BenchmarkUpdateParameters as BenchmarkUpdateParameters,
     type BenchmarkView as BenchmarkView,
     type ScenarioDefinitionListView as ScenarioDefinitionListView,
     type StartBenchmarkRunParameters as StartBenchmarkRunParameters,
@@ -425,23 +612,67 @@ export declare namespace Runloop {
     type BenchmarkDefinitionsParams as BenchmarkDefinitionsParams,
     type BenchmarkListPublicParams as BenchmarkListPublicParams,
     type BenchmarkStartRunParams as BenchmarkStartRunParams,
+    type BenchmarkUpdateScenariosParams as BenchmarkUpdateScenariosParams,
+  };
+
+  export {
+    BenchmarkRuns as BenchmarkRuns,
+    type BenchmarkRunListView as BenchmarkRunListView,
+    type BenchmarkRunView as BenchmarkRunView,
+    BenchmarkRunViewsBenchmarkRunsCursorIDPage as BenchmarkRunViewsBenchmarkRunsCursorIDPage,
+    type BenchmarkRunListParams as BenchmarkRunListParams,
+    type BenchmarkRunListScenarioRunsParams as BenchmarkRunListScenarioRunsParams,
+  };
+
+  export {
+    BenchmarkJobs as BenchmarkJobs,
+    type BenchmarkJobCreateParameters as BenchmarkJobCreateParameters,
+    type BenchmarkJobListView as BenchmarkJobListView,
+    type BenchmarkJobView as BenchmarkJobView,
+    type BenchmarkJobCreateParams as BenchmarkJobCreateParams,
+    type BenchmarkJobListParams as BenchmarkJobListParams,
+  };
+
+  export {
+    Agents as Agents,
+    type AgentCreateParameters as AgentCreateParameters,
+    type AgentDevboxCountsView as AgentDevboxCountsView,
+    type AgentListView as AgentListView,
+    type AgentView as AgentView,
+    type AgentDeleteResponse as AgentDeleteResponse,
+    AgentViewsAgentsCursorIDPage as AgentViewsAgentsCursorIDPage,
+    type AgentCreateParams as AgentCreateParams,
+    type AgentListParams as AgentListParams,
+    type AgentListPublicParams as AgentListPublicParams,
+  };
+
+  export {
+    Axons as Axons,
+    type AxonCreateParams as AxonCreateParams,
+    type AxonEventView as AxonEventView,
+    type AxonListView as AxonListView,
+    type AxonView as AxonView,
+    type PublishParams as PublishParams,
+    type PublishResultView as PublishResultView,
+    type AxonDeleteResponse as AxonDeleteResponse,
+    AxonViewsAxonsCursorIDPage as AxonViewsAxonsCursorIDPage,
+    type AxonListParams as AxonListParams,
+    type AxonPublishParams as AxonPublishParams,
+    type AxonSubscribeSseParams as AxonSubscribeSseParams,
   };
 
   export {
     Blueprints as Blueprints,
-    type BlueprintBuildFromInspectionParameters as BlueprintBuildFromInspectionParameters,
     type BlueprintBuildLog as BlueprintBuildLog,
     type BlueprintBuildLogsListView as BlueprintBuildLogsListView,
     type BlueprintBuildParameters as BlueprintBuildParameters,
     type BlueprintListView as BlueprintListView,
     type BlueprintPreviewView as BlueprintPreviewView,
     type BlueprintView as BlueprintView,
-    type InspectionSource as InspectionSource,
     type BlueprintDeleteResponse as BlueprintDeleteResponse,
     BlueprintViewsBlueprintsCursorIDPage as BlueprintViewsBlueprintsCursorIDPage,
     type BlueprintCreateParams as BlueprintCreateParams,
     type BlueprintListParams as BlueprintListParams,
-    type BlueprintCreateFromInspectionParams as BlueprintCreateFromInspectionParams,
     type BlueprintListPublicParams as BlueprintListPublicParams,
     type BlueprintPreviewParams as BlueprintPreviewParams,
   };
@@ -449,15 +680,20 @@ export declare namespace Runloop {
   export {
     Devboxes as Devboxes,
     type DevboxAsyncExecutionDetailView as DevboxAsyncExecutionDetailView,
+    type DevboxEvictionEventView as DevboxEvictionEventView,
     type DevboxExecutionDetailView as DevboxExecutionDetailView,
     type DevboxKillExecutionRequest as DevboxKillExecutionRequest,
     type DevboxListView as DevboxListView,
+    type DevboxResourceUsageView as DevboxResourceUsageView,
     type DevboxSendStdInRequest as DevboxSendStdInRequest,
     type DevboxSendStdInResult as DevboxSendStdInResult,
     type DevboxSnapshotListView as DevboxSnapshotListView,
     type DevboxSnapshotView as DevboxSnapshotView,
-    type DevboxTunnelView as DevboxTunnelView,
     type DevboxView as DevboxView,
+    type GatewayTokenView as GatewayTokenView,
+    type McpTokenView as McpTokenView,
+    type PtyTunnelView as PtyTunnelView,
+    type TunnelView as TunnelView,
     type DevboxCreateSSHKeyResponse as DevboxCreateSSHKeyResponse,
     type DevboxDeleteDiskSnapshotResponse as DevboxDeleteDiskSnapshotResponse,
     type DevboxKeepAliveResponse as DevboxKeepAliveResponse,
@@ -469,19 +705,29 @@ export declare namespace Runloop {
     type DevboxCreateParams as DevboxCreateParams,
     type DevboxUpdateParams as DevboxUpdateParams,
     type DevboxListParams as DevboxListParams,
-    type DevboxCreateTunnelParams as DevboxCreateTunnelParams,
+    type DevboxCreateGatewayTokenParams as DevboxCreateGatewayTokenParams,
+    type DevboxCreateMcpTokenParams as DevboxCreateMcpTokenParams,
     type DevboxDownloadFileParams as DevboxDownloadFileParams,
+    type DevboxEnableTunnelParams as DevboxEnableTunnelParams,
     type DevboxExecuteParams as DevboxExecuteParams,
     type DevboxExecuteAsyncParams as DevboxExecuteAsyncParams,
     type DevboxExecuteSyncParams as DevboxExecuteSyncParams,
     type DevboxListDiskSnapshotsParams as DevboxListDiskSnapshotsParams,
     type DevboxReadFileContentsParams as DevboxReadFileContentsParams,
-    type DevboxRemoveTunnelParams as DevboxRemoveTunnelParams,
+    type DevboxShutdownParams as DevboxShutdownParams,
     type DevboxSnapshotDiskParams as DevboxSnapshotDiskParams,
     type DevboxSnapshotDiskAsyncParams as DevboxSnapshotDiskAsyncParams,
     type DevboxUploadFileParams as DevboxUploadFileParams,
     type DevboxWaitForCommandParams as DevboxWaitForCommandParams,
     type DevboxWriteFileContentsParams as DevboxWriteFileContentsParams,
+  };
+
+  export {
+    Pty as Pty,
+    type PtyConnectView as PtyConnectView,
+    type PtyControlParams as PtyControlParams,
+    type PtyControlResultView as PtyControlResultView,
+    type PtyConnectParams as PtyConnectParams,
   };
 
   export {
@@ -524,23 +770,6 @@ export declare namespace Runloop {
   };
 
   export {
-    Repositories as Repositories,
-    type RepositoryConnectionListView as RepositoryConnectionListView,
-    type RepositoryConnectionView as RepositoryConnectionView,
-    type RepositoryInspectionDetails as RepositoryInspectionDetails,
-    type RepositoryInspectionListView as RepositoryInspectionListView,
-    type RepositoryManifestView as RepositoryManifestView,
-    type RepositoryDeleteResponse as RepositoryDeleteResponse,
-    type RepositoryRefreshResponse as RepositoryRefreshResponse,
-    RepositoryConnectionViewsRepositoriesCursorIDPage as RepositoryConnectionViewsRepositoriesCursorIDPage,
-    type RepositoryCreateParams as RepositoryCreateParams,
-    type RepositoryListParams as RepositoryListParams,
-    type RepositoryDeleteParams as RepositoryDeleteParams,
-    type RepositoryInspectParams as RepositoryInspectParams,
-    type RepositoryRefreshParams as RepositoryRefreshParams,
-  };
-
-  export {
     Secrets as Secrets,
     type SecretCreateParameters as SecretCreateParameters,
     type SecretListView as SecretListView,
@@ -552,15 +781,79 @@ export declare namespace Runloop {
     type SecretDeleteParams as SecretDeleteParams,
   };
 
+  export {
+    NetworkPolicies as NetworkPolicies,
+    type AllowedCidr as AllowedCidr,
+    type NetworkPolicyCreateParameters as NetworkPolicyCreateParameters,
+    type NetworkPolicyListView as NetworkPolicyListView,
+    type NetworkPolicyUpdateParameters as NetworkPolicyUpdateParameters,
+    type NetworkPolicyView as NetworkPolicyView,
+    type PortRule as PortRule,
+    NetworkPolicyViewsNetworkPoliciesCursorIDPage as NetworkPolicyViewsNetworkPoliciesCursorIDPage,
+    type NetworkPolicyCreateParams as NetworkPolicyCreateParams,
+    type NetworkPolicyUpdateParams as NetworkPolicyUpdateParams,
+    type NetworkPolicyListParams as NetworkPolicyListParams,
+    type NetworkPolicyDeleteParams as NetworkPolicyDeleteParams,
+  };
+
+  export {
+    GatewayConfigs as GatewayConfigs,
+    type GatewayConfigCreateParameters as GatewayConfigCreateParameters,
+    type GatewayConfigListView as GatewayConfigListView,
+    type GatewayConfigUpdateParameters as GatewayConfigUpdateParameters,
+    type GatewayConfigView as GatewayConfigView,
+    GatewayConfigViewsGatewayConfigsCursorIDPage as GatewayConfigViewsGatewayConfigsCursorIDPage,
+    type GatewayConfigCreateParams as GatewayConfigCreateParams,
+    type GatewayConfigUpdateParams as GatewayConfigUpdateParams,
+    type GatewayConfigListParams as GatewayConfigListParams,
+    type GatewayConfigDeleteParams as GatewayConfigDeleteParams,
+  };
+
+  export {
+    McpConfigs as McpConfigs,
+    type McpConfigCreateParameters as McpConfigCreateParameters,
+    type McpConfigListView as McpConfigListView,
+    type McpConfigUpdateParameters as McpConfigUpdateParameters,
+    type McpConfigView as McpConfigView,
+    McpConfigViewsMcpConfigsCursorIDPage as McpConfigViewsMcpConfigsCursorIDPage,
+    type McpConfigCreateParams as McpConfigCreateParams,
+    type McpConfigUpdateParams as McpConfigUpdateParams,
+    type McpConfigListParams as McpConfigListParams,
+    type McpConfigDeleteParams as McpConfigDeleteParams,
+  };
+
+  export {
+    Apikeys as Apikeys,
+    type APIKeyCreatedView as APIKeyCreatedView,
+    type APIKeyCreateParameters as APIKeyCreateParameters,
+    type ApikeyCreateParams as ApikeyCreateParams,
+  };
+
+  export {
+    RestrictedKeys as RestrictedKeys,
+    type RestrictedKeyCreatedView as RestrictedKeyCreatedView,
+    type RestrictedKeyCreateParameters as RestrictedKeyCreateParameters,
+    type ScopeEntryView as ScopeEntryView,
+    type RestrictedKeyCreateParams as RestrictedKeyCreateParams,
+  };
+
   export type AfterIdle = API.AfterIdle;
-  export type AgentMountParameters = API.AgentMountParameters;
+  export type AgentMount = API.AgentMount;
+  export type AgentSource = API.AgentSource;
+  export type AuthMechanism = API.AuthMechanism;
+  export type BrokerMount = API.BrokerMount;
   export type CodeMountParameters = API.CodeMountParameters;
+  export type CustomHeader = API.CustomHeader;
   export type LaunchParameters = API.LaunchParameters;
+  export type LifecycleConfiguration = API.LifecycleConfiguration;
+  export type LifecycleHooks = API.LifecycleHooks;
   export type Mount = API.Mount;
-  export type ObjectMountParameters = API.ObjectMountParameters;
+  export type ObjectMount = API.ObjectMount;
+  export type ResumeTriggers = API.ResumeTriggers;
   export type RunProfile = API.RunProfile;
 }
 
+export { type LongPollRequestOptions, LongPollAbortError, PollingTimeoutError } from './lib/polling';
 export { toFile, fileFromPath } from './uploads';
 export {
   RunloopError,
@@ -578,20 +871,15 @@ export {
   UnprocessableEntityError,
 } from './error';
 
-export { RunloopSDK } from './sdk';
-
-// /**
-//  * @deprecated Use named imports instead of default import. This is the old api client. Use the new SDK instead.
-//  * @example
-//  * ```typescript
-//  * // Instead of: import Runloop from '@runloop/api-client'
-//  * import { RunloopSDK } from '@runloop/api-client'
-//  * const sdk = new RunloopSDK();
-//  * //For existing api client, use the api property
-//  * const client = new RunloopSDK();
-//  * const devbox = await client.api.devboxes.create({ name: 'my-devbox' });
-//  * ```
-//  */
-// This WILL be deprecated soon.. not yet though.
-
+/**
+ * @example
+ * ```typescript
+ * // Instead of: import Runloop from '@runloop/api-client'
+ * import { RunloopSDK } from '@runloop/api-client'
+ * const sdk = new RunloopSDK();
+ * //For existing api client, use the api property
+ * const client = new RunloopSDK();
+ * const devbox = await client.api.devboxes.create({ name: 'my-devbox' });
+ * ```
+ */
 export default Runloop;

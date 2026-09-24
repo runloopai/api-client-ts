@@ -1,5 +1,5 @@
 import { ScenarioRunView } from '@runloop/api-client/resources/scenarios';
-import { makeClient, THIRTY_SECOND_TIMEOUT, uniqueName } from './utils';
+import { makeClient, SHORT_TIMEOUT, uniqueName } from './utils';
 
 const client = makeClient();
 
@@ -25,7 +25,7 @@ describe('smoketest: scenarios and benchmarks', () => {
       });
       scenarioId = scenario.id;
     },
-    THIRTY_SECOND_TIMEOUT,
+    SHORT_TIMEOUT,
   );
 
   test(
@@ -34,13 +34,13 @@ describe('smoketest: scenarios and benchmarks', () => {
       const run = await client.scenarios.startRunAndAwaitEnvReady(
         { scenario_id: scenarioId! },
         {
-          polling: { maxAttempts: 120, pollingIntervalMs: 5_000, timeoutMs: 20 * 60 * 1000 },
+          longPoll: { timeoutMs: 20 * 60 * 1000 },
         },
       );
       expect(run.scenario_id).toBe(scenarioId);
       runId = run.id;
     },
-    THIRTY_SECOND_TIMEOUT,
+    SHORT_TIMEOUT,
   );
 
   test(
@@ -49,7 +49,7 @@ describe('smoketest: scenarios and benchmarks', () => {
       let scored: ScenarioRunView | undefined;
       try {
         scored = await client.scenarios.runs.scoreAndComplete(runId!, {
-          polling: { maxAttempts: 120, pollingIntervalMs: 5_000, timeoutMs: 20 * 60 * 1000 },
+          longPoll: { timeoutMs: 20 * 60 * 1000 },
         });
         expect(['completed', 'scored', 'running', 'failed', 'timeout', 'canceled']).toContain(scored.state);
       } finally {
@@ -58,7 +58,7 @@ describe('smoketest: scenarios and benchmarks', () => {
         }
       }
     },
-    THIRTY_SECOND_TIMEOUT,
+    SHORT_TIMEOUT,
   );
 
   test(
@@ -73,6 +73,6 @@ describe('smoketest: scenarios and benchmarks', () => {
       const run = await client.benchmarks.startRun({ benchmark_id: benchmark.id });
       expect(run.benchmark_id).toBe(benchmark.id);
     },
-    THIRTY_SECOND_TIMEOUT,
+    SHORT_TIMEOUT,
   );
 });

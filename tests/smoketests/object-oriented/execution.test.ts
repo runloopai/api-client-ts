@@ -1,4 +1,4 @@
-import { Devbox, Execution } from '@runloop/api-client/objects';
+import { Devbox, Execution } from '@runloop/api-client/sdk';
 import { makeClientSDK, uniqueName } from '../utils';
 
 const sdk = makeClientSDK();
@@ -28,9 +28,7 @@ describe('smoketest: object-oriented execution', () => {
 
     test('start asynchronous execution', async () => {
       expect(devbox).toBeDefined();
-      execution = await devbox.cmd.execAsync({
-        command: 'sleep 5 && echo "Execution completed successfully"',
-      });
+      execution = await devbox.cmd.execAsync('sleep 5 && echo "Execution completed successfully"');
       expect(execution).toBeDefined();
       expect(execution.executionId).toBeTruthy();
       expect(execution.devboxId).toBeTruthy();
@@ -51,6 +49,7 @@ describe('smoketest: object-oriented execution', () => {
       expect(result.exitCode).toBe(0);
       expect(result.success).toBe(true);
       expect(result.failed).toBe(false);
+      expect(result.executionId).toBeTruthy();
       expect(result.result).toBeDefined();
 
       const output = await result.stdout();
@@ -92,8 +91,7 @@ describe('smoketest: object-oriented execution', () => {
 
     test('start execution with stdin enabled', async () => {
       expect(devbox).toBeDefined();
-      execution = await devbox.cmd.execAsync({
-        command: 'cat',
+      execution = await devbox.cmd.execAsync('cat', {
         attach_stdin: true,
       });
       expect(execution).toBeDefined();
@@ -139,11 +137,9 @@ describe('smoketest: object-oriented execution', () => {
       }
     });
 
-    test('handle execution with non-zero exit code', async () => {
+    test.concurrent('handle execution with non-zero exit code', async () => {
       expect(devbox).toBeDefined();
-      execution = await devbox.cmd.execAsync({
-        command: 'exit 42',
-      });
+      execution = await devbox.cmd.execAsync('exit 42');
       expect(execution).toBeDefined();
 
       const result = await execution.result();
@@ -153,12 +149,10 @@ describe('smoketest: object-oriented execution', () => {
       expect(result.failed).toBe(true);
     });
 
-    test('handle execution with stderr output', async () => {
+    test.concurrent('handle execution with stderr output', async () => {
       expect(devbox).toBeDefined();
       // Generate 1000 lines to stderr to test large output handling
-      const result = await devbox.cmd.exec({
-        command: 'for i in {1..1000}; do echo "Error message $i" >&2; done',
-      });
+      const result = await devbox.cmd.exec('for i in {1..1000}; do echo "Error message $i" >&2; done');
       expect(result).toBeDefined();
       expect(result.exitCode).toBe(0);
 
@@ -191,11 +185,9 @@ describe('smoketest: object-oriented execution', () => {
       expect(Math.max(...errorNumbers)).toBeLessThanOrEqual(1000);
     });
 
-    test('handle execution with no output', async () => {
+    test.concurrent('handle execution with no output', async () => {
       expect(devbox).toBeDefined();
-      const result = await devbox.cmd.exec({
-        command: 'true', // Command that produces no output
-      });
+      const result = await devbox.cmd.exec('true'); // Command that produces no output
       expect(result).toBeDefined();
       expect(result.exitCode).toBe(0);
 
@@ -225,12 +217,10 @@ describe('smoketest: object-oriented execution', () => {
       }
     });
 
-    test('get last N lines from stdout', async () => {
+    test.concurrent('get last N lines from stdout', async () => {
       expect(devbox).toBeDefined();
       // Generate output with multiple lines
-      const result = await devbox.cmd.exec({
-        command: 'for i in {1..10}; do echo "Line $i"; done',
-      });
+      const result = await devbox.cmd.exec('for i in {1..10}; do echo "Line $i"; done');
       expect(result).toBeDefined();
       expect(result.exitCode).toBe(0);
 
@@ -260,12 +250,10 @@ describe('smoketest: object-oriented execution', () => {
       expect(Math.max(...lineNumbers)).toBeLessThanOrEqual(10);
     });
 
-    test('get last N lines from stderr', async () => {
+    test.concurrent('get last N lines from stderr', async () => {
       expect(devbox).toBeDefined();
       // Generate stderr output with multiple lines
-      const result = await devbox.cmd.exec({
-        command: 'for i in {1..10}; do echo "Error $i" >&2; done',
-      });
+      const result = await devbox.cmd.exec('for i in {1..10}; do echo "Error $i" >&2; done');
       expect(result).toBeDefined();
       expect(result.exitCode).toBe(0);
 
@@ -293,11 +281,9 @@ describe('smoketest: object-oriented execution', () => {
       expect(Math.max(...errorNumbers)).toBeLessThanOrEqual(10);
     });
 
-    test('get last 1 line (most recent)', async () => {
+    test.concurrent('get last 1 line (most recent)', async () => {
       expect(devbox).toBeDefined();
-      const result = await devbox.cmd.exec({
-        command: 'echo "First line"; echo "Second line"; echo "Last line"',
-      });
+      const result = await devbox.cmd.exec('echo "First line"; echo "Second line"; echo "Last line"');
       expect(result).toBeDefined();
       expect(result.exitCode).toBe(0);
 
@@ -312,11 +298,9 @@ describe('smoketest: object-oriented execution', () => {
       expect(lastLine).not.toContain('Second line');
     });
 
-    test('get all lines when numLines exceeds available lines', async () => {
+    test.concurrent('get all lines when numLines exceeds available lines', async () => {
       expect(devbox).toBeDefined();
-      const result = await devbox.cmd.exec({
-        command: 'echo "Line 1"; echo "Line 2"',
-      });
+      const result = await devbox.cmd.exec('echo "Line 1"; echo "Line 2"');
       expect(result).toBeDefined();
       expect(result.exitCode).toBe(0);
 
@@ -326,11 +310,9 @@ describe('smoketest: object-oriented execution', () => {
       expect(output).toContain('Line 2');
     });
 
-    test('get last N lines from both stdout and stderr', async () => {
+    test.concurrent('get last N lines from both stdout and stderr', async () => {
       expect(devbox).toBeDefined();
-      const result = await devbox.cmd.exec({
-        command: 'for i in {1..5}; do echo "Out $i"; echo "Err $i" >&2; done',
-      });
+      const result = await devbox.cmd.exec('for i in {1..5}; do echo "Out $i"; echo "Err $i" >&2; done');
       expect(result).toBeDefined();
       expect(result.exitCode).toBe(0);
 
@@ -367,12 +349,10 @@ describe('smoketest: object-oriented execution', () => {
       expect(Math.max(...stderrNumbers)).toBeLessThanOrEqual(5);
     });
 
-    test('handle truncated output with last N lines', async () => {
+    test.concurrent('handle truncated output with last N lines', async () => {
       expect(devbox).toBeDefined();
       // Generate 1000 lines to trigger truncation
-      const result = await devbox.cmd.exec({
-        command: 'for i in {1..1000}; do echo "Line $i"; done',
-      });
+      const result = await devbox.cmd.exec('for i in {1..1000}; do echo "Line $i"; done');
       expect(result).toBeDefined();
       expect(result.exitCode).toBe(0);
 
@@ -411,12 +391,10 @@ describe('smoketest: object-oriented execution', () => {
       }
     });
 
-    test('handle truncated stderr with last N lines', async () => {
+    test.concurrent('handle truncated stderr with last N lines', async () => {
       expect(devbox).toBeDefined();
       // Generate 1000 lines to stderr to trigger truncation
-      const result = await devbox.cmd.exec({
-        command: 'for i in {1..1000}; do echo "Error $i" >&2; done',
-      });
+      const result = await devbox.cmd.exec('for i in {1..1000}; do echo "Error $i" >&2; done');
       expect(result).toBeDefined();
       expect(result.exitCode).toBe(0);
 

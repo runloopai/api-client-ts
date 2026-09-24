@@ -6,7 +6,7 @@ import * as Core from '../../core';
 import * as DevboxesAPI from './devboxes';
 import { DevboxSnapshotViewsDiskSnapshotsCursorIDPage } from './devboxes';
 import { type DiskSnapshotsCursorIDPageParams } from '../../pagination';
-import { poll, PollingOptions } from '../../lib/polling';
+import { LongPollRequestOptions, poll, resolveLongPollTimeoutMs } from '../../lib/polling';
 
 export class DiskSnapshots extends APIResource {
   /**
@@ -31,8 +31,8 @@ export class DiskSnapshots extends APIResource {
   }
 
   /**
-   * List all snapshots of a Devbox while optionally filtering by Devbox ID and
-   * metadata.
+   * List all snapshots of a Devbox while optionally filtering by Devbox ID, source
+   * Blueprint ID, and metadata.
    */
   list(
     query?: DiskSnapshotListParams,
@@ -79,13 +79,17 @@ export class DiskSnapshots extends APIResource {
    */
   async awaitCompleted(
     id: string,
-    options?: Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxSnapshotAsyncStatusView>> },
+    options?: LongPollRequestOptions<DevboxSnapshotAsyncStatusView>,
   ): Promise<DevboxSnapshotAsyncStatusView> {
+    const pollTimeoutMs = resolveLongPollTimeoutMs(options);
+    const { longPoll: _lp, polling, signal, ...requestOptions } = options ?? {};
     const finalResult = await poll(
-      () => this.queryStatus(id, options),
-      () => this.queryStatus(id, options),
+      () => this.queryStatus(id, requestOptions),
+      () => this.queryStatus(id, requestOptions),
       {
-        ...options?.polling,
+        ...polling,
+        signal,
+        ...(pollTimeoutMs !== undefined ? { timeoutMs: pollTimeoutMs } : {}),
         shouldStop: (result) => {
           return result.status === 'complete' || result.status === 'error';
         },
@@ -109,7 +113,7 @@ export interface DevboxSnapshotAsyncStatusView {
   /**
    * The current status of the snapshot operation.
    */
-  status: 'in_progress' | 'error' | 'complete';
+  status: 'in_progress' | 'error' | 'complete' | 'deleted';
 
   /**
    * Error message if the operation failed.
@@ -148,6 +152,12 @@ export interface DiskSnapshotListParams extends DiskSnapshotsCursorIDPageParams 
   devbox_id?: string;
 
   /**
+   * If true (default), includes total_count in the response. Set to false to skip
+   * the count query for better performance on large datasets.
+   */
+  include_total_count?: boolean;
+
+  /**
    * Filter snapshots by metadata key-value pair. Can be used multiple times for
    * different keys.
    */
@@ -157,6 +167,11 @@ export interface DiskSnapshotListParams extends DiskSnapshotsCursorIDPageParams 
    * Filter snapshots by metadata key with multiple possible values (OR condition).
    */
   'metadata[key][in]'?: string;
+
+  /**
+   * Source Blueprint ID to filter snapshots by.
+   */
+  source_blueprint_id?: string;
 }
 
 export declare namespace DiskSnapshots {

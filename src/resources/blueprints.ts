@@ -6,7 +6,7 @@ import * as Core from '../core';
 import * as Shared from './shared';
 import { BlueprintsCursorIDPage, type BlueprintsCursorIDPageParams } from '../pagination';
 import { RunloopError } from '../error';
-import { PollingOptions, poll } from '../lib/polling';
+import { LongPollRequestOptions, poll, resolveLongPollTimeoutMs } from '../lib/polling';
 import { FILE_MOUNT_MAX_SIZE_BYTES, FILE_MOUNT_TOTAL_MAX_SIZE_BYTES } from '../lib/constants';
 
 function formatBytes(numBytes: number): string {
@@ -101,15 +101,19 @@ export class Blueprints extends APIResource {
    */
   async awaitBuildComplete(
     id: string,
-    options?: Core.RequestOptions & { polling?: Partial<PollingOptions<BlueprintView>> },
+    options?: LongPollRequestOptions<BlueprintView>,
   ): Promise<BlueprintView> {
+    const pollTimeoutMs = resolveLongPollTimeoutMs(options);
+    const { longPoll: _lp, polling, signal, ...requestOptions } = options ?? {};
     const finalResult = await poll(
-      () => this.retrieve(id, options),
-      () => this.retrieve(id, options),
+      () => this.retrieve(id, requestOptions),
+      () => this.retrieve(id, requestOptions),
       {
-        ...options?.polling,
+        ...polling,
+        signal,
+        ...(pollTimeoutMs !== undefined ? { timeoutMs: pollTimeoutMs } : {}),
         shouldStop: (result) => {
-          return !['provisioning', 'building'].includes(result.status);
+          return !['queued', 'provisioning', 'building'].includes(result.status);
         },
       },
     );
@@ -128,10 +132,11 @@ export class Blueprints extends APIResource {
    */
   async createAndAwaitBuildCompleted(
     body: BlueprintCreateParams,
-    options?: Core.RequestOptions & { polling?: Partial<PollingOptions<BlueprintView>> },
+    options?: LongPollRequestOptions<BlueprintView>,
   ): Promise<BlueprintView> {
-    const blueprint = await this.create(body, options);
-    return this.awaitBuildComplete(blueprint.id, options);
+    const { longPoll, polling, ...requestOptions } = options ?? {};
+    const blueprint = await this.create(body, requestOptions);
+    return this.awaitBuildComplete(blueprint.id, { ...requestOptions, longPoll, polling });
   }
 
   /**
@@ -156,25 +161,12 @@ export class Blueprints extends APIResource {
   }
 
   /**
-   * Delete a previously created Blueprint.
+   * Delete a previously created Blueprint. If a blueprint has dependent snapshots,
+   * it cannot be deleted. You can find them by querying: GET
+   * /v1/devboxes/disk_snapshots?source_blueprint_id={blueprint_id}.
    */
   delete(id: string, options?: Core.RequestOptions): Core.APIPromise<unknown> {
     return this._client.post(`/v1/blueprints/${id}/delete`, options);
-  }
-
-  /**
-   * Starts build of custom defined container Blueprint using a RepositoryConnection
-   * Inspection as a source container specification.
-   */
-  createFromInspection(
-    body: BlueprintCreateFromInspectionParams,
-    options?: Core.RequestOptions,
-  ): Core.APIPromise<BlueprintView> {
-    const errors = validateFileMounts(body?.file_mounts);
-    if (errors.length > 0) {
-      throw new Error(errors.join('; '));
-    }
-    return this._client.post('/v1/blueprints/create_from_inspection', { body, ...options });
   }
 
   /**
@@ -210,6 +202,8 @@ export class Blueprints extends APIResource {
   /**
    * Preview building a Blueprint with the specified configuration. You can take the
    * resulting Dockerfile and test out your build using any local docker tooling.
+   *
+   * @deprecated
    */
   preview(
     body: BlueprintPreviewParams,
@@ -220,47 +214,6 @@ export class Blueprints extends APIResource {
 }
 
 export class BlueprintViewsBlueprintsCursorIDPage extends BlueprintsCursorIDPage<BlueprintView> {}
-
-export interface BlueprintBuildFromInspectionParameters {
-  /**
-   * (Optional) Use a RepositoryInspection a source of a Blueprint build. The
-   * Dockerfile will be automatically created based on the RepositoryInspection
-   * contents.
-   */
-  inspection_source: InspectionSource;
-
-  /**
-   * Name of the Blueprint.
-   */
-  name: string;
-
-  /**
-   * (Optional) Map of paths and file contents to write before setup.
-   */
-  file_mounts?: { [key: string]: string } | null;
-
-  /**
-   * Parameters to configure your Devbox at launch time.
-   */
-  launch_parameters?: Shared.LaunchParameters | null;
-
-  /**
-   * (Optional) User defined metadata for the Blueprint.
-   */
-  metadata?: { [key: string]: string } | null;
-
-  /**
-   * (Optional) Map of mount IDs/environment variable names to secret names. Secrets
-   * can be used as environment variables in system_setup_commands. Example:
-   * {"GITHUB_TOKEN": "gh_secret"} makes 'gh_secret' available as GITHUB_TOKEN.
-   */
-  secrets?: { [key: string]: string } | null;
-
-  /**
-   * A list of commands to run to set up your system.
-   */
-  system_setup_commands?: Array<string> | null;
-}
 
 export interface BlueprintBuildLog {
   /**
@@ -317,6 +270,11 @@ export interface BlueprintBuildParameters {
   build_args?: { [key: string]: string } | null;
 
   /**
+   * A build context backed by an Object.
+   */
+  build_context?: BlueprintBuildParameters.BuildContext | null;
+
+  /**
    * A list of code mounts to be included in the Blueprint.
    */
   code_mounts?: Array<Shared.CodeMountParameters> | null;
@@ -332,7 +290,9 @@ export interface BlueprintBuildParameters {
   file_mounts?: { [key: string]: string } | null;
 
   /**
-   * Parameters to configure your Devbox at launch time.
+   * LaunchParameters enable you to customize the resources available to your Devbox
+   * as well as the environment set up that should be completed before the Devbox is
+   * marked as 'running'.
    */
   launch_parameters?: Shared.LaunchParameters | null;
 
@@ -340,6 +300,15 @@ export interface BlueprintBuildParameters {
    * (Optional) User defined metadata for the Blueprint.
    */
   metadata?: { [key: string]: string } | null;
+
+  /**
+   * (Optional) ID of the network policy to apply during blueprint build. This
+   * restricts network access during the build process. This does not affect devboxes
+   * created from this blueprint; if you want devboxes created from this blueprint to
+   * inherit the network policy, set the network_policy_id on the blueprint launch
+   * parameters.
+   */
+  network_policy_id?: string | null;
 
   /**
    * (Optional) Map of mount IDs/environment variable names to secret names. Secrets
@@ -363,6 +332,18 @@ export interface BlueprintBuildParameters {
 }
 
 export namespace BlueprintBuildParameters {
+  /**
+   * A build context backed by an Object.
+   */
+  export interface BuildContext {
+    /**
+     * The ID of an object, whose contents are to be used as a build context.
+     */
+    object_id: string;
+
+    type: 'object';
+  }
+
   export interface Service {
     /**
      * The image of the container service.
@@ -422,9 +403,7 @@ export interface BlueprintListView {
 
   has_more: boolean;
 
-  remaining_count: number;
-
-  total_count: number;
+  total_count?: number | null;
 }
 
 export interface BlueprintPreviewView {
@@ -438,6 +417,8 @@ export interface BlueprintPreviewView {
  * Blueprints are ways to create customized starting points for Devboxes. They
  * allow you to define custom starting points for Devboxes such that environment
  * set up can be cached to improve Devbox boot times.
+ *
+ * @category Blueprint Types
  */
 export interface BlueprintView {
   /**
@@ -468,7 +449,7 @@ export interface BlueprintView {
   /**
    * The status of the Blueprint build.
    */
-  status: 'provisioning' | 'building' | 'failed' | 'build_complete';
+  status: 'queued' | 'provisioning' | 'building' | 'awaiting_upload' | 'failed' | 'build_complete';
 
   /**
    * The ID of the base Blueprint.
@@ -489,10 +470,15 @@ export interface BlueprintView {
   /**
    * Capabilities that will be available on Devbox.
    */
-  devbox_capabilities?: Array<'unknown' | 'computer_usage' | 'browser_usage' | 'docker_in_docker'> | null;
+  devbox_capabilities?: Array<'unknown' | 'docker_in_docker'> | null;
 
   /**
-   * The failure reason if the Blueprint build failed, if any.
+   * The cause of the failure of the Blueprint build.
+   *
+   * out_of_memory: The build has run out of memory. Contact support if this is
+   * unexpected. out_of_disk: The build has run out of disk. Contact support if this
+   * is unexpected. build_failed: The build has failed. Use the dashboard to look at
+   * Blueprint build logs for more info.
    */
   failure_reason?: 'out_of_memory' | 'out_of_disk' | 'build_failed' | null;
 
@@ -559,23 +545,13 @@ export namespace BlueprintView {
   }
 }
 
-/**
- * Use a RepositoryInspection a source of a Blueprint build.
- */
-export interface InspectionSource {
-  /**
-   * The ID of a repository inspection.
-   */
-  inspection_id: string;
-
-  /**
-   * GitHub authentication token for accessing private repositories.
-   */
-  github_auth_token?: string | null;
-}
-
 export type BlueprintDeleteResponse = unknown;
 
+/**
+ * Parameters for creating a new Blueprint.
+ *
+ * @category Blueprint Types
+ */
 export interface BlueprintCreateParams {
   /**
    * Name of the Blueprint.
@@ -602,6 +578,11 @@ export interface BlueprintCreateParams {
   build_args?: { [key: string]: string } | null;
 
   /**
+   * A build context backed by an Object.
+   */
+  build_context?: BlueprintCreateParams.BuildContext | null;
+
+  /**
    * A list of code mounts to be included in the Blueprint.
    */
   code_mounts?: Array<Shared.CodeMountParameters> | null;
@@ -617,7 +598,9 @@ export interface BlueprintCreateParams {
   file_mounts?: { [key: string]: string } | null;
 
   /**
-   * Parameters to configure your Devbox at launch time.
+   * LaunchParameters enable you to customize the resources available to your Devbox
+   * as well as the environment set up that should be completed before the Devbox is
+   * marked as 'running'.
    */
   launch_parameters?: Shared.LaunchParameters | null;
 
@@ -625,6 +608,15 @@ export interface BlueprintCreateParams {
    * (Optional) User defined metadata for the Blueprint.
    */
   metadata?: { [key: string]: string } | null;
+
+  /**
+   * (Optional) ID of the network policy to apply during blueprint build. This
+   * restricts network access during the build process. This does not affect devboxes
+   * created from this blueprint; if you want devboxes created from this blueprint to
+   * inherit the network policy, set the network_policy_id on the blueprint launch
+   * parameters.
+   */
+  network_policy_id?: string | null;
 
   /**
    * (Optional) Map of mount IDs/environment variable names to secret names. Secrets
@@ -648,6 +640,18 @@ export interface BlueprintCreateParams {
 }
 
 export namespace BlueprintCreateParams {
+  /**
+   * A build context backed by an Object.
+   */
+  export interface BuildContext {
+    /**
+     * The ID of an object, whose contents are to be used as a build context.
+     */
+    object_id: string;
+
+    type: 'object';
+  }
+
   export interface Service {
     /**
      * The image of the container service.
@@ -701,57 +705,38 @@ export namespace BlueprintCreateParams {
 
 export interface BlueprintListParams extends BlueprintsCursorIDPageParams {
   /**
+   * If true (default), includes total_count in the response. Set to false to skip
+   * the count query for better performance on large datasets.
+   */
+  include_total_count?: boolean;
+
+  /**
    * Filter by name
    */
   name?: string;
-}
-
-export interface BlueprintCreateFromInspectionParams {
-  /**
-   * (Optional) Use a RepositoryInspection a source of a Blueprint build. The
-   * Dockerfile will be automatically created based on the RepositoryInspection
-   * contents.
-   */
-  inspection_source: InspectionSource;
 
   /**
-   * Name of the Blueprint.
+   * Filter by build status (queued, provisioning, building, failed, build_complete)
    */
-  name: string;
-
-  /**
-   * (Optional) Map of paths and file contents to write before setup.
-   */
-  file_mounts?: { [key: string]: string } | null;
-
-  /**
-   * Parameters to configure your Devbox at launch time.
-   */
-  launch_parameters?: Shared.LaunchParameters | null;
-
-  /**
-   * (Optional) User defined metadata for the Blueprint.
-   */
-  metadata?: { [key: string]: string } | null;
-
-  /**
-   * (Optional) Map of mount IDs/environment variable names to secret names. Secrets
-   * can be used as environment variables in system_setup_commands. Example:
-   * {"GITHUB_TOKEN": "gh_secret"} makes 'gh_secret' available as GITHUB_TOKEN.
-   */
-  secrets?: { [key: string]: string } | null;
-
-  /**
-   * A list of commands to run to set up your system.
-   */
-  system_setup_commands?: Array<string> | null;
+  status?: string;
 }
 
 export interface BlueprintListPublicParams extends BlueprintsCursorIDPageParams {
   /**
+   * If true (default), includes total_count in the response. Set to false to skip
+   * the count query for better performance on large datasets.
+   */
+  include_total_count?: boolean;
+
+  /**
    * Filter by name
    */
   name?: string;
+
+  /**
+   * Filter by build status (queued, provisioning, building, failed, build_complete)
+   */
+  status?: string;
 }
 
 export interface BlueprintPreviewParams {
@@ -780,6 +765,11 @@ export interface BlueprintPreviewParams {
   build_args?: { [key: string]: string } | null;
 
   /**
+   * A build context backed by an Object.
+   */
+  build_context?: BlueprintPreviewParams.BuildContext | null;
+
+  /**
    * A list of code mounts to be included in the Blueprint.
    */
   code_mounts?: Array<Shared.CodeMountParameters> | null;
@@ -795,7 +785,9 @@ export interface BlueprintPreviewParams {
   file_mounts?: { [key: string]: string } | null;
 
   /**
-   * Parameters to configure your Devbox at launch time.
+   * LaunchParameters enable you to customize the resources available to your Devbox
+   * as well as the environment set up that should be completed before the Devbox is
+   * marked as 'running'.
    */
   launch_parameters?: Shared.LaunchParameters | null;
 
@@ -803,6 +795,15 @@ export interface BlueprintPreviewParams {
    * (Optional) User defined metadata for the Blueprint.
    */
   metadata?: { [key: string]: string } | null;
+
+  /**
+   * (Optional) ID of the network policy to apply during blueprint build. This
+   * restricts network access during the build process. This does not affect devboxes
+   * created from this blueprint; if you want devboxes created from this blueprint to
+   * inherit the network policy, set the network_policy_id on the blueprint launch
+   * parameters.
+   */
+  network_policy_id?: string | null;
 
   /**
    * (Optional) Map of mount IDs/environment variable names to secret names. Secrets
@@ -826,6 +827,18 @@ export interface BlueprintPreviewParams {
 }
 
 export namespace BlueprintPreviewParams {
+  /**
+   * A build context backed by an Object.
+   */
+  export interface BuildContext {
+    /**
+     * The ID of an object, whose contents are to be used as a build context.
+     */
+    object_id: string;
+
+    type: 'object';
+  }
+
   export interface Service {
     /**
      * The image of the container service.
@@ -881,19 +894,16 @@ Blueprints.BlueprintViewsBlueprintsCursorIDPage = BlueprintViewsBlueprintsCursor
 
 export declare namespace Blueprints {
   export {
-    type BlueprintBuildFromInspectionParameters as BlueprintBuildFromInspectionParameters,
     type BlueprintBuildLog as BlueprintBuildLog,
     type BlueprintBuildLogsListView as BlueprintBuildLogsListView,
     type BlueprintBuildParameters as BlueprintBuildParameters,
     type BlueprintListView as BlueprintListView,
     type BlueprintPreviewView as BlueprintPreviewView,
     type BlueprintView as BlueprintView,
-    type InspectionSource as InspectionSource,
     type BlueprintDeleteResponse as BlueprintDeleteResponse,
     BlueprintViewsBlueprintsCursorIDPage as BlueprintViewsBlueprintsCursorIDPage,
     type BlueprintCreateParams as BlueprintCreateParams,
     type BlueprintListParams as BlueprintListParams,
-    type BlueprintCreateFromInspectionParams as BlueprintCreateFromInspectionParams,
     type BlueprintListPublicParams as BlueprintListPublicParams,
     type BlueprintPreviewParams as BlueprintPreviewParams,
   };

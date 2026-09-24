@@ -15,6 +15,15 @@ export type Agent = SelectType<manual.Agent, auto.Agent>;
 // @ts-ignore
 export const fetch: SelectType<typeof manual.fetch, typeof auto.fetch>;
 
+/**
+ * Build an HTTP/2-capable `fetch`, used when the client is constructed with
+ * `{ http2: ... }`. On Node this is the native `node:http2` transport; the
+ * optional `options` tune its connection pool (the `http2: <H2FetchOptions>`
+ * passthrough), defaulting to the SDK's shared bounded pool. On the web it
+ * returns the platform `fetch`, which already negotiates HTTP/2.
+ */
+export function makeHttp2Fetch(options?: any): typeof fetch;
+
 // @ts-ignore
 export type Request = SelectType<manual.Request, auto.Request>;
 // @ts-ignore

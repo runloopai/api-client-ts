@@ -126,6 +126,12 @@ export interface ObjectCreateParameters {
    * User defined metadata to attach to the object for organization.
    */
   metadata?: { [key: string]: string } | null;
+
+  /**
+   * Optional lifetime of the object in milliseconds, after which the object is
+   * automatically deleted. Time starts ticking after the object is created.
+   */
+  ttl_ms?: number | null;
 }
 
 /**
@@ -153,18 +159,15 @@ export interface ObjectListView {
   objects: Array<ObjectView>;
 
   /**
-   * Number of Objects remaining after this page.
-   */
-  remaining_count: number;
-
-  /**
    * Total number of Objects across all pages.
    */
-  total_count: number;
+  total_count?: number | null;
 }
 
 /**
  * An Object represents a stored data entity with metadata.
+ *
+ * @category Storage Object Types
  */
 export interface ObjectView {
   /**
@@ -190,7 +193,17 @@ export interface ObjectView {
   /**
    * The current state of the Object.
    */
-  state: string;
+  state: 'UPLOADING' | 'READ_ONLY' | 'DELETED' | 'ERROR';
+
+  /**
+   * The time after which the Object will be deleted in milliseconds since epoch.
+   */
+  delete_after_time_ms?: number | null;
+
+  /**
+   * User defined metadata to attach to the Object for organization.
+   */
+  metadata?: { [key: string]: string } | null;
 
   /**
    * The size of the Object content in bytes (null until uploaded).
@@ -203,6 +216,11 @@ export interface ObjectView {
   upload_url?: string | null;
 }
 
+/**
+ * Parameters for creating a new Storage Object.
+ *
+ * @category Storage Object Types
+ */
 export interface ObjectCreateParams {
   /**
    * The content type of the Object.
@@ -218,16 +236,28 @@ export interface ObjectCreateParams {
    * User defined metadata to attach to the object for organization.
    */
   metadata?: { [key: string]: string } | null;
+
+  /**
+   * Optional lifetime of the object in milliseconds, after which the object is
+   * automatically deleted. Time starts ticking after the object is created.
+   */
+  ttl_ms?: number | null;
 }
 
 export interface ObjectListParams extends ObjectsCursorIDPageParams {
   /**
-   * Filter objects by content type.
+   * Filter storage objects by content type.
    */
-  content_type?: string;
+  content_type?: 'unspecified' | 'text' | 'binary' | 'gzip' | 'tar' | 'tgz';
 
   /**
-   * Filter objects by name (partial match supported).
+   * If true (default), includes total_count in the response. Set to false to skip
+   * the count query for better performance on large datasets.
+   */
+  include_total_count?: boolean;
+
+  /**
+   * Filter storage objects by name (partial match supported).
    */
   name?: string;
 
@@ -237,9 +267,9 @@ export interface ObjectListParams extends ObjectsCursorIDPageParams {
   search?: string;
 
   /**
-   * Filter objects by state (UPLOADING, READ_ONLY, DELETED).
+   * Filter storage objects by state.
    */
-  state?: string;
+  state?: 'UPLOADING' | 'READ_ONLY' | 'DELETED' | 'ERROR';
 }
 
 export interface ObjectDeleteParams {}
@@ -255,12 +285,18 @@ export interface ObjectDownloadParams {
 
 export interface ObjectListPublicParams extends ObjectsCursorIDPageParams {
   /**
-   * Filter objects by content type.
+   * Filter storage objects by content type.
    */
-  content_type?: string;
+  content_type?: 'unspecified' | 'text' | 'binary' | 'gzip' | 'tar' | 'tgz';
 
   /**
-   * Filter objects by name (partial match supported).
+   * If true (default), includes total_count in the response. Set to false to skip
+   * the count query for better performance on large datasets.
+   */
+  include_total_count?: boolean;
+
+  /**
+   * Filter storage objects by name (partial match supported).
    */
   name?: string;
 
@@ -270,9 +306,9 @@ export interface ObjectListPublicParams extends ObjectsCursorIDPageParams {
   search?: string;
 
   /**
-   * Filter objects by state (UPLOADING, READ_ONLY, DELETED).
+   * Filter storage objects by state.
    */
-  state?: string;
+  state?: 'UPLOADING' | 'READ_ONLY' | 'DELETED' | 'ERROR';
 }
 
 Objects.ObjectViewsObjectsCursorIDPage = ObjectViewsObjectsCursorIDPage;

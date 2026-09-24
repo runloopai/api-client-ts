@@ -45,7 +45,7 @@ export class Stream<Item> implements AsyncIterable<Item> {
           }
 
           try {
-            yield JSON.parse(sse.data);
+            yield JSON.parse(sse.data) as Item;
           } catch (e) {
             console.error(`Could not parse message into JSON:`, sse.data);
             console.error(`From chunk:`, sse.raw);

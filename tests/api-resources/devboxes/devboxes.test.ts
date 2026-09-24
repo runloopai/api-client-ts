@@ -40,12 +40,14 @@ describe('resource devboxes', () => {
               repo_name: 'repo_name',
               repo_owner: 'repo_owner',
               token: 'token',
+              git_ref: 'git_ref',
               install_command: 'install_command',
             },
           ],
           entrypoint: 'entrypoint',
           environment_variables: { foo: 'string' },
           file_mounts: { foo: 'string' },
+          gateways: { foo: { gateway: 'gateway', secret: 'secret' } },
           launch_parameters: {
             after_idle: { idle_time_seconds: 0, on_idle: 'shutdown' },
             architecture: 'x86_64',
@@ -55,16 +57,34 @@ describe('resource devboxes', () => {
             custom_gb_memory: 0,
             keep_alive_time_seconds: 0,
             launch_commands: ['string'],
+            lifecycle: {
+              after_idle: { idle_time_seconds: 0, on_idle: 'shutdown' },
+              lifecycle_hooks: { suspend_commands: ['string'], suspend_deadline_ms: 0 },
+              resume_triggers: { axon_event: true, http: true },
+            },
+            network_policy_id: 'network_policy_id',
+            provisioning_tier: 'standard',
             required_services: ['string'],
             resource_size_request: 'X_SMALL',
             user_parameters: { uid: 0, username: 'username' },
           },
+          mcp: { foo: { mcp_config: 'mcp_config', secret: 'secret' } },
           metadata: { foo: 'string' },
-          mounts: [{ object_id: 'object_id', object_path: 'object_path', type: 'object_mount' }],
+          mounts: [
+            {
+              object_id: 'object_id',
+              object_path: 'object_path',
+              type: 'object_mount',
+            },
+          ],
           name: 'name',
-          repo_connection_id: 'repo_connection_id',
           secrets: { foo: 'string' },
           snapshot_id: 'snapshot_id',
+          tunnel: {
+            auth_mode: 'open',
+            http_keep_alive: true,
+            wake_on_http: true,
+          },
         },
         { path: '/_stainless_unknown_path' },
       ),
@@ -112,7 +132,10 @@ describe('resource devboxes', () => {
     await expect(
       client.devboxes.update(
         'id',
-        { metadata: { foo: 'string' }, name: 'name' },
+        {
+          metadata: { foo: 'string' },
+          name: 'name',
+        },
         { path: '/_stainless_unknown_path' },
       ),
     ).rejects.toThrow(Runloop.NotFoundError);
@@ -140,10 +163,72 @@ describe('resource devboxes', () => {
     // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
     await expect(
       client.devboxes.list(
-        { limit: 0, starting_after: 'starting_after', status: 'provisioning' },
+        {
+          include_total_count: true,
+          limit: 0,
+          starting_after: 'starting_after',
+          status: 'scheduled',
+        },
         { path: '/_stainless_unknown_path' },
       ),
     ).rejects.toThrow(Runloop.NotFoundError);
+  });
+
+  test('createGatewayToken: only required params', async () => {
+    const responsePromise = client.devboxes.createGatewayToken('id', {
+      gateway: 'gateway',
+      secret: 'secret',
+    });
+    const rawResponse = await responsePromise.asResponse();
+    expect(rawResponse).toBeInstanceOf(Response);
+    const response = await responsePromise;
+    expect(response).not.toBeInstanceOf(Response);
+    const dataAndResponse = await responsePromise.withResponse();
+    expect(dataAndResponse.data).toBe(response);
+    expect(dataAndResponse.response).toBe(rawResponse);
+  });
+
+  test('createGatewayToken: required and optional params', async () => {
+    const response = await client.devboxes.createGatewayToken('id', { gateway: 'gateway', secret: 'secret' });
+  });
+
+  test('createMcpToken: only required params', async () => {
+    const responsePromise = client.devboxes.createMcpToken('id', {
+      mcp_config: 'mcp_config',
+      secret: 'secret',
+    });
+    const rawResponse = await responsePromise.asResponse();
+    expect(rawResponse).toBeInstanceOf(Response);
+    const response = await responsePromise;
+    expect(response).not.toBeInstanceOf(Response);
+    const dataAndResponse = await responsePromise.withResponse();
+    expect(dataAndResponse.data).toBe(response);
+    expect(dataAndResponse.response).toBe(rawResponse);
+  });
+
+  test('createMcpToken: required and optional params', async () => {
+    const response = await client.devboxes.createMcpToken('id', {
+      mcp_config: 'mcp_config',
+      secret: 'secret',
+    });
+  });
+
+  test('createPtyTunnel', async () => {
+    const responsePromise = client.devboxes.createPtyTunnel('id');
+    const rawResponse = await responsePromise.asResponse();
+    expect(rawResponse).toBeInstanceOf(Response);
+    const response = await responsePromise;
+    expect(response).not.toBeInstanceOf(Response);
+    const dataAndResponse = await responsePromise.withResponse();
+    expect(dataAndResponse.data).toBe(response);
+    expect(dataAndResponse.response).toBe(rawResponse);
+  });
+
+  test('createPtyTunnel: request options instead of params are passed correctly', async () => {
+    // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
+    await expect(client.devboxes.createPtyTunnel('id', { path: '/_stainless_unknown_path' })).rejects.toThrow(
+      Runloop.NotFoundError,
+    );
   });
 
   test('createSSHKey', async () => {
@@ -162,21 +247,6 @@ describe('resource devboxes', () => {
     await expect(client.devboxes.createSSHKey('id', { path: '/_stainless_unknown_path' })).rejects.toThrow(
       Runloop.NotFoundError,
     );
-  });
-
-  test('createTunnel: only required params', async () => {
-    const responsePromise = client.devboxes.createTunnel('id', { port: 0 });
-    const rawResponse = await responsePromise.asResponse();
-    expect(rawResponse).toBeInstanceOf(Response);
-    const response = await responsePromise;
-    expect(response).not.toBeInstanceOf(Response);
-    const dataAndResponse = await responsePromise.withResponse();
-    expect(dataAndResponse.data).toBe(response);
-    expect(dataAndResponse.response).toBe(rawResponse);
-  });
-
-  test('createTunnel: required and optional params', async () => {
-    const response = await client.devboxes.createTunnel('id', { port: 0 });
   });
 
   test('deleteDiskSnapshot', async () => {
@@ -200,6 +270,39 @@ describe('resource devboxes', () => {
   // prism can't support octet
   test.skip('downloadFile: required and optional params', async () => {
     const response = await client.devboxes.downloadFile('id', { path: 'path' });
+  });
+
+  test('enableTunnel', async () => {
+    const responsePromise = client.devboxes.enableTunnel('id');
+    const rawResponse = await responsePromise.asResponse();
+    expect(rawResponse).toBeInstanceOf(Response);
+    const response = await responsePromise;
+    expect(response).not.toBeInstanceOf(Response);
+    const dataAndResponse = await responsePromise.withResponse();
+    expect(dataAndResponse.data).toBe(response);
+    expect(dataAndResponse.response).toBe(rawResponse);
+  });
+
+  test('enableTunnel: request options instead of params are passed correctly', async () => {
+    // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
+    await expect(client.devboxes.enableTunnel('id', { path: '/_stainless_unknown_path' })).rejects.toThrow(
+      Runloop.NotFoundError,
+    );
+  });
+
+  test('enableTunnel: request options and params are passed correctly', async () => {
+    // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
+    await expect(
+      client.devboxes.enableTunnel(
+        'id',
+        {
+          auth_mode: 'open',
+          http_keep_alive: true,
+          wake_on_http: true,
+        },
+        { path: '/_stainless_unknown_path' },
+      ),
+    ).rejects.toThrow(Runloop.NotFoundError);
   });
 
   test('execute: only required params', async () => {
@@ -303,9 +406,11 @@ describe('resource devboxes', () => {
       client.devboxes.listDiskSnapshots(
         {
           devbox_id: 'devbox_id',
+          include_total_count: true,
           limit: 0,
           'metadata[key]': 'metadata[key]',
           'metadata[key][in]': 'metadata[key][in]',
+          source_blueprint_id: 'source_blueprint_id',
           starting_after: 'starting_after',
         },
         { path: '/_stainless_unknown_path' },
@@ -328,8 +433,8 @@ describe('resource devboxes', () => {
     const response = await client.devboxes.readFileContents('id', { file_path: 'file_path' });
   });
 
-  test('removeTunnel: only required params', async () => {
-    const responsePromise = client.devboxes.removeTunnel('id', { port: 0 });
+  test('removeTunnel', async () => {
+    const responsePromise = client.devboxes.removeTunnel('id');
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
     const response = await responsePromise;
@@ -339,8 +444,11 @@ describe('resource devboxes', () => {
     expect(dataAndResponse.response).toBe(rawResponse);
   });
 
-  test('removeTunnel: required and optional params', async () => {
-    const response = await client.devboxes.removeTunnel('id', { port: 0 });
+  test('removeTunnel: request options instead of params are passed correctly', async () => {
+    // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
+    await expect(client.devboxes.removeTunnel('id', { path: '/_stainless_unknown_path' })).rejects.toThrow(
+      Runloop.NotFoundError,
+    );
   });
 
   test('resume', async () => {
@@ -361,6 +469,24 @@ describe('resource devboxes', () => {
     );
   });
 
+  test('retrieveResourceUsage', async () => {
+    const responsePromise = client.devboxes.retrieveResourceUsage('id');
+    const rawResponse = await responsePromise.asResponse();
+    expect(rawResponse).toBeInstanceOf(Response);
+    const response = await responsePromise;
+    expect(response).not.toBeInstanceOf(Response);
+    const dataAndResponse = await responsePromise.withResponse();
+    expect(dataAndResponse.data).toBe(response);
+    expect(dataAndResponse.response).toBe(rawResponse);
+  });
+
+  test('retrieveResourceUsage: request options instead of params are passed correctly', async () => {
+    // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
+    await expect(
+      client.devboxes.retrieveResourceUsage('id', { path: '/_stainless_unknown_path' }),
+    ).rejects.toThrow(Runloop.NotFoundError);
+  });
+
   test('shutdown', async () => {
     const responsePromise = client.devboxes.shutdown('id');
     const rawResponse = await responsePromise.asResponse();
@@ -377,6 +503,13 @@ describe('resource devboxes', () => {
     await expect(client.devboxes.shutdown('id', { path: '/_stainless_unknown_path' })).rejects.toThrow(
       Runloop.NotFoundError,
     );
+  });
+
+  test('shutdown: request options and params are passed correctly', async () => {
+    // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
+    await expect(
+      client.devboxes.shutdown('id', { force: 'force' }, { path: '/_stainless_unknown_path' }),
+    ).rejects.toThrow(Runloop.NotFoundError);
   });
 
   test('snapshotDisk', async () => {
@@ -402,7 +535,11 @@ describe('resource devboxes', () => {
     await expect(
       client.devboxes.snapshotDisk(
         'id',
-        { commit_message: 'commit_message', metadata: { foo: 'string' }, name: 'name' },
+        {
+          commit_message: 'commit_message',
+          metadata: { foo: 'string' },
+          name: 'name',
+        },
         { path: '/_stainless_unknown_path' },
       ),
     ).rejects.toThrow(Runloop.NotFoundError);
@@ -431,7 +568,11 @@ describe('resource devboxes', () => {
     await expect(
       client.devboxes.snapshotDiskAsync(
         'id',
-        { commit_message: 'commit_message', metadata: { foo: 'string' }, name: 'name' },
+        {
+          commit_message: 'commit_message',
+          metadata: { foo: 'string' },
+          name: 'name',
+        },
         { path: '/_stainless_unknown_path' },
       ),
     ).rejects.toThrow(Runloop.NotFoundError);
@@ -469,7 +610,7 @@ describe('resource devboxes', () => {
   test('uploadFile: required and optional params', async () => {
     const response = await client.devboxes.uploadFile('id', {
       path: 'path',
-      file: await toFile(Buffer.from('# my file contents'), 'README.md'),
+      file: await toFile(Buffer.from('Example data'), 'README.md'),
     });
   });
 
@@ -492,6 +633,17 @@ describe('resource devboxes', () => {
       last_n: 'last_n',
       timeout_seconds: 0,
     });
+  });
+
+  test('watchEvictions', async () => {
+    const responsePromise = client.devboxes.watchEvictions();
+    const rawResponse = await responsePromise.asResponse();
+    expect(rawResponse).toBeInstanceOf(Response);
+    const response = await responsePromise;
+    expect(response).not.toBeInstanceOf(Response);
+    const dataAndResponse = await responsePromise.withResponse();
+    expect(dataAndResponse.data).toBe(response);
+    expect(dataAndResponse.response).toBe(rawResponse);
   });
 
   test('writeFileContents: only required params', async () => {
@@ -529,6 +681,9 @@ describe('resource devboxes', () => {
     expect(mockPost).toHaveBeenCalledTimes(2);
     expect(mockPost).toHaveBeenCalledWith('/v1/devboxes/test-id/wait_for_status', {
       body: { statuses: ['running', 'failure', 'shutdown'] },
+      signal: expect.any(AbortSignal),
+      timeout: 600000,
+      maxRetries: 0,
     });
 
     mockPost.mockRestore();
@@ -600,28 +755,43 @@ describe('resource devboxes', () => {
     expect(mockPost).toHaveBeenCalledTimes(2);
 
     // Check create call
-    expect(mockPost).toHaveBeenNthCalledWith(1, '/v1/devboxes', {
+    expect(mockPost).toHaveBeenNthCalledWith(1, '/v1/devboxes/create_and_await_running', {
       body: { name: 'test-devbox' },
     });
 
     // Check polling calls
     expect(mockPost).toHaveBeenNthCalledWith(2, '/v1/devboxes/new-devbox-id/wait_for_status', {
       body: { statuses: ['running', 'failure', 'shutdown'] },
+      signal: expect.any(AbortSignal),
+      timeout: 600000,
+      maxRetries: 0,
     });
 
     mockPost.mockRestore();
   });
 
+  test('createAndAwaitRunning: returns an optimistic running response without polling', async () => {
+    const mockPost = jest.spyOn(client.devboxes['_client'], 'post');
+    mockPost.mockResolvedValueOnce({ id: 'new-devbox-id', status: 'running' });
+
+    const result = await client.devboxes.createAndAwaitRunning({ name: 'test-devbox' });
+
+    expect(result).toEqual({ id: 'new-devbox-id', status: 'running' });
+    expect(mockPost).toHaveBeenCalledTimes(1);
+    expect(mockPost).toHaveBeenCalledWith('/v1/devboxes/create_and_await_running', {
+      body: { name: 'test-devbox' },
+    });
+  });
+
   test('createAndAwaitRunning: handles creation failure', async () => {
     const mockPost = jest.spyOn(client.devboxes['_client'], 'post');
 
-    const createError = new Error('Creation failed');
-    mockPost.mockRejectedValueOnce(createError);
+    const createError = new APIError(400, undefined, 'Creation failed', {});
+    mockPost.mockRejectedValue(createError);
 
     await expect(client.devboxes.createAndAwaitRunning()).rejects.toThrow('Creation failed');
 
-    expect(mockPost).toHaveBeenCalledTimes(1);
-    expect(mockPost).toHaveBeenCalledWith('/v1/devboxes', { body: {} });
+    expect(mockPost).toHaveBeenCalledWith('/v1/devboxes/create_and_await_running', { body: {} });
 
     mockPost.mockRestore();
   });
@@ -637,7 +807,7 @@ describe('resource devboxes', () => {
       };
       mockPost.mockResolvedValueOnce(executeResponse);
 
-      // Mock the waitForCommand call to return completed status (both initial and polling calls)
+      // Mock the waitForCommand call to return completed status
       const waitForCommandResponse = {
         devbox_id: 'devbox-123',
         execution_id: 'exec-123',
@@ -649,24 +819,15 @@ describe('resource devboxes', () => {
       };
       mockPost.mockResolvedValueOnce(waitForCommandResponse);
 
-      const result = await client.devboxes.executeAndAwaitCompletion(
-        'devbox-123',
-        {
-          command: 'echo hello',
-          last_n: '10', // This should be passed to waitForCommand
-        },
-        {
-          polling: {
-            maxAttempts: 1,
-            pollingIntervalMs: 10,
-          },
-        },
-      );
+      const result = await client.devboxes.executeAndAwaitCompletion('devbox-123', {
+        command: 'echo hello',
+        last_n: '10', // This should be passed to waitForCommand
+      });
 
       expect(result.status).toBe('completed');
       expect(result.execution_id).toBe('exec-123');
 
-      // Verify execute was called
+      // Verify execute was called (longPoll options are stripped before passing to execute)
       expect(mockPost).toHaveBeenCalledTimes(2); // execute + waitForCommand
       expect(mockPost).toHaveBeenNthCalledWith(1, '/v1/devboxes/devbox-123/execute', {
         body: expect.objectContaining({
@@ -674,10 +835,6 @@ describe('resource devboxes', () => {
           command_id: expect.any(String),
         }),
         query: { last_n: '10' },
-        polling: {
-          maxAttempts: 1,
-          pollingIntervalMs: 10,
-        },
         timeout: 600000,
       });
 
@@ -690,6 +847,9 @@ describe('resource devboxes', () => {
           body: {
             statuses: ['completed'],
           },
+          signal: expect.any(AbortSignal),
+          timeout: 600000,
+          maxRetries: 0,
         },
       );
     } finally {
@@ -708,7 +868,7 @@ describe('resource devboxes', () => {
     };
     mockPost.mockResolvedValueOnce(executeResponse);
 
-    // Mock the waitForCommand call to return completed status (both initial and polling calls)
+    // Mock the waitForCommand call to return completed status
     const waitForCommandResponse = {
       devbox_id: 'devbox-123',
       execution_id: 'exec-123',
@@ -720,24 +880,15 @@ describe('resource devboxes', () => {
     };
     mockPost.mockResolvedValueOnce(waitForCommandResponse);
 
-    const result = await client.devboxes.executeAndAwaitCompletion(
-      'devbox-123',
-      {
-        command: 'echo hello',
-        // No last_n parameter
-      },
-      {
-        polling: {
-          maxAttempts: 1,
-          pollingIntervalMs: 10,
-        },
-      },
-    );
+    const result = await client.devboxes.executeAndAwaitCompletion('devbox-123', {
+      command: 'echo hello',
+      // No last_n parameter
+    });
 
     expect(result.status).toBe('completed');
     expect(result.execution_id).toBe('exec-123');
 
-    // Verify execute was called
+    // Verify execute was called (longPoll options are stripped before passing to execute)
     expect(mockPost).toHaveBeenCalledTimes(2); // execute + waitForCommand
     expect(mockPost).toHaveBeenNthCalledWith(1, '/v1/devboxes/devbox-123/execute', {
       body: expect.objectContaining({
@@ -745,10 +896,6 @@ describe('resource devboxes', () => {
         command_id: expect.any(String),
       }),
       query: { last_n: undefined },
-      polling: {
-        maxAttempts: 1,
-        pollingIntervalMs: 10,
-      },
       timeout: 600000,
     });
 
@@ -761,6 +908,9 @@ describe('resource devboxes', () => {
         body: {
           statuses: ['completed'],
         },
+        signal: expect.any(AbortSignal),
+        timeout: 600000,
+        maxRetries: 0,
       },
     );
 

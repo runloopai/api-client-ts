@@ -32,7 +32,11 @@ describe('resource diskSnapshots', () => {
     await expect(
       client.devboxes.diskSnapshots.update(
         'id',
-        { commit_message: 'commit_message', metadata: { foo: 'string' }, name: 'name' },
+        {
+          commit_message: 'commit_message',
+          metadata: { foo: 'string' },
+          name: 'name',
+        },
         { path: '/_stainless_unknown_path' },
       ),
     ).rejects.toThrow(Runloop.NotFoundError);
@@ -62,9 +66,11 @@ describe('resource diskSnapshots', () => {
       client.devboxes.diskSnapshots.list(
         {
           devbox_id: 'devbox_id',
+          include_total_count: true,
           limit: 0,
           'metadata[key]': 'metadata[key]',
           'metadata[key][in]': 'metadata[key][in]',
+          source_blueprint_id: 'source_blueprint_id',
           starting_after: 'starting_after',
         },
         { path: '/_stainless_unknown_path' },

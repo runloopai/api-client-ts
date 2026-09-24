@@ -26,11 +26,13 @@ describe('resource blueprints', () => {
       base_blueprint_id: 'base_blueprint_id',
       base_blueprint_name: 'base_blueprint_name',
       build_args: { foo: 'string' },
+      build_context: { object_id: 'object_id', type: 'object' },
       code_mounts: [
         {
           repo_name: 'repo_name',
           repo_owner: 'repo_owner',
           token: 'token',
+          git_ref: 'git_ref',
           install_command: 'install_command',
         },
       ],
@@ -45,11 +47,19 @@ describe('resource blueprints', () => {
         custom_gb_memory: 0,
         keep_alive_time_seconds: 0,
         launch_commands: ['string'],
+        lifecycle: {
+          after_idle: { idle_time_seconds: 0, on_idle: 'shutdown' },
+          lifecycle_hooks: { suspend_commands: ['string'], suspend_deadline_ms: 0 },
+          resume_triggers: { axon_event: true, http: true },
+        },
+        network_policy_id: 'network_policy_id',
+        provisioning_tier: 'standard',
         required_services: ['string'],
         resource_size_request: 'X_SMALL',
         user_parameters: { uid: 0, username: 'username' },
       },
       metadata: { foo: 'string' },
+      network_policy_id: 'network_policy_id',
       secrets: { foo: 'string' },
       services: [
         {
@@ -130,7 +140,13 @@ describe('resource blueprints', () => {
     // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
     await expect(
       client.blueprints.list(
-        { limit: 0, name: 'name', starting_after: 'starting_after' },
+        {
+          include_total_count: true,
+          limit: 0,
+          name: 'name',
+          starting_after: 'starting_after',
+          status: 'status',
+        },
         { path: '/_stainless_unknown_path' },
       ),
     ).rejects.toThrow(Runloop.NotFoundError);
@@ -152,44 +168,6 @@ describe('resource blueprints', () => {
     await expect(client.blueprints.delete('id', { path: '/_stainless_unknown_path' })).rejects.toThrow(
       Runloop.NotFoundError,
     );
-  });
-
-  test('createFromInspection: only required params', async () => {
-    const responsePromise = client.blueprints.createFromInspection({
-      inspection_source: { inspection_id: 'inspection_id' },
-      name: 'name',
-    });
-    const rawResponse = await responsePromise.asResponse();
-    expect(rawResponse).toBeInstanceOf(Response);
-    const response = await responsePromise;
-    expect(response).not.toBeInstanceOf(Response);
-    const dataAndResponse = await responsePromise.withResponse();
-    expect(dataAndResponse.data).toBe(response);
-    expect(dataAndResponse.response).toBe(rawResponse);
-  });
-
-  test('createFromInspection: required and optional params', async () => {
-    const response = await client.blueprints.createFromInspection({
-      inspection_source: { inspection_id: 'inspection_id', github_auth_token: 'github_auth_token' },
-      name: 'name',
-      file_mounts: { foo: 'string' },
-      launch_parameters: {
-        after_idle: { idle_time_seconds: 0, on_idle: 'shutdown' },
-        architecture: 'x86_64',
-        available_ports: [0],
-        custom_cpu_cores: 0,
-        custom_disk_size: 0,
-        custom_gb_memory: 0,
-        keep_alive_time_seconds: 0,
-        launch_commands: ['string'],
-        required_services: ['string'],
-        resource_size_request: 'X_SMALL',
-        user_parameters: { uid: 0, username: 'username' },
-      },
-      metadata: { foo: 'string' },
-      secrets: { foo: 'string' },
-      system_setup_commands: ['string'],
-    });
   });
 
   test('listPublic', async () => {
@@ -214,7 +192,13 @@ describe('resource blueprints', () => {
     // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
     await expect(
       client.blueprints.listPublic(
-        { limit: 0, name: 'name', starting_after: 'starting_after' },
+        {
+          include_total_count: true,
+          limit: 0,
+          name: 'name',
+          starting_after: 'starting_after',
+          status: 'status',
+        },
         { path: '/_stainless_unknown_path' },
       ),
     ).rejects.toThrow(Runloop.NotFoundError);
@@ -254,11 +238,13 @@ describe('resource blueprints', () => {
       name: 'name',
       base_blueprint_name: 'base_blueprint_name',
       build_args: { foo: 'string' },
+      build_context: { object_id: 'object_id', type: 'object' },
       code_mounts: [
         {
           repo_name: 'repo_name',
           repo_owner: 'repo_owner',
           token: 'token',
+          git_ref: 'git_ref',
           install_command: 'install_command',
         },
       ],
@@ -273,11 +259,19 @@ describe('resource blueprints', () => {
         custom_gb_memory: 0,
         keep_alive_time_seconds: 0,
         launch_commands: ['string'],
+        lifecycle: {
+          after_idle: { idle_time_seconds: 0, on_idle: 'shutdown' },
+          lifecycle_hooks: { suspend_commands: ['string'], suspend_deadline_ms: 0 },
+          resume_triggers: { axon_event: true, http: true },
+        },
+        network_policy_id: 'network_policy_id',
+        provisioning_tier: 'standard',
         required_services: ['string'],
         resource_size_request: 'X_SMALL',
         user_parameters: { uid: 0, username: 'username' },
       },
       metadata: { foo: 'string' },
+      network_policy_id: 'network_policy_id',
       secrets: { foo: 'string' },
       services: [
         {

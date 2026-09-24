@@ -16,8 +16,6 @@ import {
   ScorerRetrieveResponse,
   ScorerUpdateParams,
   ScorerUpdateResponse,
-  ScorerValidateParams,
-  ScorerValidateResponse,
   Scorers,
 } from './scorers';
 import {
@@ -25,7 +23,7 @@ import {
   ScenariosCursorIDPage,
   type ScenariosCursorIDPageParams,
 } from '../../pagination';
-import { PollingOptions } from '@runloop/api-client/lib/polling';
+import { LongPollRequestOptions } from '@runloop/api-client/lib/polling';
 import { DevboxView } from '../devboxes';
 
 export class Scenarios extends APIResource {
@@ -48,9 +46,9 @@ export class Scenarios extends APIResource {
   }
 
   /**
-   * Update a Scenario, a repeatable AI coding evaluation test that defines the
-   * starting environment as well as evaluation success criteria. Only provided
-   * fields will be updated.
+   * Update a Scenario. Fields that are null will preserve the existing value. Fields
+   * that are provided (including empty values) will replace the existing value
+   * entirely.
    */
   update(
     id: string,
@@ -91,6 +89,14 @@ export class Scenarios extends APIResource {
   }
 
   /**
+   * Archive a previously created Scenario. The scenario will no longer appear in
+   * list endpoints but can still be retrieved by ID.
+   */
+  archive(id: string, options?: Core.RequestOptions): Core.APIPromise<ScenarioView> {
+    return this._client.post(`/v1/scenarios/${id}/archive`, options);
+  }
+
+  /**
    * List all public scenarios matching filter.
    */
   listPublic(
@@ -126,7 +132,7 @@ export class Scenarios extends APIResource {
    */
   async startRunAndAwaitEnvReady(
     body: ScenarioStartRunParams,
-    options?: Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxView>> },
+    options?: LongPollRequestOptions<DevboxView>,
   ): Promise<ScenarioRunView> {
     const run = await this.startRun(body, options);
     await this._client.devboxes.awaitRunning(run.devbox_id, options);
@@ -183,7 +189,8 @@ export interface ScenarioCreateParameters {
   scoring_contract: ScoringContract;
 
   /**
-   * The Environment in which the Scenario will run.
+   * ScenarioEnvironmentParameters specify the environment in which a Scenario will
+   * be run.
    */
   environment_parameters?: ScenarioEnvironment | null;
 
@@ -213,6 +220,11 @@ export interface ScenarioCreateParameters {
   required_secret_names?: Array<string> | null;
 
   /**
+   * Timeout for scoring in seconds. Default 30 minutes (1800s).
+   */
+  scorer_timeout_sec?: number | null;
+
+  /**
    * Validation strategy.
    */
   validation_type?: 'UNSPECIFIED' | 'FORWARD' | 'REVERSE' | 'EVALUATION' | null;
@@ -229,7 +241,9 @@ export interface ScenarioEnvironment {
   blueprint_id?: string | null;
 
   /**
-   * Optional launch parameters to apply to the devbox environment at launch.
+   * LaunchParameters enable you to customize the resources available to your Devbox
+   * as well as the environment set up that should be completed before the Devbox is
+   * marked as 'running'.
    */
   launch_parameters?: Shared.LaunchParameters | null;
 
@@ -248,14 +262,12 @@ export interface ScenarioEnvironment {
 export interface ScenarioRunListView {
   has_more: boolean;
 
-  remaining_count: number;
-
   /**
    * List of ScenarioRuns matching filter.
    */
   runs: Array<ScenarioRunView>;
 
-  total_count: number;
+  total_count?: number | null;
 }
 
 /**
@@ -314,7 +326,8 @@ export interface ScenarioRunView {
   purpose?: string | null;
 
   /**
-   * The scoring result of the ScenarioRun.
+   * A ScoringContractResultView represents the result of running all scoring
+   * functions on a given input context.
    */
   scoring_contract_result?: ScoringContractResultView | null;
 
@@ -329,9 +342,15 @@ export interface ScenarioRunView {
   start_time_ms?: number;
 }
 
+/**
+ * ScenarioUpdateParameters contain the set of parameters to update a Scenario. All
+ * fields are optional - null fields preserve existing values, provided fields
+ * replace entirely.
+ */
 export interface ScenarioUpdateParameters {
   /**
-   * The Environment in which the Scenario will run.
+   * ScenarioEnvironmentParameters specify the environment in which a Scenario will
+   * be run.
    */
   environment_parameters?: ScenarioEnvironment | null;
 
@@ -341,31 +360,36 @@ export interface ScenarioUpdateParameters {
   input_context?: InputContextUpdate | null;
 
   /**
-   * User defined metadata to attach to the scenario for organization.
+   * User defined metadata to attach to the scenario. Pass in empty map to clear.
    */
   metadata?: { [key: string]: string } | null;
 
   /**
-   * Name of the scenario.
+   * Name of the scenario. Cannot be blank.
    */
   name?: string | null;
 
   /**
    * A string representation of the reference output to solve the scenario. Commonly
    * can be the result of a git diff or a sequence of command actions to apply to the
-   * environment.
+   * environment. Pass in empty string to clear.
    */
   reference_output?: string | null;
 
   /**
-   * Environment variables required to run the scenario.
+   * Environment variables required to run the scenario. Pass in empty list to clear.
    */
   required_environment_variables?: Array<string> | null;
 
   /**
-   * Secrets required to run the scenario.
+   * Secrets required to run the scenario. Pass in empty list to clear.
    */
   required_secret_names?: Array<string> | null;
+
+  /**
+   * Timeout for scoring in seconds. Default 30 minutes (1800s).
+   */
+  scorer_timeout_sec?: number | null;
 
   /**
    * The scoring contract for the Scenario.
@@ -373,7 +397,7 @@ export interface ScenarioUpdateParameters {
   scoring_contract?: ScoringContractUpdate | null;
 
   /**
-   * Validation strategy.
+   * Validation strategy. Pass in empty string to clear.
    */
   validation_type?: 'UNSPECIFIED' | 'FORWARD' | 'REVERSE' | 'EVALUATION' | null;
 }
@@ -409,7 +433,14 @@ export interface ScenarioView {
   scoring_contract: ScoringContract;
 
   /**
-   * The Environment in which the Scenario is run.
+   * Whether the scenario is active or archived. Archived scenarios are excluded from
+   * listings and cannot be updated.
+   */
+  status: 'active' | 'archived';
+
+  /**
+   * ScenarioEnvironmentParameters specify the environment in which a Scenario will
+   * be run.
    */
   environment?: ScenarioEnvironment | null;
 
@@ -436,6 +467,11 @@ export interface ScenarioView {
    * missing, the scenario will fail to start.
    */
   required_secret_names?: Array<string>;
+
+  /**
+   * Timeout for scoring in seconds. Default 30 minutes (1800s).
+   */
+  scorer_timeout_sec?: number | null;
 
   /**
    * Validation strategy.
@@ -705,7 +741,8 @@ export interface ScenarioCreateParams {
   scoring_contract: ScoringContract;
 
   /**
-   * The Environment in which the Scenario will run.
+   * ScenarioEnvironmentParameters specify the environment in which a Scenario will
+   * be run.
    */
   environment_parameters?: ScenarioEnvironment | null;
 
@@ -735,6 +772,11 @@ export interface ScenarioCreateParams {
   required_secret_names?: Array<string> | null;
 
   /**
+   * Timeout for scoring in seconds. Default 30 minutes (1800s).
+   */
+  scorer_timeout_sec?: number | null;
+
+  /**
    * Validation strategy.
    */
   validation_type?: 'UNSPECIFIED' | 'FORWARD' | 'REVERSE' | 'EVALUATION' | null;
@@ -742,7 +784,8 @@ export interface ScenarioCreateParams {
 
 export interface ScenarioUpdateParams {
   /**
-   * The Environment in which the Scenario will run.
+   * ScenarioEnvironmentParameters specify the environment in which a Scenario will
+   * be run.
    */
   environment_parameters?: ScenarioEnvironment | null;
 
@@ -752,31 +795,36 @@ export interface ScenarioUpdateParams {
   input_context?: InputContextUpdate | null;
 
   /**
-   * User defined metadata to attach to the scenario for organization.
+   * User defined metadata to attach to the scenario. Pass in empty map to clear.
    */
   metadata?: { [key: string]: string } | null;
 
   /**
-   * Name of the scenario.
+   * Name of the scenario. Cannot be blank.
    */
   name?: string | null;
 
   /**
    * A string representation of the reference output to solve the scenario. Commonly
    * can be the result of a git diff or a sequence of command actions to apply to the
-   * environment.
+   * environment. Pass in empty string to clear.
    */
   reference_output?: string | null;
 
   /**
-   * Environment variables required to run the scenario.
+   * Environment variables required to run the scenario. Pass in empty list to clear.
    */
   required_environment_variables?: Array<string> | null;
 
   /**
-   * Secrets required to run the scenario.
+   * Secrets required to run the scenario. Pass in empty list to clear.
    */
   required_secret_names?: Array<string> | null;
+
+  /**
+   * Timeout for scoring in seconds. Default 30 minutes (1800s).
+   */
+  scorer_timeout_sec?: number | null;
 
   /**
    * The scoring contract for the Scenario.
@@ -784,7 +832,7 @@ export interface ScenarioUpdateParams {
   scoring_contract?: ScoringContractUpdate | null;
 
   /**
-   * Validation strategy.
+   * Validation strategy. Pass in empty string to clear.
    */
   validation_type?: 'UNSPECIFIED' | 'FORWARD' | 'REVERSE' | 'EVALUATION' | null;
 }
@@ -796,16 +844,43 @@ export interface ScenarioListParams extends ScenariosCursorIDPageParams {
   benchmark_id?: string;
 
   /**
-   * Query for Scenarios with a given name.
+   * If true (default), includes total_count in the response. Set to false to skip
+   * the count query for better performance on large datasets.
    */
-  name?: string;
-}
+  include_total_count?: boolean;
 
-export interface ScenarioListPublicParams extends ScenariosCursorIDPageParams {
   /**
    * Query for Scenarios with a given name.
    */
   name?: string;
+
+  /**
+   * Search by scenario ID or name.
+   */
+  search?: string;
+
+  /**
+   * Filter by validation type
+   */
+  validation_type?: string;
+}
+
+export interface ScenarioListPublicParams extends ScenariosCursorIDPageParams {
+  /**
+   * If true (default), includes total_count in the response. Set to false to skip
+   * the count query for better performance on large datasets.
+   */
+  include_total_count?: boolean;
+
+  /**
+   * Query for Scenarios with a given name.
+   */
+  name?: string;
+
+  /**
+   * Search by scenario ID or name.
+   */
+  search?: string;
 }
 
 export interface ScenarioStartRunParams {
@@ -872,11 +947,9 @@ export declare namespace Scenarios {
     type ScorerRetrieveResponse as ScorerRetrieveResponse,
     type ScorerUpdateResponse as ScorerUpdateResponse,
     type ScorerListResponse as ScorerListResponse,
-    type ScorerValidateResponse as ScorerValidateResponse,
     ScorerListResponsesScenarioScorersCursorIDPage as ScorerListResponsesScenarioScorersCursorIDPage,
     type ScorerCreateParams as ScorerCreateParams,
     type ScorerUpdateParams as ScorerUpdateParams,
     type ScorerListParams as ScorerListParams,
-    type ScorerValidateParams as ScorerValidateParams,
   };
 }

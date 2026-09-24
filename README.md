@@ -2,11 +2,18 @@
 
 [![NPM version](https://img.shields.io/npm/v/@runloop/api-client.svg)](https://npmjs.org/package/@runloop/api-client) ![npm bundle size](https://img.shields.io/bundlephobia/minzip/@runloop/api-client)
 
-This library provides convenient access to the Runloop REST API from server-side TypeScript or JavaScript.
+This library provides convenient access to the Runloop SDK & REST API from server-side TypeScript or JavaScript.
 
-The REST API documentation can be found on [runloop.ai](https://runloop.ai). The full API of this library can be found in [api.md](api.md).
+The **RunloopSDK** is the recommended, modern way to interact with the Runloop API. It provides high-level object-oriented interfaces for common operations while maintaining full access to the underlying REST API through the `.api` property.
 
-It is generated with [Stainless](https://www.stainless.com/).
+## MCP Server
+
+Use the Runloop MCP Server to enable AI assistants to interact with this API, allowing them to explore endpoints, make test requests, and use documentation to help integrate this SDK into your application.
+
+[![Add to Cursor](https://cursor.com/deeplink/mcp-install-dark.svg)](https://cursor.com/en-US/install-mcp?name=%40runloop%2Fapi-client-mcp&config=eyJjb21tYW5kIjoibnB4IiwiYXJncyI6WyIteSIsIkBydW5sb29wL2FwaS1jbGllbnQtbWNwIl0sImVudiI6eyJSVU5MT09QX0FQSV9LRVkiOiJNeSBCZWFyZXIgVG9rZW4ifX0)
+[![Install in VS Code](https://img.shields.io/badge/_-Add_to_VS_Code-blue?style=for-the-badge&logo=data:image/svg%2bxml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGZpbGw9Im5vbmUiIHZpZXdCb3g9IjAgMCA0MCA0MCI+PHBhdGggZmlsbD0iI0VFRSIgZmlsbC1ydWxlPSJldmVub2RkIiBkPSJNMzAuMjM1IDM5Ljg4NGEyLjQ5MSAyLjQ5MSAwIDAgMS0xLjc4MS0uNzNMMTIuNyAyNC43OGwtMy40NiAyLjYyNC0zLjQwNiAyLjU4MmExLjY2NSAxLjY2NSAwIDAgMS0xLjA4Mi4zMzggMS42NjQgMS42NjQgMCAwIDEtMS4wNDYtLjQzMWwtMi4yLTJhMS42NjYgMS42NjYgMCAwIDEgMC0yLjQ2M0w3LjQ1OCAyMCA0LjY3IDE3LjQ1MyAxLjUwNyAxNC41N2ExLjY2NSAxLjY2NSAwIDAgMSAwLTIuNDYzbDIuMi0yYTEuNjY1IDEuNjY1IDAgMCAxIDIuMTMtLjA5N2w2Ljg2MyA1LjIwOUwyOC40NTIuODQ0YTIuNDg4IDIuNDg4IDAgMCAxIDEuODQxLS43MjljLjM1MS4wMDkuNjk5LjA5MSAxLjAxOS4yNDVsOC4yMzYgMy45NjFhMi41IDIuNSAwIDAgMSAxLjQxNSAyLjI1M3YuMDk5LS4wNDVWMzMuMzd2LS4wNDUuMDk1YTIuNTAxIDIuNTAxIDAgMCAxLTEuNDE2IDIuMjU3bC04LjIzNSAzLjk2MWEyLjQ5MiAyLjQ5MiAwIDAgMS0xLjA3Ny4yNDZabS43MTYtMjguOTQ3LTExLjk0OCA5LjA2MiAxMS45NTIgOS4wNjUtLjAwNC0xOC4xMjdaIi8+PC9zdmc+)](https://vscode.stainless.com/mcp/%7B%22name%22%3A%22%40runloop%2Fapi-client-mcp%22%2C%22command%22%3A%22npx%22%2C%22args%22%3A%5B%22-y%22%2C%22%40runloop%2Fapi-client-mcp%22%5D%2C%22env%22%3A%7B%22RUNLOOP_API_KEY%22%3A%22My%20Bearer%20Token%22%7D%7D)
+
+> Note: You may need to set environment variables in your MCP client.
 
 ## Installation
 
@@ -14,67 +21,243 @@ It is generated with [Stainless](https://www.stainless.com/).
 npm install @runloop/api-client
 ```
 
-## Usage
+## Quickstart
 
-The full API of this library can be found in [api.md](api.md).
+Here's a complete example that demonstrates the core SDK functionality:
 
-<!-- prettier-ignore -->
-```js
-import Runloop from '@runloop/api-client';
+```typescript
+import { RunloopSDK } from '@runloop/api-client';
 
-const client = new Runloop({
-  bearerToken: process.env['RUNLOOP_API_KEY'], // This is the default and can be omitted
+const sdk = new RunloopSDK({
+  bearerToken: process.env.RUNLOOP_API_KEY, // This is the default and can be omitted
 });
 
-const devboxView = await client.devboxes.create();
+// Create a new devbox and wait for it to be ready
+const devbox = await sdk.devbox.create();
 
-console.log(devboxView.id);
+// Execute a command that returns immediately - exec blocks until completion
+const result = await devbox.cmd.exec('echo "Hello, World!"');
+console.log('Output:', await result.stdout()); // "Hello, World!"
+console.log('Exit code:', result.exitCode); // 0
+
+// Start a long-running HTTP server - execAsync returns immediately
+const serverExec = await devbox.cmd.execAsync('npx http-server -p 8080');
+console.log(`Started server with execution ID: ${serverExec.executionId}`);
+
+// Check server status
+const state = await serverExec.getState();
+console.log('Server status:', state.status); // "running"
+
+// Later... kill the server when done
+await serverExec.kill();
+
+// Retrieve devbox logs
+const logs = await devbox.logs();
+console.log('Devbox logs:', logs.logs);
+
+await devbox.shutdown();
 ```
 
-### Request & Response types
+## Examples
 
-This library includes TypeScript definitions for all request params and response fields. You may import and use them like so:
+Workflow-oriented runnable examples are documented in [`EXAMPLES.md`](./EXAMPLES.md).
 
-<!-- prettier-ignore -->
-```ts
-import Runloop from '@runloop/api-client';
+`EXAMPLES.md` is generated from metadata in `examples/*.ts` and should not be edited manually.
+Regenerate it with:
 
-const client = new Runloop({
-  bearerToken: process.env['RUNLOOP_API_KEY'], // This is the default and can be omitted
+```sh
+yarn generate:examples-md
+```
+
+Use direct `secrets` injection when code inside the devbox legitimately needs the secret value. For third-party API credentials that should stay off the devbox, prefer wiring a Runloop secret through agent gateway instead. See [`examples/secrets-with-devbox.ts`](./examples/secrets-with-devbox.ts) for both patterns side by side using `devbox.create({ secrets: ... })` and `devbox.create({ gateways: ... })`.
+
+For mount patterns, see [`examples/devbox-mounts.ts`](./examples/devbox-mounts.ts). It shows when to use `agent_mount` for reusable agents like Claude Code, `code_mount` for Git repositories such as [`runloopai/rl-cli`](https://github.com/runloopai/rl-cli.git), and `object_mount` for blobs that should appear on the devbox at startup. The example also demonstrates agent gateway wiring for Anthropic credentials plus object TTL, `.tgz` compression, and extraction-on-mount behavior.
+
+For snapshot workflows, see [`examples/devbox-snapshots.ts`](./examples/devbox-snapshots.ts). It uploads a file to a source devbox, shows `suspend()` plus `resume()`, takes a disk snapshot, restores multiple devboxes from the same snapshot baseline, mutates the file independently in each devbox, and deletes the snapshot after the demo completes.
+
+## Agent Guidance
+
+Detailed agent-specific instructions live in [`llms.txt`](./llms.txt). Consolidated recipes for frequent tasks are in [`EXAMPLES.md`](./EXAMPLES.md).
+
+After completing any modifications to this project, ensure `llms.txt` and `README.md` are kept in sync.
+
+## Core Concepts
+
+### Runloop SDK
+
+The main SDK class that provides access to all Runloop functionality. View the [RunloopSDK documentation](https://runloopai.github.io/api-client-ts/stable/) to see specific capabilities.
+
+### Available Resources
+
+The SDK provides object-oriented interfaces for all major Runloop resources:
+
+- **[`runloop.devbox`](https://runloopai.github.io/api-client-ts/stable/classes/sdk.DevboxOps.html)** - Devbox management (create, list, execute commands, file operations)
+- **[`runloop.blueprint`](https://runloopai.github.io/api-client-ts/stable/classes/sdk.BlueprintOps.html)** - Blueprint management (create, list, build blueprints)
+- **[`runloop.snapshot`](https://runloopai.github.io/api-client-ts/stable/classes/sdk.SnapshotOps.html)** - Snapshot management (list disk snapshots)
+- **[`runloop.storageObject`](https://runloopai.github.io/api-client-ts/stable/classes/sdk.StorageObjectOps.html)** - Storage object management (upload, download, list objects)
+- **[`runloop.agent`](https://runloopai.github.io/api-client-ts/stable/classes/sdk.AgentOps.html)** - Agent management (create, list agents from npm/pip/git)
+- **[`runloop.axon`](https://runloopai.github.io/api-client-ts/stable/classes/sdk.AxonOps.html)** - [Beta] Axon management (create, publish events, subscribe via SSE)
+- **[`runloop.scenario`](https://runloopai.github.io/api-client-ts/stable/classes/sdk.ScenarioOps.html)** - Scenario management (list scenarios, start runs)
+- **[`runloop.scorer`](https://runloopai.github.io/api-client-ts/stable/classes/sdk.ScorerOps.html)** - Scorer management (create, list, update)
+- **[`runloop.networkPolicy`](https://runloopai.github.io/api-client-ts/stable/classes/sdk.NetworkPolicyOps.html)** - Network policy management (create, list, update egress rules)
+- **[`runloop.gatewayConfig`](https://runloopai.github.io/api-client-ts/stable/classes/sdk.GatewayConfigOps.html)** - Gateway config management (create, list API proxy configurations)
+- **[`runloop.mcpConfig`](https://runloopai.github.io/api-client-ts/stable/classes/sdk.McpConfigOps.html)** - MCP config management (create, list MCP server configurations)
+- **[`runloop.secret`](https://runloopai.github.io/api-client-ts/stable/classes/sdk.SecretOps.html)** - Secret management (create, update, list, delete encrypted key-value pairs)
+- **[`runloop.api`](https://runloopai.github.io/api-client-ts/stable/modules/types.html)** - Direct access to the REST API client
+
+## TypeScript Support
+
+The SDK is fully typed with comprehensive TypeScript definitions:
+
+### Devbox Logs
+
+Retrieve logs from a devbox, optionally filtered by execution ID or shell name:
+
+```typescript
+const devbox = await runloop.devbox.create();
+
+// Get all devbox logs
+const logs = await devbox.logs();
+console.log(logs.logs);
+
+// Filter logs by execution ID
+const result = await devbox.cmd.exec('echo "hello"');
+const execLogs = await devbox.logs({ execution_id: result.executionId });
+
+// Filter logs by shell name
+const shellLogs = await devbox.logs({ shell_name: 'my-shell' });
+```
+
+### Blueprints
+
+Blueprints define reusable devbox configurations. Create blueprints via `runloop.blueprint.create()` and access build logs with `blueprint.logs()`:
+
+```typescript
+const blueprint = await runloop.blueprint.create({
+  name: 'my-blueprint',
+  dockerfile: 'FROM ubuntu:22.04\nRUN apt-get update',
 });
 
-const devboxView: Runloop.DevboxView = await client.devboxes.create();
+// Get build logs
+const logs = await blueprint.logs();
+console.log(logs.logs);
+
+// Create a devbox from the blueprint
+const devbox = await blueprint.createDevbox({ name: 'my-devbox' });
 ```
 
-Documentation for each method, request param, and response field are available in docstrings and will appear on hover in most modern editors.
+### Scorers
 
-## File uploads
+Scorers are custom scoring functions used to evaluate scenario outputs. Create scorers via `runloop.scorer.create()`, then update them with the returned `Scorer` instance:
 
-Request parameters that correspond to file uploads can be passed in many different forms:
+```typescript
+import { RunloopSDK } from '@runloop/api-client';
 
-- `File` (or an object with the same structure)
-- a `fetch` `Response` (or an object with the same structure)
-- an `fs.ReadStream`
-- the return value of our `toFile` helper
+const runloop = new RunloopSDK();
+
+const scorer = await runloop.scorer.create({
+  type: 'my_scorer',
+  bash_script: 'echo "1.0"',
+});
+
+await scorer.update({ bash_script: 'echo "0.5"' });
+```
+
+### Scenarios
+
+Scenarios define tasks with a well defined starting environment, task evaluation scorer and an optional reference solution. Use `runloop.scenario.fromId()` to get a scenario, then `scenario.run()` to start a run with your agent mounted:
+
+```typescript
+const scenario = runloop.scenario.fromId('scn_123');
+const run = await scenario.run({
+  run_name: 'my-run',
+  runProfile: {
+    mounts: [
+      {
+        type: 'agent_mount',
+        agent_id: 'agt_123',
+        agent_path: '/home/user/agent',
+      },
+    ],
+  },
+});
+await run.devbox.cmd.exec('python /home/user/agent/main.py');
+await run.scoreAndComplete();
+```
+
+### Benchmarks
+
+Benchmarks are collections of scenarios for evaluating AI agents. Access via `runloop.api.benchmarks`:
+
+```typescript
+const benchmarks = await runloop.api.benchmarks.listPublic();
+const definitions = await runloop.api.benchmarks.definitions('benchmark_id');
+```
+
+## Migration from API Client
+
+If you're currently using the legacy API, migration is straightforward:
+
+All of the runloop client methods `runloop.secrets` has moved to `runloopSDK.api.secrets`. Updating all references to this will move to the new sdk client.
+
+```typescript
+// Before (Legacy api client)
+import Runloop from '@runloop/api-client';
+const runloop = new Runloop();
+const secretResult = await runloop.secrets.create({ ... });
+
+
+// After (SDK)
+import { RunloopSDK } from '@runloop/api-client';
+const runloop  = new RunloopSDK();
+const secretResult = await runloop.api.secrets.create({ ... });
+```
+
+Once you've migrated your existing code to the new SDK client you can optionally go through and move from the API paradigm to the object oriented SDK.
 
 ```ts
-import fs from 'fs';
-import fetch from 'node-fetch';
-import Runloop, { toFile } from '@runloop/api-client';
+// Before (Legacy api client)
+import Runloop from '@runloop/api-client';
+const runloop = new Runloop()
 
-const client = new Runloop();
+const devboxResult = await runloop.devboxes.createAndAwaitRunning()
 
-// If you have access to Node `fs` we recommend using `fs.createReadStream()`:
-await client.devboxes.uploadFile('id', { path: 'path', file: fs.createReadStream('/path/to/file') });
+await runloop.devboxes.executeAndAwaitCompletion(devboxResult.id, { command: "touch example.txt" })
 
-// Or if you have the web `File` API you can pass a `File` instance:
-await client.devboxes.uploadFile('id', { path: 'path', file: new File(['my bytes'], 'file') });
+const snapshotResult = await runloop.devbox.snapshotDisk()
+await runloop.devboxes.snapshotDisk(devboxResult.id)
+await runloop.snapshots.awaitCompleted(snapshotResult.id)
+runloop.devbox.create({ snapshot_id: snapshotResult.id})
+...
+await runloop.devbox.shutdown(devboxResult.id)
 
+// After (SDK)
+import { RunloopSDK } from '@runloop/api-client';
+const runloop  = new RunloopSDK();
+
+const devbox = await runloop.devbox.create();
+await devbox.cmd.exec("touch example.txt");
+const snapshot = await devbox.snapshotDisk();
+await snapshot.createDevbox();
+...
+await devbox.shutdown();
+
+```
+
+## File write
+
+```ts
 // You can also pass a `fetch` `Response`:
-await client.devboxes.uploadFile('id', { path: 'path', file: await fetch('https://somesite/file') });
+await client.devboxes.uploadFile('id', {
+  path: 'path',
+  file: await fetch('https://somesite/file'),
+});
 
 // Finally, if none of the above are convenient, you can use our `toFile` helper:
-await client.devboxes.uploadFile('id', { path: 'path', file: await toFile(Buffer.from('my bytes'), 'file') });
+await client.devboxes.uploadFile('id', {
+  path: 'path',
+  file: await toFile(Buffer.from('my bytes'), 'file'),
+});
 await client.devboxes.uploadFile('id', {
   path: 'path',
   file: await toFile(new Uint8Array([0, 1, 2]), 'file'),
@@ -100,175 +283,36 @@ const devboxView = await client.devboxes.create().catch(async (err) => {
 });
 ```
 
-Error codes are as follows:
+## Advanced Configuration
 
-| Status Code | Error Type                 |
-| ----------- | -------------------------- |
-| 400         | `BadRequestError`          |
-| 401         | `AuthenticationError`      |
-| 403         | `PermissionDeniedError`    |
-| 404         | `NotFoundError`            |
-| 422         | `UnprocessableEntityError` |
-| 429         | `RateLimitError`           |
-| >=500       | `InternalServerError`      |
-| N/A         | `APIConnectionError`       |
+Customize the SDK with your API token, endpoint, timeout, and retry settings:
 
-### Retries
-
-Certain errors will be automatically retried 5 times by default, with a short exponential backoff.
-Connection errors (for example, due to a network connectivity problem), 408 Request Timeout, 409 Conflict,
-429 Rate Limit, and >=500 Internal errors will all be retried by default for GET requests. For POST requests,
-only 429 errors will be retried.
-
-You can use the `maxRetries` option to configure or disable this:
-
-<!-- prettier-ignore -->
-```js
-// Configure the default for all requests:
-const client = new Runloop({
-  maxRetries: 0, // default is 5
-});
-
-// Or, configure per-request:
-await client.devboxes.create({
-  maxRetries: 10,
+```typescript
+const runloop = new RunloopSDK({
+  bearerToken: process.env.RUNLOOP_API_KEY,
+  timeout: 60000, // 60 second timeout
+  maxRetries: 3, // Retry failed requests
 });
 ```
 
-### Timeouts
+## Error Handling
 
-Requests time out after 30 seconds by default. You can configure this with a `timeout` option:
+The SDK provides comprehensive error handling with typed exceptions:
 
-<!-- prettier-ignore -->
-```ts
-// Configure the default for all requests:
-const client = new Runloop({
-  timeout: 20 * 1000, // 20 seconds (default is 30 seconds)
-});
-
-// Override per-request:
-await client.devboxes.create({
-  timeout: 5 * 1000,
-});
-```
-
-On timeout, an `APIConnectionTimeoutError` is thrown.
-
-Note that requests which time out will be [retried twice by default](#retries).
-
-## Auto-pagination
-
-List methods in the Runloop API are paginated.
-You can use the `for await … of` syntax to iterate through items across all pages:
-
-```ts
-async function fetchAllDevboxViews(params) {
-  const allDevboxViews = [];
-  // Automatically fetches more pages as needed.
-  for await (const devboxView of client.devboxes.list()) {
-    allDevboxViews.push(devboxView);
+```typescript
+try {
+  const devbox = await runloop.devbox.create();
+  const result = await devbox.cmd.exec('invalid-command');
+} catch (error) {
+  if (error instanceof RunloopSDK.APIError) {
+    console.log('API Error:', error.status, error.message);
+  } else if (error instanceof RunloopSDK.APIConnectionError) {
+    console.log('Connection Error:', error.message);
+  } else {
+    console.log('Unexpected Error:', error);
   }
-  return allDevboxViews;
 }
 ```
-
-Alternatively, you can request a single page at a time:
-
-```ts
-let page = await client.devboxes.list();
-for (const devboxView of page.devboxes) {
-  console.log(devboxView);
-}
-
-// Convenience methods are provided for manually paginating:
-while (page.hasNextPage()) {
-  page = await page.getNextPage();
-  // ...
-}
-```
-
-## Advanced Usage
-
-### Accessing raw Response data (e.g., headers)
-
-The "raw" `Response` returned by `fetch()` can be accessed through the `.asResponse()` method on the `APIPromise` type that all methods return.
-
-You can also use the `.withResponse()` method to get the raw `Response` along with the parsed data.
-
-<!-- prettier-ignore -->
-```ts
-const client = new Runloop();
-
-const response = await client.devboxes.create().asResponse();
-console.log(response.headers.get('X-My-Header'));
-console.log(response.statusText); // access the underlying Response object
-
-const { data: devboxView, response: raw } = await client.devboxes.create().withResponse();
-console.log(raw.headers.get('X-My-Header'));
-console.log(devboxView.id);
-```
-
-### Making custom/undocumented requests
-
-This library is typed for convenient access to the documented API. If you need to access undocumented
-endpoints, params, or response properties, the library can still be used.
-
-#### Undocumented endpoints
-
-To make requests to undocumented endpoints, you can use `client.get`, `client.post`, and other HTTP verbs.
-Options on the client, such as retries, will be respected when making these requests.
-
-```ts
-await client.post('/some/path', {
-  body: { some_prop: 'foo' },
-  query: { some_query_arg: 'bar' },
-});
-```
-
-#### Undocumented request params
-
-To make requests using undocumented parameters, you may use `// @ts-expect-error` on the undocumented
-parameter. This library doesn't validate at runtime that the request matches the type, so any extra values you
-send will be sent as-is.
-
-```ts
-client.foo.create({
-  foo: 'my_param',
-  bar: 12,
-  // @ts-expect-error baz is not yet public
-  baz: 'undocumented option',
-});
-```
-
-For requests with the `GET` verb, any extra params will be in the query, all other requests will send the
-extra param in the body.
-
-If you want to explicitly send an extra argument, you can do so with the `query`, `body`, and `headers` request
-options.
-
-#### Undocumented response properties
-
-To access undocumented response properties, you may access the response object with `// @ts-expect-error` on
-the response object, or cast the response object to the requisite type. Like the request params, we do not
-validate or strip extra properties from the response from the API.
-
-### Customizing the fetch client
-
-By default, this library uses `node-fetch` in Node, and expects a global `fetch` function in other environments.
-
-If you would prefer to use a global, web-standards-compliant `fetch` function even in a Node environment,
-(for example, if you are running Node with `--experimental-fetch` or using NextJS which polyfills with `undici`),
-add the following import before your first import `from "Runloop"`:
-
-```ts
-// Tell TypeScript and the package to use the global web fetch instead of node-fetch.
-// Note, despite the name, this does not add any polyfills, but expects them to be provided if needed.
-import '@runloop/api-client/shims/web';
-import Runloop from '@runloop/api-client';
-```
-
-To do the inverse, add `import "@runloop/api-client/shims/node"` (which does import polyfills).
-This can also be useful if you are getting the wrong TypeScript types for `Response` ([more details](https://github.com/runloopai/api-client-ts/tree/main/src/_shims#readme)).
 
 ### Logging and middleware
 
@@ -277,9 +321,9 @@ which can be used to inspect or alter the `Request` or `Response` before/after e
 
 ```ts
 import { fetch } from 'undici'; // as one example
-import Runloop from '@runloop/api-client';
+import { RunloopSDK } from '@runloop/api-client';
 
-const client = new Runloop({
+const runloop = new RunloopSDK({
   fetch: async (url: RequestInfo, init?: RequestInit): Promise<Response> => {
     console.log('About to make a request', url, init);
     const response = await fetch(url, init);
@@ -300,19 +344,40 @@ If you would like to disable or customize this behavior, for example to use the 
 
 <!-- prettier-ignore -->
 ```ts
-import http from 'http';
-import { HttpsProxyAgent } from 'https-proxy-agent';
-
 // Configure the default for all requests:
-const client = new Runloop({
+const runloop = new RunloopSDK({
   httpAgent: new HttpsProxyAgent(process.env.PROXY_URL),
 });
 
 // Override per-request:
-await client.devboxes.create({
+await runloop.devboxes.create({...}, {
   httpAgent: new http.Agent({ keepAlive: false }),
 });
 ```
+
+### HTTP/2 transport
+
+On Node.js, the SDK sends requests over HTTP/2 **by default**, multiplexing many concurrent requests over a small number of TLS connections instead of opening a connection per request. The transport is built on Node's native `node:http2` and manages a bounded pool of persistent H2 sessions per origin, auto-scaling with load. On the web, Deno, and other runtimes the platform `fetch` already speaks HTTP/2, so this option is a no-op there.
+
+To tune the pool — for example to raise the number of connections for a high-concurrency workload — pass options as `http2`:
+
+<!-- prettier-ignore -->
+```ts
+const runloop = new RunloopSDK({
+  http2: { maxConnections: 20 },
+});
+```
+
+To opt out and use the HTTP/1.1 `node-fetch` transport, set `http2: false`:
+
+<!-- prettier-ignore -->
+```ts
+const runloop = new RunloopSDK({
+  http2: false,
+});
+```
+
+The `httpAgent` option only applies to the HTTP/1.1 transport. A Node `http.Agent` configures HTTP/1.1 socket pooling (keep-alive, max sockets), which has no equivalent under HTTP/2 — the H2 transport multiplexes over its own managed connections — so `httpAgent` has no effect there. To tune HTTP/2 connection behavior, use `http2: { … }` instead. To keep an existing `httpAgent` working, passing one without an explicit `http2` value keeps the client on HTTP/1.1 (with a one-time warning); pass `http2: false` to select HTTP/1.1 explicitly and silence the warning. If both `httpAgent` and `http2` are set, `httpAgent` is ignored (also warned once). A custom `fetch` always takes precedence over `http2`.
 
 ## Semantic versioning
 
@@ -333,7 +398,7 @@ TypeScript >= 4.5 is supported.
 The following runtimes are supported:
 
 - Web browsers (Up-to-date Chrome, Firefox, Safari, Edge, and more)
-- Node.js 18 LTS or later ([non-EOL](https://endoflife.date/nodejs)) versions.
+- Node.js 20.18.1 LTS or later ([non-EOL](https://endoflife.date/nodejs)) versions.
 - Deno v1.28.0 or higher.
 - Bun 1.0 or later.
 - Cloudflare Workers.
@@ -341,9 +406,18 @@ The following runtimes are supported:
 - Jest 28 or greater with the `"node"` environment (`"jsdom"` is not supported at this time).
 - Nitro v2.6 or greater.
 
-Note that React Native is not supported at this time.
-
 If you are interested in other runtime environments, please open or upvote an issue on GitHub.
+
+## Development
+
+After cloning the repository, run the bootstrap script and install git hooks:
+
+```sh
+./scripts/bootstrap
+./scripts/install-hooks
+```
+
+This installs pre-push hooks that run linting and verify generated files are up to date.
 
 ## Contributing
 

@@ -17,7 +17,11 @@ describe('resource scenarios', () => {
         scoring_function_parameters: [
           {
             name: 'name',
-            scorer: { pattern: 'pattern', search_directory: 'search_directory', type: 'ast_grep_scorer' },
+            scorer: {
+              pattern: 'pattern',
+              search_directory: 'search_directory',
+              type: 'ast_grep_scorer',
+            },
             weight: 0,
           },
         ],
@@ -34,7 +38,10 @@ describe('resource scenarios', () => {
 
   test('create: required and optional params', async () => {
     const response = await client.scenarios.create({
-      input_context: { problem_statement: 'problem_statement', additional_context: {} },
+      input_context: {
+        problem_statement: 'problem_statement',
+        additional_context: {},
+      },
       name: 'name',
       scoring_contract: {
         scoring_function_parameters: [
@@ -61,6 +68,13 @@ describe('resource scenarios', () => {
           custom_gb_memory: 0,
           keep_alive_time_seconds: 0,
           launch_commands: ['string'],
+          lifecycle: {
+            after_idle: { idle_time_seconds: 0, on_idle: 'shutdown' },
+            lifecycle_hooks: { suspend_commands: ['string'], suspend_deadline_ms: 0 },
+            resume_triggers: { axon_event: true, http: true },
+          },
+          network_policy_id: 'network_policy_id',
+          provisioning_tier: 'standard',
           required_services: ['string'],
           resource_size_request: 'X_SMALL',
           user_parameters: { uid: 0, username: 'username' },
@@ -72,6 +86,7 @@ describe('resource scenarios', () => {
       reference_output: 'reference_output',
       required_environment_variables: ['string'],
       required_secret_names: ['string'],
+      scorer_timeout_sec: 0,
       validation_type: 'UNSPECIFIED',
     });
   });
@@ -129,6 +144,13 @@ describe('resource scenarios', () => {
               custom_gb_memory: 0,
               keep_alive_time_seconds: 0,
               launch_commands: ['string'],
+              lifecycle: {
+                after_idle: { idle_time_seconds: 0, on_idle: 'shutdown' },
+                lifecycle_hooks: { suspend_commands: ['string'], suspend_deadline_ms: 0 },
+                resume_triggers: { axon_event: true, http: true },
+              },
+              network_policy_id: 'network_policy_id',
+              provisioning_tier: 'standard',
               required_services: ['string'],
               resource_size_request: 'X_SMALL',
               user_parameters: { uid: 0, username: 'username' },
@@ -136,12 +158,16 @@ describe('resource scenarios', () => {
             snapshot_id: 'snapshot_id',
             working_directory: 'working_directory',
           },
-          input_context: { additional_context: {}, problem_statement: 'problem_statement' },
+          input_context: {
+            additional_context: {},
+            problem_statement: 'problem_statement',
+          },
           metadata: { foo: 'string' },
           name: 'name',
           reference_output: 'reference_output',
           required_environment_variables: ['string'],
           required_secret_names: ['string'],
+          scorer_timeout_sec: 0,
           scoring_contract: {
             scoring_function_parameters: [
               {
@@ -185,10 +211,36 @@ describe('resource scenarios', () => {
     // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
     await expect(
       client.scenarios.list(
-        { benchmark_id: 'benchmark_id', limit: 0, name: 'name', starting_after: 'starting_after' },
+        {
+          benchmark_id: 'benchmark_id',
+          include_total_count: true,
+          limit: 0,
+          name: 'name',
+          search: 'search',
+          starting_after: 'starting_after',
+          validation_type: 'validation_type',
+        },
         { path: '/_stainless_unknown_path' },
       ),
     ).rejects.toThrow(Runloop.NotFoundError);
+  });
+
+  test('archive', async () => {
+    const responsePromise = client.scenarios.archive('id');
+    const rawResponse = await responsePromise.asResponse();
+    expect(rawResponse).toBeInstanceOf(Response);
+    const response = await responsePromise;
+    expect(response).not.toBeInstanceOf(Response);
+    const dataAndResponse = await responsePromise.withResponse();
+    expect(dataAndResponse.data).toBe(response);
+    expect(dataAndResponse.response).toBe(rawResponse);
+  });
+
+  test('archive: request options instead of params are passed correctly', async () => {
+    // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
+    await expect(client.scenarios.archive('id', { path: '/_stainless_unknown_path' })).rejects.toThrow(
+      Runloop.NotFoundError,
+    );
   });
 
   test('listPublic', async () => {
@@ -213,7 +265,13 @@ describe('resource scenarios', () => {
     // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
     await expect(
       client.scenarios.listPublic(
-        { limit: 0, name: 'name', starting_after: 'starting_after' },
+        {
+          include_total_count: true,
+          limit: 0,
+          name: 'name',
+          search: 'search',
+          starting_after: 'starting_after',
+        },
         { path: '/_stainless_unknown_path' },
       ),
     ).rejects.toThrow(Runloop.NotFoundError);
@@ -247,10 +305,24 @@ describe('resource scenarios', () => {
           custom_gb_memory: 0,
           keep_alive_time_seconds: 0,
           launch_commands: ['string'],
+          lifecycle: {
+            after_idle: { idle_time_seconds: 0, on_idle: 'shutdown' },
+            lifecycle_hooks: { suspend_commands: ['string'], suspend_deadline_ms: 0 },
+            resume_triggers: { axon_event: true, http: true },
+          },
+          network_policy_id: 'network_policy_id',
+          provisioning_tier: 'standard',
           required_services: ['string'],
           resource_size_request: 'X_SMALL',
           user_parameters: { uid: 0, username: 'username' },
         },
+        mounts: [
+          {
+            object_id: 'object_id',
+            object_path: 'object_path',
+            type: 'object_mount',
+          },
+        ],
         purpose: 'purpose',
         secrets: { foo: 'string' },
       },

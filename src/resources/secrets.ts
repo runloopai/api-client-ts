@@ -14,6 +14,13 @@ export class Secrets extends APIResource {
   }
 
   /**
+   * Retrieve a Secret by name. The secret value is not included for security.
+   */
+  retrieve(name: string, options?: Core.RequestOptions): Core.APIPromise<SecretView> {
+    return this._client.get(`/v1/secrets/${name}`, options);
+  }
+
+  /**
    * Update the value of an existing Secret by name. The new value will be encrypted
    * at rest.
    */
@@ -77,11 +84,6 @@ export interface SecretListView {
   has_more: boolean;
 
   /**
-   * Number of Secrets remaining after this page.
-   */
-  remaining_count: number;
-
-  /**
    * List of Secret objects. Values are omitted for security.
    */
   secrets: Array<SecretView>;
@@ -89,7 +91,7 @@ export interface SecretListView {
   /**
    * Total number of Secrets across all pages.
    */
-  total_count: number;
+  total_count?: number | null;
 }
 
 /**
@@ -154,7 +156,7 @@ export interface SecretUpdateParams {
 
 export interface SecretListParams {
   /**
-   * The limit of items to return. Default is 20.
+   * The limit of items to return. Default is 20. Max is 5000.
    */
   limit?: number;
 }

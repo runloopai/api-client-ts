@@ -3,7 +3,6 @@
 import { APIResource } from '../../resource';
 import { isRequestOptions } from '../../core';
 import * as Core from '../../core';
-import * as ScenariosAPI from './scenarios';
 import { ScenarioScorersCursorIDPage, type ScenarioScorersCursorIDPageParams } from '../../pagination';
 
 export class Scorers extends APIResource {
@@ -54,17 +53,6 @@ export class Scorers extends APIResource {
       ...options,
     });
   }
-
-  /**
-   * Validate a scenario scorer.
-   */
-  validate(
-    id: string,
-    body: ScorerValidateParams,
-    options?: Core.RequestOptions,
-  ): Core.APIPromise<ScorerValidateResponse> {
-    return this._client.post(`/v1/scenarios/scorers/${id}/validate`, { body, ...options });
-  }
 }
 
 export class ScorerListResponsesScenarioScorersCursorIDPage extends ScenarioScorersCursorIDPage<ScorerListResponse> {}
@@ -79,7 +67,7 @@ export interface ScorerCreateResponse {
   id: string;
 
   /**
-   * Bash script that takes in $RL_TEST_CONTEXT as env variable and runs scoring.
+   * Bash script that takes in $RL_SCORER_CONTEXT as env variable and runs scoring.
    */
   bash_script: string;
 
@@ -99,7 +87,7 @@ export interface ScorerRetrieveResponse {
   id: string;
 
   /**
-   * Bash script that takes in $RL_TEST_CONTEXT as env variable and runs scoring.
+   * Bash script that takes in $RL_SCORER_CONTEXT as env variable and runs scoring.
    */
   bash_script: string;
 
@@ -119,7 +107,7 @@ export interface ScorerUpdateResponse {
   id: string;
 
   /**
-   * Bash script that takes in $RL_TEST_CONTEXT as env variable and runs scoring.
+   * Bash script that takes in $RL_SCORER_CONTEXT as env variable and runs scoring.
    */
   bash_script: string;
 
@@ -139,7 +127,7 @@ export interface ScorerListResponse {
   id: string;
 
   /**
-   * Bash script that takes in $RL_TEST_CONTEXT as env variable and runs scoring.
+   * Bash script that takes in $RL_SCORER_CONTEXT as env variable and runs scoring.
    */
   bash_script: string;
 
@@ -147,28 +135,6 @@ export interface ScorerListResponse {
    * Name of the type of scenario scorer.
    */
   type: string;
-}
-
-export interface ScorerValidateResponse {
-  /**
-   * Name of the custom scorer.
-   */
-  name: string;
-
-  /**
-   * Json context that gets passed to the custom scorer
-   */
-  scoring_context: unknown;
-
-  /**
-   * Result of the scoring function.
-   */
-  scoring_result: ScenariosAPI.ScoringFunctionResultView;
-
-  /**
-   * The Environment in which the Scenario will run.
-   */
-  environment_parameters?: ScenariosAPI.ScenarioEnvironment;
 }
 
 export interface ScorerCreateParams {
@@ -197,18 +163,17 @@ export interface ScorerUpdateParams {
   type: string;
 }
 
-export interface ScorerListParams extends ScenarioScorersCursorIDPageParams {}
-
-export interface ScorerValidateParams {
+export interface ScorerListParams extends ScenarioScorersCursorIDPageParams {
   /**
-   * Json context that gets passed to the custom scorer
+   * If true (default), includes total_count in the response. Set to false to skip
+   * the count query for better performance on large datasets.
    */
-  scoring_context: unknown;
+  include_total_count?: boolean;
 
   /**
-   * The Environment in which the Scenario will run.
+   * Search by scenario scorer ID or type.
    */
-  environment_parameters?: ScenariosAPI.ScenarioEnvironment;
+  search?: string;
 }
 
 Scorers.ScorerListResponsesScenarioScorersCursorIDPage = ScorerListResponsesScenarioScorersCursorIDPage;
@@ -219,11 +184,9 @@ export declare namespace Scorers {
     type ScorerRetrieveResponse as ScorerRetrieveResponse,
     type ScorerUpdateResponse as ScorerUpdateResponse,
     type ScorerListResponse as ScorerListResponse,
-    type ScorerValidateResponse as ScorerValidateResponse,
     ScorerListResponsesScenarioScorersCursorIDPage as ScorerListResponsesScenarioScorersCursorIDPage,
     type ScorerCreateParams as ScorerCreateParams,
     type ScorerUpdateParams as ScorerUpdateParams,
     type ScorerListParams as ScorerListParams,
-    type ScorerValidateParams as ScorerValidateParams,
   };
 }

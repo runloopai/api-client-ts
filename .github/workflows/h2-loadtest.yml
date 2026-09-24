@@ -1,0 +1,36 @@
+name: H2 Load Tests
+
+on:
+  schedule:
+    - cron: '0 6 * * *'  # 06:00 UTC daily
+  workflow_dispatch:
+
+jobs:
+  loadtest:
+    name: h2-transport load tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: runloopai/checkout@main
+
+      - name: Set up Node
+        uses: runloopai/setup-node@main
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: yarn --frozen-lockfile
+
+      - name: Connect to Tailscale
+        uses: tailscale/github-action@306e68a486fd2350f2bfc3b19fcd143891a4a2d8 # v4.1.2
+        with:
+          oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
+          oauth-secret: ${{ secrets.TS_OAUTH_SECRET }}
+          tags: tag:ci
+          hostname: github-ci-${{ github.run_id }}-loadtest
+
+      - name: Run load tests and push to Loki
+        env:
+          LOKI_URL: https://dev-loki
+        run: npx tsx loadtest/push-to-loki.ts

@@ -2,22 +2,9 @@
 
 import { APIResource } from '../../resource';
 import { isRequestOptions } from '../../core';
+import { APIPromise } from '../../core';
 import * as Core from '../../core';
 import * as Shared from '../shared';
-import * as BrowsersAPI from './browsers';
-import { BrowserCreateParams, BrowserView, Browsers } from './browsers';
-import * as ComputersAPI from './computers';
-import {
-  ComputerCreateParams,
-  ComputerKeyboardInteractionParams,
-  ComputerKeyboardInteractionResponse,
-  ComputerMouseInteractionParams,
-  ComputerMouseInteractionResponse,
-  ComputerScreenInteractionParams,
-  ComputerScreenInteractionResponse,
-  ComputerView,
-  Computers,
-} from './computers';
 import * as DiskSnapshotsAPI from './disk-snapshots';
 import {
   DevboxSnapshotAsyncStatusView,
@@ -46,8 +33,13 @@ import {
   DiskSnapshotsCursorIDPage,
   type DiskSnapshotsCursorIDPageParams,
 } from '../../pagination';
+import { Stream } from '../../streaming';
 import { type Response } from '../../_shims/index';
-import { poll, PollingOptions } from '@runloop/api-client/lib/polling';
+import {
+  longPollUntil,
+  LongPollRequestOptions,
+  resolveLongPollTimeoutMs,
+} from '@runloop/api-client/lib/polling';
 import { awaitDevboxState } from '@runloop/api-client/lib/devbox-state';
 import { DevboxTools } from './tools';
 import { uuidv7 } from 'uuidv7';
@@ -57,17 +49,16 @@ const DEVBOX_BOOTING_STATES: DevboxStatus[] = ['provisioning', 'initializing'];
 
 export class Devboxes extends APIResource {
   diskSnapshots: DiskSnapshotsAPI.DiskSnapshots = new DiskSnapshotsAPI.DiskSnapshots(this._client);
-  browsers: BrowsersAPI.Browsers = new BrowsersAPI.Browsers(this._client);
-  computers: ComputersAPI.Computers = new ComputersAPI.Computers(this._client);
   logs: LogsAPI.Logs = new LogsAPI.Logs(this._client);
   executions: ExecutionsAPI.Executions = new ExecutionsAPI.Executions(this._client);
 
   /**
-   * Create a Devbox and begin the boot process. The Devbox will initially launch in
-   * the 'provisioning' state while Runloop allocates the necessary infrastructure.
-   * It will transition to the 'initializing' state while the booted Devbox runs any
-   * Runloop or user defined set up scripts. Finally, the Devbox will transition to
-   * the 'running' state when it is ready for use.
+   * Create a Devbox and begin the boot process. Standard Devboxes initially report
+   * the 'provisioning' state. FLEX Devboxes initially report the 'queued' state
+   * while waiting for infrastructure allocation, then transition to 'provisioning'
+   * once assigned to a node. The Devbox transitions to 'initializing' while the
+   * booted Devbox runs Runloop or user-defined setup scripts, then to 'running' when
+   * it is ready for use.
    */
   create(body?: DevboxCreateParams, options?: Core.RequestOptions): Core.APIPromise<DevboxView>;
   create(options?: Core.RequestOptions): Core.APIPromise<DevboxView>;
@@ -90,44 +81,40 @@ export class Devboxes extends APIResource {
 
   /**
    * Wait for a devbox to reach the running state.
-   * Polls the devbox status until it reaches running state or fails with an error.
+   * Long Polls the devbox status until it reaches running state.
    *
    * @param id - Devbox ID
-   * @param options - request options to specify retries, timeout, polling, etc.
+   * @param options - request options with optional long-poll configuration.
    */
-  async awaitRunning(
-    id: string,
-    options?: Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxView>> },
-  ): Promise<DevboxView> {
+  async awaitRunning(id: string, options?: LongPollRequestOptions<DevboxView>): Promise<DevboxView> {
     return awaitDevboxState<DevboxView>({
       client: this._client,
       devboxId: id,
       targetState: 'running',
       statesToCheck: ['running', 'failure', 'shutdown'],
       transitionStates: DEVBOX_BOOTING_STATES,
-      pollingOptions: options?.polling as Partial<PollingOptions<DevboxView>> | undefined,
+      timeoutMs: resolveLongPollTimeoutMs(options),
+      signal: options?.signal,
       errorMessage: (devboxId, actualState) => `Devbox ${devboxId} is in non-running state ${actualState}`,
     });
   }
 
   /**
    * Wait for a devbox to reach the suspended state.
-   * Polls the devbox status until it reaches suspended state or fails with an error.
+   * Long Polls the devbox status until it reaches suspended state.
    *
    * @param id - Devbox ID
-   * @param options - request options to specify retries, timeout, polling, etc.
+   * @param options - request options with optional long-poll configuration.
    */
-  async awaitSuspended(
-    id: string,
-    options?: Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxView>> },
-  ): Promise<DevboxView> {
+  async awaitSuspended(id: string, options?: LongPollRequestOptions<DevboxView>): Promise<DevboxView> {
     return awaitDevboxState<DevboxView>({
       client: this._client,
       devboxId: id,
       targetState: 'suspended',
       statesToCheck: ['suspended', 'failure', 'shutdown'],
       transitionStates: ['suspending'],
-      pollingOptions: options?.polling as Partial<PollingOptions<DevboxView>> | undefined,
+      timeoutMs: resolveLongPollTimeoutMs(options),
+      signal: options?.signal,
       errorMessage: (devboxId, actualState) => `Devbox ${devboxId} is in non-suspended state ${actualState}`,
     });
   }
@@ -137,18 +124,25 @@ export class Devboxes extends APIResource {
    * This is a convenience method that combines create() and awaitDevboxRunning().
    *
    * @param body - DevboxCreateParams
-   * @param options - request options to specify retries, timeout, polling, etc.
+   * @param options - request options with optional long-poll configuration.
    */
   async createAndAwaitRunning(
     body?: DevboxCreateParams,
-    options?: Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxView>> },
+    options?: LongPollRequestOptions<DevboxView>,
   ): Promise<DevboxView> {
-    const devbox = await this.create(body, options);
-    return this.awaitRunning(devbox.id, options);
+    const { longPoll, polling, ...requestOptions } = options ?? {};
+    const devbox = (await this._client.post('/v1/devboxes/create_and_await_running', {
+      body: body ?? {},
+      ...requestOptions,
+    })) as DevboxView;
+    if (devbox.status === 'running') {
+      return devbox;
+    }
+    return this.awaitRunning(devbox.id, { ...requestOptions, longPoll, polling });
   }
   /**
-   * Updates a devbox by doing a complete update the existing name,metadata fields.
-   * It does not patch partial values.
+   * Updates the specified Devbox fields. Omitted fields are left unchanged. An empty
+   * name clears the name, and an empty metadata map clears the metadata.
    */
   update(id: string, body?: DevboxUpdateParams, options?: Core.RequestOptions): Core.APIPromise<DevboxView>;
   update(id: string, options?: Core.RequestOptions): Core.APIPromise<DevboxView>;
@@ -182,21 +176,56 @@ export class Devboxes extends APIResource {
   }
 
   /**
+   * Mint a token that lets a running Devbox call an external API through the Runloop
+   * agent gateway, using the credential in the supplied secret. The gateway applies
+   * the credential to proxied requests, so the real API key is never exposed to the
+   * Devbox.
+   *
+   * The token is bound to this Devbox and is only accepted for requests that
+   * originate from it. Nothing is stored on the Devbox: the token is returned to the
+   * caller and is not re-issued when the Devbox is resumed.
+   */
+  createGatewayToken(
+    id: string,
+    body: DevboxCreateGatewayTokenParams,
+    options?: Core.RequestOptions,
+  ): Core.APIPromise<GatewayTokenView> {
+    return this._client.post(`/v1/devboxes/${id}/create_gateway_token`, { body, ...options });
+  }
+
+  /**
+   * [Beta] Mint a token that lets a running Devbox reach an upstream MCP (Model
+   * Context Protocol) server through the Runloop MCP hub, using the credential in
+   * the supplied secret. Tool access is limited to the MCP config's allowed_tools,
+   * and the credential itself is never exposed to the Devbox.
+   *
+   * The token is bound to this Devbox and is only accepted for requests that
+   * originate from it. Nothing is stored on the Devbox: the token is returned to the
+   * caller and is not re-issued when the Devbox is resumed.
+   */
+  createMcpToken(
+    id: string,
+    body: DevboxCreateMcpTokenParams,
+    options?: Core.RequestOptions,
+  ): Core.APIPromise<McpTokenView> {
+    return this._client.post(`/v1/devboxes/${id}/create_mcp_token`, { body, ...options });
+  }
+
+  /**
+   * Create an ephemeral authenticated tunnel for terminal access to a running
+   * Devbox. This tunnel is not persisted on the Devbox and is generated fresh on
+   * each request. The returned auth_token should be passed as a Bearer token in the
+   * X-Runloop-Tunnel-Authorization header.
+   */
+  createPtyTunnel(id: string, options?: Core.RequestOptions): Core.APIPromise<PtyTunnelView> {
+    return this._client.post(`/v1/devboxes/${id}/create_pty_tunnel`, options);
+  }
+
+  /**
    * Create an SSH key for a Devbox to enable remote access.
    */
   createSSHKey(id: string, options?: Core.RequestOptions): Core.APIPromise<DevboxCreateSSHKeyResponse> {
     return this._client.post(`/v1/devboxes/${id}/create_ssh_key`, options);
-  }
-
-  /**
-   * Create a live tunnel to an available port on the Devbox.
-   */
-  createTunnel(
-    id: string,
-    body: DevboxCreateTunnelParams,
-    options?: Core.RequestOptions,
-  ): Core.APIPromise<DevboxTunnelView> {
-    return this._client.post(`/v1/devboxes/${id}/create_tunnel`, { body, ...options });
   }
 
   /**
@@ -217,11 +246,35 @@ export class Devboxes extends APIResource {
   ): Core.APIPromise<Response> {
     return this._client.post(`/v1/devboxes/${id}/download_file`, {
       body,
-      timeout: (this._client as any)._options.timeout ?? 600000,
+      timeout: this._client.timeout ?? 600000,
       ...options,
       headers: { Accept: 'application/octet-stream', ...options?.headers },
       __binaryResponse: true,
     });
+  }
+
+  /**
+   * Enable a V2 tunnel for an existing running Devbox. Tunnels provide encrypted
+   * URL-based access to the Devbox without exposing internal IDs. The tunnel URL
+   * format is: https://&#123;port&#125;-&#123;tunnel_key&#125;.tunnel.runloop.ai
+   *
+   * Each Devbox can have one tunnel.
+   */
+  enableTunnel(
+    id: string,
+    body?: DevboxEnableTunnelParams,
+    options?: Core.RequestOptions,
+  ): Core.APIPromise<TunnelView>;
+  enableTunnel(id: string, options?: Core.RequestOptions): Core.APIPromise<TunnelView>;
+  enableTunnel(
+    id: string,
+    body: DevboxEnableTunnelParams | Core.RequestOptions = {},
+    options?: Core.RequestOptions,
+  ): Core.APIPromise<TunnelView> {
+    if (isRequestOptions(body)) {
+      return this.enableTunnel(id, {}, body);
+    }
+    return this._client.post(`/v1/devboxes/${id}/enable_tunnel`, { body, ...options });
   }
 
   /**
@@ -243,31 +296,33 @@ export class Devboxes extends APIResource {
         command_id: body.command_id || uuidv7(),
       },
       query: { last_n },
-      timeout: (this._client as any)._options.timeout ?? 600000,
+      timeout: this._client.timeout ?? 600000,
       ...options,
     });
   }
 
   /**
    * Execute a command and wait for it to complete with optimal latency for long running commands that can't rely on just polling.
+   *
+   * @param devboxId - Devbox ID
+   * @param params - Execution parameters.
+   * @param options - request options with optional long-poll configuration.
    */
   async executeAndAwaitCompletion(
     devboxId: string,
     params: Omit<DevboxExecuteParams, 'command_id'>,
-    options?: Core.RequestOptions & { polling?: Partial<PollingOptions<DevboxAsyncExecutionDetailView>> },
+    options?: LongPollRequestOptions<DevboxAsyncExecutionDetailView>,
   ): Promise<DevboxAsyncExecutionDetailView> {
+    const { longPoll, polling, ...requestOptions } = options ?? {};
+    const effectiveTimeoutMs = resolveLongPollTimeoutMs(options);
     const commandId = uuidv7();
     const execution = await this.execute(
       devboxId,
       { ...params, command_id: commandId },
-      // For first poll, if timeout is provided, use the timeout from the request options
-      // Otherwise, if polling options are provided, use the timeout from the polling options
-      // Otherwise, use the default timeout of 600 seconds
-      { ...{ timeout: options?.timeout ?? options?.polling?.timeoutMs ?? 600000 }, ...options },
+      { ...{ timeout: requestOptions?.timeout ?? effectiveTimeoutMs ?? 600000 }, ...requestOptions },
     );
 
     if (execution.status === 'completed') {
-      // If the execution completes in the initial timeout, return the result
       return execution;
     }
 
@@ -279,23 +334,22 @@ export class Devboxes extends APIResource {
       waitForCommandBody.last_n = params.last_n;
     }
 
-    const finalResult = await poll(
-      () => this.waitForCommand(devboxId, execution.execution_id, waitForCommandBody),
-      () => this.waitForCommand(devboxId, execution.execution_id, waitForCommandBody),
+    const finalResult = await longPollUntil(
+      (signal) =>
+        this.waitForCommand(devboxId, execution.execution_id, waitForCommandBody, {
+          signal,
+          // Per-request HTTP timeout must exceed the server's max long-poll hold (25s)
+          // so the server's 408 always arrives before the client aborts the connection.
+          // The longPollUntil AbortSignal enforces the caller's actual deadline.
+          timeout: 600000,
+          // Disable base-client retries so 408s surface immediately to longPollUntil
+          // (the server's wait_for_status endpoint sets x-should-retry: true for executions).
+          maxRetries: 0,
+        }),
       {
-        ...options?.polling,
-        shouldStop: (result) => {
-          return result.status === 'completed';
-        },
-        onError: (error) => {
-          if (error.status === 408) {
-            // Return a placeholder result to continue polling
-            return execution;
-          }
-
-          // For any other error, rethrow it
-          throw error;
-        },
+        timeoutMs: effectiveTimeoutMs,
+        shouldStop: (result) => result.status === 'completed',
+        signal: requestOptions.signal,
       },
     );
 
@@ -328,7 +382,7 @@ export class Devboxes extends APIResource {
   ): Core.APIPromise<DevboxExecutionDetailView> {
     return this._client.post(`/v1/devboxes/${id}/execute_sync`, {
       body,
-      timeout: (this._client as any)._options.timeout ?? 600000,
+      timeout: this._client.timeout ?? 600000,
       ...options,
     });
   }
@@ -337,13 +391,13 @@ export class Devboxes extends APIResource {
    * Send a 'Keep Alive' signal to a running Devbox that is configured to shutdown on
    * idle so the idle time resets.
    */
-  keepAlive(id: string, options?: Core.RequestOptions): Core.APIPromise<unknown> {
+  keepAlive(id: string, options?: Core.RequestOptions): Core.APIPromise<DevboxKeepAliveResponse> {
     return this._client.post(`/v1/devboxes/${id}/keep_alive`, options);
   }
 
   /**
-   * List all snapshots of a Devbox while optionally filtering by Devbox ID and
-   * metadata.
+   * List all snapshots of a Devbox while optionally filtering by Devbox ID, source
+   * Blueprint ID, and metadata.
    */
   listDiskSnapshots(
     query?: DevboxListDiskSnapshotsParams,
@@ -378,21 +432,17 @@ export class Devboxes extends APIResource {
   ): Core.APIPromise<string> {
     return this._client.post(`/v1/devboxes/${id}/read_file_contents`, {
       body,
-      timeout: (this._client as any)._options.timeout ?? 600000,
+      timeout: this._client.timeout ?? 600000,
       ...options,
       headers: { Accept: 'text/plain', ...options?.headers },
     });
   }
 
   /**
-   * Remove a previously opened tunnel on the Devbox.
+   * Remove an existing V2 tunnel from the Devbox.
    */
-  removeTunnel(
-    id: string,
-    body: DevboxRemoveTunnelParams,
-    options?: Core.RequestOptions,
-  ): Core.APIPromise<unknown> {
-    return this._client.post(`/v1/devboxes/${id}/remove_tunnel`, { body, ...options });
+  removeTunnel(id: string, options?: Core.RequestOptions): Core.APIPromise<unknown> {
+    return this._client.post(`/v1/devboxes/${id}/remove_tunnel`, options);
   }
 
   /**
@@ -405,12 +455,38 @@ export class Devboxes extends APIResource {
   }
 
   /**
+   * Get resource usage metrics for a specific Devbox. Returns CPU, memory, and disk
+   * consumption calculated from the Devbox's lifecycle, excluding any suspended
+   * periods for CPU and memory. Disk usage includes the full elapsed time since
+   * storage is consumed even when suspended.
+   */
+  retrieveResourceUsage(id: string, options?: Core.RequestOptions): Core.APIPromise<DevboxResourceUsageView> {
+    return this._client.get(`/v1/devboxes/${id}/usage`, options);
+  }
+
+  /**
    * Shutdown a running Devbox. This will permanently stop the Devbox. If you want to
    * save the state of the Devbox, you should take a snapshot before shutting down or
-   * should suspend the Devbox instead of shutting down.
+   * should suspend the Devbox instead of shutting down. If the Devbox has any
+   * in-progress snapshots, the shutdown will be rejected with a 409 Conflict unless
+   * force=true is specified.
    */
-  shutdown(id: string, options?: Core.RequestOptions): Core.APIPromise<DevboxView> {
-    return this._client.post(`/v1/devboxes/${id}/shutdown`, options);
+  shutdown(
+    id: string,
+    params?: DevboxShutdownParams,
+    options?: Core.RequestOptions,
+  ): Core.APIPromise<DevboxView>;
+  shutdown(id: string, options?: Core.RequestOptions): Core.APIPromise<DevboxView>;
+  shutdown(
+    id: string,
+    params: DevboxShutdownParams | Core.RequestOptions = {},
+    options?: Core.RequestOptions,
+  ): Core.APIPromise<DevboxView> {
+    if (isRequestOptions(params)) {
+      return this.shutdown(id, {}, params);
+    }
+    const { force } = params;
+    return this._client.post(`/v1/devboxes/${id}/shutdown`, { query: { force }, ...options });
   }
 
   /**
@@ -433,7 +509,7 @@ export class Devboxes extends APIResource {
     }
     return this._client.post(`/v1/devboxes/${id}/snapshot_disk`, {
       body,
-      timeout: (this._client as any)._options.timeout ?? 600000,
+      timeout: this._client.timeout ?? 600000,
       ...options,
     });
   }
@@ -483,7 +559,7 @@ export class Devboxes extends APIResource {
       `/v1/devboxes/${id}/upload_file`,
       Core.multipartFormRequestOptions({
         body,
-        timeout: (this._client as any)._options.timeout ?? 600000,
+        timeout: this._client.timeout ?? 600000,
         ...options,
       }),
     );
@@ -491,7 +567,7 @@ export class Devboxes extends APIResource {
 
   /**
    * Polls the asynchronous execution's status until it reaches one of the desired
-   * statuses or times out. Defaults to 60 seconds.
+   * statuses or times out. Max is 25 seconds.
    */
   waitForCommand(
     devboxId: string,
@@ -508,6 +584,19 @@ export class Devboxes extends APIResource {
   }
 
   /**
+   * Subscribe, via server-sent events, to pending infrastructure evictions for every
+   * Devbox in the account. On connect the stream emits one event per Devbox that
+   * currently has a pending eviction, then one event as each further eviction is
+   * scheduled. Best-effort and advisory: a Devbox stays running until its deadline,
+   * and delivery is not guaranteed.
+   */
+  watchEvictions(options?: Core.RequestOptions): APIPromise<Stream<DevboxEvictionEventView>> {
+    return this._client.get('/v1/devboxes/evictions/watch', { ...options, stream: true }) as APIPromise<
+      Stream<DevboxEvictionEventView>
+    >;
+  }
+
+  /**
    * Write UTF-8 string contents to a file at path on the Devbox. Note for large
    * files (larger than 100MB), the upload_file endpoint must be used.
    */
@@ -518,7 +607,7 @@ export class Devboxes extends APIResource {
   ): Core.APIPromise<DevboxExecutionDetailView> {
     return this._client.post(`/v1/devboxes/${id}/write_file_contents`, {
       body,
-      timeout: (this._client as any)._options.timeout ?? 600000,
+      timeout: this._client.timeout ?? 600000,
       ...options,
     });
   }
@@ -533,6 +622,11 @@ export class DevboxViewsDevboxesCursorIDPage extends DevboxesCursorIDPage<Devbox
 
 export class DevboxSnapshotViewsDiskSnapshotsCursorIDPage extends DiskSnapshotsCursorIDPage<DevboxSnapshotView> {}
 
+/**
+ * Details of an asynchronous command execution on a Devbox.
+ *
+ * @category Devbox Types
+ */
 export interface DevboxAsyncExecutionDetailView {
   /**
    * Devbox id where command was executed.
@@ -583,6 +677,19 @@ export interface DevboxAsyncExecutionDetailView {
   stdout_truncated?: boolean | null;
 }
 
+export interface DevboxEvictionEventView {
+  /**
+   * The ID of the Devbox with a pending eviction.
+   */
+  devbox_id: string;
+
+  /**
+   * Unix timestamp (milliseconds) after which the Devbox will be suspended. Advisory
+   * and best-effort.
+   */
+  eviction_deadline_ms: number;
+}
+
 export interface DevboxExecutionDetailView {
   /**
    * Devbox id where command was executed.
@@ -626,9 +733,58 @@ export interface DevboxListView {
 
   has_more: boolean;
 
-  remaining_count: number;
+  total_count?: number | null;
+}
 
-  total_count: number;
+export interface DevboxResourceUsageView {
+  /**
+   * The devbox ID.
+   */
+  id: string;
+
+  /**
+   * Disk usage in GB-seconds (total_elapsed_seconds multiplied by disk size in GB).
+   * Disk is billed for elapsed time since storage is consumed even when suspended.
+   */
+  disk_gb_seconds: number;
+
+  /**
+   * Memory usage in GB-seconds (total_active_seconds multiplied by memory in GB).
+   */
+  memory_gb_seconds: number;
+
+  /**
+   * The devbox creation time in milliseconds since epoch.
+   */
+  start_time_ms: number;
+
+  /**
+   * The current status of the devbox.
+   */
+  status: string;
+
+  /**
+   * Total time in seconds the devbox was actively running (excludes time spent
+   * suspended).
+   */
+  total_active_seconds: number;
+
+  /**
+   * Total elapsed time in seconds from devbox creation to now (or end time if
+   * terminated). Includes all time regardless of devbox state.
+   */
+  total_elapsed_seconds: number;
+
+  /**
+   * vCPU usage in vCPU-seconds (total_active_seconds multiplied by the number of
+   * vCPUs).
+   */
+  vcpu_seconds: number;
+
+  /**
+   * The devbox end time in milliseconds since epoch, or null if still running.
+   */
+  end_time_ms?: number | null;
 }
 
 export interface DevboxSendStdInRequest {
@@ -663,16 +819,19 @@ export interface DevboxSendStdInResult {
 export interface DevboxSnapshotListView {
   has_more: boolean;
 
-  remaining_count: number;
-
   /**
    * List of snapshots matching filter.
    */
   snapshots: Array<DevboxSnapshotView>;
 
-  total_count: number;
+  total_count?: number | null;
 }
 
+/**
+ * View of a Devbox disk snapshot.
+ *
+ * @category Snapshot Types
+ */
 export interface DevboxSnapshotView {
   /**
    * The unique identifier of the snapshot.
@@ -703,29 +862,24 @@ export interface DevboxSnapshotView {
    * (Optional) The custom name of the snapshot.
    */
   name?: string | null;
-}
-
-export interface DevboxTunnelView {
-  /**
-   * ID of the Devbox the tunnel routes to.
-   */
-  devbox_id: string;
 
   /**
-   * Port of the Devbox the tunnel routes to.
+   * (Optional) The size of the snapshot in bytes, relative to the base blueprint.
    */
-  port: number;
+  size_bytes?: number | null;
 
   /**
-   * Public url used to access Devbox.
+   * (Optional) The source Blueprint ID this snapshot was created from.
    */
-  url: string;
+  source_blueprint_id?: string | null;
 }
 
 /**
  * A Devbox represents a virtual development environment. It is an isolated sandbox
  * that can be given to agents and used to run arbitrary code such as AI generated
  * code.
+ *
+ * @category Devbox Types
  */
 export interface DevboxView {
   /**
@@ -734,10 +888,9 @@ export interface DevboxView {
   id: string;
 
   /**
-   * A list of capability groups this devbox has access to. This allows devboxes to
-   * be compatible with certain tools sets like computer usage APIs.
+   * A list of capability groups this devbox has access to.
    */
-  capabilities: Array<'unknown' | 'computer_usage' | 'browser_usage' | 'docker_in_docker'>;
+  capabilities: Array<'unknown' | 'docker_in_docker'>;
 
   /**
    * Creation time of the Devbox (Unix timestamp milliseconds).
@@ -769,6 +922,8 @@ export interface DevboxView {
    * The current status of the Devbox.
    */
   status:
+    | 'scheduled'
+    | 'queued'
     | 'provisioning'
     | 'initializing'
     | 'running'
@@ -785,9 +940,23 @@ export interface DevboxView {
   blueprint_id?: string | null;
 
   /**
-   * The failure reason if the Devbox failed, if the Devbox has a 'failure' status.
+   * The category of failure experienced by the Devbox.
+   *
+   * out_of_memory: The Devbox ran out of memory at runtime. Use launch parameters to
+   * request a larger resource size. out_of_disk: The Devbox ran out of disk at
+   * runtime. Please reach out to support for us to better support your use case.
+   * execution_failed: The Devbox failed at runtime. Please use the dashboard to look
+   * at the logs of the failure. health_check_failed: The Devbox failed its health
+   * checks. This may indicate resource utilization is close to the maximum. Consider
+   * requesting a larger resource size.
    */
-  failure_reason?: 'out_of_memory' | 'out_of_disk' | 'execution_failed' | null;
+  failure_reason?: 'out_of_memory' | 'out_of_disk' | 'execution_failed' | 'health_check_failed' | null;
+
+  /**
+   * Gateway specifications configured for this devbox. Map key is the environment
+   * variable prefix (e.g., 'GWS_ANTHROPIC').
+   */
+  gateway_specs?: { [key: string]: DevboxView.GatewaySpecs } | null;
 
   /**
    * The ID of the initiator that created the Devbox.
@@ -797,7 +966,14 @@ export interface DevboxView {
   /**
    * The type of initiator that created the Devbox.
    */
-  initiator_type?: 'unknown' | 'api' | 'scenario';
+  initiator_type?: 'unknown' | 'api' | 'scenario' | 'scoring_validation' | 'reflex';
+
+  /**
+   * [Beta] MCP specifications configured for this devbox. Map key is the environment
+   * variable name for the MCP token envelope. Each spec links an MCP config to a
+   * secret for MCP server access through the MCP hub.
+   */
+  mcp_specs?: { [key: string]: DevboxView.McpSpecs } | null;
 
   /**
    * The name of the Devbox.
@@ -805,34 +981,58 @@ export interface DevboxView {
   name?: string | null;
 
   /**
-   * The shutdown reason if the Devbox shutdown, if the Devbox has a 'shutdown'
-   * status.
+   * The reason that caused the transition of the Devbox to the shutown state.
+   *
+   * api_shutdown: The Devbox shutdown due to API request. entrypoint_exit: The
+   * Devbox entrypoint program completed. idle: The Devbox shutdown due to configured
+   * action on idle configuration. ttl_expired: The Devbox shutdown due to TTL
+   * expiration.
    */
-  shutdown_reason?: 'api_shutdown' | 'keep_alive_timeout' | 'entrypoint_exit' | 'idle' | null;
+  shutdown_reason?: 'api_shutdown' | 'keep_alive_timeout' | 'entrypoint_exit' | 'idle' | 'ttl_expired' | null;
 
   /**
    * The Snapshot ID used in creation of the Devbox, if the devbox was created from a
    * Snapshot.
    */
   snapshot_id?: string | null;
+
+  /**
+   * A V2 tunnel provides secure HTTP access to services running on a Devbox. Tunnels
+   * allow external clients to reach web servers, APIs, or other HTTP services
+   * running inside a Devbox without requiring direct network access. Each tunnel is
+   * uniquely identified by an encrypted tunnel_key and can be configured for either
+   * open (public) or authenticated access. Usage:
+   * https://{port}-{tunnel_key}.tunnel.runloop.ai. Authenticated tunnels should pass
+   * auth_token as X-Runloop-Tunnel-Authorization: Bearer {auth_token}.
+   */
+  tunnel?: TunnelView | null;
 }
 
 export namespace DevboxView {
   export interface StateTransition {
     /**
+     * The failure that caused this state transition, if applicable.
+     */
+    failure_reason?: string | null;
+
+    /**
      * The status of the Devbox.
      *
-     * provisioning: Runloop is allocating and booting the necessary infrastructure
-     * resources. initializing: Runloop defined boot scripts are running to enable the
-     * environment for interaction. running: The Devbox is ready for interaction.
-     * suspending: The Devbox disk is being snaphsotted and as part of suspension.
-     * suspended: The Devbox disk is saved and no more active compute is being used for
-     * the Devbox. resuming: The Devbox disk is being loaded as part of booting a
-     * suspended Devbox. failure: The Devbox failed as part of booting or running user
-     * requested actions. shutdown: The Devbox was successfully shutdown and no more
-     * active compute is being used.
+     * scheduled: Deprecated. The Devbox is waiting for infrastructure allocation to
+     * start. Use queued. queued: The Devbox is waiting for infrastructure allocation
+     * to start. provisioning: Runloop is allocating and booting the necessary
+     * infrastructure resources. initializing: Runloop defined boot scripts are running
+     * to enable the environment for interaction. running: The Devbox is ready for
+     * interaction. suspending: The Devbox disk is being snapshotted as part of
+     * suspension. suspended: The Devbox disk is saved and no more active compute is
+     * being used for the Devbox. resuming: The Devbox disk is being loaded as part of
+     * booting a suspended Devbox. failure: The Devbox failed as part of booting or
+     * running user requested actions. shutdown: The Devbox was successfully shutdown
+     * and no more active compute is being used.
      */
     status?:
+      | 'scheduled'
+      | 'queued'
       | 'provisioning'
       | 'initializing'
       | 'running'
@@ -842,8 +1042,168 @@ export namespace DevboxView {
       | 'failure'
       | 'shutdown';
 
+    /**
+     * The time the status change occurred
+     */
     transition_time_ms?: unknown;
   }
+
+  export interface GatewaySpecs {
+    /**
+     * The ID of the gateway config (e.g., gwc_123abc).
+     */
+    gateway_config_id: string;
+
+    /**
+     * The ID of the secret containing the credential.
+     */
+    secret_id: string;
+  }
+
+  export interface McpSpecs {
+    /**
+     * The ID of the MCP config (e.g., mcp_123abc).
+     */
+    mcp_config_id: string;
+
+    /**
+     * The ID of the secret containing the credential.
+     */
+    secret_id: string;
+  }
+}
+
+export interface GatewayTokenView {
+  /**
+   * The token to send to the gateway as a Bearer token in the Authorization header.
+   * Only accepted for requests originating from the bound Devbox.
+   */
+  token: string;
+
+  /**
+   * How the gateway applies the credential to proxied requests.
+   */
+  auth_mechanism: Shared.AuthMechanism;
+
+  /**
+   * The Devbox the token is bound to.
+   */
+  devbox_id: string;
+
+  /**
+   * The target API endpoint the gateway proxies to.
+   */
+  endpoint: string;
+
+  /**
+   * The ID of the gateway config the token proxies through.
+   */
+  gateway_config_id: string;
+
+  /**
+   * The gateway URL to send requests to. Matches the value of the
+   * &#123;prefix&#125;\_URL environment variable inside the Devbox.
+   */
+  url: string;
+}
+
+export interface McpTokenView {
+  /**
+   * The token to send to the MCP hub as a Bearer token in the Authorization header.
+   * Only accepted for requests originating from the bound Devbox.
+   */
+  token: string;
+
+  /**
+   * Glob patterns for the tools the token permits.
+   */
+  allowed_tools: Array<string>;
+
+  /**
+   * The Devbox the token is bound to.
+   */
+  devbox_id: string;
+
+  /**
+   * The upstream MCP server endpoint the hub proxies to.
+   */
+  endpoint: string;
+
+  /**
+   * The ID of the MCP config the token grants access to.
+   */
+  mcp_config_id: string;
+
+  /**
+   * The MCP hub URL the token authenticates against. Matches the RL_MCP_URL
+   * environment variable inside the Devbox.
+   */
+  url: string;
+}
+
+/**
+ * An ephemeral PTY tunnel providing authenticated terminal access to a Devbox.
+ * These tunnels are not stored on the Devbox and are generated fresh on each
+ * request. Usage: https://{port}-{tunnel_key}.tunnel.runloop.ai with
+ * X-Runloop-Tunnel-Authorization: Bearer {auth_token}.
+ */
+export interface PtyTunnelView {
+  /**
+   * Bearer token for tunnel authentication. Always required for PTY tunnels. Pass as
+   * X-Runloop-Tunnel-Authorization: Bearer {auth_token}.
+   */
+  auth_token: string;
+
+  /**
+   * The encrypted tunnel key used to construct the tunnel URL. URL format:
+   * https://{port}-{tunnel_key}.tunnel.runloop.{domain}
+   */
+  tunnel_key: string;
+}
+
+/**
+ * A V2 tunnel provides secure HTTP access to services running on a Devbox. Tunnels
+ * allow external clients to reach web servers, APIs, or other HTTP services
+ * running inside a Devbox without requiring direct network access. Each tunnel is
+ * uniquely identified by an encrypted tunnel_key and can be configured for either
+ * open (public) or authenticated access. Usage:
+ * https://{port}-{tunnel_key}.tunnel.runloop.ai. Authenticated tunnels should pass
+ * auth_token as X-Runloop-Tunnel-Authorization: Bearer {auth_token}.
+ */
+export interface TunnelView {
+  /**
+   * The authentication mode for the tunnel.
+   */
+  auth_mode: 'open' | 'authenticated';
+
+  /**
+   * Creation time of the tunnel (Unix timestamp milliseconds).
+   */
+  create_time_ms: number;
+
+  /**
+   * When true, HTTP traffic through the tunnel counts as activity for idle lifecycle
+   * policies, resetting the idle timer.
+   */
+  http_keep_alive: boolean;
+
+  /**
+   * The encrypted tunnel key used to construct the tunnel URL. URL format:
+   * https://{port}-{tunnel_key}.tunnel.runloop.{domain}
+   */
+  tunnel_key: string;
+
+  /**
+   * When true, HTTP traffic to a suspended devbox will automatically trigger a
+   * resume.
+   */
+  wake_on_http: boolean;
+
+  /**
+   * Bearer token for tunnel authentication. Only present when auth_mode is
+   * 'authenticated'. Pass as X-Runloop-Tunnel-Authorization: Bearer {auth_token}.
+   */
+  auth_token?: string | null;
 }
 
 export interface DevboxCreateSSHKeyResponse {
@@ -856,6 +1216,11 @@ export interface DevboxCreateSSHKeyResponse {
    * The ssh private key, in PEM format.
    */
   ssh_private_key: string;
+
+  /**
+   * The Linux user to use for SSH connections to this Devbox.
+   */
+  ssh_user: string;
 
   /**
    * The host url of the Devbox that can be used for SSH.
@@ -873,6 +1238,11 @@ export type DevboxRemoveTunnelResponse = unknown;
 
 export type DevboxUploadFileResponse = unknown;
 
+/**
+ * Parameters for creating a new Devbox.
+ *
+ * @category Devbox Types
+ */
 export interface DevboxCreateParams {
   /**
    * Blueprint ID to use for the Devbox. If none set, the Devbox will be created with
@@ -889,7 +1259,7 @@ export interface DevboxCreateParams {
   blueprint_name?: string | null;
 
   /**
-   * A list of code mounts to be included in the Devbox.
+   * A list of code mounts to be included in the Devbox. Use mounts instead.
    */
   code_mounts?: Array<Shared.CodeMountParameters> | null;
 
@@ -906,14 +1276,34 @@ export interface DevboxCreateParams {
   environment_variables?: { [key: string]: string } | null;
 
   /**
-   * (Optional) Map of paths and file contents to write before setup..
+   * Map of paths and file contents to write before setup. Use mounts instead.
    */
   file_mounts?: { [key: string]: string } | null;
 
   /**
-   * Parameters to configure the resources and launch time behavior of the Devbox.
+   * (Optional) Agent gateway specifications for credential proxying. Map key is the
+   * environment variable prefix (e.g., 'GWS_ANTHROPIC'). The agent gateway will
+   * proxy requests to external APIs using the specified credential without exposing
+   * the real API key. Example: {'GWS_ANTHROPIC': {'gateway': 'anthropic', 'secret':
+   * 'my_claude_key'}}
+   */
+  gateways?: { [key: string]: DevboxCreateParams.Gateways } | null;
+
+  /**
+   * LaunchParameters enable you to customize the resources available to your Devbox
+   * as well as the environment set up that should be completed before the Devbox is
+   * marked as 'running'.
    */
   launch_parameters?: Shared.LaunchParameters | null;
+
+  /**
+   * [Beta] (Optional) MCP specifications for MCP server access. Map key is the
+   * environment variable name for the MCP token envelope. Each spec links an MCP
+   * config to a secret. The devbox will also receive RL_MCP_URL for the MCP hub
+   * endpoint. Example: {'MCP_SECRET': {'mcp_config': 'github-readonly', 'secret':
+   * 'MY_GITHUB_TOKEN'}}
+   */
+  mcp?: { [key: string]: DevboxCreateParams.Mcp } | null;
 
   /**
    * User defined metadata to attach to the devbox for organization.
@@ -921,7 +1311,7 @@ export interface DevboxCreateParams {
   metadata?: { [key: string]: string } | null;
 
   /**
-   * A list of file system mounts to be included in the Devbox.
+   * A list of mounts to be included in the Devbox.
    */
   mounts?: Array<Shared.Mount> | null;
 
@@ -929,11 +1319,6 @@ export interface DevboxCreateParams {
    * (Optional) A user specified name to give the Devbox.
    */
   name?: string | null;
-
-  /**
-   * Repository connection id the devbox should source its base image from.
-   */
-  repo_connection_id?: string | null;
 
   /**
    * (Optional) Map of environment variable names to secret names. The secret values
@@ -948,25 +1333,103 @@ export interface DevboxCreateParams {
    * Blueprint name) should be specified.
    */
   snapshot_id?: string | null;
+
+  /**
+   * Configuration for creating a V2 tunnel. When specified at Devbox creation, a
+   * tunnel will be automatically provisioned.
+   */
+  tunnel?: DevboxCreateParams.Tunnel | null;
+}
+
+export namespace DevboxCreateParams {
+  /**
+   * GatewaySpec links an agent gateway configuration to a secret for credential
+   * proxying in a devbox. The agent gateway will proxy requests to external APIs
+   * using the specified credential without exposing the real API key.
+   */
+  export interface Gateways {
+    /**
+     * The gateway config to use. Can be a gateway config ID (gwc_xxx) or name.
+     */
+    gateway: string;
+
+    /**
+     * The secret containing the credential. Can be a secret ID or name.
+     */
+    secret: string;
+  }
+
+  /**
+   * [Beta] McpSpec links an MCP configuration to a secret for MCP server access in a
+   * devbox. The MCP hub will proxy requests to upstream MCP servers using the
+   * specified credential, with tool-level access control based on the MCP config's
+   * allowed_tools.
+   */
+  export interface Mcp {
+    /**
+     * The MCP config to use. Can be an MCP config ID (mcp_xxx) or name.
+     */
+    mcp_config: string;
+
+    /**
+     * The secret containing the MCP server credential. Can be a secret ID or name.
+     */
+    secret: string;
+  }
+
+  /**
+   * Configuration for creating a V2 tunnel. When specified at Devbox creation, a
+   * tunnel will be automatically provisioned.
+   */
+  export interface Tunnel {
+    /**
+     * Authentication mode for the tunnel. Defaults to 'public' if not specified.
+     */
+    auth_mode?: 'open' | 'authenticated' | null;
+
+    /**
+     * When true, HTTP traffic through the tunnel counts as activity for idle lifecycle
+     * policies, resetting the idle timer. Defaults to true if not specified.
+     */
+    http_keep_alive?: boolean | null;
+
+    /**
+     * When true, HTTP traffic to a suspended devbox will automatically trigger a
+     * resume. Defaults to false if not specified. Prefer
+     * lifecycle.resume_triggers.http on launch_parameters for new integrations. If
+     * both are set, lifecycle.resume_triggers.http takes precedence.
+     */
+    wake_on_http?: boolean | null;
+  }
 }
 
 export interface DevboxUpdateParams {
   /**
-   * User defined metadata to attach to the devbox for organization.
+   * User defined metadata to replace the Devbox metadata. Omit to leave unchanged or
+   * set to an empty map to clear it.
    */
   metadata?: { [key: string]: string } | null;
 
   /**
-   * (Optional) A user specified name to give the Devbox.
+   * A user specified name to give the Devbox. Omit to leave unchanged or set to an
+   * empty string to clear it.
    */
   name?: string | null;
 }
 
 export interface DevboxListParams extends DevboxesCursorIDPageParams {
   /**
+   * If true (default), includes total_count in the response. Set to false to skip
+   * the count query for better performance on large datasets.
+   */
+  include_total_count?: boolean;
+
+  /**
    * Filter by status
    */
   status?:
+    | 'scheduled'
+    | 'queued'
     | 'provisioning'
     | 'initializing'
     | 'running'
@@ -977,11 +1440,28 @@ export interface DevboxListParams extends DevboxesCursorIDPageParams {
     | 'shutdown';
 }
 
-export interface DevboxCreateTunnelParams {
+export interface DevboxCreateGatewayTokenParams {
   /**
-   * Devbox port that tunnel will expose.
+   * The gateway config to use. Can be a gateway config ID (gwc_xxx) or name.
    */
-  port: number;
+  gateway: string;
+
+  /**
+   * The secret containing the credential. Can be a secret ID or name.
+   */
+  secret: string;
+}
+
+export interface DevboxCreateMcpTokenParams {
+  /**
+   * The MCP config to use. Can be an MCP config ID (mcp_xxx) or name.
+   */
+  mcp_config: string;
+
+  /**
+   * The secret containing the MCP server credential. Can be a secret ID or name.
+   */
+  secret: string;
 }
 
 export interface DevboxDownloadFileParams {
@@ -992,6 +1472,32 @@ export interface DevboxDownloadFileParams {
   path: string;
 }
 
+export interface DevboxEnableTunnelParams {
+  /**
+   * Authentication mode for the tunnel. Defaults to 'public' if not specified.
+   */
+  auth_mode?: 'open' | 'authenticated' | null;
+
+  /**
+   * When true, HTTP traffic through the tunnel counts as activity for idle lifecycle
+   * policies, resetting the idle timer. Defaults to true if not specified.
+   */
+  http_keep_alive?: boolean | null;
+
+  /**
+   * When true, HTTP traffic to a suspended devbox will automatically trigger a
+   * resume. Defaults to false if not specified. Prefer
+   * lifecycle.resume_triggers.http on launch_parameters for new integrations. If
+   * both are set, lifecycle.resume_triggers.http takes precedence.
+   */
+  wake_on_http?: boolean | null;
+}
+
+/**
+ * Parameters for executing a command on a Devbox.
+ *
+ * @category Devbox Types
+ */
 export interface DevboxExecuteParams {
   /**
    * Body param: The command to execute via the Devbox shell. By default, commands
@@ -1013,8 +1519,8 @@ export interface DevboxExecuteParams {
   last_n?: string;
 
   /**
-   * Body param: Timeout in seconds to wait for command completion. Operation is not
-   * killed. Max is 600 seconds.
+   * Body param: Timeout in seconds to wait for command completion, up to 25 seconds.
+   * Defaults to 25 seconds. Operation is not killed.
    */
   optimistic_timeout?: number | null;
 
@@ -1079,6 +1585,12 @@ export interface DevboxListDiskSnapshotsParams extends DiskSnapshotsCursorIDPage
   devbox_id?: string;
 
   /**
+   * If true (default), includes total_count in the response. Set to false to skip
+   * the count query for better performance on large datasets.
+   */
+  include_total_count?: boolean;
+
+  /**
    * Filter snapshots by metadata key-value pair. Can be used multiple times for
    * different keys.
    */
@@ -1088,6 +1600,11 @@ export interface DevboxListDiskSnapshotsParams extends DiskSnapshotsCursorIDPage
    * Filter snapshots by metadata key with multiple possible values (OR condition).
    */
   'metadata[key][in]'?: string;
+
+  /**
+   * Source Blueprint ID to filter snapshots by.
+   */
+  source_blueprint_id?: string;
 }
 
 export interface DevboxReadFileContentsParams {
@@ -1098,11 +1615,11 @@ export interface DevboxReadFileContentsParams {
   file_path: string;
 }
 
-export interface DevboxRemoveTunnelParams {
+export interface DevboxShutdownParams {
   /**
-   * Devbox port that tunnel will expose.
+   * If true, force shutdown even if snapshots are in progress. Defaults to false.
    */
-  port: number;
+  force?: string;
 }
 
 export interface DevboxSnapshotDiskParams {
@@ -1164,8 +1681,8 @@ export interface DevboxWaitForCommandParams {
   last_n?: string;
 
   /**
-   * Body param: (Optional) Timeout in seconds to wait for the status, up to 60
-   * seconds. Defaults to 60 seconds.
+   * Body param: (Optional) Timeout in seconds to wait for the status, up to 25
+   * seconds. Defaults to 25 seconds.
    */
   timeout_seconds?: number | null;
 }
@@ -1186,23 +1703,26 @@ export interface DevboxWriteFileContentsParams {
 Devboxes.DevboxViewsDevboxesCursorIDPage = DevboxViewsDevboxesCursorIDPage;
 Devboxes.DevboxSnapshotViewsDiskSnapshotsCursorIDPage = DevboxSnapshotViewsDiskSnapshotsCursorIDPage;
 Devboxes.DiskSnapshots = DiskSnapshots;
-Devboxes.Browsers = Browsers;
-Devboxes.Computers = Computers;
 Devboxes.Logs = Logs;
 Devboxes.Executions = Executions;
 
 export declare namespace Devboxes {
   export {
     type DevboxAsyncExecutionDetailView as DevboxAsyncExecutionDetailView,
+    type DevboxEvictionEventView as DevboxEvictionEventView,
     type DevboxExecutionDetailView as DevboxExecutionDetailView,
     type DevboxKillExecutionRequest as DevboxKillExecutionRequest,
     type DevboxListView as DevboxListView,
+    type DevboxResourceUsageView as DevboxResourceUsageView,
     type DevboxSendStdInRequest as DevboxSendStdInRequest,
     type DevboxSendStdInResult as DevboxSendStdInResult,
     type DevboxSnapshotListView as DevboxSnapshotListView,
     type DevboxSnapshotView as DevboxSnapshotView,
-    type DevboxTunnelView as DevboxTunnelView,
     type DevboxView as DevboxView,
+    type GatewayTokenView as GatewayTokenView,
+    type McpTokenView as McpTokenView,
+    type PtyTunnelView as PtyTunnelView,
+    type TunnelView as TunnelView,
     type DevboxCreateSSHKeyResponse as DevboxCreateSSHKeyResponse,
     type DevboxDeleteDiskSnapshotResponse as DevboxDeleteDiskSnapshotResponse,
     type DevboxKeepAliveResponse as DevboxKeepAliveResponse,
@@ -1214,14 +1734,16 @@ export declare namespace Devboxes {
     type DevboxCreateParams as DevboxCreateParams,
     type DevboxUpdateParams as DevboxUpdateParams,
     type DevboxListParams as DevboxListParams,
-    type DevboxCreateTunnelParams as DevboxCreateTunnelParams,
+    type DevboxCreateGatewayTokenParams as DevboxCreateGatewayTokenParams,
+    type DevboxCreateMcpTokenParams as DevboxCreateMcpTokenParams,
     type DevboxDownloadFileParams as DevboxDownloadFileParams,
+    type DevboxEnableTunnelParams as DevboxEnableTunnelParams,
     type DevboxExecuteParams as DevboxExecuteParams,
     type DevboxExecuteAsyncParams as DevboxExecuteAsyncParams,
     type DevboxExecuteSyncParams as DevboxExecuteSyncParams,
     type DevboxListDiskSnapshotsParams as DevboxListDiskSnapshotsParams,
     type DevboxReadFileContentsParams as DevboxReadFileContentsParams,
-    type DevboxRemoveTunnelParams as DevboxRemoveTunnelParams,
+    type DevboxShutdownParams as DevboxShutdownParams,
     type DevboxSnapshotDiskParams as DevboxSnapshotDiskParams,
     type DevboxSnapshotDiskAsyncParams as DevboxSnapshotDiskAsyncParams,
     type DevboxUploadFileParams as DevboxUploadFileParams,
@@ -1235,24 +1757,6 @@ export declare namespace Devboxes {
     type DiskSnapshotDeleteResponse as DiskSnapshotDeleteResponse,
     type DiskSnapshotUpdateParams as DiskSnapshotUpdateParams,
     type DiskSnapshotListParams as DiskSnapshotListParams,
-  };
-
-  export {
-    Browsers as Browsers,
-    type BrowserView as BrowserView,
-    type BrowserCreateParams as BrowserCreateParams,
-  };
-
-  export {
-    Computers as Computers,
-    type ComputerView as ComputerView,
-    type ComputerKeyboardInteractionResponse as ComputerKeyboardInteractionResponse,
-    type ComputerMouseInteractionResponse as ComputerMouseInteractionResponse,
-    type ComputerScreenInteractionResponse as ComputerScreenInteractionResponse,
-    type ComputerCreateParams as ComputerCreateParams,
-    type ComputerKeyboardInteractionParams as ComputerKeyboardInteractionParams,
-    type ComputerMouseInteractionParams as ComputerMouseInteractionParams,
-    type ComputerScreenInteractionParams as ComputerScreenInteractionParams,
   };
 
   export { Logs as Logs, type DevboxLogsListView as DevboxLogsListView, type LogListParams as LogListParams };

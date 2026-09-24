@@ -4,6 +4,7 @@ import { Runloop } from '@runloop/api-client';
 import { APIUserAbortError } from '@runloop/api-client';
 import { Headers } from '@runloop/api-client/core';
 import defaultFetch, { Response, type RequestInit, type RequestInfo } from 'node-fetch';
+// MockAgent import removed: h2-transport replaces undici
 
 describe('instantiate client', () => {
   const env = process.env;
@@ -96,6 +97,101 @@ describe('instantiate client', () => {
     expect(response).toEqual({ url: 'http://localhost:5000/foo', custom: true });
   });
 
+  test('custom fetch wins over http2', async () => {
+    // When both `fetch` and `http2` are provided, the custom fetch must be used —
+    // the h2 adapter should not run. Locks in src/index.ts:
+    //   fetch: options.fetch ?? resolveHttp2Fetch(options)
+    const customFetch = jest.fn((url: RequestInfo) =>
+      Promise.resolve(
+        new Response(JSON.stringify({ url, custom: true }), {
+          headers: { 'Content-Type': 'application/json' },
+        }),
+      ),
+    );
+    const client = new Runloop({
+      baseURL: 'http://localhost:5000/',
+      bearerToken: 'My Bearer Token',
+      http2: true,
+      fetch: customFetch as any,
+    });
+
+    const response = await client.get('/foo');
+    expect(response).toEqual({ url: 'http://localhost:5000/foo', custom: true });
+    expect(customFetch).toHaveBeenCalledTimes(1);
+  });
+
+  test('http2 option accepts H2FetchOptions for pool tuning', () => {
+    // Passing H2FetchOptions as `http2` configures the native H2 connection pool.
+    const client = new Runloop({
+      baseURL: 'http://localhost:5000/',
+      bearerToken: 'My Bearer Token',
+      maxRetries: 0,
+      http2: { maxConnections: 10, minConnections: 2 },
+    });
+    // If construction succeeds without error, the options were accepted.
+    expect(client).toBeDefined();
+  });
+
+  test('warns once when http2 and httpAgent are combined', () => {
+    const warn = jest.spyOn(console, 'warn').mockImplementation(() => {});
+    try {
+      // Explicit http2 alone does not warn.
+      new Runloop({ baseURL: 'http://localhost:5000/', bearerToken: 'My Bearer Token', http2: true });
+      expect(warn).not.toHaveBeenCalled();
+
+      // Combining them warns — exactly once per process (module-scoped flag), so the
+      // second construction is silent.
+      const opts = {
+        baseURL: 'http://localhost:5000/',
+        bearerToken: 'My Bearer Token',
+        httpAgent: {} as any,
+      };
+      new Runloop({ ...opts, http2: true });
+      new Runloop({ ...opts, http2: true });
+      expect(warn).toHaveBeenCalledTimes(1);
+      expect(String(warn.mock.calls[0]?.[0])).toContain('httpAgent');
+    } finally {
+      warn.mockRestore();
+    }
+  });
+
+  test('httpAgent without explicit http2 stays on HTTP/1.1 and warns once', () => {
+    // HTTP/2 is the default, but a bare `httpAgent` keeps the client on HTTP/1.1 so
+    // existing agents keep working. The fallback warns once (module-scoped flag).
+    const warn = jest.spyOn(console, 'warn').mockImplementation(() => {});
+    try {
+      const opts = {
+        baseURL: 'http://localhost:5000/',
+        bearerToken: 'My Bearer Token',
+        httpAgent: {} as any,
+      };
+      new Runloop(opts);
+      new Runloop(opts);
+      expect(warn).toHaveBeenCalledTimes(1);
+      expect(String(warn.mock.calls[0]?.[0])).toContain('HTTP/1.1');
+    } finally {
+      warn.mockRestore();
+    }
+  });
+
+  test('http2: false opts out of the default HTTP/2 transport without warning', () => {
+    // Explicit opt-out is silent even alongside an httpAgent — the user has chosen
+    // HTTP/1.1 deliberately.
+    const warn = jest.spyOn(console, 'warn').mockImplementation(() => {});
+    try {
+      const client = new Runloop({
+        baseURL: 'http://localhost:5000/',
+        bearerToken: 'My Bearer Token',
+        httpAgent: {} as any,
+        http2: false,
+      });
+      expect(client).toBeDefined();
+      expect(warn).not.toHaveBeenCalled();
+    } finally {
+      warn.mockRestore();
+    }
+  });
+
   test('explicit global fetch', async () => {
     // make sure the global fetch type is assignable to our Fetch type
     const client = new Runloop({
@@ -127,7 +223,7 @@ describe('instantiate client', () => {
 
     const spy = jest.spyOn(client, 'request');
 
-    await expect(client.get('/foo', { signal: controller.signal })).rejects.toThrowError(APIUserAbortError);
+    await expect(client.get('/foo', { signal: controller.signal })).rejects.toThrow(APIUserAbortError);
     expect(spy).toHaveBeenCalledTimes(1);
   });
 
@@ -193,6 +289,7 @@ describe('instantiate client', () => {
     });
 
     test('in request options', () => {
+      process.env['RUNLOOP_BASE_URL'] = ''; // empty, so that the default base URL is used
       const client = new Runloop({ bearerToken: 'My Bearer Token' });
       expect(client.buildURL('/foo', null, 'http://localhost:5000/option')).toEqual(
         'http://localhost:5000/option/foo',
@@ -285,14 +382,25 @@ describe('retries', () => {
     let count = 0;
     const testFetch = async (url: RequestInfo, { signal }: RequestInit = {}): Promise<Response> => {
       if (count++ === 0) {
-        return new Promise((resolve, reject) =>
-          signal?.addEventListener('abort', () => reject(new Error('timed out'))),
-        );
+        return new Promise((resolve, reject) => {
+          const abortHandler = () => {
+            reject(new Error('timed out'));
+          };
+          if (signal?.aborted) {
+            abortHandler();
+          } else {
+            signal?.addEventListener('abort', abortHandler);
+          }
+        });
       }
       return new Response(JSON.stringify({ a: 1 }), { headers: { 'Content-Type': 'application/json' } });
     };
 
-    const client = new Runloop({ bearerToken: 'My Bearer Token', timeout: 10, fetch: testFetch });
+    const client = new Runloop({
+      bearerToken: 'My Bearer Token',
+      timeout: 100,
+      fetch: testFetch,
+    });
 
     expect(await client.request({ path: '/foo', method: 'get' })).toEqual({ a: 1 });
     expect(count).toEqual(2);
@@ -322,7 +430,11 @@ describe('retries', () => {
       return new Response(JSON.stringify({ a: 1 }), { headers: { 'Content-Type': 'application/json' } });
     };
 
-    const client = new Runloop({ bearerToken: 'My Bearer Token', fetch: testFetch, maxRetries: 4 });
+    const client = new Runloop({
+      bearerToken: 'My Bearer Token',
+      fetch: testFetch,
+      maxRetries: 4,
+    });
 
     expect(await client.request({ path: '/foo', method: 'get' })).toEqual({ a: 1 });
 
@@ -346,7 +458,11 @@ describe('retries', () => {
       capturedRequest = init;
       return new Response(JSON.stringify({ a: 1 }), { headers: { 'Content-Type': 'application/json' } });
     };
-    const client = new Runloop({ bearerToken: 'My Bearer Token', fetch: testFetch, maxRetries: 4 });
+    const client = new Runloop({
+      bearerToken: 'My Bearer Token',
+      fetch: testFetch,
+      maxRetries: 4,
+    });
 
     expect(
       await client.request({
@@ -408,7 +524,11 @@ describe('retries', () => {
       capturedRequest = init;
       return new Response(JSON.stringify({ a: 1 }), { headers: { 'Content-Type': 'application/json' } });
     };
-    const client = new Runloop({ bearerToken: 'My Bearer Token', fetch: testFetch, maxRetries: 4 });
+    const client = new Runloop({
+      bearerToken: 'My Bearer Token',
+      fetch: testFetch,
+      maxRetries: 4,
+    });
 
     expect(
       await client.request({

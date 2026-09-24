@@ -1,5 +1,834 @@
 # Changelog
 
+## [1.31.0](https://github.com/runloopai/api-client-ts/compare/v1.30.0...v1.31.0) (2026-08-25)
+
+
+### Features
+
+* initial stlc build ([02f992d](https://github.com/runloopai/api-client-ts/commit/02f992dc3ba48c15d1d31b83a33af1eacd75eb0c))
+* **mux:** mint agent gateway tokens for running devboxes ([#10872](https://github.com/runloopai/api-client-ts/issues/10872)) ([2c814e0](https://github.com/runloopai/api-client-ts/commit/2c814e0ebd9403f759c7d89dd51d543584c9af39))
+* **mux:** mint MCP tokens for running devboxes ([#10871](https://github.com/runloopai/api-client-ts/issues/10871)) ([1b38fde](https://github.com/runloopai/api-client-ts/commit/1b38fdebe72cfd309fe6c21459b69a9f49b6be5a))
+
+
+### Bug Fixes
+
+* **ci:** gate publish-docs to production and tolerate an empty docs diff ([43fa787](https://github.com/runloopai/api-client-ts/commit/43fa787ec9e66686f018d88f8cae31abf44c2f8d))
+* **release:** use stable versioning instead of prerelease ([6bc5b36](https://github.com/runloopai/api-client-ts/commit/6bc5b3666b7953346487c4450dd97b60d1a5d9ac))
+* **test:** install deps against the integrated manifest before jest ([89a9fc9](https://github.com/runloopai/api-client-ts/commit/89a9fc938780b8ed390ee39c1860a078c8d4cb81))
+
+
+### Chores
+
+* ignore mcp bundle artifacts ([6364ec1](https://github.com/runloopai/api-client-ts/commit/6364ec12f834b1166fc1119c11cecdda29775b45))
+
+## 1.30.0 (2026-08-23)
+
+Full Changelog: [v1.29.0...v1.30.0](https://github.com/runloopai/api-client-ts/compare/v1.29.0...v1.30.0)
+
+### Features
+
+* **devboxes:** use optimistic create endpoint ([#825](https://github.com/runloopai/api-client-ts/issues/825)) ([07c0ca0](https://github.com/runloopai/api-client-ts/commit/07c0ca079a3ed09d2350d320323b616e471d0b03))
+
+
+### Chores
+
+* **internal:** allow the mock server port to be set with STAINLESS_MOCK_PORT ([627021b](https://github.com/runloopai/api-client-ts/commit/627021b4d35e9996fe00a7a263a8e8ab5a83cba5))
+
+## 1.29.0 (2026-08-20)
+
+Full Changelog: [v1.28.0...v1.29.0](https://github.com/runloopai/api-client-ts/compare/v1.28.0...v1.29.0)
+
+### Features
+
+* **axon:** add registry delete endpoint ([#10769](https://github.com/runloopai/api-client-ts/issues/10769)) ([e82b606](https://github.com/runloopai/api-client-ts/commit/e82b606f189f91751fb636a2b8878daea69a74af))
+* **broker:** plumb Pi protocol selection ([#10256](https://github.com/runloopai/api-client-ts/issues/10256)) ([84893cc](https://github.com/runloopai/api-client-ts/commit/84893cc2ca7e97176bb24c917b1fcd08c1cc2fd5))
+* **config:** custom_headers on McpConfig/GatewayConfig — persistence, REST, validation, provisioner, OpenAPI ([#11096](https://github.com/runloopai/api-client-ts/issues/11096)) ([378d2df](https://github.com/runloopai/api-client-ts/commit/378d2df40b5580bf09e9b394e75f5c5763418be6))
+* **converter:** add Helm chart, container image, and enable in dev ([#10405](https://github.com/runloopai/api-client-ts/issues/10405)) ([3d08f4d](https://github.com/runloopai/api-client-ts/commit/3d08f4d5771cb771101fb479d5bb8d72b62a2092))
+* **devbox:** recover resume provisioning failures ([#10597](https://github.com/runloopai/api-client-ts/issues/10597)) ([b85737e](https://github.com/runloopai/api-client-ts/commit/b85737ef21a61dd4ed6c0f4c669cc313346e3af4))
+* **gateway:** first-class BASIC auth mechanism ([#11063](https://github.com/runloopai/api-client-ts/issues/11063)) ([6ad0047](https://github.com/runloopai/api-client-ts/commit/6ad00478d8c7853bcb173ea1579d0e1da8825dd3))
+* **mcp:** configurable auth_mechanism on McpConfig, shared shape with gateway ([#11113](https://github.com/runloopai/api-client-ts/issues/11113)) ([d81080b](https://github.com/runloopai/api-client-ts/commit/d81080bcce7704b498f7242a4738eb767bcb5dd5))
+
+
+### Bug Fixes
+
+* **devbox:** make Devbox update API patch-like ([#10582](https://github.com/runloopai/api-client-ts/issues/10582)) ([e99087b](https://github.com/runloopai/api-client-ts/commit/e99087b1a297230510180d041e8da895d993c552))
+* **gateway:** reject keyless HEADER auth_mechanism at admission and in looper ([#11120](https://github.com/runloopai/api-client-ts/issues/11120)) ([9277e11](https://github.com/runloopai/api-client-ts/commit/9277e118b9fcd85cd05106390be0a98ed4f3a8c8))
+* **mcp:** remove stale createFromInspection metadata ([#811](https://github.com/runloopai/api-client-ts/issues/811)) ([0842f40](https://github.com/runloopai/api-client-ts/commit/0842f402cc4a7ddc73d89e4643c3a5984e1bdb4a))
+
+## 1.28.0 (2026-07-29)
+
+Full Changelog: [v1.27.0...v1.28.0](https://github.com/runloopai/api-client-ts/compare/v1.27.0...v1.28.0)
+
+### Features
+
+* **devbox:** queue devboxes until node assignment ([#10320](https://github.com/runloopai/api-client-ts/issues/10320)) ([a1d9b21](https://github.com/runloopai/api-client-ts/commit/a1d9b2196b5f9a5ff6446712c851d1e8acefe36e))
+
+## 1.27.0 (2026-07-24)
+
+Full Changelog: [v1.26.0...v1.27.0](https://github.com/runloopai/api-client-ts/compare/v1.26.0...v1.27.0)
+
+### Features
+
+* **mux:** wait_for_eviction endpoint for flex eviction notifications ([#10325](https://github.com/runloopai/api-client-ts/issues/10325)) ([429f2b1](https://github.com/runloopai/api-client-ts/commit/429f2b1ea76284ab6006e6e819457dfeddaaf5c9))
+
+
+### Bug Fixes
+
+* **mux:** field-level merge on network policy egress updates ([#10338](https://github.com/runloopai/api-client-ts/issues/10338)) ([835c772](https://github.com/runloopai/api-client-ts/commit/835c7720715b525a371c06745dc93aac249b01ee))
+* **mux:** move eviction-watch SSE route off the /{id} slot ([#10409](https://github.com/runloopai/api-client-ts/issues/10409)) ([80d82cf](https://github.com/runloopai/api-client-ts/commit/80d82cf7798ce423dff86876ff89bd752f80d0f0))
+
+
+### Chores
+
+* **stainless:** generate watch_evictions as an SSE stream ([#10404](https://github.com/runloopai/api-client-ts/issues/10404)) ([043ebbc](https://github.com/runloopai/api-client-ts/commit/043ebbc407067c3d7d620b9a00fa1937dd3bcb3b))
+
+## 1.26.0 (2026-07-22)
+
+Full Changelog: [v1.25.0...v1.26.0](https://github.com/runloopai/api-client-ts/compare/v1.25.0...v1.26.0)
+
+### Features
+
+* **api:** add codex broker mount protocol and axon attach enum value ([#10186](https://github.com/runloopai/api-client-ts/issues/10186)) ([113c92b](https://github.com/runloopai/api-client-ts/commit/113c92b26df3a3f1846583afa1558da3bb3a1f22))
+* **devbox:** rename scheduled -&gt; queued ([#10217](https://github.com/runloopai/api-client-ts/issues/10217)) ([6b3e488](https://github.com/runloopai/api-client-ts/commit/6b3e4881fb713efe154a12c3a79b1e905b7e1925))
+* **mux:** expose CIDR egress rules on the network policy API ([#10269](https://github.com/runloopai/api-client-ts/issues/10269)) ([ec9fef0](https://github.com/runloopai/api-client-ts/commit/ec9fef0d1424671cc377fc0456e62461036c37ac))
+* **network:** add allow_runloop_mirrors egress flag to network policies ([#10350](https://github.com/runloopai/api-client-ts/issues/10350)) ([45d2036](https://github.com/runloopai/api-client-ts/commit/45d20369b986e19e696dccbd551aec78a40039aa))
+* **stlc:** configurable CI runner and private-production-repo support in workflow templates ([9e8ca6e](https://github.com/runloopai/api-client-ts/commit/9e8ca6e3d68602fdbfe738f926bb962ae536ebd7))
+
+
+### Bug Fixes
+
+* **mux:** uniform id/name search across list endpoints, close cross-tenant IDOR ([#10267](https://github.com/runloopai/api-client-ts/issues/10267)) ([70e6a27](https://github.com/runloopai/api-client-ts/commit/70e6a27a76ddd29494cf69b881702e3a9ad112d7))
+
+## 1.25.0 (2026-07-10)
+
+Full Changelog: [v1.24.1...v1.25.0](https://github.com/runloopai/api-client-ts/compare/v1.24.1...v1.25.0)
+
+### Features
+
+* add HTTP/2 load testing infrastructure ([#798](https://github.com/runloopai/api-client-ts/issues/798)) ([ea7cc09](https://github.com/runloopai/api-client-ts/commit/ea7cc095d728c91166b84068e3ec8710fdc74e51))
+* default to HTTP/2 transport on Node ([#815](https://github.com/runloopai/api-client-ts/issues/815)) ([35dd305](https://github.com/runloopai/api-client-ts/commit/35dd305ff6b59ed7d617ac1bf99a657d054e317c))
+
+
+### Bug Fixes
+
+* **blueprints:** remove create_from_inspection endpoint ([e84b5c1](https://github.com/runloopai/api-client-ts/commit/e84b5c1a02ecf0ad07c1d41add61b14432fc4bef))
+* **smoketests:** instrument node:http2 in verify-http2.mjs, not undici ([#814](https://github.com/runloopai/api-client-ts/issues/814)) ([6ceb236](https://github.com/runloopai/api-client-ts/commit/6ceb236965305eb160788a74f365607d0ab56c5d))
+
+
+### Chores
+
+* **deps:** remove dead undici HTTP/2 adapter and dependency ([#817](https://github.com/runloopai/api-client-ts/issues/817)) ([9792541](https://github.com/runloopai/api-client-ts/commit/979254137ff02d1abea72d2d05544aee97c656b6))
+
+
+### Documentation
+
+* add agent PR guidance ([#813](https://github.com/runloopai/api-client-ts/issues/813)) ([be107b9](https://github.com/runloopai/api-client-ts/commit/be107b90195bdb1552afcfb1819812b07124a4d0))
+
+## 1.24.1 (2026-06-19)
+
+Full Changelog: [v1.24.0...v1.24.1](https://github.com/runloopai/api-client-ts/compare/v1.24.0...v1.24.1)
+
+### Bug Fixes
+
+* **h2-transport:** guard enqueue after cancel; deduplicate body reads; avoid arrayBuffer copy ([#808](https://github.com/runloopai/api-client-ts/issues/808)) ([316d558](https://github.com/runloopai/api-client-ts/commit/316d55838629edc4ed534886d36e66de214917d4))
+
+## 1.24.0 (2026-06-15)
+
+Full Changelog: [v1.23.1...v1.24.0](https://github.com/runloopai/api-client-ts/compare/v1.23.1...v1.24.0)
+
+### Features
+
+* add standalone HTTP/2 transport library ([#799](https://github.com/runloopai/api-client-ts/issues/799)) ([79f0e6f](https://github.com/runloopai/api-client-ts/commit/79f0e6f980f3b96bfaf86c018147ad382e8d77b6))
+* wire h2-transport into the SDK ([#800](https://github.com/runloopai/api-client-ts/issues/800)) ([8391579](https://github.com/runloopai/api-client-ts/commit/83915799fe1481cbae89e5e6b336ed2d03f7ecfb))
+
+
+### Performance Improvements
+
+* increase undici HTTP/2 pool from 4x64 to 20x128 streams ([#801](https://github.com/runloopai/api-client-ts/issues/801)) ([72f8014](https://github.com/runloopai/api-client-ts/commit/72f8014e6cd768e6f52b85b49b15e3662a8fb067))
+
+## 1.23.1 (2026-06-09)
+
+Full Changelog: [v1.23.0...v1.23.1](https://github.com/runloopai/api-client-ts/compare/v1.23.0...v1.23.1)
+
+### Features
+
+* **devbox:** add provisioning_tier (flex) to LaunchParameters (alpha) ([#796](https://github.com/runloopai/api-client-ts/issues/796)) ([d7bdcb7](https://github.com/runloopai/api-client-ts/commit/d7bdcb7c028668b3f1c4ccb467f18324f7a0008a))
+* **devbox:** expose provisioning_tier=flex in API + SDKs (alpha) ([#9700](https://github.com/runloopai/api-client-ts/issues/9700)) ([c32c279](https://github.com/runloopai/api-client-ts/commit/c32c2799a219dafcb0c1aee6d03dc069c54cc884))
+
+## 1.23.0 (2026-06-05)
+
+Full Changelog: [v1.22.1...v1.23.0](https://github.com/runloopai/api-client-ts/compare/v1.22.1...v1.23.0)
+
+### Features
+
+* **devbox:** add SCHEDULED status to the data model ([#9654](https://github.com/runloopai/api-client-ts/issues/9654)) ([398e350](https://github.com/runloopai/api-client-ts/commit/398e350d12074fb6f3244b505df8a774922b114e))
+* opt-in HTTP/2 multiplexing transport via undici 7 (Node &gt;= 20.18.1) ([#791](https://github.com/runloopai/api-client-ts/issues/791)) ([4cafa17](https://github.com/runloopai/api-client-ts/commit/4cafa17b21d71eeaf8091784a8bf8e9fc40f786b))
+* **portal:** support tunnel authorization header ([#9597](https://github.com/runloopai/api-client-ts/issues/9597)) ([ed324c5](https://github.com/runloopai/api-client-ts/commit/ed324c59c596640896bda199fa2740ce53da06ac))
+
+## 1.22.1 (2026-06-01)
+
+Full Changelog: [v1.22.0...v1.22.1](https://github.com/runloopai/api-client-ts/compare/v1.22.0...v1.22.1)
+
+### Build System
+
+* **stainless:** map /v1/accounts/me to accounts.me in the SDK ([#9569](https://github.com/runloopai/api-client-ts/issues/9569)) ([1571dff](https://github.com/runloopai/api-client-ts/commit/1571dff77dca609acf7fbf7d37891ea2990e5fe1))
+
+## 1.22.0 (2026-05-27)
+
+Full Changelog: [v1.21.0...v1.22.0](https://github.com/runloopai/api-client-ts/compare/v1.21.0...v1.22.0)
+
+### Features
+
+* add reflex initiator type, hidden param ([#9350](https://github.com/runloopai/api-client-ts/issues/9350)) ([7118ffe](https://github.com/runloopai/api-client-ts/commit/7118ffed796f9948a7fc7226019ef14e95f14027))
+* **api:** expose lifecycle_hooks on LaunchParameters lifecycle ([#9115](https://github.com/runloopai/api-client-ts/issues/9115)) ([e3806db](https://github.com/runloopai/api-client-ts/commit/e3806db364a8d2b7e7e49e16f39bfff50766a154))
+* **mux:** initial changes to enable http/2  ([#8936](https://github.com/runloopai/api-client-ts/issues/8936)) ([d93d0b8](https://github.com/runloopai/api-client-ts/commit/d93d0b89492b196348babd45123d724a8b880120))
+
+
+### Bug Fixes
+
+* clean up PTY and lifecycle hook OpenAPI descriptions ([#9502](https://github.com/runloopai/api-client-ts/issues/9502)) ([cc0a029](https://github.com/runloopai/api-client-ts/commit/cc0a029fc71356f545e66337d76b4e10322795a7))
+* **mux:** strip internal stub note from PTY OpenAPI descriptions ([#9315](https://github.com/runloopai/api-client-ts/issues/9315)) ([4438736](https://github.com/runloopai/api-client-ts/commit/44387366b7cc62b33c3e8dc80332e61fc28061fd))
+* revert workflow actions to runloopai forks ([#790](https://github.com/runloopai/api-client-ts/issues/790)) ([fc872d6](https://github.com/runloopai/api-client-ts/commit/fc872d621e490e47e9ca719ff5419b23b7c027a9))
+* update types for pty control, use int instead of str  ([#9235](https://github.com/runloopai/api-client-ts/issues/9235)) ([64ea127](https://github.com/runloopai/api-client-ts/commit/64ea127051861329727bb805344162df0ca1c9fd))
+
+
+### Chores
+
+* Update stainless.yml, bump AGENTS.md to keep this updated ([#9268](https://github.com/runloopai/api-client-ts/issues/9268)) ([ced9bc9](https://github.com/runloopai/api-client-ts/commit/ced9bc910676ef3b16debb20dd35408325df2e6d))
+
+## 1.21.0 (2026-05-12)
+
+Full Changelog: [v1.20.0...v1.21.0](https://github.com/runloopai/api-client-ts/compare/v1.20.0...v1.21.0)
+
+### Features
+
+* make agent version optional in API ([#8858](https://github.com/runloopai/api-client-ts/issues/8858)) ([9676132](https://github.com/runloopai/api-client-ts/commit/9676132d3a4dd6ad458229a309349160832edd8a))
+* **metadata:** add object metadata viewing, discovery, and validation ([#9124](https://github.com/runloopai/api-client-ts/issues/9124)) ([204e2a9](https://github.com/runloopai/api-client-ts/commit/204e2a9c871c6ea895348a32f8b1ef734e2fc19b))
+* support setting headers via env ([7f226b0](https://github.com/runloopai/api-client-ts/commit/7f226b081e7a8b4221379fa4530a81887de124b7))
+
+
+### Bug Fixes
+
+* **test:** increase SDK maxRetries from 1 to 3 for smoketest resilience ([#786](https://github.com/runloopai/api-client-ts/issues/786)) ([c8b5448](https://github.com/runloopai/api-client-ts/commit/c8b5448bb00d7108deb50749969ee09d8bf511e8))
+* update openapi.stainless.yaml for PTY server methods ([#9218](https://github.com/runloopai/api-client-ts/issues/9218)) ([e72f504](https://github.com/runloopai/api-client-ts/commit/e72f5046b989fae45edadb6840c696d48900ec8d))
+
+
+### Chores
+
+* add get secret to stainless ([#7833](https://github.com/runloopai/api-client-ts/issues/7833)) ([3e8eee7](https://github.com/runloopai/api-client-ts/commit/3e8eee7a59d9bd6f08d2060bdeaf58bfb29d93b8))
+* **internal:** more robust bootstrap script ([c31aa86](https://github.com/runloopai/api-client-ts/commit/c31aa86ba3c30b13052b18a6e498e0be685cb0fa))
+* **tests:** bump steady to v0.22.1 ([620beac](https://github.com/runloopai/api-client-ts/commit/620beac7bde9bdf9ef84b4bd023f844be0b2c37f))
+
+
+### Documentation
+
+* add missing SDK operations to README ([#785](https://github.com/runloopai/api-client-ts/issues/785)) ([128b60b](https://github.com/runloopai/api-client-ts/commit/128b60b1b346a873083d1b238573e1af05e97008))
+
+## 1.20.0 (2026-04-14)
+
+Full Changelog: [v1.19.0...v1.20.0](https://github.com/runloopai/api-client-ts/compare/v1.19.0...v1.20.0)
+
+### Features
+
+* add OO SDK support for new Agent API calls ([#780](https://github.com/runloopai/api-client-ts/issues/780)) ([cb107b1](https://github.com/runloopai/api-client-ts/commit/cb107b1b5b0a35b2670ae8cfb09092695e6575d7))
+* **axon:** add working directory / directory to launch agent ([#8689](https://github.com/runloopai/api-client-ts/issues/8689)) ([72a0357](https://github.com/runloopai/api-client-ts/commit/72a0357139ffee91b61cc0f176f5a8412a894bcd))
+
+## 1.19.0 (2026-04-13)
+
+Full Changelog: [v1.18.1...v1.19.0](https://github.com/runloopai/api-client-ts/compare/v1.18.1...v1.19.0)
+
+### Features
+
+* Add wake on axon event as an API primitive ([#8681](https://github.com/runloopai/api-client-ts/issues/8681)) ([ec27047](https://github.com/runloopai/api-client-ts/commit/ec27047ddf21fff3690166c045ff5ab7831bd003))
+* Allow API keys to create API and restricted keys ([#8663](https://github.com/runloopai/api-client-ts/issues/8663)) ([5727999](https://github.com/runloopai/api-client-ts/commit/57279999228e9ecb0fb9803e04ba9552f4110411))
+
+
+### Bug Fixes
+
+* add missing agent API paths to stainless config ([#8699](https://github.com/runloopai/api-client-ts/issues/8699)) ([00aa6d8](https://github.com/runloopai/api-client-ts/commit/00aa6d833b6e3767e0090fb2b945a7e17bd71789))
+
+## 1.18.1 (2026-04-10)
+
+Full Changelog: [v1.18.0...v1.18.1](https://github.com/runloopai/api-client-ts/compare/v1.18.0...v1.18.1)
+
+### Bug Fixes
+
+* add list events to axon ([#8648](https://github.com/runloopai/api-client-ts/issues/8648)) ([413113e](https://github.com/runloopai/api-client-ts/commit/413113e1ffae4864ec742c43a01569b8ad134047))
+* TTL shutdown showed non-standard reason in devbox logs ([#8636](https://github.com/runloopai/api-client-ts/issues/8636)) ([16c33d5](https://github.com/runloopai/api-client-ts/commit/16c33d5cba17dbbf8fc58a4f4e88ac206c732411))
+
+
+### Documentation
+
+* clarify that we don't support git commit SHA in git agents/blueprint builds ([#8638](https://github.com/runloopai/api-client-ts/issues/8638)) ([0d635d1](https://github.com/runloopai/api-client-ts/commit/0d635d18dfe56aa75dfedabbe47fb45cd376bbef))
+
+## 1.18.0 (2026-04-09)
+
+Full Changelog: [v1.17.0...v1.18.0](https://github.com/runloopai/api-client-ts/compare/v1.17.0...v1.18.0)
+
+### Features
+
+* Add protocol, launch etc arguments to attach axon grpc, persist them in the db ([#8564](https://github.com/runloopai/api-client-ts/issues/8564)) ([76f0a17](https://github.com/runloopai/api-client-ts/commit/76f0a1764044e81f8a7484ea1217833e040a5d3d))
+* **api:** add lifecycle configuration to launch parameters ([#8606](https://github.com/runloopai/api-client-ts/issues/8606)) ([83e7cfa](https://github.com/runloopai/api-client-ts/commit/83e7cfa0eb34eecb85a106e1f62c7515b28a4796))
+* stream kernel messages (kmsg) to devbox logs ([#8588](https://github.com/runloopai/api-client-ts/issues/8588)) ([6350865](https://github.com/runloopai/api-client-ts/commit/63508655a22a511a518f578b7307cb9abe778af6))
+
+
+### Bug Fixes
+
+* **broker:** remove codex in favor of codex via acp ([#8602](https://github.com/runloopai/api-client-ts/issues/8602)) ([2b4f672](https://github.com/runloopai/api-client-ts/commit/2b4f6721930fe9ffa66bd146f382d5c5d13793cd))
+* propagate git ref to maverick for git-based agents ([#8608](https://github.com/runloopai/api-client-ts/issues/8608)) ([5ae92ae](https://github.com/runloopai/api-client-ts/commit/5ae92ae53fe7f0435eccce602c673cca758293dc))
+
+
+### Chores
+
+* Cleanup remaining junk left over from browser and computer use ([#8553](https://github.com/runloopai/api-client-ts/issues/8553)) ([3aae2ca](https://github.com/runloopai/api-client-ts/commit/3aae2cade2fb3cc6e5fa4b84fa4c249bbfc88265))
+* **internal:** codegen related update ([81db5f0](https://github.com/runloopai/api-client-ts/commit/81db5f05681c16696c9cd513c8aab7fcb6b467e5))
+* make smoketests faster via test.concurrent, no sharding, 800% workers ([#773](https://github.com/runloopai/api-client-ts/issues/773)) ([d5d7a29](https://github.com/runloopai/api-client-ts/commit/d5d7a29c881c6bbd6a8158a2785327ec6ab911e3))
+
+
+### Documentation
+
+* fix typo, fix repoc/git-based agent mounts ignoring custom mount paths ([#8537](https://github.com/runloopai/api-client-ts/issues/8537)) ([eedbc55](https://github.com/runloopai/api-client-ts/commit/eedbc55f6b1a40cb55614d64978c1ff4c43aa84b))
+
+## 1.17.0 (2026-04-03)
+
+Full Changelog: [v1.16.2...v1.17.0](https://github.com/runloopai/api-client-ts/compare/v1.16.2...v1.17.0)
+
+### Features
+
+* add specific message when a devbox fails due to missing its health checks ([#8535](https://github.com/runloopai/api-client-ts/issues/8535)) ([275fb89](https://github.com/runloopai/api-client-ts/commit/275fb89cf3641e90d16e8f1e6b1454ee2f9be8b9))
+
+
+### Chores
+
+* **blueprints:** deprecate `blueprints.preview()` method ([#8526](https://github.com/runloopai/api-client-ts/issues/8526)) ([4e7f1ec](https://github.com/runloopai/api-client-ts/commit/4e7f1ec35fc7faaac9a66cfc11119358bb9361e5))
+* Remove computer and browser use controllers ([#8530](https://github.com/runloopai/api-client-ts/issues/8530)) ([1f97ce0](https://github.com/runloopai/api-client-ts/commit/1f97ce02c7b03951450401a7a82fb4a28124e7a7))
+
+## 1.16.2 (2026-04-02)
+
+Full Changelog: [v1.16.1...v1.16.2](https://github.com/runloopai/api-client-ts/compare/v1.16.1...v1.16.2)
+
+### Bug Fixes
+
+* Add after_sequence param to axon subscribe ([#8497](https://github.com/runloopai/api-client-ts/issues/8497)) ([4e9a274](https://github.com/runloopai/api-client-ts/commit/4e9a2748d6dff095a3850c6a5127bd8e3b4712be))
+
+## 1.16.1 (2026-04-02)
+
+Full Changelog: [v1.16.0...v1.16.1](https://github.com/runloopai/api-client-ts/compare/v1.16.0...v1.16.1)
+
+### Bug Fixes
+
+* **streaming:** reconnect SSE on undici TimeoutError, not only HTTP 408 ([#769](https://github.com/runloopai/api-client-ts/issues/769)) ([624b53f](https://github.com/runloopai/api-client-ts/commit/624b53f83a0207ec4b8476347e575ff72b9a9c12))
+
+## 1.16.0 (2026-04-02)
+
+Full Changelog: [v1.15.0...v1.16.0](https://github.com/runloopai/api-client-ts/compare/v1.15.0...v1.16.0)
+
+### Features
+
+* **benchmark-runs:** add state filter and multi-value benchmark_id support to listBenchmarkRuns ([#8480](https://github.com/runloopai/api-client-ts/issues/8480)) ([12c55bb](https://github.com/runloopai/api-client-ts/commit/12c55bb86eb4a16539e496131a075159c43fa85b))
+
+
+### Bug Fixes
+
+* Fix slow list endpoints for object oriented sdk ([#767](https://github.com/runloopai/api-client-ts/issues/767)) ([1f26406](https://github.com/runloopai/api-client-ts/commit/1f264066eb3a66e0e4705508c7ecb7c536b52600))
+
+## 1.15.0 (2026-04-01)
+
+Full Changelog: [v1.14.1...v1.15.0](https://github.com/runloopai/api-client-ts/compare/v1.14.1...v1.15.0)
+
+### Features
+
+* add archive / unarchive to benchmarks ([#8391](https://github.com/runloopai/api-client-ts/issues/8391)) ([834bc32](https://github.com/runloopai/api-client-ts/commit/834bc32babefa622451b31bb25a559806fe5a96a))
+* Add axon list filters by id and name ([#8384](https://github.com/runloopai/api-client-ts/issues/8384)) ([4325b97](https://github.com/runloopai/api-client-ts/commit/4325b974e446b5a85e01afbe6a0bd1c62d71e4cf))
+* Add pagination to list active axons ([#8359](https://github.com/runloopai/api-client-ts/issues/8359)) ([5bc0c7d](https://github.com/runloopai/api-client-ts/commit/5bc0c7d5569d3e521c9497686b447d8575e995d2))
+* **sdk:** add `AxonListParams` support and auto-pagination to `AxonOps.list()` ([#763](https://github.com/runloopai/api-client-ts/issues/763)) ([857ab06](https://github.com/runloopai/api-client-ts/commit/857ab06eb3055d5655e0abaa7f79c8a2a9101791))
+* **sdk:** add `ScenarioBuilder` class to OO-SDK ([#748](https://github.com/runloopai/api-client-ts/issues/748)) ([f80ed4c](https://github.com/runloopai/api-client-ts/commit/f80ed4c30c8e4c3998460a6f12bd862f7f9d96ac))
+
+
+### Bug Fixes
+
+* **api:** surface scenario setup failures instead of silently dropping them ([#8300](https://github.com/runloopai/api-client-ts/issues/8300)) ([ae6b11b](https://github.com/runloopai/api-client-ts/commit/ae6b11b8d45efcb6535407bb830605acc5d14da0))
+
+
+### Chores
+
+* **axon:** add axon auto-pagination to stainless sdks ([#8420](https://github.com/runloopai/api-client-ts/issues/8420)) ([28acb74](https://github.com/runloopai/api-client-ts/commit/28acb748e4e198e83d300952eeffe1b96d68c8c4))
+* Hide repository connection APIs from public OpenAPI spec ([#8462](https://github.com/runloopai/api-client-ts/issues/8462)) ([4f0b53f](https://github.com/runloopai/api-client-ts/commit/4f0b53f9d35b28ac8d5386bc05467d7dcfbb70c5))
+* **internal:** update multipart form array serialization ([56437dc](https://github.com/runloopai/api-client-ts/commit/56437dc1b0d8e44607412c96b9be81d4f9a9f1a8))
+* **smoketests:** migrate deprecated polling to longPoll for devbox await methods ([#764](https://github.com/runloopai/api-client-ts/issues/764)) ([e5d866c](https://github.com/runloopai/api-client-ts/commit/e5d866cfd615baccb513193bf14b383a5d16abe4))
+* **tests:** bump steady to v0.20.1 ([a001475](https://github.com/runloopai/api-client-ts/commit/a00147563782a9389b4b9c6b18cb747f7a10b5b9))
+* **tests:** bump steady to v0.20.2 ([c5abc92](https://github.com/runloopai/api-client-ts/commit/c5abc92b4c1de24347d3e91aaefdf4138e2afba8))
+
+
+### Documentation
+
+* **api:** document vCPU, RAM, and disk for resource_size_request ([#8368](https://github.com/runloopai/api-client-ts/issues/8368)) ([0ddaf44](https://github.com/runloopai/api-client-ts/commit/0ddaf443f8669830b9d33d2e1dd551e31a08050a))
+
+## 1.14.1 (2026-03-25)
+
+Full Changelog: [v1.14.0...v1.14.1](https://github.com/runloopai/api-client-ts/compare/v1.14.0...v1.14.1)
+
+### Bug Fixes
+
+* **tunnels:** extract tunnel domain from base url ([#755](https://github.com/runloopai/api-client-ts/issues/755)) ([03b7479](https://github.com/runloopai/api-client-ts/commit/03b7479515ea129bf9ba191d103a05d20e6ee260))
+
+## 1.14.0 (2026-03-25)
+
+Full Changelog: [v1.13.0...v1.14.0](https://github.com/runloopai/api-client-ts/compare/v1.13.0...v1.14.0)
+
+### Features
+
+* Add axon rest endpoints for raw SQL access ([#8287](https://github.com/runloopai/api-client-ts/issues/8287)) ([4f8b988](https://github.com/runloopai/api-client-ts/commit/4f8b9884344cbb0c0a1a86d66390086e9b397e2a))
+
+
+### Bug Fixes
+
+* **broker:** broker protocol renames for clarity / future proof ([#8285](https://github.com/runloopai/api-client-ts/issues/8285)) ([db4eadd](https://github.com/runloopai/api-client-ts/commit/db4eaddd921cb07879fccf9fbb8ca902b9cdbb6b))
+
+
+### Chores
+
+* **ci:** skip lint on metadata-only changes ([3ea23af](https://github.com/runloopai/api-client-ts/commit/3ea23af6a629913bc7aba2d65c7173df86a817e3))
+* **tests:** bump steady to v0.19.7 ([ef57274](https://github.com/runloopai/api-client-ts/commit/ef57274687f6e364bab6055bc9fca40b531c6602))
+
+## 1.13.0 (2026-03-25)
+
+Full Changelog: [v1.12.0...v1.13.0](https://github.com/runloopai/api-client-ts/compare/v1.12.0...v1.13.0)
+
+### Features
+
+* add BrokerMount to OpenAPI spec ([#8282](https://github.com/runloopai/api-client-ts/issues/8282)) ([88863c6](https://github.com/runloopai/api-client-ts/commit/88863c61384888bd25bb7d5733a1100b319b62bb))
+* adding axon sdk methods ([#758](https://github.com/runloopai/api-client-ts/issues/758)) ([1681eb3](https://github.com/runloopai/api-client-ts/commit/1681eb385979849a8f95843eba833eaa983031bb))
+
+
+### Chores
+
+* **sdk:** update `removeTunnel()` oo sdk method and add smoketest ([#756](https://github.com/runloopai/api-client-ts/issues/756)) ([db682a9](https://github.com/runloopai/api-client-ts/commit/db682a91d2a2c2a34d71492a11c26f396212f98b))
+
+## 1.12.0 (2026-03-24)
+
+Full Changelog: [v1.11.2...v1.12.0](https://github.com/runloopai/api-client-ts/compare/v1.11.2...v1.12.0)
+
+### Features
+
+* [beta] adding axon, an event communication channel ([#8268](https://github.com/runloopai/api-client-ts/issues/8268)) ([81f048a](https://github.com/runloopai/api-client-ts/commit/81f048a2ebc688a60fddcf3e047bb12ee60dc41a))
+* tunnel example ([#741](https://github.com/runloopai/api-client-ts/issues/741)) ([222e123](https://github.com/runloopai/api-client-ts/commit/222e123673b1e74dda6a76c55cacbbfbebde0221))
+
+
+### Bug Fixes
+
+* add AxonEventView schema to OpenAPI spec for SSE subscribe endpoint ([#8274](https://github.com/runloopai/api-client-ts/issues/8274)) ([6966e67](https://github.com/runloopai/api-client-ts/commit/6966e67e79a5a605cf7e4a6b60cccf851961eb60))
+* add name to Axon ([#8277](https://github.com/runloopai/api-client-ts/issues/8277)) ([3e9232b](https://github.com/runloopai/api-client-ts/commit/3e9232ba1ba650a4deed68ade5de97a3f80436bf))
+* avoid actually calling claude in example ([#753](https://github.com/runloopai/api-client-ts/issues/753)) ([7425502](https://github.com/runloopai/api-client-ts/commit/742550288e6d83a55635feda2ca3496ea1d70115))
+* **tunnels:** allow tunnel removal ([#8257](https://github.com/runloopai/api-client-ts/issues/8257)) ([049b89c](https://github.com/runloopai/api-client-ts/commit/049b89c2c7ee56ce50794ab21bdc29ffd82d0e0f))
+
+
+### Chores
+
+* **internal:** update gitignore ([52bd497](https://github.com/runloopai/api-client-ts/commit/52bd497f637f69df7c4d0b1b5252e0ebf6e185e5))
+* remove dead port configuration code, mark deprecated / ignored in the API ([#8195](https://github.com/runloopai/api-client-ts/issues/8195)) ([960a249](https://github.com/runloopai/api-client-ts/commit/960a249773062d0b9c3835b6a10edcd16cb0e812))
+* **tests:** bump steady to v0.19.4 ([3b49bf8](https://github.com/runloopai/api-client-ts/commit/3b49bf814b0e2fdb6695f3c1afe84a454af7a28b))
+* **tests:** bump steady to v0.19.5 ([c7d6cc2](https://github.com/runloopai/api-client-ts/commit/c7d6cc25481ee89dab3310885d1cb4d5521a62aa))
+* **tests:** bump steady to v0.19.6 ([695a7d2](https://github.com/runloopai/api-client-ts/commit/695a7d2a8c77c1bb3300a3e9be7e5395273a1bc2))
+
+
+### Documentation
+
+* add mounts example ([#752](https://github.com/runloopai/api-client-ts/issues/752)) ([8b8eda2](https://github.com/runloopai/api-client-ts/commit/8b8eda2764d980a372f8f0d76898e83fceb64f97))
+* add suspend, resume & snapshot documentation ([#754](https://github.com/runloopai/api-client-ts/issues/754)) ([0295cc6](https://github.com/runloopai/api-client-ts/commit/0295cc645201a5c3abae489ae08ad689c5dfadb1))
+
+
+### Refactors
+
+* **tests:** switch from prism to steady ([1ad5e76](https://github.com/runloopai/api-client-ts/commit/1ad5e7623d62f06c3aef1f6f11c57fb1fb6ff162))
+* undeprecate total_count from pagination API, remove remaining_count ([#8084](https://github.com/runloopai/api-client-ts/issues/8084)) ([6d2a604](https://github.com/runloopai/api-client-ts/commit/6d2a6041e49f1f9ca85ae1f43d7be94041e87610))
+
+## 1.11.2 (2026-03-19)
+
+Full Changelog: [v1.11.1...v1.11.2](https://github.com/runloopai/api-client-ts/compare/v1.11.1...v1.11.2)
+
+### Chores
+
+* remove create_tunnel endpoint ([5076da2](https://github.com/runloopai/api-client-ts/commit/5076da21a6729b4d288b530f78cc0e16415175d7))
+
+## 1.11.1 (2026-03-18)
+
+Full Changelog: [v1.11.0...v1.11.1](https://github.com/runloopai/api-client-ts/compare/v1.11.0...v1.11.1)
+
+### Chores
+
+* configure new SDK language ([64381c0](https://github.com/runloopai/api-client-ts/commit/64381c018407f0e02a3aaf110158e917efe664ac))
+* configure new SDK language ([c710951](https://github.com/runloopai/api-client-ts/commit/c7109516f4f2c8c860cde297831310781f4addb3))
+* **internal:** make generated MCP servers compatible with Cloudflare worker environments ([53f0208](https://github.com/runloopai/api-client-ts/commit/53f0208346e1ab2283efbc5c665428446db72e64))
+* **internal:** support x-stainless-mcp-client-envs header in MCP servers ([9b4769e](https://github.com/runloopai/api-client-ts/commit/9b4769e31c07f9729492ff87b3f3771bc5c5680a))
+* **internal:** support x-stainless-mcp-client-permissions headers in MCP servers ([624d5f1](https://github.com/runloopai/api-client-ts/commit/624d5f14c20094cf942e92673271e0136fba8fa8))
+* **internal:** tweak CI branches ([1064841](https://github.com/runloopai/api-client-ts/commit/10648417aec063456e8ecab75db62daec1f148fd))
+
+## 1.11.0 (2026-03-10)
+
+Full Changelog: [v1.10.3...v1.11.0](https://github.com/runloopai/api-client-ts/compare/v1.10.3...v1.11.0)
+
+### Features
+
+* **documentation:** added self-documenting examples ([#733](https://github.com/runloopai/api-client-ts/issues/733)) ([c11402d](https://github.com/runloopai/api-client-ts/commit/c11402d2c8e8493dd05dad63316280921429ee94))
+* replace polling with long-poll loop for wait endpoints ([#745](https://github.com/runloopai/api-client-ts/issues/745)) ([9c81c01](https://github.com/runloopai/api-client-ts/commit/9c81c0127354cbabd210a06e556ee52d6ce055b5))
+* **sdk:** added secrets as first class concepts and examples ([#739](https://github.com/runloopai/api-client-ts/issues/739)) ([c82944a](https://github.com/runloopai/api-client-ts/commit/c82944a8ffd5342073c247edad72a7ddf69490b7))
+
+
+### Bug Fixes
+
+* add logs to devboxes, smoke tests & examples ([#742](https://github.com/runloopai/api-client-ts/issues/742)) ([0462122](https://github.com/runloopai/api-client-ts/commit/04621224e5dde6fef942da969fbed84f19053066))
+* **client:** preserve URL params already embedded in path ([1a4be5a](https://github.com/runloopai/api-client-ts/commit/1a4be5aaf6597727628db2ebd953f332f0d6fbd4))
+* default initial timeout delay for polling reduced to 0 seconds ([#744](https://github.com/runloopai/api-client-ts/issues/744)) ([8694d51](https://github.com/runloopai/api-client-ts/commit/8694d51658fbca53e90f0fa8826eee600768292f))
+
+
+### Chores
+
+* **ci:** skip uploading artifacts on stainless-internal branches ([7a33109](https://github.com/runloopai/api-client-ts/commit/7a33109ddeb30309f25065b9465045f6d9655da2))
+* **documentation:** correct exec advice ([#738](https://github.com/runloopai/api-client-ts/issues/738)) ([4d9624c](https://github.com/runloopai/api-client-ts/commit/4d9624c80bfa4ab1f8490ca093307c0d961a930d))
+* **documentation:** fix some broken links and bad example code ([#736](https://github.com/runloopai/api-client-ts/issues/736)) ([842c9bc](https://github.com/runloopai/api-client-ts/commit/842c9bc2ec33aba85ec4b943ebfe86527ec49d05))
+* fix smoketest tunnel removal ([#735](https://github.com/runloopai/api-client-ts/issues/735)) ([2b15fa6](https://github.com/runloopai/api-client-ts/commit/2b15fa6f9ea185256d8a2b25008643b12dd6b732))
+* **internal:** codegen related update ([7fd0cfd](https://github.com/runloopai/api-client-ts/commit/7fd0cfdf43c2136e019799622cdc514711cb8aaa))
+* shard smoketests in workflow ([#743](https://github.com/runloopai/api-client-ts/issues/743)) ([ea55929](https://github.com/runloopai/api-client-ts/commit/ea5592921982a98baaf6766d934f0a2cec079178))
+* **test:** do not count install time for mock server timeout ([d0cdc76](https://github.com/runloopai/api-client-ts/commit/d0cdc76bab4382caa170a51e405b7e79c7c13ab4))
+* update placeholder string ([77a7e9a](https://github.com/runloopai/api-client-ts/commit/77a7e9aadcd9d470dd059cf6ecd2f76eb3ada470))
+
+## 1.10.3 (2026-02-27)
+
+Full Changelog: [v1.10.2...v1.10.3](https://github.com/runloopai/api-client-ts/compare/v1.10.2...v1.10.3)
+
+### Bug Fixes
+
+* switching to MCP definition to specify a secret name per MCP server ([#7715](https://github.com/runloopai/api-client-ts/issues/7715)) ([ee0078f](https://github.com/runloopai/api-client-ts/commit/ee0078f21eedd7fd04d3d9bc39ee7f14dae3009c))
+
+
+### Chores
+
+* add mcp example ([#730](https://github.com/runloopai/api-client-ts/issues/730)) ([ed77255](https://github.com/runloopai/api-client-ts/commit/ed77255e95b49fbc815cb9118df73144bb2bd790))
+* **internal:** move stringifyQuery implementation to internal function ([aab68c2](https://github.com/runloopai/api-client-ts/commit/aab68c2e4c7ac559d1b36f0ec945602b8fc93c12))
+
+
+### Documentation
+
+* fix examples.md ([#732](https://github.com/runloopai/api-client-ts/issues/732)) ([ffef871](https://github.com/runloopai/api-client-ts/commit/ffef871a74138c29791c1b834248a5bbc948c0a8))
+
+## 1.10.2 (2026-02-26)
+
+Full Changelog: [v1.10.1...v1.10.2](https://github.com/runloopai/api-client-ts/compare/v1.10.1...v1.10.2)
+
+### Bug Fixes
+
+* remove beta docs from gateway-config ([#7677](https://github.com/runloopai/api-client-ts/issues/7677)) ([2079a07](https://github.com/runloopai/api-client-ts/commit/2079a07164f9563fc717a31c1b2a4a2f3976cbdc))
+
+
+### Chores
+
+* rename AI Gateway to Agent Gateway ([#7687](https://github.com/runloopai/api-client-ts/issues/7687)) ([2262a30](https://github.com/runloopai/api-client-ts/commit/2262a30a573aff3d5c3f8665a4f7e40edba8fd1b))
+
+## 1.10.1 (2026-02-26)
+
+Full Changelog: [v1.10.0...v1.10.1](https://github.com/runloopai/api-client-ts/compare/v1.10.0...v1.10.1)
+
+### Bug Fixes
+
+* **devbox:** add mcp configs to DevboxView ([#7680](https://github.com/runloopai/api-client-ts/issues/7680)) ([4be73c0](https://github.com/runloopai/api-client-ts/commit/4be73c0bba99b51d2e8fbbea7d4e5aa52957a883))
+
+## 1.10.0 (2026-02-26)
+
+Full Changelog: [v1.9.0...v1.10.0](https://github.com/runloopai/api-client-ts/compare/v1.9.0...v1.10.0)
+
+### Features
+
+* add MCP Hub to sdk ([#714](https://github.com/runloopai/api-client-ts/issues/714)) ([4bc5ba4](https://github.com/runloopai/api-client-ts/commit/4bc5ba46742270fa2c8855668c5aa189aee5beff))
+
+
+### Bug Fixes
+
+* **documentation:** fixed doc publishing ([#727](https://github.com/runloopai/api-client-ts/issues/727)) ([e152cdb](https://github.com/runloopai/api-client-ts/commit/e152cdb9eab36b50dca20fdc46775aa9dbd51434))
+
+
+### Chores
+
+* revert "Allow specifying smoketests jest filter to workflow" ([#725](https://github.com/runloopai/api-client-ts/issues/725)) ([a244af3](https://github.com/runloopai/api-client-ts/commit/a244af3f07663e39df73e6ec928123def42077da))
+
+## 1.9.0 (2026-02-25)
+
+Full Changelog: [v1.8.1...v1.9.0](https://github.com/runloopai/api-client-ts/compare/v1.8.1...v1.9.0)
+
+### Features
+
+* Add AI gateway and MCP gateway flags to network policy create ([#7638](https://github.com/runloopai/api-client-ts/issues/7638)) ([5542b72](https://github.com/runloopai/api-client-ts/commit/5542b727869a411b7828c2779f5f683e4c35f3ea))
+
+
+### Bug Fixes
+
+* **docs/contributing:** correct pnpm link command ([df98444](https://github.com/runloopai/api-client-ts/commit/df98444d096ae0fb8d737476ebb506122e3426b8))
+* **internal:** skip tests that depend on mock server ([284aac3](https://github.com/runloopai/api-client-ts/commit/284aac38f7f281f096ebb2bd4e5605df0db77a71))
+* workflow issues for npm stable tag and docs tar ([#721](https://github.com/runloopai/api-client-ts/issues/721)) ([2c5e7a4](https://github.com/runloopai/api-client-ts/commit/2c5e7a40f2b1cbcb73bb3ec17e2f4dd6e6e2ed6d))
+
+
+### Chores
+
+* Add archive method to stainless ([#7537](https://github.com/runloopai/api-client-ts/issues/7537)) ([b68ac03](https://github.com/runloopai/api-client-ts/commit/b68ac035f2d72bee47c2790c8c814e15e4ea4a1e))
+* allow specifying smoketests jest filter to workflow ([#722](https://github.com/runloopai/api-client-ts/issues/722)) ([b9d117b](https://github.com/runloopai/api-client-ts/commit/b9d117b23b5da12b38d7bc5e138079cedb40622b))
+* **documentation:** fixed bug in doc publishing ([#720](https://github.com/runloopai/api-client-ts/issues/720)) ([1eeb486](https://github.com/runloopai/api-client-ts/commit/1eeb486190d5184e7a9b8c363b68893c5492bf57))
+* **scenarios:** make scenario status enum instead of string ([#7552](https://github.com/runloopai/api-client-ts/issues/7552)) ([c5b244c](https://github.com/runloopai/api-client-ts/commit/c5b244ce0f502984420758c63e7a7c55760026f8))
+* update mock server docs ([875216d](https://github.com/runloopai/api-client-ts/commit/875216d63a50d030df6d5d3233a364a61b1b82b1))
+
+## 1.8.1 (2026-02-19)
+
+Full Changelog: [v1.8.0...v1.8.1](https://github.com/runloopai/api-client-ts/compare/v1.8.0...v1.8.1)
+
+### Chores
+
+* **benchmarks:** removed unused validate scorer endpoint ([#716](https://github.com/runloopai/api-client-ts/issues/716)) ([54bb583](https://github.com/runloopai/api-client-ts/commit/54bb5834f011ad10f9cdb086cddca9810c05f13e))
+
+
+### Refactors
+
+* deprecate and make Nullable total_count and remaining_count of ListViews ([#7533](https://github.com/runloopai/api-client-ts/issues/7533)) ([1af5508](https://github.com/runloopai/api-client-ts/commit/1af55086d738d85db55ac5a1116bd01950665902))
+
+## 1.8.0 (2026-02-12)
+
+Full Changelog: [v1.7.0...v1.8.0](https://github.com/runloopai/api-client-ts/compare/v1.7.0...v1.8.0)
+
+### Features
+
+* **benchmarks:** scenario scoring timeout ([#7300](https://github.com/runloopai/api-client-ts/issues/7300)) ([893cd00](https://github.com/runloopai/api-client-ts/commit/893cd0057d67f98f5e9ed2f453aae31e20728db0))
+* **devbox:** expose snapshot size (in bytes) ([#7444](https://github.com/runloopai/api-client-ts/issues/7444)) ([54aa338](https://github.com/runloopai/api-client-ts/commit/54aa338efb7935509bc6b7a47d892f8cddcb7164))
+
+
+### Bug Fixes
+
+* remove duplicate operationId createDevboxTunnel in openapi ([#7397](https://github.com/runloopai/api-client-ts/issues/7397)) ([99b8c23](https://github.com/runloopai/api-client-ts/commit/99b8c23fd3fc44bee446d97f701d3acd0a73a27f))
+
+
+### Chores
+
+* **internal:** avoid type checking errors with ts-reset ([1e3ed19](https://github.com/runloopai/api-client-ts/commit/1e3ed1959f5afbe8235b8f37742e3fb04c9fb877))
+
+## 1.7.0 (2026-02-05)
+
+Full Changelog: [v1.6.0...v1.7.0](https://github.com/runloopai/api-client-ts/compare/v1.6.0...v1.7.0)
+
+### Features
+
+* adding MCP Config routes ([#7331](https://github.com/runloopai/api-client-ts/issues/7331)) ([81054b5](https://github.com/runloopai/api-client-ts/commit/81054b5b53a4e5244d1bf8489b610deda650600e))
+* **devbox:** add mcp configuration to devbox create ([#7341](https://github.com/runloopai/api-client-ts/issues/7341)) ([6ed219b](https://github.com/runloopai/api-client-ts/commit/6ed219bbbc44d105ca43be3f2e4265263d259b22))
+
+
+### Bug Fixes
+
+* publish-docs.yml on main failing b/c yarn binary missing in ubuntu-slim ([#712](https://github.com/runloopai/api-client-ts/issues/712)) ([13c187b](https://github.com/runloopai/api-client-ts/commit/13c187b3efa409ecad35910b11bf041217dd7679))
+
+
+### Chores
+
+* additional e2e tests for gatewayconfig + network config  ([#709](https://github.com/runloopai/api-client-ts/issues/709)) ([ed48249](https://github.com/runloopai/api-client-ts/commit/ed482490613dc503893edaa2808aaad10c7f75c5))
+* **ci:** migrate fast and simple actions to ubuntu-slim runner ([#703](https://github.com/runloopai/api-client-ts/issues/703)) ([3c06589](https://github.com/runloopai/api-client-ts/commit/3c06589447650885fe143c8e5470e6231473f4e8))
+* fix workflow using slim not having yarn ([#713](https://github.com/runloopai/api-client-ts/issues/713)) ([261fc58](https://github.com/runloopai/api-client-ts/commit/261fc580c7ccd3aeda0dbd99af31c2b42b4882ae))
+
+## 1.6.0 (2026-02-04)
+
+Full Changelog: [v1.5.1...v1.6.0](https://github.com/runloopai/api-client-ts/compare/v1.5.1...v1.6.0)
+
+### Features
+
+* add api to query devbox usage ([#7296](https://github.com/runloopai/api-client-ts/issues/7296)) ([7c5fbee](https://github.com/runloopai/api-client-ts/commit/7c5fbee5859eb24604678ad4436414333cb9120f))
+* Add tunnel helpers to OO sdk ([#705](https://github.com/runloopai/api-client-ts/issues/705)) ([d510b53](https://github.com/runloopai/api-client-ts/commit/d510b53304d9fc8c506192c5a3cb078681013ab7))
+* **devbox:** adding gateway config to devbox ([#701](https://github.com/runloopai/api-client-ts/issues/701)) ([173fada](https://github.com/runloopai/api-client-ts/commit/173fadaf97a02e89138addf57bcf9f5e580a81b3))
+
+
+### Chores
+
+* **client:** do not parse responses with empty content-length ([f797b28](https://github.com/runloopai/api-client-ts/commit/f797b28110f08f78867a4e9fb8d45eb2073c3247))
+* deprecate remove tunnel API ([#707](https://github.com/runloopai/api-client-ts/issues/707)) ([e2322e6](https://github.com/runloopai/api-client-ts/commit/e2322e693c17d395f373bc08fc931e32be891b29))
+* Mark legacy tunnel methods deprecated ([#706](https://github.com/runloopai/api-client-ts/issues/706)) ([56a26f9](https://github.com/runloopai/api-client-ts/commit/56a26f950e26d6f86baede3eddeb2282130f8d33))
+
+## 1.5.1 (2026-01-30)
+
+Full Changelog: [v1.5.0...v1.5.1](https://github.com/runloopai/api-client-ts/compare/v1.5.0...v1.5.1)
+
+### Chores
+
+* **devbox:** rename tunnel auth enum ([#7239](https://github.com/runloopai/api-client-ts/issues/7239)) ([e5d273e](https://github.com/runloopai/api-client-ts/commit/e5d273e8dacee31c9f440162d3aa6806c1618d4b))
+
+## 1.5.0 (2026-01-30)
+
+Full Changelog: [v1.4.1...v1.5.0](https://github.com/runloopai/api-client-ts/compare/v1.4.1...v1.5.0)
+
+### Features
+
+* **devbox:** add enable_tunnel API ([#7236](https://github.com/runloopai/api-client-ts/issues/7236)) ([9ebf964](https://github.com/runloopai/api-client-ts/commit/9ebf964b099983533b9f4ce0bfc43540db876690))
+
+## 1.4.1 (2026-01-30)
+
+Full Changelog: [v1.4.0...v1.4.1](https://github.com/runloopai/api-client-ts/compare/v1.4.0...v1.4.1)
+
+### Chores
+
+* **devbox:** deprecate remove tunnel API ([#7230](https://github.com/runloopai/api-client-ts/issues/7230)) ([25d9586](https://github.com/runloopai/api-client-ts/commit/25d9586715e303d52e80adc56ed26fd35faae1fe))
+
+## 1.4.0 (2026-01-30)
+
+Full Changelog: [v1.3.2...v1.4.0](https://github.com/runloopai/api-client-ts/compare/v1.3.2...v1.4.0)
+
+### Features
+
+* **devbox:** add gateway routes ([#7212](https://github.com/runloopai/api-client-ts/issues/7212)) ([4e46620](https://github.com/runloopai/api-client-ts/commit/4e46620b9eaa3ea1e18114fd8ba5687e1f892153))
+* **devbox:** add new tunnel APIs and deprecate old tunnel API ([#7227](https://github.com/runloopai/api-client-ts/issues/7227)) ([8f8d43b](https://github.com/runloopai/api-client-ts/commit/8f8d43be17e322106484ca99ad1efa464fc87096))
+
+
+### Chores
+
+* **documentation:** made warning message language more accurate ([#7215](https://github.com/runloopai/api-client-ts/issues/7215)) ([ea2cdbe](https://github.com/runloopai/api-client-ts/commit/ea2cdbe1eb3c02fbbaa11eb6b6e7f51d9c8edf91))
+
+## 1.3.2 (2026-01-30)
+
+Full Changelog: [v1.3.1...v1.3.2](https://github.com/runloopai/api-client-ts/compare/v1.3.1...v1.3.2)
+
+### Bug Fixes
+
+* **blueprint:** blueprint state queued handled by is ready ([#696](https://github.com/runloopai/api-client-ts/issues/696)) ([119c82c](https://github.com/runloopai/api-client-ts/commit/119c82c2d07095982d5da6ab625c92bc202f4ee7))
+
+## 1.3.1 (2026-01-28)
+
+Full Changelog: [v1.3.0...v1.3.1](https://github.com/runloopai/api-client-ts/compare/v1.3.0...v1.3.1)
+
+### Features
+
+* **benchmark:** adding in progress benchmark runs for benchmark jobs ([#7183](https://github.com/runloopai/api-client-ts/issues/7183)) ([65f75d9](https://github.com/runloopai/api-client-ts/commit/65f75d9f1711422459bc952c7833ef8f8e750477))
+
+
+### Bug Fixes
+
+* smoketest workflow workflow_call event checkout on caller repo ([#687](https://github.com/runloopai/api-client-ts/issues/687)) ([77d82a9](https://github.com/runloopai/api-client-ts/commit/77d82a97fc468aafb29780d472f90c24b1a0041a))
+* updating the readme ([#692](https://github.com/runloopai/api-client-ts/issues/692)) ([80fb27a](https://github.com/runloopai/api-client-ts/commit/80fb27a9f7f4b99c3581b5121dae0c6346064f6c))
+
+
+### Chores
+
+* **ci:** upgrade `actions/github-script` ([9417f0c](https://github.com/runloopai/api-client-ts/commit/9417f0c97c6811ee7147db7942104be46e581f6f))
+* remove api docs readme reference ([#690](https://github.com/runloopai/api-client-ts/issues/690)) ([dd16be0](https://github.com/runloopai/api-client-ts/commit/dd16be0ff1797427d813a5bc98a6a8cc1583a57a))
+
+## 1.3.0 (2026-01-22)
+
+Full Changelog: [v1.2.0-beta-2...v1.3.0](https://github.com/runloopai/api-client-ts/compare/v1.2.0-beta-2...v1.3.0)
+
+### Features
+
+* adding network policies oo concepts ([#680](https://github.com/runloopai/api-client-ts/issues/680)) ([4f01339](https://github.com/runloopai/api-client-ts/commit/4f0133956634fefbc761de1183b6d900f7b2e28c))
+* **sdk:** Scenario ([#684](https://github.com/runloopai/api-client-ts/issues/684)) ([c7c3274](https://github.com/runloopai/api-client-ts/commit/c7c3274ac0dd74000414299c490346e71bcd1bf4))
+* **sdk:** ScenarioRun class ([#681](https://github.com/runloopai/api-client-ts/issues/681)) ([52a9275](https://github.com/runloopai/api-client-ts/commit/52a92754f31211dbc970f621ea931a05037de114))
+* **blueprint:** Set cilium network policy on blueprint build ([#7006](https://github.com/runloopai/api-client-ts/issues/7006)) ([038fc8a](https://github.com/runloopai/api-client-ts/commit/038fc8a393d533d4a29532b570fc7b48ef3292f3))
+* **benchmarks:** add `update_scenarios` method to benchmarks resource ([4ef2680](https://github.com/runloopai/api-client-ts/commit/4ef26807dbb81cd171a1d1a91a4eadf4ec0cde73))
+* **devbox:** remove this one ([ffe23be](https://github.com/runloopai/api-client-ts/commit/ffe23bea59c737ad845bc179e007fecb07a721b7))
+* **mounts:** add convenience helper for inline mounting storage objects ([#675](https://github.com/runloopai/api-client-ts/issues/675)) ([2e5866c](https://github.com/runloopai/api-client-ts/commit/2e5866c4b4f80078144f218c4c7145f767e8b2a0))
+* **network-policy:** add network policies to api ([fd7c42c](https://github.com/runloopai/api-client-ts/commit/fd7c42c760cd5d80f5843fbf7e97b85d29d925d5))
+* **sdk:** added scorers to OO SDK ([#679](https://github.com/runloopai/api-client-ts/issues/679)) ([ee67c94](https://github.com/runloopai/api-client-ts/commit/ee67c9406a97731d38f2ce0ab8dcb16226322304))
+
+
+### Chores
+
+* fix npm publish ([#689](https://github.com/runloopai/api-client-ts/issues/689)) ([f161f1c](https://github.com/runloopai/api-client-ts/commit/f161f1c3454e69b99ce5142af79830bb1b6fdce5))
+* fix stainless spec / remove deprecated benchmark/runs ([#7074](https://github.com/runloopai/api-client-ts/issues/7074)) ([d772c92](https://github.com/runloopai/api-client-ts/commit/d772c92acae9b124a797d204a0d1a9bdaa0eec19))
+* make smoketest workflow support workflow_call event ([#686](https://github.com/runloopai/api-client-ts/issues/686)) ([505de6b](https://github.com/runloopai/api-client-ts/commit/505de6b3b73fb355f606088cfcb4265fd3b25db5))
+* update network policy create params descriptions ([#7069](https://github.com/runloopai/api-client-ts/issues/7069)) ([159b43f](https://github.com/runloopai/api-client-ts/commit/159b43f2864105b83fa47cef591a216aedeb2b7c))
+* **devbox:** Remove network policy from devbox view; use launch params instead ([#7025](https://github.com/runloopai/api-client-ts/issues/7025)) ([849bcfa](https://github.com/runloopai/api-client-ts/commit/849bcfab616e79e5b52612afd09ee3eab36d3f91))
+* break long lines in snippets into multiline ([aea51a8](https://github.com/runloopai/api-client-ts/commit/aea51a857a3ec4f741281782bd7d1b40b3e33ca9))
+* **internal:** codegen related update ([f2acb64](https://github.com/runloopai/api-client-ts/commit/f2acb645f6854253dd74676570b03c1c6f325b2c))
+* **internal:** update `actions/checkout` version ([6f2a8ae](https://github.com/runloopai/api-client-ts/commit/6f2a8ae880dbe17fdfd66389fbe674baf5e75dc8))
+* **internal:** upgrade babel, qs, js-yaml ([3c31dd4](https://github.com/runloopai/api-client-ts/commit/3c31dd460e6f8e487ff326763bbe39b555fd136e))
+
+
+### Refactors
+
+* **benchmark:** Deprecate /benchmark/{id}/runs in favor of /benchmark_runs ([#7019](https://github.com/runloopai/api-client-ts/issues/7019)) ([33624ce](https://github.com/runloopai/api-client-ts/commit/33624ce149003dfb1eaa49c10c8efa233b875ab9))
+
+
+### Bug Fixes
+
+* **benchmarks:** `update()` for benchmarks and scenarios replaces all provided fields and does not modify unspecified fields ([#6702](https://github.com/runloopai/api-client-ts/issues/6702)) ([0c2e0f0](https://github.com/runloopai/api-client-ts/commit/0c2e0f017684ddc578b80c31e3a08925bc582765))
+* **documentation:** added types to the typedoc main list and fixed some decorators ([#677](https://github.com/runloopai/api-client-ts/issues/677)) ([392007d](https://github.com/runloopai/api-client-ts/commit/392007d6555582d9a00b877e2ba6c1ea0de4236d))
+
+
+## 1.1.0 (2025-12-13)
+
+Full Changelog: [v1.0.0...v1.1.0](https://github.com/runloopai/api-client-ts/compare/v1.0.0...v1.1.0)
+
+### Features
+
+* **blueprints:** Add build context to the OpenAPI spec ([#6494](https://github.com/runloopai/api-client-ts/issues/6494)) ([e295c86](https://github.com/runloopai/api-client-ts/commit/e295c861c54be8320cf3a049023722159e1566d9))
+* **devbox:** added stdin streaming endpoint ([2610c5d](https://github.com/runloopai/api-client-ts/commit/2610c5d9207fab989f335633e9b8034d6905afd0))
+* **devbox:** added suspend async and promoted suspend to automatically await the devbox running ([#670](https://github.com/runloopai/api-client-ts/issues/670)) ([e814e00](https://github.com/runloopai/api-client-ts/commit/e814e000496e923023e525b038efcb39e34b4cdd))
+* **devbox:** default to x86 arch ([e040bc2](https://github.com/runloopai/api-client-ts/commit/e040bc2bd4411dd566fbe6e339055403eb52bfca))
+* **devbox:** return user for createSshKey ([3e8406b](https://github.com/runloopai/api-client-ts/commit/3e8406bb8b29a4e2cf87e89c22be7a8e5ecebf39))
+* **ignore matcher:** support for .dockerignore for build context ([#673](https://github.com/runloopai/api-client-ts/issues/673)) ([a843d54](https://github.com/runloopai/api-client-ts/commit/a843d54b93a69ea4cf8bf22475fd0cf6b04ba98b))
+
+
+### Bug Fixes
+
+* **api:** don't ignore devbox keep_alive, suspend and resume in api ([a5143ef](https://github.com/runloopai/api-client-ts/commit/a5143eff331d3404e1649ec57f01e67ea18b6613))
+* **devbox:** launch parameter typo ([2ef3ede](https://github.com/runloopai/api-client-ts/commit/2ef3ede2bbc71b79f111ab9c0326573f44dfab4c))
+* **mcp:** correct code tool API endpoint ([8932b2d](https://github.com/runloopai/api-client-ts/commit/8932b2d7b4bc2a5c50487db572286448d388e6ea))
+* **mcp:** return correct lines on typescript errors ([4ebe08c](https://github.com/runloopai/api-client-ts/commit/4ebe08c525a71cecb26e78a3a52602efb40fb968))
+* **scorer:** fixed RL_TEST_CONTEXT to RL_SCORER_CONTEXT ([e810958](https://github.com/runloopai/api-client-ts/commit/e810958cdab4b067d91f7a2e3cec481b44a5a7d9))
+
+
+### Chores
+
+* hide build context APIs ([8ea7bba](https://github.com/runloopai/api-client-ts/commit/8ea7bba5cd9cd9d047091386025965edeb316ab4))
+* **internal:** codegen related update ([09eb01d](https://github.com/runloopai/api-client-ts/commit/09eb01ddeb7496eb3badd068dba2fb9c1198fddf))
+* **internal:** codegen related update ([83d2d6c](https://github.com/runloopai/api-client-ts/commit/83d2d6cb029c72383fdece53d3850af5416447a1))
+* **mounts:** Update documentation for deprecated fields to direct the user to the replacement API ([1e68146](https://github.com/runloopai/api-client-ts/commit/1e6814677b20e12513da0faaa3cd4414a4d3df6e))
+
+## 1.0.0 (2025-12-01)
+
+Full Changelog: [v0.69.0...v1.0.0](https://github.com/runloopai/api-client-ts/compare/v0.69.0...v1.0.0)
+
+### Features
+
+* **devbox:** added devbox.shell(shellName) command and stateful shell class to SDK ([#665](https://github.com/runloopai/api-client-ts/issues/665)) ([ad9474f](https://github.com/runloopai/api-client-ts/commit/ad9474f9a8a25c331be7d51bebc5d6934db9ec6d))
+
+
+### Chores
+
+* **blueprints:** Add convenience build_context API that takes a StorageObject directly. ([#666](https://github.com/runloopai/api-client-ts/issues/666)) ([ec2beaf](https://github.com/runloopai/api-client-ts/commit/ec2beafd9d8091b1b679921ed9a871d57fa8dbdf))
+* Remove broken tests and command_id for exec ([#668](https://github.com/runloopai/api-client-ts/issues/668)) ([0ca3940](https://github.com/runloopai/api-client-ts/commit/0ca394035f746cce5492ac86ce9e5ce21c3ec592))
+
+## 0.69.0 (2025-11-25)
+
+Full Changelog: [v0.68.0...v0.69.0](https://github.com/runloopai/api-client-ts/compare/v0.68.0...v0.69.0)
+
+### Features
+
+* **devbox:** unify api for devbox mounts ([ea54ef5](https://github.com/runloopai/api-client-ts/commit/ea54ef53e610cfc0c635a12cc3cc09352e91354b))
+* **storage-objects:** Adds a helper method to create an Object from a local directory ([#656](https://github.com/runloopai/api-client-ts/issues/656)) ([b87ac39](https://github.com/runloopai/api-client-ts/commit/b87ac396696b02ef99bdf700b2abff2c7de68c9d))
+
+
+### Bug Fixes
+
+* **sdk:** Fix exports of the SDK not getting clobbered ([#662](https://github.com/runloopai/api-client-ts/issues/662)) ([b9ca9a1](https://github.com/runloopai/api-client-ts/commit/b9ca9a162dd4c305aeb58f4a4bf7ec339e6eabc9))
+
+## 0.68.0 (2025-11-19)
+
+Full Changelog: [v0.67.1...v0.68.0](https://github.com/runloopai/api-client-ts/compare/v0.67.1...v0.68.0)
+
+### Features
+
+* **blueprint:** adds queued state ([c8f5e0b](https://github.com/runloopai/api-client-ts/commit/c8f5e0b01cbd2fd573403b7d9b61816efce03b1f))
+* **blueprints:** Cleanup the BuildContext API ([#6407](https://github.com/runloopai/api-client-ts/issues/6407))\n\nTest ([8bd1c44](https://github.com/runloopai/api-client-ts/commit/8bd1c4468565effadc66b8524594daa5761938a4))
+* **blueprints:** prevent deletion of blueprints with dependent snapshots ([f52eb9a](https://github.com/runloopai/api-client-ts/commit/f52eb9aedc5d9317a2ab27952c13b0f2b2172339))
+* **devbox:** adding devbox execution std out / err last n lines ([#643](https://github.com/runloopai/api-client-ts/issues/643)) ([71de54c](https://github.com/runloopai/api-client-ts/commit/71de54c13bca60f3057e8c8ed2b8e5e531fffc9f))
+* **object:** Added ability to give objects a Time To Live, after which they are automatically deleted.\nfeat(blueprints): Added the ability to attach objects as build contexts that can be referenced in your Dockerfile. ([0ee5067](https://github.com/runloopai/api-client-ts/commit/0ee50676c734c536a8d1b5c25ef19d154da1f121))
+* **streaming:** harden SSE timeout recovery ([#645](https://github.com/runloopai/api-client-ts/issues/645)) ([cb249a7](https://github.com/runloopai/api-client-ts/commit/cb249a7d2c854a28e3932f35b2ad98dd30c8737b))
+
+
+### Bug Fixes
+
+* **file-mount:** client side validation for file_mount size checks ([#639](https://github.com/runloopai/api-client-ts/issues/639)) ([30e7123](https://github.com/runloopai/api-client-ts/commit/30e712315740c393c21dbfe34e4d2611dca0d0dc))
+* **snapshot:** added "deleted" status to DevboxSnapshotStatus enum \n fix(storage-object): added ObjectState enum, fixed createObject() to appropriately type content_type and state as the respective enums ([5f8b203](https://github.com/runloopai/api-client-ts/commit/5f8b2031aa38ff9a87e3554c9e5100189ea448e2))
+
 ## 0.67.1 (2025-11-05)
 
 Full Changelog: [v0.67.0...v0.67.1](https://github.com/runloopai/api-client-ts/compare/v0.67.0...v0.67.1)

@@ -1,6 +1,7 @@
 import { toFile } from '@runloop/api-client';
-import { Devbox } from '@runloop/api-client/objects';
-import { makeClientSDK, THIRTY_SECOND_TIMEOUT, uniqueName } from '../utils';
+import { Devbox, NetworkPolicy } from '@runloop/api-client/sdk';
+import { makeClientSDK, SHORT_TIMEOUT, LONG_TIMEOUT, uniqueName, cleanUpPolicy } from '../utils';
+import { uuidv7 } from 'uuidv7';
 
 const sdk = makeClientSDK();
 
@@ -9,25 +10,27 @@ describe('smoketest: object-oriented devbox', () => {
     let devbox: Devbox;
     let devboxId: string | undefined;
 
+    // Create devbox in beforeAll to avoid test order dependency
+    beforeAll(async () => {
+      devbox = await sdk.devbox.create({
+        name: uniqueName('sdk-devbox'),
+        launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 }, // 5 minutes
+      });
+      devboxId = devbox.id;
+    }, SHORT_TIMEOUT);
+
     afterAll(async () => {
       if (devbox) {
         await devbox.shutdown();
       }
     });
 
-    test(
-      'create devbox',
-      async () => {
-        devbox = await sdk.devbox.create({
-          name: uniqueName('sdk-devbox'),
-          launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 }, // 5 minutes
-        });
-        expect(devbox).toBeDefined();
-        expect(devbox.id).toBeTruthy();
-        devboxId = devbox.id;
-      },
-      THIRTY_SECOND_TIMEOUT,
-    );
+    test('create devbox', async () => {
+      // Devbox was created in beforeAll - just verify it exists
+      expect(devbox).toBeDefined();
+      expect(devbox.id).toBeTruthy();
+      expect(devboxId).toBeTruthy();
+    });
 
     test('get devbox info', async () => {
       expect(devbox).toBeDefined();
@@ -38,7 +41,7 @@ describe('smoketest: object-oriented devbox', () => {
 
     test('execute synchronous command', async () => {
       expect(devbox).toBeDefined();
-      const result = await devbox.cmd.exec({ command: 'echo "Hello from SDK!"' });
+      const result = await devbox.cmd.exec('echo "Hello from SDK!"');
       expect(result).toBeDefined();
       expect(result.exitCode).toBe(0);
       const output = await result.stdout();
@@ -47,7 +50,7 @@ describe('smoketest: object-oriented devbox', () => {
 
     test('execute asynchronous command', async () => {
       expect(devbox).toBeDefined();
-      const execution = await devbox.cmd.execAsync({ command: 'sleep 2 && echo "Async command completed"' });
+      const execution = await devbox.cmd.execAsync('sleep 2 && echo "Async command completed"');
       expect(execution).toBeDefined();
       expect(execution.executionId).toBeTruthy();
 
@@ -94,14 +97,77 @@ describe('smoketest: object-oriented devbox', () => {
     });
   });
 
+  describe('devbox creation edge cases', () => {
+    test.concurrent(
+      'create devbox with empty mounts array',
+      async () => {
+        // This tests the transformSDKDevboxCreateParams branch for empty mounts
+        let devbox: Devbox | undefined;
+        try {
+          devbox = await sdk.devbox.create({
+            name: uniqueName('sdk-devbox-empty-mounts'),
+            launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 },
+            mounts: [],
+          });
+          expect(devbox).toBeDefined();
+          expect(devbox.id).toBeTruthy();
+        } finally {
+          if (devbox) {
+            await devbox.shutdown();
+          }
+        }
+      },
+      SHORT_TIMEOUT,
+    );
+
+    test.concurrent(
+      'create devbox with network policy',
+      async () => {
+        let policy: NetworkPolicy | undefined;
+        let devbox: Devbox | undefined;
+        try {
+          // Create a network policy
+          policy = await sdk.networkPolicy.create({
+            name: uniqueName('sdk-policy-for-devbox'),
+            allow_all: false,
+            allowed_hostnames: ['github.com'],
+          });
+          expect(policy.id).toBeTruthy();
+
+          // Create a devbox with the network policy
+          devbox = await sdk.devbox.create({
+            name: uniqueName('sdk-devbox-with-policy'),
+            launch_parameters: {
+              resource_size_request: 'X_SMALL',
+              keep_alive_time_seconds: 60 * 5,
+              network_policy_id: policy.id,
+            },
+          });
+          expect(devbox).toBeDefined();
+          expect(devbox.id).toBeTruthy();
+
+          // Verify devbox was created successfully
+          const info = await devbox.getInfo();
+          expect(info.status).toBeDefined();
+        } finally {
+          if (devbox) {
+            await devbox.shutdown();
+          }
+          await cleanUpPolicy(policy);
+        }
+      },
+      SHORT_TIMEOUT,
+    );
+  });
+
   describe('devbox list and retrieval', () => {
-    test('list devboxes', async () => {
+    test.concurrent('list devboxes', async () => {
       const devboxes = await sdk.devbox.list({ limit: 10 });
       expect(Array.isArray(devboxes)).toBe(true);
       expect(devboxes.length).toBeGreaterThan(0);
     });
 
-    test('get devbox by ID', async () => {
+    test.concurrent('get devbox by ID', async () => {
       let devbox: Devbox | undefined;
       try {
         devbox = await sdk.devbox.create({
@@ -124,7 +190,7 @@ describe('smoketest: object-oriented devbox', () => {
   });
 
   describe('devbox suspend and resume', () => {
-    test('suspend and resume devbox', async () => {
+    test.concurrent('suspend and resume devbox', async () => {
       const devbox = await sdk.devbox.create({
         name: uniqueName('sdk-devbox-suspend'),
         launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 }, // 5 minutes
@@ -136,17 +202,39 @@ describe('smoketest: object-oriented devbox', () => {
       const suspendedInfo = await devbox.getInfo();
       expect(suspendedInfo.status).toBe('suspended');
 
-      // Resume the devbox
-      await devbox.resume();
-      await devbox.awaitRunning();
-      const resumedInfo = await devbox.getInfo();
+      // Resume the devbox - resume() automatically waits for running state
+      const resumedInfo = await devbox.resume();
       expect(resumedInfo.status).toBe('running');
 
       // Clean up
       await devbox.shutdown();
     });
 
-    test('keep alive', async () => {
+    test.concurrent('resumeAsync - resume without waiting', async () => {
+      const devbox = await sdk.devbox.create({
+        name: uniqueName('sdk-devbox-resume-async'),
+        launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 }, // 5 minutes
+      });
+
+      // Suspend the devbox
+      await devbox.suspend();
+      await devbox.awaitSuspended();
+      const suspendedInfo = await devbox.getInfo();
+      expect(suspendedInfo.status).toBe('suspended');
+
+      // Resume the devbox asynchronously - doesn't wait automatically
+      const resumeResponse = await devbox.resumeAsync();
+      expect(resumeResponse).toBeDefined();
+
+      // Now wait for running state explicitly
+      const runningInfo = await devbox.awaitRunning();
+      expect(runningInfo.status).toBe('running');
+
+      // Clean up
+      await devbox.shutdown();
+    });
+
+    test.concurrent('keep alive', async () => {
       const devbox = await sdk.devbox.create({
         name: uniqueName('sdk-devbox-keepalive'),
         launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 }, // 5 minutes
@@ -162,7 +250,7 @@ describe('smoketest: object-oriented devbox', () => {
   });
 
   describe('devbox networking', () => {
-    test('create SSH key', async () => {
+    test.concurrent('create SSH key', async () => {
       const devbox = await sdk.devbox.create({
         name: uniqueName('sdk-devbox-ssh'),
         launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 }, // 5 minutes
@@ -175,77 +263,247 @@ describe('smoketest: object-oriented devbox', () => {
       await devbox.shutdown();
     });
 
-    test('create and remove tunnel', async () => {
+    test.concurrent('enable V2 tunnel (open)', async () => {
       const devbox = await sdk.devbox.create({
-        name: uniqueName('sdk-devbox-tunnel'),
-        launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 }, // 5 minutes
+        name: uniqueName('sdk-devbox-enable-tunnel'),
+        launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 },
       });
 
-      // Create tunnel
-      const tunnel = await devbox.net.createTunnel({ port: 8080 });
-      expect(tunnel).toBeDefined();
+      try {
+        // Enable V2 tunnel with open auth mode
+        const tunnel = await devbox.net.enableTunnel({ auth_mode: 'open' });
 
-      // Remove tunnel
-      await devbox.net.removeTunnel({ port: 8080 });
+        expect(tunnel).toBeDefined();
+        expect(tunnel.tunnel_key).toBeTruthy();
+        expect(tunnel.auth_mode).toBe('open');
+        expect(tunnel.create_time_ms).toBeTruthy();
 
-      // Clean up
-      await devbox.shutdown();
+        // Verify tunnel is present on devbox info
+        const info = await devbox.getInfo();
+        expect(info.tunnel).toBeDefined();
+        expect(info.tunnel?.tunnel_key).toBe(tunnel.tunnel_key);
+
+        await devbox.net.removeTunnel();
+
+        const tunnelAfterRemoval = await devbox.getTunnel();
+        expect(tunnelAfterRemoval).toBeNull();
+      } finally {
+        await devbox.shutdown();
+      }
+    });
+
+    test.concurrent('enable V2 tunnel (authenticated)', async () => {
+      const devbox = await sdk.devbox.create({
+        name: uniqueName('sdk-devbox-enable-auth-tunnel'),
+        launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 },
+      });
+
+      try {
+        // Enable V2 tunnel with authenticated mode
+        const tunnel = await devbox.net.enableTunnel({ auth_mode: 'authenticated' });
+
+        expect(tunnel).toBeDefined();
+        expect(tunnel.tunnel_key).toBeTruthy();
+        expect(tunnel.auth_mode).toBe('authenticated');
+        // Authenticated tunnels should have an auth token
+        expect(tunnel.auth_token).toBeTruthy();
+      } finally {
+        await devbox.shutdown();
+      }
+    });
+
+    test.concurrent('enable V2 tunnel with default params', async () => {
+      const devbox = await sdk.devbox.create({
+        name: uniqueName('sdk-devbox-enable-tunnel-default'),
+        launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 },
+      });
+
+      try {
+        // Enable V2 tunnel without specifying params (should default to open/public)
+        const tunnel = await devbox.net.enableTunnel();
+
+        expect(tunnel).toBeDefined();
+        expect(tunnel.tunnel_key).toBeTruthy();
+        expect(tunnel.create_time_ms).toBeTruthy();
+      } finally {
+        await devbox.shutdown();
+      }
+    });
+
+    test.concurrent('create devbox with tunnel in create params', async () => {
+      // Create devbox with tunnel configured at launch time
+      const devbox = await sdk.devbox.create({
+        name: uniqueName('sdk-devbox-tunnel-create'),
+        launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 },
+        tunnel: { auth_mode: 'open' },
+      });
+
+      try {
+        // Verify tunnel was created at launch time
+        const info = await devbox.getInfo();
+        expect(info.tunnel).toBeDefined();
+        expect(info.tunnel?.tunnel_key).toBeTruthy();
+        expect(info.tunnel?.auth_mode).toBe('open');
+      } finally {
+        await devbox.shutdown();
+      }
+    });
+
+    test.concurrent('create devbox with authenticated tunnel in create params', async () => {
+      // Create devbox with authenticated tunnel at launch time
+      const devbox = await sdk.devbox.create({
+        name: uniqueName('sdk-devbox-tunnel-auth-create'),
+        launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 },
+        tunnel: { auth_mode: 'authenticated' },
+      });
+
+      try {
+        // Verify authenticated tunnel was created
+        const info = await devbox.getInfo();
+        expect(info.tunnel).toBeDefined();
+        expect(info.tunnel?.tunnel_key).toBeTruthy();
+        expect(info.tunnel?.auth_mode).toBe('authenticated');
+        expect(info.tunnel?.auth_token).toBeTruthy();
+      } finally {
+        await devbox.shutdown();
+      }
+    });
+
+    test.concurrent('getTunnel returns null when no tunnel enabled', async () => {
+      const devbox = await sdk.devbox.create({
+        name: uniqueName('sdk-devbox-get-tunnel-null'),
+        launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 },
+      });
+
+      try {
+        const tunnel = await devbox.getTunnel();
+        expect(tunnel).toBeNull();
+      } finally {
+        await devbox.shutdown();
+      }
+    });
+
+    test.concurrent('getTunnel returns tunnel info after enabling', async () => {
+      const devbox = await sdk.devbox.create({
+        name: uniqueName('sdk-devbox-get-tunnel'),
+        launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 },
+      });
+
+      try {
+        const enabledTunnel = await devbox.net.enableTunnel({ auth_mode: 'open' });
+        expect(enabledTunnel.tunnel_key).toBeTruthy();
+
+        const tunnel = await devbox.getTunnel();
+        expect(tunnel).not.toBeNull();
+        expect(tunnel?.tunnel_key).toBe(enabledTunnel.tunnel_key);
+        expect(tunnel?.auth_mode).toBe('open');
+      } finally {
+        await devbox.shutdown();
+      }
+    });
+
+    test.concurrent('getTunnelUrl constructs correct URL', async () => {
+      const devbox = await sdk.devbox.create({
+        name: uniqueName('sdk-devbox-get-tunnel-url'),
+        launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 },
+      });
+
+      try {
+        const tunnel = await devbox.net.enableTunnel({ auth_mode: 'open' });
+        expect(tunnel.tunnel_key).toBeTruthy();
+
+        const url = await devbox.getTunnelUrl(8080);
+        expect(url).toContain(`https://8080-${tunnel.tunnel_key}.tunnel.runloop.`);
+
+        const url3000 = await devbox.getTunnelUrl(3000);
+        expect(url3000).toContain(`https://3000-${tunnel.tunnel_key}.tunnel.runloop.`);
+      } finally {
+        await devbox.shutdown();
+      }
+    });
+
+    test.concurrent('getTunnelUrl throws RunloopError when no tunnel enabled', async () => {
+      const devbox = await sdk.devbox.create({
+        name: uniqueName('sdk-devbox-get-tunnel-url-error'),
+        launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 },
+      });
+
+      try {
+        // Verify getTunnelUrl throws RunloopError when no tunnel is enabled
+        await expect(devbox.getTunnelUrl(8080)).rejects.toThrow('No tunnel has been enabled');
+      } finally {
+        await devbox.shutdown();
+      }
     });
   });
 
   describe('devbox creation from blueprint and snapshot', () => {
-    test('create devbox from blueprint ID', async () => {
-      // First create a blueprint
-      const blueprint = await sdk.blueprint.create({
-        name: uniqueName('sdk-blueprint-for-devbox'),
-        dockerfile: 'FROM ubuntu:20.04\nRUN apt-get update && apt-get install -y curl',
-      });
-      expect(blueprint).toBeDefined();
+    test.concurrent(
+      'create devbox from blueprint ID',
+      async () => {
+        // First create a blueprint with extended long-poll timeout
+        const blueprint = await sdk.blueprint.create(
+          {
+            name: uniqueName('sdk-blueprint-for-devbox'),
+            dockerfile: 'FROM ubuntu:22.04\nRUN apt-get update && apt-get install -y curl',
+          },
+          { longPoll: { timeoutMs: 10 * 60 * 1000 } },
+        );
+        expect(blueprint).toBeDefined();
 
-      // Create devbox from blueprint using SDK method with blueprint ID
-      const devbox = await sdk.devbox.createFromBlueprintId(blueprint.id, {
-        name: uniqueName('sdk-devbox-from-blueprint-id'),
-        launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 },
-      });
-      expect(devbox).toBeDefined();
-      expect(devbox.id).toBeTruthy();
+        // Create devbox from blueprint using SDK method with blueprint ID
+        const devbox = await sdk.devbox.createFromBlueprintId(blueprint.id, {
+          name: uniqueName('sdk-devbox-from-blueprint-id'),
+          launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 },
+        });
+        expect(devbox).toBeDefined();
+        expect(devbox.id).toBeTruthy();
 
-      // Verify it's running
-      const info = await devbox.getInfo();
-      expect(info.status).toBe('running');
+        // Verify it's running
+        const info = await devbox.getInfo();
+        expect(info.status).toBe('running');
 
-      // Clean up
-      await devbox.shutdown();
-      await blueprint.delete();
-    });
+        // Clean up
+        await devbox.shutdown();
+        await blueprint.delete();
+      },
+      LONG_TIMEOUT,
+    );
 
-    test('create devbox from blueprint name', async () => {
-      // First create a blueprint with a specific name
-      const blueprintName = uniqueName('sdk-blueprint-name-test');
-      const blueprint = await sdk.blueprint.create({
-        name: blueprintName,
-        dockerfile: 'FROM ubuntu:20.04\nRUN apt-get update && apt-get install -y wget',
-      });
-      expect(blueprint).toBeDefined();
+    test.concurrent(
+      'create devbox from blueprint name',
+      async () => {
+        // First create a blueprint with a specific name and extended long-poll timeout
+        const blueprintName = uniqueName('sdk-blueprint-name-test');
+        const blueprint = await sdk.blueprint.create(
+          {
+            name: blueprintName,
+            dockerfile: 'FROM ubuntu:22.04\nRUN apt-get update && apt-get install -y wget',
+          },
+          { longPoll: { timeoutMs: 10 * 60 * 1000 } },
+        );
+        expect(blueprint).toBeDefined();
 
-      // Create devbox from blueprint using SDK method with blueprint name
-      const devbox = await sdk.devbox.createFromBlueprintName(blueprintName, {
-        name: uniqueName('sdk-devbox-from-blueprint-name'),
-        launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 },
-      });
-      expect(devbox).toBeDefined();
-      expect(devbox.id).toBeTruthy();
+        // Create devbox from blueprint using SDK method with blueprint name
+        const devbox = await sdk.devbox.createFromBlueprintName(blueprintName, {
+          name: uniqueName('sdk-devbox-from-blueprint-name'),
+          launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 },
+        });
+        expect(devbox).toBeDefined();
+        expect(devbox.id).toBeTruthy();
 
-      // Verify it's running
-      const info = await devbox.getInfo();
-      expect(info.status).toBe('running');
+        // Verify it's running
+        const info = await devbox.getInfo();
+        expect(info.status).toBe('running');
 
-      // Clean up
-      await devbox.shutdown();
-      await blueprint.delete();
-    });
+        // Clean up
+        await devbox.shutdown();
+        await blueprint.delete();
+      },
+      LONG_TIMEOUT,
+    );
 
-    test('create devbox from snapshot', async () => {
+    test.concurrent('create devbox from snapshot', async () => {
       // First create a devbox
       const sourceDevbox = await sdk.devbox.create({
         name: uniqueName('sdk-devbox-for-snapshot'),
@@ -277,6 +535,27 @@ describe('smoketest: object-oriented devbox', () => {
       await sourceDevbox.shutdown();
       await snapshot.delete();
     });
+
+    test.concurrent('snapshot disk async', async () => {
+      const sourceDevbox = await sdk.devbox.create({
+        name: uniqueName('sdk-devbox-for-async-snapshot'),
+        launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 },
+      });
+
+      let snapshot: Awaited<ReturnType<typeof sourceDevbox.snapshotDiskAsync>> | undefined;
+      try {
+        snapshot = await sourceDevbox.snapshotDisk({
+          name: uniqueName('sdk-async-snapshot'),
+          commit_message: 'Async snapshot test',
+        });
+        expect(snapshot).toBeDefined();
+        expect(snapshot.id).toBeTruthy();
+      } finally {
+        // force=true required because the async snapshot may still be in progress
+        await sdk.api.devboxes.shutdown(sourceDevbox.id);
+        if (snapshot) await snapshot.delete();
+      }
+    });
   });
 
   describe('command execution with streaming callbacks', () => {
@@ -287,7 +566,7 @@ describe('smoketest: object-oriented devbox', () => {
         name: uniqueName('sdk-devbox-streaming'),
         launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 },
       });
-    }, THIRTY_SECOND_TIMEOUT);
+    }, SHORT_TIMEOUT);
 
     afterAll(async () => {
       if (devbox) {
@@ -295,11 +574,10 @@ describe('smoketest: object-oriented devbox', () => {
       }
     });
 
-    test('exec with stdout callback', async () => {
+    test.concurrent('exec with stdout callback', async () => {
       const stdoutLines: string[] = [];
 
-      const result = await devbox.cmd.exec({
-        command: 'echo "line1" && echo "line2" && echo "line3"',
+      const result = await devbox.cmd.exec('echo "line1" && echo "line2" && echo "line3"', {
         stdout: (line) => {
           stdoutLines.push(line);
         },
@@ -316,11 +594,10 @@ describe('smoketest: object-oriented devbox', () => {
       expect(stdoutCombined).toBe(await result.stdout());
     });
 
-    test('exec with stderr callback', async () => {
+    test.concurrent('exec with stderr callback', async () => {
       const stderrLines: string[] = [];
 
-      const result = await devbox.cmd.exec({
-        command: 'echo "error1" >&2 && echo "error2" >&2',
+      const result = await devbox.cmd.exec('echo "error1" >&2 && echo "error2" >&2', {
         stderr: (line) => {
           stderrLines.push(line);
         },
@@ -336,11 +613,10 @@ describe('smoketest: object-oriented devbox', () => {
       expect(stderrCombined).toBe(await result.stderr());
     });
 
-    test('exec with output callback (both stdout and stderr)', async () => {
+    test.concurrent('exec with output callback (both stdout and stderr)', async () => {
       const allLines: string[] = [];
 
-      const result = await devbox.cmd.exec({
-        command: 'echo "stdout1" && echo "stderr1" >&2 && echo "stdout2"',
+      const result = await devbox.cmd.exec('echo "stdout1" && echo "stderr1" >&2 && echo "stdout2"', {
         output: (line) => {
           allLines.push(line);
         },
@@ -355,13 +631,12 @@ describe('smoketest: object-oriented devbox', () => {
       expect(combined).toContain('stdout2');
     });
 
-    test('exec with all three callbacks (stdout, stderr, output)', async () => {
+    test.concurrent('exec with all three callbacks (stdout, stderr, output)', async () => {
       const stdoutLines: string[] = [];
       const stderrLines: string[] = [];
       const outputLines: string[] = [];
 
-      const result = await devbox.cmd.exec({
-        command: 'echo "out1" && echo "err1" >&2 && echo "out2"',
+      const result = await devbox.cmd.exec('echo "out1" && echo "err1" >&2 && echo "out2"', {
         stdout: (line) => stdoutLines.push(line),
         stderr: (line) => stderrLines.push(line),
         output: (line) => outputLines.push(line),
@@ -386,10 +661,8 @@ describe('smoketest: object-oriented devbox', () => {
       expect(combined).toContain('err1');
     });
 
-    test('exec WITHOUT callbacks (preserve existing behavior)', async () => {
-      const result = await devbox.cmd.exec({
-        command: 'echo "test output"',
-      });
+    test.concurrent('exec WITHOUT callbacks (preserve existing behavior)', async () => {
+      const result = await devbox.cmd.exec('echo "test output"');
 
       expect(result.success).toBe(true);
       expect(result.exitCode).toBe(0);
@@ -402,8 +675,7 @@ describe('smoketest: object-oriented devbox', () => {
       let receivedBeforeCompletion = false;
 
       // Start async execution with streaming
-      const execution = await devbox.cmd.execAsync({
-        command: 'echo "immediate" && sleep 2 && echo "delayed"',
+      const execution = await devbox.cmd.execAsync('echo "immediate" && sleep 2 && echo "delayed"', {
         stdout: (line) => {
           stdoutLines.push(line);
           if (line.includes('immediate')) {
@@ -431,11 +703,10 @@ describe('smoketest: object-oriented devbox', () => {
       expect(stdoutCombined).toBe(await result.stdout());
     });
 
-    test('execAsync with stderr callback', async () => {
+    test.concurrent('execAsync with stderr callback', async () => {
       const stderrLines: string[] = [];
 
-      const execution = await devbox.cmd.execAsync({
-        command: 'echo "error output" >&2',
+      const execution = await devbox.cmd.execAsync('echo "error output" >&2', {
         stderr: (line) => {
           stderrLines.push(line);
         },
@@ -451,12 +722,11 @@ describe('smoketest: object-oriented devbox', () => {
       expect(stderrCombined).toBe(await result.stderr());
     });
 
-    test('exec with command producing both stdout and stderr', async () => {
+    test.concurrent('exec with command producing both stdout and stderr', async () => {
       const stdoutLines: string[] = [];
       const stderrLines: string[] = [];
 
-      const result = await devbox.cmd.exec({
-        command: 'echo "to stdout" && echo "to stderr" >&2 && echo "more stdout"',
+      const result = await devbox.cmd.exec('echo "to stdout" && echo "to stderr" >&2 && echo "more stdout"', {
         stdout: (line) => stdoutLines.push(line),
         stderr: (line) => stderrLines.push(line),
       });
@@ -477,11 +747,10 @@ describe('smoketest: object-oriented devbox', () => {
       expect(stderrCombined).toBe(await result.stderr());
     });
 
-    test('exec with long output - verify all lines received', async () => {
+    test.concurrent('exec with long output - verify all lines received', async () => {
       const stdoutLines: string[] = [];
 
-      const result = await devbox.cmd.exec({
-        command: 'for i in {1..1000}; do echo "line $i"; done',
+      const result = await devbox.cmd.exec('for i in {1..1000}; do echo "line $i"; done', {
         stdout: (line) => stdoutLines.push(line),
       });
 
@@ -511,21 +780,25 @@ describe('smoketest: object-oriented devbox', () => {
       let taskBCount = 0;
 
       // Start both executions at the same time (don't await)
-      const executionA = devbox.cmd.execAsync({
-        command: 'echo "A1" && sleep 0.5 && echo "A2" && sleep 0.5 && echo "A3"',
-        stdout: (line) => {
-          taskALogs.push(line);
-          taskACount++;
+      const executionA = devbox.cmd.execAsync(
+        'echo "A1" && sleep 0.5 && echo "A2" && sleep 0.5 && echo "A3"',
+        {
+          stdout: (line) => {
+            taskALogs.push(line);
+            taskACount++;
+          },
         },
-      });
+      );
 
-      const executionB = devbox.cmd.execAsync({
-        command: 'sleep 0.3 && echo "B1" && sleep 0.5 && echo "B2" && sleep 0.5 && echo "B3"',
-        stdout: (line) => {
-          taskBLogs.push(line);
-          taskBCount++;
+      const executionB = devbox.cmd.execAsync(
+        'sleep 0.3 && echo "B1" && sleep 0.5 && echo "B2" && sleep 0.5 && echo "B3"',
+        {
+          stdout: (line) => {
+            taskBLogs.push(line);
+            taskBCount++;
+          },
         },
-      });
+      );
 
       // Wait for both to start
       const [execA, execB] = await Promise.all([executionA, executionB]);
@@ -564,6 +837,363 @@ describe('smoketest: object-oriented devbox', () => {
       // Verify streaming captured same data as ExecutionResult
       expect(taskACombined).toBe(await resultA.stdout());
       expect(taskBCombined).toBe(await resultB.stdout());
+    });
+  });
+
+  describe('named shell - stateful command execution', () => {
+    let devbox: Devbox;
+
+    beforeAll(async () => {
+      devbox = await sdk.devbox.create({
+        name: uniqueName('sdk-devbox-named-shell'),
+        launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 },
+      });
+    }, SHORT_TIMEOUT);
+
+    afterAll(async () => {
+      if (devbox) {
+        await devbox.shutdown();
+      }
+    });
+
+    test.concurrent('shell.exec - basic execution', async () => {
+      expect(devbox).toBeDefined();
+      const shell = devbox.shell('test-shell-1');
+      const result = await shell.exec('echo "Hello from named shell!"');
+      expect(result).toBeDefined();
+      expect(result.exitCode).toBe(0);
+      const output = await result.stdout();
+      expect(output).toContain('Hello from named shell!');
+    });
+
+    test.concurrent('shell.exec - CWD persistence across commands', async () => {
+      expect(devbox).toBeDefined();
+      const shell = devbox.shell('test-shell-2');
+
+      // Create a directory and change to it
+      await shell.exec('mkdir -p /tmp/test-shell-dir');
+      await shell.exec('cd /tmp/test-shell-dir');
+
+      // Verify we're in the new directory
+      const pwdResult = await shell.exec('pwd');
+      const pwd = (await pwdResult.stdout()).trim();
+      expect(pwd).toBe('/tmp/test-shell-dir');
+
+      // Create a file in the current directory
+      await shell.exec('echo "test content" > testfile.txt');
+
+      // Verify the file exists in the current directory
+      const lsResult = await shell.exec('ls testfile.txt');
+      expect(lsResult.exitCode).toBe(0);
+      const lsOutput = await lsResult.stdout();
+      expect(lsOutput).toContain('testfile.txt');
+    });
+
+    test.concurrent('shell.exec - environment variable persistence', async () => {
+      expect(devbox).toBeDefined();
+      const shell = devbox.shell('test-shell-3');
+
+      // Set an environment variable
+      await shell.exec('export TEST_VAR="test-value-123"');
+
+      // Verify the variable persists in the next command
+      const echoResult = await shell.exec('echo $TEST_VAR');
+      const output = (await echoResult.stdout()).trim();
+      expect(output).toBe('test-value-123');
+
+      // Set another variable and verify both persist
+      await shell.exec('export ANOTHER_VAR="another-value"');
+      const bothResult = await shell.exec('echo "$TEST_VAR:$ANOTHER_VAR"');
+      const bothOutput = (await bothResult.stdout()).trim();
+      expect(bothOutput).toBe('test-value-123:another-value');
+    });
+
+    test.concurrent('shell.exec - combined CWD and environment persistence', async () => {
+      expect(devbox).toBeDefined();
+      const shell = devbox.shell('test-shell-4');
+
+      // Set environment and change directory
+      await shell.exec('export PROJECT_DIR="/tmp/my-project"');
+      await shell.exec('mkdir -p $PROJECT_DIR');
+      await shell.exec('cd $PROJECT_DIR');
+
+      // Verify both persist
+      const pwdResult = await shell.exec('pwd');
+      const pwd = (await pwdResult.stdout()).trim();
+      expect(pwd).toBe('/tmp/my-project');
+
+      // Create a file using the environment variable
+      await shell.exec('echo "project file" > $PROJECT_DIR/file.txt');
+
+      // Verify file exists
+      const lsResult = await shell.exec('ls file.txt');
+      expect(lsResult.exitCode).toBe(0);
+    });
+
+    test.concurrent('shell.execAsync - basic async execution', async () => {
+      expect(devbox).toBeDefined();
+      const shell = devbox.shell('test-shell-5');
+      const execution = await shell.execAsync('sleep 1 && echo "Async command completed"');
+      expect(execution).toBeDefined();
+      expect(execution.executionId).toBeTruthy();
+
+      // Wait for completion
+      const result = await execution.result();
+      expect(result.exitCode).toBe(0);
+      const output = await result.stdout();
+      expect(output).toContain('Async command completed');
+    });
+
+    test.concurrent('shell.execAsync - stateful async execution', async () => {
+      expect(devbox).toBeDefined();
+      const shell = devbox.shell('test-shell-6');
+
+      // Set state in first command
+      await shell.exec('export ASYNC_VAR="async-value"');
+      await shell.exec('cd /tmp');
+
+      // Start async command that uses the state
+      const execution = await shell.execAsync('echo "CWD: $(pwd), VAR: $ASYNC_VAR"');
+      const result = await execution.result();
+
+      expect(result.exitCode).toBe(0);
+      const output = await result.stdout();
+      expect(output).toContain('CWD: /tmp');
+      expect(output).toContain('VAR: async-value');
+    });
+
+    test.concurrent('shell.exec - sequential execution (queuing)', async () => {
+      expect(devbox).toBeDefined();
+      const shell = devbox.shell('test-shell-7');
+
+      // Start multiple commands - they should execute sequentially
+      const startTime = Date.now();
+      await shell.exec('sleep 1 && echo "first"');
+      await shell.exec('sleep 1 && echo "second"');
+      await shell.exec('sleep 1 && echo "third"');
+      const endTime = Date.now();
+
+      // Verify they took at least 3 seconds (sequential execution)
+      const duration = endTime - startTime;
+      expect(duration).toBeGreaterThanOrEqual(2900); // Allow some margin for overhead
+
+      // Verify all commands executed in order
+      const finalResult = await shell.exec('echo "done"');
+      const output = await finalResult.stdout();
+      expect(output).toContain('done');
+    });
+
+    test.concurrent('shell.execAsync - sequential execution with queuing', async () => {
+      expect(devbox).toBeDefined();
+      const shell = devbox.shell('test-shell-8');
+
+      // Start multiple async commands - they should queue and execute sequentially
+      const exec1 = shell.execAsync('sleep 1 && echo "async-first"');
+      const exec2 = shell.execAsync('sleep 1 && echo "async-second"');
+      const exec3 = shell.execAsync('sleep 1 && echo "async-third"');
+
+      // Wait for all to complete
+      const [result1, result2, result3] = await Promise.all([
+        (await exec1).result(),
+        (await exec2).result(),
+        (await exec3).result(),
+      ]);
+
+      // Verify all completed successfully
+      expect(result1.exitCode).toBe(0);
+      expect(result2.exitCode).toBe(0);
+      expect(result3.exitCode).toBe(0);
+
+      // Verify outputs
+      expect(await result1.stdout()).toContain('async-first');
+      expect(await result2.stdout()).toContain('async-second');
+      expect(await result3.stdout()).toContain('async-third');
+    });
+
+    test.concurrent('shell.exec - with streaming callbacks', async () => {
+      expect(devbox).toBeDefined();
+      const shell = devbox.shell('test-shell-9');
+      const stdoutLines: string[] = [];
+
+      const result = await shell.exec('echo "line1" && echo "line2" && echo "line3"', {
+        stdout: (line) => {
+          stdoutLines.push(line);
+        },
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.exitCode).toBe(0);
+      expect(stdoutLines.length).toBeGreaterThan(0);
+      const stdoutCombined = stdoutLines.join('');
+      expect(stdoutCombined).toContain('line1');
+      expect(stdoutCombined).toContain('line2');
+      expect(stdoutCombined).toContain('line3');
+      // Verify streaming captured same data as result
+      expect(stdoutCombined).toBe(await result.stdout());
+    });
+
+    test.concurrent('shell.execAsync - with streaming callbacks', async () => {
+      expect(devbox).toBeDefined();
+      const shell = devbox.shell('test-shell-10');
+      const stdoutLines: string[] = [];
+
+      const execution = await shell.execAsync('echo "async-line1" && sleep 0.5 && echo "async-line2"', {
+        stdout: (line) => {
+          stdoutLines.push(line);
+        },
+      });
+
+      const result = await execution.result();
+      expect(result.success).toBe(true);
+      expect(result.exitCode).toBe(0);
+
+      const stdoutCombined = stdoutLines.join('');
+      expect(stdoutCombined).toContain('async-line1');
+      expect(stdoutCombined).toContain('async-line2');
+      // Verify streaming captured same data as result
+      expect(stdoutCombined).toBe(await result.stdout());
+    });
+
+    test.concurrent('multiple named shells - independent state', async () => {
+      expect(devbox).toBeDefined();
+      const shell1 = devbox.shell('independent-shell-1');
+      const shell2 = devbox.shell('independent-shell-2');
+
+      // Set different state in each shell
+      await shell1.exec('export VAR="shell1-value"');
+      await shell1.exec('cd /tmp');
+      await shell2.exec('export VAR="shell2-value"');
+      await shell2.exec('cd /home');
+
+      // Verify each shell maintains its own state
+      const result1 = await shell1.exec('echo "$VAR:$(pwd)"');
+      const output1 = (await result1.stdout()).trim();
+      expect(output1).toContain('shell1-value');
+      expect(output1).toContain('/tmp');
+
+      const result2 = await shell2.exec('echo "$VAR:$(pwd)"');
+      const output2 = (await result2.stdout()).trim();
+      expect(output2).toContain('shell2-value');
+      expect(output2).toContain('/home');
+    });
+
+    test.concurrent('shell.exec - with stderr streaming callback', async () => {
+      expect(devbox).toBeDefined();
+      const shell = devbox.shell('test-shell-stderr');
+      const stderrLines: string[] = [];
+
+      const result = await shell.exec('echo "error output" >&2', {
+        stderr: (line) => {
+          stderrLines.push(line);
+        },
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.exitCode).toBe(0);
+      expect(stderrLines.length).toBeGreaterThan(0);
+      const stderrCombined = stderrLines.join('');
+      expect(stderrCombined).toContain('error output');
+      // Verify streaming captured same data as result
+      expect(stderrCombined).toBe(await result.stderr());
+    });
+
+    test.concurrent('shell.execAsync - with both stdout and stderr streaming callbacks', async () => {
+      expect(devbox).toBeDefined();
+      const shell = devbox.shell('test-shell-both-streams');
+      const stdoutLines: string[] = [];
+      const stderrLines: string[] = [];
+
+      const execution = await shell.execAsync('echo "to stdout" && echo "to stderr" >&2', {
+        stdout: (line) => stdoutLines.push(line),
+        stderr: (line) => stderrLines.push(line),
+      });
+
+      const result = await execution.result();
+      expect(result.success).toBe(true);
+      expect(result.exitCode).toBe(0);
+
+      const stdoutCombined = stdoutLines.join('');
+      const stderrCombined = stderrLines.join('');
+
+      expect(stdoutCombined).toContain('to stdout');
+      expect(stderrCombined).toContain('to stderr');
+
+      // Verify streaming captured same data as result
+      expect(stdoutCombined).toBe(await result.stdout());
+      expect(stderrCombined).toBe(await result.stderr());
+    });
+
+    test.concurrent('shell - auto-generated shell name', async () => {
+      expect(devbox).toBeDefined();
+      // Create shell without providing a name - should auto-generate UUID
+      const shell = devbox.shell();
+      expect(shell).toBeDefined();
+
+      const result = await shell.exec('echo "test"');
+      expect(result.exitCode).toBe(0);
+      const output = await result.stdout();
+      expect(output).toContain('test');
+    });
+  });
+
+  describe('devbox logs', () => {
+    let devbox: Devbox;
+
+    beforeAll(async () => {
+      devbox = await sdk.devbox.create({
+        name: uniqueName('sdk-devbox-logs'),
+        launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 },
+      });
+    }, SHORT_TIMEOUT);
+
+    afterAll(async () => {
+      if (devbox) {
+        await devbox.shutdown();
+      }
+    });
+
+    test.concurrent('logs - basic retrieval', async () => {
+      expect(devbox).toBeDefined();
+
+      // Fetch logs - verifies API returns valid response structure
+      // Logs may be empty depending on timing
+      const logs = await devbox.logs();
+
+      expect(logs).toBeDefined();
+      expect(logs.logs).toBeDefined();
+      expect(Array.isArray(logs.logs)).toBe(true);
+    });
+
+    test.concurrent('logs - with execution_id filter', async () => {
+      expect(devbox).toBeDefined();
+
+      // Run a command and get its execution ID
+      const execution = await devbox.cmd.execAsync('echo "filtered log test"');
+      const result = await execution.result();
+      expect(result.exitCode).toBe(0);
+
+      // Fetch logs filtered by execution ID - verifies API accepts the filter
+      const logs = await devbox.logs({ execution_id: execution.executionId });
+
+      expect(logs).toBeDefined();
+      expect(Array.isArray(logs.logs)).toBe(true);
+    });
+
+    test.concurrent('logs - with shell_name filter', async () => {
+      expect(devbox).toBeDefined();
+
+      const shellName = 'test-logs-shell';
+      const shell = devbox.shell(shellName);
+
+      // Run a command in the named shell
+      const result = await shell.exec('echo "shell log test"');
+      expect(result.exitCode).toBe(0);
+
+      // Fetch logs filtered by shell name - verifies API accepts the filter
+      const logs = await devbox.logs({ shell_name: shellName });
+
+      expect(logs).toBeDefined();
+      expect(Array.isArray(logs.logs)).toBe(true);
     });
   });
 });

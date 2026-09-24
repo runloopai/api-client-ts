@@ -32,9 +32,7 @@ export {
   type ScorerRetrieveResponse,
   type ScorerUpdateResponse,
   type ScorerListResponse,
-  type ScorerValidateResponse,
   type ScorerCreateParams,
   type ScorerUpdateParams,
   type ScorerListParams,
-  type ScorerValidateParams,
 } from './scorers';

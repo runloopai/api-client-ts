@@ -1,5 +1,5 @@
 import { BlueprintView } from '@runloop/api-client/resources/blueprints';
-import { makeClient, THIRTY_SECOND_TIMEOUT, uniqueName } from './utils';
+import { makeClient, SHORT_TIMEOUT, uniqueName } from './utils';
 import { DevboxView } from '@runloop/api-client/resources/devboxes';
 
 const client = makeClient();
@@ -24,13 +24,13 @@ describe('smoketest: blueprints', () => {
             name: blueprintName,
           },
           {
-            polling: { maxAttempts: 180, pollingIntervalMs: 5_000, timeoutMs: 30 * 60 * 1000 },
+            longPoll: { timeoutMs: 30 * 60 * 1000 },
           },
         );
         expect(created.status).toBe('build_complete');
         blueprintId = created.id;
       },
-      THIRTY_SECOND_TIMEOUT,
+      SHORT_TIMEOUT,
     );
 
     test(
@@ -44,7 +44,7 @@ describe('smoketest: blueprints', () => {
               launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 }, // 5 minutes
             },
             {
-              polling: { maxAttempts: 120, pollingIntervalMs: 5_000, timeoutMs: 20 * 60 * 1000 },
+              longPoll: { timeoutMs: 20 * 60 * 1000 },
             },
           );
           expect(devbox.blueprint_id).toBe(blueprintId);
@@ -54,7 +54,7 @@ describe('smoketest: blueprints', () => {
           }
         }
       },
-      THIRTY_SECOND_TIMEOUT,
+      SHORT_TIMEOUT,
     );
 
     test(
@@ -68,7 +68,7 @@ describe('smoketest: blueprints', () => {
               launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 }, // 5 minutes
             },
             {
-              polling: { maxAttempts: 120, pollingIntervalMs: 5_000, timeoutMs: 20 * 60 * 1000 },
+              longPoll: { timeoutMs: 20 * 60 * 1000 },
             },
           );
           expect(devbox.blueprint_id).toBeTruthy();
@@ -78,7 +78,7 @@ describe('smoketest: blueprints', () => {
           }
         }
       },
-      THIRTY_SECOND_TIMEOUT,
+      SHORT_TIMEOUT,
     );
   });
 
@@ -86,7 +86,7 @@ describe('smoketest: blueprints', () => {
   (process.env['RUN_SMOKETESTS'] ? describe : describe.skip)('blueprint secrets', () => {
     const secretsBlueprintName = uniqueName('bp-secrets');
 
-    test(
+    test.concurrent(
       'create blueprint with secret in Dockerfile and await build',
       async () => {
         let bpt: BlueprintView | undefined;
@@ -101,7 +101,7 @@ describe('smoketest: blueprints', () => {
               },
             },
             {
-              polling: { maxAttempts: 180, pollingIntervalMs: 5_000, timeoutMs: 30 * 60 * 1000 },
+              longPoll: { timeoutMs: 30 * 60 * 1000 },
             },
           );
 
@@ -113,7 +113,7 @@ describe('smoketest: blueprints', () => {
           }
         }
       },
-      THIRTY_SECOND_TIMEOUT,
+      SHORT_TIMEOUT,
     );
   });
 });

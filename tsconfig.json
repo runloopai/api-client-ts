@@ -1,6 +1,6 @@
 {
   "include": ["src", "tests", "examples"],
-  "exclude": ["src/_shims/**/*-deno.ts"],
+  "exclude": ["src/_shims/**/*-deno.ts", "tests/smoketests/build-package.test.ts", "src/types.ts"],
   "compilerOptions": {
     "target": "es2020",
     "lib": ["es2020"],
@@ -10,7 +10,7 @@
     "paths": {
       "@runloop/api-client/_shims/auto/*": ["./src/_shims/auto/*-node"],
       "@runloop/api-client/*": ["./src/*"],
-      "@runloop/api-client": ["./src/index.ts"]
+      "@runloop/api-client": ["./src/sdk.ts"]
     },
     "noEmit": true,
 
@@ -31,7 +31,7 @@
     "noUncheckedIndexedAccess": true,
     "noImplicitOverride": true,
     "noPropertyAccessFromIndexSignature": true,
-    "isolatedModules": false,
+		"isolatedModules": false,
 
     "skipLibCheck": true
   }

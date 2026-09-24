@@ -1,0 +1,272 @@
+// File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
+
+import { APIResource } from '../resource';
+import { isRequestOptions } from '../core';
+import * as Core from '../core';
+import * as Shared from './shared';
+import { AgentsCursorIDPage, type AgentsCursorIDPageParams } from '../pagination';
+
+export class Agents extends APIResource {
+  /**
+   * Create a new Agent with a name and optional public visibility. The Agent will be
+   * assigned a unique ID.
+   */
+  create(body: AgentCreateParams, options?: Core.RequestOptions): Core.APIPromise<AgentView> {
+    return this._client.post('/v1/agents', { body, ...options });
+  }
+
+  /**
+   * Retrieve a specific Agent by its unique identifier.
+   */
+  retrieve(id: string, options?: Core.RequestOptions): Core.APIPromise<AgentView> {
+    return this._client.get(`/v1/agents/${id}`, options);
+  }
+
+  /**
+   * List all Agents for the authenticated account with pagination support.
+   */
+  list(
+    query?: AgentListParams,
+    options?: Core.RequestOptions,
+  ): Core.PagePromise<AgentViewsAgentsCursorIDPage, AgentView>;
+  list(options?: Core.RequestOptions): Core.PagePromise<AgentViewsAgentsCursorIDPage, AgentView>;
+  list(
+    query: AgentListParams | Core.RequestOptions = {},
+    options?: Core.RequestOptions,
+  ): Core.PagePromise<AgentViewsAgentsCursorIDPage, AgentView> {
+    if (isRequestOptions(query)) {
+      return this.list({}, query);
+    }
+    return this._client.getAPIList('/v1/agents', AgentViewsAgentsCursorIDPage, { query, ...options });
+  }
+
+  /**
+   * Delete an Agent by its unique identifier. The Agent will be permanently removed.
+   */
+  delete(id: string, options?: Core.RequestOptions): Core.APIPromise<unknown> {
+    return this._client.post(`/v1/agents/${id}/delete`, options);
+  }
+
+  /**
+   * Returns devbox counts grouped by agent name. This endpoint efficiently
+   * aggregates devbox counts for all agents in a single request, avoiding N+1 query
+   * patterns.
+   */
+  devboxCounts(options?: Core.RequestOptions): Core.APIPromise<AgentDevboxCountsView> {
+    return this._client.get('/v1/agents/devbox_counts', options);
+  }
+
+  /**
+   * List all public Agents with pagination support.
+   */
+  listPublic(
+    query?: AgentListPublicParams,
+    options?: Core.RequestOptions,
+  ): Core.PagePromise<AgentViewsAgentsCursorIDPage, AgentView>;
+  listPublic(options?: Core.RequestOptions): Core.PagePromise<AgentViewsAgentsCursorIDPage, AgentView>;
+  listPublic(
+    query: AgentListPublicParams | Core.RequestOptions = {},
+    options?: Core.RequestOptions,
+  ): Core.PagePromise<AgentViewsAgentsCursorIDPage, AgentView> {
+    if (isRequestOptions(query)) {
+      return this.listPublic({}, query);
+    }
+    return this._client.getAPIList('/v1/agents/list_public', AgentViewsAgentsCursorIDPage, {
+      query,
+      ...options,
+    });
+  }
+}
+
+export class AgentViewsAgentsCursorIDPage extends AgentsCursorIDPage<AgentView> {}
+
+/**
+ * Parameters for creating a new Agent.
+ */
+export interface AgentCreateParameters {
+  /**
+   * The name of the Agent.
+   */
+  name: string;
+
+  /**
+   * Agent source configuration.
+   */
+  source?: Shared.AgentSource | null;
+
+  /**
+   * Optional version identifier for the Agent. For npm/pip sources this is typically
+   * a semver string (e.g. '2.0.65'). For git sources it can be a branch or tag.
+   * Semantics are user-defined for object sources.
+   */
+  version?: string | null;
+}
+
+/**
+ * Devbox counts grouped by agent name. Used to efficiently fetch devbox counts for
+ * multiple agents in a single request.
+ */
+export interface AgentDevboxCountsView {
+  /**
+   * Map of agent name to devbox count. Each key is an agent name, and the value is
+   * the count of devboxes associated with that agent.
+   */
+  counts: { [key: string]: number };
+
+  /**
+   * Total count of devboxes across all agents in the result.
+   */
+  total_count: number;
+}
+
+/**
+ * A paginated list of Agents.
+ */
+export interface AgentListView {
+  /**
+   * The list of Agents.
+   */
+  agents: Array<AgentView>;
+
+  /**
+   * Whether there are more Agents to fetch.
+   */
+  has_more: boolean;
+
+  /**
+   * The total count of Agents.
+   */
+  total_count?: number | null;
+}
+
+/**
+ * An Agent represents a registered AI agent entity.
+ *
+ * @category Agent Types
+ */
+export interface AgentView {
+  /**
+   * The unique identifier of the Agent.
+   */
+  id: string;
+
+  /**
+   * The creation time of the Agent (Unix timestamp milliseconds).
+   */
+  create_time_ms: number;
+
+  /**
+   * Whether the Agent is publicly accessible.
+   */
+  is_public: boolean;
+
+  /**
+   * The name of the Agent.
+   */
+  name: string;
+
+  /**
+   * Agent source configuration.
+   */
+  source?: Shared.AgentSource | null;
+
+  /**
+   * Optional version identifier for the Agent. For npm/pip sources this is typically
+   * a semver string (e.g. '2.0.65'). For git sources it can be a branch or tag.
+   * Omitted for object sources or when not provided.
+   */
+  version?: string | null;
+}
+
+export type AgentDeleteResponse = unknown;
+
+/**
+ * Parameters for creating a new Agent.
+ *
+ * @category Agent Types
+ */
+export interface AgentCreateParams {
+  /**
+   * The name of the Agent.
+   */
+  name: string;
+
+  /**
+   * Agent source configuration.
+   */
+  source?: Shared.AgentSource | null;
+
+  /**
+   * Optional version identifier for the Agent. For npm/pip sources this is typically
+   * a semver string (e.g. '2.0.65'). For git sources it can be a branch or tag.
+   * Semantics are user-defined for object sources.
+   */
+  version?: string | null;
+}
+
+export interface AgentListParams extends AgentsCursorIDPageParams {
+  /**
+   * If true (default), includes total_count in the response. Set to false to skip
+   * the count query for better performance on large datasets.
+   */
+  include_total_count?: boolean;
+
+  /**
+   * Filter agents by public visibility.
+   */
+  is_public?: boolean;
+
+  /**
+   * Filter agents by name (partial match supported).
+   */
+  name?: string;
+
+  /**
+   * Search by agent ID or name.
+   */
+  search?: string;
+
+  /**
+   * Filter by version. Use 'latest' to get the most recently created agent.
+   */
+  version?: string;
+}
+
+export interface AgentListPublicParams extends AgentsCursorIDPageParams {
+  /**
+   * If true (default), includes total_count in the response. Set to false to skip
+   * the count query for better performance on large datasets.
+   */
+  include_total_count?: boolean;
+
+  /**
+   * Filter agents by name (partial match supported).
+   */
+  name?: string;
+
+  /**
+   * Search by agent ID or name.
+   */
+  search?: string;
+
+  /**
+   * Filter by version. Use 'latest' to get the most recently created agent.
+   */
+  version?: string;
+}
+
+Agents.AgentViewsAgentsCursorIDPage = AgentViewsAgentsCursorIDPage;
+
+export declare namespace Agents {
+  export {
+    type AgentCreateParameters as AgentCreateParameters,
+    type AgentDevboxCountsView as AgentDevboxCountsView,
+    type AgentListView as AgentListView,
+    type AgentView as AgentView,
+    type AgentDeleteResponse as AgentDeleteResponse,
+    AgentViewsAgentsCursorIDPage as AgentViewsAgentsCursorIDPage,
+    type AgentCreateParams as AgentCreateParams,
+    type AgentListParams as AgentListParams,
+    type AgentListPublicParams as AgentListPublicParams,
+  };
+}

@@ -1,4 +1,4 @@
-import { makeClient, THIRTY_SECOND_TIMEOUT, uniqueName } from './utils';
+import { makeClient, SHORT_TIMEOUT, uniqueName } from './utils';
 
 const client = makeClient();
 
@@ -21,23 +21,31 @@ describe('smoketest: executions', () => {
           launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 }, // 5 minutes
         },
         {
-          polling: { maxAttempts: 120, pollingIntervalMs: 5_000, timeoutMs: 20 * 60 * 1000 },
+          longPoll: { timeoutMs: 20 * 60 * 1000 },
         },
       );
       devboxId = created.id;
     },
-    THIRTY_SECOND_TIMEOUT,
+    SHORT_TIMEOUT,
   );
 
-  test('execute async and await completion', async () => {
-    const started = await client.devboxes.executions.executeAsync(devboxId!, {
-      command: 'echo hello && sleep 1',
+  test('execute async and await completion (deprecated polling path)', async () => {
+    const warnSpy = jest.spyOn(console, 'warn').mockImplementation((...args: unknown[]) => {
+      if (typeof args[0] === 'string' && args[0].includes('[runloop-api-client]')) return;
+      process.stderr.write(`console.warn: ${args.join(' ')}\n`);
     });
-    execId = started.execution_id;
-    const completed = await client.devboxes.executions.awaitCompleted(devboxId!, execId!, {
-      polling: { maxAttempts: 120, pollingIntervalMs: 2_000, timeoutMs: 10 * 60 * 1000 },
-    });
-    expect(completed.status).toBe('completed');
+    try {
+      const started = await client.devboxes.executions.executeAsync(devboxId!, {
+        command: 'echo hello && sleep 1',
+      });
+      execId = started.execution_id;
+      const completed = await client.devboxes.executions.awaitCompleted(devboxId!, execId!, {
+        polling: { timeoutMs: 10 * 60 * 1000 },
+      });
+      expect(completed.status).toBe('completed');
+    } finally {
+      warnSpy.mockRestore();
+    }
   });
 
   test('tail stdout logs', async () => {
@@ -57,7 +65,7 @@ describe('smoketest: executions', () => {
     });
     const stderrExecId = stderrExec.execution_id;
     await client.devboxes.executions.awaitCompleted(devboxId!, stderrExecId, {
-      polling: { maxAttempts: 120, pollingIntervalMs: 2_000, timeoutMs: 10 * 60 * 1000 },
+      longPoll: { timeoutMs: 10 * 60 * 1000 },
     });
 
     const stream = await client.devboxes.executions.streamStderrUpdates(devboxId!, stderrExecId, {});
@@ -85,13 +93,12 @@ describe('smoketest: executions', () => {
       });
       expect(completed.status).toBe('completed');
     },
-    THIRTY_SECOND_TIMEOUT * 3,
+    SHORT_TIMEOUT * 3,
   );
 
   test(
     'executeAndAwaitCompletion timeout',
     async () => {
-      // Use polling options
       await expect(
         client.devboxes.executeAndAwaitCompletion(
           devboxId!,
@@ -99,7 +106,7 @@ describe('smoketest: executions', () => {
             command: 'sleep 30',
           },
           {
-            polling: { pollingIntervalMs: 100, maxAttempts: 1, timeoutMs: 3000 },
+            longPoll: { timeoutMs: 3000 },
           },
         ),
       ).rejects.toThrow();
@@ -117,7 +124,7 @@ describe('smoketest: executions', () => {
         ),
       ).rejects.toThrow();
     },
-    THIRTY_SECOND_TIMEOUT,
+    SHORT_TIMEOUT,
   );
 
   test('executeAndAwaitCompletion with last_n parameter', async () => {

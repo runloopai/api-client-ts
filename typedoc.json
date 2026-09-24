@@ -1,0 +1,75 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "entryPoints": ["src/sdk.ts", "src/types.ts"],
+  "entryPointStrategy": "expand",
+  "out": "docs/",
+  "tsconfig": "tsconfig.typedoc.json",
+  "includeVersion": true,
+  "readme": "README.md",
+  "plugin": ["typedoc-github-theme", "@shipgirl/typedoc-plugin-versions", "typedoc-plugin-dt-links"],
+  "navigation": {
+    "includeCategories": true,
+    "includeGroups": true
+  },
+  "favicon": "./favicon.png",
+  "githubPages": true,
+  "categorizeByGroup": true,
+  "searchInComments": true,
+  "sort": ["source-order"],
+  "kindSortOrder": [
+    "Project",
+    "Module",
+    "Enum",
+    "Class",
+    "Namespace",
+    "Interface",
+    "TypeAlias",
+    "Constructor",
+    "Property",
+    "Method",
+    "Accessor",
+    "Function",
+    "Variable"
+  ],
+  "categoryOrder": [
+    "SDK Client",
+    "Devbox",
+    "Blueprint",
+    "Snapshot",
+    "Storage Object",
+    "Agent",
+    "Devbox Types",
+    "Blueprint Types",
+    "Snapshot Types",
+    "Storage Object Types",
+    "Agent Types",
+    "Execution Types",
+    "Shared Types",
+    "Browser Types",
+    "Computer Types",
+    "Log Types",
+    "SDK Types",
+    "*"
+  ],
+  "visibilityFilters": {
+    "protected": false,
+    "private": false,
+    "inherited": true,
+    "external": true
+  },
+
+  "excludeTags": ["@hidden"],
+  "validation": {
+    "invalidLink": true,
+    "notDocumented": false
+  },
+  "externalSymbolLinkMappings": {
+    "@runloop/api-client": {
+      "BlobLikePart": "#"
+    }
+  },
+  "navigationLinks": {
+    "GitHub": "https://github.com/runloopai/api-client-ts",
+    "Documentation": "https://docs.runloop.ai"
+  }
+}
