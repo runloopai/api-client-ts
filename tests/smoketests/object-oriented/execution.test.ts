@@ -103,15 +103,10 @@ describe('smoketest: object-oriented execution', () => {
       expect(execution).toBeDefined();
       expect((await execution.getState()).status).toBe('running');
       await execution.sendStdIn('Hello from stdin!\n');
-
-      // Wait a bit for the input to be processed
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      // Kill the execution to get the result
-      await execution.kill();
+      await execution.closeStdIn();
 
       const result = await execution.result();
-      expect(result).toBeDefined();
+      expect(result.exitCode).toBe(0);
 
       const output = await result.stdout();
       expect(output).toContain('Hello from stdin!');

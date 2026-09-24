@@ -1,6 +1,8 @@
 import { Runloop } from '../index';
 import type * as Core from '../core';
-import type { DevboxAsyncExecutionDetailView } from '../resources/devboxes/devboxes';
+import { RunloopError } from '../error';
+import type { DevboxAsyncExecutionDetailView, DevboxSendStdInResult } from '../resources/devboxes/devboxes';
+import type { ExecutionSendStdInParams } from '../resources/devboxes/executions';
 import { longPollUntil, resolveLongPollTimeoutMs, type LongPollRequestOptions } from '../lib/polling';
 import { ExecutionResult } from './execution-result';
 
@@ -65,18 +67,49 @@ export class Execution {
   }
 
   /**
-   * Send input to the execution's stdin.
+   * Send input to the execution's stdin. The execution must have been started with `attach_stdin: true`.
    *
-   * @param input - The input to send
-   * @param options - Request options
+   * @example
+   * ```typescript
+   * const execution = await devbox.cmd.execAsync('cat', { attach_stdin: true });
+   * await execution.sendStdIn('Hello from stdin!\n');
+   * await execution.closeStdIn();
+   * const result = await execution.result();
+   * ```
+   *
+   * @param {string} input - The text to write to stdin
+   * @param {Core.RequestOptions} [options] - Request options
+   * @returns {Promise<void>} Promise that resolves once the input has been delivered
+   * @throws {RunloopError} If the API reports that the input was not delivered
    */
   async sendStdIn(input: string, options?: Core.RequestOptions): Promise<void> {
-    await this.client.devboxes.executions.sendStdIn(
-      this._devboxId,
-      this._executionId,
-      { text: input },
-      options,
+    await this.sendStdInRequest({ text: input }, options);
+  }
+
+  /**
+   * Close the execution's stdin by sending EOF, so commands that read until end of input can finish.
+   *
+   * @param {Core.RequestOptions} [options] - Request options
+   * @returns {Promise<void>} Promise that resolves once EOF has been delivered
+   * @throws {RunloopError} If the API reports that EOF was not delivered
+   */
+  async closeStdIn(options?: Core.RequestOptions): Promise<void> {
+    await this.sendStdInRequest({ signal: 'EOF' }, options);
+  }
+
+  private async sendStdInRequest(
+    body: ExecutionSendStdInParams,
+    options?: Core.RequestOptions,
+  ): Promise<void> {
+    // executions.sendStdIn() would treat `{ signal: 'EOF' }` as RequestOptions (its `signal` key collides
+    // with the AbortSignal option) and drop the body, so post to the endpoint directly.
+    const response = await this.client.post<unknown, DevboxSendStdInResult>(
+      `/v1/devboxes/${this._devboxId}/executions/${this._executionId}/send_std_in`,
+      { ...options, body },
     );
+    if (!response.success) {
+      throw new RunloopError(`Failed to send stdin to execution ${this._executionId}`);
+    }
   }
 
   /**
