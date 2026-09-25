@@ -7,8 +7,8 @@ name: Promote SDKs
 # staging main, because any staging-only commit (stlc build or not) forks the trunks
 # against the next production merge; the daily schedule is a backstop and
 # workflow_dispatch an eager promote (back-sync dispatches it on a fork). A fork
-# that merges cleanly is healed with a merge commit on both trunks (the only
-# non-linear history this writes); a conflicting fork fails for a person to resolve.
+# that merges cleanly and passes staging CI is healed with a merge commit on both
+# trunks (the only non-linear history this writes); anything else fails for a person.
 # Every run is a safe no-op when there's nothing to promote.
 on:
   push:
@@ -20,6 +20,7 @@ on:
 
 permissions:
   contents: read
+  actions: read
 
 jobs:
   promote:
@@ -70,6 +71,7 @@ jobs:
         if: steps.diff.outputs.synced == 'false'
         env:
           PRODUCTION_REPO_TOKEN: ${{ secrets.PRODUCTION_REPO_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
         run: |
           # Production not an ancestor of staging means the trunks have forked
           # (production advanced without a back-sync) and FF is unsafe: heal with a
