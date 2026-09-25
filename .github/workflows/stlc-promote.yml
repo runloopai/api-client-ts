@@ -61,12 +61,15 @@ jobs:
 
       - name: Promote staging to production (fast-forward)
         if: steps.diff.outputs.synced == 'false'
+        env:
+          PRODUCTION_REPO_TOKEN: ${{ secrets.PRODUCTION_REPO_TOKEN }}
         run: |
-          # Refuse unless production is an ancestor of staging: otherwise the trunks
-          # have forked (production advanced without a back-sync) and FF is unsafe.
+          # Production not an ancestor of staging means the trunks have forked
+          # (production advanced without a back-sync) and FF is unsafe: heal with a
+          # clean merge commit, else fail.
           if ! git merge-base --is-ancestor production/main origin/main; then
-            bash .github/scripts/stlc-fork-hint.sh
-            exit 1
+            bash .github/scripts/stlc-heal-fork.sh
+            exit 0
           fi
           git push production origin/main:refs/heads/main
           echo "Fast-forwarded production/main to staging/main."

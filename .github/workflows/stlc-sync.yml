@@ -74,11 +74,11 @@ jobs:
         env:
           PRODUCTION_REPO_TOKEN: ${{ secrets.PRODUCTION_REPO_TOKEN }}
         run: |
-          # Refuse unless staging is an ancestor of production: otherwise the
-          # trunks have forked and a fast-forward would be unsafe.
+          # Staging not an ancestor of production means the trunks have forked and
+          # a fast-forward is unsafe: heal with a clean merge commit, else fail.
           if ! git merge-base --is-ancestor origin/main production/main; then
-            bash .github/scripts/stlc-fork-hint.sh
-            exit 1
+            bash .github/scripts/stlc-heal-fork.sh
+            exit 0
           fi
           if [ -z "${PRODUCTION_REPO_TOKEN:-}" ]; then
             echo "::error title=Back-sync blocked::PRODUCTION_REPO_TOKEN is required to update staging main."
