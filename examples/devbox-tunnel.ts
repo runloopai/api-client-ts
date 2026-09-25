@@ -29,7 +29,35 @@ import { wrapRecipe, runAsCli } from './_harness';
 import type { RecipeContext, RecipeOutput } from './types';
 
 const HTTP_SERVER_PORT = 8080;
-const SERVER_STARTUP_DELAY_MS = 2000;
+const SERVER_READY_TIMEOUT_MS = 60_000;
+const SERVER_READY_POLL_MS = 1000;
+
+/**
+ * Fetch the tunnel URL until the server answers with a successful status.
+ * The HTTP server inside the devbox and the tunnel route both come up
+ * asynchronously, so the first requests can fail or return a gateway error.
+ */
+async function fetchWhenReady(url: string): Promise<Response> {
+  const deadline = Date.now() + SERVER_READY_TIMEOUT_MS;
+  let lastResponse: Response | undefined;
+  while (true) {
+    try {
+      lastResponse = await fetch(url);
+      if (lastResponse.ok) {
+        return lastResponse;
+      }
+    } catch {
+      // Connection errors while the tunnel route is being established.
+    }
+    if (Date.now() >= deadline) {
+      if (lastResponse) {
+        return lastResponse;
+      }
+      throw new Error(`Tunnel URL ${url} did not respond within ${SERVER_READY_TIMEOUT_MS}ms`);
+    }
+    await new Promise((resolve) => setTimeout(resolve, SERVER_READY_POLL_MS));
+  }
+}
 
 export async function recipe(ctx: RecipeContext): Promise<RecipeOutput> {
   const { cleanup } = ctx;
@@ -55,9 +83,6 @@ export async function recipe(ctx: RecipeContext): Promise<RecipeOutput> {
     `python3 -m http.server ${HTTP_SERVER_PORT} --directory /tmp`,
   );
 
-  // Give the server a moment to start
-  await new Promise((resolve) => setTimeout(resolve, SERVER_STARTUP_DELAY_MS));
-
   // The tunnel was created with the devbox. For authenticated tunnels, set
   // tunnel: { auth_mode: 'authenticated' } on create and include the auth_token
   // in your requests via the Authorization header: `Authorization: Bearer ${tunnel.auth_token}`
@@ -71,7 +96,7 @@ export async function recipe(ctx: RecipeContext): Promise<RecipeOutput> {
 
   // Make an HTTP request from the LOCAL MACHINE through the tunnel to the devbox
   // This demonstrates that the tunnel allows external access to the devbox service
-  const response = await fetch(tunnelUrl);
+  const response = await fetchWhenReady(tunnelUrl);
   const responseText = await response.text();
 
   // Stop the HTTP server

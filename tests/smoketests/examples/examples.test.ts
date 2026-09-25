@@ -17,7 +17,7 @@ describe('smoketest: examples', () => {
         expect(result.skipped).toBeUndefined();
         expect(result.resourcesCreated.length).toBeGreaterThan(0);
         expect(result.checks.length).toBeGreaterThan(0);
-        expect(result.checks.every((check) => check.passed)).toBe(true);
+        expect(result.checks.filter((check) => !check.passed)).toEqual([]);
         expect(result.cleanupStatus.failed).toHaveLength(0);
       },
       LONG_TIMEOUT,

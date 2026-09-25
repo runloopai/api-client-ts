@@ -2,6 +2,10 @@
  * Chaos test — server randomly drops sockets, sends RST_STREAM, GOAWAY, or
  * delays headers. Asserts the client survives.
  *
+ * Every request is bounded by REQUEST_TIMEOUT_MS and batches are drained with
+ * allSettled, so a request the chaos server never answers is counted as a
+ * failure instead of wedging the driver loop past `durationSeconds`.
+ *
  * Run: `npx tsx loadtest/h2-chaos.ts [durationSeconds=60]`
  */
 import http2 from 'node:http2';
@@ -90,6 +94,36 @@ async function startServer(seed: number) {
   });
 }
 
+/** Upper bound on any single request. The chaos server's worst honest reply is ~200ms. */
+const REQUEST_TIMEOUT_MS = 5_000;
+/** Grace period the last batch is allowed to run past the requested duration. */
+const SHUTDOWN_GRACE_MS = 1_000;
+
+class RequestTimeoutError extends Error {
+  constructor(ms: number) {
+    super(`request exceeded ${ms}ms`);
+    this.name = 'RequestTimeoutError';
+  }
+}
+
+/**
+ * Run `op` with an abort signal and a hard deadline. If the deadline wins, the
+ * request is aborted and the returned promise rejects with RequestTimeoutError.
+ * `Promise.race` keeps a handler attached to the losing promise, so a late
+ * rejection from the aborted request can't surface as an unhandled rejection.
+ */
+function withTimeout<T>(ms: number, op: (signal: AbortSignal) => Promise<T>): Promise<T> {
+  const controller = new AbortController();
+  let timer: NodeJS.Timeout | undefined;
+  const deadline = new Promise<never>((_resolve, reject) => {
+    timer = setTimeout(() => {
+      controller.abort();
+      reject(new RequestTimeoutError(ms));
+    }, ms);
+  });
+  return Promise.race([op(controller.signal), deadline]).finally(() => clearTimeout(timer));
+}
+
 async function main() {
   const durationSec = Number(process.argv[2] ?? 60);
   if (!Number.isFinite(durationSec) || durationSec <= 0) {
@@ -107,33 +141,52 @@ async function main() {
   const end = Date.now() + durationSec * 1000;
   let getOk = 0,
     getFail = 0,
+    getTimedOut = 0,
     postOk = 0,
-    postFail = 0;
+    postFail = 0,
+    postTimedOut = 0;
 
-  async function get() {
+  async function get(timeoutMs: number) {
     try {
-      const r = (await fetch(`https://localhost:${server.port}/x`, { method: 'GET' } as any)) as any;
-      await r.text();
+      await withTimeout(timeoutMs, async (signal) => {
+        const r = (await fetch(`https://localhost:${server.port}/x`, {
+          method: 'GET',
+          signal,
+        } as any)) as any;
+        await r.text();
+      });
       getOk++;
-    } catch {
+    } catch (err) {
       getFail++;
+      if (err instanceof RequestTimeoutError) getTimedOut++;
     }
   }
-  async function post() {
+  async function post(timeoutMs: number) {
     try {
-      const r = (await fetch(`https://localhost:${server.port}/x`, {
-        method: 'POST',
-        body: 'b',
-      } as any)) as any;
-      await r.text();
+      await withTimeout(timeoutMs, async (signal) => {
+        const r = (await fetch(`https://localhost:${server.port}/x`, {
+          method: 'POST',
+          body: 'b',
+          signal,
+        } as any)) as any;
+        await r.text();
+      });
       postOk++;
-    } catch {
+    } catch (err) {
       postFail++;
+      if (err instanceof RequestTimeoutError) postTimedOut++;
     }
   }
 
   while (Date.now() < end) {
-    await Promise.all([...Array.from({ length: 10 }, get), ...Array.from({ length: 5 }, post)]);
+    // Shrink the per-request budget as the deadline nears so the final batch
+    // can't push the run more than SHUTDOWN_GRACE_MS past `durationSec`.
+    const budgetMs = Math.max(500, Math.min(REQUEST_TIMEOUT_MS, end - Date.now() + SHUTDOWN_GRACE_MS));
+    // allSettled, not all: one straggler must not hold up the rest of the batch.
+    await Promise.allSettled([
+      ...Array.from({ length: 10 }, () => get(budgetMs)),
+      ...Array.from({ length: 5 }, () => post(budgetMs)),
+    ]);
   }
 
   await fetch.close();
@@ -153,12 +206,15 @@ async function main() {
       {
         getOk,
         getFail,
+        getTimedOut,
         getTotal,
         getSuccessRate: Number(getRate.toFixed(3)),
         postOk,
         postFail,
+        postTimedOut,
         postTotal,
         durationSec,
+        requestTimeoutMs: REQUEST_TIMEOUT_MS,
       },
       null,
       2,

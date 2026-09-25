@@ -3,11 +3,16 @@ name: Promote SDKs
 # Promote staging to production by fast-forwarding production main up to staging,
 # preserving SHAs so the trunks stay identical and linear (nothing to heal on the
 # next stlc build). This is a git-only reconciliation, not a release: release-please
-# owns the actual version bump/publish gate on production. Runs daily so unpromoted
-# staging content can't sit long enough to fork against an independent production
-# push; workflow_dispatch remains for an eager promote. The fast-forward-only guard
-# below makes every run a safe no-op when there's nothing to promote.
+# owns the actual version bump/publish gate on production. Runs on every push to
+# staging main, because any staging-only commit (stlc build or not) forks the trunks
+# against the next production merge; the daily schedule is a backstop and
+# workflow_dispatch an eager promote (back-sync dispatches it on a fork). A fork
+# that merges cleanly and passes staging CI is healed with a merge commit on both
+# trunks (the only non-linear history this writes); anything else fails for a person.
+# Every run is a safe no-op when there's nothing to promote.
 on:
+  push:
+    branches: [main]
   schedule:
     # 8am PT (15:00 UTC); shifts to 7am during PST since GitHub cron doesn't track DST.
     - cron: '0 15 * * *'
@@ -15,6 +20,7 @@ on:
 
 permissions:
   contents: read
+  actions: read
 
 jobs:
   promote:
@@ -49,7 +55,12 @@ jobs:
           # After a release, production has release-please commits staging lacks, so compare trees.
           MERGED=$(git merge-tree --write-tree production/main origin/main) || MERGED=conflict
           PRODUCTION_TREE=$(git rev-parse 'production/main^{tree}')
-          if [ "$MERGED" = "$PRODUCTION_TREE" ]; then
+          # A fork needs healing even when production already has staging's content.
+          if ! git merge-base --is-ancestor origin/main production/main &&
+             ! git merge-base --is-ancestor production/main origin/main; then
+            echo "Staging and production main have forked."
+            echo "synced=false" >> "$GITHUB_OUTPUT"
+          elif [ "$MERGED" = "$PRODUCTION_TREE" ]; then
             echo "Production already contains staging's content. Nothing to promote."
             echo "synced=true" >> "$GITHUB_OUTPUT"
           else
@@ -58,12 +69,16 @@ jobs:
 
       - name: Promote staging to production (fast-forward)
         if: steps.diff.outputs.synced == 'false'
+        env:
+          PRODUCTION_REPO_TOKEN: ${{ secrets.PRODUCTION_REPO_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
         run: |
-          # Refuse unless production is an ancestor of staging: otherwise the trunks
-          # have forked (production advanced without a back-sync) and FF is unsafe.
+          # Production not an ancestor of staging means the trunks have forked
+          # (production advanced without a back-sync) and FF is unsafe: heal with a
+          # clean merge commit, else fail.
           if ! git merge-base --is-ancestor production/main origin/main; then
-            echo "::error title=Promote blocked::production/main is not an ancestor of staging main. Back-sync production into staging first."
-            exit 1
+            bash .github/scripts/stlc-heal-fork.sh
+            exit 0
           fi
           git push production origin/main:refs/heads/main
           echo "Fast-forwarded production/main to staging/main."

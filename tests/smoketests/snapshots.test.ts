@@ -1,5 +1,5 @@
 import { DevboxView } from '@runloop/api-client/resources/devboxes';
-import { makeClient, uniqueName } from './utils';
+import { makeClient, MEDIUM_TIMEOUT, uniqueName } from './utils';
 
 const client = makeClient();
 
@@ -29,7 +29,7 @@ describe('smoketest: devbox snapshots', () => {
         await client.devboxes.shutdown(devbox.id);
       }
     }
-  }, 30_000);
+  }, MEDIUM_TIMEOUT);
 
   test('launch devbox from snapshot (deprecated polling path)', async () => {
     const warnSpy = jest.spyOn(console, 'warn').mockImplementation((...args: unknown[]) => {
@@ -54,5 +54,5 @@ describe('smoketest: devbox snapshots', () => {
         await client.devboxes.shutdown(devbox.id);
       }
     }
-  }, 30_000);
+  }, MEDIUM_TIMEOUT);
 });

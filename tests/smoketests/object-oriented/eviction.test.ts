@@ -102,4 +102,26 @@ const tick = (ms = 20) => new Promise((resolve) => setTimeout(resolve, ms));
     await tick();
     expect(callback).not.toHaveBeenCalled();
   });
+
+  test('onEvict reconnects after the stream ends cleanly', async () => {
+    const watchEvictions = jest
+      .fn<Promise<FakeStream>, []>()
+      .mockResolvedValueOnce(streamOf([]))
+      .mockResolvedValueOnce(streamOf([{ devbox_id: 'dbx_reconnect', eviction_deadline_ms: 1 }]));
+    const devbox = Devbox.fromId(fakeClient(watchEvictions), 'dbx_reconnect');
+
+    const fired = new Promise<void>((resolve) => devbox.onEvict(() => resolve()));
+
+    let guard: ReturnType<typeof setTimeout>;
+    const timeout = new Promise<never>((_resolve, reject) => {
+      guard = setTimeout(() => reject(new Error('onEvict callback never fired after reconnect')), 3000);
+    });
+    try {
+      await Promise.race([fired, timeout]);
+    } finally {
+      clearTimeout(guard!);
+    }
+
+    expect(watchEvictions).toHaveBeenCalledTimes(2);
+  });
 });

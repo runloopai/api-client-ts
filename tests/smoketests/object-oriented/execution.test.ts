@@ -89,33 +89,24 @@ describe('smoketest: object-oriented execution', () => {
       }
     });
 
-    test.skip('start execution with stdin enabled', async () => {
+    test('start execution with stdin enabled', async () => {
       expect(devbox).toBeDefined();
       execution = await devbox.cmd.execAsync('cat', {
         attach_stdin: true,
       });
       expect(execution).toBeDefined();
       expect(execution.executionId).toBeTruthy();
-      expect((await execution.getState()).status).toBe('running');
+      expect((await execution.getState()).status).not.toBe('completed');
     });
 
-    test.skip('send input to execution', async () => {
+    test('send input to execution', async () => {
       expect(execution).toBeDefined();
-      expect((await execution.getState()).status).toBe('running');
-      try {
-        //await execution.sendStdIn('Hello from stdin!\n');
-      } catch (error) {
-        console.error('Error sending input to execution:', error);
-      }
-
-      // Wait a bit for the input to be processed
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      // Kill the execution to get the result
-      await execution.kill();
+      expect((await execution.getState()).status).not.toBe('completed');
+      await execution.sendStdIn('Hello from stdin!\n');
+      await execution.closeStdIn();
 
       const result = await execution.result();
-      expect(result).toBeDefined();
+      expect(result.exitCode).toBe(0);
 
       const output = await result.stdout();
       expect(output).toContain('Hello from stdin!');
