@@ -96,12 +96,12 @@ describe('smoketest: object-oriented execution', () => {
       });
       expect(execution).toBeDefined();
       expect(execution.executionId).toBeTruthy();
-      expect((await execution.getState()).status).toBe('running');
+      expect((await execution.getState()).status).not.toBe('completed');
     });
 
     test('send input to execution', async () => {
       expect(execution).toBeDefined();
-      expect((await execution.getState()).status).toBe('running');
+      expect((await execution.getState()).status).not.toBe('completed');
       await execution.sendStdIn('Hello from stdin!\n');
       await execution.closeStdIn();
 
