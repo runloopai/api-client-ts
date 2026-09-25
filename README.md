@@ -10,7 +10,6 @@ Why teams pick Runloop:
 - **A real machine, not just a code runner.** Full filesystem, shell, background processes, and public URLs for ports.
 - **Fast repeat starts.** Blueprints and disk snapshots boot pre-built environments instead of reinstalling dependencies.
 - **Built for production.** SOC 2 compliant, with bring-your-own-cloud deployment on AWS, GCP, and Azure.
-- **Evaluation built in.** Scenarios, scorers, and benchmarks let you measure agent performance on the same platform you run it on.
 
 ## Installation
 
@@ -103,8 +102,6 @@ The SDK provides object-oriented interfaces for all major Runloop resources:
 - **[`runloop.storageObject`](https://runloopai.github.io/api-client-ts/stable/classes/sdk.StorageObjectOps.html)** - Storage object management (upload, download, list objects)
 - **[`runloop.agent`](https://runloopai.github.io/api-client-ts/stable/classes/sdk.AgentOps.html)** - Agent management (create, list agents from npm/pip/git)
 - **[`runloop.axon`](https://runloopai.github.io/api-client-ts/stable/classes/sdk.AxonOps.html)** - [Beta] Axon management (create, publish events, subscribe via SSE)
-- **[`runloop.scenario`](https://runloopai.github.io/api-client-ts/stable/classes/sdk.ScenarioOps.html)** - Scenario management (list scenarios, start runs)
-- **[`runloop.scorer`](https://runloopai.github.io/api-client-ts/stable/classes/sdk.ScorerOps.html)** - Scorer management (create, list, update)
 - **[`runloop.networkPolicy`](https://runloopai.github.io/api-client-ts/stable/classes/sdk.NetworkPolicyOps.html)** - Network policy management (create, list, update egress rules)
 - **[`runloop.gatewayConfig`](https://runloopai.github.io/api-client-ts/stable/classes/sdk.GatewayConfigOps.html)** - Gateway config management (create, list API proxy configurations)
 - **[`runloop.mcpConfig`](https://runloopai.github.io/api-client-ts/stable/classes/sdk.McpConfigOps.html)** - MCP config management (create, list MCP server configurations)
@@ -150,54 +147,6 @@ console.log(logs.logs);
 
 // Create a devbox from the blueprint
 const devbox = await blueprint.createDevbox({ name: 'my-devbox' });
-```
-
-### Scorers
-
-Scorers are custom scoring functions used to evaluate scenario outputs. Create scorers via `runloop.scorer.create()`, then update them with the returned `Scorer` instance:
-
-```typescript
-import { RunloopSDK } from '@runloop/api-client';
-
-const runloop = new RunloopSDK();
-
-const scorer = await runloop.scorer.create({
-  type: 'my_scorer',
-  bash_script: 'echo "1.0"',
-});
-
-await scorer.update({ bash_script: 'echo "0.5"' });
-```
-
-### Scenarios
-
-Scenarios define tasks with a well defined starting environment, task evaluation scorer and an optional reference solution. Use `runloop.scenario.fromId()` to get a scenario, then `scenario.run()` to start a run with your agent mounted:
-
-```typescript
-const scenario = runloop.scenario.fromId('scn_123');
-const run = await scenario.run({
-  run_name: 'my-run',
-  runProfile: {
-    mounts: [
-      {
-        type: 'agent_mount',
-        agent_id: 'agt_123',
-        agent_path: '/home/user/agent',
-      },
-    ],
-  },
-});
-await run.devbox.cmd.exec('python /home/user/agent/main.py');
-await run.scoreAndComplete();
-```
-
-### Benchmarks
-
-Benchmarks are collections of scenarios for evaluating AI agents. Access via `runloop.api.benchmarks`:
-
-```typescript
-const benchmarks = await runloop.api.benchmarks.listPublic();
-const definitions = await runloop.api.benchmarks.definitions('benchmark_id');
 ```
 
 ## Migration from API Client

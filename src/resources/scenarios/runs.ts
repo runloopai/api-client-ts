@@ -6,8 +6,6 @@ import * as Core from '../../core';
 import * as ScenariosAPI from './scenarios';
 import { ScenarioRunViewsBenchmarkRunsCursorIDPage } from './scenarios';
 import { type BenchmarkRunsCursorIDPageParams } from '../../pagination';
-import { LongPollRequestOptions, poll, resolveLongPollTimeoutMs } from '@runloop/api-client/lib/polling';
-import { RunloopError } from '../..';
 import { type Response } from '../../_shims/index';
 
 export class Runs extends APIResource {
@@ -74,65 +72,6 @@ export class Runs extends APIResource {
    */
   score(id: string, options?: Core.RequestOptions): Core.APIPromise<ScenariosAPI.ScenarioRunView> {
     return this._client.post(`/v1/scenarios/runs/${id}/score`, options);
-  }
-
-  /**
-   * Wait for a scenario run to finish scoring.
-   * Polls the scenario run status until it reaches a terminal state.
-   */
-  async awaitScored(
-    id: string,
-    options?: LongPollRequestOptions<ScenariosAPI.ScenarioRunView>,
-  ): Promise<ScenariosAPI.ScenarioRunView> {
-    const pollTimeoutMs = resolveLongPollTimeoutMs(options);
-    const { longPoll: _lp, polling, signal, ...requestOptions } = options ?? {};
-    const finalResult = await poll(
-      () => this.retrieve(id, requestOptions),
-      () => this.retrieve(id, requestOptions),
-      {
-        ...polling,
-        signal,
-        ...(pollTimeoutMs !== undefined ? { timeoutMs: pollTimeoutMs } : {}),
-        shouldStop: (result) => {
-          return result.state !== 'scoring';
-        },
-      },
-    );
-
-    // Check if the run was scored successfully, otherwise throw an error
-    if (finalResult.state !== 'scored') {
-      throw new RunloopError(
-        `Scenario run ${id} failed to transition to scored state. Final state: ${finalResult.state}`,
-      );
-    }
-
-    return finalResult;
-  }
-
-  /**
-   * Score a scenario run and wait for it to finish scoring.
-   * This is a convenience method that combines score() and awaitScoring().
-   */
-  async scoreAndAwait(
-    id: string,
-    options?: LongPollRequestOptions<ScenariosAPI.ScenarioRunView>,
-  ): Promise<ScenariosAPI.ScenarioRunView> {
-    const { longPoll, polling, signal, ...requestOptions } = options ?? {};
-    const run = await this.score(id, requestOptions);
-    return this.awaitScored(run.id, { ...requestOptions, longPoll, polling, signal });
-  }
-
-  /**
-   * Score a scenario run, wait for scoring to complete, and then complete the run.
-   * This is a convenience method that combines scoreAndAwait() and complete().
-   */
-  async scoreAndComplete(
-    id: string,
-    options?: LongPollRequestOptions<ScenariosAPI.ScenarioRunView>,
-  ): Promise<ScenariosAPI.ScenarioRunView> {
-    const { longPoll, polling, signal, ...requestOptions } = options ?? {};
-    const scoredRun = await this.scoreAndAwait(id, { ...requestOptions, longPoll, polling, signal });
-    return this.complete(scoredRun.id, requestOptions);
   }
 }
 

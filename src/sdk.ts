@@ -7,12 +7,9 @@ import { Snapshot } from './sdk/snapshot';
 import { StorageObject } from './sdk/storage-object';
 import { Agent } from './sdk/agent';
 import { Axon } from './sdk/axon';
-import { Scorer } from './sdk/scorer';
 import { NetworkPolicy } from './sdk/network-policy';
 import { GatewayConfig } from './sdk/gateway-config';
 import { McpConfig } from './sdk/mcp-config';
-import { Scenario } from './sdk/scenario';
-import { ScenarioBuilder } from './sdk/scenario-builder';
 import { Secret } from './sdk/secret';
 
 // Import types used in this file
@@ -31,11 +28,9 @@ import type {
   AgentListPublicParams,
 } from './resources/agents';
 import type { AxonCreateParams, AxonListParams } from './resources/axons/axons';
-import type { ScorerCreateParams, ScorerListParams } from './resources/scenarios/scorers';
 import type { NetworkPolicyCreateParams, NetworkPolicyListParams } from './resources/network-policies';
 import type { GatewayConfigCreateParams, GatewayConfigListParams } from './resources/gateway-configs';
 import type { McpConfigCreateParams, McpConfigListParams } from './resources/mcp-configs';
-import type { ScenarioListParams } from './resources/scenarios/scenarios';
 import type {
   SecretCreateParams,
   SecretUpdateParams,
@@ -378,7 +373,6 @@ type ContentType = ObjectCreateParams['content_type'];
  * - `storageObject` - {@link StorageObjectOps}
  * - `agent` - {@link AgentOps}
  * - `axon` - {@link AxonOps}
- * - `scorer` - {@link ScorerOps}
  * - `networkPolicy` - {@link NetworkPolicyOps}
  * - `gatewayConfig` - {@link GatewayConfigOps}
  * - `mcpConfig` - {@link McpConfigOps}
@@ -452,14 +446,6 @@ export class RunloopSDK {
   public readonly axon: AxonOps;
 
   /**
-   * **Scorer Operations** - {@link ScorerOps} for creating and accessing {@link Scorer} class instances.
-   *
-   * Scorers are custom scoring functions that evaluate scenario outputs. They define scripts
-   * that produce a score in the range [0.0, 1.0] for scenario runs.
-   */
-  public readonly scorer: ScorerOps;
-
-  /**
    * **Network Policy Operations** - {@link NetworkPolicyOps} for creating and accessing {@link NetworkPolicy} class instances.
    *
    * Network policies define egress network access rules for devboxes. Policies can be applied to
@@ -486,14 +472,6 @@ export class RunloopSDK {
   public readonly mcpConfig: McpConfigOps;
 
   /**
-   * **Scenario Operations** - {@link ScenarioOps} for accessing {@link Scenario} class instances.
-   *
-   * Scenarios define repeatable AI coding evaluation tests with starting environments and
-   * success criteria. Use these operations to get existing scenarios by ID or list all scenarios.
-   */
-  public readonly scenario: ScenarioOps;
-
-  /**
    * **Secret Operations** - {@link SecretOps} for managing secrets.
    *
    * Secrets are encrypted key-value pairs that can be injected into devboxes as environment
@@ -513,11 +491,9 @@ export class RunloopSDK {
     this.storageObject = new StorageObjectOps(this.api);
     this.agent = new AgentOps(this.api);
     this.axon = new AxonOps(this.api);
-    this.scorer = new ScorerOps(this.api);
     this.networkPolicy = new NetworkPolicyOps(this.api);
     this.gatewayConfig = new GatewayConfigOps(this.api);
     this.mcpConfig = new McpConfigOps(this.api);
-    this.scenario = new ScenarioOps(this.api);
     this.secret = new SecretOps(this.api);
   }
 }
@@ -1663,117 +1639,6 @@ export class AxonOps {
 }
 
 /**
- * Scorer SDK interface for managing custom scorers.
- *
- * @category Scorer
- *
- * @remarks
- * ## Overview
- *
- * Scorers are custom scoring functions used to evaluate scenario outputs. A scorer is a
- * script that runs and prints a score in the range [0.0, 1.0], e.g. `echo "0.5"`.
- *
- * ## Usage
- *
- * This interface is accessed via {@link RunloopSDK.scorer}. Create scorers with {@link ScorerOps.create}
- * or reference an existing scorer by ID with {@link ScorerOps.fromId} to obtain a {@link Scorer} instance.
- *
- * @example
- * ```typescript
- * import { RunloopSDK } from '@runloop/api-client';
- *
- * const runloop = new RunloopSDK();
- *
- * // Create a scorer
- * const scorer = await runloop.scorer.create({
- *   type: 'my_scorer',
- *   bash_script: 'echo "1.0"',
- * });
- *
- * // Update the scorer
- * await scorer.update({ bash_script: 'echo "0.5"' });
- * ```
- *
- * @example
- * Get scorer info (typical usage):
- * ```typescript
- * const runloop = new RunloopSDK();
- * const scorer = await runloop.scorer.create({
- *   type: 'my_scorer',
- *   bash_script: 'echo "1.0"',
- * });
- *
- * const info = await scorer.getInfo();
- * console.log(`Scorer ${info.id} (${info.type})`);
- * ```
- */
-export class ScorerOps {
-  /**
-   * @private
-   */
-  constructor(private client: RunloopAPI) {}
-
-  /**
-   * Create a new custom scorer.
-   *
-   * @example
-   * ```typescript
-   * const runloop = new RunloopSDK();
-   * const scorer = await runloop.scorer.create({
-   *   type: 'my_scorer',
-   *   bash_script: 'echo "1.0"',
-   * });
-   *
-   * const info = await scorer.getInfo();
-   * console.log(info.id);
-   * ```
-   *
-   * @param {ScorerCreateParams} params - Parameters for creating the scorer
-   * @param {Core.RequestOptions} [options] - Request options
-   * @returns {Promise<Scorer>} A {@link Scorer} instance
-   */
-  async create(params: ScorerCreateParams, options?: Core.RequestOptions): Promise<Scorer> {
-    return Scorer.create(this.client, params, options);
-  }
-
-  /**
-   * Get a scorer object by its ID.
-   *
-   * @example
-   * ```typescript
-   * const runloop = new RunloopSDK();
-   * const scorer = runloop.scorer.fromId('scs_123');
-   * const info = await scorer.getInfo();
-   * console.log(info.type);
-   * ```
-   *
-   * @param {string} id - The ID of the scorer
-   * @returns {Scorer} A {@link Scorer} instance
-   */
-  fromId(id: string): Scorer {
-    return Scorer.fromId(this.client, id);
-  }
-
-  /**
-   * List scorers with optional filters (paginated).
-   *
-   * @example
-   * ```typescript
-   * const runloop = new RunloopSDK();
-   * const scorers = await runloop.scorer.list({ limit: 10 });
-   * console.log(scorers.map((s) => s.id));
-   * ```
-   *
-   * @param {ScorerListParams} [params] - Optional filter parameters
-   * @param {Core.RequestOptions} [options] - Request options
-   * @returns {Promise<Scorer[]>} An array of {@link Scorer} instances
-   */
-  async list(params?: ScorerListParams, options?: Core.RequestOptions): Promise<Scorer[]> {
-    return Scorer.list(this.client, params, options);
-  }
-}
-
-/**
  * Network Policy SDK interface for managing network policies.
  *
  * @category Network Policy
@@ -2090,127 +1955,6 @@ export class McpConfigOps {
 }
 
 /**
- * Scenario SDK interface for managing scenarios.
- *
- * @category Scenario
- *
- * @remarks
- * ## Overview
- *
- * The `ScenarioOps` class provides a high-level abstraction for managing scenarios.
- *
- * ## Quickstart
- *
- * Use `fromId()` to get a {@link Scenario} by ID, `list()` to retrieve all scenarios,
- * or `builder()` to construct a new scenario with a fluent API.
- * Once you have a scenario, call `scenario.run()` to start a {@link ScenarioRun} with
- * your agent mounted.
- *
- * ## Usage
- *
- * This interface is accessed via {@link RunloopSDK.scenario}. You should construct
- * a {@link RunloopSDK} instance and use it from there:
- *
- * @example
- * ```typescript
- * const runloop = new RunloopSDK();
- * const scenario = runloop.scenario.fromId('scn_123');
- *
- * // Get scenario details
- * const info = await scenario.getInfo();
- * console.log(info.name);
- *
- * // Start a run with agent mounted and wait for the devbox to be ready
- * const run = await scenario.run({
- *   run_name: 'my-run',
- *   runProfile: {
- *     mounts: [{
- *       type: 'agent_mount',
- *       agent_id: 'agt_123',
- *       agent_name: null,
- *       agent_path: '/home/user/agent',
- *     }],
- *   },
- * });
- *
- * // Execute your agent on the devbox
- * await run.devbox.cmd.exec('python /home/user/agent/main.py');
- *
- * // Score and complete
- * await run.scoreAndComplete();
- * ```
- */
-export class ScenarioOps {
-  /**
-   * @private
-   */
-  constructor(private client: RunloopAPI) {}
-
-  /**
-   * Create a new {@link ScenarioBuilder} for constructing a scenario with a fluent API.
-   *
-   * @example
-   * ```typescript
-   * const runloop = new RunloopSDK();
-   * const scenario = await runloop.scenario
-   *   .builder('my-scenario')
-   *   .withProblemStatement('Fix the bug in main.py')
-   *   .addTestCommandScorer('tests', { test_command: 'pytest' })
-   *   .push();
-   * ```
-   *
-   * @param {string} name - Name for the scenario
-   * @returns {ScenarioBuilder} A {@link ScenarioBuilder} instance
-   */
-  builder(name: string): ScenarioBuilder {
-    return new ScenarioBuilder(name, this.client);
-  }
-
-  /**
-   * Get a scenario object by its ID.
-   *
-   * @example
-   * ```typescript
-   * const runloop = new RunloopSDK();
-   * const scenario = runloop.scenario.fromId('scn_123');
-   * const info = await scenario.getInfo();
-   * console.log(info.name);
-   * ```
-   *
-   * @param {string} id - The ID of the scenario
-   * @returns {Scenario} A {@link Scenario} instance
-   */
-  fromId(id: string): Scenario {
-    return Scenario.fromId(this.client, id);
-  }
-
-  /**
-   * List scenarios with optional filters (paginated).
-   *
-   * @example
-   * ```typescript
-   * const runloop = new RunloopSDK();
-   * const scenarios = await runloop.scenario.list({ limit: 10 });
-   * console.log(scenarios.map((s) => s.id));
-   * ```
-   *
-   * @param {ScenarioListParams} [params] - Optional filter parameters
-   * @param {Core.RequestOptions} [options] - Request options
-   * @returns {Promise<Scenario[]>} An array of {@link Scenario} instances
-   */
-  async list(params?: ScenarioListParams, options?: Core.RequestOptions): Promise<Scenario[]> {
-    const result = await this.client.scenarios.list(params, options);
-    const scenarios: Scenario[] = [];
-
-    for (const scenario of result.scenarios) {
-      scenarios.push(Scenario.fromId(this.client, scenario.id));
-    }
-
-    return scenarios;
-  }
-}
-
-/**
  * Secret SDK interface for managing secrets.
  *
  * @category Secret
@@ -2399,11 +2143,9 @@ export declare namespace RunloopSDK {
     StorageObjectOps as StorageObjectOps,
     AgentOps as AgentOps,
     AxonOps as AxonOps,
-    ScorerOps as ScorerOps,
     NetworkPolicyOps as NetworkPolicyOps,
     GatewayConfigOps as GatewayConfigOps,
     McpConfigOps as McpConfigOps,
-    ScenarioOps as ScenarioOps,
     SecretOps as SecretOps,
     Devbox as Devbox,
     Blueprint as Blueprint,
@@ -2411,12 +2153,10 @@ export declare namespace RunloopSDK {
     StorageObject as StorageObject,
     Agent as Agent,
     Axon as Axon,
-    Scorer as Scorer,
     NetworkPolicy as NetworkPolicy,
     GatewayConfig as GatewayConfig,
     McpConfig as McpConfig,
     Secret as Secret,
-    Scenario as Scenario,
   };
 }
 // Export SDK classes from sdk/sdk.ts - these are separate from RunloopSDK to avoid circular dependencies
@@ -2431,12 +2171,9 @@ export {
   StorageObject,
   Agent,
   Axon,
-  Scorer,
   NetworkPolicy,
   McpConfig,
   Secret,
   Execution,
   ExecutionResult,
-  Scenario,
-  ScenarioRun,
 } from './sdk/index';
