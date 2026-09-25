@@ -521,36 +521,3 @@ export interface ResumeTriggers {
    */
   http?: boolean | null;
 }
-
-export interface RunProfile {
-  /**
-   * Mapping of Environment Variable to Value. May be shown in devbox logging.
-   * Example: {"DB_PASS": "DATABASE_PASSWORD"} would set the environment variable
-   * 'DB_PASS' to the value 'DATABASE_PASSWORD_VALUE'.
-   */
-  envVars?: { [key: string]: string } | null;
-
-  /**
-   * LaunchParameters enable you to customize the resources available to your Devbox
-   * as well as the environment set up that should be completed before the Devbox is
-   * marked as 'running'.
-   */
-  launchParameters?: LaunchParameters | null;
-
-  /**
-   * A list of mounts to be included in the scenario run.
-   */
-  mounts?: Array<Mount> | null;
-
-  /**
-   * Purpose of the run.
-   */
-  purpose?: string | null;
-
-  /**
-   * Mapping of Environment Variable to User Secret Name. Never shown in devbox
-   * logging. Example: {"DB_PASS": "DATABASE_PASSWORD"} would set the environment
-   * variable 'DB_PASS' to the value of the secret 'DATABASE_PASSWORD'.
-   */
-  secrets?: { [key: string]: string } | null;
-}

@@ -36,39 +36,6 @@ export {
   type AxonSubscribeSseParams,
 } from './axons/axons';
 export {
-  BenchmarkJobs,
-  type BenchmarkJobCreateParameters,
-  type BenchmarkJobListView,
-  type BenchmarkJobView,
-  type BenchmarkJobCreateParams,
-  type BenchmarkJobListParams,
-} from './benchmark-jobs';
-export {
-  BenchmarkRunViewsBenchmarkRunsCursorIDPage,
-  BenchmarkRuns,
-  type BenchmarkRunListView,
-  type BenchmarkRunView,
-  type BenchmarkRunListParams,
-  type BenchmarkRunListScenarioRunsParams,
-} from './benchmark-runs';
-export {
-  BenchmarkViewsBenchmarksCursorIDPage,
-  Benchmarks,
-  type BenchmarkCreateParameters,
-  type BenchmarkScenarioUpdateParameters,
-  type BenchmarkUpdateParameters,
-  type BenchmarkView,
-  type ScenarioDefinitionListView,
-  type StartBenchmarkRunParameters,
-  type BenchmarkCreateParams,
-  type BenchmarkUpdateParams,
-  type BenchmarkListParams,
-  type BenchmarkDefinitionsParams,
-  type BenchmarkListPublicParams,
-  type BenchmarkStartRunParams,
-  type BenchmarkUpdateScenariosParams,
-} from './benchmarks';
-export {
   BlueprintViewsBlueprintsCursorIDPage,
   Blueprints,
   type BlueprintBuildLog,
@@ -193,30 +160,6 @@ export {
   type ScopeEntryView,
   type RestrictedKeyCreateParams,
 } from './restricted-keys';
-export {
-  ScenarioRunViewsBenchmarkRunsCursorIDPage,
-  ScenarioViewsScenariosCursorIDPage,
-  Scenarios,
-  type InputContext,
-  type InputContextUpdate,
-  type ScenarioCreateParameters,
-  type ScenarioEnvironment,
-  type ScenarioRunListView,
-  type ScenarioRunView,
-  type ScenarioUpdateParameters,
-  type ScenarioView,
-  type ScoringContract,
-  type ScoringContractResultView,
-  type ScoringContractUpdate,
-  type ScoringFunction,
-  type ScoringFunctionResultView,
-  type StartScenarioRunParameters,
-  type ScenarioCreateParams,
-  type ScenarioUpdateParams,
-  type ScenarioListParams,
-  type ScenarioListPublicParams,
-  type ScenarioStartRunParams,
-} from './scenarios/scenarios';
 export {
   Secrets,
   type SecretCreateParameters,

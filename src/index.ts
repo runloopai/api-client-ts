@@ -10,10 +10,6 @@ import {
   AgentsCursorIDPageResponse,
   type AxonsCursorIDPageParams,
   AxonsCursorIDPageResponse,
-  type BenchmarkRunsCursorIDPageParams,
-  BenchmarkRunsCursorIDPageResponse,
-  type BenchmarksCursorIDPageParams,
-  BenchmarksCursorIDPageResponse,
   type BlueprintsCursorIDPageParams,
   BlueprintsCursorIDPageResponse,
   type DevboxesCursorIDPageParams,
@@ -28,12 +24,8 @@ import {
   NetworkPoliciesCursorIDPageResponse,
   type ObjectsCursorIDPageParams,
   ObjectsCursorIDPageResponse,
-  type ScenarioRunsCursorIDPageParams,
-  ScenarioRunsCursorIDPageResponse,
   type ScenarioScorersCursorIDPageParams,
   ScenarioScorersCursorIDPageResponse,
-  type ScenariosCursorIDPageParams,
-  ScenariosCursorIDPageResponse,
 } from './pagination';
 import * as Uploads from './uploads';
 import * as API from './resources/index';
@@ -51,39 +43,6 @@ import {
   Agents,
 } from './resources/agents';
 import { APIKeyCreateParameters, APIKeyCreatedView, ApikeyCreateParams, Apikeys } from './resources/apikeys';
-import {
-  BenchmarkJobCreateParameters,
-  BenchmarkJobCreateParams,
-  BenchmarkJobListParams,
-  BenchmarkJobListView,
-  BenchmarkJobView,
-  BenchmarkJobs,
-} from './resources/benchmark-jobs';
-import {
-  BenchmarkRunListParams,
-  BenchmarkRunListScenarioRunsParams,
-  BenchmarkRunListView,
-  BenchmarkRunView,
-  BenchmarkRunViewsBenchmarkRunsCursorIDPage,
-  BenchmarkRuns,
-} from './resources/benchmark-runs';
-import {
-  BenchmarkCreateParameters,
-  BenchmarkCreateParams,
-  BenchmarkDefinitionsParams,
-  BenchmarkListParams,
-  BenchmarkListPublicParams,
-  BenchmarkScenarioUpdateParameters,
-  BenchmarkStartRunParams,
-  BenchmarkUpdateParameters,
-  BenchmarkUpdateParams,
-  BenchmarkUpdateScenariosParams,
-  BenchmarkView,
-  BenchmarkViewsBenchmarksCursorIDPage,
-  Benchmarks,
-  ScenarioDefinitionListView,
-  StartBenchmarkRunParameters,
-} from './resources/benchmarks';
 import {
   BlueprintBuildLog,
   BlueprintBuildLogsListView,
@@ -235,29 +194,6 @@ import {
   PtyTunnelView,
   TunnelView,
 } from './resources/devboxes/devboxes';
-import {
-  InputContext,
-  InputContextUpdate,
-  ScenarioCreateParameters,
-  ScenarioCreateParams,
-  ScenarioEnvironment,
-  ScenarioListParams,
-  ScenarioListPublicParams,
-  ScenarioRunListView,
-  ScenarioRunView,
-  ScenarioStartRunParams,
-  ScenarioUpdateParameters,
-  ScenarioUpdateParams,
-  ScenarioView,
-  ScenarioViewsScenariosCursorIDPage,
-  Scenarios,
-  ScoringContract,
-  ScoringContractResultView,
-  ScoringContractUpdate,
-  ScoringFunction,
-  ScoringFunctionResultView,
-  StartScenarioRunParameters,
-} from './resources/scenarios/scenarios';
 
 export interface ClientOptions {
   /**
@@ -419,15 +355,11 @@ export class Runloop extends Core.APIClient {
   }
 
   accounts: API.Accounts = new API.Accounts(this);
-  benchmarks: API.Benchmarks = new API.Benchmarks(this);
-  benchmarkRuns: API.BenchmarkRuns = new API.BenchmarkRuns(this);
-  benchmarkJobs: API.BenchmarkJobs = new API.BenchmarkJobs(this);
   agents: API.Agents = new API.Agents(this);
   axons: API.Axons = new API.Axons(this);
   blueprints: API.Blueprints = new API.Blueprints(this);
   devboxes: API.Devboxes = new API.Devboxes(this);
   pty: API.Pty = new API.Pty(this);
-  scenarios: API.Scenarios = new API.Scenarios(this);
   objects: API.Objects = new API.Objects(this);
   secrets: API.Secrets = new API.Secrets(this);
   networkPolicies: API.NetworkPolicies = new API.NetworkPolicies(this);
@@ -480,11 +412,6 @@ export class Runloop extends Core.APIClient {
 }
 
 Runloop.Accounts = Accounts;
-Runloop.Benchmarks = Benchmarks;
-Runloop.BenchmarkViewsBenchmarksCursorIDPage = BenchmarkViewsBenchmarksCursorIDPage;
-Runloop.BenchmarkRuns = BenchmarkRuns;
-Runloop.BenchmarkRunViewsBenchmarkRunsCursorIDPage = BenchmarkRunViewsBenchmarkRunsCursorIDPage;
-Runloop.BenchmarkJobs = BenchmarkJobs;
 Runloop.Agents = Agents;
 Runloop.AgentViewsAgentsCursorIDPage = AgentViewsAgentsCursorIDPage;
 Runloop.Axons = Axons;
@@ -495,8 +422,6 @@ Runloop.Devboxes = Devboxes;
 Runloop.DevboxViewsDevboxesCursorIDPage = DevboxViewsDevboxesCursorIDPage;
 Runloop.DevboxSnapshotViewsDiskSnapshotsCursorIDPage = DevboxSnapshotViewsDiskSnapshotsCursorIDPage;
 Runloop.Pty = Pty;
-Runloop.Scenarios = Scenarios;
-Runloop.ScenarioViewsScenariosCursorIDPage = ScenarioViewsScenariosCursorIDPage;
 Runloop.Objects = Objects;
 Runloop.ObjectViewsObjectsCursorIDPage = ObjectViewsObjectsCursorIDPage;
 Runloop.Secrets = Secrets;
@@ -530,12 +455,6 @@ export declare namespace Runloop {
     type DiskSnapshotsCursorIDPageResponse as DiskSnapshotsCursorIDPageResponse,
   };
 
-  export import BenchmarksCursorIDPage = Pagination.BenchmarksCursorIDPage;
-  export {
-    type BenchmarksCursorIDPageParams as BenchmarksCursorIDPageParams,
-    type BenchmarksCursorIDPageResponse as BenchmarksCursorIDPageResponse,
-  };
-
   export import AgentsCursorIDPage = Pagination.AgentsCursorIDPage;
   export {
     type AgentsCursorIDPageParams as AgentsCursorIDPageParams,
@@ -546,24 +465,6 @@ export declare namespace Runloop {
   export {
     type AxonsCursorIDPageParams as AxonsCursorIDPageParams,
     type AxonsCursorIDPageResponse as AxonsCursorIDPageResponse,
-  };
-
-  export import BenchmarkRunsCursorIDPage = Pagination.BenchmarkRunsCursorIDPage;
-  export {
-    type BenchmarkRunsCursorIDPageParams as BenchmarkRunsCursorIDPageParams,
-    type BenchmarkRunsCursorIDPageResponse as BenchmarkRunsCursorIDPageResponse,
-  };
-
-  export import ScenariosCursorIDPage = Pagination.ScenariosCursorIDPage;
-  export {
-    type ScenariosCursorIDPageParams as ScenariosCursorIDPageParams,
-    type ScenariosCursorIDPageResponse as ScenariosCursorIDPageResponse,
-  };
-
-  export import ScenarioRunsCursorIDPage = Pagination.ScenarioRunsCursorIDPage;
-  export {
-    type ScenarioRunsCursorIDPageParams as ScenarioRunsCursorIDPageParams,
-    type ScenarioRunsCursorIDPageResponse as ScenarioRunsCursorIDPageResponse,
   };
 
   export import ScenarioScorersCursorIDPage = Pagination.ScenarioScorersCursorIDPage;
@@ -597,42 +498,6 @@ export declare namespace Runloop {
   };
 
   export { Accounts as Accounts, type AccountView as AccountView };
-
-  export {
-    Benchmarks as Benchmarks,
-    type BenchmarkCreateParameters as BenchmarkCreateParameters,
-    type BenchmarkScenarioUpdateParameters as BenchmarkScenarioUpdateParameters,
-    type BenchmarkUpdateParameters as BenchmarkUpdateParameters,
-    type BenchmarkView as BenchmarkView,
-    type ScenarioDefinitionListView as ScenarioDefinitionListView,
-    type StartBenchmarkRunParameters as StartBenchmarkRunParameters,
-    BenchmarkViewsBenchmarksCursorIDPage as BenchmarkViewsBenchmarksCursorIDPage,
-    type BenchmarkCreateParams as BenchmarkCreateParams,
-    type BenchmarkUpdateParams as BenchmarkUpdateParams,
-    type BenchmarkListParams as BenchmarkListParams,
-    type BenchmarkDefinitionsParams as BenchmarkDefinitionsParams,
-    type BenchmarkListPublicParams as BenchmarkListPublicParams,
-    type BenchmarkStartRunParams as BenchmarkStartRunParams,
-    type BenchmarkUpdateScenariosParams as BenchmarkUpdateScenariosParams,
-  };
-
-  export {
-    BenchmarkRuns as BenchmarkRuns,
-    type BenchmarkRunListView as BenchmarkRunListView,
-    type BenchmarkRunView as BenchmarkRunView,
-    BenchmarkRunViewsBenchmarkRunsCursorIDPage as BenchmarkRunViewsBenchmarkRunsCursorIDPage,
-    type BenchmarkRunListParams as BenchmarkRunListParams,
-    type BenchmarkRunListScenarioRunsParams as BenchmarkRunListScenarioRunsParams,
-  };
-
-  export {
-    BenchmarkJobs as BenchmarkJobs,
-    type BenchmarkJobCreateParameters as BenchmarkJobCreateParameters,
-    type BenchmarkJobListView as BenchmarkJobListView,
-    type BenchmarkJobView as BenchmarkJobView,
-    type BenchmarkJobCreateParams as BenchmarkJobCreateParams,
-    type BenchmarkJobListParams as BenchmarkJobListParams,
-  };
 
   export {
     Agents as Agents,
@@ -733,30 +598,6 @@ export declare namespace Runloop {
   };
 
   export {
-    Scenarios as Scenarios,
-    type InputContext as InputContext,
-    type InputContextUpdate as InputContextUpdate,
-    type ScenarioCreateParameters as ScenarioCreateParameters,
-    type ScenarioEnvironment as ScenarioEnvironment,
-    type ScenarioRunListView as ScenarioRunListView,
-    type ScenarioRunView as ScenarioRunView,
-    type ScenarioUpdateParameters as ScenarioUpdateParameters,
-    type ScenarioView as ScenarioView,
-    type ScoringContract as ScoringContract,
-    type ScoringContractResultView as ScoringContractResultView,
-    type ScoringContractUpdate as ScoringContractUpdate,
-    type ScoringFunction as ScoringFunction,
-    type ScoringFunctionResultView as ScoringFunctionResultView,
-    type StartScenarioRunParameters as StartScenarioRunParameters,
-    ScenarioViewsScenariosCursorIDPage as ScenarioViewsScenariosCursorIDPage,
-    type ScenarioCreateParams as ScenarioCreateParams,
-    type ScenarioUpdateParams as ScenarioUpdateParams,
-    type ScenarioListParams as ScenarioListParams,
-    type ScenarioListPublicParams as ScenarioListPublicParams,
-    type ScenarioStartRunParams as ScenarioStartRunParams,
-  };
-
-  export {
     Objects as Objects,
     type ObjectCreateParameters as ObjectCreateParameters,
     type ObjectDownloadURLView as ObjectDownloadURLView,
@@ -852,7 +693,6 @@ export declare namespace Runloop {
   export type Mount = API.Mount;
   export type ObjectMount = API.ObjectMount;
   export type ResumeTriggers = API.ResumeTriggers;
-  export type RunProfile = API.RunProfile;
 }
 
 export { type LongPollRequestOptions, LongPollAbortError, PollingTimeoutError } from './lib/polling';

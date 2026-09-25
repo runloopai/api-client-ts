@@ -15,7 +15,6 @@ Types:
 - <code><a href="./src/resources/shared.ts">Mount</a></code>
 - <code><a href="./src/resources/shared.ts">ObjectMount</a></code>
 - <code><a href="./src/resources/shared.ts">ResumeTriggers</a></code>
-- <code><a href="./src/resources/shared.ts">RunProfile</a></code>
 
 # Accounts
 
@@ -26,57 +25,6 @@ Types:
 Methods:
 
 - <code title="get /v1/accounts/me">client.accounts.<a href="./src/resources/accounts.ts">me</a>() -> AccountView</code>
-
-# Benchmarks
-
-Types:
-
-- <code><a href="./src/resources/benchmarks.ts">BenchmarkCreateParameters</a></code>
-- <code><a href="./src/resources/benchmarks.ts">BenchmarkScenarioUpdateParameters</a></code>
-- <code><a href="./src/resources/benchmarks.ts">BenchmarkUpdateParameters</a></code>
-- <code><a href="./src/resources/benchmarks.ts">BenchmarkView</a></code>
-- <code><a href="./src/resources/benchmarks.ts">ScenarioDefinitionListView</a></code>
-- <code><a href="./src/resources/benchmarks.ts">StartBenchmarkRunParameters</a></code>
-
-Methods:
-
-- <code title="post /v1/benchmarks">client.benchmarks.<a href="./src/resources/benchmarks.ts">create</a>({ ...params }) -> BenchmarkView</code>
-- <code title="get /v1/benchmarks/{id}">client.benchmarks.<a href="./src/resources/benchmarks.ts">retrieve</a>(id) -> BenchmarkView</code>
-- <code title="post /v1/benchmarks/{id}">client.benchmarks.<a href="./src/resources/benchmarks.ts">update</a>(id, { ...params }) -> BenchmarkView</code>
-- <code title="get /v1/benchmarks">client.benchmarks.<a href="./src/resources/benchmarks.ts">list</a>({ ...params }) -> BenchmarkViewsBenchmarksCursorIDPage</code>
-- <code title="get /v1/benchmarks/{id}/definitions">client.benchmarks.<a href="./src/resources/benchmarks.ts">definitions</a>(id, { ...params }) -> ScenarioDefinitionListView</code>
-- <code title="get /v1/benchmarks/list_public">client.benchmarks.<a href="./src/resources/benchmarks.ts">listPublic</a>({ ...params }) -> BenchmarkViewsBenchmarksCursorIDPage</code>
-- <code title="post /v1/benchmarks/start_run">client.benchmarks.<a href="./src/resources/benchmarks.ts">startRun</a>({ ...params }) -> BenchmarkRunView</code>
-- <code title="post /v1/benchmarks/{id}/scenarios">client.benchmarks.<a href="./src/resources/benchmarks.ts">updateScenarios</a>(id, { ...params }) -> BenchmarkView</code>
-
-# BenchmarkRuns
-
-Types:
-
-- <code><a href="./src/resources/benchmark-runs.ts">BenchmarkRunListView</a></code>
-- <code><a href="./src/resources/benchmark-runs.ts">BenchmarkRunView</a></code>
-
-Methods:
-
-- <code title="get /v1/benchmark_runs/{id}">client.benchmarkRuns.<a href="./src/resources/benchmark-runs.ts">retrieve</a>(id) -> BenchmarkRunView</code>
-- <code title="get /v1/benchmark_runs">client.benchmarkRuns.<a href="./src/resources/benchmark-runs.ts">list</a>({ ...params }) -> BenchmarkRunViewsBenchmarkRunsCursorIDPage</code>
-- <code title="post /v1/benchmark_runs/{id}/cancel">client.benchmarkRuns.<a href="./src/resources/benchmark-runs.ts">cancel</a>(id) -> BenchmarkRunView</code>
-- <code title="post /v1/benchmark_runs/{id}/complete">client.benchmarkRuns.<a href="./src/resources/benchmark-runs.ts">complete</a>(id) -> BenchmarkRunView</code>
-- <code title="get /v1/benchmark_runs/{id}/scenario_runs">client.benchmarkRuns.<a href="./src/resources/benchmark-runs.ts">listScenarioRuns</a>(id, { ...params }) -> ScenarioRunViewsBenchmarkRunsCursorIDPage</code>
-
-# BenchmarkJobs
-
-Types:
-
-- <code><a href="./src/resources/benchmark-jobs.ts">BenchmarkJobCreateParameters</a></code>
-- <code><a href="./src/resources/benchmark-jobs.ts">BenchmarkJobListView</a></code>
-- <code><a href="./src/resources/benchmark-jobs.ts">BenchmarkJobView</a></code>
-
-Methods:
-
-- <code title="post /v1/benchmark_jobs">client.benchmarkJobs.<a href="./src/resources/benchmark-jobs.ts">create</a>({ ...params }) -> BenchmarkJobView</code>
-- <code title="get /v1/benchmark_jobs/{id}">client.benchmarkJobs.<a href="./src/resources/benchmark-jobs.ts">retrieve</a>(id) -> BenchmarkJobView</code>
-- <code title="get /v1/benchmark_jobs">client.benchmarkJobs.<a href="./src/resources/benchmark-jobs.ts">list</a>({ ...params }) -> BenchmarkJobListView</code>
 
 # Agents
 
@@ -279,62 +227,6 @@ Methods:
 
 - <code title="get /pty/{session_name}">client.pty.<a href="./src/resources/pty.ts">connect</a>(sessionName, { ...params }) -> PtyConnectView</code>
 - <code title="post /pty/{session_name}/control">client.pty.<a href="./src/resources/pty.ts">control</a>(sessionName, { ...params }) -> PtyControlResultView</code>
-
-# Scenarios
-
-Types:
-
-- <code><a href="./src/resources/scenarios/scenarios.ts">InputContext</a></code>
-- <code><a href="./src/resources/scenarios/scenarios.ts">InputContextUpdate</a></code>
-- <code><a href="./src/resources/scenarios/scenarios.ts">ScenarioCreateParameters</a></code>
-- <code><a href="./src/resources/scenarios/scenarios.ts">ScenarioEnvironment</a></code>
-- <code><a href="./src/resources/scenarios/scenarios.ts">ScenarioRunListView</a></code>
-- <code><a href="./src/resources/scenarios/scenarios.ts">ScenarioRunView</a></code>
-- <code><a href="./src/resources/scenarios/scenarios.ts">ScenarioUpdateParameters</a></code>
-- <code><a href="./src/resources/scenarios/scenarios.ts">ScenarioView</a></code>
-- <code><a href="./src/resources/scenarios/scenarios.ts">ScoringContract</a></code>
-- <code><a href="./src/resources/scenarios/scenarios.ts">ScoringContractResultView</a></code>
-- <code><a href="./src/resources/scenarios/scenarios.ts">ScoringContractUpdate</a></code>
-- <code><a href="./src/resources/scenarios/scenarios.ts">ScoringFunction</a></code>
-- <code><a href="./src/resources/scenarios/scenarios.ts">ScoringFunctionResultView</a></code>
-- <code><a href="./src/resources/scenarios/scenarios.ts">StartScenarioRunParameters</a></code>
-
-Methods:
-
-- <code title="post /v1/scenarios">client.scenarios.<a href="./src/resources/scenarios/scenarios.ts">create</a>({ ...params }) -> ScenarioView</code>
-- <code title="get /v1/scenarios/{id}">client.scenarios.<a href="./src/resources/scenarios/scenarios.ts">retrieve</a>(id) -> ScenarioView</code>
-- <code title="post /v1/scenarios/{id}">client.scenarios.<a href="./src/resources/scenarios/scenarios.ts">update</a>(id, { ...params }) -> ScenarioView</code>
-- <code title="get /v1/scenarios">client.scenarios.<a href="./src/resources/scenarios/scenarios.ts">list</a>({ ...params }) -> ScenarioViewsScenariosCursorIDPage</code>
-- <code title="post /v1/scenarios/{id}/archive">client.scenarios.<a href="./src/resources/scenarios/scenarios.ts">archive</a>(id) -> ScenarioView</code>
-- <code title="get /v1/scenarios/list_public">client.scenarios.<a href="./src/resources/scenarios/scenarios.ts">listPublic</a>({ ...params }) -> ScenarioViewsScenariosCursorIDPage</code>
-- <code title="post /v1/scenarios/start_run">client.scenarios.<a href="./src/resources/scenarios/scenarios.ts">startRun</a>({ ...params }) -> ScenarioRunView</code>
-
-## Runs
-
-Methods:
-
-- <code title="get /v1/scenarios/runs/{id}">client.scenarios.runs.<a href="./src/resources/scenarios/runs.ts">retrieve</a>(id) -> ScenarioRunView</code>
-- <code title="get /v1/scenarios/runs">client.scenarios.runs.<a href="./src/resources/scenarios/runs.ts">list</a>({ ...params }) -> ScenarioRunViewsBenchmarkRunsCursorIDPage</code>
-- <code title="post /v1/scenarios/runs/{id}/cancel">client.scenarios.runs.<a href="./src/resources/scenarios/runs.ts">cancel</a>(id) -> ScenarioRunView</code>
-- <code title="post /v1/scenarios/runs/{id}/complete">client.scenarios.runs.<a href="./src/resources/scenarios/runs.ts">complete</a>(id) -> ScenarioRunView</code>
-- <code title="post /v1/scenarios/runs/{id}/download_logs">client.scenarios.runs.<a href="./src/resources/scenarios/runs.ts">downloadLogs</a>(id) -> Response</code>
-- <code title="post /v1/scenarios/runs/{id}/score">client.scenarios.runs.<a href="./src/resources/scenarios/runs.ts">score</a>(id) -> ScenarioRunView</code>
-
-## Scorers
-
-Types:
-
-- <code><a href="./src/resources/scenarios/scorers.ts">ScorerCreateResponse</a></code>
-- <code><a href="./src/resources/scenarios/scorers.ts">ScorerRetrieveResponse</a></code>
-- <code><a href="./src/resources/scenarios/scorers.ts">ScorerUpdateResponse</a></code>
-- <code><a href="./src/resources/scenarios/scorers.ts">ScorerListResponse</a></code>
-
-Methods:
-
-- <code title="post /v1/scenarios/scorers">client.scenarios.scorers.<a href="./src/resources/scenarios/scorers.ts">create</a>({ ...params }) -> ScorerCreateResponse</code>
-- <code title="get /v1/scenarios/scorers/{id}">client.scenarios.scorers.<a href="./src/resources/scenarios/scorers.ts">retrieve</a>(id) -> ScorerRetrieveResponse</code>
-- <code title="post /v1/scenarios/scorers/{id}">client.scenarios.scorers.<a href="./src/resources/scenarios/scorers.ts">update</a>(id, { ...params }) -> ScorerUpdateResponse</code>
-- <code title="get /v1/scenarios/scorers">client.scenarios.scorers.<a href="./src/resources/scenarios/scorers.ts">list</a>({ ...params }) -> ScorerListResponsesScenarioScorersCursorIDPage</code>
 
 # Objects
 
