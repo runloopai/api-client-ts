@@ -65,6 +65,26 @@ describe('smoketest: object-oriented agent', () => {
       },
       SHORT_TIMEOUT,
     );
+    test.concurrent(
+      'delete agent',
+      async () => {
+        const agent = await runloop.agent.create({
+          name: uniqueName('sdk-agent-test-delete'),
+          version: '1.0.0',
+          source: {
+            type: 'npm',
+            npm: {
+              package_name: '@runloop/hello-world-agent',
+            },
+          },
+        });
+
+        await runloop.agent.delete(agent);
+
+        await expect(agent.getInfo()).rejects.toThrow();
+      },
+      SHORT_TIMEOUT,
+    );
   });
 
   describe('agent listing', () => {
@@ -76,6 +96,31 @@ describe('smoketest: object-oriented agent', () => {
         expect(Array.isArray(agents)).toBe(true);
         // List might be empty, that's okay
         expect(agents.length).toBeGreaterThanOrEqual(0);
+      },
+      SHORT_TIMEOUT,
+    );
+
+    test.concurrent(
+      'list public agents',
+      async () => {
+        const agents = await runloop.agent.listPublic({ limit: 10 });
+
+        expect(Array.isArray(agents)).toBe(true);
+        for (const agent of agents) {
+          expect(agent).toBeInstanceOf(Agent);
+          expect(agent.id).toBeTruthy();
+        }
+      },
+      SHORT_TIMEOUT,
+    );
+
+    test.concurrent(
+      'get devbox counts',
+      async () => {
+        const counts = await runloop.agent.getDevboxCounts();
+
+        expect(typeof counts.total_count).toBe('number');
+        expect(typeof counts.counts).toBe('object');
       },
       SHORT_TIMEOUT,
     );
