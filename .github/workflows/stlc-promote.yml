@@ -65,7 +65,7 @@ jobs:
           # Refuse unless production is an ancestor of staging: otherwise the trunks
           # have forked (production advanced without a back-sync) and FF is unsafe.
           if ! git merge-base --is-ancestor production/main origin/main; then
-            echo "::error title=Promote blocked::production/main is not an ancestor of staging main. Back-sync production into staging first."
+            bash .github/scripts/stlc-fork-hint.sh
             exit 1
           fi
           git push production origin/main:refs/heads/main
