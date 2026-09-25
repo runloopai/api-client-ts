@@ -5,9 +5,11 @@ name: Promote SDKs
 # next stlc build). This is a git-only reconciliation, not a release: release-please
 # owns the actual version bump/publish gate on production. Runs on every push to
 # staging main, because any staging-only commit (stlc build or not) forks the trunks
-# against the next production merge and blocks both directions; the daily schedule
-# is a backstop and workflow_dispatch an eager promote. The fast-forward-only guard
-# below makes every run a safe no-op when there's nothing to promote.
+# against the next production merge; the daily schedule is a backstop and
+# workflow_dispatch an eager promote (back-sync dispatches it on a fork). A fork
+# that merges cleanly is healed with a merge commit on both trunks (the only
+# non-linear history this writes); a conflicting fork fails for a person to resolve.
+# Every run is a safe no-op when there's nothing to promote.
 on:
   push:
     branches: [main]
