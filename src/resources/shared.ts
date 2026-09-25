@@ -522,11 +522,6 @@ export interface ResumeTriggers {
   http?: boolean | null;
 }
 
-/**
- * Configuration profile for scenario/benchmark runs.
- *
- * @category Shared Types
- */
 export interface RunProfile {
   /**
    * Mapping of Environment Variable to Value. May be shown in devbox logging.
