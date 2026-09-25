@@ -52,7 +52,12 @@ jobs:
           # After a release, production has release-please commits staging lacks, so compare trees.
           MERGED=$(git merge-tree --write-tree production/main origin/main) || MERGED=conflict
           PRODUCTION_TREE=$(git rev-parse 'production/main^{tree}')
-          if [ "$MERGED" = "$PRODUCTION_TREE" ]; then
+          # A fork needs healing even when production already has staging's content.
+          if ! git merge-base --is-ancestor origin/main production/main &&
+             ! git merge-base --is-ancestor production/main origin/main; then
+            echo "Staging and production main have forked."
+            echo "synced=false" >> "$GITHUB_OUTPUT"
+          elif [ "$MERGED" = "$PRODUCTION_TREE" ]; then
             echo "Production already contains staging's content. Nothing to promote."
             echo "synced=true" >> "$GITHUB_OUTPUT"
           else

@@ -7,6 +7,13 @@ set -euo pipefail
 
 HINT="$(dirname "$0")/stlc-fork-hint.sh"
 
+# One trunk ahead of the other is a fast-forward, not a fork.
+if git merge-base --is-ancestor origin/main production/main ||
+   git merge-base --is-ancestor production/main origin/main; then
+  echo "::error title=Fork heal refused::staging and production main have not forked."
+  exit 1
+fi
+
 if [ -z "${PRODUCTION_REPO_TOKEN:-}" ]; then
   bash "$HINT"
   echo "::error title=Fork heal blocked::PRODUCTION_REPO_TOKEN is required to heal the fork."
@@ -21,15 +28,11 @@ fi
 STAGING_ONLY=$(git log --format='%h %an %s' production/main..origin/main)
 PRODUCTION_ONLY=$(git log --format='%h %an %s' origin/main..production/main)
 
-# Dates pinned to the newer parent make the commit deterministic, so a concurrent
-# back-sync and promote build the same SHA and the second push is a no-op.
-DATE="$(git log --no-walk --format=%ct origin/main production/main | sort -n | tail -1) +0000"
 # Not stlc-bot: seal-dispatch must still re-seal the production custom code
 # this merge brings onto staging.
 MERGE=$(
   GIT_AUTHOR_NAME="stlc-fork-heal" GIT_AUTHOR_EMAIL="41898282+github-actions[bot]@users.noreply.github.com" \
   GIT_COMMITTER_NAME="stlc-fork-heal" GIT_COMMITTER_EMAIL="41898282+github-actions[bot]@users.noreply.github.com" \
-  GIT_AUTHOR_DATE="$DATE" GIT_COMMITTER_DATE="$DATE" \
   git commit-tree "$TREE" -p production/main -p origin/main \
     -m "chore: merge staging main into production to heal trunk fork"
 )

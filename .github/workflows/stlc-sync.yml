@@ -28,6 +28,7 @@ jobs:
       (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || github.event_name == 'repository_dispatch')
     permissions:
       contents: write
+      actions: write
     concurrency:
       group: stlc-back-sync
       cancel-in-progress: true
@@ -68,17 +69,37 @@ jobs:
           else
             echo "behind=true" >> "$GITHUB_OUTPUT"
           fi
+          if git merge-base --is-ancestor origin/main production/main ||
+             git merge-base --is-ancestor production/main origin/main; then
+            echo "forked=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "forked=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Hand a forked trunk to promote
+        if: steps.diff.outputs.forked == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # Healing writes production main, so it runs only in promote's
+          # production-environment job; a conflicting fork needs a person.
+          if ! git merge-tree --write-tree origin/main production/main >/dev/null 2>&1; then
+            bash .github/scripts/stlc-fork-hint.sh
+            exit 1
+          fi
+          gh workflow run stlc-promote.yml -R "$GITHUB_REPOSITORY" --ref main
+          echo "::warning title=Trunk fork::staging and production main have forked but merge cleanly; dispatched Promote SDKs to heal it."
 
       - name: Sync production to staging (fast-forward)
-        if: steps.diff.outputs.behind == 'true'
+        if: steps.diff.outputs.behind == 'true' && steps.diff.outputs.forked != 'true'
         env:
           PRODUCTION_REPO_TOKEN: ${{ secrets.PRODUCTION_REPO_TOKEN }}
         run: |
-          # Staging not an ancestor of production means the trunks have forked and
-          # a fast-forward is unsafe: heal with a clean merge commit, else fail.
+          # Refuse unless staging is an ancestor of production: otherwise the
+          # trunks have forked and a fast-forward would be unsafe.
           if ! git merge-base --is-ancestor origin/main production/main; then
-            bash .github/scripts/stlc-heal-fork.sh
-            exit 0
+            bash .github/scripts/stlc-fork-hint.sh
+            exit 1
           fi
           if [ -z "${PRODUCTION_REPO_TOKEN:-}" ]; then
             echo "::error title=Back-sync blocked::PRODUCTION_REPO_TOKEN is required to update staging main."
