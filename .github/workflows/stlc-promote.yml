@@ -3,11 +3,11 @@ name: Promote SDKs
 # Promote staging to production by fast-forwarding production main up to staging,
 # preserving SHAs so the trunks stay identical and linear (nothing to heal on the
 # next stlc build). This is a git-only reconciliation, not a release: release-please
-# owns the actual version bump/publish gate on production. Runs as soon as an stlc
-# build lands on staging main, because any production merge before the promote forks
-# the trunks and blocks both directions; the daily schedule is a backstop and
-# workflow_dispatch an eager promote. The fast-forward-only guard below makes every
-# run a safe no-op when there's nothing to promote.
+# owns the actual version bump/publish gate on production. Runs on every push to
+# staging main, because any staging-only commit (stlc build or not) forks the trunks
+# against the next production merge and blocks both directions; the daily schedule
+# is a backstop and workflow_dispatch an eager promote. The fast-forward-only guard
+# below makes every run a safe no-op when there's nothing to promote.
 on:
   push:
     branches: [main]
@@ -23,11 +23,7 @@ jobs:
   promote:
     # Runner comes from the STLC_RUNNER repo/org variable when set; defaults to GitHub-hosted.
     runs-on: ${{ vars.STLC_RUNNER || 'ubuntu-latest' }}
-    # push: stlc builds only (Stainless-Generated-From trailer); other staging pushes
-    # wait for the schedule.
-    if: >-
-      github.repository == 'runloopai/api-client-ts-staging' &&
-      (github.event_name != 'push' || contains(github.event.head_commit.message, 'Stainless-Generated-From'))
+    if: github.repository == 'runloopai/api-client-ts-staging'
     # Optional gate: add required reviewers to this environment to approve each
     # promote. With none it only scopes secrets and adds no gate. Remove if unused.
     environment: production
