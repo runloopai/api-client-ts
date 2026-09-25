@@ -1,5 +1,48 @@
 # Changelog
 
+## [2.0.0](https://github.com/runloopai/api-client-ts/compare/v1.32.0...v2.0.0) (2026-09-25)
+
+
+### ⚠ BREAKING CHANGES
+
+* remove benchmark identities and shared provisioning behavior
+* **api:** remove the benchmark and scenario APIs
+* **types:** drop scenario and benchmark type re-exports
+* **sdk:** drop custom edits to generated benchmark and scenario files
+* **sdk:** remove hosted scenario and scorer wrappers
+
+### Features
+
+* **api:** remove the benchmark and scenario APIs ([175dbfd](https://github.com/runloopai/api-client-ts/commit/175dbfdd98073f64325191f1711ff399dbfc2c61))
+* **execute:** adding sendStdIn to devbox exec ([#844](https://github.com/runloopai/api-client-ts/issues/844)) ([bb295b7](https://github.com/runloopai/api-client-ts/commit/bb295b732b6aff23b204db16743fc255d7046367))
+* implement Azure storage, runtime secrets, and service lifecycle coverage ([ef585e2](https://github.com/runloopai/api-client-ts/commit/ef585e2cc531b8171792694ef1aff128013e0a53))
+* remove benchmark identities and shared provisioning behavior ([00cca2a](https://github.com/runloopai/api-client-ts/commit/00cca2a0cc91f5260a12e3557841c17bf103fac7))
+* **sdk:** remove hosted scenario and scorer wrappers ([9eb5e7c](https://github.com/runloopai/api-client-ts/commit/9eb5e7c2dec9e722a99ed5e1562cfb27983af9d3))
+
+
+### Bug Fixes
+
+* **api:** allow CUSTOM_SIZE with 0.5 CPU cores ([154a25b](https://github.com/runloopai/api-client-ts/commit/154a25b7ff55e3370629f0f0d1cafff2b85df3bd))
+* **examples:** wait for the tunnel server instead of sleeping 2s ([3ae5050](https://github.com/runloopai/api-client-ts/commit/3ae5050b3b9de8a59054b50ca94b8c0913cea640))
+* **examples:** wait for the tunnel server instead of sleeping 2s ([f8ff88e](https://github.com/runloopai/api-client-ts/commit/f8ff88e3c9283647e6bbebdd3d20f5617a1ae1da))
+* **loadtest:** make the h2 load test workflow produce a trustworthy signal ([8a2eefc](https://github.com/runloopai/api-client-ts/commit/8a2eefcf3482776ac06576e8edd4da3b4aa81f68))
+* **mcp:** drop generated-file header from custom code-tool-paths ([31c4eff](https://github.com/runloopai/api-client-ts/commit/31c4effbef7160fc69910c212180ad72e77f0053))
+* **mux:** validate scenario custom scorer references ([e9861b6](https://github.com/runloopai/api-client-ts/commit/e9861b6bdde3ea4d2518e4b75a8a982ef7f15df7))
+* require scoped handles in backend workflows ([fb4d50b](https://github.com/runloopai/api-client-ts/commit/fb4d50bb213a1ad71b000781c745879980f6a9fd))
+* **sdk:** drop custom edits to generated benchmark and scenario files ([ae1f8fb](https://github.com/runloopai/api-client-ts/commit/ae1f8fb4be2c535fe1ac3b353fa5626ca2adb03b))
+* **smoketests:** give the snapshot devbox tests the shared provisioning timeout ([#841](https://github.com/runloopai/api-client-ts/issues/841)) ([83d539c](https://github.com/runloopai/api-client-ts/commit/83d539c232f4daf3b3fef03a6c2bed75f88a10bf))
+* **types:** drop scenario and benchmark type re-exports ([4200332](https://github.com/runloopai/api-client-ts/commit/42003323738626f4af174f7dea78d1cb0f5fa86a))
+
+
+### Chores
+
+* back-sync production main ([#841](https://github.com/runloopai/api-client-ts/issues/841)) into staging ([bf26e38](https://github.com/runloopai/api-client-ts/commit/bf26e3875995b865b72addd9e6cc7860841c5ab8))
+* **ci:** diagnose open handles in smoketests ([#842](https://github.com/runloopai/api-client-ts/issues/842)) ([dd96dbd](https://github.com/runloopai/api-client-ts/commit/dd96dbdefb24fdc807cf15674179f2f71c306ff7))
+* **ci:** run smoketests in parallel and move the build off their path ([#843](https://github.com/runloopai/api-client-ts/issues/843)) ([392924c](https://github.com/runloopai/api-client-ts/commit/392924c9523d4f37128e48ad1bb2ba22e6403a1b))
+* merge staging main into production to heal trunk fork ([73ac59c](https://github.com/runloopai/api-client-ts/commit/73ac59c1f118ab37e62108629f2abedd3e94da80))
+* merge staging main into production to heal trunk fork ([1a9bf09](https://github.com/runloopai/api-client-ts/commit/1a9bf097c42541a4a68ca0d2254b00623ed458c6))
+* **security:** Improve security docs and tighten JWT audience ([3770acb](https://github.com/runloopai/api-client-ts/commit/3770acb20ed21b4eb0cd6981e0c65ce6a1a6dbab))
+
 ## [1.32.0](https://github.com/runloopai/api-client-ts/compare/v1.31.0...v1.32.0) (2026-09-08)
 
 
