@@ -24,8 +24,6 @@ import {
   NetworkPoliciesCursorIDPageResponse,
   type ObjectsCursorIDPageParams,
   ObjectsCursorIDPageResponse,
-  type ScenarioScorersCursorIDPageParams,
-  ScenarioScorersCursorIDPageResponse,
 } from './pagination';
 import * as Uploads from './uploads';
 import * as API from './resources/index';
@@ -465,12 +463,6 @@ export declare namespace Runloop {
   export {
     type AxonsCursorIDPageParams as AxonsCursorIDPageParams,
     type AxonsCursorIDPageResponse as AxonsCursorIDPageResponse,
-  };
-
-  export import ScenarioScorersCursorIDPage = Pagination.ScenarioScorersCursorIDPage;
-  export {
-    type ScenarioScorersCursorIDPageParams as ScenarioScorersCursorIDPageParams,
-    type ScenarioScorersCursorIDPageResponse as ScenarioScorersCursorIDPageResponse,
   };
 
   export import ObjectsCursorIDPage = Pagination.ObjectsCursorIDPage;
