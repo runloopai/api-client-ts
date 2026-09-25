@@ -600,7 +600,9 @@ export namespace ScoringFunction {
    */
   export interface CustomScoringFunction {
     /**
-     * Type of the scoring function, previously registered with Runloop.
+     * Type of the scoring function, previously registered with Runloop. When creating
+     * or updating a scenario, must be non-empty and contain only letters, digits,
+     * underscores, and hyphens ([a-zA-Z0-9_-]+).
      */
     custom_scorer_type: string;
 
