@@ -73,8 +73,11 @@ jobs:
         run: yarn check:examples-md
 
       # Jest resolves @runloop/api-client to src/, so these tests do not need a build.
+      # Each test file gets its own worker because the tests wait on the API, not
+      # the CPU. The count must be a plain number: Jest reads a percentage above
+      # 100% as that many workers ("800%" starts 800 processes).
       - name: Run smoke tests
-        run: yarn test:smoke --maxWorkers=800% --color
+        run: yarn test:smoke --maxWorkers=32 --color
 
   # Checks the built package over HTTP/2 outside Jest. It runs beside the smoke
   # tests so the build is not on their critical path.

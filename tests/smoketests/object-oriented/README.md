@@ -17,12 +17,22 @@ This directory contains comprehensive smoke tests for the object-oriented Runloo
 - File operations (read, write)
 - Devbox listing and retrieval by ID
 
+### `devbox-from-blueprint.test.ts`
+
+- Creating devboxes from blueprints (by ID and by name) and from snapshots
+- Asynchronous disk snapshots
+
 ### `blueprint.test.ts`
 
 - Blueprint lifecycle (create, get info, delete)
 - Blueprint logs retrieval
 - Creating devboxes from blueprints
+
+### `blueprint-build.test.ts`
+
+- Blueprint builds with object-storage and directory build contexts, honoring `.dockerignore`
 - Blueprint listing and retrieval by ID
+- Blueprints with network policies for the build and for launched devboxes
 
 ### `snapshot.test.ts`
 
