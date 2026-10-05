@@ -101,8 +101,8 @@ export interface AllowedCidr {
  */
 export interface NetworkPolicyCreateParameters {
   /**
-   * The human-readable name for the NetworkPolicy. Must be unique within the
-   * account.
+   * The human-readable name for the NetworkPolicy. Names are labels and may be
+   * reused.
    */
   name: string;
 
@@ -250,7 +250,7 @@ export interface NetworkPolicyView {
   egress: NetworkPolicyView.Egress;
 
   /**
-   * The human-readable name of the NetworkPolicy. Unique per account.
+   * The human-readable name of the NetworkPolicy. Names may be reused.
    */
   name: string;
 
@@ -334,8 +334,8 @@ export interface PortRule {
 
 export interface NetworkPolicyCreateParams {
   /**
-   * The human-readable name for the NetworkPolicy. Must be unique within the
-   * account.
+   * The human-readable name for the NetworkPolicy. Names are labels and may be
+   * reused.
    */
   name: string;
 

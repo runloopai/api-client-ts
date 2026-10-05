@@ -1350,7 +1350,8 @@ export namespace DevboxCreateParams {
    */
   export interface Gateways {
     /**
-     * The gateway config to use. Can be a gateway config ID (gwc_xxx) or name.
+     * The gateway config to use. Can be a gateway config ID (gwc_xxx) or name. A name
+     * binds the most recently created config with that name.
      */
     gateway: string;
 
@@ -1368,7 +1369,8 @@ export namespace DevboxCreateParams {
    */
   export interface Mcp {
     /**
-     * The MCP config to use. Can be an MCP config ID (mcp_xxx) or name.
+     * The MCP config to use. Can be an MCP config ID (mcp_xxx) or name. A name binds
+     * the most recently created config with that name.
      */
     mcp_config: string;
 

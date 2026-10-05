@@ -94,7 +94,7 @@ export interface McpConfigCreateParameters {
   endpoint: string;
 
   /**
-   * The human-readable name for the McpConfig. Must be unique within your account.
+   * The human-readable name for the McpConfig. Names are labels and may be reused.
    * The first segment before '-' is used as the service name for tool routing (e.g.,
    * 'github-readonly' uses 'github' as the service name).
    */
@@ -172,7 +172,7 @@ export interface McpConfigUpdateParameters {
   endpoint?: string | null;
 
   /**
-   * New name for the McpConfig. Must be unique within your account.
+   * New name for the McpConfig. Names are labels and may be reused.
    */
   name?: string | null;
 }
@@ -210,7 +210,7 @@ export interface McpConfigView {
   endpoint: string;
 
   /**
-   * The human-readable name of the McpConfig. Unique per account.
+   * The human-readable name of the McpConfig. Names may be reused.
    */
   name: string;
 
@@ -240,7 +240,7 @@ export interface McpConfigCreateParams {
   endpoint: string;
 
   /**
-   * The human-readable name for the McpConfig. Must be unique within your account.
+   * The human-readable name for the McpConfig. Names are labels and may be reused.
    * The first segment before '-' is used as the service name for tool routing (e.g.,
    * 'github-readonly' uses 'github' as the service name).
    */
@@ -294,7 +294,7 @@ export interface McpConfigUpdateParams {
   endpoint?: string | null;
 
   /**
-   * New name for the McpConfig. Must be unique within your account.
+   * New name for the McpConfig. Names are labels and may be reused.
    */
   name?: string | null;
 }

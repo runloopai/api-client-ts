@@ -96,8 +96,8 @@ export interface GatewayConfigCreateParameters {
   endpoint: string;
 
   /**
-   * The human-readable name for the GatewayConfig. Must be unique within your
-   * account.
+   * The human-readable name for the GatewayConfig. Names are labels and may be
+   * reused.
    */
   name: string;
 
@@ -161,7 +161,7 @@ export interface GatewayConfigUpdateParameters {
   endpoint?: string | null;
 
   /**
-   * New name for the GatewayConfig. Must be unique within your account.
+   * New name for the GatewayConfig. Names are labels and may be reused.
    */
   name?: string | null;
 }
@@ -193,8 +193,7 @@ export interface GatewayConfigView {
   endpoint: string;
 
   /**
-   * The human-readable name of the GatewayConfig. Unique per account (or globally
-   * for system configs).
+   * The human-readable name of the GatewayConfig. Names may be reused.
    */
   name: string;
 
@@ -229,8 +228,8 @@ export interface GatewayConfigCreateParams {
   endpoint: string;
 
   /**
-   * The human-readable name for the GatewayConfig. Must be unique within your
-   * account.
+   * The human-readable name for the GatewayConfig. Names are labels and may be
+   * reused.
    */
   name: string;
 
@@ -270,7 +269,7 @@ export interface GatewayConfigUpdateParams {
   endpoint?: string | null;
 
   /**
-   * New name for the GatewayConfig. Must be unique within your account.
+   * New name for the GatewayConfig. Names are labels and may be reused.
    */
   name?: string | null;
 }

@@ -6,23 +6,28 @@ import * as Core from '../core';
 
 export class Secrets extends APIResource {
   /**
-   * Create a new Secret with a globally unique name and value. The Secret will be
-   * encrypted at rest and made available as an environment variable in Devboxes.
+   * Create a new Secret with a name and value. The Secret will be encrypted at rest
+   * and made available as an environment variable in Devboxes. Creation rejects an
+   * existing name within the account on a best-effort basis; concurrent creates may
+   * produce duplicates.
    */
   create(body: SecretCreateParams, options?: Core.RequestOptions): Core.APIPromise<SecretView> {
     return this._client.post('/v1/secrets', { body, ...options });
   }
 
   /**
-   * Retrieve a Secret by name. The secret value is not included for security.
+   * Retrieve a Secret by name. If several match, the greatest ID is selected. The
+   * secret value is not included for security.
    */
   retrieve(name: string, options?: Core.RequestOptions): Core.APIPromise<SecretView> {
     return this._client.get(`/v1/secrets/${name}`, options);
   }
 
   /**
-   * Update the value of an existing Secret by name. The new value will be encrypted
-   * at rest.
+   * Update the value of an existing Secret by name. If several Secrets in the
+   * account have this name, only the one with the greatest ID at lookup is updated
+   * and returned. Older matches are unchanged. A concurrent create may become the
+   * latest match. The new value will be encrypted at rest.
    */
   update(name: string, body: SecretUpdateParams, options?: Core.RequestOptions): Core.APIPromise<SecretView> {
     return this._client.post(`/v1/secrets/${name}`, { body, ...options });
@@ -45,8 +50,10 @@ export class Secrets extends APIResource {
   }
 
   /**
-   * Delete an existing Secret by name. This action is irreversible and will remove
-   * the Secret from all Devboxes.
+   * Delete an existing Secret by name. If several Secrets in the account have this
+   * name, every selected match is deleted and the one with the greatest selected ID
+   * is returned. Deletions are not atomic across matches: a failure may leave some
+   * matches deleted. A concurrent create may survive. This action is irreversible.
    */
   delete(
     name: string,
@@ -55,6 +62,36 @@ export class Secrets extends APIResource {
   ): Core.APIPromise<SecretView> {
     return this._client.post(`/v1/secrets/${name}/delete`, { body, ...options });
   }
+
+  /**
+   * Delete an existing Secret by ID. This action is irreversible.
+   */
+  deleteById(
+    id: string,
+    body?: SecretDeleteByIDParams | null | undefined,
+    options?: Core.RequestOptions,
+  ): Core.APIPromise<SecretView> {
+    return this._client.post(`/v1/secrets/id/${id}/delete`, { body, ...options });
+  }
+
+  /**
+   * Retrieve a Secret by ID. The secret value is not included for security.
+   */
+  retrieveById(id: string, options?: Core.RequestOptions): Core.APIPromise<SecretView> {
+    return this._client.get(`/v1/secrets/id/${id}`, options);
+  }
+
+  /**
+   * Update the value of an existing Secret by ID. The new value will be encrypted at
+   * rest.
+   */
+  updateById(
+    id: string,
+    body: SecretUpdateByIDParams,
+    options?: Core.RequestOptions,
+  ): Core.APIPromise<SecretView> {
+    return this._client.post(`/v1/secrets/id/${id}/update`, { body, ...options });
+  }
 }
 
 /**
@@ -62,8 +99,8 @@ export class Secrets extends APIResource {
  */
 export interface SecretCreateParameters {
   /**
-   * The globally unique name for the Secret. Must be a valid environment variable
-   * name (alphanumeric and underscores only). Example: 'DATABASE_PASSWORD'
+   * The name for the Secret. Must be a valid environment variable name (alphanumeric
+   * and underscores only). Example: 'DATABASE_PASSWORD'
    */
   name: string;
 
@@ -121,8 +158,7 @@ export interface SecretView {
   create_time_ms: number;
 
   /**
-   * The globally unique name of the Secret. Used as the environment variable name in
-   * Devboxes.
+   * The name of the Secret. Used as the environment variable name in Devboxes.
    */
   name: string;
 
@@ -134,8 +170,8 @@ export interface SecretView {
 
 export interface SecretCreateParams {
   /**
-   * The globally unique name for the Secret. Must be a valid environment variable
-   * name (alphanumeric and underscores only). Example: 'DATABASE_PASSWORD'
+   * The name for the Secret. Must be a valid environment variable name (alphanumeric
+   * and underscores only). Example: 'DATABASE_PASSWORD'
    */
   name: string;
 
@@ -163,6 +199,16 @@ export interface SecretListParams {
 
 export interface SecretDeleteParams {}
 
+export interface SecretDeleteByIDParams {}
+
+export interface SecretUpdateByIDParams {
+  /**
+   * The new value for the Secret. This will replace the existing value and be
+   * encrypted at rest. Example: 'my-updated-secure-password'
+   */
+  value: string;
+}
+
 export declare namespace Secrets {
   export {
     type SecretCreateParameters as SecretCreateParameters,
@@ -173,5 +219,7 @@ export declare namespace Secrets {
     type SecretUpdateParams as SecretUpdateParams,
     type SecretListParams as SecretListParams,
     type SecretDeleteParams as SecretDeleteParams,
+    type SecretDeleteByIDParams as SecretDeleteByIDParams,
+    type SecretUpdateByIDParams as SecretUpdateByIDParams,
   };
 }

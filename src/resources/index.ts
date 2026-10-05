@@ -170,4 +170,6 @@ export {
   type SecretUpdateParams,
   type SecretListParams,
   type SecretDeleteParams,
+  type SecretDeleteByIDParams,
+  type SecretUpdateByIDParams,
 } from './secrets';

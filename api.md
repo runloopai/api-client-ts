@@ -263,6 +263,9 @@ Methods:
 - <code title="post /v1/secrets/{name}">client.secrets.<a href="./src/resources/secrets.ts">update</a>(name, { ...params }) -> SecretView</code>
 - <code title="get /v1/secrets">client.secrets.<a href="./src/resources/secrets.ts">list</a>({ ...params }) -> SecretListView</code>
 - <code title="post /v1/secrets/{name}/delete">client.secrets.<a href="./src/resources/secrets.ts">delete</a>(name) -> SecretView</code>
+- <code title="post /v1/secrets/id/{id}/delete">client.secrets.<a href="./src/resources/secrets.ts">deleteById</a>(id) -> SecretView</code>
+- <code title="get /v1/secrets/id/{id}">client.secrets.<a href="./src/resources/secrets.ts">retrieveById</a>(id) -> SecretView</code>
+- <code title="post /v1/secrets/id/{id}/update">client.secrets.<a href="./src/resources/secrets.ts">updateById</a>(id, { ...params }) -> SecretView</code>
 
 # NetworkPolicies
 
