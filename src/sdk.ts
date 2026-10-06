@@ -11,6 +11,7 @@ import { NetworkPolicy } from './sdk/network-policy';
 import { GatewayConfig } from './sdk/gateway-config';
 import { McpConfig } from './sdk/mcp-config';
 import { Secret } from './sdk/secret';
+import { SecretById } from './sdk/secret-by-id';
 
 // Import types used in this file
 import type {
@@ -229,7 +230,13 @@ function transformMounts(mounts: Array<MountInstance>): Array<Shared.Mount> {
  * @returns The secret name as a string
  */
 function resolveSecretName(secret: Secret | string): string {
-  return typeof secret === 'string' ? secret : secret.name;
+  const name = typeof secret === 'string' ? secret : secret?.name;
+  if (typeof name !== 'string' || name.length === 0) {
+    throw new TypeError(
+      'Expected a secret name or name-bound Secret; use ID handle methods for ID operations',
+    );
+  }
+  return name;
 }
 
 /**
@@ -1964,7 +1971,8 @@ export class McpConfigOps {
  *
  * The `SecretOps` class provides methods for managing secrets, which are encrypted key-value
  * pairs that can be injected into devboxes as environment variables. Secrets are identified
- * by their globally unique name.
+ * by account-scoped names. Name reads/updates select the greatest ID at lookup; name deletion
+ * removes every selected match, nonatomically. Use fromId() for exact row operations.
  *
  * ## Usage
  *
@@ -2031,11 +2039,20 @@ export class SecretOps {
    * console.log(`Secret ID: ${info.id}`);
    * ```
    *
-   * @param {string} name - The globally unique name of the secret.
+   * @param {string} name - The literal, account-scoped name of the secret (including sec_-prefixed names).
    * @returns {Secret} A {@link Secret} instance.
    */
   fromName(name: string): Secret {
     return Secret.fromName(this.client, name);
+  }
+
+  /**
+   * Get an exact-ID handle without an API call. Its methods never fall back to a name.
+   * Use the handle's update/delete methods, not the name-only manager methods.
+   * Pass its .id explicitly to gateway/MCP bindings; environment-secret maps require names.
+   */
+  fromId(id: string): SecretById {
+    return SecretById.fromId(this.client, id);
   }
 
   /**
@@ -2157,6 +2174,7 @@ export declare namespace RunloopSDK {
     GatewayConfig as GatewayConfig,
     McpConfig as McpConfig,
     Secret as Secret,
+    SecretById as SecretById,
   };
 }
 // Export SDK classes from sdk/sdk.ts - these are separate from RunloopSDK to avoid circular dependencies
@@ -2174,6 +2192,7 @@ export {
   NetworkPolicy,
   McpConfig,
   Secret,
+  SecretById,
   Execution,
   ExecutionResult,
 } from './sdk/index';

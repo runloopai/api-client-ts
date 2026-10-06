@@ -14,6 +14,7 @@ import {
   DevboxNetOps,
   Execution,
   ExecutionResult,
+  SecretById,
   type ExecuteStreamingCallbacks,
   type ClientOptions,
 } from '../../dist/sdk';
@@ -67,6 +68,7 @@ describe('smoketest: built package import', () => {
       expect(DevboxNetOps).toBeDefined();
       expect(Execution).toBeDefined();
       expect(ExecutionResult).toBeDefined();
+      expect(sdk.secret.fromId('sec_test')).toBeInstanceOf(SecretById);
     });
 
     test('should verify types are available', () => {

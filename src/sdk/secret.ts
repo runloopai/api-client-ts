@@ -12,7 +12,10 @@ import type { SecretView, SecretUpdateParams } from '../resources/secrets';
  *
  * The `Secret` class provides a high-level, object-oriented API for managing secrets.
  * Secrets are encrypted key-value pairs that can be securely stored and used in Devboxes
- * as environment variables. Secrets are identified by their globally unique name.
+ * as environment variables. This wrapper always operates by its account-scoped name,
+ * even when it contains an ID from an earlier response. Reads and updates select the
+ * greatest ID at lookup; deletion removes every selected match nonatomically.
+ * Use `sdk.secret.fromId(id)` for exact row operations.
  *
  * ## Quickstart
  *
@@ -79,7 +82,7 @@ export class Secret {
    * ```
    *
    * @param {Runloop} client - The Runloop client instance
-   * @param {string} name - The secret name (globally unique)
+   * @param {string} name - The literal account-scoped secret name
    * @returns {Secret} A {@link Secret} instance
    */
   static fromName(client: Runloop, name: string): Secret {
@@ -88,7 +91,7 @@ export class Secret {
 
   /**
    * Get the secret ID.
-   * @returns {string | undefined} The secret ID, or undefined if not yet fetched from API
+   * @returns {string | undefined} The ID captured when this wrapper was constructed, or undefined. Fetching does not refresh it.
    */
   get id(): string | undefined {
     return this._id;
@@ -96,7 +99,7 @@ export class Secret {
 
   /**
    * Get the secret name.
-   * @returns {string} The secret name (globally unique identifier)
+   * @returns {string} The literal account-scoped secret name
    */
   get name(): string {
     return this._name;
@@ -122,7 +125,8 @@ export class Secret {
   }
 
   /**
-   * Update this secret's value.
+   * Update the value of the greatest-ID row matching this name at lookup.
+   * This wrapper remains name-bound and its captured ID is unchanged.
    *
    * @example
    * ```typescript
@@ -142,7 +146,8 @@ export class Secret {
   }
 
   /**
-   * Delete this secret. This action is irreversible.
+   * Delete every selected row matching this name. Deletions are not atomic across rows;
+   * a concurrent create can survive. This action is irreversible.
    *
    * @private
    * See the {@link SecretOps.delete} method for calling this

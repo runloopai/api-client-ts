@@ -11,3 +11,4 @@ export { NetworkPolicy } from './network-policy';
 export { GatewayConfig } from './gateway-config';
 export { McpConfig } from './mcp-config';
 export { Secret } from './secret';
+export { SecretById } from './secret-by-id';

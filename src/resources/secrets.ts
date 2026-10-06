@@ -1,6 +1,7 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 import { APIResource } from '../resource';
+import { secretIdPathSegment } from '../lib/secret-id';
 import { isRequestOptions } from '../core';
 import * as Core from '../core';
 
@@ -71,14 +72,14 @@ export class Secrets extends APIResource {
     body?: SecretDeleteByIDParams | null | undefined,
     options?: Core.RequestOptions,
   ): Core.APIPromise<SecretView> {
-    return this._client.post(`/v1/secrets/id/${id}/delete`, { body, ...options });
+    return this._client.post(`/v1/secrets/id/${secretIdPathSegment(id)}/delete`, { body, ...options });
   }
 
   /**
    * Retrieve a Secret by ID. The secret value is not included for security.
    */
   retrieveById(id: string, options?: Core.RequestOptions): Core.APIPromise<SecretView> {
-    return this._client.get(`/v1/secrets/id/${id}`, options);
+    return this._client.get(`/v1/secrets/id/${secretIdPathSegment(id)}`, options);
   }
 
   /**
@@ -90,7 +91,7 @@ export class Secrets extends APIResource {
     body: SecretUpdateByIDParams,
     options?: Core.RequestOptions,
   ): Core.APIPromise<SecretView> {
-    return this._client.post(`/v1/secrets/id/${id}/update`, { body, ...options });
+    return this._client.post(`/v1/secrets/id/${secretIdPathSegment(id)}/update`, { body, ...options });
   }
 }
 

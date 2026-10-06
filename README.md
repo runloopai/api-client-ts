@@ -108,6 +108,20 @@ The SDK provides object-oriented interfaces for all major Runloop resources:
 - **[`runloop.secret`](https://runloopai.github.io/api-client-ts/stable/classes/sdk.SecretOps.html)** - Secret management (create, update, list, delete encrypted key-value pairs)
 - **[`runloop.api`](https://runloopai.github.io/api-client-ts/stable/modules/types.html)** - Direct access to the REST API client
 
+### Secrets: names and exact IDs
+
+`Secret` objects from `create()`, `list()`, and `fromName()` always operate by name, even when they carry a captured `.id`. Use the separate `SecretById` handle to target one exact row:
+
+```ts
+const created = await runloop.secret.create({ name: 'API_TOKEN', value: 'synthetic-example' });
+if (!created.id) throw new Error('Missing Secret ID');
+const exact = runloop.secret.fromId(created.id); // Lazy; never falls back to a name.
+await exact.update({ value: 'synthetic-rotated' }); // Returns SecretView, as do getInfo() and delete().
+await exact.delete(); // Deletes only this row.
+```
+
+ID handles have `.id`, not `.name`; use their instance methods rather than the name-only manager helpers. Environment-secret maps still take names/name wrappers; pass `exact.id` explicitly for an ID-based gateway/MCP binding. Name reads/updates select the greatest ID; name deletion removes selected matches nonatomically. An ID identifies a mutable row, not a value version, and existing retries can replay writes. Rotation does not rewrite running devbox environments or issued tokens. Avoid debug request logging with real credentials.
+
 ## TypeScript Support
 
 The SDK is fully typed with comprehensive TypeScript definitions:

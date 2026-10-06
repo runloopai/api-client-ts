@@ -1,103 +1,62 @@
 import { makeClientSDK, uniqueName, MEDIUM_TIMEOUT } from '../utils';
-import type { Secret } from '@runloop/api-client';
+import { NotFoundError, type Secret } from '@runloop/api-client';
 
 const sdk = makeClientSDK();
 
 describe('smoketest: object-oriented secrets', () => {
-  describe('secret lifecycle', () => {
-    let secretName: string;
-    let createdSecret: Secret | undefined;
-    let createTimeMs: number;
+  test(
+    'secret lifecycle through name and ID handles',
+    async () => {
+      const name = `sec_${uniqueName('SDK_TEST_SECRET').replace(/-/g, '_')}`;
+      const secret = await sdk.secret.create({ name, value: 'synthetic-initial' });
+      expect(secret.name).toBe(name);
+      expect(secret.id).toMatch(/^sec_/);
+      const ids = [secret.id!];
+      try {
+        const named = sdk.secret.fromName(name);
+        expect(named.id).toBeUndefined();
+        const info = await named.getInfo();
+        expect(info.id).toBe(secret.id);
+        expect(info.create_time_ms).toBeGreaterThan(0);
+        const updated = await sdk.secret.update(secret, { value: 'synthetic-ops' });
+        expect(updated.name).toBe(name);
+        expect((await updated.getInfo()).update_time_ms).toBeGreaterThanOrEqual(info.create_time_ms);
+        expect(await secret.update({ value: 'synthetic-name' })).toBe(secret);
+        expect((await sdk.secret.list()).some((item) => item.id === secret.id)).toBe(true);
+        expect((await sdk.secret.list({ limit: 5 })).length).toBeGreaterThan(0);
 
-    beforeAll(async () => {
-      secretName = uniqueName('SDK_TEST_SECRET').toUpperCase().replace(/-/g, '_');
-    });
-
-    afterAll(async () => {
-      if (createdSecret) {
-        try {
-          await createdSecret.delete();
-        } catch {
-          // Already deleted or doesn't exist, ignore
-        }
+        const exact = sdk.secret.fromId(secret.id!);
+        expect((await exact.getInfo()).name).toBe(name);
+        expect((await exact.update({ value: 'synthetic-id' })).id).toBe(exact.id);
+        expect((await exact.delete()).id).toBe(exact.id);
+        const replacement = await sdk.secret.create({ name, value: 'synthetic-replacement' });
+        expect(replacement.id).toBeDefined();
+        ids.push(replacement.id!);
+        expect(replacement.id).not.toBe(exact.id);
+        // The original wrapper still follows its name, not its captured ID.
+        expect((await secret.getInfo()).id).toBe(replacement.id);
+        expect(secret.id).toBe(exact.id);
+        await expect(exact.getInfo()).rejects.toBeInstanceOf(NotFoundError);
+        await expect(exact.update({ value: 'must-not-update-replacement' })).rejects.toBeInstanceOf(
+          NotFoundError,
+        );
+        await expect(exact.delete()).rejects.toBeInstanceOf(NotFoundError);
+        expect((await secret.delete()).id).toBe(replacement.id);
+        expect((await sdk.secret.list()).some((item) => item.name === name)).toBe(false);
+      } finally {
+        await Promise.all(
+          ids.map(async (id) => {
+            try {
+              await sdk.secret.fromId(id).delete();
+            } catch (error) {
+              if (!(error instanceof NotFoundError)) throw error;
+            }
+          }),
+        );
       }
-    });
-
-    test('create secret', async () => {
-      createdSecret = await sdk.secret.create({
-        name: secretName,
-        value: 'test-secret-value',
-      });
-
-      expect(createdSecret).toBeDefined();
-      expect(createdSecret.name).toBe(secretName);
-      expect(createdSecret.id).toMatch(/^sec_/);
-
-      const info = await createdSecret.getInfo();
-      expect(info.id).toMatch(/^sec_/);
-      expect(info.create_time_ms).toBeGreaterThan(0);
-      createTimeMs = info.create_time_ms;
-    });
-
-    test('update secret via SecretOps', async () => {
-      const updated = await sdk.secret.update(createdSecret!, {
-        value: 'updated-secret-value',
-      });
-
-      expect(updated).toBeDefined();
-      expect(updated.name).toBe(secretName);
-
-      const info = await updated.getInfo();
-      expect(info.update_time_ms).toBeGreaterThanOrEqual(createTimeMs);
-    });
-
-    test('update secret via instance method', async () => {
-      const updated = await createdSecret!.update({
-        value: 'updated-again-value',
-      });
-
-      expect(updated).toBeDefined();
-      expect(updated.name).toBe(secretName);
-    });
-
-    test('list secrets', async () => {
-      const secrets = await sdk.secret.list();
-
-      expect(Array.isArray(secrets)).toBe(true);
-      expect(secrets.length).toBeGreaterThan(0);
-
-      const found = secrets.find((s) => s.name === secretName);
-      expect(found).toBeDefined();
-      expect(found?.name).toBe(secretName);
-    });
-
-    test('list secrets with limit', async () => {
-      const secrets = await sdk.secret.list({ limit: 5 });
-
-      expect(Array.isArray(secrets)).toBe(true);
-      expect(secrets.length).toBeGreaterThan(0);
-    });
-
-    test('fromName creates Secret without API call', () => {
-      const secret = sdk.secret.fromName(secretName);
-      expect(secret).toBeDefined();
-      expect(secret.name).toBe(secretName);
-      expect(secret.id).toBeUndefined();
-    });
-
-    test('delete secret', async () => {
-      const deleted = await createdSecret!.delete();
-
-      expect(deleted).toBeDefined();
-      expect(deleted.name).toBe(secretName);
-
-      createdSecret = undefined;
-
-      const secrets = await sdk.secret.list();
-      const found = secrets.find((s) => s.name === secretName);
-      expect(found).toBeUndefined();
-    });
-  });
+    },
+    MEDIUM_TIMEOUT,
+  );
 
   describe('secret with devbox integration', () => {
     let secret: Secret;
