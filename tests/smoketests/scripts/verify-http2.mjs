@@ -93,10 +93,23 @@ try {
   const N = 25;
   const before = connectCount;
   const client = newClient({ http2: true });
-  const results = await Promise.allSettled(Array.from({ length: N }, () => client.devboxes.list({ limit: 1 })));
+  const results = await Promise.allSettled(
+    Array.from({ length: N }, () => client.devboxes.list({ limit: 1 })),
+  );
   const ok = results.filter((r) => r.status === 'fulfilled').length;
   const opened = connectCount - before;
   check(ok === N, `h2: ${N} concurrent requests all resolved (${ok}/${N})`);
+  // Print why requests were rejected, once per distinct reason, so a failure explains itself.
+  const reasons = new Map();
+  for (const r of results) {
+    if (r.status !== 'rejected') continue;
+    const e = r.reason;
+    const reason = [e?.constructor?.name, e?.status, e?.code ?? e?.cause?.code, e?.message ?? String(e)]
+      .filter((part) => part != null)
+      .join(' ');
+    reasons.set(reason, (reasons.get(reason) ?? 0) + 1);
+  }
+  for (const [reason, count] of reasons) console.log(`  rejected x${count}: ${reason}`);
   check(opened <= 4, `h2: ${N} concurrent requests multiplexed over <= 4 connections (opened ${opened})`);
 } catch (e) {
   check(false, `h2: concurrent multiplexing pass threw ${e?.constructor?.name}: ${e?.message}`);
