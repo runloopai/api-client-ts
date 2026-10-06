@@ -43,7 +43,8 @@ export class Axons extends APIResource {
   }
 
   /**
-   * [Beta] Get an axon given ID.
+   * [Beta] Get an axon by ID. Deleted axons remain readable and include their
+   * deletion time.
    */
   retrieve(id: string, options?: Core.RequestOptions): Core.APIPromise<AxonView> {
     return this._client.get(`/v1/axons/${id}`, options);
@@ -51,7 +52,8 @@ export class Axons extends APIResource {
 
   /**
    * [Beta] Updates the specified axon fields. Omitted fields are left unchanged. An
-   * empty metadata map clears the metadata.
+   * empty metadata map clears the metadata. Deleted axons remain readable but cannot
+   * be updated.
    */
   update(id: string, body?: AxonUpdateParams, options?: Core.RequestOptions): Core.APIPromise<AxonView>;
   update(id: string, options?: Core.RequestOptions): Core.APIPromise<AxonView>;
@@ -67,7 +69,8 @@ export class Axons extends APIResource {
   }
 
   /**
-   * [Beta] List all active axons.
+   * [Beta] List axons, including deleted axons. Deleted axons include their deletion
+   * time.
    */
   list(
     query?: AxonListParams,
@@ -85,7 +88,7 @@ export class Axons extends APIResource {
   }
 
   /**
-   * [Beta] Mark an axon deleted.
+   * [Beta] Delete an axon's event data. The axon's registry record remains readable.
    */
   delete(id: string, options?: Core.RequestOptions): Core.APIPromise<unknown> {
     return this._client.delete(`/v1/axons/${id}`, options);
@@ -221,6 +224,11 @@ export interface AxonView {
    * The user defined axon metadata.
    */
   metadata: { [key: string]: string };
+
+  /**
+   * Deletion time in milliseconds since epoch; null while the axon is active.
+   */
+  deleted_at_ms?: number | null;
 
   /**
    * The name of the axon.
