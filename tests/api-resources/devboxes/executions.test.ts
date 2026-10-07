@@ -138,7 +138,7 @@ describe('resource executions', () => {
     ).rejects.toThrow(Runloop.NotFoundError);
   });
 
-  test.skip('streamStderrUpdates', async () => {
+  test('streamStderrUpdates', async () => {
     const responsePromise = client.devboxes.executions.streamStderrUpdates('devbox_id', 'execution_id');
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
@@ -161,7 +161,7 @@ describe('resource executions', () => {
     ).rejects.toThrow(Runloop.NotFoundError);
   });
 
-  test.skip('streamStdoutUpdates', async () => {
+  test('streamStdoutUpdates', async () => {
     const responsePromise = client.devboxes.executions.streamStdoutUpdates('devbox_id', 'execution_id');
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
