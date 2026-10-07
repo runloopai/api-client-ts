@@ -134,28 +134,17 @@ export class Executions extends APIResource {
   }
 
   /**
-   * Send content to the Std In of a running execution.
+   * Send nonempty text or a signal to an execution started with attach_stdin
+   * enabled. The request body is required. Supply exactly one of nonempty text or a
+   * non-null signal. Wait for each send before sending more input or EOF; concurrent
+   * requests are not ordered and retries after connection failures can replay input.
    */
   sendStdIn(
     devboxId: string,
     executionId: string,
-    body?: ExecutionSendStdInParams,
-    options?: Core.RequestOptions,
-  ): Core.APIPromise<DevboxesAPI.DevboxSendStdInResult>;
-  sendStdIn(
-    devboxId: string,
-    executionId: string,
-    options?: Core.RequestOptions,
-  ): Core.APIPromise<DevboxesAPI.DevboxSendStdInResult>;
-  sendStdIn(
-    devboxId: string,
-    executionId: string,
-    body: ExecutionSendStdInParams | Core.RequestOptions = {},
+    body: ExecutionSendStdInParams,
     options?: Core.RequestOptions,
   ): Core.APIPromise<DevboxesAPI.DevboxSendStdInResult> {
-    if (isRequestOptions(body)) {
-      return this.sendStdIn(devboxId, executionId, {}, body);
-    }
     return this._client.post(`/v1/devboxes/${devboxId}/executions/${executionId}/send_std_in`, {
       body,
       ...options,

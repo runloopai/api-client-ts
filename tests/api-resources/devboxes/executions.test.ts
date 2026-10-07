@@ -109,7 +109,7 @@ describe('resource executions', () => {
   });
 
   test('sendStdIn', async () => {
-    const responsePromise = client.devboxes.executions.sendStdIn('devbox_id', 'execution_id');
+    const responsePromise = client.devboxes.executions.sendStdIn('devbox_id', 'execution_id', {});
     const rawResponse = await responsePromise.asResponse();
     expect(rawResponse).toBeInstanceOf(Response);
     const response = await responsePromise;
@@ -117,25 +117,6 @@ describe('resource executions', () => {
     const dataAndResponse = await responsePromise.withResponse();
     expect(dataAndResponse.data).toBe(response);
     expect(dataAndResponse.response).toBe(rawResponse);
-  });
-
-  test('sendStdIn: request options instead of params are passed correctly', async () => {
-    // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
-    await expect(
-      client.devboxes.executions.sendStdIn('devbox_id', 'execution_id', { path: '/_stainless_unknown_path' }),
-    ).rejects.toThrow(Runloop.NotFoundError);
-  });
-
-  test('sendStdIn: request options and params are passed correctly', async () => {
-    // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
-    await expect(
-      client.devboxes.executions.sendStdIn(
-        'devbox_id',
-        'execution_id',
-        { signal: 'EOF', text: 'text' },
-        { path: '/_stainless_unknown_path' },
-      ),
-    ).rejects.toThrow(Runloop.NotFoundError);
   });
 
   test('streamStderrUpdates', async () => {
