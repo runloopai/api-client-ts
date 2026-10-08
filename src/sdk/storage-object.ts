@@ -86,11 +86,18 @@ export class StorageObject {
   private client: Runloop;
   private _id: string;
   private _uploadUrl?: string | null;
+  private readonly _uploadHeaders: Readonly<Record<string, string>>;
 
-  private constructor(client: Runloop, id: string, uploadUrl?: string | null) {
+  private constructor(
+    client: Runloop,
+    id: string,
+    uploadUrl?: string | null,
+    uploadHeaders?: Record<string, string> | null,
+  ) {
     this.client = client;
     this._id = id;
     this._uploadUrl = uploadUrl ?? null;
+    this._uploadHeaders = { ...uploadHeaders };
   }
 
   /**
@@ -100,7 +107,7 @@ export class StorageObject {
    * You should use the uploadFromFile() or uploadFromBuffer() methods to upload content and handle the complete process for you. If you need more control, you can use the uploadContent() method.
    *
    * To upload content:
-   * 1. To upload you call uploadContent() or use the getDownloadUrl() method to get the upload URL and upload the content manually.
+   * 1. Call uploadContent(), which uses the upload URL and required headers returned by create().
    * 2. You must call complete() to mark the upload as complete.
    *
    * @example
@@ -130,7 +137,7 @@ export class StorageObject {
     options?: Core.RequestOptions,
   ): Promise<StorageObject> {
     const objectData = await client.objects.create(params, options);
-    return new StorageObject(client, objectData.id, objectData.upload_url);
+    return new StorageObject(client, objectData.id, objectData.upload_url, objectData.upload_headers);
   }
 
   /**
@@ -244,27 +251,8 @@ export class StorageObject {
       metadata: options?.metadata || null,
     };
 
-    const objectData = await client.objects.create(createParams, options);
-    const storageObject = new StorageObject(client, objectData.id, objectData.upload_url);
-
-    const uploadUrl = objectData.upload_url;
-
-    if (!uploadUrl) {
-      throw new Error('No upload URL available. Object may already be completed or deleted.');
-    }
-
-    try {
-      const response = await fetch(uploadUrl, {
-        method: 'PUT',
-        body: fileBuffer,
-      });
-
-      if (!response.ok) {
-        throw new Error(`Upload failed: ${response.status} ${response.statusText}`);
-      }
-    } catch (error) {
-      throw new Error(`Failed to upload file: ${error instanceof Error ? error.message : 'Unknown error'}`);
-    }
+    const storageObject = await StorageObject.create(client, createParams, options);
+    await storageObject.uploadContent(fileBuffer);
 
     // Step 3: Mark upload as complete
     await storageObject.complete();
@@ -312,27 +300,8 @@ export class StorageObject {
       metadata: options?.metadata || null,
     };
 
-    const objectData = await client.objects.create(createParams, options);
-    const storageObject = new StorageObject(client, objectData.id, objectData.upload_url);
-
-    const uploadUrl = objectData.upload_url;
-
-    if (!uploadUrl) {
-      throw new Error('No upload URL available. Object may already be completed or deleted.');
-    }
-
-    try {
-      const response = await fetch(uploadUrl, {
-        method: 'PUT',
-        body: Buffer.from(text, 'utf-8'),
-      });
-
-      if (!response.ok) {
-        throw new Error(`Upload failed: ${response.status} ${response.statusText}`);
-      }
-    } catch (error) {
-      throw new Error(`Failed to upload text: ${error instanceof Error ? error.message : 'Unknown error'}`);
-    }
+    const storageObject = await StorageObject.create(client, createParams, options);
+    await storageObject.uploadContent(Buffer.from(text, 'utf-8'));
 
     // Step 3: Mark upload as complete
     await storageObject.complete();
@@ -387,27 +356,8 @@ export class StorageObject {
       metadata: options?.metadata || null,
     };
 
-    const objectData = await client.objects.create(createParams, options);
-    const storageObject = new StorageObject(client, objectData.id, objectData.upload_url);
-
-    const uploadUrl = objectData.upload_url;
-
-    if (!uploadUrl) {
-      throw new Error('No upload URL available. Object may already be completed or deleted.');
-    }
-
-    try {
-      const response = await fetch(uploadUrl, {
-        method: 'PUT',
-        body: buffer,
-      });
-
-      if (!response.ok) {
-        throw new Error(`Upload failed: ${response.status} ${response.statusText}`);
-      }
-    } catch (error) {
-      throw new Error(`Failed to upload buffer: ${error instanceof Error ? error.message : 'Unknown error'}`);
-    }
+    const storageObject = await StorageObject.create(client, createParams, options);
+    await storageObject.uploadContent(buffer);
 
     // Step 3: Mark upload as complete
     await storageObject.complete();
@@ -503,42 +453,13 @@ export class StorageObject {
 
       // Create the object.
       const createParams: ObjectCreateParams = { ...params, content_type: 'tgz' };
-      // Cast requestOptions to Core.RequestOptions to satisfy the type checker,
-      // assuming the caller provided valid options minus our custom ones.
-      const objectData = await client.objects.create(createParams, requestOptions as Core.RequestOptions);
-      const storageObject = new StorageObject(client, objectData.id, objectData.upload_url);
-
-      const uploadUrl = objectData.upload_url;
-      if (!uploadUrl) {
-        throw new Error('No upload URL available. Object may already be completed or deleted.');
-      }
-
-      // Upload the file from disk (read into buffer like uploadFromFile does)
-      try {
-        const fileBuffer = await fs.readFile(tmpFilePath);
-
-        const response = await fetch(uploadUrl, {
-          method: 'PUT',
-          body: fileBuffer,
-        });
-
-        if (!response.ok) {
-          throw new Error(`Upload failed: ${response.status} ${response.statusText}`);
-        }
-      } catch (error) {
-        throw new Error(
-          `Failed to upload tarball: ${error instanceof Error ? error.message : 'Unknown error'}`,
-        );
-      }
+      const storageObject = await StorageObject.create(client, createParams, requestOptions);
+      await storageObject.uploadContent(await fs.readFile(tmpFilePath));
 
       await storageObject.complete();
 
       return storageObject;
     } catch (error) {
-      // Re-throw errors related to tar creation or other steps
-      if (error instanceof Error && error.message.startsWith('Failed to upload tarball')) {
-        throw error;
-      }
       throw new Error(
         `Failed to create tarball from directory ${dirPath}: ${error instanceof Error ? error.message : 'Unknown error'}`,
       );
@@ -581,8 +502,10 @@ export class StorageObject {
    * Upload content to the storage object using the presigned URL.
    * This is a convenience method that handles the HTTP PUT request.
    *
-   * Note: For large files or binary content, you may want to use the uploadUrl directly
-   * with your own upload logic.
+   * Uses the upload URL and required headers as one per-object credential snapshot.
+   * Neither API request options nor API authentication are forwarded to storage.
+   * Uploads are not retried and redirects are not followed. Error messages exclude
+   * signed URLs, headers, and storage response bodies.
    *
    * When this is done call complete() to mark the upload as complete.
    *
@@ -605,25 +528,21 @@ export class StorageObject {
       throw new Error('No upload URL available. Object may already be completed or deleted.');
     }
 
+    const buffer = Buffer.isBuffer(content) ? content : Buffer.from(content, 'utf-8');
+    let response;
     try {
-      // Always convert to Buffer to ensure consistent handling
-      const buffer = Buffer.isBuffer(content) ? content : Buffer.from(content, 'utf-8');
-
-      // Use fetch with absolutely minimal configuration
-      const response = await fetch(this._uploadUrl, {
+      response = await fetch(this._uploadUrl, {
         method: 'PUT',
         body: buffer,
-        // Absolutely no headers - let the presigned URL handle everything
+        headers: { ...this._uploadHeaders },
+        redirect: 'error',
       });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Upload failed: ${response.status} ${errorText}`);
-      }
-    } catch (error) {
-      throw new Error(
-        `Upload failed to ${this._uploadUrl}: ${error instanceof Error ? error.message : 'Unknown error'}`,
-      );
+    } catch {
+      // Fetch errors can contain the signed URL; do not include their message or cause.
+      throw new Error('Storage upload failed during transport');
+    }
+    if (!response.ok) {
+      throw new Error(`Storage upload failed (HTTP ${response.status})`);
     }
   }
 

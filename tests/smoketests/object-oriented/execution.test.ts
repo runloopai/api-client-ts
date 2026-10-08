@@ -5,111 +5,44 @@ const sdk = makeClientSDK();
 
 describe('smoketest: object-oriented execution', () => {
   describe('execution lifecycle', () => {
-    let devbox: Devbox;
-    let execution: Execution;
-
-    beforeAll(async () => {
-      // Create a devbox first
-      devbox = await sdk.devbox.create({
-        name: uniqueName('sdk-devbox-execution'),
-        launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 }, // 5 minutes
-      });
-      expect(devbox).toBeDefined();
-    });
-
-    afterAll(async () => {
-      if (execution) {
-        await execution.kill();
-      }
-      if (devbox) {
-        await devbox.shutdown();
-      }
-    });
-
-    test('start asynchronous execution', async () => {
-      expect(devbox).toBeDefined();
-      execution = await devbox.cmd.execAsync('sleep 5 && echo "Execution completed successfully"');
-      expect(execution).toBeDefined();
-      expect(execution.executionId).toBeTruthy();
-      expect(execution.devboxId).toBeTruthy();
-      expect(execution.devboxId).toBe(devbox.id);
-    });
-
-    test('check execution status', async () => {
-      expect(execution).toBeDefined();
-      const status = await execution.getState();
-      expect(status).toBeDefined();
-      expect(status.status).toBeTruthy();
-    });
-
-    test('wait for execution completion', async () => {
-      expect(execution).toBeDefined();
-      const result = await execution.result();
-      expect(result).toBeDefined();
-      expect(result.exitCode).toBe(0);
-      expect(result.success).toBe(true);
-      expect(result.failed).toBe(false);
-      expect(result.executionId).toBeTruthy();
-      expect(result.result).toBeDefined();
-
-      const output = await result.stdout();
-      expect(output).toContain('Execution completed successfully');
-    });
-
-    test('get execution result after completion', async () => {
-      expect(execution).toBeDefined();
-      const result = await execution.result();
-      expect(result).toBeDefined();
-      expect(result.exitCode).toBe(0);
-
-      const output = await result.stdout();
-      expect(output).toContain('Execution completed successfully');
-    });
-  });
-
-  describe('execution with stdin', () => {
-    let devbox: Devbox;
-    let execution: Execution;
-
-    beforeAll(async () => {
-      // Create a devbox first
-      devbox = await sdk.devbox.create({
+    test('tracks execution, delivers ordered stdin, and reads the completed result again', async () => {
+      const devbox = await sdk.devbox.create({
         name: uniqueName('sdk-devbox-execution-stdin'),
-        launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 }, // 5 minutes
+        launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 },
       });
-      expect(devbox).toBeDefined();
-    });
+      let execution: Execution | undefined;
+      try {
+        execution = await devbox.cmd.execAsync('cat', { attach_stdin: true });
+        expect(execution.executionId).toBeTruthy();
+        expect(execution.devboxId).toBe(devbox.id);
 
-    afterAll(async () => {
-      if (execution) {
-        await execution.kill();
+        const state = await execution.getState();
+        expect(state.execution_id).toBe(execution.executionId);
+        // Async creation may still be queued; cat must not finish before EOF.
+        expect(['queued', 'running']).toContain(state.status);
+
+        await execution.sendStdIn('first\n');
+        await execution.sendStdIn('second\n');
+        await execution.closeStdIn();
+        const result = await execution.result();
+        expect(result.exitCode).toBe(0);
+        expect(result.success).toBe(true);
+        expect(result.failed).toBe(false);
+        expect(result.executionId).toBe(execution.executionId);
+        expect(result.result).toBeDefined();
+        expect(await result.stdout()).toBe('first\nsecond\n');
+
+        const repeatedResult = await execution.result();
+        expect(repeatedResult.exitCode).toBe(0);
+        expect(repeatedResult.executionId).toBe(execution.executionId);
+        expect(await repeatedResult.stdout()).toBe('first\nsecond\n');
+      } finally {
+        try {
+          if (execution) await execution.kill();
+        } finally {
+          await devbox.shutdown();
+        }
       }
-      if (devbox) {
-        await devbox.shutdown();
-      }
-    });
-
-    test('start execution with stdin enabled', async () => {
-      expect(devbox).toBeDefined();
-      execution = await devbox.cmd.execAsync('cat', {
-        attach_stdin: true,
-      });
-      expect(execution).toBeDefined();
-      expect(execution.executionId).toBeTruthy();
-      expect((await execution.getState()).status).not.toBe('completed');
-    });
-
-    test('send input to execution', async () => {
-      expect(execution).toBeDefined();
-      expect((await execution.getState()).status).not.toBe('completed');
-      await execution.sendStdIn('Hello from stdin!\n');
-      await execution.closeStdIn();
-
-      const result = await execution.result();
-      expect(result.exitCode).toBe(0);
-
-      const output = await result.stdout();
-      expect(output).toContain('Hello from stdin!');
     });
   });
 

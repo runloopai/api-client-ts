@@ -76,13 +76,13 @@ This directory contains comprehensive smoke tests for the object-oriented Runloo
 
 ```bash
 # Run all object-oriented smoke tests
-npm test -- tests/smoketests/object-oriented/
+RUN_SMOKETESTS=1 yarn jest tests/smoketests/object-oriented/
 
 # Run specific test file
-npm test -- tests/smoketests/object-oriented/devbox.test.ts
+RUN_SMOKETESTS=1 yarn jest tests/smoketests/object-oriented/devbox.test.ts
 
 # Run with verbose output
-npm test -- tests/smoketests/object-oriented/ --verbose
+RUN_SMOKETESTS=1 yarn jest tests/smoketests/object-oriented/ --verbose
 ```
 
 ## Environment Variables

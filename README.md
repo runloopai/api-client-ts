@@ -100,6 +100,13 @@ The SDK provides object-oriented interfaces for all major Runloop resources:
 - **[`runloop.blueprint`](https://runloopai.github.io/api-client-ts/stable/classes/sdk.BlueprintOps.html)** - Blueprint management (create, list, build blueprints)
 - **[`runloop.snapshot`](https://runloopai.github.io/api-client-ts/stable/classes/sdk.SnapshotOps.html)** - Snapshot management (list disk snapshots)
 - **[`runloop.storageObject`](https://runloopai.github.io/api-client-ts/stable/classes/sdk.StorageObjectOps.html)** - Storage object management (upload, download, list objects)
+
+Storage upload helpers retain both the signed URL and required headers from object
+creation, including Azure upload headers. They upload before marking the object
+complete, and do not forward API authentication or request-option headers to storage.
+Treat signed URLs and headers as credentials. Signed PUTs do not follow redirects or
+retry, and their error messages exclude signed credentials and storage response bodies.
+
 - **[`runloop.agent`](https://runloopai.github.io/api-client-ts/stable/classes/sdk.AgentOps.html)** - Agent management (create, list agents from npm/pip/git)
 - **[`runloop.axon`](https://runloopai.github.io/api-client-ts/stable/classes/sdk.AxonOps.html)** - [Beta] Axon management (create, publish events, subscribe via SSE)
 - **[`runloop.networkPolicy`](https://runloopai.github.io/api-client-ts/stable/classes/sdk.NetworkPolicyOps.html)** - Network policy management (create, list, update egress rules)

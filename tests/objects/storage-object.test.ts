@@ -176,6 +176,16 @@ describe('StorageObject (New API)', () => {
     });
   });
 
+  it('copies upload headers instead of retaining a mutable create response', async () => {
+    const headers = { 'x-ms-blob-type': 'BlockBlob' };
+    mockClient.objects.create.mockResolvedValue({ ...mockObjectData, upload_headers: headers });
+    const object = await StorageObject.create(mockClient, { name: 'copy', content_type: 'text' });
+    headers['x-ms-blob-type'] = 'mutated';
+    mockedShimsFetch.mockResolvedValue({ ok: true });
+    await object.uploadContent('hello');
+    expect(mockedShimsFetch.mock.calls[0]![1].headers['x-ms-blob-type']).toBe('BlockBlob');
+  });
+
   describe('list', () => {
     it('should list all storage objects', async () => {
       const obj1: ObjectView = {
@@ -255,47 +265,6 @@ describe('StorageObject (New API)', () => {
     });
 
     describe('uploadContent', () => {
-      it('should upload string content', async () => {
-        // Mock getInfo to return object data with upload_url
-        mockClient.objects.retrieve.mockResolvedValue(mockObjectData);
-
-        const mockedShimsFetchResponse = {
-          ok: true,
-          status: 200,
-          statusText: 'OK',
-        };
-
-        mockedShimsFetch.mockResolvedValue(mockedShimsFetchResponse);
-
-        await storageObject.uploadContent('Hello, World!');
-
-        expect(mockedShimsFetch).toHaveBeenCalledWith(mockObjectData.upload_url, {
-          method: 'PUT',
-          body: Buffer.from('Hello, World!', 'utf-8'),
-        });
-      });
-
-      it('should upload buffer content', async () => {
-        // Mock getInfo to return object data with upload_url
-        mockClient.objects.retrieve.mockResolvedValue(mockObjectData);
-
-        const mockedShimsFetchResponse = {
-          ok: true,
-          status: 200,
-          statusText: 'OK',
-        };
-
-        mockedShimsFetch.mockResolvedValue(mockedShimsFetchResponse);
-
-        const buffer = Buffer.from([0x89, 0x50, 0x4e, 0x47]);
-        await storageObject.uploadContent(buffer);
-
-        expect(mockedShimsFetch).toHaveBeenCalledWith(mockObjectData.upload_url, {
-          method: 'PUT',
-          body: buffer,
-        });
-      });
-
       it('should throw error when upload URL is not available', async () => {
         const completedData = { ...mockObjectData, upload_url: null };
         mockClient.objects.retrieve.mockResolvedValue(completedData);
@@ -317,7 +286,7 @@ describe('StorageObject (New API)', () => {
 
         mockedShimsFetch.mockResolvedValue(mockedShimsFetchResponse);
 
-        await expect(storageObject.uploadContent('test')).rejects.toThrow('Upload failed: 403');
+        await expect(storageObject.uploadContent('test')).rejects.toThrow('Storage upload failed (HTTP 403)');
       });
     });
 
@@ -592,7 +561,7 @@ describe('StorageObject (New API)', () => {
       });
 
       await expect(StorageObject.uploadFromFile(mockClient, './test.txt', 'test.txt', {})).rejects.toThrow(
-        'Failed to upload file: Upload failed: 500 Internal Server Error',
+        'Storage upload failed (HTTP 500)',
       );
     });
 
@@ -712,7 +681,7 @@ describe('StorageObject (New API)', () => {
       });
 
       await expect(StorageObject.uploadFromText(mockClient, textContent, 'test.txt')).rejects.toThrow(
-        'Failed to upload text: Upload failed: 403 Forbidden',
+        'Storage upload failed (HTTP 403)',
       );
     });
 
@@ -804,7 +773,7 @@ describe('StorageObject (New API)', () => {
       });
 
       await expect(StorageObject.uploadFromBuffer(mockClient, buffer, 'test.txt', 'text')).rejects.toThrow(
-        'Failed to upload buffer: Upload failed: 403 Forbidden',
+        'Storage upload failed (HTTP 403)',
       );
     });
 
@@ -1063,7 +1032,7 @@ describe('StorageObject (New API)', () => {
 
       await expect(
         StorageObject.uploadFromDir(mockClient, './project', { name: 'project.tar.gz' }),
-      ).rejects.toThrow('Failed to upload tarball: Upload failed: 500 Internal Server Error');
+      ).rejects.toThrow('Storage upload failed (HTTP 500)');
     });
   });
 

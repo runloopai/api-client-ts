@@ -1622,7 +1622,7 @@ export class AxonOps {
   }
 
   /**
-   * [Beta] List all active axons.
+   * [Beta] List all axons, including deleted axons.
    *
    * @example
    * ```typescript

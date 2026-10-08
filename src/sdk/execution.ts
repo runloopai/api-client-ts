@@ -1,7 +1,7 @@
 import { Runloop } from '../index';
 import type * as Core from '../core';
 import { RunloopError } from '../error';
-import type { DevboxAsyncExecutionDetailView, DevboxSendStdInResult } from '../resources/devboxes/devboxes';
+import type { DevboxAsyncExecutionDetailView } from '../resources/devboxes/devboxes';
 import type { ExecutionSendStdInParams } from '../resources/devboxes/executions';
 import { longPollUntil, resolveLongPollTimeoutMs, type LongPollRequestOptions } from '../lib/polling';
 import { ExecutionResult } from './execution-result';
@@ -67,7 +67,10 @@ export class Execution {
   }
 
   /**
-   * Send input to the execution's stdin. The execution must have been started with `attach_stdin: true`.
+   * Send nonempty input to the execution's stdin. Start it with `attach_stdin: true`.
+   * Await each send before the next send or closeStdIn(). Concurrent requests are
+   * not ordered. The generated client's retry policy is preserved: a retry after
+   * an ambiguous connection failure can replay input; delivery is not exactly once.
    *
    * @example
    * ```typescript
@@ -101,11 +104,11 @@ export class Execution {
     body: ExecutionSendStdInParams,
     options?: Core.RequestOptions,
   ): Promise<void> {
-    // executions.sendStdIn() would treat `{ signal: 'EOF' }` as RequestOptions (its `signal` key collides
-    // with the AbortSignal option) and drop the body, so post to the endpoint directly.
-    const response = await this.client.post<unknown, DevboxSendStdInResult>(
-      `/v1/devboxes/${this._devboxId}/executions/${this._executionId}/send_std_in`,
-      { ...options, body },
+    const response = await this.client.devboxes.executions.sendStdIn(
+      this._devboxId,
+      this._executionId,
+      body,
+      options,
     );
     if (!response.success) {
       throw new RunloopError(`Failed to send stdin to execution ${this._executionId}`);
