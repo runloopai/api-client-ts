@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -exuo pipefail
 
+node scripts/sync-sdk-methods.cjs
+
 rm -rf dist; mkdir dist
 
 # Copy src to dist/src and build from dist/src into dist, so that

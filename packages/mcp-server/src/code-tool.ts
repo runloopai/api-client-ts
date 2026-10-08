@@ -1,4 +1,4 @@
-// File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
+// Handwritten MCP code-tool dispatch and best-effort method filtering.
 
 import fs from 'node:fs';
 import path from 'node:path';
@@ -100,7 +100,11 @@ export function codeTool({
     // stronger security blocks are required, then these should be enforced in the downstream
     // API (e.g., by having users call the MCP server with API keys with limited permissions).
     if (blockedMethods) {
-      const blockedMatches = blockedMethods.filter((method) => code.includes(method.fullyQualifiedName));
+      const blockedMatches = blockedMethods.filter((method) => {
+        const name = method.fullyQualifiedName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        // Match a complete property name, not a prefix such as update in updateById.
+        return new RegExp(`(?:^|[^\\w$])${name}(?![\\w$])`).test(code);
+      });
       if (blockedMatches.length > 0) {
         return asErrorResult(
           `The following methods have been blocked by the MCP server and cannot be used in code execution: ${blockedMatches

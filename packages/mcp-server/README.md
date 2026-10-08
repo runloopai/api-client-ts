@@ -1,6 +1,13 @@
 # Runloop Node MCP Server
 
-It is generated with [Stainless](https://www.stainless.com/).
+The underlying SDK is generated with [Stainless](https://www.stainless.com/).
+This MCP package is maintained as custom code in the SDK staging repository.
+Its build regenerates the method catalog from the SDK's `api.md`; both method
+filters and typo suggestions consume that catalog. To check it without writing:
+
+```sh
+node packages/mcp-server/scripts/sync-sdk-methods.cjs --check
+```
 
 ## Installation
 
@@ -67,12 +74,20 @@ isolated sandbox. To accomplish this, the server will expose two tools to your a
   documentation about your API/SDK.
 
 - The second tool is a code tool, where the agent can write code against the TypeScript SDK.
-  The code will be executed in a sandbox environment without web or filesystem access. Then,
+  Local execution uses a Deno worker with network access restricted to the configured API
+  hostname and read access to the installed SDK/package files; it is not a no-network,
+  no-filesystem sandbox. Remote execution uses Stainless's separately deployed runtime. Then,
   anything the code returns or prints will be returned to the agent as the result of the
   tool call.
 
 Using this scheme, agents are capable of performing very complex tasks deterministically
 and repeatably.
+
+Method allow/block patterns are best-effort checks of direct property names, not an
+authorization boundary. Aliases, computed properties, or obfuscated code can evade
+them; enforce access with appropriately restricted API keys. Keeping this package's
+catalog current does not update the hosted execution runtime. Validate that runtime
+separately before relying on new SDK methods in remote mode.
 
 ## Running remotely
 
