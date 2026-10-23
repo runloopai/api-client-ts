@@ -6,8 +6,6 @@ import * as Core from './core';
 import * as Errors from './error';
 import * as Pagination from './pagination';
 import {
-  type AgentsCursorIDPageParams,
-  AgentsCursorIDPageResponse,
   type AxonsCursorIDPageParams,
   AxonsCursorIDPageResponse,
   type BlueprintsCursorIDPageParams,
@@ -28,18 +26,6 @@ import {
 import * as Uploads from './uploads';
 import * as API from './resources/index';
 import { AccountView, Accounts } from './resources/accounts';
-import {
-  AgentCreateParameters,
-  AgentCreateParams,
-  AgentDeleteResponse,
-  AgentDevboxCountsView,
-  AgentListParams,
-  AgentListPublicParams,
-  AgentListView,
-  AgentView,
-  AgentViewsAgentsCursorIDPage,
-  Agents,
-} from './resources/agents';
 import { APIKeyCreateParameters, APIKeyCreatedView, ApikeyCreateParams, Apikeys } from './resources/apikeys';
 import {
   BlueprintBuildLog,
@@ -355,7 +341,6 @@ export class Runloop extends Core.APIClient {
   }
 
   accounts: API.Accounts = new API.Accounts(this);
-  agents: API.Agents = new API.Agents(this);
   axons: API.Axons = new API.Axons(this);
   blueprints: API.Blueprints = new API.Blueprints(this);
   devboxes: API.Devboxes = new API.Devboxes(this);
@@ -412,8 +397,6 @@ export class Runloop extends Core.APIClient {
 }
 
 Runloop.Accounts = Accounts;
-Runloop.Agents = Agents;
-Runloop.AgentViewsAgentsCursorIDPage = AgentViewsAgentsCursorIDPage;
 Runloop.Axons = Axons;
 Runloop.AxonViewsAxonsCursorIDPage = AxonViewsAxonsCursorIDPage;
 Runloop.Blueprints = Blueprints;
@@ -455,12 +438,6 @@ export declare namespace Runloop {
     type DiskSnapshotsCursorIDPageResponse as DiskSnapshotsCursorIDPageResponse,
   };
 
-  export import AgentsCursorIDPage = Pagination.AgentsCursorIDPage;
-  export {
-    type AgentsCursorIDPageParams as AgentsCursorIDPageParams,
-    type AgentsCursorIDPageResponse as AgentsCursorIDPageResponse,
-  };
-
   export import AxonsCursorIDPage = Pagination.AxonsCursorIDPage;
   export {
     type AxonsCursorIDPageParams as AxonsCursorIDPageParams,
@@ -492,19 +469,6 @@ export declare namespace Runloop {
   };
 
   export { Accounts as Accounts, type AccountView as AccountView };
-
-  export {
-    Agents as Agents,
-    type AgentCreateParameters as AgentCreateParameters,
-    type AgentDevboxCountsView as AgentDevboxCountsView,
-    type AgentListView as AgentListView,
-    type AgentView as AgentView,
-    type AgentDeleteResponse as AgentDeleteResponse,
-    AgentViewsAgentsCursorIDPage as AgentViewsAgentsCursorIDPage,
-    type AgentCreateParams as AgentCreateParams,
-    type AgentListParams as AgentListParams,
-    type AgentListPublicParams as AgentListPublicParams,
-  };
 
   export {
     Axons as Axons,
@@ -677,8 +641,6 @@ export declare namespace Runloop {
   };
 
   export type AfterIdle = API.AfterIdle;
-  export type AgentMount = API.AgentMount;
-  export type AgentSource = API.AgentSource;
   export type AuthMechanism = API.AuthMechanism;
   export type BrokerMount = API.BrokerMount;
   export type CodeMountParameters = API.CodeMountParameters;

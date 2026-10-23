@@ -3,18 +3,6 @@
 export * from './shared';
 export { Accounts, type AccountView } from './accounts';
 export {
-  AgentViewsAgentsCursorIDPage,
-  Agents,
-  type AgentCreateParameters,
-  type AgentDevboxCountsView,
-  type AgentListView,
-  type AgentView,
-  type AgentDeleteResponse,
-  type AgentCreateParams,
-  type AgentListParams,
-  type AgentListPublicParams,
-} from './agents';
-export {
   Apikeys,
   type APIKeyCreatedView,
   type APIKeyCreateParameters,

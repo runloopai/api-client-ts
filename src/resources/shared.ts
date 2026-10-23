@@ -17,139 +17,6 @@ export interface AfterIdle {
   on_idle: 'shutdown' | 'suspend';
 }
 
-export interface AgentMount {
-  /**
-   * The ID of the agent to mount. Either agent_id or name must be set.
-   */
-  agent_id: string | null;
-
-  /**
-   * The name of the agent to mount. Returns the most recent agent with a matching
-   * name if no agent id string provided. Either agent id or name must be set
-   */
-  agent_name: string | null;
-
-  type: 'agent_mount';
-
-  /**
-   * Path to mount the agent on the Devbox. Required for git and object agents. Use
-   * absolute path (e.g., /home/user/agent)
-   */
-  agent_path?: string | null;
-
-  /**
-   * Optional auth token for private repositories. Only used for git agents.
-   */
-  auth_token?: string | null;
-}
-
-/**
- * Agent source configuration.
- */
-export interface AgentSource {
-  /**
-   * Source type: npm, pip, object, or git
-   */
-  type: string;
-
-  /**
-   * Git-based agent source configuration.
-   */
-  git?: AgentSource.Git | null;
-
-  /**
-   * NPM-based agent source configuration.
-   */
-  npm?: AgentSource.Npm | null;
-
-  /**
-   * Object store agent source configuration.
-   */
-  object?: AgentSource.Object | null;
-
-  /**
-   * Pip-based agent source configuration.
-   */
-  pip?: AgentSource.Pip | null;
-}
-
-export namespace AgentSource {
-  /**
-   * Git-based agent source configuration.
-   */
-  export interface Git {
-    /**
-     * Git repository URL
-     */
-    repository: string;
-
-    /**
-     * Setup commands to run after cloning
-     */
-    agent_setup?: Array<string> | null;
-
-    /**
-     * Optional Git ref (branch/tag/commit), defaults to main/HEAD
-     */
-    ref?: string | null;
-  }
-
-  /**
-   * NPM-based agent source configuration.
-   */
-  export interface Npm {
-    /**
-     * NPM package name
-     */
-    package_name: string;
-
-    /**
-     * Setup commands to run after installation
-     */
-    agent_setup?: Array<string> | null;
-
-    /**
-     * NPM registry URL
-     */
-    registry_url?: string | null;
-  }
-
-  /**
-   * Object store agent source configuration.
-   */
-  export interface Object {
-    /**
-     * Object ID
-     */
-    object_id: string;
-
-    /**
-     * Setup commands to run after unpacking
-     */
-    agent_setup?: Array<string> | null;
-  }
-
-  /**
-   * Pip-based agent source configuration.
-   */
-  export interface Pip {
-    /**
-     * Pip package name
-     */
-    package_name: string;
-
-    /**
-     * Setup commands to run after installation
-     */
-    agent_setup?: Array<string> | null;
-
-    /**
-     * Pip registry URL
-     */
-    registry_url?: string | null;
-  }
-}
-
 /**
  * Defines how the primary credential is applied to requests proxied to the
  * upstream.
@@ -436,7 +303,7 @@ export interface LifecycleHooks {
   suspend_deadline_ms?: number | null;
 }
 
-export type Mount = ObjectMount | AgentMount | Mount.CodeMount | Mount.FileMount | BrokerMount;
+export type Mount = ObjectMount | Mount.CodeMount | Mount.FileMount | BrokerMount;
 
 export namespace Mount {
   export interface CodeMount {
