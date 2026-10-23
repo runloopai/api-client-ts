@@ -141,8 +141,6 @@ export interface AgentListView {
 
 /**
  * An Agent represents a registered AI agent entity.
- *
- * @category Agent Types
  */
 export interface AgentView {
   /**
@@ -180,11 +178,6 @@ export interface AgentView {
 
 export type AgentDeleteResponse = unknown;
 
-/**
- * Parameters for creating a new Agent.
- *
- * @category Agent Types
- */
 export interface AgentCreateParams {
   /**
    * The name of the Agent.

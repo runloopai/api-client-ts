@@ -45,8 +45,6 @@ export interface AgentMount {
 
 /**
  * Agent source configuration.
- *
- * @category Shared Types
  */
 export interface AgentSource {
   /**
@@ -438,11 +436,6 @@ export interface LifecycleHooks {
   suspend_deadline_ms?: number | null;
 }
 
-/**
- * Mount configuration for attaching files, agents, or code to a Devbox.
- *
- * @category Shared Types
- */
 export type Mount = ObjectMount | AgentMount | Mount.CodeMount | Mount.FileMount | BrokerMount;
 
 export namespace Mount {
