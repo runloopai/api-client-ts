@@ -36,7 +36,7 @@ export const exampleRegistry: ExampleRegistryEntry[] = [
   },
   {
     slug: 'devbox-mounts',
-    title: 'Devbox Mounts (Agent, Code, Object)',
+    title: 'Devbox Mounts (Code, Object)',
     fileName: 'devbox-mounts.ts',
     requiredEnv: ['RUNLOOP_API_KEY', 'ANTHROPIC_API_KEY'],
     run: runDevboxMountsExample,

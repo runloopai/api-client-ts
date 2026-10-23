@@ -76,7 +76,7 @@ yarn generate:examples-md
 
 Use direct `secrets` injection when code inside the devbox legitimately needs the secret value. For third-party API credentials that should stay off the devbox, prefer wiring a Runloop secret through agent gateway instead. See [`examples/secrets-with-devbox.ts`](./examples/secrets-with-devbox.ts) for both patterns side by side using `devbox.create({ secrets: ... })` and `devbox.create({ gateways: ... })`.
 
-For mount patterns, see [`examples/devbox-mounts.ts`](./examples/devbox-mounts.ts). It shows when to use `agent_mount` for reusable agents like Claude Code, `code_mount` for Git repositories such as [`runloopai/rl-cli`](https://github.com/runloopai/rl-cli.git), and `object_mount` for blobs that should appear on the devbox at startup. The example also demonstrates agent gateway wiring for Anthropic credentials plus object TTL, `.tgz` compression, and extraction-on-mount behavior.
+For mount patterns, see [`examples/devbox-mounts.ts`](./examples/devbox-mounts.ts). It shows when to use `code_mount` for Git repositories such as [`runloopai/rl-cli`](https://github.com/runloopai/rl-cli.git), and `object_mount` for blobs that should appear on the devbox at startup. The example installs Claude Code with a command and demonstrates agent gateway wiring for Anthropic credentials plus object TTL, `.tgz` compression, and extraction-on-mount behavior.
 
 For snapshot workflows, see [`examples/devbox-snapshots.ts`](./examples/devbox-snapshots.ts). It uploads a file to a source devbox, shows `suspend()` plus `resume()`, takes a disk snapshot, restores multiple devboxes from the same snapshot baseline, mutates the file independently in each devbox, and deletes the snapshot after the demo completes.
 
@@ -107,7 +107,6 @@ complete, and do not forward API authentication or request-option headers to sto
 Treat signed URLs and headers as credentials. Signed PUTs do not follow redirects or
 retry, and their error messages exclude signed credentials and storage response bodies.
 
-- **[`runloop.agent`](https://runloopai.github.io/api-client-ts/stable/classes/sdk.AgentOps.html)** - Agent management (create, list agents from npm/pip/git)
 - **[`runloop.axon`](https://runloopai.github.io/api-client-ts/stable/classes/sdk.AxonOps.html)** - [Beta] Axon management (create, publish events, subscribe via SSE)
 - **[`runloop.networkPolicy`](https://runloopai.github.io/api-client-ts/stable/classes/sdk.NetworkPolicyOps.html)** - Network policy management (create, list, update egress rules)
 - **[`runloop.gatewayConfig`](https://runloopai.github.io/api-client-ts/stable/classes/sdk.GatewayConfigOps.html)** - Gateway config management (create, list API proxy configurations)

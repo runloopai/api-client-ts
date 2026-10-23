@@ -110,7 +110,6 @@ describe('smoketest: built package import', () => {
       expect(RunloopAPI.Blueprints).toBeDefined();
       expect(RunloopAPI.Objects).toBeDefined();
       expect(RunloopAPI.Secrets).toBeDefined();
-      expect(RunloopAPI.Agents).toBeDefined();
     });
 
     test('should allow creating new types based on execution.result() return type', () => {

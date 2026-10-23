@@ -3,7 +3,6 @@ export { EvictionMonitor, getEvictionMonitor, type EvictionCallback } from './ev
 export { Blueprint } from './blueprint';
 export { Snapshot } from './snapshot';
 export { StorageObject } from './storage-object';
-export { Agent } from './agent';
 export { Axon, AxonSqlOps } from './axon';
 export { Execution } from './execution';
 export { ExecutionResult } from './execution-result';

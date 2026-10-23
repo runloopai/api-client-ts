@@ -9,7 +9,7 @@ Runnable examples live in [`examples/`](./examples).
 
 - [Blueprint with Build Context](#blueprint-with-build-context)
 - [Devbox From Blueprint (Run Command, Shutdown)](#devbox-from-blueprint-lifecycle)
-- [Devbox Mounts (Agent, Code, Object)](#devbox-mounts)
+- [Devbox Mounts (Code, Object)](#devbox-mounts)
 - [Devbox Snapshots (Suspend, Resume, Restore, Delete)](#devbox-snapshots)
 - [Devbox Tunnel (HTTP Server Access)](#devbox-tunnel)
 - [MCP Hub + Claude Code + GitHub](#mcp-github-tools)
@@ -77,17 +77,17 @@ yarn test:examples
 **Source:** [`examples/devbox-from-blueprint-lifecycle.ts`](./examples/devbox-from-blueprint-lifecycle.ts)
 
 <a id="devbox-mounts"></a>
-## Devbox Mounts (Agent, Code, Object)
+## Devbox Mounts (Code, Object)
 
-**Use case:** Launch a devbox that combines an agent mount for Claude Code, a code mount for the Runloop CLI repo, and an object mount for startup files.
+**Use case:** Launch a devbox with a code mount for the Runloop CLI repo and an object mount for startup files, then install Claude Code with a command.
 
 **Tags:** `devbox`, `mounts`, `agent`, `code`, `object`, `claude-code`, `agent-gateway`, `ttl`
 
 ### Workflow
-- Create or reuse an agent by name
 - Create a secret for an agent and route it through agent gateway
 - Upload a temporary directory as a storage object with a TTL
-- Launch a devbox with agent, code, and object mounts together
+- Launch a devbox with code and object mounts together
+- Install Claude Code with a command
 - Run Claude Code on Opus 4.5 through the Anthropic agent gateway
 - Verify the rl-cli repo and extracted object files are present on the devbox
 - Shutdown the devbox and delete the temporary secret and object

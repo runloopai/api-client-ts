@@ -2,14 +2,14 @@
 
 /**
 ---
-title: Devbox Mounts (Agent, Code, Object)
+title: Devbox Mounts (Code, Object)
 slug: devbox-mounts
-use_case: Launch a devbox that combines an agent mount for Claude Code, a code mount for the Runloop CLI repo, and an object mount for startup files.
+use_case: Launch a devbox with a code mount for the Runloop CLI repo and an object mount for startup files, then install Claude Code with a command.
 workflow:
-  - Create or reuse an agent by name
   - Create a secret for an agent and route it through agent gateway
   - Upload a temporary directory as a storage object with a TTL
-  - Launch a devbox with agent, code, and object mounts together
+  - Launch a devbox with code and object mounts together
+  - Install Claude Code with a command
   - Run Claude Code on Opus 4.5 through the Anthropic agent gateway
   - Verify the rl-cli repo and extracted object files are present on the devbox
   - Shutdown the devbox and delete the temporary secret and object
@@ -37,8 +37,6 @@ import { RunloopSDK } from '@runloop/api-client';
 import { wrapRecipe, runAsCli } from './_harness';
 import type { RecipeContext, RecipeOutput } from './types';
 
-const CLAUDE_CODE_AGENT_NAME = 'example-claude-code-agent';
-const CLAUDE_CODE_AGENT_VERSION = '1.0.0';
 const CLAUDE_CODE_PACKAGE = '@anthropic-ai/claude-code';
 const CLAUDE_MODEL = 'claude-opus-4-5';
 const OBJECT_TTL_MS = 60 * 60 * 1000;
@@ -48,34 +46,6 @@ const GATEWAY_ENV_PREFIX = 'ANTHROPIC';
 
 function uniqueName(prefix: string): string {
   return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-}
-
-// example setup: get or create an agent so we can mount it
-async function ensureClaudeCodeAgent(sdk: RunloopSDK): Promise<{ agentId: string; reused: boolean }> {
-  const existingAgentsList = await sdk.agent.list({ name: CLAUDE_CODE_AGENT_NAME, limit: 20 });
-  const existingAgentDetails = await Promise.all(existingAgentsList.map((candidate) => candidate.getInfo()));
-
-  const matchingAgent = existingAgentDetails
-    .filter(
-      (info) =>
-        info.name === CLAUDE_CODE_AGENT_NAME &&
-        info.version === CLAUDE_CODE_AGENT_VERSION &&
-        info.source?.type === 'npm' &&
-        info.source?.npm?.package_name === CLAUDE_CODE_PACKAGE,
-    )
-    .sort((left, right) => right.create_time_ms - left.create_time_ms)[0];
-
-  if (matchingAgent) {
-    return { agentId: matchingAgent.id, reused: true };
-  }
-
-  const createdAgent = await sdk.agent.createFromNpm({
-    name: CLAUDE_CODE_AGENT_NAME,
-    version: CLAUDE_CODE_AGENT_VERSION,
-    package_name: CLAUDE_CODE_PACKAGE,
-  });
-
-  return { agentId: createdAgent.id, reused: false };
 }
 
 export async function recipe(ctx: RecipeContext): Promise<RecipeOutput> {
@@ -91,9 +61,6 @@ export async function recipe(ctx: RecipeContext): Promise<RecipeOutput> {
   });
 
   const resourcesCreated: string[] = [];
-
-  const { agentId, reused } = await ensureClaudeCodeAgent(sdk);
-  resourcesCreated.push(reused ? `agent:${agentId}:reused` : `agent:${agentId}`);
 
   // best practice: create a secret for the agent's credentials and use agent gateway to route it through
   // so that credentials are not exposed to the agent.
@@ -128,14 +95,7 @@ export async function recipe(ctx: RecipeContext): Promise<RecipeOutput> {
 
   const devbox = await sdk.devbox.create({
     name: uniqueName('mounts-example-devbox'),
-    // Use agent mounts for reusable tools or agents that should be installed onto the devbox.
-    // For npm-based agents like Claude Code, mounting by name makes it easy to reuse the latest matching agent.
     mounts: [
-      {
-        type: 'agent_mount',
-        agent_id: null,
-        agent_name: CLAUDE_CODE_AGENT_NAME,
-      },
       // Use code mounts for Git projects that should be cloned onto the devbox.
       {
         type: 'code_mount',
@@ -170,6 +130,11 @@ export async function recipe(ctx: RecipeContext): Promise<RecipeOutput> {
 
   const gatewayTokenResult = await devbox.cmd.exec(`echo $${GATEWAY_ENV_PREFIX}`);
   const gatewayToken = (await gatewayTokenResult.stdout()).trim();
+
+  const installResult = await devbox.cmd.exec(`npm install -g ${CLAUDE_CODE_PACKAGE}`);
+  if (installResult.exitCode !== 0) {
+    throw new Error(`Claude Code installation failed: ${await installResult.stderr()}`);
+  }
 
   const claudeVersionResult = await devbox.cmd.exec('claude --version');
   const claudeVersion = (await claudeVersionResult.stdout()).trim();
@@ -228,7 +193,7 @@ export async function recipe(ctx: RecipeContext): Promise<RecipeOutput> {
       {
         name: 'object mount extracted the uploaded example file onto the devbox',
         passed:
-          mountedExampleContents.includes('title: Devbox Mounts (Agent, Code, Object)') &&
+          mountedExampleContents.includes('title: Devbox Mounts (Code, Object)') &&
           mountedExampleContents.startsWith('#!/usr/bin/env -S npm run tsn -T'),
         details: mountedExamplePath,
       },
