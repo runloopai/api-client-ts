@@ -235,10 +235,8 @@ export interface ExecutionRetrieveParams {
 
 export interface ExecutionExecuteAsyncParams {
   /**
-   * The command to execute via the Devbox shell. By default, commands are run from
-   * the user home directory unless shell_name is specified. If shell_name is
-   * specified the command is run from the directory based on the recent state of the
-   * persistent shell.
+   * The command to execute via the Devbox shell. Commands are run from the user home
+   * directory in a fresh login shell.
    */
   command: string;
 
@@ -247,21 +245,12 @@ export interface ExecutionExecuteAsyncParams {
    * endpoint. Defaults to false if not specified.
    */
   attach_stdin?: boolean | null;
-
-  /**
-   * The name of the persistent shell to create or use if already created. When using
-   * a persistent shell, the command will run from the directory at the end of the
-   * previous command and environment variables will be preserved.
-   */
-  shell_name?: string | null;
 }
 
 export interface ExecutionExecuteSyncParams {
   /**
-   * The command to execute via the Devbox shell. By default, commands are run from
-   * the user home directory unless shell_name is specified. If shell_name is
-   * specified the command is run from the directory based on the recent state of the
-   * persistent shell.
+   * The command to execute via the Devbox shell. Commands are run from the user home
+   * directory in a fresh login shell.
    */
   command: string;
 
@@ -270,13 +259,6 @@ export interface ExecutionExecuteSyncParams {
    * endpoint. Defaults to false if not specified.
    */
   attach_stdin?: boolean | null;
-
-  /**
-   * The name of the persistent shell to create or use if already created. When using
-   * a persistent shell, the command will run from the directory at the end of the
-   * previous command and environment variables will be preserved.
-   */
-  shell_name?: string | null;
 }
 
 export interface ExecutionKillParams {

@@ -65,11 +65,6 @@ export namespace DevboxLogsListView {
      * Log line message.
      */
     message?: string | null;
-
-    /**
-     * The Shell name the cmd executed in.
-     */
-    shell_name?: string | null;
   }
 }
 
@@ -78,11 +73,6 @@ export interface LogListParams {
    * ID of execution to filter logs by.
    */
   execution_id?: string;
-
-  /**
-   * Shell Name to filter logs by.
-   */
-  shell_name?: string;
 }
 
 export declare namespace Logs {
