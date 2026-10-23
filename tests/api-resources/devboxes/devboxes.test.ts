@@ -322,7 +322,6 @@ describe('resource devboxes', () => {
       command_id: 'command_id',
       last_n: 'last_n',
       optimistic_timeout: 0,
-      shell_name: 'shell_name',
     });
   });
 
@@ -340,7 +339,6 @@ describe('resource devboxes', () => {
   test('executeAsync: required and optional params', async () => {
     const response = await client.devboxes.executeAsync('id', {
       command: 'command',
-      shell_name: 'shell_name',
       attach_stdin: true,
     });
   });
@@ -359,7 +357,6 @@ describe('resource devboxes', () => {
   test('executeSync: required and optional params', async () => {
     const response = await client.devboxes.executeSync('id', {
       command: 'command',
-      shell_name: 'shell_name',
       attach_stdin: true,
     });
   });
@@ -812,7 +809,6 @@ describe('resource devboxes', () => {
         devbox_id: 'devbox-123',
         execution_id: 'exec-123',
         status: 'completed',
-        shell_name: 'bash',
         stdout: 'hello',
         stderr: '',
         exit_status: 0,
@@ -873,7 +869,6 @@ describe('resource devboxes', () => {
       devbox_id: 'devbox-123',
       execution_id: 'exec-123',
       status: 'completed',
-      shell_name: 'bash',
       stdout: 'hello',
       stderr: '',
       exit_status: 0,

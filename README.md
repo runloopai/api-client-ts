@@ -147,9 +147,6 @@ console.log(logs.logs);
 // Filter logs by execution ID
 const result = await devbox.cmd.exec('echo "hello"');
 const execLogs = await devbox.logs({ execution_id: result.executionId });
-
-// Filter logs by shell name
-const shellLogs = await devbox.logs({ shell_name: 'my-shell' });
 ```
 
 ### Blueprints
