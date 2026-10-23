@@ -17,42 +17,6 @@ export const sdkMethods: SdkMethod[] = [
     httpPath: '/v1/accounts/me',
   },
   {
-    clientCallName: 'client.agents.create',
-    fullyQualifiedName: 'agents.create',
-    httpMethod: 'post',
-    httpPath: '/v1/agents',
-  },
-  {
-    clientCallName: 'client.agents.retrieve',
-    fullyQualifiedName: 'agents.retrieve',
-    httpMethod: 'get',
-    httpPath: '/v1/agents/{id}',
-  },
-  {
-    clientCallName: 'client.agents.list',
-    fullyQualifiedName: 'agents.list',
-    httpMethod: 'get',
-    httpPath: '/v1/agents',
-  },
-  {
-    clientCallName: 'client.agents.delete',
-    fullyQualifiedName: 'agents.delete',
-    httpMethod: 'post',
-    httpPath: '/v1/agents/{id}/delete',
-  },
-  {
-    clientCallName: 'client.agents.devboxCounts',
-    fullyQualifiedName: 'agents.devboxCounts',
-    httpMethod: 'get',
-    httpPath: '/v1/agents/devbox_counts',
-  },
-  {
-    clientCallName: 'client.agents.listPublic',
-    fullyQualifiedName: 'agents.listPublic',
-    httpMethod: 'get',
-    httpPath: '/v1/agents/list_public',
-  },
-  {
     clientCallName: 'client.axons.create',
     fullyQualifiedName: 'axons.create',
     httpMethod: 'post',
