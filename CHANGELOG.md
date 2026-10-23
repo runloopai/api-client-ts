@@ -1,5 +1,27 @@
 # Changelog
 
+## [3.0.0](https://github.com/runloopai/api-client-ts/compare/v2.0.0...v3.0.0) (2026-10-23)
+
+
+### ⚠ BREAKING CHANGES
+
+* remove the agent API and agent mounts
+* **sdk:** remove retired agent helpers and mount examples ([#21](https://github.com/runloopai/api-client-ts/issues/21))
+* **sdk:** remove named shell helpers and API references ([#19](https://github.com/runloopai/api-client-ts/issues/19))
+
+### Features
+
+* remove the agent API and agent mounts ([39de30f](https://github.com/runloopai/api-client-ts/commit/39de30f67e0803c3b817a92e6b07bbccb4912c59))
+* **sdk:** remove named shell helpers and API references ([#19](https://github.com/runloopai/api-client-ts/issues/19)) ([d24b861](https://github.com/runloopai/api-client-ts/commit/d24b8610a42cf7c7c6af28ace801c18fa80a56a5))
+* **sdk:** remove retired agent helpers and mount examples ([#21](https://github.com/runloopai/api-client-ts/issues/21)) ([d3de4b2](https://github.com/runloopai/api-client-ts/commit/d3de4b2b318bc88beea50a060ea5320151e6ff6f))
+
+
+### Bug Fixes
+
+* **mcp:** refresh method registry after agent retirement ([#22](https://github.com/runloopai/api-client-ts/issues/22)) ([97de287](https://github.com/runloopai/api-client-ts/commit/97de287afe6230a7c6268f23e389c784f1b6cf83))
+* **sdk:** align execution fixtures with generated formatting ([#20](https://github.com/runloopai/api-client-ts/issues/20)) ([9bfad3a](https://github.com/runloopai/api-client-ts/commit/9bfad3a35e5a09253ac7ccf6ce1810d43e190dae))
+* **sdk:** remove custom comments on retired agent types ([#18](https://github.com/runloopai/api-client-ts/issues/18)) ([4571353](https://github.com/runloopai/api-client-ts/commit/45713533c8d0fdca5bc0791d67b6449219d14298))
+
 ## [2.0.0](https://github.com/runloopai/api-client-ts/compare/v1.32.0...v2.0.0) (2026-10-08)
 
 
