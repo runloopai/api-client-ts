@@ -64,17 +64,12 @@ export interface AccountView {
   /**
    * Deprecated: use billing.account_billing_type.
    */
-  account_billing_type?: 'STRIPE' | 'AWS_MARKETPLACE' | 'STRIPE_PROJECTS' | 'UNRECOGNIZED';
+  account_billing_type?: 'STRIPE' | 'AWS_MARKETPLACE' | 'STRIPE_PROJECTS' | 'NONE' | 'UNRECOGNIZED';
 
   /**
    * Deprecated: use billing.stripe.active_subscription.
    */
   active_subscription?: string | null;
-
-  /**
-   * Deprecated: use billing.aws.customer_identifier.
-   */
-  external_billing_account_id?: string | null;
 
   /**
    * Deprecated: use billing.stripe.customer_id.
@@ -90,12 +85,7 @@ export namespace AccountView {
     /**
      * The account billing type.
      */
-    account_billing_type: 'STRIPE' | 'AWS_MARKETPLACE' | 'STRIPE_PROJECTS' | 'UNRECOGNIZED';
-
-    /**
-     * AWS Marketplace billing information.
-     */
-    aws?: Billing.Aws | null;
+    account_billing_type: 'STRIPE' | 'AWS_MARKETPLACE' | 'STRIPE_PROJECTS' | 'NONE' | 'UNRECOGNIZED';
 
     /**
      * Stripe billing information.
@@ -109,26 +99,6 @@ export namespace AccountView {
   }
 
   export namespace Billing {
-    /**
-     * AWS Marketplace billing information.
-     */
-    export interface Aws {
-      /**
-       * The AWS account ID used for Marketplace billing (12-digit).
-       */
-      customer_identifier?: string | null;
-
-      /**
-       * The AWS Marketplace license ARN.
-       */
-      license_arn?: string | null;
-
-      /**
-       * The AWS Marketplace subscription status.
-       */
-      subscription_status?: string | null;
-    }
-
     /**
      * Stripe billing information.
      */
