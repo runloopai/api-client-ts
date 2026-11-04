@@ -250,19 +250,6 @@ describe('smoketest: object-oriented devbox', () => {
   });
 
   describe('devbox networking', () => {
-    test.concurrent('create SSH key', async () => {
-      const devbox = await sdk.devbox.create({
-        name: uniqueName('sdk-devbox-ssh'),
-        launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 }, // 5 minutes
-      });
-
-      const sshKey = await devbox.net.createSSHKey();
-      expect(sshKey).toBeDefined();
-
-      // Clean up
-      await devbox.shutdown();
-    });
-
     test.concurrent('enable V2 tunnel (open)', async () => {
       const devbox = await sdk.devbox.create({
         name: uniqueName('sdk-devbox-enable-tunnel'),

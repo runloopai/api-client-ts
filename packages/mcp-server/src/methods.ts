@@ -161,12 +161,6 @@ export const sdkMethods: SdkMethod[] = [
     httpPath: '/v1/devboxes/{id}/create_pty_tunnel',
   },
   {
-    clientCallName: 'client.devboxes.createSSHKey',
-    fullyQualifiedName: 'devboxes.createSSHKey',
-    httpMethod: 'post',
-    httpPath: '/v1/devboxes/{id}/create_ssh_key',
-  },
-  {
     clientCallName: 'client.devboxes.deleteDiskSnapshot',
     fullyQualifiedName: 'devboxes.deleteDiskSnapshot',
     httpMethod: 'post',

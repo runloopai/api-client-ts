@@ -27,7 +27,6 @@ describe('Snapshot (New API)', () => {
         resume: jest.fn(),
         keepAlive: jest.fn(),
         snapshotDisk: jest.fn(),
-        createSSHKey: jest.fn(),
         createTunnel: jest.fn(),
         removeTunnel: jest.fn(),
         listDiskSnapshots: jest.fn(),

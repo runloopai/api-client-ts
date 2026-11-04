@@ -30,7 +30,6 @@ describe('Devbox (New API)', () => {
         keepAlive: jest.fn(),
         snapshotDisk: jest.fn(),
         snapshotDiskAsync: jest.fn(),
-        createSSHKey: jest.fn(),
         createTunnel: jest.fn(),
         enableTunnel: jest.fn(),
         removeTunnel: jest.fn(),
@@ -340,16 +339,6 @@ describe('Devbox (New API)', () => {
     });
 
     describe('net operations', () => {
-      it('should create SSH key', async () => {
-        const mockSSHKey = { url: 'ssh.example.com', ssh_private_key: 'private-key' };
-        mockClient.devboxes.createSSHKey.mockResolvedValue(mockSSHKey);
-
-        const result = await devbox.net.createSSHKey();
-
-        expect(mockClient.devboxes.createSSHKey).toHaveBeenCalledWith('devbox-123', undefined);
-        expect(result).toEqual(mockSSHKey);
-      });
-
       it('should create legacy tunnel (deprecated) and return old URL format', async () => {
         // Legacy tunnel response includes the old URL format: https://{devbox_id}-{port}.tunnel.runloop.ai
         // along with the V2 properties for backward compatibility
