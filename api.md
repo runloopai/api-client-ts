@@ -116,7 +116,6 @@ Types:
 - <code><a href="./src/resources/devboxes/devboxes.ts">McpTokenView</a></code>
 - <code><a href="./src/resources/devboxes/devboxes.ts">PtyTunnelView</a></code>
 - <code><a href="./src/resources/devboxes/devboxes.ts">TunnelView</a></code>
-- <code><a href="./src/resources/devboxes/devboxes.ts">DevboxCreateSSHKeyResponse</a></code>
 - <code><a href="./src/resources/devboxes/devboxes.ts">DevboxDeleteDiskSnapshotResponse</a></code>
 - <code><a href="./src/resources/devboxes/devboxes.ts">DevboxKeepAliveResponse</a></code>
 - <code><a href="./src/resources/devboxes/devboxes.ts">DevboxReadFileContentsResponse</a></code>
@@ -132,7 +131,6 @@ Methods:
 - <code title="post /v1/devboxes/{id}/create_gateway_token">client.devboxes.<a href="./src/resources/devboxes/devboxes.ts">createGatewayToken</a>(id, { ...params }) -> GatewayTokenView</code>
 - <code title="post /v1/devboxes/{id}/create_mcp_token">client.devboxes.<a href="./src/resources/devboxes/devboxes.ts">createMcpToken</a>(id, { ...params }) -> McpTokenView</code>
 - <code title="post /v1/devboxes/{id}/create_pty_tunnel">client.devboxes.<a href="./src/resources/devboxes/devboxes.ts">createPtyTunnel</a>(id) -> PtyTunnelView</code>
-- <code title="post /v1/devboxes/{id}/create_ssh_key">client.devboxes.<a href="./src/resources/devboxes/devboxes.ts">createSSHKey</a>(id) -> DevboxCreateSSHKeyResponse</code>
 - <code title="post /v1/devboxes/disk_snapshots/{id}/delete">client.devboxes.<a href="./src/resources/devboxes/devboxes.ts">deleteDiskSnapshot</a>(id) -> unknown</code>
 - <code title="post /v1/devboxes/{id}/download_file">client.devboxes.<a href="./src/resources/devboxes/devboxes.ts">downloadFile</a>(id, { ...params }) -> Response</code>
 - <code title="post /v1/devboxes/{id}/enable_tunnel">client.devboxes.<a href="./src/resources/devboxes/devboxes.ts">enableTunnel</a>(id, { ...params }) -> TunnelView</code>

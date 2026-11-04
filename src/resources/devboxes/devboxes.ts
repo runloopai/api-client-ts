@@ -222,13 +222,6 @@ export class Devboxes extends APIResource {
   }
 
   /**
-   * Create an SSH key for a Devbox to enable remote access.
-   */
-  createSSHKey(id: string, options?: Core.RequestOptions): Core.APIPromise<DevboxCreateSSHKeyResponse> {
-    return this._client.post(`/v1/devboxes/${id}/create_ssh_key`, options);
-  }
-
-  /**
    * Delete a previously taken disk snapshot of a Devbox.
    */
   deleteDiskSnapshot(id: string, options?: Core.RequestOptions): Core.APIPromise<unknown> {
@@ -1197,28 +1190,6 @@ export interface TunnelView {
   auth_token?: string | null;
 }
 
-export interface DevboxCreateSSHKeyResponse {
-  /**
-   * The ID of the Devbox.
-   */
-  id: string;
-
-  /**
-   * The ssh private key, in PEM format.
-   */
-  ssh_private_key: string;
-
-  /**
-   * The Linux user to use for SSH connections to this Devbox.
-   */
-  ssh_user: string;
-
-  /**
-   * The host url of the Devbox that can be used for SSH.
-   */
-  url: string;
-}
-
 export type DevboxDeleteDiskSnapshotResponse = unknown;
 
 export type DevboxKeepAliveResponse = unknown;
@@ -1691,7 +1662,6 @@ export declare namespace Devboxes {
     type McpTokenView as McpTokenView,
     type PtyTunnelView as PtyTunnelView,
     type TunnelView as TunnelView,
-    type DevboxCreateSSHKeyResponse as DevboxCreateSSHKeyResponse,
     type DevboxDeleteDiskSnapshotResponse as DevboxDeleteDiskSnapshotResponse,
     type DevboxKeepAliveResponse as DevboxKeepAliveResponse,
     type DevboxReadFileContentsResponse as DevboxReadFileContentsResponse,

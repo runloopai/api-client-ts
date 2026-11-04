@@ -19,7 +19,6 @@ export {
   type McpTokenView,
   type PtyTunnelView,
   type TunnelView,
-  type DevboxCreateSSHKeyResponse,
   type DevboxDeleteDiskSnapshotResponse,
   type DevboxKeepAliveResponse,
   type DevboxReadFileContentsResponse,

@@ -231,24 +231,6 @@ describe('resource devboxes', () => {
     );
   });
 
-  test('createSSHKey', async () => {
-    const responsePromise = client.devboxes.createSSHKey('id');
-    const rawResponse = await responsePromise.asResponse();
-    expect(rawResponse).toBeInstanceOf(Response);
-    const response = await responsePromise;
-    expect(response).not.toBeInstanceOf(Response);
-    const dataAndResponse = await responsePromise.withResponse();
-    expect(dataAndResponse.data).toBe(response);
-    expect(dataAndResponse.response).toBe(rawResponse);
-  });
-
-  test('createSSHKey: request options instead of params are passed correctly', async () => {
-    // ensure the request options are being passed correctly by passing an invalid HTTP method in order to cause an error
-    await expect(client.devboxes.createSSHKey('id', { path: '/_stainless_unknown_path' })).rejects.toThrow(
-      Runloop.NotFoundError,
-    );
-  });
-
   test('deleteDiskSnapshot', async () => {
     const responsePromise = client.devboxes.deleteDiskSnapshot('id');
     const rawResponse = await responsePromise.asResponse();
