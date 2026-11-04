@@ -38,6 +38,9 @@ import {
   BlueprintListView,
   BlueprintPreviewParams,
   BlueprintPreviewView,
+  BlueprintRegisterParams,
+  BlueprintUploadParameters,
+  BlueprintUploadView,
   BlueprintView,
   BlueprintViewsBlueprintsCursorIDPage,
   Blueprints,
@@ -493,6 +496,8 @@ export declare namespace Runloop {
     type BlueprintBuildParameters as BlueprintBuildParameters,
     type BlueprintListView as BlueprintListView,
     type BlueprintPreviewView as BlueprintPreviewView,
+    type BlueprintUploadParameters as BlueprintUploadParameters,
+    type BlueprintUploadView as BlueprintUploadView,
     type BlueprintView as BlueprintView,
     type BlueprintDeleteResponse as BlueprintDeleteResponse,
     BlueprintViewsBlueprintsCursorIDPage as BlueprintViewsBlueprintsCursorIDPage,
@@ -500,6 +505,7 @@ export declare namespace Runloop {
     type BlueprintListParams as BlueprintListParams,
     type BlueprintListPublicParams as BlueprintListPublicParams,
     type BlueprintPreviewParams as BlueprintPreviewParams,
+    type BlueprintRegisterParams as BlueprintRegisterParams,
   };
 
   export {
