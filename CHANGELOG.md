@@ -1,5 +1,33 @@
 # Changelog
 
+## [4.0.0](https://github.com/runloopai/api-client-ts/compare/v3.0.0...v4.0.0) (2026-11-05)
+
+
+### ⚠ BREAKING CHANGES
+
+* remove SSH support from the platform
+* remove Mirrorball and customer mirror controls
+
+### Features
+
+* remove SSH support from the platform ([2d06134](https://github.com/runloopai/api-client-ts/commit/2d06134fc6706f4570b3bff96ad0693789a61fb3))
+
+
+### Bug Fixes
+
+* **tests:** allow smoke devboxes time to finish provisioning ([#24](https://github.com/runloopai/api-client-ts/issues/24)) ([0920ed3](https://github.com/runloopai/api-client-ts/commit/0920ed35d26d432bf31273c83a5dc2fb87b43ab5))
+
+
+### Chores
+
+* remove Mirrorball and customer mirror controls ([c552c1e](https://github.com/runloopai/api-client-ts/commit/c552c1e47031000be73efe0d78ae8667da0fd4fd))
+* remove the SSH devbox helpers ([#23](https://github.com/runloopai/api-client-ts/issues/23)) ([2e3f3b1](https://github.com/runloopai/api-client-ts/commit/2e3f3b1d94a300bf5e3bc12ab7e86ac283e284e6))
+
+
+### Refactors
+
+* **billing:** remove Amazon Marketplace billing ([5612da0](https://github.com/runloopai/api-client-ts/commit/5612da08700dbb3a09b8058e004739489f81604e))
+
 ## [3.0.0](https://github.com/runloopai/api-client-ts/compare/v2.0.0...v3.0.0) (2026-10-23)
 
 
