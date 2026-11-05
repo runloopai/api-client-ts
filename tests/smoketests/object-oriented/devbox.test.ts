@@ -1,6 +1,6 @@
 import { toFile } from '@runloop/api-client';
 import { Devbox, NetworkPolicy } from '@runloop/api-client/sdk';
-import { makeClientSDK, SHORT_TIMEOUT, uniqueName, cleanUpPolicy } from '../utils';
+import { makeClientSDK, SHORT_TIMEOUT, MEDIUM_TIMEOUT, uniqueName, cleanUpPolicy } from '../utils';
 import { uuidv7 } from 'uuidv7';
 
 const sdk = makeClientSDK();
@@ -17,7 +17,7 @@ describe('smoketest: object-oriented devbox', () => {
         launch_parameters: { resource_size_request: 'X_SMALL', keep_alive_time_seconds: 60 * 5 }, // 5 minutes
       });
       devboxId = devbox.id;
-    }, SHORT_TIMEOUT);
+    }, MEDIUM_TIMEOUT);
 
     afterAll(async () => {
       if (devbox) {

@@ -97,7 +97,7 @@ describe('smoketest: object-oriented secrets', () => {
           },
           launch_parameters: {
             resource_size_request: 'X_SMALL',
-            keep_alive_time_seconds: 60,
+            keep_alive_time_seconds: MEDIUM_TIMEOUT / 1000,
           },
         });
         devboxId = devbox.id;
